@@ -2,7 +2,8 @@ import { Button, VALUE_PLACEHOLDER } from '@nexg/ui';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
 
-import { SectionLabel } from './landing';
+import { MERCHANT_SPEED, SectionLabel } from './landing';
+import { Reveal } from '@/components/reveal';
 
 /**
  * The "Get featured" block from the `Merchants` artboard — an inset ink card
@@ -47,9 +48,13 @@ const SLOTS = [
 export function FeaturedSlots() {
   return (
     <section id="featured" className="bg-ink text-white">
-      <div className="mx-auto max-w-[120rem] px-4 py-16 sm:px-[30px] sm:py-24">
-        <div className="grid gap-10 lg:grid-cols-[1fr_31rem] lg:items-start">
-          <div>
+      <Reveal
+        speed={MERCHANT_SPEED}
+        variant="featured"
+        className="mx-auto max-w-[120rem] px-4 py-16 sm:px-[30px] sm:py-24"
+      >
+        <div className="grid gap-10 [perspective:1200px] lg:grid-cols-[1fr_31rem] lg:items-start">
+          <div data-reveal-head>
             <SectionLabel onDark>Get featured</SectionLabel>
 
             <h2 className="mt-3 text-3xl font-extrabold leading-[1.08] tracking-tight sm:text-4xl lg:text-[2.75rem]">
@@ -81,6 +86,7 @@ export function FeaturedSlots() {
               beside it says the same thing. */}
           <div
             aria-hidden="true"
+            data-reveal-item="preview"
             className="bg-bg text-ink rounded-3xl p-5 shadow-[0_24px_50px_-24px_rgb(0_0_0/0.6)]"
           >
             <div className="flex items-center justify-between">
@@ -91,7 +97,7 @@ export function FeaturedSlots() {
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-3">
-              <div className="border-gold bg-surface rounded-xl border-2 p-2.5">
+              <div data-reveal-ring className="border-gold bg-surface rounded-xl border-2 p-2.5">
                 <div className="bg-bg flex h-16 items-center justify-center rounded-lg">
                   <span className="text-muted-light text-[0.625rem] uppercase tracking-widest">
                     Your cover photo
@@ -133,6 +139,8 @@ export function FeaturedSlots() {
           {SLOTS.map((slot) => (
             <li
               key={slot.name}
+              data-reveal-item="slot"
+              data-reveal-settle={slot.highlight ? '' : undefined}
               className={
                 slot.highlight
                   ? 'bg-gold text-ink rounded-3xl p-6'
@@ -173,7 +181,7 @@ export function FeaturedSlots() {
           ))}
         </ul>
 
-        <div className="mt-8 flex flex-wrap items-center gap-4">
+        <div data-reveal-tail className="mt-8 flex flex-wrap items-center gap-4">
           <Button variant="gold" size="lg" asChild className="rounded-full">
             <Link href="/help">Ask about featured placement</Link>
           </Button>
@@ -181,7 +189,7 @@ export function FeaturedSlots() {
             Available to live merchants in good standing.
           </p>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

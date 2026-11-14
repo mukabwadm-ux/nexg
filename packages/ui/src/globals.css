@@ -393,3 +393,30 @@ div.ui-table-viewport[data-table-viewport] {
     opacity: 0;
   }
 }
+
+/*
+ * An FAQ answer slides open and closed rather than jumping, where the
+ * browser can animate to and from auto height. Elsewhere it opens as before;
+ * reduced motion stops the transition (see the base layer).
+ */
+@supports (interpolate-size: allow-keywords) {
+  .faq-smooth {
+    interpolate-size: allow-keywords;
+  }
+  .faq-smooth::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size 450ms cubic-bezier(0.22, 1, 0.36, 1),
+      content-visibility 450ms allow-discrete;
+  }
+  .faq-smooth[open]::details-content {
+    block-size: auto;
+  }
+  /* The base layer's reduced-motion rule does not reach this pseudo-element. */
+  @media (prefers-reduced-motion: reduce) {
+    .faq-smooth::details-content {
+      transition: none;
+    }
+  }
+}

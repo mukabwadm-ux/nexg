@@ -43,3 +43,6 @@ export function SectionLabel({
 export function Highlight({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
+
+/** The merchants page's entrances play a little quicker than the homepage's. */
+export const MERCHANT_SPEED = 1.25;

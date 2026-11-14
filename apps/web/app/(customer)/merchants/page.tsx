@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { FeaturedSlots } from '@/components/merchants/featured-slots';
 import { CARD, CONTAINER, H2, SectionLabel, THEME_VARS } from '@/components/merchants/landing';
 import { MerchantRegistrationForm } from '@/components/merchants/registration-form';
+import { MERCHANT_SPEED } from '@/components/merchants/landing';
+import { Reveal } from '@/components/reveal';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -145,9 +147,14 @@ export default async function MerchantsPage() {
             className={`${CONTAINER} grid gap-12 pb-16 pt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)] lg:items-start lg:gap-16 lg:pb-24 lg:pt-16`}
           >
             <div className="min-w-0">
-              <h1 className="max-w-[40rem] text-4xl/[1.04] font-extrabold tracking-tight sm:text-5xl/[1.04] lg:text-[4.5rem]/[1.02]">
-                Put your business in every guest&apos;s hands.
-              </h1>
+              <Reveal speed={MERCHANT_SPEED} variant="rise">
+                <h1
+                  data-reveal-head
+                  className="max-w-[40rem] text-4xl/[1.04] font-extrabold tracking-tight sm:text-5xl/[1.04] lg:text-[4.5rem]/[1.02]"
+                >
+                  Put your business in every guest&apos;s hands.
+                </h1>
+              </Reveal>
 
               <h2
                 id="register-title"
@@ -186,63 +193,77 @@ export default async function MerchantsPage() {
 
             {/* Two arched photographs with what a merchant gets pinned to them.
                 Decorative: the copy beside it says the same. */}
-            <div
-              aria-hidden="true"
+            <Reveal
+              speed={MERCHANT_SPEED}
+              variant="arches"
               className="relative mx-auto aspect-[6/5] w-full max-w-[36rem] lg:sticky lg:top-28 lg:mr-0"
             >
-              <span className="bg-gold absolute left-[26%] top-[3%] h-14 w-14 rounded-full sm:h-20 sm:w-20" />
-              <div className="absolute right-0 top-0 h-[86%] w-[58%] overflow-hidden rounded-b-[2rem] rounded-t-full shadow-[0_30px_60px_-30px_rgb(0_0_0/0.45)]">
-                <Image
-                  src="/images/merchant-page/boutique-checkout.jpg"
-                  alt=""
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 21rem, 58vw"
-                  className="object-cover object-[42%_center]"
+              <div aria-hidden="true" className="absolute inset-0">
+                <span
+                  data-reveal-item="dot"
+                  className="bg-gold absolute left-[26%] top-[3%] h-14 w-14 rounded-full sm:h-20 sm:w-20"
                 />
-              </div>
-              <div className="ring-bg absolute bottom-[12%] left-0 h-[60%] w-[42%] overflow-hidden rounded-b-[1.5rem] rounded-t-full shadow-[0_24px_50px_-26px_rgb(0_0_0/0.5)] ring-[6px]">
-                <Image
-                  src="/images/merchant-page/bartender.jpg"
-                  alt=""
-                  fill
-                  sizes="(min-width: 1024px) 15rem, 42vw"
-                  className="object-cover object-[46%_center]"
-                />
-              </div>
+                <div
+                  data-reveal-item="tall"
+                  className="absolute right-0 top-0 h-[86%] w-[58%] overflow-hidden rounded-b-[2rem] rounded-t-full shadow-[0_30px_60px_-30px_rgb(0_0_0/0.45)]"
+                >
+                  <Image
+                    src="/images/merchant-page/boutique-checkout.jpg"
+                    alt=""
+                    fill
+                    priority
+                    sizes="(min-width: 1024px) 21rem, 58vw"
+                    className="object-cover object-[42%_center]"
+                  />
+                </div>
+                <div
+                  data-reveal-item="short"
+                  className="ring-bg absolute bottom-[12%] left-0 h-[60%] w-[42%] overflow-hidden rounded-b-[1.5rem] rounded-t-full shadow-[0_24px_50px_-26px_rgb(0_0_0/0.5)] ring-[6px]"
+                >
+                  <Image
+                    src="/images/merchant-page/bartender.jpg"
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 15rem, 42vw"
+                    className="object-cover object-[46%_center]"
+                  />
+                </div>
 
-              <div
-                className={`${CARD} absolute -right-1 top-[8%] flex items-center gap-2.5 rounded-2xl px-3 py-2.5 shadow-[0_14px_30px_-12px_rgb(0_0_0/0.35)] sm:-right-6`}
-              >
-                <span className="bg-gold text-ink flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
-                  <Banknote className="h-4 w-4" />
-                </span>
-                <span>
-                  <span className="block text-[0.75rem] font-extrabold">
-                    Weekly M-Pesa settlement
+                <div
+                  data-reveal-item="note-right"
+                  className={`${CARD} absolute -right-1 top-[8%] flex items-center gap-2.5 rounded-2xl px-3 py-2.5 shadow-[0_14px_30px_-12px_rgb(0_0_0/0.35)] sm:-right-6`}
+                >
+                  <span className="bg-gold text-ink flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+                    <Banknote className="h-4 w-4" />
                   </span>
-                  <span className="text-muted block text-[0.625rem] font-semibold">
-                    To your till or bank
+                  <span>
+                    <span className="block text-[0.75rem] font-extrabold">
+                      Weekly M-Pesa settlement
+                    </span>
+                    <span className="text-muted block text-[0.625rem] font-semibold">
+                      To your till or bank
+                    </span>
                   </span>
-                </span>
-              </div>
+                </div>
 
-              <div
-                className={`${CARD} absolute bottom-0 left-[20%] flex items-center gap-3 rounded-2xl px-3.5 py-3 shadow-[0_14px_30px_-12px_rgb(0_0_0/0.4)]`}
-              >
-                <span className="bg-gold text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
-                  <Check className="h-4 w-4" />
-                </span>
-                <span>
-                  <span className="block text-[0.8125rem] font-extrabold">
-                    New order from [Airbnb]
+                <div
+                  data-reveal-item="note-left"
+                  className={`${CARD} absolute bottom-0 left-[20%] flex items-center gap-3 rounded-2xl px-3.5 py-3 shadow-[0_14px_30px_-12px_rgb(0_0_0/0.4)]`}
+                >
+                  <span className="bg-gold text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+                    <Check className="h-4 w-4" />
                   </span>
-                  <span className="text-muted block text-[0.6875rem] font-semibold">
-                    Rider assigned · pickup in 8 min
+                  <span>
+                    <span className="block text-[0.8125rem] font-extrabold">
+                      New order from [Airbnb]
+                    </span>
+                    <span className="text-muted block text-[0.6875rem] font-semibold">
+                      Rider assigned · pickup in 8 min
+                    </span>
                   </span>
-                </span>
+                </div>
               </div>
-            </div>
+            </Reveal>
           </div>
         </section>
 
@@ -268,8 +289,11 @@ export default async function MerchantsPage() {
 
         {/* ------------------------------------------------------ categories */}
         <section className="py-20 sm:py-24">
-          <div className={CONTAINER}>
-            <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
+          <Reveal speed={MERCHANT_SPEED} variant="gallery" className={CONTAINER}>
+            <div
+              data-reveal-head
+              className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4"
+            >
               <div>
                 <SectionLabel>Categories</SectionLabel>
                 <h2 className={`mt-3 max-w-2xl ${H2}`}>
@@ -283,7 +307,7 @@ export default async function MerchantsPage() {
 
             <ul className="mt-10 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-4 lg:grid-cols-4">
               {photoCategories.map((category, index) => (
-                <li key={category.category}>
+                <li key={category.category} data-reveal-item>
                   <Link
                     href={registrationHref}
                     aria-label={`Register your ${category.label} business`}
@@ -297,7 +321,10 @@ export default async function MerchantsPage() {
                         sizes="(min-width: 1024px) 25vw, 50vw"
                         className={`object-cover ${category.focus} transition-transform duration-500 ease-out group-hover:scale-[1.04]`}
                       />
-                      <span className="bg-gold text-ink absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full text-[0.6875rem] font-extrabold tabular-nums">
+                      <span
+                        data-reveal-pop
+                        className="bg-gold text-ink absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full text-[0.6875rem] font-extrabold tabular-nums"
+                      >
                         {String(index + 1).padStart(2, '0')}
                       </span>
                     </span>
@@ -317,7 +344,7 @@ export default async function MerchantsPage() {
               ))}
             </ul>
 
-            <ul className="mt-8 flex flex-wrap gap-2">
+            <ul data-reveal-tail className="mt-8 flex flex-wrap gap-2">
               {allCategories.map((category) => {
                 const lead = PHOTO_CATEGORIES.some((photo) => photo.key === category.category);
                 return (
@@ -337,41 +364,48 @@ export default async function MerchantsPage() {
                 );
               })}
             </ul>
-          </div>
+          </Reveal>
         </section>
 
         {/* ------------------------------------------- steps and pricing */}
         <section id="how" className="scroll-mt-20 py-20 sm:py-28">
           <div className={`${CONTAINER} grid gap-12 lg:grid-cols-[1fr_27rem] lg:gap-16`}>
-            <div>
-              <SectionLabel>Get started</SectionLabel>
-              <h2 className={`mt-3 ${H2}`}>Live in three steps</h2>
-              <p className="text-muted mt-4 text-[0.9375rem] font-semibold">
-                Most merchants are taking orders within a few days of registering.
-              </p>
+            <Reveal speed={MERCHANT_SPEED} variant="steps">
+              <div data-reveal-head>
+                <SectionLabel>Get started</SectionLabel>
+                <h2 className={`mt-3 ${H2}`}>Live in three steps</h2>
+                <p className="text-muted mt-4 text-[0.9375rem] font-semibold">
+                  Most merchants are taking orders within a few days of registering.
+                </p>
+              </div>
 
               <ol className="mt-10">
                 {STEPS.map((step, index) => (
-                  <li
-                    key={step.title}
-                    className="border-border-strong flex gap-6 border-t py-7 last:pb-0 sm:gap-8"
-                  >
+                  <li key={step.title} className="relative py-7 last:pb-0">
+                    {/* The rule above the step, drawn across as it comes in. */}
                     <span
                       aria-hidden="true"
-                      className="text-gold-text dark:text-gold w-8 shrink-0 text-[2.5rem] font-extrabold tabular-nums leading-none"
-                    >
-                      {index + 1}
-                    </span>
-                    <div>
-                      <h3 className="text-lg font-extrabold">{step.title}</h3>
-                      <p className="text-muted mt-1.5 max-w-lg text-[0.9375rem] font-semibold leading-[1.7]">
-                        {step.body}
-                      </p>
+                      data-reveal-item="rule"
+                      className="border-border-strong absolute inset-x-0 top-0 origin-left border-t"
+                    />
+                    <div data-reveal-item="row" className="flex gap-6 sm:gap-8">
+                      <span
+                        aria-hidden="true"
+                        className="text-gold-text dark:text-gold w-8 shrink-0 text-[2.5rem] font-extrabold tabular-nums leading-none"
+                      >
+                        {index + 1}
+                      </span>
+                      <div>
+                        <h3 className="text-lg font-extrabold">{step.title}</h3>
+                        <p className="text-muted mt-1.5 max-w-lg text-[0.9375rem] font-semibold leading-[1.7]">
+                          {step.body}
+                        </p>
+                      </div>
                     </div>
                   </li>
                 ))}
               </ol>
-            </div>
+            </Reveal>
 
             {/*
              * Simple pricing. The percentage comes from
@@ -379,38 +413,41 @@ export default async function MerchantsPage() {
              * this renders [—] rather than a number nobody has agreed to
              * (ground rule 3).
              */}
-            <div className="bg-ink self-start rounded-3xl p-8 text-white sm:p-10">
-              <SectionLabel onDark>Simple pricing</SectionLabel>
-              <p className="text-gold mt-4 text-[4rem] font-extrabold leading-none tracking-tight">
-                {commissionValue === null ? VALUE_PLACEHOLDER : String(commissionValue)}%
-              </p>
-              <p className="mt-3 text-sm font-semibold text-white/60">
-                per completed order. That&apos;s it.
-              </p>
+            <Reveal speed={MERCHANT_SPEED} variant="pricing" className="self-start">
+              <div data-reveal-item className="bg-ink rounded-3xl p-8 text-white sm:p-10">
+                <SectionLabel onDark>Simple pricing</SectionLabel>
+                <p className="text-gold mt-4 text-[4rem] font-extrabold leading-none tracking-tight">
+                  {commissionValue === null ? VALUE_PLACEHOLDER : String(commissionValue)}%
+                </p>
+                <p className="mt-3 text-sm font-semibold text-white/60">
+                  per completed order. That&apos;s it.
+                </p>
 
-              <hr className="my-7 border-white/10" />
+                <hr className="my-7 border-white/10" />
 
-              <ul className="space-y-4">
-                {PRICING_POINTS.map((point) => (
-                  <li key={point} className="flex items-center gap-3">
-                    <span
-                      aria-hidden="true"
-                      className="bg-gold text-ink flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
-                    >
-                      <Check className="h-3.5 w-3.5" />
-                    </span>
-                    <span className="text-sm font-semibold text-white/85">{point}</span>
-                  </li>
-                ))}
-              </ul>
+                <ul className="space-y-4">
+                  {PRICING_POINTS.map((point) => (
+                    <li key={point} className="flex items-center gap-3">
+                      <span
+                        aria-hidden="true"
+                        data-reveal-pop
+                        className="bg-gold text-ink flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                      >
+                        <Check className="h-3.5 w-3.5" />
+                      </span>
+                      <span className="text-sm font-semibold text-white/85">{point}</span>
+                    </li>
+                  ))}
+                </ul>
 
-              <Link
-                href={registrationHref}
-                className={`${BUTTON} bg-gold text-ink mt-8 h-14 w-full text-base hover:bg-[#FEDD5C]`}
-              >
-                Register Your Business
-              </Link>
-            </div>
+                <Link
+                  href={registrationHref}
+                  className={`${BUTTON} bg-gold text-ink mt-8 h-14 w-full text-base hover:bg-[#FEDD5C]`}
+                >
+                  Register Your Business
+                </Link>
+              </div>
+            </Reveal>
           </div>
         </section>
 
@@ -419,8 +456,12 @@ export default async function MerchantsPage() {
 
         {/* ------------------------------------------------------------- FAQ */}
         <section className="pb-20 pt-5 sm:pb-28">
-          <div className={`${CONTAINER} grid gap-10 lg:grid-cols-[26rem_1fr] lg:gap-16`}>
-            <div>
+          <Reveal
+            speed={MERCHANT_SPEED}
+            variant="rise"
+            className={`${CONTAINER} grid gap-10 lg:grid-cols-[26rem_1fr] lg:gap-16`}
+          >
+            <div data-reveal-head>
               <SectionLabel>FAQ</SectionLabel>
               <h2 className={`mt-3 ${H2}`}>Questions merchants ask</h2>
               <p className="text-muted mt-4 text-[0.9375rem] font-semibold">
@@ -433,10 +474,10 @@ export default async function MerchantsPage() {
 
             <ul className="space-y-3">
               {FAQ.map((item, index) => (
-                <li key={item.q}>
+                <li key={item.q} data-reveal-item>
                   <details
                     open={index === 0}
-                    className={`${CARD} group rounded-2xl px-5 py-4 open:shadow-[0_18px_40px_-26px_rgb(20_20_20/0.35)] sm:px-6 sm:py-5`}
+                    className={`${CARD} faq-smooth group rounded-2xl px-5 py-4 open:shadow-[0_18px_40px_-26px_rgb(20_20_20/0.35)] sm:px-6 sm:py-5`}
                   >
                     <summary className="focus-visible:ring-gold flex cursor-pointer list-none items-center justify-between gap-4 text-[0.9375rem] font-extrabold focus-visible:outline-none focus-visible:ring-2 [&::-webkit-details-marker]:hidden">
                       {item.q}
@@ -460,31 +501,43 @@ export default async function MerchantsPage() {
                 </li>
               ))}
             </ul>
-          </div>
+          </Reveal>
         </section>
 
         {/* ------------------------------------------------------------- CTA */}
         <section className="pb-20 sm:pb-24">
-          <div className={CONTAINER}>
-            <div className="bg-gold text-ink relative isolate grid overflow-hidden rounded-3xl lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:items-stretch">
+          <Reveal speed={MERCHANT_SPEED} variant="cta" className={CONTAINER}>
+            <div
+              data-reveal-item="panel"
+              className="bg-gold text-ink relative isolate grid overflow-hidden rounded-3xl lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:items-stretch"
+            >
               <span
                 aria-hidden="true"
                 className="bg-ink/[0.07] absolute -left-24 -top-28 -z-10 h-80 w-80 rounded-full"
               />
               <div className="px-7 py-12 sm:px-12 sm:py-16">
-                <h2 className="max-w-xl text-3xl font-extrabold leading-[1.08] tracking-tight sm:text-[2.75rem]">
+                <h2
+                  data-reveal-item="line"
+                  className="max-w-xl text-3xl font-extrabold leading-[1.08] tracking-tight sm:text-[2.75rem]"
+                >
                   Ready to reach thousands of guests?
                 </h2>
-                <p className="text-ink/75 mt-3 max-w-md text-[0.9375rem] font-semibold">
+                <p
+                  data-reveal-item="line"
+                  className="text-ink/75 mt-3 max-w-md text-[0.9375rem] font-semibold"
+                >
                   Register today and be on the concierge&apos;s list before the next check-in.
                 </p>
-                <Link href={registrationHref} className={`${inkButton} mt-8 h-14 px-7 text-base`}>
-                  Register Your Business
-                  <ArrowRight aria-hidden="true" className="text-gold h-4 w-4" />
-                </Link>
+                <div data-reveal-item="button">
+                  <Link href={registrationHref} className={`${inkButton} mt-8 h-14 px-7 text-base`}>
+                    Register Your Business
+                    <ArrowRight aria-hidden="true" className="text-gold h-4 w-4" />
+                  </Link>
+                </div>
               </div>
               <div
                 aria-hidden="true"
+                data-reveal-item="photo"
                 className="relative mx-7 mb-7 h-56 overflow-hidden rounded-[1.75rem] sm:mx-12 sm:mb-12 lg:m-5 lg:ml-0 lg:h-auto lg:rounded-l-[8rem]"
               >
                 <Image
@@ -496,7 +549,7 @@ export default async function MerchantsPage() {
                 />
               </div>
             </div>
-          </div>
+          </Reveal>
         </section>
       </main>
 

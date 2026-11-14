@@ -9,7 +9,19 @@ import { REVEAL_CLASS, REVEAL_LOADED, REVEAL_READY } from './reveal-script';
 if (typeof window !== 'undefined')
   (window as unknown as Record<string, boolean>)[REVEAL_LOADED] = true;
 
-export type RevealVariant = 'rise' | 'iris' | 'wipe' | 'focus' | 'path' | 'phone';
+export type RevealVariant =
+  | 'rise'
+  | 'iris'
+  | 'wipe'
+  | 'focus'
+  | 'path'
+  | 'phone'
+  | 'arches'
+  | 'gallery'
+  | 'steps'
+  | 'pricing'
+  | 'featured'
+  | 'cta';
 
 type State = 'static' | 'waiting' | 'playing' | 'done';
 
@@ -32,10 +44,13 @@ const ANIMATED = ['opacity', 'transform', 'clip-path', 'filter', 'will-change'] 
  */
 export function Reveal({
   variant = 'rise',
+  speed = 1,
   className,
   children,
 }: {
   variant?: RevealVariant;
+  /** Plays the entrance faster (above 1) or slower (below 1). */
+  speed?: number;
   className?: string;
   children: React.ReactNode;
 }) {
@@ -63,7 +78,7 @@ export function Reveal({
     if (box.top < window.innerHeight && box.bottom > 0) {
       /* Already on screen: play now if it is still held back; if the mark
          came off (slow scripts) it is already showing, so leave it. */
-      if (held) void play(element, variant, update);
+      if (held) void play(element, variant, speed, update);
       return () => {
         cancelled = true;
       };
@@ -77,7 +92,7 @@ export function Reveal({
       (entries) => {
         if (!entries.some((entry) => entry.isIntersecting)) return;
         observer.disconnect();
-        void play(element, variant, (next) => {
+        void play(element, variant, speed, (next) => {
           if (!cancelled) setState(next);
         });
       },
@@ -102,7 +117,7 @@ export function Reveal({
       observer.disconnect();
       near.disconnect();
     };
-  }, [variant]);
+  }, [variant, speed]);
 
   return (
     <div ref={ref} data-reveal={variant} data-state={state} className={className}>
@@ -111,7 +126,12 @@ export function Reveal({
   );
 }
 
-async function play(element: HTMLElement, variant: RevealVariant, setState: (s: State) => void) {
+async function play(
+  element: HTMLElement,
+  variant: RevealVariant,
+  speed: number,
+  setState: (s: State) => void,
+) {
   const items = [...element.querySelectorAll<HTMLElement>('[data-reveal-item]')].filter(
     /* Only what is drawn: the phone section is hidden on small screens. */
     (item) => item.offsetParent !== null || getComputedStyle(item).position === 'fixed',
@@ -124,7 +144,9 @@ async function play(element: HTMLElement, variant: RevealVariant, setState: (s: 
   const heads = drawn('[data-reveal-head]');
   const tails = drawn('[data-reveal-tail]');
   const glows = [...element.querySelectorAll<HTMLElement>('[data-reveal-glow]')];
-  const targets = [...heads, ...items, ...(line ? [line] : []), ...tails, ...glows];
+  /* Small marks inside an item (a badge, a checkmark) that pop after it. */
+  const pops = drawn('[data-reveal-pop]');
+  const targets = [...heads, ...items, ...(line ? [line] : []), ...tails, ...glows, ...pops];
   if (targets.length === 0) {
     setState('done');
     return;
@@ -158,7 +180,7 @@ async function play(element: HTMLElement, variant: RevealVariant, setState: (s: 
     if (variant === 'wipe' && items.includes(target)) target.style.clipPath = CURTAIN_CLOSED;
     else target.style.opacity = '0';
   }
-  const timeline = anime.createTimeline({ onComplete: finish });
+  const timeline = anime.createTimeline({ onComplete: finish, playbackRate: speed });
   const smooth = anime.cubicBezier(...SMOOTH);
   if (glows.length) timeline.add(glows, { opacity: [0, 1], duration: 1800, ease: smooth }, 0);
   if (heads.length)
@@ -175,12 +197,15 @@ async function play(element: HTMLElement, variant: RevealVariant, setState: (s: 
     );
   /* The items follow the heading a beat later. */
   const at = heads.length ? 250 : 0;
-  if (items.length || line) ENTRANCES[variant]({ anime, timeline, items, line, at });
+  /* An entrance may say when the closing line should follow its items. */
+  const tailAt =
+    (items.length || line ? ENTRANCES[variant]({ anime, timeline, items, line, at }) : undefined) ??
+    at + 700;
   if (tails.length)
     timeline.add(
       tails,
       { opacity: [0, 1], translateY: [8, 0], duration: 1100, ease: smooth },
-      at + 700,
+      tailAt,
     );
   /* The first frame holds every item at its start, inline; only then is the
      CSS hold lifted, so nothing flashes in between. */
@@ -195,7 +220,7 @@ type Entrance = (input: {
   line: HTMLElement | null;
   /** When the items start, in ms from the start of the timeline. */
   at: number;
-}) => void;
+}) => number | void;
 
 /** Resolves once every photo inside the items has decoded, or after `cap` ms. */
 function imagesReady(items: HTMLElement[], cap: number) {
@@ -322,6 +347,218 @@ const ENTRANCES: Record<RevealVariant, Entrance> = {
         delay: anime.stagger(160, { start: at }),
       },
       0,
+    );
+  },
+  /* Merchants hero: the tall arch rises, then the short one; the gold dot
+     pops and the two notes slide in from either side. */
+  arches: ({ anime, timeline, items, at }) => {
+    const smooth = anime.cubicBezier(...SMOOTH);
+    const step = (key: string, params: Anime.AnimationParams, when: number) => {
+      const part = items.filter((item) => item.dataset.revealItem === key);
+      if (part.length) timeline.add(part, params, when);
+    };
+    step(
+      'tall',
+      { opacity: [0, 1], translateY: [24, 0], scale: [1.03, 1], duration: 1400, ease: smooth },
+      at,
+    );
+    step('short', { opacity: [0, 1], translateY: [24, 0], duration: 1300, ease: smooth }, at + 220);
+    step(
+      'dot',
+      { opacity: [0, 1], scale: [0.4, 1], duration: 900, ease: 'outBack(1.6)' },
+      at + 600,
+    );
+    step(
+      'note-right',
+      { opacity: [0, 1], translateX: [22, 0], duration: 1200, ease: smooth },
+      at + 800,
+    );
+    step(
+      'note-left',
+      { opacity: [0, 1], translateX: [-22, 0], duration: 1200, ease: smooth },
+      at + 1000,
+    );
+  },
+  /* Photo cards open from the bottom one after another, left to right; the
+     numbered badge on each pops as its card lands. */
+  gallery: ({ anime, timeline, items, at }) => {
+    timeline.add(
+      items,
+      {
+        opacity: [0, 1],
+        clipPath: ['inset(100% 0% 0% 0% round 24px)', 'inset(0% 0% 0% 0% round 24px)'],
+        translateY: [16, 0],
+        duration: 1300,
+        ease: anime.cubicBezier(...SMOOTH),
+        delay: anime.stagger(180, { start: at }),
+      },
+      0,
+    );
+    const pops = items.flatMap((item) => [
+      ...item.querySelectorAll<HTMLElement>('[data-reveal-pop]'),
+    ]);
+    if (pops.length)
+      timeline.add(
+        pops,
+        {
+          opacity: [0, 1],
+          scale: [0.4, 1],
+          duration: 800,
+          ease: 'outBack(1.8)',
+          delay: anime.stagger(180, { start: at + 700 }),
+        },
+        0,
+      );
+    /* The chips under the cards follow the last card. */
+    return at + 180 * Math.max(items.length - 1, 0) + 700;
+  },
+  /* Steps: the rule above each draws across, then its number and text. */
+  steps: ({ anime, timeline, items, at }) => {
+    const smooth = anime.cubicBezier(...SMOOTH);
+    const rules = items.filter((item) => item.dataset.revealItem === 'rule');
+    const rows = items.filter((item) => item.dataset.revealItem === 'row');
+    if (rules.length)
+      timeline.add(
+        rules,
+        {
+          opacity: [0, 1],
+          scaleX: [0, 1],
+          duration: 1100,
+          ease: smooth,
+          delay: anime.stagger(300, { start: at }),
+        },
+        0,
+      );
+    if (rows.length)
+      timeline.add(
+        rows,
+        {
+          opacity: [0, 1],
+          translateY: [12, 0],
+          duration: 1200,
+          ease: smooth,
+          delay: anime.stagger(300, { start: at + 250 }),
+        },
+        0,
+      );
+  },
+  /* Pricing: the card rises a beat after the steps beside it, then its
+     checkmarks tick in one by one. */
+  pricing: ({ anime, timeline, items, at }) => {
+    timeline.add(
+      items,
+      {
+        opacity: [0, 1],
+        translateY: [20, 0],
+        duration: 1300,
+        ease: anime.cubicBezier(...SMOOTH),
+      },
+      at + 400,
+    );
+    const pops = items.flatMap((item) => [
+      ...item.querySelectorAll<HTMLElement>('[data-reveal-pop]'),
+    ]);
+    if (pops.length)
+      timeline.add(
+        pops,
+        {
+          opacity: [0, 1],
+          scale: [0.4, 1],
+          duration: 800,
+          ease: 'outBack(1.8)',
+          delay: anime.stagger(140, { start: at + 1000 }),
+        },
+        0,
+      );
+  },
+  /* Get featured: the preview card arrives with a slight tilt (perspective
+     on its parent) and its gold slot glows once; then the three slots come
+     in left to right, the highlighted one settling as it lands. */
+  featured: ({ anime, timeline, items, at }) => {
+    const smooth = anime.cubicBezier(...SMOOTH);
+    const preview = items.filter((item) => item.dataset.revealItem === 'preview');
+    const slots = items.filter((item) => item.dataset.revealItem === 'slot');
+    if (preview.length)
+      timeline.add(
+        preview,
+        { opacity: [0, 1], rotateX: [20, 0], translateY: [20, 0], duration: 1300, ease: smooth },
+        at,
+      );
+    const ring = preview[0]?.querySelector<HTMLElement>('[data-reveal-ring]');
+    if (ring)
+      timeline.add(
+        ring,
+        {
+          boxShadow: ['0 0 0 0px rgba(253, 209, 40, 0.7)', '0 0 0 14px rgba(253, 209, 40, 0)'],
+          duration: 1400,
+          ease: 'outQuad',
+          onComplete: () => ring.style.removeProperty('box-shadow'),
+        },
+        at + 900,
+      );
+    if (slots.length)
+      timeline.add(
+        slots,
+        {
+          opacity: [0, 1],
+          translateY: [16, 0],
+          duration: 1300,
+          ease: smooth,
+          delay: anime.stagger(180, { start: at + 400 }),
+        },
+        0,
+      );
+    slots.forEach((slot, index) => {
+      if (slot.dataset.revealSettle === undefined) return;
+      timeline.add(
+        slot,
+        {
+          keyframes: { '0%': { scale: 1 }, '45%': { scale: 1.025 }, '100%': { scale: 1 } },
+          duration: 900,
+          ease: 'inOutSine',
+        },
+        at + 400 + index * 180 + 900,
+      );
+    });
+    /* The button under the slots follows the last one. */
+    return at + 400 + 180 * Math.max(slots.length - 1, 0) + 700;
+  },
+  /* Closing call to action: the panel rises, the photo opens from its
+     rounded edge, the words follow and the button comes last. */
+  cta: ({ anime, timeline, items, at }) => {
+    const smooth = anime.cubicBezier(...SMOOTH);
+    const part = (key: string) => items.filter((item) => item.dataset.revealItem === key);
+    const add = (targets: HTMLElement[], params: Anime.AnimationParams, when: number) => {
+      if (targets.length) timeline.add(targets, params, when);
+    };
+    add(part('panel'), { opacity: [0, 1], translateY: [20, 0], duration: 1300, ease: smooth }, at);
+    add(
+      part('photo'),
+      {
+        opacity: [0, 1],
+        clipPath: ['inset(0% 100% 0% 0%)', 'inset(0% 0% 0% 0%)'],
+        duration: 1400,
+        ease: smooth,
+      },
+      at + 300,
+    );
+    const lines = part('line');
+    if (lines.length)
+      timeline.add(
+        lines,
+        {
+          opacity: [0, 1],
+          translateY: [12, 0],
+          duration: 1200,
+          ease: smooth,
+          delay: anime.stagger(150, { start: at + 350 }),
+        },
+        0,
+      );
+    add(
+      part('button'),
+      { opacity: [0, 1], translateY: [10, 0], duration: 1100, ease: smooth },
+      at + 900,
     );
   },
 };
