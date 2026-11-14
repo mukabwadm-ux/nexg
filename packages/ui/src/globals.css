@@ -383,7 +383,13 @@ div.ui-table-viewport[data-table-viewport] {
  */
 @media (prefers-reduced-motion: no-preference) {
   :is(html.nx-anim [data-reveal][data-state='static'], [data-reveal][data-state='waiting'])
-    :is([data-reveal-item], [data-reveal-line], [data-reveal-glow]) {
+    :is(
+      [data-reveal-item],
+      [data-reveal-head],
+      [data-reveal-tail],
+      [data-reveal-line],
+      [data-reveal-glow]
+    ) {
     opacity: 0;
   }
 }

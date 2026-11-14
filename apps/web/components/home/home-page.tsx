@@ -222,19 +222,22 @@ export async function HomePageContent({
           <div className="mx-auto max-w-[120rem] px-4 sm:px-[30px]">
             <Reveal variant="wipe">
               <FeaturedMerchants merchants={featured} t={t} />
-            </Reveal>
 
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm font-semibold text-white/45">
-                {t('home.featured.ownBusiness')}
-              </p>
-              <Link
-                href="/merchants#featured"
-                className="text-gold text-sm font-bold hover:underline"
+              <div
+                data-reveal-tail
+                className="mt-8 flex flex-wrap items-center justify-between gap-2"
               >
-                {t('home.featured.getFeatured')}
-              </Link>
-            </div>
+                <p className="text-sm font-semibold text-white/45">
+                  {t('home.featured.ownBusiness')}
+                </p>
+                <Link
+                  href="/merchants#featured"
+                  className="text-gold text-sm font-bold hover:underline"
+                >
+                  {t('home.featured.getFeatured')}
+                </Link>
+              </div>
+            </Reveal>
           </div>
         </section>
 
@@ -278,21 +281,32 @@ export async function HomePageContent({
             className="bg-night absolute inset-x-0 inset-y-[3px] rounded-r-[3rem] lg:right-[42%] lg:rounded-r-[11rem]"
           />
           <div className="relative mx-auto grid max-w-[120rem] gap-10 px-4 sm:px-[30px] lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-center">
-            <div className="py-10 text-white sm:py-12 lg:py-10 lg:pr-16">
-              <span className="inline-flex items-center gap-2.5 rounded-full border border-white/20 px-5 py-2.5 text-xs font-extrabold uppercase tracking-[0.2em]">
+            {/* The words come in line by line, with the phone beside them. */}
+            <Reveal variant="rise" className="py-10 text-white sm:py-12 lg:py-10 lg:pr-16">
+              <span
+                data-reveal-head
+                className="inline-flex items-center gap-2.5 rounded-full border border-white/20 px-5 py-2.5 text-xs font-extrabold uppercase tracking-[0.2em]"
+              >
                 <span aria-hidden="true" className="bg-gold h-2 w-2 rounded-full" />
                 {t('home.app.eyebrow')}
               </span>
 
-              <h2 className="mt-7 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
+              <h2
+                data-reveal-head
+                className="mt-7 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]"
+              >
                 {t('home.app.heading')}
                 <br />
                 your <span className="text-gold">pocket.</span>
               </h2>
 
-              <NotifyForm />
-              <StoreBadges />
-            </div>
+              <div data-reveal-head>
+                <NotifyForm />
+              </div>
+              <div data-reveal-head>
+                <StoreBadges />
+              </div>
+            </Reveal>
 
             {/* The phone at 62% of its drawn size: the section stays compact. */}
             <div className="hidden py-6 lg:block">

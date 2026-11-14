@@ -3,7 +3,11 @@
 import type * as Anime from 'animejs';
 import * as React from 'react';
 
-import { REVEAL_CLASS, REVEAL_READY } from './reveal-script';
+import { REVEAL_CLASS, REVEAL_LOADED, REVEAL_READY } from './reveal-script';
+
+/* Tells the head script the page's scripts are running (see reveal-script.ts). */
+if (typeof window !== 'undefined')
+  (window as unknown as Record<string, boolean>)[REVEAL_LOADED] = true;
 
 export type RevealVariant = 'rise' | 'iris' | 'wipe' | 'focus' | 'path' | 'phone';
 
@@ -82,9 +86,21 @@ export function Reveal({
       { threshold: 0.25, rootMargin: '0px 0px -20% 0px' },
     );
     observer.observe(element);
+    /* About a screen and a half away, the section's lazy photos start
+       downloading, so they are there when its cards arrive. */
+    const near = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        near.disconnect();
+        for (const img of element.querySelectorAll('img')) img.loading = 'eager';
+      },
+      { rootMargin: '0px 0px 150% 0px' },
+    );
+    near.observe(element);
     return () => {
       cancelled = true;
       observer.disconnect();
+      near.disconnect();
     };
   }, [variant]);
 
@@ -101,7 +117,14 @@ async function play(element: HTMLElement, variant: RevealVariant, setState: (s: 
     (item) => item.offsetParent !== null || getComputedStyle(item).position === 'fixed',
   );
   const line = element.querySelector<HTMLElement>('[data-reveal-line]');
-  const targets = line ? [...items, line] : items;
+  const drawn = (selector: string) =>
+    [...element.querySelectorAll<HTMLElement>(selector)].filter((el) => el.offsetParent !== null);
+  /* The heading block, a closing line under the cards, and a soft glow:
+     held back with the items, so nothing in the section shows first. */
+  const heads = drawn('[data-reveal-head]');
+  const tails = drawn('[data-reveal-tail]');
+  const glows = [...element.querySelectorAll<HTMLElement>('[data-reveal-glow]')];
+  const targets = [...heads, ...items, ...(line ? [line] : []), ...tails, ...glows];
   if (targets.length === 0) {
     setState('done');
     return;
@@ -115,15 +138,50 @@ async function play(element: HTMLElement, variant: RevealVariant, setState: (s: 
     return;
   }
 
+  /* Cards wait (briefly) for their photos, so an image never pops in after
+     its card has already arrived. */
+  await imagesReady(items, 1500);
+
   const finish = () => {
     for (const target of targets) for (const prop of ANIMATED) target.style.removeProperty(prop);
     setState('done');
   };
 
-  /* Each item on its own layer for the entrance only, so it stays smooth. */
-  for (const target of targets) target.style.willChange = 'transform, opacity, clip-path, filter';
+  for (const target of targets) {
+    /* Each item on its own layer for the entrance only, so it stays smooth. */
+    target.style.willChange = 'transform, opacity, clip-path, filter';
+    /* Hidden inline until its own tween begins: anime.js only writes a
+       tween's starting values once it starts, so an item further down a
+       stagger would otherwise show in full when the CSS hold lifts. The
+       sponsored cards are hidden by their curtain, every other entrance
+       starts from transparent. */
+    if (variant === 'wipe' && items.includes(target)) target.style.clipPath = CURTAIN_CLOSED;
+    else target.style.opacity = '0';
+  }
   const timeline = anime.createTimeline({ onComplete: finish });
-  ENTRANCES[variant]({ anime, timeline, items, line });
+  const smooth = anime.cubicBezier(...SMOOTH);
+  if (glows.length) timeline.add(glows, { opacity: [0, 1], duration: 1800, ease: smooth }, 0);
+  if (heads.length)
+    timeline.add(
+      heads,
+      {
+        opacity: [0, 1],
+        translateY: [12, 0],
+        duration: 1100,
+        ease: smooth,
+        delay: anime.stagger(120),
+      },
+      0,
+    );
+  /* The items follow the heading a beat later. */
+  const at = heads.length ? 250 : 0;
+  if (items.length || line) ENTRANCES[variant]({ anime, timeline, items, line, at });
+  if (tails.length)
+    timeline.add(
+      tails,
+      { opacity: [0, 1], translateY: [8, 0], duration: 1100, ease: smooth },
+      at + 700,
+    );
   /* The first frame holds every item at its start, inline; only then is the
      CSS hold lifted, so nothing flashes in between. */
   timeline.seek(0);
@@ -135,60 +193,94 @@ type Entrance = (input: {
   timeline: ReturnType<(typeof Anime)['createTimeline']>;
   items: HTMLElement[];
   line: HTMLElement | null;
+  /** When the items start, in ms from the start of the timeline. */
+  at: number;
 }) => void;
+
+/** Resolves once every photo inside the items has decoded, or after `cap` ms. */
+function imagesReady(items: HTMLElement[], cap: number) {
+  const images = items.flatMap((item) => [...item.querySelectorAll('img')]);
+  const pending = images
+    .filter((img) => !img.complete || img.naturalWidth === 0)
+    .map((img) => img.decode().catch(() => {}));
+  if (pending.length === 0) return Promise.resolve();
+  return Promise.race([
+    Promise.all(pending),
+    new Promise<void>((resolve) => setTimeout(resolve, cap)),
+  ]);
+}
 
 /* Unhurried and smooth: about 1.3s an item, gaps of 150-220ms so each row
    reads as a wave from left to right, short travel, and a gentle ease-out
    (no expo snap at the start). */
 const SMOOTH = [0.22, 1, 0.36, 1] as const;
 
+/** A sponsored card before its curtain lifts. */
+const CURTAIN_CLOSED = 'inset(100% 0% 0% 0% round 24px)';
+
 const ENTRANCES: Record<RevealVariant, Entrance> = {
   /* Categories: a spring settle, a touch past full size and back. */
-  iris: ({ anime, timeline, items }) => {
-    timeline.add(items, {
-      keyframes: {
-        '0%': { opacity: 0, scale: 0.9 },
-        '60%': { opacity: 1, scale: 1.02 },
-        '82%': { scale: 0.995 },
-        '100%': { scale: 1 },
+  iris: ({ anime, timeline, items, at }) => {
+    timeline.add(
+      items,
+      {
+        keyframes: {
+          '0%': { opacity: 0, scale: 0.9 },
+          '60%': { opacity: 1, scale: 1.02 },
+          '82%': { scale: 0.995 },
+          '100%': { scale: 1 },
+        },
+        duration: 1300,
+        ease: 'outQuad',
+        delay: anime.stagger(150, { start: at }),
       },
-      duration: 1300,
-      ease: 'outQuad',
-      delay: anime.stagger(150),
-    });
+      0,
+    );
   },
   /* Sponsored: a curtain lifts off each card, bottom edge first. */
-  wipe: ({ anime, timeline, items }) => {
-    timeline.add(items, {
-      clipPath: ['inset(100% 0% 0% 0% round 24px)', 'inset(0% 0% 0% 0% round 24px)'],
-      duration: 1300,
-      ease: anime.cubicBezier(0.65, 0, 0.35, 1),
-      delay: anime.stagger(200),
-    });
+  wipe: ({ anime, timeline, items, at }) => {
+    timeline.add(
+      items,
+      {
+        clipPath: [CURTAIN_CLOSED, 'inset(0% 0% 0% 0% round 24px)'],
+        duration: 1300,
+        ease: anime.cubicBezier(0.65, 0, 0.35, 1),
+        delay: anime.stagger(200, { start: at }),
+      },
+      0,
+    );
   },
   /* Best sellers: a soft rise. */
-  rise: ({ anime, timeline, items }) => {
-    timeline.add(items, {
-      opacity: [0, 1],
-      translateY: [16, 0],
-      duration: 1300,
-      ease: anime.cubicBezier(...SMOOTH),
-      delay: anime.stagger(160),
-    });
+  rise: ({ anime, timeline, items, at }) => {
+    timeline.add(
+      items,
+      {
+        opacity: [0, 1],
+        translateY: [16, 0],
+        duration: 1300,
+        ease: anime.cubicBezier(...SMOOTH),
+        delay: anime.stagger(160, { start: at }),
+      },
+      0,
+    );
   },
   /* Stores: a focus pull. */
-  focus: ({ anime, timeline, items }) => {
-    timeline.add(items, {
-      opacity: [0, 1],
-      filter: ['blur(6px)', 'blur(0px)'],
-      scale: [1.03, 1],
-      duration: 1300,
-      ease: anime.cubicBezier(...SMOOTH),
-      delay: anime.stagger(180),
-    });
+  focus: ({ anime, timeline, items, at }) => {
+    timeline.add(
+      items,
+      {
+        opacity: [0, 1],
+        filter: ['blur(6px)', 'blur(0px)'],
+        scale: [1.03, 1],
+        duration: 1300,
+        ease: anime.cubicBezier(...SMOOTH),
+        delay: anime.stagger(180, { start: at }),
+      },
+      0,
+    );
   },
   /* Join: the steps slide in left to right as the dotted line draws. */
-  path: ({ anime, timeline, items, line }) => {
+  path: ({ anime, timeline, items, line, at }) => {
     if (line)
       timeline.add(
         line,
@@ -197,6 +289,7 @@ const ENTRANCES: Record<RevealVariant, Entrance> = {
           clipPath: ['inset(0% 100% 0% 0%)', 'inset(0% 0% 0% 0%)'],
           duration: 1400 + 220 * Math.max(items.length - 1, 0),
           ease: anime.cubicBezier(...SMOOTH),
+          delay: at,
         },
         0,
       );
@@ -207,24 +300,28 @@ const ENTRANCES: Record<RevealVariant, Entrance> = {
         translateX: [-22, 0],
         duration: 1400,
         ease: anime.cubicBezier(...SMOOTH),
-        delay: anime.stagger(220),
+        delay: anime.stagger(220, { start: at }),
       },
       0,
     );
   },
   /* The app: a depth tilt (the perspective is set on the parent), phone
      first, then the cards beside it. */
-  phone: ({ anime, timeline, items }) => {
+  phone: ({ anime, timeline, items, at }) => {
     const ordered = ['', 'left', 'right']
       .map((key) => items.find((item) => item.dataset.revealItem === key))
       .filter((item): item is HTMLElement => Boolean(item));
-    timeline.add(ordered, {
-      opacity: [0, 1],
-      rotateX: [28, 0],
-      translateY: [20, 0],
-      duration: 1300,
-      ease: anime.cubicBezier(...SMOOTH),
-      delay: anime.stagger(160),
-    });
+    timeline.add(
+      ordered,
+      {
+        opacity: [0, 1],
+        rotateX: [28, 0],
+        translateY: [20, 0],
+        duration: 1300,
+        ease: anime.cubicBezier(...SMOOTH),
+        delay: anime.stagger(160, { start: at }),
+      },
+      0,
+    );
   },
 };

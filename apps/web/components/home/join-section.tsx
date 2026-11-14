@@ -120,11 +120,12 @@ export function JoinSection({ t }: { t: Translate }) {
   return (
     <div className="relative">
       <span
+        data-reveal-glow
         aria-hidden="true"
         className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[40rem] max-w-full -translate-x-1/2 rounded-full bg-[#FDD128]/15 blur-3xl"
       />
 
-      <div className="relative mx-auto max-w-3xl text-center">
+      <div data-reveal-head className="relative mx-auto max-w-3xl text-center">
         <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
           {plain} <span className="text-gold-text">{gold}</span>
         </h2>

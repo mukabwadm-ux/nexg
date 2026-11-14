@@ -55,7 +55,7 @@ export function CardRail({
 
   return (
     <div className={className}>
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <div data-reveal-head className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">{heading}</div>
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="hidden gap-2 sm:flex">

@@ -73,7 +73,7 @@ export function PopularCategories({
 
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div data-reveal-head className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.375rem]">
             {heading}
