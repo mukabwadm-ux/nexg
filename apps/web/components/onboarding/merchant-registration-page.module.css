@@ -97,12 +97,99 @@
   line-height: 1.7;
 }
 
-/* The same form inside the dark band on /merchants: the notes that sit
-   outside the form's cards read on the dark, the cards stay cream. */
+/* The same form in the /merchants hero, straight on the page: the notes
+   that sit outside the form's cards follow the theme, the cards stay cream. */
 .embedded {
+  --registration-ink: #141414;
+  --registration-muted: rgb(20 20 20 / 62%);
+  --registration-line: var(--border);
+}
+
+:global(.dark) .embedded {
   --registration-ink: #ffffff;
   --registration-muted: rgb(255 255 255 / 62%);
-  --registration-line: var(--border);
+}
+
+/* Material outlined fields on /merchants, to save space: the label sits
+   inside the box like a placeholder and floats onto the top border once the
+   field has focus or a value (React keeps the value attribute in step). A
+   select always shows its label on the border, since it always shows an
+   option. Label and control share one grid cell; errors and help fall to the
+   rows below. */
+.embedded :global(.mo-section-body .mo-field:not(:has(.mo-check))) {
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 6px;
+}
+
+.embedded :global(.mo-section-body .mo-field:not(:has(.mo-check)) > label) {
+  z-index: 1;
+  grid-area: 1 / 1;
+  align-self: start;
+  justify-self: start;
+  max-width: calc(100% - 24px);
+  margin: 0 11px;
+  padding: 0 5px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: transparent;
+  color: rgb(20 20 20 / 58%);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateY(17px);
+  transform-origin: left center;
+  transition:
+    transform 160ms cubic-bezier(0.2, 0, 0, 1),
+    font-size 160ms cubic-bezier(0.2, 0, 0, 1),
+    color 160ms ease,
+    background-color 160ms ease;
+}
+
+.embedded :global(.mo-section-body .mo-field:not(:has(.mo-check)) > :is(input, select, textarea)) {
+  grid-area: 1 / 1;
+}
+
+.embedded
+  :global(
+    .mo-section-body
+      .mo-field:is(
+        :has(> :is(input, textarea):focus),
+        :has(> input:not([value=''])),
+        :has(> :is(select, textarea))
+      )
+      > label
+  ) {
+  background: var(--mo-paper, #faf7f0);
+  color: var(--mo-ink, #141414);
+  font-size: 12px;
+  font-weight: 700;
+  transform: translateY(-6px);
+}
+
+.embedded :global(.mo-section-body .mo-field:has(> :is(input, select, textarea):focus) > label) {
+  color: var(--mo-green, #141414);
+}
+
+/* A hint shows only once the label has moved out of its way. */
+.embedded :global(.mo-section-body .mo-field > input:not(:focus)::placeholder) {
+  color: transparent;
+}
+
+.embedded :global(.mo-section-body .mo-field.has-error > label) {
+  color: var(--mo-warn, #a33d2e);
+}
+
+.embedded :global(.mo-section-pair) {
+  gap: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .embedded :global(.mo-section-body .mo-field > label) {
+    transition: none;
+  }
 }
 
 .form {

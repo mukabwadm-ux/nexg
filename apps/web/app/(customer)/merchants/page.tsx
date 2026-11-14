@@ -138,7 +138,9 @@ export default async function MerchantsPage() {
 
       <main className={THEME_VARS}>
         {/* ------------------------------------------------------------ hero */}
-        <section className="overflow-hidden">
+        {/* overflow-x-clip, not overflow-hidden: hidden would make the section a
+            scroll box and stop the photographs from sticking. */}
+        <section className="overflow-x-clip">
           <div
             className={`${CONTAINER} grid gap-12 pb-16 pt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)] lg:items-start lg:gap-16 lg:pb-24 lg:pt-16`}
           >
@@ -147,23 +149,34 @@ export default async function MerchantsPage() {
                 Put your business in every guest&apos;s hands.
               </h1>
 
+              <h2
+                id="register-title"
+                className="mt-6 flex items-center gap-2 text-lg font-extrabold sm:text-xl"
+              >
+                Register your business here
+                <ArrowRight
+                  aria-hidden="true"
+                  className="text-gold-text dark:text-gold h-5 w-5 rotate-90"
+                />
+              </h2>
+
               {/* The registration form itself, the one /merchants/register
                   uses: it saves as a draft and asks for the business email to
                   be verified before it can be submitted. Every "Register Your
-                  Business" on the page comes here. It is styled for a dark
-                  surface, so it sits on an ink panel in both themes. */}
+                  Business" on the page comes here. It sits straight on the
+                  page, lined up with the headline above it. */}
               <div
                 id="register"
-                aria-label="Register your business"
+                aria-labelledby="register-title"
                 role="region"
-                className="mt-8 scroll-mt-24 rounded-3xl bg-[#141414] p-5 text-white shadow-[0_30px_60px_-30px_rgb(0_0_0/0.45)] sm:p-7"
+                className="mt-4 scroll-mt-24"
               >
                 <MerchantRegistrationForm />
-                <p className="mt-6 text-sm font-semibold text-white/60">
+                <p className="text-muted mt-6 text-sm font-semibold">
                   Already on NexG?{' '}
                   <Link
                     href="/merchants/sign-in?next=%2Fmerchant"
-                    className="text-gold rounded-sm font-extrabold underline underline-offset-4 hover:text-[#FEDD5C]"
+                    className="text-gold-text dark:text-gold rounded-sm font-extrabold underline underline-offset-4 dark:hover:text-[#FEDD5C]"
                   >
                     Sign in
                   </Link>
@@ -175,7 +188,7 @@ export default async function MerchantsPage() {
                 Decorative: the copy beside it says the same. */}
             <div
               aria-hidden="true"
-              className="relative mx-auto aspect-[6/5] w-full max-w-[36rem] lg:mr-0"
+              className="relative mx-auto aspect-[6/5] w-full max-w-[36rem] lg:sticky lg:top-28 lg:mr-0"
             >
               <span className="bg-gold absolute left-[26%] top-[3%] h-14 w-14 rounded-full sm:h-20 sm:w-20" />
               <div className="absolute right-0 top-0 h-[86%] w-[58%] overflow-hidden rounded-b-[2rem] rounded-t-full shadow-[0_30px_60px_-30px_rgb(0_0_0/0.45)]">
