@@ -1,10 +1,11 @@
 'use client';
 
-import { loadSetupOfferings, saveSetupOffering } from '@/app/merchant/offering-setup-actions';
+import { loadSetupOfferings } from '@/app/merchant/offering-setup-actions';
 import type { WorkspaceCatalogueRow } from '@/lib/merchant-workspace-catalogue';
 import { browserUuid } from '@/lib/browser-uuid';
 import { createClient } from '@/lib/supabase/client';
 import { createOffering, defaultConfiguration, type Offering } from './model';
+import { saveOfferingPublication } from './publication';
 import type { OfferingsSource } from './source';
 
 export function liveOfferingsSource({
@@ -67,16 +68,11 @@ export function liveOfferingsSource({
       };
     },
     async save(_profile, item, publication) {
-      if (
-        !canEditDrafts ||
-        item.publication !== 'draft' ||
-        (publication && publication !== 'draft')
-      )
-        throw new Error('This editor can save setup drafts only.');
-      const result = await saveSetupOffering(item);
-      if (!result.ok) throw new Error(result.message);
-      registeredDraftIds.add(result.item.id);
-      return { ...result.item, image: item.image };
+      if (!canEditDrafts) throw new Error('Only the business owner can change offerings.');
+      // The same save and publish as the Offerings section on Home.
+      const saved = await saveOfferingPublication(item, publication);
+      registeredDraftIds.add(saved.id);
+      return { ...saved, image: item.image };
     },
     async replace() {
       throw new Error('Bulk changes are unavailable for the saved catalogue.');

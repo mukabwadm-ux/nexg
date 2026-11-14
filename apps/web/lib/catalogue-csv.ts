@@ -181,7 +181,7 @@ function csvCell(value: string): string {
   return /[",\r\n]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
 }
 
-function unguard(value: string): string {
+export function unguardCsvCell(value: string): string {
   return value.startsWith("'") && FORMULA_START.test(value.slice(1)) ? value.slice(1) : value;
 }
 
@@ -393,7 +393,7 @@ export function planCatalogueImport(
     const rowNo = index + 2;
     const cell = (c: CatalogueCsvColumn) => {
       const at = columns.indexOf(c);
-      return at < 0 ? '' : unguard((cells[at] ?? '').trim());
+      return at < 0 ? '' : unguardCsvCell((cells[at] ?? '').trim());
     };
     if (cells.every((c) => c.trim() === '')) return;
     if (cells.length > columns.length && cells.slice(columns.length).some((c) => c.trim())) {

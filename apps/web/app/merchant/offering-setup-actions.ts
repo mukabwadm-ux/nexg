@@ -8,6 +8,7 @@ import {
   merchantActionClient,
   type WorkspaceSetupLoadFailure,
 } from '@/lib/merchant-action-access';
+import { merchantCatalogueRows } from '@/lib/merchant-catalogue-rows';
 import {
   availableSchemas,
   createOffering,
@@ -146,26 +147,28 @@ export async function loadSetupOfferings(): Promise<
         };
     }
     /* The draft rows always say "draft"; whether guests can order an
-       offering is its catalogue item's `available`, which Publish sets. */
+       offering is its catalogue item's `available`, which Publish sets.
+       Offerings saved before the editor's section field reached the
+       catalogue show the section they are actually in. */
     const items = data as Offering[];
-    const { data: live } = items.length
-      ? await client
-          .from('catalogue_item')
-          .select('id')
-          .eq('merchant_id', merchantId)
-          .eq('available', true)
-          .in(
-            'id',
-            items.map((item) => item.id),
-          )
-      : { data: [] as { id: string }[] };
-    const published = new Set((live ?? []).map((row) => row.id));
+    const catalogue = new Map(
+      (items.length ? await merchantCatalogueRows(client, merchantId) : []).map((row) => [
+        row.id,
+        row,
+      ]),
+    );
     return {
       ok: true,
       merchantId,
-      items: items.map((item) =>
-        published.has(item.id) ? { ...item, publication: 'published' as const } : item,
-      ),
+      items: items.map((item) => {
+        const row = catalogue.get(item.id);
+        const section = item.section?.trim() ? item.section : row?.section || undefined;
+        return {
+          ...item,
+          ...(section ? { section } : {}),
+          ...(row?.available ? { publication: 'published' as const } : {}),
+        };
+      }),
     };
   } catch {
     return { ok: false, message: 'Could not access your saved offering drafts.' };
@@ -224,6 +227,7 @@ export async function saveSetupOfferingPublication(
       };
     revalidatePath('/merchant');
     revalidatePath('/merchant/menu');
+    revalidatePath('/merchant/offerings');
     return {
       ok: true,
       item: { ...saved.item, publication: publish ? 'published' : 'draft' },
@@ -259,6 +263,7 @@ export async function saveSetupOffering(
     if (error || !data)
       return { ok: false, message: error?.message ?? 'Could not save this offering.' };
     revalidatePath('/merchant');
+    revalidatePath('/merchant/offerings');
     return { ok: true, item: data as Offering };
   } catch {
     return { ok: false, message: 'Could not save this offering. Your changes are still open.' };

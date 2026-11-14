@@ -50302,6 +50302,11 @@ export type Database = {
           isSetofReturn: true;
         };
       };
+      fn_merchant_setup_offering_authorize: { Args: { p_merchant_id: string }; Returns: undefined };
+      fn_merchant_setup_offering_write: {
+        Args: { p_data: Json; p_merchant_id: string };
+        Returns: Json;
+      };
       fn_mood_chips: {
         Args: { p_city_id: string };
         Returns: {
@@ -55453,6 +55458,10 @@ export type Database = {
         Returns: Json;
       };
       rpc_merchant_setup_offerings: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_setup_offerings_import: {
+        Args: { p_merchant_id: string; p_rows: Json };
+        Returns: Json;
+      };
       rpc_merchant_soft_delete: {
         Args: { p_confirmation_name: string; p_merchant_id: string; p_reason: string };
         Returns: Json;
