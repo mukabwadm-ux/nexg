@@ -18725,21 +18725,27 @@ export type Database = {
         Row: {
           answered_at: string;
           closed: boolean;
+          closes: string | null;
           holiday_id: string;
           merchant_id: string;
+          opens: string | null;
         };
         ComputedFields: never;
         Insert: {
           answered_at?: string;
           closed: boolean;
+          closes?: string | null;
           holiday_id: string;
           merchant_id: string;
+          opens?: string | null;
         };
         Update: {
           answered_at?: string;
           closed?: boolean;
+          closes?: string | null;
           holiday_id?: string;
           merchant_id?: string;
+          opens?: string | null;
         };
         Relationships: [
           {
@@ -54465,10 +54471,6 @@ export type Database = {
           opens: string;
         }[];
       };
-      rpc_merchant_hours_override_clear: {
-        Args: { p_merchant_id: string; p_override_id: string };
-        Returns: undefined;
-      };
       rpc_merchant_hours_override: {
         Args: {
           p_branch_id?: string;
@@ -54499,6 +54501,10 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_merchant_hours_override_clear: {
+        Args: { p_merchant_id: string; p_override_id: string };
+        Returns: undefined;
       };
       rpc_merchant_invite_member: {
         Args: {
