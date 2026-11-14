@@ -107,20 +107,15 @@ export default async function MerchantsPage() {
   const supabase = createPublicClient();
 
   const [
-    { count: cityCount, error: cityCountError },
     { data: commission, error: commissionError },
     { data: categories, error: categoriesError },
   ] = await Promise.all([
-    // The hero counts the whole footprint, not just the cities open today —
-    // "cities to grow into" is the point of the number.
-    supabase.from('city').select('id', { count: 'exact', head: true }),
     // Ground rule 3: this row exists with a null value on purpose. The block
     // renders [—] until a real commission is configured and approved.
     supabase.from('setting').select('value').eq('key', 'commission_pct_by_category').maybeSingle(),
     supabase.from('category_config').select('category, label').eq('is_active', true).order('sort'),
   ]);
 
-  if (cityCountError) throw new Error(`Could not count merchant cities: ${cityCountError.message}`);
   if (commissionError) throw new Error(`Could not load merchant fees: ${commissionError.message}`);
   if (categoriesError)
     throw new Error(`Could not load merchant categories: ${categoriesError.message}`);
@@ -174,34 +169,6 @@ export default async function MerchantsPage() {
                   </Link>
                 </p>
               </div>
-
-              <p className="text-muted mt-8 max-w-[32.5rem] text-[1.0625rem] font-semibold leading-[1.7]">
-                List your restaurant, bar, laundry, florist or boutique and let our riders bring
-                your products to their door.
-              </p>
-
-              {/* Three columns on a phone so the dividers always sit between
-                  the figures; a row with wider spacing from sm up. */}
-              <dl className="mt-10 grid grid-cols-3 sm:flex sm:gap-x-10">
-                {[
-                  { value: 'Zero', label: 'riders to hire' },
-                  { value: 'Weekly', label: 'M-Pesa settlement' },
-                  { value: cityCount ?? VALUE_PLACEHOLDER, label: 'cities to grow into' },
-                ].map((stat, index) => (
-                  <div
-                    key={stat.label}
-                    className={index > 0 ? 'border-border-strong border-l pl-4 sm:pl-10' : 'pr-2'}
-                  >
-                    <dt className="sr-only">{stat.label}</dt>
-                    <dd>
-                      <span className="block text-2xl font-extrabold tracking-tight">
-                        {stat.value}
-                      </span>
-                      <span className="text-muted block text-xs font-semibold">{stat.label}</span>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
             </div>
 
             {/* Two arched photographs with what a merchant gets pinned to them.
