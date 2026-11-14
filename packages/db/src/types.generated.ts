@@ -4450,6 +4450,7 @@ export type Database = {
           created_at: string;
           ends_at: string;
           exclusive: boolean;
+          expired_at: string | null;
           guest_name: string | null;
           guest_phone: string | null;
           guest_user_id: string | null;
@@ -4472,6 +4473,7 @@ export type Database = {
           created_at?: string;
           ends_at: string;
           exclusive?: boolean;
+          expired_at?: string | null;
           guest_name?: string | null;
           guest_phone?: string | null;
           guest_user_id?: string | null;
@@ -4493,6 +4495,7 @@ export type Database = {
           created_at?: string;
           ends_at?: string;
           exclusive?: boolean;
+          expired_at?: string | null;
           guest_name?: string | null;
           guest_phone?: string | null;
           guest_user_id?: string | null;
@@ -49744,6 +49747,7 @@ export type Database = {
         Args: { p_at: string; p_is_end?: boolean; p_merchant_id: string };
         Returns: boolean;
       };
+      fn_booking_release_stale: { Args: { p_resource_id?: string }; Returns: number };
       fn_build_plan: { Args: { p_plan_id: string }; Returns: undefined };
       fn_capability: { Args: { p_key: string }; Returns: Json };
       fn_cash_guard: { Args: { p_rider_id: string }; Returns: undefined };
@@ -50098,7 +50102,12 @@ export type Database = {
       };
       fn_merchant_is_featured: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_is_live: { Args: { p_merchant_id: string }; Returns: boolean };
+      fn_merchant_liquor_licensed: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_mine: { Args: { p_merchant_id: string }; Returns: string };
+      fn_merchant_open_for_orders: {
+        Args: { p_at?: string; p_merchant_id: string };
+        Returns: boolean;
+      };
       fn_merchant_readiness: { Args: { p_merchant_id: string }; Returns: Json };
       fn_merchant_required_docs: {
         Args: { p_merchant_id: string };
@@ -51095,6 +51104,7 @@ export type Database = {
           created_at: string;
           ends_at: string;
           exclusive: boolean;
+          expired_at: string | null;
           guest_name: string | null;
           guest_phone: string | null;
           guest_user_id: string | null;
@@ -51141,6 +51151,7 @@ export type Database = {
           created_at: string;
           ends_at: string;
           exclusive: boolean;
+          expired_at: string | null;
           guest_name: string | null;
           guest_phone: string | null;
           guest_user_id: string | null;
@@ -51178,6 +51189,7 @@ export type Database = {
           created_at: string;
           ends_at: string;
           exclusive: boolean;
+          expired_at: string | null;
           guest_name: string | null;
           guest_phone: string | null;
           guest_user_id: string | null;
@@ -55705,10 +55717,6 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
-      };
-      rpc_payment_authorised: {
-        Args: { p_provider_ref: string; p_reference: string; p_url: string };
-        Returns: Json;
       };
       rpc_payment_bank_started: {
         Args: {
