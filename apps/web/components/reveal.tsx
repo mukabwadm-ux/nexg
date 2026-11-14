@@ -42,6 +42,9 @@ export function Reveal({
 
     let cancelled = false;
     setState('waiting');
+    /* Fetched now, while the section is still below the fold, so its
+       entrance starts the moment it is seen rather than after a download. */
+    void import('animejs').catch(() => {});
     const observer = new IntersectionObserver(
       (entries) => {
         if (!entries.some((entry) => entry.isIntersecting)) return;
