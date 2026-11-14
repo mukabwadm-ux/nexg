@@ -12,6 +12,16 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-14',
     kind: 'added',
+    title: 'Test keys and a sandbox for bookings',
+    body: [
+      'The developer console issues test keys as well as live ones. A test key starts nexg_test_ and calls the same URL. It reads the same public data, but POST /v1/orders with it records a sandbox booking with a TEST- reference that never becomes an order, and GET /v1/orders reads those test bookings, never real orders.',
+      'A test booking goes through the same checks as a live one. Where NexG has not priced a service in your city yet, it gets a sample price of KES 1,000 a unit. Test keys spend from a rate-limit bucket of their own, and every successful answer to a request with a key names its kind in the NexG-Environment header.',
+    ],
+    endpoints: [],
+  },
+  {
+    date: '2026-11-14',
+    kind: 'added',
     title: 'Book a service',
     body: [
       'POST /v1/orders books a service for your guests, such as an airport transfer, a courier or a venue, with a key that has merchant_write. NexG prices it from its fee settings for your city, and the booking is charged to your merchant’s account.',

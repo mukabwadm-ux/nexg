@@ -46,7 +46,8 @@ export default function MerchantIntegrationPage() {
         <li>Use NexG&apos;s delivery zones, published experiences and bookable services.</li>
         <li>
           Book NexG services for your guests, such as an airport transfer, charged to your account:{' '}
-          <A href="/docs/reference/create-order">POST /v1/orders</A>.
+          <A href="/docs/reference/create-order">POST /v1/orders</A>. Try it first with a{' '}
+          <A href="/docs/environments#test-keys">test key</A>, which books in a sandbox.
         </li>
         <li>Keep your catalogue in your own system and import it to NexG as CSV.</li>
       </List>

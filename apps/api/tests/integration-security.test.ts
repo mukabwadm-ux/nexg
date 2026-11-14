@@ -38,6 +38,8 @@ describe('API credential boundary', () => {
       scopes: ['public_read', 'merchant_read'],
       rateLimit: 60,
       anonymous: false,
+      // A key row without an environment (before the test-keys migration) is live.
+      environment: 'live',
     });
     expect(() => requireScope(credential, 'merchant_write')).toThrow(
       'This credential does not have the scope for that.',

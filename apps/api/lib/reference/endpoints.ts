@@ -537,7 +537,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     title: 'List your orders',
     summary: 'Your merchant’s orders, newest first. The key decides which merchant.',
     description: [
-      'Returns orders placed with the merchant your key is bound to, newest first: guest orders from nexgapp.com and, once booking ships, service bookings made through the API.',
+      'Returns orders placed with the merchant your key is bound to, newest first: guest orders from nexgapp.com and service bookings made through the API. With a test key it returns your test bookings instead, never real orders.',
       'You never send a merchant id. The key decides the merchant, so a key can never read another merchant’s orders. The stage is the one the merchant console shows, read from the order rather than worked out again.',
       'Poll this endpoint to keep your system in step with NexG. Each call costs 3 tokens; at the default 60 tokens a minute, polling once a minute leaves plenty of room for catalogue reads.',
     ],
@@ -678,7 +678,8 @@ export const ENDPOINTS: EndpointDoc[] = [
     title: 'Book a service',
     summary: 'A merchant books a transfer, courier or venue for its guests, priced by NexG.',
     description: [
-      'For a business that books NexG services for its own guests: a hotel or tour company booking an airport transfer, for example. The booking becomes a real NexG order, charged to your merchant’s account.',
+      'For a business that books NexG services for its own guests: a hotel or tour company booking an airport transfer, for example. With a live key the booking becomes a real NexG order, charged to your merchant’s account.',
+      'With a test key it is a sandbox booking: same checks, a TEST- reference, and nothing dispatched or charged. A service NexG has not priced in your city yet gets a sample price of KES 1,000 a unit, so you can build before prices are set. See Environments.',
       'You say what and how many; NexG works out the price from its fee settings for your city, the same way checkout does. A request can never state a price. The total is frozen on the order when it is placed.',
       'Every booking needs an Idempotency-Key header. A retry with the same key gets the first answer back instead of booking twice, so a timeout is always safe to retry.',
       'The answer is 201 with the receipt as data.booking and a Location header. The booking then appears in GET /v1/orders, and GET /v1/orders/{id} reads it in full.',
@@ -693,7 +694,8 @@ export const ENDPOINTS: EndpointDoc[] = [
         in: 'header',
         type: 'string',
         required: true,
-        description: 'A key bound to your merchant, with merchant_write.',
+        description:
+          'A key bound to your merchant, with merchant_write. A test key (nexg_test_…) books in the sandbox.',
       },
       {
         name: 'Idempotency-Key',
@@ -787,9 +789,9 @@ export const ENDPOINTS: EndpointDoc[] = [
     ],
     notes: [
       'Only on_account is accepted today: the booking is charged to your merchant’s account with NexG. Paying an API booking by M-Pesa or card is not available yet.',
-      'There is no test mode yet. Every booking is a real order NexG will act on, so agree a test booking with NexG before building against it.',
-      'A service can be booked in a city only once NexG has priced it there. Until then a booking is refused, and the message says so.',
-      'Keys with merchant_write are not offered in the developer console yet. Ask NexG for one.',
+      'Build against it with a test key (nexg_test_…). A test booking is recorded in the sandbox with a TEST- reference and never becomes an order; a booking with a live key is a real order NexG will act on.',
+      'With a live key, a service can be booked in a city only once NexG has priced it there. Until then a booking is refused, and the message says so. A test key gets a sample price instead.',
+      'The developer console offers merchant_write on test keys. For a live key that books, ask NexG.',
       'Merchant keys work only while the merchant may operate: not while it is paused, suspended or delisted, and not while its application is waiting for approval.',
     ],
     since: '2026-11-14',

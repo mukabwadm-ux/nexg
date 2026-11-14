@@ -13,7 +13,7 @@ import { NextResponse } from 'next/server';
 import { jsonError, withErrorEnvelope } from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
 import { privateHeaders } from '@/lib/cache';
-import { orderReader } from '@/lib/orders';
+import { ORDER_FUNCTIONS, orderReader } from '@/lib/orders';
 import { Uuid } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
@@ -48,7 +48,7 @@ export const GET = withErrorEnvelope(
       });
     }
 
-    const { data, error } = await orderReader().rpc('rpc_order_read_api', {
+    const { data, error } = await orderReader().rpc(ORDER_FUNCTIONS[credential.environment].read, {
       p_api_key: credential.rawKey,
       p_order_id: params.id,
     });
@@ -74,7 +74,7 @@ export const GET = withErrorEnvelope(
 
     return NextResponse.json(
       { ok: true, data: { order }, meta: { api_version: 'v1' as const } },
-      { headers: privateHeaders(rate) },
+      { headers: privateHeaders(rate, credential) },
     );
   },
 );

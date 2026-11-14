@@ -24,7 +24,7 @@ import {
 } from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
 import { privateHeaders } from '@/lib/cache';
-import { orderReader, orderWriter } from '@/lib/orders';
+import { ORDER_FUNCTIONS, orderReader, orderWriter } from '@/lib/orders';
 import { parse } from '@nexg/contracts';
 import { BookingReceipt, IdempotencyKey, ListRequest, ServiceBooking } from '@nexg/contracts/api';
 
@@ -66,7 +66,7 @@ export const GET = withErrorEnvelope(async (request: Request) => {
   const after = cursor ? decodeKeysetCursor(cursor) : null;
   if (cursor && !after) return invalidCursor();
 
-  const { data, error } = await orderReader().rpc('rpc_order_read_api', {
+  const { data, error } = await orderReader().rpc(ORDER_FUNCTIONS[credential.environment].read, {
     p_api_key: credential.rawKey,
     p_limit: limit,
     p_cursor_created_at: after?.at ?? null,
@@ -106,7 +106,7 @@ export const GET = withErrorEnvelope(async (request: Request) => {
         limit,
       },
     },
-    { headers: privateHeaders(rate) },
+    { headers: privateHeaders(rate, credential) },
   );
 });
 
@@ -197,7 +197,7 @@ export const POST = withErrorEnvelope(async (request: Request) => {
   }
 
   const place = () =>
-    orderWriter().rpc('rpc_order_place_api', {
+    orderWriter().rpc(ORDER_FUNCTIONS[credential.environment].place, {
       p_api_key: credential.rawKey,
       p_idempotency_key: idempotencyKey.data,
       p_payload: booking.data,
@@ -229,7 +229,10 @@ export const POST = withErrorEnvelope(async (request: Request) => {
     { ok: true, data: { booking: receipt.data }, meta: { api_version: 'v1' as const } },
     {
       status: 201,
-      headers: { ...privateHeaders(rate), Location: `/v1/orders/${receipt.data.order_id}` },
+      headers: {
+        ...privateHeaders(rate, credential),
+        Location: `/v1/orders/${receipt.data.order_id}`,
+      },
     },
   );
 });

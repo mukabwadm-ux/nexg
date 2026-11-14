@@ -18,8 +18,8 @@ const AUDIENCES = [
   {
     name: 'Partners and developers',
     today:
-      'Build on NexG’s public data: live merchants and catalogues, delivery zones, upcoming experiences and bookable services. Public reads work without a key.',
-    soon: 'Sandbox keys with test data, for building writes without touching real orders.',
+      'Build on NexG’s public data: live merchants and catalogues, delivery zones, upcoming experiences and bookable services. Public reads work without a key, and test keys try bookings in a sandbox.',
+    soon: 'Order events sent to you instead of polling, and OAuth sign-in for third-party apps.',
     href: '/docs/quickstart',
     link: 'Quickstart',
   },
@@ -176,19 +176,17 @@ export default function IntroductionPage() {
         says they are live.
       </P>
       <List>
-        <li>
-          Writes: booking a service with <C>POST /v1/orders</C>, and any <C>PATCH</C> endpoint.
-        </li>
+        <li>Changing an order through the API: any <C>PATCH</C> endpoint.</li>
         <li>Events NexG sends to you, such as an order changing stage. Poll your orders for now.</li>
-        <li>Sandbox API keys with test data.</li>
         <li>Two-way sync with a POS, ERP, booking or inventory system.</li>
         <li>OAuth sign-in for third-party apps. Use API keys.</li>
       </List>
       <Callout tone="note" title="Reads are safe to explore">
         <p>
           Every endpoint except booking a service only reads, so you can explore the live API
-          safely. A booking is a real order: it carries an idempotency key, so a retried booking is
-          never made twice, and there is no test mode yet.
+          safely. A booking made with a live key is a real order: it carries an idempotency key,
+          so a retried booking is never made twice. Try bookings with a{' '}
+          <A href="/docs/environments#test-keys">test key</A> first.
         </p>
       </Callout>
     </DocPage>

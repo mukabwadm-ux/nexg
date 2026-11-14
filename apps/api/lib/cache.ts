@@ -19,18 +19,26 @@ export const CREDENTIAL_HEADERS = 'X-Api-Key, Authorization';
 
 /** Headers for a public read: shared when no key was sent, private when one was. */
 export function readHeaders(
-  credential: Pick<ApiCredential, 'anonymous'>,
+  credential: Pick<ApiCredential, 'anonymous' | 'environment'>,
   sharedCache: string,
   rate: RateLimitResult | undefined,
 ): Record<string, string> {
   if (credential.anonymous) return { 'Cache-Control': sharedCache, Vary: CREDENTIAL_HEADERS };
-  return { ...privateHeaders(rate), Vary: CREDENTIAL_HEADERS };
+  return { ...privateHeaders(rate, credential), Vary: CREDENTIAL_HEADERS };
 }
 
-/** Headers for an answer only the caller may see: never stored, with the tokens left. */
-export function privateHeaders(rate: RateLimitResult | undefined): Record<string, string> {
+/**
+ * Headers for an answer only the caller may see: never stored, with the
+ * tokens left, and which kind of key answered (`NexG-Environment: live` or
+ * `test`), so a developer can tell a sandbox answer from a real one.
+ */
+export function privateHeaders(
+  rate: RateLimitResult | undefined,
+  credential?: Pick<ApiCredential, 'anonymous' | 'environment'>,
+): Record<string, string> {
   return {
     'Cache-Control': 'no-store',
     ...(rate && rate.remaining !== null ? { 'RateLimit-Remaining': String(rate.remaining) } : {}),
+    ...(credential && !credential.anonymous ? { 'NexG-Environment': credential.environment } : {}),
   };
 }

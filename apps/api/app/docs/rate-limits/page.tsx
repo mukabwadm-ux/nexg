@@ -52,6 +52,11 @@ export default function RateLimitsPage() {
           of the person who issued it, shared by all of their keys without a merchant.
         </li>
         <li>
+          <strong className="text-ink">A test key</strong> spends from a test bucket, kept the
+          same way (per merchant, or per person for keys without a merchant) and shared only by
+          test keys. Testing never spends your live tokens.
+        </li>
+        <li>
           <strong className="text-ink">No key</strong>: keyless callers share one bucket of 120
           tokens a minute (or get 60 a minute for each address, where NexG identifies callers by IP
           at its edge). A keyless public read answered from NexG&apos;s cache spends nothing. Fine
@@ -59,8 +64,8 @@ export default function RateLimitsPage() {
         </li>
       </List>
       <P>
-        So issuing more keys does not add capacity, and replacing a key does not refill the
-        bucket. To raise a merchant&apos;s limit, issue a key with a higher limit and have the
+        So issuing more keys of the same kind does not add capacity, and replacing a key does not
+        refill the bucket. To raise a merchant&apos;s limit, issue a key with a higher limit and have the
         lower ones revoked.
       </P>
 
