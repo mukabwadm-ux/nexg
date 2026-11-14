@@ -69,12 +69,6 @@ const PRICING_POINTS = [
   'Leave any time, no lock-in',
 ] as const;
 
-const REQUIREMENTS = [
-  'Valid business permit',
-  'A physical location in one of our cities',
-  'M-Pesa till or bank account for payouts',
-] as const;
-
 const FAQ = [
   {
     q: 'Who sets the prices guests see?',
@@ -108,7 +102,7 @@ export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 
 export default async function MerchantsPage() {
-  /* The form is on this page, in the Register section. */
+  /* The form is on this page, in the hero. */
   const registrationHref = '#register';
   const supabase = createPublicClient();
 
@@ -151,24 +145,40 @@ export default async function MerchantsPage() {
         {/* ------------------------------------------------------------ hero */}
         <section className="overflow-hidden">
           <div
-            className={`${CONTAINER} grid gap-12 pb-16 pt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)] lg:items-center lg:gap-16 lg:pb-24 lg:pt-16`}
+            className={`${CONTAINER} grid gap-12 pb-16 pt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)] lg:items-start lg:gap-16 lg:pb-24 lg:pt-16`}
           >
-            <div>
+            <div className="min-w-0">
               <h1 className="max-w-[40rem] text-4xl/[1.04] font-extrabold tracking-tight sm:text-5xl/[1.04] lg:text-[4.5rem]/[1.02]">
                 Put your business in every guest&apos;s hands.
               </h1>
 
-              <p className="text-muted mt-5 max-w-[32.5rem] text-[1.0625rem] font-semibold leading-[1.7]">
+              {/* The registration form itself, the one /merchants/register
+                  uses: it saves as a draft and asks for the business email to
+                  be verified before it can be submitted. Every "Register Your
+                  Business" on the page comes here. It is styled for a dark
+                  surface, so it sits on an ink panel in both themes. */}
+              <div
+                id="register"
+                aria-label="Register your business"
+                role="region"
+                className="mt-8 scroll-mt-24 rounded-3xl bg-[#141414] p-5 text-white shadow-[0_30px_60px_-30px_rgb(0_0_0/0.45)] sm:p-7"
+              >
+                <MerchantRegistrationForm />
+                <p className="mt-6 text-sm font-semibold text-white/60">
+                  Already on NexG?{' '}
+                  <Link
+                    href="/merchants/sign-in?next=%2Fmerchant"
+                    className="text-gold rounded-sm font-extrabold underline underline-offset-4 hover:text-[#FEDD5C]"
+                  >
+                    Sign in
+                  </Link>
+                </p>
+              </div>
+
+              <p className="text-muted mt-8 max-w-[32.5rem] text-[1.0625rem] font-semibold leading-[1.7]">
                 List your restaurant, bar, laundry, florist or boutique and let our riders bring
                 your products to their door.
               </p>
-
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <Link href={registrationHref} className={`${primaryButton} h-12`}>
-                  Register Your Business
-                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
-                </Link>
-              </div>
 
               {/* Three columns on a phone so the dividers always sit between
                   the figures; a row with wider spacing from sm up. */}
@@ -347,63 +357,6 @@ export default async function MerchantsPage() {
                 );
               })}
             </ul>
-          </div>
-        </section>
-
-        {/* -------------------------------------------------------- register */}
-        {/* The registration form itself, the one /merchants/register uses:
-            it saves as a draft and asks for the business email to be
-            verified before it can be submitted. Every "Register Your
-            Business" on the page comes here. */}
-        <section
-          id="register"
-          className="scroll-mt-20 bg-[#141414] py-20 text-white sm:py-28"
-          aria-labelledby="register-title"
-        >
-          <div
-            className={`${CONTAINER} grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,40rem)] lg:items-start lg:gap-16`}
-          >
-            <div className="lg:sticky lg:top-28">
-              <SectionLabel onDark>Register</SectionLabel>
-              <h2 id="register-title" className={`mt-3 max-w-md ${H2}`}>
-                Register your business
-              </h2>
-              <p className="mt-4 max-w-md text-[0.9375rem] font-semibold leading-[1.7] text-white/60">
-                Tell us who you are and what you sell. Verify your business email, submit, and the
-                merchant team reviews your application within two working days.
-              </p>
-
-              <p className="mt-10 text-xs font-extrabold uppercase tracking-[0.14em] text-white/45">
-                Have these ready
-              </p>
-              <ul className="mt-4 space-y-4">
-                {REQUIREMENTS.map((item) => (
-                  <li key={item} className="flex items-center gap-3">
-                    <span
-                      aria-hidden="true"
-                      className="bg-gold text-night flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
-                    >
-                      <Check className="h-3.5 w-3.5" />
-                    </span>
-                    <span className="text-[0.9375rem] font-bold text-white/85">{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <p className="mt-10 text-sm font-semibold text-white/60">
-                Already on NexG?{' '}
-                <Link
-                  href="/merchants/sign-in?next=%2Fmerchant"
-                  className="text-gold rounded-sm font-extrabold underline underline-offset-4 hover:text-[#FEDD5C]"
-                >
-                  Sign in
-                </Link>
-              </p>
-            </div>
-
-            <div className="min-w-0">
-              <MerchantRegistrationForm />
-            </div>
           </div>
         </section>
 
