@@ -9,7 +9,7 @@ type State = 'static' | 'waiting' | 'playing' | 'done';
 
 /* Everything an entrance may write inline, cleared once it has played so
    the section is back to its own styles (and its hover effects). */
-const ANIMATED = ['opacity', 'transform', 'clip-path', 'filter'] as const;
+const ANIMATED = ['opacity', 'transform', 'clip-path', 'filter', 'will-change'] as const;
 
 /**
  * Plays a section's entrance the first time it scrolls into view, as an
@@ -96,6 +96,8 @@ async function play(element: HTMLElement, variant: RevealVariant, setState: (s: 
     setState('done');
   };
 
+  /* Each item on its own layer for the entrance only, so it stays smooth. */
+  for (const target of targets) target.style.willChange = 'transform, opacity, clip-path, filter';
   const timeline = anime.createTimeline({ onComplete: finish });
   ENTRANCES[variant]({ anime, timeline, items, line });
   /* The first frame holds every item at its start, inline; only then is the
@@ -111,9 +113,10 @@ type Entrance = (input: {
   line: HTMLElement | null;
 }) => void;
 
-/* Real interface timing: under a second an item, short staggers, and the
-   ease-out-expo curve unless a section needs its own. */
-const EXPO = [0.16, 1, 0.3, 1] as const;
+/* Unhurried and smooth: about 1.3s an item, gaps of 150-220ms so each row
+   reads as a wave from left to right, short travel, and a gentle ease-out
+   (no expo snap at the start). */
+const SMOOTH = [0.22, 1, 0.36, 1] as const;
 
 const ENTRANCES: Record<RevealVariant, Entrance> = {
   /* Categories: a spring settle, a touch past full size and back. */
@@ -125,18 +128,18 @@ const ENTRANCES: Record<RevealVariant, Entrance> = {
         '82%': { scale: 0.995 },
         '100%': { scale: 1 },
       },
-      duration: 900,
+      duration: 1300,
       ease: 'outQuad',
-      delay: anime.stagger(60),
+      delay: anime.stagger(150),
     });
   },
   /* Sponsored: a curtain lifts off each card, bottom edge first. */
   wipe: ({ anime, timeline, items }) => {
     timeline.add(items, {
       clipPath: ['inset(100% 0% 0% 0% round 24px)', 'inset(0% 0% 0% 0% round 24px)'],
-      duration: 900,
+      duration: 1300,
       ease: anime.cubicBezier(0.65, 0, 0.35, 1),
-      delay: anime.stagger(110),
+      delay: anime.stagger(200),
     });
   },
   /* Best sellers: a soft rise. */
@@ -144,20 +147,20 @@ const ENTRANCES: Record<RevealVariant, Entrance> = {
     timeline.add(items, {
       opacity: [0, 1],
       translateY: [16, 0],
-      duration: 800,
-      ease: anime.cubicBezier(...EXPO),
-      delay: anime.stagger(70),
+      duration: 1300,
+      ease: anime.cubicBezier(...SMOOTH),
+      delay: anime.stagger(160),
     });
   },
   /* Stores: a focus pull. */
   focus: ({ anime, timeline, items }) => {
     timeline.add(items, {
       opacity: [0, 1],
-      filter: ['blur(10px)', 'blur(0px)'],
+      filter: ['blur(6px)', 'blur(0px)'],
       scale: [1.03, 1],
-      duration: 900,
-      ease: anime.cubicBezier(...EXPO),
-      delay: anime.stagger(90),
+      duration: 1300,
+      ease: anime.cubicBezier(...SMOOTH),
+      delay: anime.stagger(180),
     });
   },
   /* Join: the steps slide in left to right as the dotted line draws. */
@@ -168,8 +171,8 @@ const ENTRANCES: Record<RevealVariant, Entrance> = {
         {
           opacity: [0, 1],
           clipPath: ['inset(0% 100% 0% 0%)', 'inset(0% 0% 0% 0%)'],
-          duration: 750 + 120 * Math.max(items.length - 1, 0),
-          ease: anime.cubicBezier(...EXPO),
+          duration: 1400 + 220 * Math.max(items.length - 1, 0),
+          ease: anime.cubicBezier(...SMOOTH),
         },
         0,
       );
@@ -177,10 +180,10 @@ const ENTRANCES: Record<RevealVariant, Entrance> = {
       items,
       {
         opacity: [0, 1],
-        translateX: [-28, 0],
-        duration: 750,
-        ease: anime.cubicBezier(...EXPO),
-        delay: anime.stagger(120),
+        translateX: [-22, 0],
+        duration: 1400,
+        ease: anime.cubicBezier(...SMOOTH),
+        delay: anime.stagger(220),
       },
       0,
     );
@@ -194,10 +197,10 @@ const ENTRANCES: Record<RevealVariant, Entrance> = {
     timeline.add(ordered, {
       opacity: [0, 1],
       rotateX: [28, 0],
-      translateY: [24, 0],
-      duration: 1000,
-      ease: anime.cubicBezier(...EXPO),
-      delay: anime.stagger(80),
+      translateY: [20, 0],
+      duration: 1300,
+      ease: anime.cubicBezier(...SMOOTH),
+      delay: anime.stagger(160),
     });
   },
 };

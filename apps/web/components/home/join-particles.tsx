@@ -199,8 +199,8 @@ function draw(THREE: Three, anime: typeof Anime, element: HTMLElement) {
       if (visible && !rising)
         rising = anime.animate(material.uniforms.uProgress!, {
           value: [0, 1],
-          duration: 1400,
-          ease: anime.cubicBezier(0.16, 1, 0.3, 1),
+          duration: 2000,
+          ease: anime.cubicBezier(0.22, 1, 0.36, 1),
         });
       wake();
     },
