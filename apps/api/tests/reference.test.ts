@@ -182,10 +182,17 @@ describe('the documented shapes match @nexg/contracts/api', () => {
     expect(() => detail.parse(endpoint('get-merchant').responseExample)).not.toThrow();
   });
 
-  it('the coming-soon booking follows its planned contracts', () => {
+  it('the booking example follows its contracts', () => {
     const booking = endpoint('create-order');
     expect(() => ServiceBooking.parse(booking.example.body)).not.toThrow();
-    expect(() => BookingReceipt.parse(booking.responseExample)).not.toThrow();
+    const receipt = z
+      .object({
+        ok: z.literal(true),
+        data: z.object({ booking: BookingReceipt }).strict(),
+        meta: z.object({ api_version: z.literal('v1') }).strict(),
+      })
+      .strict();
+    expect(() => receipt.parse(booking.responseExample)).not.toThrow();
   });
 
   it('the one-order example is a valid order', () => {

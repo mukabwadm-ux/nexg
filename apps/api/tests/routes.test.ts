@@ -21,7 +21,7 @@ import { GET as getMerchant } from '../app/v1/catalog/merchants/[id]/route';
 import { GET as listExperiences } from '../app/v1/experiences/route';
 import { GET as listZones } from '../app/v1/zones/route';
 import { GET as listServices } from '../app/v1/services/route';
-import { GET as listOrders } from '../app/v1/orders/route';
+import { GET as listOrders, POST as createOrder } from '../app/v1/orders/route';
 import { GET as getOrder } from '../app/v1/orders/[id]/route';
 
 type Result = { data: unknown; error: unknown };
@@ -509,5 +509,195 @@ describe('who may cache an answer', () => {
     expect(res.status).toBe(200);
     expect(res.headers.get('cache-control')).toBe('no-store');
     expect(res.headers.get('ratelimit-remaining')).toBeNull();
+  });
+});
+
+/*
+ * POST /v1/orders: booking a service (2026-11-14). The database function
+ * resolves the key, prices the booking and stores the Idempotency-Key with
+ * the order; the route checks the scope, the header and the body, and turns
+ * the function's refusals into statuses.
+ */
+describe('POST /v1/orders', () => {
+  const WRITER_KEY = {
+    ...MERCHANT_KEY,
+    scopes: ['public_read', 'merchant_read', 'merchant_write'],
+  };
+  const RECEIPT = {
+    order_id: '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d',
+    reference: 'NX-261114-0012',
+    service: 'airport_transfer',
+    quantity: 2,
+    total_cents: 450000,
+    currency: 'KES',
+    payment_method: 'on_account',
+    scheduled_for: '2026-11-14T03:30:00+00:00',
+  };
+  const BOOKING = {
+    service: 'airport_transfer',
+    quantity: 2,
+    pickup_label: 'JKIA Terminal 1A',
+    pickup_lat: -1.3192,
+    pickup_lng: 36.9278,
+    dropoff_label: 'Woodvale Grove, Westlands, Nairobi',
+    dropoff_lat: -1.2648,
+    dropoff_lng: 36.8027,
+    scheduled_for: '2026-11-14T06:30:00+03:00',
+    passengers: [{ name: 'Amina Wekesa', flight: 'KQ 101' }],
+  };
+
+  const post = (body: unknown, headers: Record<string, string> = {}) =>
+    new Request('https://api.test/v1/orders', {
+      method: 'POST',
+      headers: {
+        'x-api-key': 'a-merchant-key',
+        'idempotency-key': 'booking-2026-11-14-0001',
+        'content-type': 'application/json',
+        ...headers,
+      },
+      body: typeof body === 'string' ? body : JSON.stringify(body),
+    });
+
+  /** A key that may book; `place` answers for the booking function. */
+  function allowBookings(
+    place: (args: Record<string, unknown>) => Result,
+    key: Record<string, unknown> = WRITER_KEY,
+  ) {
+    rpc.mockImplementation(async (name: string, args: Record<string, unknown>) => {
+      if (name === 'fn_api_key_lookup') return { data: [key], error: null };
+      if (name === 'fn_api_request_spend') {
+        return { data: [{ allowed: true, retry_after: 0, remaining: 45 }], error: null };
+      }
+      if (name === 'rpc_order_place_api') return place(args);
+      throw new Error(`unexpected rpc ${name}`);
+    });
+  }
+  const placeCalls = () => rpc.mock.calls.filter(([name]) => name === 'rpc_order_place_api');
+  const placed = () => ({ data: { ok: true, ...RECEIPT }, error: null });
+
+  it('books a service and answers 201 with the receipt', async () => {
+    allowBookings(placed);
+
+    const res = await createOrder(post(BOOKING));
+    const body = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(body).toEqual({ ok: true, data: { booking: RECEIPT }, meta: { api_version: 'v1' } });
+    expect(res.headers.get('location')).toBe(`/v1/orders/${RECEIPT.order_id}`);
+    expect(res.headers.get('cache-control')).toBe('no-store');
+    expect(res.headers.get('ratelimit-remaining')).toBe('45');
+    expect(placeCalls()).toHaveLength(1);
+    expect(placeCalls()[0]?.[1]).toEqual({
+      p_api_key: 'a-merchant-key',
+      p_idempotency_key: 'booking-2026-11-14-0001',
+      p_payload: { ...BOOKING, payment_method: 'on_account' },
+    });
+    const spend = rpc.mock.calls.find(([name]) => name === 'fn_api_request_spend')?.[1];
+    expect(spend).toMatchObject({ p_operation: 'merchant_write' });
+  });
+
+  it('refuses a key without merchant_write, and a key bound to no merchant', async () => {
+    // The default key from allowRequests() reads but cannot book.
+    const res = await createOrder(post(BOOKING));
+
+    expect(res.status).toBe(403);
+    expect((await res.json()).error.code).toBe('not_found');
+
+    allowBookings(placed, { ...WRITER_KEY, merchant_id: null });
+    const unbound = await createOrder(post(BOOKING));
+
+    expect(unbound.status).toBe(403);
+    expect(placeCalls()).toHaveLength(0);
+  });
+
+  it.each(['', 'too-short'])(
+    'needs an Idempotency-Key of 16 to 128 characters (%j)',
+    async (idempotencyKey) => {
+      allowBookings(placed);
+
+      const res = await createOrder(post(BOOKING, { 'idempotency-key': idempotencyKey }));
+      const body = await res.json();
+
+      expect(res.status).toBe(400);
+      expect(body.error.fields['Idempotency-Key']).toBeTruthy();
+      expect(placeCalls()).toHaveLength(0);
+    },
+  );
+
+  it('refuses a body that is not JSON', async () => {
+    allowBookings(placed);
+
+    const res = await createOrder(post('{ not json'));
+
+    expect(res.status).toBe(400);
+    expect(placeCalls()).toHaveLength(0);
+  });
+
+  it.each([
+    ['a price', { ...BOOKING, total_cents: 0 }],
+    ['another payment method', { ...BOOKING, payment_method: 'mpesa_stk' }],
+    ['a quantity over 60', { ...BOOKING, quantity: 61 }],
+    ['a time without an offset', { ...BOOKING, scheduled_for: '2026-11-14T06:30:00' }],
+  ])('refuses %s before the database sees it', async (_label, body) => {
+    allowBookings(placed);
+
+    const res = await createOrder(post(body));
+    const answer = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(answer.error.code).toBe('invalid_request');
+    expect(Object.keys(answer.error.fields ?? {}).length).toBeGreaterThan(0);
+    expect(placeCalls()).toHaveLength(0);
+  });
+
+  it.each([
+    ['22023', 'That service is not one we offer.', 400],
+    ['22023', 'Where are we collecting from?', 400],
+    ['42501', 'This merchant is not live.', 403],
+    ['42501', 'That API key is not valid.', 401],
+    ['P0001', 'That service is not priced yet. Our team has to set it up first.', 400],
+  ])('passes on the database refusal %s "%s" as %i', async (code, message, status) => {
+    allowBookings(() => ({ data: null, error: { code, message } }));
+
+    const res = await createOrder(post(BOOKING));
+    const body = await res.json();
+
+    expect(res.status).toBe(status);
+    expect(body.error.message).toBe(message);
+  });
+
+  it('answers any other database failure with a logged 500', async () => {
+    allowBookings(() => ({ data: null, error: { code: 'P0001', message: 'audit chain broken' } }));
+
+    const res = await createOrder(post(BOOKING));
+    const body = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(body.error.message).not.toContain('audit');
+    expect(errorLog).toHaveBeenCalled();
+  });
+
+  it('asks once more when two requests race on the same key', async () => {
+    let calls = 0;
+    allowBookings(() =>
+      ++calls === 1
+        ? { data: null, error: { code: '23505', message: 'duplicate key value' } }
+        : placed(),
+    );
+
+    const res = await createOrder(post(BOOKING));
+
+    expect(res.status).toBe(201);
+    expect(placeCalls()).toHaveLength(2);
+  });
+
+  it('answers 500 when the receipt cannot be read back', async () => {
+    allowBookings(() => ({ data: { ok: true, ...RECEIPT, order_id: 'not-a-uuid' }, error: null }));
+
+    const res = await createOrder(post(BOOKING));
+    const body = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(body.error.message).toContain('same Idempotency-Key');
   });
 });

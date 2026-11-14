@@ -1,6 +1,6 @@
 import { CodeBlock } from '@/components/docs/code';
 import { DocPage } from '@/components/docs/doc-page';
-import { A, C, Callout, H2, List, P, Table } from '@/components/docs/prose';
+import { A, C, H2, List, P, Table } from '@/components/docs/prose';
 import { pageMetadata } from '@/lib/reference/navigation';
 
 export const metadata = pageMetadata('/docs/idempotency');
@@ -34,22 +34,17 @@ export default function IdempotencyPage() {
     >
       <H2 id="reads">Reads are safe to retry</H2>
       <P>
-        Every endpoint on api.nexgapp.com is a <C>GET</C> today, and a read never changes anything at NexG. If a
+        Every endpoint on api.nexgapp.com except booking a service is a <C>GET</C>, and a read never changes anything at NexG. If a
         call times out or fails with a <C>5xx</C>, send it again, waiting longer each time (1, 2,
         then 4 seconds is plenty). After a <C>429</C>, wait for <C>Retry-After</C> first.
       </P>
 
       <H2 id="keys">Idempotency keys for writes</H2>
-      <Callout tone="soon" title="Arrives with the first write">
-        <p>
-          Booking a service, <A href="/docs/reference/create-order">POST /v1/orders</A>, is the
-          first write and is not served yet. This is how it is designed to behave.
-        </p>
-      </Callout>
       <P>
         A retried write must not happen twice: a second airport transfer is a second car nobody
-        asked for. So every write carries an <C>Idempotency-Key</C> header, and NexG keeps the
-        first answer it gave for that key.
+        asked for. So every write, today{' '}
+        <A href="/docs/reference/create-order">booking a service</A>, carries an{' '}
+        <C>Idempotency-Key</C> header, and NexG keeps the first answer it gave for that key.
       </P>
       <List>
         <li>The key is 16 to 128 characters. A random UUID is a good choice.</li>

@@ -47,8 +47,8 @@ export default function EnvironmentsPage() {
         rows={[
           [
             'The NexG API',
-            'Coming soon: sandbox keys with test data, alongside the first write endpoints.',
-            'api.nexgapp.com. Every endpoint on it only reads today, so building against it changes nothing.',
+            'Coming soon: sandbox keys with test data.',
+            'api.nexgapp.com. Reads change nothing. A booking (POST /v1/orders) is a real order, so agree a test booking with NexG first.',
           ],
           [
             'Bank collections',
@@ -62,11 +62,12 @@ export default function EnvironmentsPage() {
           ],
         ]}
       />
-      <Callout tone="note" title="Why the API has no sandbox yet">
+      <Callout tone="note" title="The API has no sandbox yet">
         <p>
-          Sandboxes exist so a test cannot do something real. Every endpoint on api.nexgapp.com is a
-          read, so there is nothing for a test to do by accident. A sandbox arrives with the first
-          writes, such as <A href="/docs/reference/create-order">booking a service</A>.
+          Sandboxes exist so a test cannot do something real. A read cannot change anything at
+          NexG, but <A href="/docs/reference/create-order">booking a service</A> makes a real order
+          that NexG will act on. Until sandbox keys arrive, agree a test booking with NexG before
+          you send one.
         </p>
       </Callout>
 

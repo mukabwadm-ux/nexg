@@ -36,7 +36,7 @@ export default function RateLimitsPage() {
         rows={[
           ['Public reads: merchants, zones, experiences, services', <C key="s">public_read</C>, '1'],
           ['Reading your orders', <C key="s">merchant_read</C>, '3'],
-          ['Booking a service (coming soon)', <C key="s">merchant_write</C>, '5'],
+          ['Booking a service', <C key="s">merchant_write</C>, '5'],
         ]}
       />
 

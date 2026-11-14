@@ -335,8 +335,13 @@ export const ServiceBooking = z
       )
       .max(60)
       .optional(),
-    /** How they want to pay. */
-    payment_method: z.enum(['on_account', 'mpesa_stk', 'card']).default('on_account'),
+    /**
+     * How it is paid. Only `on_account` today: the booking is charged to
+     * the merchant's account with NexG. The database also knows M-Pesa
+     * and card, but nothing yet collects either for an API booking, so
+     * accepting them would leave orders that nobody can pay.
+     */
+    payment_method: z.enum(['on_account']).default('on_account'),
     /** Anything the driver should know. */
     note: z.string().max(1000).optional(),
   })
@@ -345,7 +350,9 @@ export const ServiceBooking = z
 export type ServiceBooking = z.infer<typeof ServiceBooking>;
 
 /**
- * What a booking comes back as.
+ * What a booking comes back as: `data.booking` in the answer to
+ * POST /v1/orders. A retry with the same Idempotency-Key gets the same
+ * receipt, and the full order is GET /v1/orders/{order_id}.
  *
  * `total_cents` is what the booking cost, frozen at the moment it was
  * placed. It is not a quote and it will not change: the money on an
@@ -354,7 +361,6 @@ export type ServiceBooking = z.infer<typeof ServiceBooking>;
  */
 export const BookingReceipt = z
   .object({
-    ok: z.literal(true),
     order_id: Uuid,
     reference: z.string(),
     service: z.string(),
@@ -362,7 +368,7 @@ export const BookingReceipt = z
     total_cents: Money,
     currency: z.literal('KES'),
     payment_method: z.string(),
-    scheduled_for: z.string().nullable().optional(),
+    scheduled_for: z.string().nullable(),
   })
   .strict();
 

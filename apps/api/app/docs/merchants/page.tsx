@@ -44,14 +44,16 @@ export default function MerchantIntegrationPage() {
         <li>Read your own orders into your system, with a key bound to your merchant.</li>
         <li>Show your NexG listing and catalogue on your own website.</li>
         <li>Use NexG&apos;s delivery zones, published experiences and bookable services.</li>
+        <li>
+          Book NexG services for your guests, such as an airport transfer, charged to your account:{' '}
+          <A href="/docs/reference/create-order">POST /v1/orders</A>.
+        </li>
         <li>Keep your catalogue in your own system and import it to NexG as CSV.</li>
       </List>
       <Callout tone="soon" title="Not through the API yet">
         <p>
-          Creating, changing or cancelling orders, accepting bookings, starting a payment and
-          requesting a payout. Booking a service by API is designed and listed in the{' '}
-          <A href="/docs/reference/create-order">reference</A> as coming soon. The service list is
-          informational until then.
+          Changing or cancelling orders, accepting bookings from guests, starting a payment and
+          requesting a payout.
         </p>
       </Callout>
 
