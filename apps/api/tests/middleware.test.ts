@@ -53,14 +53,16 @@ describe('the /v1 middleware', () => {
   );
 
   it.each([
-    ['POST', '/v1/orders'],
-    ['DELETE', '/v1/zones'],
-    ['PATCH', `/v1/catalog/merchants/${ID}`],
-    ['PUT', `/v1/orders/${ID}`],
-  ])('answers %s %s with a JSON 405 and Allow', async (method, path) => {
+    ['DELETE', '/v1/orders', 'GET, POST, HEAD, OPTIONS'],
+    ['PATCH', '/v1/orders', 'GET, POST, HEAD, OPTIONS'],
+    ['DELETE', '/v1/zones', 'GET, HEAD, OPTIONS'],
+    ['POST', '/v1/zones', 'GET, HEAD, OPTIONS'],
+    ['PATCH', `/v1/catalog/merchants/${ID}`, 'GET, HEAD, OPTIONS'],
+    ['PUT', `/v1/orders/${ID}`, 'GET, HEAD, OPTIONS'],
+  ])('answers %s %s with a JSON 405 and Allow', async (method, path, allow) => {
     const res = run(path, method);
     await expectEnvelope(res, 405, 'method_not_allowed');
-    expect(res.headers.get('allow')).toBe('GET, HEAD, OPTIONS');
+    expect(res.headers.get('allow')).toBe(allow);
   });
 });
 

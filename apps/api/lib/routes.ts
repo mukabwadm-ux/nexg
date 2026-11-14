@@ -19,7 +19,7 @@ export const V1_ROUTES: readonly V1Route[] = [
   { path: '/v1/catalog/merchants', methods: ['GET'] },
   { path: '/v1/catalog/merchants/{id}', methods: ['GET'] },
   { path: '/v1/experiences', methods: ['GET'] },
-  { path: '/v1/orders', methods: ['GET'] },
+  { path: '/v1/orders', methods: ['GET', 'POST'] },
   { path: '/v1/orders/{id}', methods: ['GET'] },
   { path: '/v1/services', methods: ['GET'] },
   { path: '/v1/zones', methods: ['GET'] },

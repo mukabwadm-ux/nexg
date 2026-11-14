@@ -390,7 +390,8 @@ export const BOOKING_REQUEST_FIELDS: FieldDoc[] = [
   {
     name: 'payment_method',
     type: 'string',
-    description: 'on_account (the default), mpesa_stk or card.',
+    description:
+      'on_account, the default and the only method today: charged to your merchant’s account with NexG.',
   },
   {
     name: 'note',
@@ -400,8 +401,11 @@ export const BOOKING_REQUEST_FIELDS: FieldDoc[] = [
 ];
 
 export const BOOKING_RECEIPT_FIELDS: FieldDoc[] = [
-  { name: 'ok', type: 'boolean', description: 'Always true on a receipt.' },
-  { name: 'order_id', type: 'uuid', description: 'NexG’s id for the new order.' },
+  {
+    name: 'order_id',
+    type: 'uuid',
+    description: 'NexG’s id for the new order. GET /v1/orders/{order_id} reads it in full.',
+  },
   { name: 'reference', type: 'string', description: 'The reference people read.' },
   { name: 'service', type: 'string', description: 'The service code you booked.' },
   { name: 'quantity', type: 'integer', description: 'How many units.' },
@@ -412,11 +416,11 @@ export const BOOKING_RECEIPT_FIELDS: FieldDoc[] = [
       'What it cost, in cents, priced by NexG from its fee settings. A caller never sets a price.',
   },
   { name: 'currency', type: 'string', description: 'Always KES.' },
-  { name: 'payment_method', type: 'string', description: 'How it will be paid.' },
+  { name: 'payment_method', type: 'string', description: 'How it will be paid: on_account.' },
   {
     name: 'scheduled_for',
     type: 'timestamp',
     nullable: true,
-    description: 'When it is booked for, if scheduled.',
+    description: 'When it is booked for, in UTC. Null for as soon as possible.',
   },
 ];

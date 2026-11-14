@@ -10,6 +10,17 @@ import type { ChangelogEntry } from './types';
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-11-14',
+    kind: 'added',
+    title: 'Book a service',
+    body: [
+      'POST /v1/orders books a service for your guests, such as an airport transfer, a courier or a venue, with a key that has merchant_write. NexG prices it from its fee settings for your city, and the booking is charged to your merchant’s account.',
+      'Every booking needs an Idempotency-Key: a retry with the same key gets the first answer back and never books twice. The answer is 201 with the receipt as data.booking and a Location header for the full order.',
+      'A service can be booked in a city once NexG has priced it there, and there is no test mode yet: every booking is a real order.',
+    ],
+    endpoints: ['create-order'],
+  },
+  {
     date: '2026-11-11',
     kind: 'fixed',
     title: 'Keys are always checked, and every /v1 answer is JSON',

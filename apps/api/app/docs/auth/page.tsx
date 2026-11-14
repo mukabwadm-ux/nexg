@@ -83,8 +83,8 @@ export default function AuthPage() {
           ],
           [
             <C key="s">merchant_write</C>,
-            'Book services for that merchant, when booking ships. No endpoint uses it yet.',
-            'Not issued by the console yet.',
+            'Book services for that merchant, charged to its account (POST /v1/orders).',
+            'Not offered by the console yet: ask NexG.',
           ],
           [
             <span key="s">

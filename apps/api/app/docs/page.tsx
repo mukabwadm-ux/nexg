@@ -184,11 +184,11 @@ export default function IntroductionPage() {
         <li>Two-way sync with a POS, ERP, booking or inventory system.</li>
         <li>OAuth sign-in for third-party apps. Use API keys.</li>
       </List>
-      <Callout tone="note" title="Everything live today is read-only">
+      <Callout tone="note" title="Reads are safe to explore">
         <p>
-          No endpoint on api.nexgapp.com changes anything at NexG, so you can explore against the live
-          API safely. The first write, booking a service, is designed around an idempotency key,
-          so a retried booking is never made twice.
+          Every endpoint except booking a service only reads, so you can explore the live API
+          safely. A booking is a real order: it carries an idempotency key, so a retried booking is
+          never made twice, and there is no test mode yet.
         </p>
       </Callout>
     </DocPage>
