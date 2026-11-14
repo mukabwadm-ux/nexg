@@ -3,6 +3,7 @@ import '@nexg/ui/globals.css';
 import { ToastProvider } from '@nexg/ui';
 import type { Metadata, Viewport } from 'next';
 import { RegisterServiceWorker } from '@/components/notifications/register-sw';
+import { REVEAL_SCRIPT } from '@/components/reveal-script';
 import { THEME_SCRIPT } from '@/components/theme/script';
 import { ThemeSync } from '@/components/theme/theme';
 
@@ -37,6 +38,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {/* Light or dark before the first paint: no flash for dark-mode visitors. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        {/* Homepage entrances: their items first appear through the animation. */}
+        <script dangerouslySetInnerHTML={{ __html: REVEAL_SCRIPT }} />
         <link
           rel="preload"
           href="/fonts/manrope/v1/manrope-latin.woff2"

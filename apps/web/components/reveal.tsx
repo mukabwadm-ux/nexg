@@ -3,6 +3,8 @@
 import type * as Anime from 'animejs';
 import * as React from 'react';
 
+import { REVEAL_CLASS, REVEAL_READY } from './reveal-script';
+
 export type RevealVariant = 'rise' | 'iris' | 'wipe' | 'focus' | 'path' | 'phone';
 
 type State = 'static' | 'waiting' | 'playing' | 'done';
@@ -15,11 +17,14 @@ const ANIMATED = ['opacity', 'transform', 'clip-path', 'filter', 'will-change'] 
  * Plays a section's entrance the first time it scrolls into view, as an
  * anime.js timeline (loaded only when the first section needs it).
  *
- * The section is `static` as the server sends it, so everything shows if
- * scripts are slow or fail. Once mounted below the fold it is `waiting`
- * (its items held back by CSS), `playing` while the timeline runs and
- * `done` after. A visitor who asked for reduced motion gets no entrance and
- * nothing held back; if anime.js cannot load, the section simply shows.
+ * The section is `static` as the server sends it. A script in <head> marks
+ * <html> before the first paint (see reveal-script.ts), and while it is
+ * marked CSS holds a static section's items back, so nothing shows before
+ * its entrance. Once mounted the section plays at once if already in view,
+ * else is `waiting` until it scrolls into view; then `playing` while the
+ * timeline runs and `done` after. Without the mark (no JS, reduced motion,
+ * or scripts too slow) the section simply shows; so it does if anime.js
+ * fails to load.
  */
 export function Reveal({
   variant = 'rise',
@@ -35,12 +40,31 @@ export function Reveal({
 
   React.useEffect(() => {
     const element = ref.current;
-    if (!element || typeof IntersectionObserver === 'undefined') return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const box = element.getBoundingClientRect();
-    if (box.top < window.innerHeight && box.bottom > 0) return;
+    (window as unknown as Record<string, boolean>)[REVEAL_READY] = true;
+    const held = document.documentElement.classList.contains(REVEAL_CLASS);
+    if (
+      !element ||
+      typeof IntersectionObserver === 'undefined' ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      if (held) setState('done');
+      return;
+    }
 
     let cancelled = false;
+    const update = (next: State) => {
+      if (!cancelled) setState(next);
+    };
+    const box = element.getBoundingClientRect();
+    if (box.top < window.innerHeight && box.bottom > 0) {
+      /* Already on screen: play now if it is still held back; if the mark
+         came off (slow scripts) it is already showing, so leave it. */
+      if (held) void play(element, variant, update);
+      return () => {
+        cancelled = true;
+      };
+    }
+
     setState('waiting');
     /* Fetched now, while the section is still below the fold, so its
        entrance starts the moment it is seen rather than after a download. */

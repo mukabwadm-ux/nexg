@@ -374,15 +374,16 @@ div.ui-table-viewport[data-table-viewport] {
 /*
  * Scroll entrances. The motion is anime.js, in apps/web components/reveal.tsx;
  * all this does is hold a section's items back while it waits below the
- * fold. A section is `static` as the server sends it, so nothing is hidden
- * if scripts are slow or fail, and never for a visitor who asked for
- * reduced motion. Once its timeline starts, anime.js holds each item at its
- * starting point inline, and clears those styles when it ends.
+ * fold, and from the first paint: a script in <head> adds .nx-anim to <html>
+ * (scripts on, no reduced motion), which holds a `static` section's items
+ * too. No-JS visitors and crawlers never get the class, and it comes off
+ * after 3s if the page has not hydrated. Once a timeline starts, anime.js
+ * holds each item at its starting point inline, and clears those styles
+ * when it ends.
  */
-@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-  [data-reveal][data-state='waiting'] [data-reveal-item],
-  [data-reveal='path'][data-state='waiting'] [data-reveal-line],
-  [data-reveal='path'][data-state='waiting'] [data-reveal-glow] {
+@media (prefers-reduced-motion: no-preference) {
+  :is(html.nx-anim [data-reveal][data-state='static'], [data-reveal][data-state='waiting'])
+    :is([data-reveal-item], [data-reveal-line], [data-reveal-glow]) {
     opacity: 0;
   }
 }
