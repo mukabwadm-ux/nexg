@@ -680,7 +680,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     description: [
       'For a business that books NexG services for its own guests: a hotel or tour company booking an airport transfer, for example. With a live key the booking becomes a real NexG order, charged to your merchant’s account.',
       'With a test key it is a sandbox booking: same checks, a TEST- reference, and nothing dispatched or charged. A service NexG has not priced in your city yet gets a sample price of KES 1,000 a unit, so you can build before prices are set. See Environments.',
-      'You say what and how many; NexG works out the price from its fee settings for your city, the same way checkout does. A request can never state a price. The total is frozen on the order when it is placed.',
+      'You say what and how many; NexG works out the price from its fee settings for your city, the same way checkout does. A transfer or courier is charged per passenger or parcel, a venue booking once whatever the quantity. A request can never state a price. The total is frozen on the order when it is placed.',
       'Every booking needs an Idempotency-Key header. A retry with the same key gets the first answer back instead of booking twice, so a timeout is always safe to retry.',
       'The answer is 201 with the receipt as data.booking and a Location header. The booking then appears in GET /v1/orders, and GET /v1/orders/{id} reads it in full.',
     ],

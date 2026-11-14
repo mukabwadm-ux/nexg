@@ -287,7 +287,8 @@ export const SERVICE_FIELDS: FieldDoc[] = [
   {
     name: 'unit_label',
     type: 'string',
-    description: 'What one unit is called, for example passenger or parcel.',
+    description:
+      'What one unit is called, for example passenger or parcel. Where it is booking, the service is charged once per booking.',
   },
   {
     name: 'active',
@@ -361,7 +362,8 @@ export const BOOKING_REQUEST_FIELDS: FieldDoc[] = [
   {
     name: 'quantity',
     type: 'integer',
-    description: 'How many units, 1 to 60. Defaults to 1. For a transfer, passengers.',
+    description:
+      'How many units, 1 to 60. Defaults to 1. For a transfer, passengers. A flat-priced service, such as a venue booking, costs the same whatever the quantity.',
   },
   {
     name: 'pickup_label',

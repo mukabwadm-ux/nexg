@@ -11,6 +11,15 @@ import type { ChangelogEntry } from './types';
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-14',
+    kind: 'fixed',
+    title: 'A venue booking is charged once',
+    body: [
+      'POST /v1/orders charged a flat-priced service, such as a venue booking, its price times the quantity. It is now charged once per booking, whatever the quantity. Transfers and couriers are still charged per passenger or parcel.',
+    ],
+    endpoints: ['create-order'],
+  },
+  {
+    date: '2026-11-14',
     kind: 'added',
     title: 'Test keys and a sandbox for bookings',
     body: [
