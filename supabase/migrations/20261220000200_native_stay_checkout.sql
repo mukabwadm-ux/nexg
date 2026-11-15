@@ -19,6 +19,18 @@ create table public.native_stay_checkout (
 alter table public.native_stay_checkout enable row level security;
 revoke all on public.native_stay_checkout from public, anon, authenticated;
 
+insert into audit.action_registry (action, module, default_severity, money, description)
+values ('stay.quote_issued', 'hotels', 'info', false, 'An exact native stay quote was issued.')
+on conflict (action) do nothing;
+
+insert into public.wiring_audit_exempt (function_name, reason, recorded_in)
+values (
+  'rpc_native_stay_hold',
+  'The underlying rpc_stay_hold audits the reservation in the same transaction. This wrapper only records the replay mapping and emits no second hold event.',
+  'audit.log(stay.held); public.native_stay_checkout.stay_id'
+)
+on conflict (function_name) do nothing;
+
 create function public.fn_native_stay_customer()
 returns uuid
 language plpgsql
@@ -109,6 +121,15 @@ begin
     v_uid, p_property_id, p_unit_id, p_check_in, p_check_out, p_adults, p_children,
     v_price.nightly_rate_kes * 100, v_price.total_kes * 100, clock_timestamp() + interval '10 minutes'
   ) returning * into v_checkout;
+
+  perform audit.log('guest'::public.actor_type, 'hotels', 'stay.quote_issued',
+    p_actor_id => v_uid, p_target_type => 'native_stay_checkout', p_target_id => v_checkout.id,
+    p_city_id => (select u.city_id from public.unit u where u.id = v_checkout.unit_id),
+    p_after => jsonb_build_object(
+      'property', v_checkout.property_id, 'unit', v_checkout.unit_id,
+      'nights', v_checkout.check_out - v_checkout.check_in,
+      'total_minor', v_checkout.total_minor, 'currency', 'KES', 'expires_at', v_checkout.expires_at
+    ));
 
   return jsonb_build_object(
     'quoteId', v_checkout.id, 'propertyId', v_checkout.property_id, 'unitId', v_checkout.unit_id,

@@ -3,6 +3,14 @@
 alter table public.payment
   add column if not exists mpesa_dispatch_claimed_at timestamptz;
 
+insert into public.wiring_audit_exempt (function_name, reason, recorded_in)
+values (
+  'rpc_payment_mpesa_prompt_claim',
+  'The claim is an operational send lock. Payment opening and settlement are audited by the existing payment RPCs, and the sent prompt is recorded separately.',
+  'public.payment.mpesa_dispatch_claimed_at; public.payment_prompt'
+)
+on conflict (function_name) do nothing;
+
 create function public.rpc_payment_mpesa_prompt_claim(p_reference text, p_callback_secret text)
 returns jsonb
 language plpgsql

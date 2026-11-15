@@ -27,10 +27,15 @@ it('uses the production availability, hold and settlement functions without dupl
         'create function auth.uid() returns uuid language sql stable',
         "as $$ select nullif(current_setting('test.uid', true), '')::uuid $$;",
         "create type public.actor_type as enum ('guest', 'system');",
-        'create function audit.log(public.actor_type, text, text, p_actor_id uuid default null,',
+        'create table audit.action_registry(action text primary key, module text, default_severity text,',
+        '  money boolean, description text);',
+        'create table public.wiring_audit_exempt(function_name text primary key, reason text, recorded_in text);',
+        'create table audit.fixture_log(action text, actor_id uuid, target_id uuid, after_state jsonb);',
+        'create function audit.log(public.actor_type, text, p_action text, p_actor_id uuid default null,',
         '  p_target_type text default null, p_target_id uuid default null, p_city_id uuid default null,',
         '  p_after jsonb default null, p_severity text default null, p_reason text default null)',
-        '  returns void language plpgsql as $$ begin end; $$;',
+        '  returns void language sql as $$',
+        '    insert into audit.fixture_log values (p_action, p_actor_id, p_target_id, p_after) $$;',
         'create table public.host(id uuid primary key, time_zone text);',
         'create table public.property(id uuid primary key, check_in_from time, check_out_by time);',
         'create table public.unit(id uuid primary key, host_id uuid, property_id uuid, city_id uuid,',
@@ -147,6 +152,20 @@ it('uses the production availability, hold and settlement functions without dupl
     await expect(quote(sample)).rejects.toMatchObject({ code: 'NX001' });
     await expect(quote(unpriced)).rejects.toMatchObject({ code: 'NX001' });
     const priced = await quote();
+    expect(
+      await result(
+        "(select to_jsonb(a) from audit.fixture_log a where action = 'stay.quote_issued' and target_id = $1)",
+        priced.quoteId,
+      ),
+    ).toMatchObject({ actor_id: owner, after_state: { currency: 'KES', total_minor: 1400000 } });
+    expect(
+      await result("(select module from audit.action_registry where action = 'stay.quote_issued')"),
+    ).toBe('hotels');
+    expect(
+      await result(
+        '(select array_agg(function_name order by function_name) from public.wiring_audit_exempt)',
+      ),
+    ).toEqual(['rpc_native_stay_hold', 'rpc_payment_mpesa_prompt_claim']);
     expect(priced).toMatchObject({
       propertyId: property,
       unitId: unit,
@@ -177,6 +196,12 @@ it('uses the production availability, hold and settlement functions without dupl
     const first = await hold(fresh.quoteId);
     await expect(hold(fresh.quoteId)).resolves.toEqual(first);
     expect(await counts()).toBe(1);
+    expect(
+      await result<number>(
+        "(select count(*)::int from audit.fixture_log where action = 'stay.held' and target_id = $1)",
+        first.stayId,
+      ),
+    ).toBe(1);
     await expect(hold(fresh.quoteId, 'Not the same guest')).rejects.toMatchObject({
       code: 'NX005',
     });
