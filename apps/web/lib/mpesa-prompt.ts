@@ -28,6 +28,15 @@ export type PromptOutcome =
   | { ok: true; message: string }
   | { ok: false; status: number; message: string; pending?: boolean; waitSeconds?: number };
 
+export async function mpesaDispatchIsReady(supabase: Client): Promise<boolean> {
+  if (!darajaConfigured()) return false;
+  const callbackSecret = process.env.DARAJA_CALLBACK_SECRET?.trim() ?? '';
+  const ready = await supabase.rpc('rpc_payment_mpesa_ready', {
+    p_callback_secret: callbackSecret,
+  });
+  return ready.data === true;
+}
+
 /** Sends the PIN prompt for a payment the caller has just begun or reused. */
 export async function sendMpesaPrompt(input: {
   supabase: Client;
@@ -42,27 +51,26 @@ export async function sendMpesaPrompt(input: {
 }): Promise<PromptOutcome> {
   const rpc = loose(input.supabase);
 
-  const wait = await rpc('rpc_payment_mpesa_prompt_wait', { p_reference: input.reference });
+  if (!(await mpesaDispatchIsReady(input.supabase))) {
+    return { ok: false, status: 503, pending: true, message: input.notReadyMessage };
+  }
+  const callbackSecret = process.env.DARAJA_CALLBACK_SECRET?.trim() ?? '';
+  const wait = await rpc('rpc_payment_mpesa_prompt_claim', {
+    p_reference: input.reference,
+    p_callback_secret: callbackSecret,
+  });
   const gate = wait.data as { ok?: boolean; message?: string; wait_seconds?: number } | null;
   if (wait.error) {
-    return { ok: false, status: 400, message: wait.error.message.replace(/^.*?:\s*/, '') };
+    return { ok: false, status: 503, pending: true, message: input.notReadyMessage };
   }
-  if (gate && gate.ok === false) {
+  if (!gate || gate.ok !== true) {
     return {
       ok: false,
       status: 429,
-      message: gate.message ?? 'Check your phone for the prompt already sent.',
-      waitSeconds: gate.wait_seconds ?? 0,
+      pending: true,
+      message: gate?.message ?? 'Check your phone for the prompt already sent.',
+      waitSeconds: gate?.wait_seconds ?? 0,
     };
-  }
-
-  const callbackSecret = process.env.DARAJA_CALLBACK_SECRET?.trim() ?? '';
-  const ready =
-    darajaConfigured() &&
-    (await input.supabase.rpc('rpc_payment_mpesa_ready', { p_callback_secret: callbackSecret }))
-      .data;
-  if (!ready) {
-    return { ok: false, status: 503, pending: true, message: input.notReadyMessage };
   }
 
   const sent = await stkPush({
@@ -74,7 +82,7 @@ export async function sendMpesaPrompt(input: {
     description: input.description,
   });
   if (!sent.ok || !sent.checkoutRequestId) {
-    return { ok: false, status: 502, message: sent.message };
+    return { ok: false, status: 502, pending: true, message: sent.message };
   }
 
   const back = await rpc('rpc_payment_mpesa_sent', {
