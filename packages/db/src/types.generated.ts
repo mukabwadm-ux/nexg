@@ -22420,6 +22420,70 @@ export type Database = {
           },
         ];
       };
+      native_stay_checkout: {
+        Row: {
+          adults: number;
+          check_in: string;
+          check_out: string;
+          children: number;
+          expires_at: string;
+          guest_name_hash: string | null;
+          guest_user_id: string;
+          id: string;
+          nightly_minor: number;
+          property_id: string;
+          stay_id: string | null;
+          total_minor: number;
+          unit_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          adults: number;
+          check_in: string;
+          check_out: string;
+          children: number;
+          expires_at: string;
+          guest_name_hash?: string | null;
+          guest_user_id: string;
+          id?: string;
+          nightly_minor: number;
+          property_id: string;
+          stay_id?: string | null;
+          total_minor: number;
+          unit_id: string;
+        };
+        Update: {
+          adults?: number;
+          check_in?: string;
+          check_out?: string;
+          children?: number;
+          expires_at?: string;
+          guest_name_hash?: string | null;
+          guest_user_id?: string;
+          id?: string;
+          nightly_minor?: number;
+          property_id?: string;
+          stay_id?: string | null;
+          total_minor?: number;
+          unit_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'native_stay_checkout_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_stay_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'native_stay_checkout_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: true;
+            referencedRelation: 'stay';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       notification: {
         Row: {
           attempts: number;
@@ -24820,6 +24884,7 @@ export type Database = {
           id: string;
           intent: Database['public']['Enums']['payment_intent'];
           merchant_id: string | null;
+          mpesa_dispatch_claimed_at: string | null;
           order_id: string | null;
           paid_at: string | null;
           payer_phone: string | null;
@@ -24849,6 +24914,7 @@ export type Database = {
           id?: string;
           intent: Database['public']['Enums']['payment_intent'];
           merchant_id?: string | null;
+          mpesa_dispatch_claimed_at?: string | null;
           order_id?: string | null;
           paid_at?: string | null;
           payer_phone?: string | null;
@@ -24877,6 +24943,7 @@ export type Database = {
           id?: string;
           intent?: Database['public']['Enums']['payment_intent'];
           merchant_id?: string | null;
+          mpesa_dispatch_claimed_at?: string | null;
           order_id?: string | null;
           paid_at?: string | null;
           payer_phone?: string | null;
@@ -50364,6 +50431,8 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      fn_native_stay_checkout_view: { Args: { p_checkout_id: string }; Returns: Json };
+      fn_native_stay_customer: { Args: Record<PropertyKey, never>; Returns: string };
       fn_needs_action_reads_as: { Args: { p_reasons: string[] }; Returns: string };
       fn_notify_enqueue: {
         Args: {
@@ -55746,6 +55815,20 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_native_stay_hold: { Args: { p_first_name: string; p_quote_id: string }; Returns: Json };
+      rpc_native_stay_payment_begin: { Args: { p_operation_id: string }; Returns: Json };
+      rpc_native_stay_quote: {
+        Args: {
+          p_adults: number;
+          p_check_in: string;
+          p_check_out: string;
+          p_children: number;
+          p_property_id: string;
+          p_unit_id: string;
+        };
+        Returns: Json;
+      };
+      rpc_native_stay_status: { Args: { p_operation_id: string }; Returns: Json };
       rpc_nearest_free: {
         Args: { p_job_id: string; p_limit?: number };
         Returns: {
@@ -55979,6 +56062,10 @@ export type Database = {
       rpc_payment_mpesa_paybill_registered: {
         Args: { p_callback_secret: string; p_message: string; p_ok: boolean };
         Returns: undefined;
+      };
+      rpc_payment_mpesa_prompt_claim: {
+        Args: { p_callback_secret: string; p_reference: string };
+        Returns: Json;
       };
       rpc_payment_mpesa_prompt_wait: { Args: { p_reference: string }; Returns: Json };
       rpc_payment_mpesa_ready: { Args: { p_callback_secret: string }; Returns: boolean };
