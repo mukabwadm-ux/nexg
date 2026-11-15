@@ -1,5 +1,7 @@
 # Current handoff index
 
+- [D8 native notifications, 15 November 2026](sessions/2026-11-15-d8-native-notifications.md). Shared native delivery and background progress contracts for Consumer, Stays and Rider, with app wiring and release checks.
+
 - [Unified merchant platform, 2 November 2026](sessions/2026-11-02-unified-merchant-platform.md). The Derrick NEXG checkout is the primary source for the combined platform and merchant workspace; the separate merchant folder is a retained local backup.
 
 - [Merchant email OTP](../merchant-email-otp.md). The local onboarding handoff and returning email-code sign-in use Supabase Auth with Resend SMTP. An isolated Auth check passed; delivery and the full real merchant journey still need confirmation with the authorized test inbox. Hosted-project configuration is separate.

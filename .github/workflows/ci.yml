@@ -83,6 +83,17 @@ jobs:
         if: always()
         run: supabase stop --no-backup
 
+  native-push:
+    name: Native push payload and worker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - run: deno check --no-config --no-lock supabase/functions/native-push-dispatch/index.ts
+      - run: deno test --no-config --no-lock supabase/functions/native-push-dispatch/native-push.test.ts
+
   booking-postgres:
     name: Booking runtime on PostgreSQL
     runs-on: ubuntu-latest
