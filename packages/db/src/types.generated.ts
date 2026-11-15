@@ -55775,21 +55775,6 @@ export type Database = {
         };
         Returns: Json;
       };
-      rpc_nearest_free: {
-        Args: { p_job_id: string; p_limit?: number };
-        Returns: {
-          distance_km: number;
-          eligible: boolean;
-          eta_min: number;
-          name: string;
-          note: string;
-          plate_no: string;
-          presence: string;
-          rider_id: string;
-          skip_reason: string;
-          vehicle: string;
-        }[];
-      };
       rpc_native_push_register: {
         Args: {
           p_alerts: boolean;
@@ -55828,6 +55813,21 @@ export type Database = {
           p_watch: string;
         };
         Returns: boolean;
+      };
+      rpc_nearest_free: {
+        Args: { p_job_id: string; p_limit?: number };
+        Returns: {
+          distance_km: number;
+          eligible: boolean;
+          eta_min: number;
+          name: string;
+          note: string;
+          plate_no: string;
+          presence: string;
+          rider_id: string;
+          skip_reason: string;
+          vehicle: string;
+        }[];
       };
       rpc_note_locale: { Args: { p_locale: string }; Returns: undefined };
       rpc_notification_mark: {
