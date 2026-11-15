@@ -146,7 +146,7 @@ begin
     values (p_installation, v_owner, native_push.hash(p_proof), p_app, p_platform, p_environment, p_token, p_locale, p_alerts, p_rider_device)
     returning * into v_row;
   end if;
-  perform audit.log('guest', 'platform', 'native_push.registered', p_actor_id => v_owner,
+  perform audit.log('guest', 'settings', 'native_push.registered', p_actor_id => v_owner,
     p_target_type => 'native_installation', p_target_id => p_installation,
     p_after => jsonb_build_object('app', p_app, 'platform', p_platform, 'revision', v_row.revision));
   return jsonb_build_object('revision', v_row.revision, 'binding', v_row.binding);
@@ -176,7 +176,7 @@ begin
       and revision = p_expected_revision and token is not null;
   if not found then return false; end if;
   delete from native_push.watch where installation_id = p_installation;
-  perform audit.log('guest', 'platform', 'native_push.revoked', p_actor_id => v_owner,
+  perform audit.log('guest', 'settings', 'native_push.revoked', p_actor_id => v_owner,
     p_target_type => 'native_installation', p_target_id => p_installation);
   return true;
 end
@@ -192,6 +192,8 @@ declare
   v_install native_push.installation;
   v_owner uuid := auth.uid();
   v_title_stage text;
+  v_deadline timestamptz;
+  v_publish_snapshot boolean;
 begin
   select * into v_install from native_push.installation
     where id = p_installation and owner_id = v_owner and proof_hash = native_push.hash(p_proof)
@@ -212,20 +214,27 @@ begin
       and o.stage in ('confirmed', 'preparing', 'ready', 'picked_up', 'arriving')
     for share of o;
   elsif v_install.app = 'stays' and p_subject = 'stay' then
-    select s.status::text into v_title_stage from public.stay s
+    select s.status::text, s.hold_expires_at into v_title_stage, v_deadline from public.stay s
     where s.id = p_subject_id and s.guest_user_id = v_owner and s.status = 'held'
       and s.hold_expires_at > now()
     for share of s;
   elsif v_install.app = 'rider' and p_subject = 'job' then
-    select j.state::text into v_title_stage from dispatch.job j
+    select case when o.stage in ('ready', 'picked_up', 'arriving') then o.stage::text else 'assigned' end
+      into v_title_stage from dispatch.job j
+    join public."order" o on o.id = j.order_id
     join public.rider_device d on d.rider_id = j.assigned_rider_id
     where j.id = p_subject_id and d.id = v_install.rider_device_id
       and native_push.rider_device_current(d.id, v_owner, v_install.platform)
       and j.state in ('assigned', 'manual_assigned')
-    for share of j;
+      and o.stage not in ('delivered', 'cancelled', 'disputed', 'refunded')
+    for share of j, o;
   end if;
   if v_title_stage is null then return false; end if;
 
+  select not exists (
+    select 1 from native_push.watch w where w.installation_id = p_installation and w.id = p_watch
+      and w.activity_token is not distinct from p_activity_token and w.valid_until > now()
+  ) into v_publish_snapshot;
   insert into native_push.watch (installation_id, id, subject, subject_id, activity_token, valid_until)
   values (p_installation, p_watch, p_subject, p_subject_id, p_activity_token, now() + interval '12 hours')
   on conflict (installation_id) do update
@@ -234,7 +243,13 @@ begin
     where native_push.watch.id <> excluded.id or
           (native_push.watch.subject, native_push.watch.subject_id) = (excluded.subject, excluded.subject_id);
   if not found then return false; end if;
-  perform audit.log('guest', 'platform', 'native_push.watch_registered', p_actor_id => v_owner,
+  if v_publish_snapshot then
+    insert into native_push.delivery
+      (installation_id, binding, surface, watch_id, subject, subject_id, stage, terminal, deadline, expires_at)
+    values (p_installation, p_binding, 'live', p_watch, p_subject, p_subject_id, v_title_stage, false, v_deadline,
+      least(coalesce(v_deadline, 'infinity'), clock_timestamp() + interval '15 minutes'));
+  end if;
+  perform audit.log('guest', 'settings', 'native_push.watch_registered', p_actor_id => v_owner,
     p_target_type => 'native_installation', p_target_id => p_installation,
     p_after => jsonb_build_object('subject', p_subject));
   return true;
@@ -252,7 +267,7 @@ begin
   where w.installation_id = i.id and i.id = p_installation and w.id = p_watch
     and i.owner_id = v_owner and i.proof_hash = native_push.hash(p_proof) and i.binding = p_binding;
   if not found then return false; end if;
-  perform audit.log('guest', 'platform', 'native_push.watch_released', p_actor_id => v_owner,
+  perform audit.log('guest', 'settings', 'native_push.watch_released', p_actor_id => v_owner,
     p_target_type => 'native_installation', p_target_id => p_installation);
   return true;
 end
@@ -383,11 +398,11 @@ returns table (
 ) language sql security definer set search_path = '' as $$
   with expired as (
     update native_push.delivery d set result = 'expired', finished_at = clock_timestamp()
-    where d.result is null and d.expires_at <= clock_timestamp()
+    where d.result is null and (d.expires_at <= clock_timestamp() or d.attempts >= 6)
       and coalesce(d.lease_until, '-infinity') <= clock_timestamp()
   ), obsolete as (
     update native_push.delivery d set result = 'superseded', finished_at = clock_timestamp()
-    where d.result is null and d.expires_at > clock_timestamp()
+    where d.result is null and d.expires_at > clock_timestamp() and d.attempts < 6
       and coalesce(d.lease_until, '-infinity') <= clock_timestamp()
       and (
         not exists (select 1 from native_push.installation i where i.id = d.installation_id
@@ -397,10 +412,23 @@ returns table (
         or (d.surface = 'live' and not exists (
           select 1 from native_push.watch w where w.installation_id = d.installation_id and w.id = d.watch_id
             and w.valid_until > now()))
+        or (d.subject = 'order' and not exists (
+          select 1 from public."order" o join public.guest g on g.id = o.guest_id
+          join native_push.installation i on i.owner_id = g.user_id
+          where o.id = d.subject_id and i.id = d.installation_id))
+        or (d.subject = 'stay' and not exists (
+          select 1 from public.stay s join native_push.installation i on i.owner_id = s.guest_user_id
+          where s.id = d.subject_id and i.id = d.installation_id))
+        or (d.subject = 'job' and not d.terminal and not exists (
+          select 1 from dispatch.job j join public.rider_device r on r.rider_id = j.assigned_rider_id
+          join native_push.installation i on i.rider_device_id = r.id
+          where j.id = d.subject_id and i.id = d.installation_id and j.state in ('assigned', 'manual_assigned')))
         or (d.subject = 'stay' and d.stage = 'held' and d.deadline <= clock_timestamp())
         or (d.subject = 'offer' and not exists (
           select 1 from dispatch.offer o join dispatch.job j on j.id = o.job_id
-          where o.id = d.subject_id and o.outcome = 'pending' and o.expires_at > clock_timestamp()
+          join public.rider_device r on r.rider_id = o.rider_id
+          join native_push.installation i on i.rider_device_id = r.id
+          where i.id = d.installation_id and o.id = d.subject_id and o.outcome = 'pending' and o.expires_at > clock_timestamp()
             and j.state in ('queued', 'offering', 'escalated')))
         or exists (
           select 1 from native_push.delivery newer where newer.installation_id = d.installation_id
@@ -414,7 +442,7 @@ returns table (
     from native_push.delivery d
     join native_push.installation i on i.id = d.installation_id
     left join native_push.watch w on w.installation_id = d.installation_id and w.id = d.watch_id
-    where d.result is null and d.due_at <= clock_timestamp() and d.expires_at > clock_timestamp()
+    where d.result is null and d.due_at <= clock_timestamp() and d.expires_at > clock_timestamp() and d.attempts < 6
       and coalesce(d.lease_until, '-infinity') <= clock_timestamp()
       and not exists (select 1 from obsolete where obsolete.id = d.id)
       and not exists (
@@ -492,10 +520,10 @@ end
 $$;
 
 insert into audit.action_registry (action, module, description) values
-  ('native_push.registered', 'platform', 'Register or rotate a phone notification binding'),
-  ('native_push.revoked', 'platform', 'Revoke a phone notification binding'),
-  ('native_push.watch_registered', 'platform', 'Start or rotate a native live watch'),
-  ('native_push.watch_released', 'platform', 'End a native live watch');
+  ('native_push.registered', 'settings', 'Register or rotate a phone notification binding'),
+  ('native_push.revoked', 'settings', 'Revoke a phone notification binding'),
+  ('native_push.watch_registered', 'settings', 'Start or rotate a native live watch'),
+  ('native_push.watch_released', 'settings', 'End a native live watch');
 
 revoke all on all functions in schema native_push from public, anon, authenticated, service_role;
 revoke execute on function public.rpc_native_push_register(uuid, text, text, text, text, text, text, boolean, integer, uuid),

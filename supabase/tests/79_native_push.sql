@@ -82,6 +82,11 @@ select is(public.rpc_native_push_register('d8050000-0000-7000-8000-000000000073'
   'A signed-in rider registers their current job phone.');
 reset role;
 
+select is((select stage from native_push.delivery where installation_id='d8050000-0000-7000-8000-000000000071'),
+  'confirmed', 'Registering an order watch queues the current authoritative state.');
+select is((select stage from native_push.delivery where installation_id='d8050000-0000-7000-8000-000000000072'),
+  'held', 'Registering a stay watch queues the current verified deadline.');
+
 insert into dispatch.offer (id, job_id, round, rank, rider_id, expires_at)
 values ('d8050000-0000-7000-8000-000000000052','d8050000-0000-7000-8000-000000000051',1,1,
   'd8050000-0000-7000-8000-000000000031',clock_timestamp()+interval '20 seconds');
