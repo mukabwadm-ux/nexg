@@ -57,32 +57,31 @@ it('uses the production availability, hold and settlement functions without dupl
         '  as $$ select gen_random_uuid()::text $$;',
       ].join('\n'),
     );
-    const originals = await Promise.all(
-      [
-        '20261118000100_stay_holds_and_blocks.sql',
-        '20261122000100_sample_listings.sql',
-        '20261119000200_stay_checkout.sql',
-        '20261220000100_mpesa_dispatch_claim.sql',
-        '20261220000200_native_stay_checkout.sql',
-      ].map((file) => readFile(new URL(file, migrations), 'utf8')),
-    );
+    const load = (file: string) => readFile(new URL(file, migrations), 'utf8');
+    const [holdsSql, listingSql, paymentSql, dispatchSql, nativeSql] = await Promise.all([
+      load('20261118000100_stay_holds_and_blocks.sql'),
+      load('20261122000100_sample_listings.sql'),
+      load('20261119000200_stay_checkout.sql'),
+      load('20261220000100_mpesa_dispatch_claim.sql'),
+      load('20261220000200_native_stay_checkout.sql'),
+    ]);
     for (const name of [
       'fn_stay_window',
       'fn_stay_dates_check',
       'fn_stay_occupies',
       'fn_stay_release_expired_holds',
     ]) {
-      await db.exec(definition(originals[0], name));
+      await db.exec(definition(holdsSql, name));
     }
     for (const name of ['rpc_stay_search', 'rpc_stay_hold']) {
-      await db.exec(definition(originals[1], name));
+      await db.exec(definition(listingSql, name));
     }
     for (const name of [
       'rpc_payment_begin_stay',
       'fn_stay_commission_rate',
       'tg_payment_stay_settled',
     ]) {
-      await db.exec(definition(originals[2], name));
+      await db.exec(definition(paymentSql, name));
     }
     await db.exec(
       /* sql */ [
@@ -112,15 +111,17 @@ it('uses the production availability, hold and settlement functions without dupl
         'grant usage on schema public to authenticated, anon;',
       ].join('\n'),
     );
-    await db.exec(originals[3]);
-    await db.exec(originals[4]);
+    await db.exec(dispatchSql);
+    await db.exec(nativeSql);
 
     function actor(userId: string) {
       return db.query("select set_config('test.uid', $1, false)", [userId]);
     }
     async function result<T>(statement: string, ...params: unknown[]): Promise<T> {
-      return (await db.query<{ value: T }>('select ' + statement + ' as value', params)).rows[0]
-        .value;
+      const response = await db.query<{ value: T }>('select ' + statement + ' as value', params);
+      const row = response.rows[0];
+      if (!row) throw new Error('The SQL fixture received no result row.');
+      return row.value;
     }
     const counts = () => result<number>('(select count(*)::int from public.stay)');
     const quote = (unitId = unit, offset = 10) =>
