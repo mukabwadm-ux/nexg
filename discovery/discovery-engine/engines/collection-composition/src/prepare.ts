@@ -1,4 +1,5 @@
 import { ContractError, type EngineRequest, type Schemas } from '../../../src/contracts/index.js';
+import { unsupported } from '../../../src/contracts/readErrors.js';
 import { parseEngineRequest, parseSchema } from '../../../src/contracts/validate.js';
 import type { ReleaseArtifact } from '../../../src/releases/artifact.js';
 import { canonicalJson } from '../../../src/shared/immutable.js';
@@ -9,6 +10,7 @@ import { requestFingerprint } from '../../../src/shared/requestFingerprint.js';
 
 export function parseCollectionRequest(value: unknown, release: Readonly<ReleaseArtifact>): Schemas['CollectionRequest'] {
   const collection = parseSchema('CollectionRequest', value);
+  if (collection.request.viewport) throw unsupported('/request/viewport');
   parseEngineRequest(collection.request, release);
   if (new Set(collection.definitionIds).size !== collection.definitionIds.length) throw new ContractError('INVALID_REQUEST', ['/definitionIds']);
   if (collection.definitionIds.some(id => !release.collections.some(definition => definition.id === id))) throw new ContractError('INVALID_REQUEST', ['/definitionIds']);

@@ -412,6 +412,11 @@ inspector_port = 8083
 # The Deno major version to use.
 deno_version = 2
 
+# The handler verifies the caller's bearer with GoTrue and denies temporary accounts.
+# Let the handler return the versioned authentication failure for this function.
+[functions.maps-routes]
+verify_jwt = false
+
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 

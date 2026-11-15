@@ -15,7 +15,8 @@ import { MAX_WINDOW_REFS } from './resultSessions.js';
 export async function retrieveMerchants(request: EngineRequest, plan: QueryPlan | undefined, scope: CatalogScope,
   release: Readonly<ReleaseArtifact>, provider: ServerDiscoveryProvider, budget: ReadBudget, retrieval?: RetrievalCandidatePort) {
   let window: CandidateWindow | undefined;
-  if (plan && retrieval) {
+  // Index windows do not carry the catalogue viewport. Their limit could omit stores in bounds.
+  if (plan && retrieval && !scope.viewport) {
     const selectionId = request.selection.optionId ?? request.selection.subcategoryId ?? request.selection.categoryId!;
     window = await retrieval.search({ query: plan.normalized, selectionId, mode: 'merchant', limit: 200 }, budget);
     if (!window.indexGeneration || !window.sourceSnapshot || window.refs.length > 200 || window.refs.some(ref => ref.kind !== 'merchant'
