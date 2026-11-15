@@ -119,15 +119,14 @@ it('uses the production availability, hold and settlement functions without dupl
     await db.exec(dispatchSql);
     await db.exec(nativeSql);
 
-    function actor(userId: string) {
-      return db.query("select set_config('test.uid', $1, false)", [userId]);
-    }
-    async function result<T>(statement: string, ...params: unknown[]): Promise<T> {
+    const actor = (userId: string) =>
+      db.query("select set_config('test.uid', $1, false)", [userId]);
+    const result = async <T>(statement: string, ...params: unknown[]): Promise<T> => {
       const response = await db.query<{ value: T }>('select ' + statement + ' as value', params);
       const row = response.rows[0];
       if (!row) throw new Error('The SQL fixture received no result row.');
       return row.value;
-    }
+    };
     const counts = () => result<number>('(select count(*)::int from public.stay)');
     const quote = (unitId = unit, offset = 10) =>
       result<{ quoteId: string }>(
