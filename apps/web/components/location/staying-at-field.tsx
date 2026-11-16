@@ -248,7 +248,7 @@ export function StayingAtField() {
                  * to tell which is which.
                  */
                 aria-label="Use my current location to fill in where you are staying"
-                className="ml-auto flex items-center gap-1 text-[0.75rem] font-extrabold text-[#86650D] hover:underline"
+                className="tap-area ml-auto flex items-center gap-1 text-[0.75rem] font-extrabold text-[#86650D] hover:underline"
               >
                 <Crosshair className="h-3 w-3" aria-hidden="true" />
                 {consent === 'denied' ? 'Pick on a map' : 'Use my current location'}

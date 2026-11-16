@@ -26,9 +26,15 @@ export const metadata: Metadata = {
  * the same switch.
  */
 export const viewport: Viewport = {
-  themeColor: '#F6F3EC',
+  /* The browser bar takes the page colour, cream or night, like an app's. */
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F6F3EC' },
+    { media: '(prefers-color-scheme: dark)', color: '#111315' },
+  ],
   width: 'device-width',
   initialScale: 1,
+  /* Edge to edge on phones with a notch; the fixed bars keep clear of it. */
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

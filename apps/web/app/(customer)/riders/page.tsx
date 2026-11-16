@@ -396,7 +396,7 @@ export default async function RidersPage() {
               </p>
               <Link
                 href="/help"
-                className="mt-3 inline-block text-sm font-bold underline underline-offset-4"
+                className="tap-area mt-3 inline-block text-sm font-bold underline underline-offset-4"
               >
                 Talk to the rider team
               </Link>

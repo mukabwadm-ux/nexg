@@ -136,7 +136,7 @@ export function AuthShell({ portal, children }: { portal: Portal; children: Reac
           </Link>
           <Link
             href={story.back[0]}
-            className="text-muted hover:text-ink text-sm font-bold transition-colors"
+            className="text-muted hover:text-ink tap-area text-sm font-bold transition-colors"
           >
             ← {story.back[1]}
           </Link>

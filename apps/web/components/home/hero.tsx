@@ -2,7 +2,7 @@
 
 import { useLocation } from '@nexg/location';
 import { cn } from '@nexg/ui';
-import { ArrowRight, ChevronDown, MapPin, Menu, Search } from 'lucide-react';
+import { ArrowRight, ChevronDown, MapPin, Menu, Search, User } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
@@ -72,10 +72,12 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
       <HeroNav where={where} onWhere={() => openSheet('hero')} locale={locale} />
 
       {/* ─────────────────────────────────────────────── the message */}
-      {/* Centred in what the nav leaves of the hero, then nudged down by about a
-          fifth of the hero on larger screens. The block is as wide as
-          the headline, and the search takes that width. */}
-      <div className="mx-auto flex w-full max-w-[120rem] flex-1 flex-col justify-center px-5 pb-8 pt-[6.5rem] sm:relative sm:top-[18svh] sm:px-[30px] sm:pt-28 lg:pb-12 lg:pt-32">
+      {/* On a phone the block sits low, just above "Scroll to explore", so
+          the photograph has the top of the screen. From sm up it is centred
+          in what the nav leaves of the hero, then nudged down by about a
+          fifth of the hero. The block is as wide as the headline, and the
+          search takes that width. */}
+      <div className="mx-auto flex w-full max-w-[120rem] flex-1 flex-col justify-end px-5 pb-5 pt-[6.5rem] sm:relative sm:top-[18svh] sm:justify-center sm:px-[30px] sm:pb-8 sm:pt-28 lg:pb-12 lg:pt-32">
         <div className="sm:w-fit">
           <p className="text-gold text-[0.625rem] font-bold uppercase tracking-[0.3em] sm:text-[0.6875rem]">
             {copy.eyebrow}
@@ -92,9 +94,11 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
         </div>
       </div>
 
+      {/* A slow, welcoming bounce that invites a scroll. Off for reduced
+          motion (the shared styles stop animations there). */}
       <a
         href="#popular"
-        className="flex flex-col items-center pb-2 text-[0.6875rem] text-white/70 sm:hidden"
+        className="mx-auto flex animate-[scroll-cue_1.8s_ease-in-out_infinite] flex-col items-center px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1 text-[0.6875rem] text-white/70 sm:hidden"
       >
         <ChevronDown className="text-gold h-4 w-4" aria-hidden="true" />
         {copy.scroll}
@@ -170,7 +174,17 @@ function HeroNav({
             </button>
           </div>
 
-          <ThemeToggle className={round} />
+          {/* On a phone: sign in, or your account once signed in (/account
+              sends a signed-out visitor to sign in and back). From sm up the
+              theme switch stays here, as on the other pages. */}
+          <Link
+            href="/account"
+            aria-label="Sign in or open your account"
+            className={cn(round, 'text-gold sm:hidden')}
+          >
+            <User className="h-4 w-4" aria-hidden="true" fill="currentColor" />
+          </Link>
+          <ThemeToggle className={cn(round, 'hidden sm:flex')} />
           <SiteMenu locale={locale}>
             <button type="button" aria-label="Open menu" className={round}>
               <Menu className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />

@@ -281,7 +281,7 @@
 }
 .root :global(.in-metric p) {
   margin-top: 6px;
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted-light);
   line-height: 1.55;
 }
@@ -331,7 +331,7 @@
 }
 .root :global(.in-panel-heading p) {
   color: var(--muted-light);
-  font-size: 10px;
+  font-size: 11px;
   margin-top: 4px;
   line-height: 1.55;
 }
@@ -352,7 +352,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 5px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -395,7 +395,7 @@
   border-radius: 2px;
 }
 .root :global(figcaption) {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted-light);
   text-align: center;
   width: 100%;
@@ -412,7 +412,7 @@
   flex-direction: column;
   justify-content: space-between;
   text-align: right;
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted-light);
 }
 .root :global(.in-chart-columns) {
@@ -449,13 +449,13 @@
   flex-shrink: 0;
 }
 .root :global(.in-column-value) {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 20px;
 }
 .root :global(.in-column-label) {
   display: block;
-  font-size: 9px;
+  font-size: 11px;
   color: var(--muted);
   margin-top: 9px;
   overflow-wrap: anywhere;
@@ -488,7 +488,7 @@
 }
 .root :global(.in-evidence table th button),
 .root :global(.in-evidence table th span) {
-  font-size: 10px;
+  font-size: 11px;
   text-transform: none;
   letter-spacing: 0;
   color: var(--muted);
@@ -600,14 +600,14 @@
   display: block;
   color: var(--muted-light);
   margin-top: 4px;
-  font-size: 10px;
+  font-size: 11px;
 }
 .root :global(.in-state) {
   width: fit-content;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 10px;
+  font-size: 11px;
   border-radius: 20px;
   background: #edf4ee;
   color: #346743;
@@ -795,7 +795,7 @@
     padding-left: 0;
   }
   .root :global(.in-freshness) {
-    font-size: 10px;
+    font-size: 11px;
   }
   .root :global(.in-tabs) {
     gap: 0;
@@ -923,14 +923,14 @@
   }
   .root :global(.in-compare) {
     min-height: 32px;
-    font-size: 10px;
+    font-size: 11px;
     padding: 0 2px;
     gap: 6px;
   }
   .root :global(.in-freshness) {
     width: auto;
     margin-left: auto;
-    font-size: 9px;
+    font-size: 11px;
     gap: 4px;
   }
   .root :global(.in-tabs) {
@@ -981,7 +981,7 @@
     flex: none;
   }
   .root :global(.in-view-heading p) {
-    font-size: 10px;
+    font-size: 11px;
     margin: 0;
     line-height: 1.4;
   }
@@ -995,7 +995,7 @@
     border-radius: 8px;
   }
   .root :global(.in-metric-label) {
-    font-size: 10px;
+    font-size: 11px;
     align-items: center;
     gap: 4px;
   }
@@ -1008,7 +1008,7 @@
     text-overflow: ellipsis;
   }
   .root :global(.in-metric p) {
-    font-size: 9px;
+    font-size: 11px;
     margin-top: 3px;
     line-height: 1.3;
   }
@@ -1042,7 +1042,7 @@
     font-size: 11px;
   }
   .root :global(.in-panel-heading p) {
-    font-size: 9px;
+    font-size: 11px;
     margin-top: 2px;
   }
   .root :global(.in-panel-actions) {
@@ -1050,11 +1050,11 @@
     flex: none;
   }
   .root :global(.in-text-button) {
-    font-size: 10px;
+    font-size: 11px;
     min-height: 24px;
   }
   .root :global(.in-table-toggle) {
-    font-size: 9px;
+    font-size: 11px;
     min-height: 24px;
     padding: 3px 5px;
   }
@@ -1065,18 +1065,18 @@
     padding: 6px 12px;
   }
   .root :global(.in-bar-row) {
-    font-size: 10px;
+    font-size: 11px;
     gap: 8px;
     grid-template-columns: minmax(65px, 110px) minmax(0, 1fr) 48px;
   }
   .root :global(.in-bar-row strong) {
-    font-size: 10px;
+    font-size: 11px;
   }
   .root :global(.in-bar-track) {
     height: 10px;
   }
   .root :global(figcaption) {
-    font-size: 9px;
+    font-size: 11px;
   }
   .root :global(.in-vertical-chart) {
     flex: 1;
@@ -1088,7 +1088,7 @@
   .root :global(.in-chart-axis) {
     height: auto;
     min-height: 0;
-    font-size: 8px;
+    font-size: 11px;
   }
   .root :global(.in-chart-columns) {
     min-height: 0;
@@ -1110,11 +1110,11 @@
   }
   .root :global(.in-column-value) {
     position: absolute;
-    font-size: 9px;
+    font-size: 11px;
     line-height: 15px;
   }
   .root :global(.in-column-label) {
-    font-size: 8px;
+    font-size: 11px;
     margin-top: 3px;
   }
   .root :global(.in-vertical-chart figcaption) {
@@ -1154,11 +1154,11 @@
   }
   .root :global(.in-evidence table th button),
   .root :global(.in-evidence table th span) {
-    font-size: 9px;
+    font-size: 11px;
   }
   .root :global(.in-evidence table td) {
     padding: 3px 8px;
-    font-size: 10px;
+    font-size: 11px;
     line-height: 18px;
     white-space: nowrap;
     max-width: 220px;
@@ -1172,21 +1172,21 @@
   }
   .root :global(.in-evidence [data-table-pagination]) {
     min-height: 24px;
-    font-size: 9px;
+    font-size: 11px;
   }
   .root :global(.in-evidence [data-table-pagination] p) {
-    font-size: 9px;
+    font-size: 11px;
   }
   .root :global(.in-evidence [data-table-pagination] button) {
     min-height: 24px;
     height: 24px;
     padding: 3px 8px;
-    font-size: 10px;
+    font-size: 11px;
   }
   .root :global(.in-notice) {
     padding: 4px 8px;
     gap: 6px;
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1.35;
   }
   .root :global(.in-notice .in-text-button) {
@@ -1199,7 +1199,7 @@
   .root :global(.in-chart-table th),
   .root :global(.in-chart-table td) {
     padding: 1px 6px;
-    font-size: 10px;
+    font-size: 11px;
     line-height: 13px;
   }
   .root :global(.in-chart-table.ui-table-viewport) {
@@ -1254,7 +1254,7 @@
   }
   .root :global(.in-library-row small) {
     margin-top: 2px;
-    font-size: 9px;
+    font-size: 11px;
   }
   .root :global(.in-report-preview) {
     padding: 10px 12px;
@@ -1265,7 +1265,7 @@
   }
   .root :global(.in-report-preview > p) {
     margin: 5px 0 9px;
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1.4;
   }
   .root :global(.in-report-preview .in-metric) {
@@ -1301,7 +1301,7 @@
   align-items: center;
   gap: 3px;
   color: #805d14;
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.2;
   margin-left: 5px;
 }
@@ -1326,7 +1326,7 @@
 }
 .root :global(.in-donut-unit) {
   fill: var(--muted);
-  font-size: 9px;
+  font-size: 11px;
 }
 .root :global(.in-donut > figcaption) {
   width: auto;
@@ -1339,7 +1339,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 10px;
+  font-size: 11px;
 }
 .root :global(.in-donut-key i) {
   display: block;
@@ -1357,14 +1357,14 @@
   justify-content: space-between;
   gap: 8px;
   padding: 5px 10px;
-  font-size: 10px;
+  font-size: 11px;
   flex: none;
 }
 .root :global(.in-unit-picker) {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 10px;
+  font-size: 11px;
   flex: none;
 }
 .root :global(.in-unit-picker select) {

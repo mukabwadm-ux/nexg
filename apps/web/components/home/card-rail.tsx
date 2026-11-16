@@ -99,6 +99,10 @@ export function CardRail({
   );
 }
 
-/** Card widths for the rail: most of a phone, two across on a tablet, four on desktop. */
+/**
+ * Card widths for the rail: about two thirds of a phone (the next card peeks
+ * in), two across on a tablet, four on desktop. Best sellers and stores near
+ * you take the same phone width.
+ */
 export const RAIL_CARD =
-  'w-[82%] shrink-0 snap-start sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3rem)/4)]';
+  'w-[68%] shrink-0 snap-start sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3rem)/4)]';

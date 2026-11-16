@@ -226,7 +226,7 @@ export function RiderShell({
 
         <RiderPhoneNav nav={nav} />
 
-        <main className="pb-24 lg:pb-0">{children}</main>
+        <main className="pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-0">{children}</main>
       </div>
     </div>
   );

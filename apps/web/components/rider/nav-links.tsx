@@ -73,7 +73,7 @@ export function RiderPhoneNav({ nav }: { nav: RiderNavItem[] }) {
   return (
     <nav
       aria-label="Rider dashboard"
-      className="border-border bg-surface fixed bottom-0 left-0 right-0 z-30 flex gap-1 overflow-x-auto border-t px-2 py-2 lg:hidden"
+      className="border-border bg-surface fixed bottom-0 left-0 right-0 z-30 flex gap-1 overflow-x-auto border-t px-[max(0.5rem,env(safe-area-inset-left))] pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 lg:hidden"
     >
       {nav.slice(0, 6).map((item) => {
         const on = isOn(pathname, item.href);

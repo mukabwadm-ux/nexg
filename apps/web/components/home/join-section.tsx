@@ -154,7 +154,7 @@ export function JoinSection({ t }: { t: Translate }) {
           />
         </svg>
 
-        <ol className="relative grid grid-cols-1 gap-14 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-14 lg:grid-cols-4 lg:gap-6">
+        <ol className="relative grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-14 lg:grid-cols-4 lg:gap-6">
           {cards.map((card, index) => (
             <li
               data-reveal-item
@@ -166,23 +166,23 @@ export function JoinSection({ t }: { t: Translate }) {
                 className="focus-visible:ring-gold focus-visible:ring-offset-bg group flex flex-col items-center rounded-3xl text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4"
               >
                 {/* A gold-ringed circle in a dark halo, with its number. */}
-                <span className="relative rounded-full bg-[#EFE3C4] p-3">
-                  <span className="border-gold relative block h-[11.25rem] w-[11.25rem] overflow-hidden rounded-full border-4 bg-[#17140F] lg:h-48 lg:w-48">
+                <span className="relative rounded-full bg-[#EFE3C4] p-2.5 sm:p-3">
+                  <span className="border-gold relative block h-36 w-36 overflow-hidden rounded-full border-[3px] bg-[#17140F] sm:h-[11.25rem] sm:w-[11.25rem] sm:border-4 lg:h-48 lg:w-48">
                     {card.art}
                   </span>
-                  <span className="bg-gold text-ink border-bg absolute right-3 top-3 flex h-14 w-14 items-center justify-center rounded-full border-4 text-lg font-extrabold tabular-nums">
+                  <span className="bg-gold text-ink border-bg absolute right-1.5 top-1.5 flex h-11 w-11 items-center justify-center rounded-full border-[3px] text-[0.9375rem] font-extrabold tabular-nums sm:right-3 sm:top-3 sm:h-14 sm:w-14 sm:border-4 sm:text-lg">
                     {String(index + 1).padStart(2, '0')}
                   </span>
                 </span>
 
-                <span className="text-gold-text mt-7 text-xs font-extrabold uppercase tracking-[0.2em]">
+                <span className="text-gold-text mt-5 text-[0.6875rem] font-extrabold uppercase tracking-[0.2em] sm:mt-7 sm:text-xs">
                   {card.eyebrow}
                 </span>
-                <span className="mt-3 text-xl font-extrabold leading-tight tracking-tight sm:text-[1.375rem] lg:text-[1.0625rem] xl:text-[1.375rem]">
+                <span className="mt-2 text-lg font-extrabold leading-tight tracking-tight sm:mt-3 sm:text-[1.375rem] lg:text-[1.0625rem] xl:text-[1.375rem]">
                   {card.title}
                 </span>
-                <span className="mt-5 inline-flex items-center gap-3 text-base font-semibold">
-                  <span className="bg-gold text-ink flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-transform group-hover:translate-x-1">
+                <span className="mt-4 inline-flex items-center gap-2.5 text-[0.9375rem] font-semibold sm:mt-5 sm:gap-3 sm:text-base">
+                  <span className="bg-gold text-ink flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-transform group-hover:translate-x-1 sm:h-8 sm:w-8">
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </span>
                   <span className="group-hover:underline group-hover:underline-offset-4">

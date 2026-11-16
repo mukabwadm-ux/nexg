@@ -172,7 +172,7 @@ export default function HelpPage() {
                 <li key={topic.anchor}>
                   <Link
                     href={`#${topic.anchor}`}
-                    className="inline-block rounded-full border border-white/20 px-3.5 py-1.5 text-xs font-bold text-white/80 transition-colors hover:border-white/50 hover:text-white"
+                    className="inline-block rounded-full border border-white/20 px-3.5 py-2.5 text-xs font-bold text-white/80 transition-colors hover:border-white/50 hover:text-white"
                   >
                     {topic.title}
                   </Link>
