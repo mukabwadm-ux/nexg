@@ -37,13 +37,15 @@ export class DiscoveryReadService {
     const ready = await this.provider.probe(budget);
     return { contractVersion: '1', status: ready ? 'ok' : 'degraded', readiness: ready ? 'R1' : 'R0' };
   }
-  async capabilities(releaseId: string, budget: ReadBudget): Promise<Schemas['EngineCapabilities']> {
+  async capabilities(releaseId: string, budget: ReadBudget, mapsFeatures = false): Promise<Schemas['EngineCapabilities']> {
     if (releaseId !== this.release.releaseId) throw new ContractError('RELEASE_INCOMPATIBLE', ['/releaseId']);
     const health = await this.health(budget);
     return parseSchema('EngineCapabilities', { contractVersion: '1', discoveryReleaseId: this.release.releaseId, versions: this.versions(),
       resultModes: health.readiness === 'R1' ? ['merchant'] : [], filterKinds: health.readiness === 'R1' ? ['catalog_area'] : [],
       sorts: health.readiness === 'R1' ? ['recommended'] : [], countKinds: ['lower_bound', 'unknown'], workflowKinds: [], readiness: health.readiness,
       limits: { maxPageSize: 48, maxTaskComponents: 4, maxRequiredTaskComponents: 3, maxBodyBytes: 65536, sessionLifetimeSeconds: 300 },
+      ...(mapsFeatures && health.readiness === 'R1' && this.provider.supportsViewportSearch === true
+        ? { source: 'nexg', viewportSearch: true } : {}),
       policyCoverage: this.release.nodes.map(node => { const mapping = this.release.mappings.find(item => item.nodeId === node.id)!;
         return { nodeId: node.id, state: mapping.status === 'unmapped' ? 'unmapped' : 'partial',
           reasonCodes: mapping.status === 'unmapped' ? ['NO_SOURCE_MAPPING'] : ['MERCHANT_CONTEXT_ONLY', 'ITEM_AND_WORKFLOW_UNVERIFIED', 'BOUNDED_MERCHANT_LEXICAL_QUERY'] }; }) });
@@ -68,6 +70,7 @@ export class DiscoveryReadService {
     if (request.sourceScope !== undefined) throw unsupported('/sourceScope');
     if (request.sort !== 'recommended') throw unsupported('/sort');
     if (!request.selection.categoryId) throw unsupported('/selection/categoryId');
+    if (request.viewport && !this.provider.supportsViewportSearch) throw unsupported('/viewport');
     let area: string | undefined;
     for (const [index, filter] of request.filters.entries()) {
       if (filter.kind !== 'catalog_area' || filter.areaId === 'all') throw unsupported(`/filters/${index}`);
@@ -78,7 +81,8 @@ export class DiscoveryReadService {
     const ids = node ? this.release.mappings.find(mapping => mapping.nodeId === node)!.sourceSubcategoryIds
       : this.release.nodes.filter(item => item.kind === 'subcategory' && item.parentId === request.selection.categoryId)
         .flatMap(item => this.release.mappings.find(mapping => mapping.nodeId === item.id)!.sourceSubcategoryIds);
-    return { sourceSubcategoryIds: [...new Set(ids)], limit: request.limit, ...(area ? { area } : {}) };
+    return { sourceSubcategoryIds: [...new Set(ids)], limit: request.limit, ...(area ? { area } : {}),
+      ...(request.viewport ? { viewport: request.viewport } : {}) };
   }
   async results(value: unknown, budget: ReadBudget, caller = 'internal-public'): Promise<Schemas['EnginePage']> {
     this.options.controls?.assertServing();
@@ -117,6 +121,7 @@ export class DiscoveryReadService {
       ...(hasNext ? { nextCursor: this.sessions.cursor(session, nextOffset) } : {}),
       ...(offset > 0 ? { previousCursor: this.sessions.cursor(session, Math.max(0, offset - request.limit)) } : {}),
       applied: { selection: request.selection, filterHash: requestFingerprint(request, plan?.normalized),
+        ...(request.viewport ? { viewport: request.viewport } : {}),
         constraints: request.filters.map(value => ({ value, origin: 'explicit_control', strength: 'hard', state: 'supported', reasonCodes: ['CATALOG_AREA_ONLY'] })), sort: request.sort },
       status: unmapped ? 'unmapped' : returned.length < request.limit ? 'underfilled' : 'ok',
       presentations: { merchants: returned.map(row => row.presentation), offerings: [] } });

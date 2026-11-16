@@ -59,6 +59,17 @@ function timezoneValid(timezone: string): boolean {
 
 export function parseEngineRequest(value: unknown, release: SelectionAuthority): EngineRequest {
   const request = parseSchema('EngineRequest', value);
+  if (request.viewport) {
+    const { south, west, north, east } = request.viewport;
+    if (south >= north || west === east || (west === 180 && east === -180)) {
+      throw new ContractError('INVALID_REQUEST', ['/viewport']);
+    }
+    if (request.mode !== 'merchant') throw new ContractError('INVALID_REQUEST', ['/mode']);
+    if (!request.selection.categoryId) throw new ContractError('INVALID_REQUEST', ['/selection/categoryId']);
+    if (request.filters.some(filter => filter.kind === 'catalog_area')) {
+      throw new ContractError('CONSTRAINT_CONFLICT', ['/viewport']);
+    }
+  }
   if (request.discoveryReleaseId !== release.releaseId) throw new ContractError('RELEASE_INCOMPATIBLE', ['/discoveryReleaseId']);
   validateSelection(request.selection, release);
   if (request.sourceScope?.anchorRef) {

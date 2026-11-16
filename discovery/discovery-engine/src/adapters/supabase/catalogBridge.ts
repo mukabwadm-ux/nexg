@@ -6,6 +6,9 @@
  * setting change only. It sends GET requests with the public key: never the service-role key, never a write.
  */
 
+import type { Schemas } from '../../contracts/index.js';
+import { isInCatalogViewport } from '../../shared/catalogViewport.js';
+import { geoPoint } from '../presentation.js';
 import { withPlatformCatalogueRows } from './platformCatalogueRows.js';
 
 /** One row of the platform subcategory map. */
@@ -123,7 +126,15 @@ export interface BridgeMerchant {
   nairobiArea?: string; address?: string; latitude?: number; longitude?: number; isOpen?: boolean; heroImage?: string; logoUrl?: string;
   items: BridgeItem[];
 }
-export interface MerchantQuery { subcategory?: string; discoveryCategory?: string; search?: string; area?: string; limit: number; offset: number }
+export interface MerchantQuery {
+  subcategory?: string;
+  discoveryCategory?: string;
+  search?: string;
+  area?: string;
+  viewport?: Schemas['MapViewport'];
+  limit: number;
+  offset: number;
+}
 
 const LIST_ITEMS = 30;
 const DETAIL_ITEMS = 200;
@@ -187,6 +198,7 @@ export class CatalogBridge {
       if (query.subcategory ? row.demoSubcategoryId !== query.subcategory
         : query.discoveryCategory && query.discoveryCategory !== 'all' && row.discovery.categoryId !== query.discoveryCategory) return false;
       if (query.area && query.area !== 'all' && merchant.nairobiArea !== query.area) return false;
+      if (query.viewport && !isInCatalogViewport(query.viewport, geoPoint(merchant.latitude, merchant.longitude))) return false;
       return !search || merchant.name.toLocaleLowerCase('en-KE').includes(search);
     });
     const page = eligible.slice(query.offset, query.offset + query.limit).map(({ merchant }) => ({ ...merchant, items: merchant.items.slice(0, LIST_ITEMS) }));

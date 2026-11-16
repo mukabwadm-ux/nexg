@@ -90,6 +90,7 @@ export interface SupabaseConnectorOptions {
 export class SupabaseConnector implements ServerDiscoveryProvider {
   readonly ownerId = supabaseConnectorManifest.ownerId;
   readonly configured = true;
+  readonly supportsViewportSearch = true;
   readonly #catalog: CatalogBridge;
   readonly #load: () => Promise<CatalogRows>;
   readonly #paths: TaxonomyPathIndex;
@@ -170,7 +171,11 @@ export class SupabaseConnector implements ServerDiscoveryProvider {
     const observedAt = this.#fresh();
     const unique = new Map<string, ObservedMerchant>();
     for (const id of new Set(scope.sourceSubcategoryIds)) {
-      const page = this.#catalog.merchants({ subcategory: id, ...(scope.area ? { area: scope.area } : {}), limit: scope.limit, offset: 0 });
+      const page = this.#catalog.merchants({
+        subcategory: id, limit: scope.limit, offset: 0,
+        ...(scope.area ? { area: scope.area } : {}),
+        ...(scope.viewport ? { viewport: scope.viewport } : {}),
+      });
       for (const merchant of page.merchants) if (!unique.has(merchant.id)) unique.set(merchant.id, this.#observe(merchant, observedAt));
       budget.assertOpen();
     }
