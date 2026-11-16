@@ -22,7 +22,9 @@ describe('Discovery links', () => {
     expect(discoverCategoryHref('games_sports')).toBe('/discover?category=games-sports');
     // Keys the master category list retired (16 Nov 2026) open where their merchants moved.
     expect(discoverCategoryHref('health')).toBe('/discover?category=pharmacy');
-    expect(discoverCategoryHref('financial_services')).toBe('/discover?category=concierge-services');
+    expect(discoverCategoryHref('financial_services')).toBe(
+      '/discover?category=concierge-services',
+    );
     expect(discoverCategoryHref('vehicle_services')).toBe('/discover?category=vehicle-rentals');
     expect(discoverCategoryHref('not_a_category', { search: ' sushi ' })).toBe('/discover?q=sushi');
     expect(discoverCategoryHref()).toBe('/discover');
