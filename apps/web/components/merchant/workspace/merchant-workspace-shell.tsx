@@ -6,13 +6,13 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 
 import { WorkspaceMobileNavigation } from './mobile-navigation';
-import { merchantWorkspaceNavigation, type MerchantWorkspaceSection } from './navigation';
+import { workspaceNavIcon, type MerchantWorkspaceNavLabel } from './navigation';
 import { WorkspaceFrame } from './workspace-frame';
 import { safeMerchantWorkspaceHref } from './workspace-href';
 import styles from './workspace.module.css';
 
 export interface MerchantWorkspaceNavItem {
-  label: MerchantWorkspaceSection;
+  label: MerchantWorkspaceNavLabel;
   href: string;
   locked?: boolean;
 }
@@ -46,7 +46,7 @@ export function MerchantWorkspaceShell({
 }: MerchantWorkspaceShellProps) {
   const pathname = usePathname() ?? '/merchant';
   const [lockSelection, setLockSelection] = useState<{
-    label: MerchantWorkspaceSection;
+    label: MerchantWorkspaceNavLabel;
     pathname: string;
   } | null>(null);
   useEffect(() => setLockSelection(null), [pathname]);
@@ -63,7 +63,7 @@ export function MerchantWorkspaceShell({
   const navigation = (
     <nav aria-label="Merchant workspace navigation" className={styles.nav}>
       {nav.map((item) => {
-        const Icon = merchantWorkspaceNavigation.find((entry) => entry.label === item.label)!.icon;
+        const Icon = workspaceNavIcon(item.label);
         const content = (
           <>
             <Icon size={18} strokeWidth={1.7} aria-hidden="true" />

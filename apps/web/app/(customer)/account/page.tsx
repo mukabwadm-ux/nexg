@@ -3,6 +3,12 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { MyBookings } from '@/components/booking/my-bookings';
+import {
+  MyApplications,
+  MySavedJobs,
+  type MyApplication,
+  type MySavedJob,
+} from '@/components/careers/my-applications';
 import { ReceiptList } from '@/components/receipts/receipt-list';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
@@ -21,6 +27,8 @@ const TABS = [
   { key: 'orders', label: 'Orders' },
   { key: 'bookings', label: 'Bookings' },
   { key: 'stays', label: 'Stays' },
+  { key: 'applications', label: 'Job applications' },
+  { key: 'saved', label: 'Saved jobs' },
 ] as const;
 type Tab = (typeof TABS)[number]['key'];
 
@@ -42,7 +50,7 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
   if (!user || user.is_anonymous)
     redirect(`/sign-in?next=${encodeURIComponent(`/account?tab=${tab}`)}`);
 
-  const [receipts, orders, stays, bookings] = await Promise.all([
+  const [receipts, orders, stays, bookings, applications, savedJobs] = await Promise.all([
     tab === 'receipts'
       ? supabase
           .from('receipt' as never)
@@ -70,6 +78,24 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
     tab === 'bookings'
       ? supabase.rpc('rpc_my_bookings')
       : Promise.resolve({ data: [], error: null }),
+    tab === 'applications'
+      ? supabase
+          .from('my_job_applications_v')
+          .select(
+            'id, vacancy_id, status, employer_note, interview_at, created_at, cv_name, title, area, employer_name, city_name, timezone, still_open',
+          )
+          .order('created_at', { ascending: false })
+          .limit(100)
+      : Promise.resolve({ data: [], error: null }),
+    tab === 'saved'
+      ? supabase
+          .from('my_saved_jobs_v')
+          .select(
+            'vacancy_id, title, area, salary_min, salary_max, salary_period, currency, employer_name, city_name, still_open',
+          )
+          .order('saved_at', { ascending: false })
+          .limit(100)
+      : Promise.resolve({ data: [], error: null }),
   ]);
 
   return (
@@ -79,7 +105,10 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
         <p className="text-muted text-[0.75rem] font-bold">{user.email}</p>
         <h1 className="mt-1 text-[1.75rem] font-extrabold tracking-[-0.02em]">Your account</h1>
 
-        <nav className="border-border mt-6 flex gap-6 border-b" aria-label="Account sections">
+        <nav
+          className="border-border mt-6 flex gap-6 overflow-x-auto whitespace-nowrap border-b"
+          aria-label="Account sections"
+        >
           {TABS.map((t) => (
             <Link
               key={t.key}
@@ -204,6 +233,18 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
                 ))}
               </ul>
             ))}
+
+          {tab === 'applications' && (
+            <MyApplications
+              applications={
+                applications.error ? null : ((applications.data ?? []) as MyApplication[])
+              }
+            />
+          )}
+
+          {tab === 'saved' && (
+            <MySavedJobs jobs={savedJobs.error ? null : ((savedJobs.data ?? []) as MySavedJob[])} />
+          )}
         </section>
       </main>
       <SiteFooter />

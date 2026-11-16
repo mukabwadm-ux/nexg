@@ -33646,6 +33646,346 @@ export type Database = {
         };
         Relationships: [];
       };
+      vacancy: {
+        Row: {
+          area: string | null;
+          category: string;
+          city_id: string;
+          closed_at: string | null;
+          closes_on: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string;
+          id: string;
+          job_type: string;
+          merchant_id: string;
+          openings: number;
+          posted_at: string | null;
+          requirements: string | null;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_period: string | null;
+          status: string;
+          title: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          area?: string | null;
+          category: string;
+          city_id: string;
+          closed_at?: string | null;
+          closes_on?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          description: string;
+          id?: string;
+          job_type: string;
+          merchant_id: string;
+          openings?: number;
+          posted_at?: string | null;
+          requirements?: string | null;
+          salary_max?: number | null;
+          salary_min?: number | null;
+          salary_period?: string | null;
+          status?: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          area?: string | null;
+          category?: string;
+          city_id?: string;
+          closed_at?: string | null;
+          closes_on?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string;
+          id?: string;
+          job_type?: string;
+          merchant_id?: string;
+          openings?: number;
+          posted_at?: string | null;
+          requirements?: string | null;
+          salary_max?: number | null;
+          salary_min?: number | null;
+          salary_period?: string | null;
+          status?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_bounds_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'waitlist_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      vacancy_application: {
+        Row: {
+          created_at: string;
+          cv_name: string | null;
+          cv_path: string | null;
+          email: string;
+          employer_note: string | null;
+          full_name: string;
+          id: string;
+          interview_at: string | null;
+          note: string | null;
+          phone: string | null;
+          status: string;
+          status_changed_at: string;
+          user_id: string;
+          vacancy_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          cv_name?: string | null;
+          cv_path?: string | null;
+          email: string;
+          employer_note?: string | null;
+          full_name: string;
+          id?: string;
+          interview_at?: string | null;
+          note?: string | null;
+          phone?: string | null;
+          status?: string;
+          status_changed_at?: string;
+          user_id: string;
+          vacancy_id: string;
+        };
+        Update: {
+          created_at?: string;
+          cv_name?: string | null;
+          cv_path?: string | null;
+          email?: string;
+          employer_note?: string | null;
+          full_name?: string;
+          id?: string;
+          interview_at?: string | null;
+          note?: string | null;
+          phone?: string | null;
+          status?: string;
+          status_changed_at?: string;
+          user_id?: string;
+          vacancy_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'vacancy_application_vacancy_id_fkey';
+            columns: ['vacancy_id'];
+            isOneToOne: false;
+            referencedRelation: 'careers_vacancy_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_application_vacancy_id_fkey';
+            columns: ['vacancy_id'];
+            isOneToOne: false;
+            referencedRelation: 'vacancy';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      vacancy_saved: {
+        Row: {
+          created_at: string;
+          user_id: string;
+          vacancy_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          user_id: string;
+          vacancy_id: string;
+        };
+        Update: {
+          created_at?: string;
+          user_id?: string;
+          vacancy_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'vacancy_saved_vacancy_id_fkey';
+            columns: ['vacancy_id'];
+            isOneToOne: false;
+            referencedRelation: 'careers_vacancy_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_saved_vacancy_id_fkey';
+            columns: ['vacancy_id'];
+            isOneToOne: false;
+            referencedRelation: 'vacancy';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       waitlist_signup: {
         Row: {
           city_id: string | null;
@@ -35459,6 +35799,31 @@ export type Database = {
           },
         ];
       };
+      careers_board_v: {
+        Row: {
+          area: string | null;
+          category: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          city_slug: string | null;
+          closes_on: string | null;
+          currency: string | null;
+          employer_name: string | null;
+          employer_photo: string | null;
+          id: string | null;
+          job_type: string | null;
+          kind: string | null;
+          openings: number | null;
+          posted_at: string | null;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_period: string | null;
+          slug: string | null;
+          title: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
       careers_job_v: {
         Row: {
           benefits_md: string | null;
@@ -35682,6 +36047,203 @@ export type Database = {
           sort?: number | null;
         };
         Relationships: [];
+      };
+      careers_vacancy_v: {
+        Row: {
+          area: string | null;
+          category: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          city_slug: string | null;
+          closes_on: string | null;
+          currency: string | null;
+          description: string | null;
+          employer_name: string | null;
+          employer_photo: string | null;
+          employer_verified_at: string | null;
+          id: string | null;
+          job_type: string | null;
+          merchant_id: string | null;
+          openings: number | null;
+          posted_at: string | null;
+          requirements: string | null;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_period: string | null;
+          timezone: string | null;
+          title: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_bounds_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'waitlist_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
       };
       catalogue_health: {
         Row: {
@@ -46164,6 +46726,75 @@ export type Database = {
             isOneToOne: true;
             referencedRelation: 'msg_object_conversations_v';
             referencedColumns: ['conversation_id'];
+          },
+        ];
+      };
+      my_job_applications_v: {
+        Row: {
+          area: string | null;
+          city_name: string | null;
+          created_at: string | null;
+          cv_name: string | null;
+          employer_name: string | null;
+          employer_note: string | null;
+          id: string | null;
+          interview_at: string | null;
+          job_type: string | null;
+          status: string | null;
+          status_changed_at: string | null;
+          still_open: boolean | null;
+          timezone: string | null;
+          title: string | null;
+          vacancy_id: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: 'vacancy_application_vacancy_id_fkey';
+            columns: ['vacancy_id'];
+            isOneToOne: false;
+            referencedRelation: 'careers_vacancy_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_application_vacancy_id_fkey';
+            columns: ['vacancy_id'];
+            isOneToOne: false;
+            referencedRelation: 'vacancy';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      my_saved_jobs_v: {
+        Row: {
+          area: string | null;
+          city_name: string | null;
+          currency: string | null;
+          employer_name: string | null;
+          job_type: string | null;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_period: string | null;
+          saved_at: string | null;
+          still_open: boolean | null;
+          title: string | null;
+          vacancy_id: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: 'vacancy_saved_vacancy_id_fkey';
+            columns: ['vacancy_id'];
+            isOneToOne: false;
+            referencedRelation: 'careers_vacancy_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_saved_vacancy_id_fkey';
+            columns: ['vacancy_id'];
+            isOneToOne: false;
+            referencedRelation: 'vacancy';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -58563,6 +59194,151 @@ export type Database = {
         SetofOptions: {
           from: '*';
           to: 'user_preference';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_vacancy_application_update: {
+        Args: {
+          p_application_id: string;
+          p_interview_at?: string;
+          p_message?: string;
+          p_status: string;
+        };
+        Returns: {
+          created_at: string;
+          cv_name: string | null;
+          cv_path: string | null;
+          email: string;
+          employer_note: string | null;
+          full_name: string;
+          id: string;
+          interview_at: string | null;
+          note: string | null;
+          phone: string | null;
+          status: string;
+          status_changed_at: string;
+          user_id: string;
+          vacancy_id: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'vacancy_application';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_vacancy_application_withdraw: {
+        Args: { p_application_id: string };
+        Returns: {
+          created_at: string;
+          cv_name: string | null;
+          cv_path: string | null;
+          email: string;
+          employer_note: string | null;
+          full_name: string;
+          id: string;
+          interview_at: string | null;
+          note: string | null;
+          phone: string | null;
+          status: string;
+          status_changed_at: string;
+          user_id: string;
+          vacancy_id: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'vacancy_application';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_vacancy_apply: {
+        Args: {
+          p_cv_name?: string;
+          p_cv_path?: string;
+          p_email: string;
+          p_full_name: string;
+          p_note?: string;
+          p_phone?: string;
+          p_vacancy_id: string;
+        };
+        Returns: string;
+      };
+      rpc_vacancy_save: {
+        Args: {
+          p_area?: string;
+          p_category: string;
+          p_city_id: string;
+          p_closes_on?: string;
+          p_description: string;
+          p_job_type: string;
+          p_merchant_id: string;
+          p_openings?: number;
+          p_publish?: boolean;
+          p_requirements?: string;
+          p_salary_max?: number;
+          p_salary_min?: number;
+          p_salary_period?: string;
+          p_title: string;
+          p_vacancy_id?: string;
+        };
+        Returns: {
+          area: string | null;
+          category: string;
+          city_id: string;
+          closed_at: string | null;
+          closes_on: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string;
+          id: string;
+          job_type: string;
+          merchant_id: string;
+          openings: number;
+          posted_at: string | null;
+          requirements: string | null;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_period: string | null;
+          status: string;
+          title: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'vacancy';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_vacancy_set_status: {
+        Args: { p_reason?: string; p_status: string; p_vacancy_id: string };
+        Returns: {
+          area: string | null;
+          category: string;
+          city_id: string;
+          closed_at: string | null;
+          closes_on: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string;
+          id: string;
+          job_type: string;
+          merchant_id: string;
+          openings: number;
+          posted_at: string | null;
+          requirements: string | null;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_period: string | null;
+          status: string;
+          title: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'vacancy';
           isOneToOne: true;
           isSetofReturn: false;
         };

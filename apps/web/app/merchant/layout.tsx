@@ -91,6 +91,7 @@ export default async function MerchantLayout({ children }: { children: React.Rea
       { label: 'Business', href: '/merchant/business' },
       { label: 'Money', href: '/merchant/money' },
       { label: 'Promotions', href: '/merchant/promotions' },
+      { label: 'Hiring', href: '/merchant/hiring' },
       { label: 'Insights', href: '/merchant/insights' },
       { label: 'Settings', href: '/merchant/settings' },
     ];

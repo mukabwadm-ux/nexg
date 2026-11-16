@@ -1,6 +1,7 @@
 import {
   BarChart3,
   Bell,
+  Briefcase,
   Building2,
   CalendarCheck,
   CalendarDays,
@@ -124,6 +125,7 @@ export function merchantNav({
     },
     { href: '/merchant/reviews', label: 'Reviews', icon: i(<Star className="h-4 w-4" />) },
     { href: '/merchant/team', label: 'Team', icon: i(<Users className="h-4 w-4" />) },
+    { href: '/merchant/hiring', label: 'Hiring', icon: i(<Briefcase className="h-4 w-4" />) },
     {
       href: '/merchant/documents',
       label: 'Documents',

@@ -1,6 +1,7 @@
 import {
   BarChart3,
   Box,
+  Briefcase,
   Building2,
   CalendarDays,
   ClipboardList,
@@ -78,6 +79,22 @@ export const merchantWorkspaceNavigation = [
 ] as const;
 
 export type MerchantWorkspaceSection = (typeof merchantWorkspaceNavigation)[number]['label'];
+
+/**
+ * Sections only the signed-in workspace has. The preview has no page for
+ * them, so they stay out of its navigation and search.
+ */
+export const merchantWorkspaceOnlyNavigation = [{ label: 'Hiring', icon: Briefcase }] as const;
+
+export type MerchantWorkspaceNavLabel =
+  | MerchantWorkspaceSection
+  | (typeof merchantWorkspaceOnlyNavigation)[number]['label'];
+
+export function workspaceNavIcon(label: MerchantWorkspaceNavLabel) {
+  return [...merchantWorkspaceNavigation, ...merchantWorkspaceOnlyNavigation].find(
+    (entry) => entry.label === label,
+  )!.icon;
+}
 
 export function permittedWorkspaceNavigation(sections?: readonly MerchantWorkspaceSection[]) {
   return merchantWorkspaceNavigation.filter((item) => !sections || sections.includes(item.label));
