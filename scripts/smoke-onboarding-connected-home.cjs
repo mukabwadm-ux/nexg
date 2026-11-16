@@ -89,8 +89,8 @@ fs.mkdirSync(output, { recursive: true });
     );
 
     await edit('Documents and evidence');
-    await page.locator('#upload-owner_id').setInputFiles({
-      name: 'owner-id.pdf',
+    await page.locator('#upload-county_permit').setInputFiles({
+      name: 'county-permit.pdf',
       mimeType: 'application/pdf',
       buffer: Buffer.from('%PDF-1.4\nPreview evidence only'),
     });

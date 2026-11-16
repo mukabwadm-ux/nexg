@@ -271,7 +271,7 @@ const sections: Record<
         detail: 'Upload a clear photo or PDF',
         state: 'Needed',
       },
-      { title: 'KRA PIN certificate', detail: 'Uploaded 21 Oct', state: 'Under review' },
+      { title: 'Business permit (county)', detail: 'Uploaded 21 Oct', state: 'Under review' },
     ],
   },
   settings: {

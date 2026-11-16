@@ -705,9 +705,8 @@ export const FULFILLMENT_LABELS = {
   warehouse_receiving: 'Warehouse receiving',
   bulky_goods_delivery: 'Bulky goods delivery',
 };
+// No owner ID or KRA PIN certificate: merchants no longer upload either (owner, 15 Nov 2026).
 export const CORE_DOCUMENTS = [
-  { id: 'owner_id', label: 'Owner/authorized representative ID', required: true },
-  { id: 'kra_pin_certificate', label: 'KRA PIN certificate', required: true },
   {
     id: 'county_permit',
     label: 'County business permit for the operating premise',
