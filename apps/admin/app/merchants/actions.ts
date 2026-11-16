@@ -63,7 +63,7 @@ export async function goLive(merchantId: string, reason: string): Promise<Review
   return listed.error
     ? {
         ok: true,
-        message: `Live, but not shown in Discovery yet: ${listed.error.message} Switch it on from the directory.`,
+        message: `Live, but not shown in Discovery yet: ${listed.error.message} Switch it on under Status & controls.`,
       }
     : { ok: true, message: 'Live and shown in Discovery. Customers can now find and book it.' };
 }
@@ -115,6 +115,7 @@ export async function setControls(merchantId: string, patch: Controls): Promise<
   if (error) return { ok: false, message: error.message };
 
   revalidatePath('/merchants');
+  revalidatePath(`/merchants/${merchantId}`);
   return { ok: true, message: 'Saved.' };
 }
 

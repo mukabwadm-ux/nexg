@@ -51,8 +51,8 @@ const AUDIENCES = [
   {
     name: 'Partners and developers',
     today:
-      'Build on live merchants and catalogues, delivery zones, experiences and bookable services.',
-    soon: 'Sandbox keys with test data, for building writes safely.',
+      'Build on live merchants and catalogues, delivery zones, experiences and bookable services, and try bookings with test keys.',
+    soon: 'Order events pushed to you, and OAuth for third-party apps.',
     href: '/docs/quickstart',
   },
   {

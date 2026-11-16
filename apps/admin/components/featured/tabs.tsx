@@ -344,7 +344,7 @@ function SlotPanel({ slot, requests }: { slot: InventoryRow; requests: RequestRo
         <div className="grid grid-cols-2 gap-2">
           {slot.merchant_id && (
             <Link
-              href={`/merchants?selected=${slot.merchant_id}`}
+              href={`/merchants/${encodeURIComponent(slot.merchant_id)}`}
               className="border-border-strong hover:border-ink rounded-lg border px-3 py-2 text-center text-[0.8125rem] font-bold transition-colors"
             >
               Open merchant

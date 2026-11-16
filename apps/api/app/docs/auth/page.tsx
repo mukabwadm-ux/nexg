@@ -36,6 +36,7 @@ export default function AuthPage() {
       href="/docs/auth"
       toc={[
         { id: 'keys', label: 'API keys' },
+        { id: 'live-and-test', label: 'Live and test keys' },
         { id: 'sending', label: 'Sending a key' },
         { id: 'scopes', label: 'Scopes' },
         { id: 'merchant-keys', label: 'Merchant keys' },
@@ -50,11 +51,21 @@ export default function AuthPage() {
         An API key is a 64-character secret issued in the{' '}
         <A href="/developers">developer console</A>. NexG stores only a SHA-256 hash of it, so the
         key is shown once, when it is issued, and cannot be shown again. The console identifies a
-        key by its first eight characters.
+        key by its first eight characters, or for a test key by <C>nexg_test_</C> and the four
+        after it.
       </P>
       <P>
         A key is not tied to a person&apos;s login. It keeps working when the person who issued it
         signs out, which is what lets a server use it.
+      </P>
+
+      <H2 id="live-and-test">Live and test keys</H2>
+      <P>
+        Every key is live or test, chosen when it is issued. A test key is the same 64 characters
+        with <C>nexg_test_</C> in front, so it is easy to spot in a config file or a log. It reads
+        the same public data as a live key, but bookings made with it go to a sandbox and never
+        become orders, and it reads only those test bookings. Test keys have a rate-limit bucket
+        of their own. See <A href="/docs/environments#test-keys">Environments</A>.
       </P>
 
       <H2 id="sending">Sending a key</H2>
@@ -83,8 +94,8 @@ export default function AuthPage() {
           ],
           [
             <C key="s">merchant_write</C>,
-            'Book services for that merchant, charged to its account (POST /v1/orders).',
-            'Not offered by the console yet: ask NexG.',
+            'Book services for that merchant (POST /v1/orders): for real, charged to its account, with a live key; in the sandbox with a test key.',
+            'On a test key, the merchant’s owner, from the console. On a live key, ask NexG.',
           ],
           [
             <span key="s">

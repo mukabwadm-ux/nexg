@@ -484,7 +484,10 @@ export function WorkWorkspace({
                         {selected.statusLabel ?? template.stages[selected.stage]}
                       </span>
                     </div>
-                    <p>{selected.customer} · Sample record</p>
+                    <p>
+                      {selected.customer}
+                      {preview ? ' · Sample record' : ''}
+                    </p>
                   </div>
                   <button
                     type="button"

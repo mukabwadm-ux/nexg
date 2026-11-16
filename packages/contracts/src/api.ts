@@ -309,7 +309,10 @@ export const ServiceBooking = z
   .object({
     /** The service code, e.g. `airport_transfer`. */
     service: z.string().min(1).max(64),
-    /** How many units. For a transfer, that is passengers. */
+    /**
+     * How many units. For a transfer, that is passengers. A flat-priced
+     * service, such as a venue booking, costs the same whatever the number.
+     */
     quantity: z.number().int().min(1).max(60).default(1),
     /** Where we collect from. Required for a ride or a courier. */
     pickup_label: z.string().max(240).optional(),

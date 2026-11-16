@@ -1812,10 +1812,7 @@ export function InsightsWorkspace({
               in Work.
             </p>
             {mode === 'live' ? (
-              <Link
-                className="in-button"
-                href={`/merchant/orders?reference=${encodeURIComponent(panelRecord.reference)}`}
-              >
+              <Link className="in-button" href="/merchant/work">
                 Open Work <ArrowRight size={14} />
               </Link>
             ) : (
@@ -1980,7 +1977,7 @@ export function InsightsWorkspace({
                       '/merchant-live-preview/settings',
                       activeDemo,
                     )
-                  : '/merchant/settings'
+                  : '/merchant/settings?section=connections'
               }
             >
               Open connection settings <ArrowRight size={14} />

@@ -15,6 +15,11 @@ import type { Database } from '@nexg/db';
  * A developer with no merchant gets a platform key: public data only.
  * That is the common case for somebody evaluating the API, and it is
  * enough to call every endpoint that exists in stage one.
+ *
+ * A key is live or test. A test key starts `nexg_test_`, books in the
+ * sandbox (never a real order) and has a rate-limit bucket of its own.
+ * Booking (`merchant_write`) is offered on test keys only: who may book
+ * for real, on account, is NexG's decision, not a checkbox.
  */
 
 const RequestSchema = z.object({
@@ -24,6 +29,7 @@ const RequestSchema = z.object({
     .max(3),
   merchant_id: z.string().uuid().nullable(),
   rate_limit: z.number().int().min(10).max(600).default(60),
+  environment: z.enum(['live', 'test']).default('live'),
 });
 
 export interface IssuedKey {
@@ -32,6 +38,7 @@ export interface IssuedKey {
   keyPrefix: string;
   scopes: string[];
   merchantId: string | null;
+  environment: 'live' | 'test';
 }
 
 export type IssueResult =
@@ -71,6 +78,7 @@ export async function issueApiKey(formData: FormData): Promise<IssueResult> {
     scopes: formData.getAll('scopes').map(String),
     merchant_id: (formData.get('merchant_id') as string) || null,
     rate_limit: Number(formData.get('rate_limit') ?? 60),
+    environment: (formData.get('environment') as string) || 'live',
   });
 
   if (!parsed.success) {
@@ -86,7 +94,19 @@ export async function issueApiKey(formData: FormData): Promise<IssueResult> {
     };
   }
 
-  const { scopes, merchant_id, rate_limit } = parsed.data;
+  const { scopes, merchant_id, rate_limit, environment } = parsed.data;
+
+  /*
+   * A live key that books makes real orders, charged to the merchant's
+   * account. NexG enables that; the console offers booking on test keys.
+   */
+  if (environment === 'live' && scopes.includes('merchant_write')) {
+    return {
+      ok: false,
+      message: 'Booking is offered on test keys. Ask NexG to book for real.',
+      fields: { scopes: 'Booking needs a test key.' },
+    };
+  }
 
   /*
    * A key that can read a merchant's records must belong to somebody who
@@ -142,6 +162,9 @@ export async function issueApiKey(formData: FormData): Promise<IssueResult> {
     p_expires_at: null,
     p_created_by: null,
     p_created_by_user: user.id,
+    // Sent only for a test key, so a live key is issued the same way it
+    // was before test keys existed.
+    ...(environment === 'test' ? { p_environment: 'test' } : {}),
   });
 
   if (error) {
@@ -166,6 +189,7 @@ export async function issueApiKey(formData: FormData): Promise<IssueResult> {
       keyPrefix: row.key_prefix,
       scopes,
       merchantId: merchant_id,
+      environment,
     },
   };
 }

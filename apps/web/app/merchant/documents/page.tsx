@@ -6,14 +6,17 @@ import {
 } from '@/components/partner/documents';
 import { AgreementPanel, type AgreementStatus } from '@/components/merchant/agreement-panel';
 import { PageHead } from '@/components/merchant/frame';
-import { requireMerchant } from '@/lib/partner';
+import { requireMerchant, setupPageOrWorkspace } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = { title: 'Documents' };
 export const dynamic = 'force-dynamic';
 
 export default async function MerchantDocuments() {
-  const me = await requireMerchant({ access: 'setup' });
+  const me = await setupPageOrWorkspace(
+    () => requireMerchant({ access: 'setup' }),
+    '/merchant/business?tab=documents',
+  );
   const supabase = createClient();
 
   const [{ data: reqs, error }, { data: docs }, { data: asked }, { data: agreement }] =

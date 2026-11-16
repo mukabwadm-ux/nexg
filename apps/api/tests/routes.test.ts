@@ -701,3 +701,122 @@ describe('POST /v1/orders', () => {
     expect(body.error.message).toContain('same Idempotency-Key');
   });
 });
+
+/*
+ * Test keys (2026-11-14). A test key's bookings and order reads go to the
+ * sandbox functions and never to the live ones; every answer to a keyed
+ * request says which kind of key it was.
+ */
+describe('test keys', () => {
+  const SCOPES = ['public_read', 'merchant_read', 'merchant_write'];
+  const TEST_KEY = { ...MERCHANT_KEY, scopes: SCOPES, environment: 'test' };
+  const LIVE_KEY = { ...MERCHANT_KEY, scopes: SCOPES, environment: 'live' };
+  const SANDBOX_RECEIPT = {
+    ok: true,
+    order_id: '7c6b5a49-3827-4615-a4b3-c2d1e0f9a8b7',
+    reference: 'TEST-261114-A1B2C3',
+    service: 'venue_booking',
+    quantity: 1,
+    total_cents: 100000,
+    currency: 'KES',
+    payment_method: 'on_account',
+    scheduled_for: null,
+  };
+  const page = { data: { ok: true, items: [ORDER], next_cursor: null }, error: null };
+
+  /** Answers for every function; records which ones were called. */
+  function keyIs(key: Record<string, unknown>) {
+    rpc.mockImplementation(async (name: string) => {
+      if (name === 'fn_api_key_lookup') return { data: [key], error: null };
+      if (name === 'fn_api_request_spend') {
+        return { data: [{ allowed: true, retry_after: 0, remaining: 9 }], error: null };
+      }
+      if (name === 'rpc_order_place_api' || name === 'rpc_order_place_api_test') {
+        return { data: SANDBOX_RECEIPT, error: null };
+      }
+      if (name === 'rpc_order_read_api' || name === 'rpc_order_read_api_test') return page;
+      throw new Error(`unexpected rpc ${name}`);
+    });
+  }
+  const called = () => rpc.mock.calls.map(([name]) => name as string);
+  const booking = () =>
+    new Request('https://api.test/v1/orders', {
+      method: 'POST',
+      headers: {
+        'x-api-key': 'nexg_test_a-sandbox-key',
+        'idempotency-key': 'sandbox-booking-0001',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ service: 'venue_booking' }),
+    });
+
+  it('books in the sandbox, never through the live function', async () => {
+    keyIs(TEST_KEY);
+
+    const res = await createOrder(booking());
+
+    expect(res.status).toBe(201);
+    expect(res.headers.get('nexg-environment')).toBe('test');
+    expect((await res.json()).data.booking.reference).toBe('TEST-261114-A1B2C3');
+    expect(called()).toContain('rpc_order_place_api_test');
+    expect(called()).not.toContain('rpc_order_place_api');
+  });
+
+  it('reads test bookings, never real orders, as a list and one by one', async () => {
+    keyIs(TEST_KEY);
+
+    const list = await listOrders(keyed('/v1/orders'));
+    const one = await getOrder(keyed(`/v1/orders/${ORDER.order_id}`), {
+      params: { id: ORDER.order_id },
+    });
+
+    for (const res of [list, one]) {
+      expect(res.status).toBe(200);
+      expect(res.headers.get('nexg-environment')).toBe('test');
+    }
+    expect(called().filter((n) => n.startsWith('rpc_order_read_api'))).toEqual([
+      'rpc_order_read_api_test',
+      'rpc_order_read_api_test',
+    ]);
+  });
+
+  it('sends a live key to the live functions and says so', async () => {
+    keyIs(LIVE_KEY);
+
+    const res = await createOrder(booking());
+    await listOrders(keyed('/v1/orders'));
+
+    expect(res.headers.get('nexg-environment')).toBe('live');
+    expect(called()).toContain('rpc_order_place_api');
+    expect(called()).toContain('rpc_order_read_api');
+    expect(called().some((n) => n.endsWith('_test'))).toBe(false);
+  });
+
+  it('treats a key as live when the database does not say (before the migration)', async () => {
+    keyIs({ ...MERCHANT_KEY, scopes: SCOPES }); // no environment column
+
+    await listOrders(keyed('/v1/orders'));
+
+    expect(called()).toContain('rpc_order_read_api');
+  });
+
+  it('refuses to guess at a kind of key it does not know', async () => {
+    keyIs({ ...LIVE_KEY, environment: 'staging' });
+
+    const res = await listOrders(keyed('/v1/orders'));
+
+    expect(res.status).toBe(503);
+    expect(called().some((n) => n.startsWith('rpc_order'))).toBe(false);
+  });
+
+  it('marks public reads made with a test key as test', async () => {
+    keyIs(TEST_KEY);
+    from.mockReturnValue(fakeQuery({ data: [], error: null }).builder);
+
+    const res = await listZones(keyed('/v1/zones'));
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('no-store');
+    expect(res.headers.get('nexg-environment')).toBe('test');
+  });
+});

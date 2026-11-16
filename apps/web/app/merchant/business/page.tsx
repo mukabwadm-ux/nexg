@@ -281,8 +281,11 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
         ),
         locations: mayManageSetup ? (
           <BusinessLocationTools activities={activities.map(({ id, name }) => ({ id, name }))} />
-        ) : (
+        ) : me.access.state === 'legacy' ? (
           <AddBranch merchantId={me.id} />
+        ) : (
+          // Saving a branch needs setup access, which only the application owner has.
+          <p className="text-sm">The application owner manages locations.</p>
         ),
         team: <InviteMember merchantId={me.id} branches={branchChoices} />,
         documents: mayManageDocuments ? (

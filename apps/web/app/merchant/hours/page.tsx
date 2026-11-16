@@ -14,6 +14,7 @@ import {
   type HolidayRow,
   type HoursRow,
 } from '@/components/merchant/hours-vocab';
+import { setupPageOrWorkspace } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = { title: 'Hours' };
@@ -41,7 +42,10 @@ interface OverrideRow {
  * shown as open right now".
  */
 export default async function HoursPage({ searchParams }: { searchParams?: { branch?: string } }) {
-  const { m } = await merchantContext({ draft: true });
+  const { m } = await setupPageOrWorkspace(
+    () => merchantContext({ draft: true }),
+    '/merchant/availability',
+  );
   if (!m) return null;
 
   const supabase = createClient();

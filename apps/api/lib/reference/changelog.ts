@@ -11,6 +11,25 @@ import type { ChangelogEntry } from './types';
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-14',
+    kind: 'fixed',
+    title: 'A venue booking is charged once',
+    body: [
+      'POST /v1/orders charged a flat-priced service, such as a venue booking, its price times the quantity. It is now charged once per booking, whatever the quantity. Transfers and couriers are still charged per passenger or parcel.',
+    ],
+    endpoints: ['create-order'],
+  },
+  {
+    date: '2026-11-14',
+    kind: 'added',
+    title: 'Test keys and a sandbox for bookings',
+    body: [
+      'The developer console issues test keys as well as live ones. A test key starts nexg_test_ and calls the same URL. It reads the same public data, but POST /v1/orders with it records a sandbox booking with a TEST- reference that never becomes an order, and GET /v1/orders reads those test bookings, never real orders.',
+      'A test booking goes through the same checks as a live one. Where NexG has not priced a service in your city yet, it gets a sample price of KES 1,000 a unit. Test keys spend from a rate-limit bucket of their own, and every successful answer to a request with a key names its kind in the NexG-Environment header.',
+    ],
+    endpoints: [],
+  },
+  {
+    date: '2026-11-14',
     kind: 'added',
     title: 'Book a service',
     body: [

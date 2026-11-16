@@ -1,6 +1,6 @@
 import { PageHead } from '@/components/merchant/frame';
 import { Menu, type ItemRow, type SectionRow } from '@/components/partner/merchant-menu';
-import { requireMerchant } from '@/lib/partner';
+import { requireMerchant, setupPageOrWorkspace } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 import { getCatalogueExample } from '@nexg/contracts';
 
@@ -14,7 +14,10 @@ export const dynamic = 'force-dynamic';
  * from the same row, so an edit is live for the next order.
  */
 export default async function MerchantMenu() {
-  const me = await requireMerchant({ access: 'setup' });
+  const me = await setupPageOrWorkspace(
+    () => requireMerchant({ access: 'setup' }),
+    '/merchant/offerings',
+  );
   const supabase = createClient();
 
   const [{ data, error }, { data: sectionData }, { data: merchantData }] = await Promise.all([

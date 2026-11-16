@@ -13,6 +13,13 @@ export const API_SCOPES = {
 export type ApiScope = (typeof API_SCOPES)[keyof typeof API_SCOPES];
 export type ApiOperation = 'public_read' | 'merchant_read' | 'merchant_write';
 
+/**
+ * live: real data, and a booking is a real order. test: a sandbox key
+ * (`nexg_test_...`); its bookings and order reads go to the sandbox
+ * functions, never to real orders. A request without a key is live.
+ */
+export type ApiEnvironment = 'live' | 'test';
+
 export interface ApiCredential {
   keyId: string;
   /** Kept only for the request and forwarded to the existing owned RPC. Never log it. */
@@ -21,6 +28,7 @@ export interface ApiCredential {
   scopes: ApiScope[];
   rateLimit: number;
   anonymous: boolean;
+  environment: ApiEnvironment;
 }
 
 export interface RateLimitResult {
@@ -79,6 +87,7 @@ export async function authenticate(request: Request): Promise<ApiCredential> {
       scopes: [API_SCOPES.public_read],
       rateLimit: 120,
       anonymous: true,
+      environment: 'live',
     };
   }
   if (!raw || raw.length > 256 || /\s/.test(raw)) {
@@ -94,6 +103,7 @@ export async function authenticate(request: Request): Promise<ApiCredential> {
     merchant_id?: unknown;
     scopes?: unknown;
     rate_limit?: unknown;
+    environment?: unknown;
   } | null;
   if (!row) {
     // Unknown, revoked, expired and access-restricted credentials share one response.
@@ -108,7 +118,9 @@ export async function authenticate(request: Request): Promise<ApiCredential> {
     row.scopes.some((scope) => !Object.values(API_SCOPES).includes(scope as ApiScope)) ||
     typeof row.rate_limit !== 'number' ||
     !Number.isInteger(row.rate_limit) ||
-    row.rate_limit < 1
+    row.rate_limit < 1 ||
+    // Absent only before the test-keys migration (20261217000100) runs: then every key is live.
+    !(row.environment === undefined || row.environment === 'live' || row.environment === 'test')
   ) {
     throw new ApiAuthError('The API key could not be checked.', 'internal_error', 503);
   }
@@ -119,6 +131,7 @@ export async function authenticate(request: Request): Promise<ApiCredential> {
     scopes: row.scopes as ApiScope[],
     rateLimit: Math.min(row.rate_limit, 600),
     anonymous: false,
+    environment: row.environment === 'test' ? 'test' : 'live',
   };
 }
 

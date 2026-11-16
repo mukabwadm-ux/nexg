@@ -3794,6 +3794,7 @@ export type Database = {
           created_at: string;
           created_by: string | null;
           created_by_user: string | null;
+          environment: string;
           expires_at: string | null;
           id: string;
           key_hash: string;
@@ -3812,6 +3813,7 @@ export type Database = {
           created_at?: string;
           created_by?: string | null;
           created_by_user?: string | null;
+          environment?: string;
           expires_at?: string | null;
           id?: string;
           key_hash: string;
@@ -3829,6 +3831,7 @@ export type Database = {
           created_at?: string;
           created_by?: string | null;
           created_by_user?: string | null;
+          environment?: string;
           expires_at?: string | null;
           id?: string;
           key_hash?: string;
@@ -4042,6 +4045,173 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [];
+      };
+      api_test_order: {
+        Row: {
+          api_key_id: string | null;
+          created_at: string;
+          currency: string;
+          dropoff_label: string | null;
+          id: string;
+          merchant_id: string;
+          payload: NonNullable<Json>;
+          payment_method: string;
+          payment_status: string;
+          pickup_label: string | null;
+          price_source: string;
+          quantity: number;
+          reference: string;
+          scheduled_for: string | null;
+          service: string;
+          stage: string;
+          total_cents: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          api_key_id?: string | null;
+          created_at?: string;
+          currency?: string;
+          dropoff_label?: string | null;
+          id?: string;
+          merchant_id: string;
+          payload: NonNullable<Json>;
+          payment_method?: string;
+          payment_status?: string;
+          pickup_label?: string | null;
+          price_source: string;
+          quantity: number;
+          reference: string;
+          scheduled_for?: string | null;
+          service: string;
+          stage?: string;
+          total_cents: number;
+        };
+        Update: {
+          api_key_id?: string | null;
+          created_at?: string;
+          currency?: string;
+          dropoff_label?: string | null;
+          id?: string;
+          merchant_id?: string;
+          payload?: NonNullable<Json>;
+          payment_method?: string;
+          payment_status?: string;
+          pickup_label?: string | null;
+          price_source?: string;
+          quantity?: number;
+          reference?: string;
+          scheduled_for?: string | null;
+          service?: string;
+          stage?: string;
+          total_cents?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_test_order_api_key_id_fkey';
+            columns: ['api_key_id'];
+            isOneToOne: false;
+            referencedRelation: 'api_key';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
       };
       approval_request: {
         Row: {
@@ -49672,6 +49842,7 @@ export type Database = {
         Args: {
           p_created_by?: string;
           p_created_by_user?: string;
+          p_environment?: string;
           p_expires_at?: string;
           p_merchant_id?: string;
           p_rate_limit?: number;
@@ -49686,6 +49857,7 @@ export type Database = {
       fn_api_key_lookup: {
         Args: { p_raw_key: string };
         Returns: {
+          environment: string;
           key_id: string;
           merchant_id: string;
           rate_limit: number;
@@ -50129,6 +50301,11 @@ export type Database = {
           isOneToOne: false;
           isSetofReturn: true;
         };
+      };
+      fn_merchant_setup_offering_authorize: { Args: { p_merchant_id: string }; Returns: undefined };
+      fn_merchant_setup_offering_write: {
+        Args: { p_data: Json; p_merchant_id: string };
+        Returns: Json;
       };
       fn_mood_chips: {
         Args: { p_city_id: string };
@@ -55281,6 +55458,10 @@ export type Database = {
         Returns: Json;
       };
       rpc_merchant_setup_offerings: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_setup_offerings_import: {
+        Args: { p_merchant_id: string; p_rows: Json };
+        Returns: Json;
+      };
       rpc_merchant_soft_delete: {
         Args: { p_confirmation_name: string; p_merchant_id: string; p_reason: string };
         Returns: Json;
@@ -55613,9 +55794,23 @@ export type Database = {
         Args: { p_api_key: string; p_idempotency_key: string; p_payload: Json };
         Returns: Json;
       };
+      rpc_order_place_api_test: {
+        Args: { p_api_key: string; p_idempotency_key: string; p_payload: Json };
+        Returns: Json;
+      };
       rpc_order_place_web: { Args: { p_payload: Json }; Returns: Json };
       rpc_order_quote_web: { Args: { p_payload: Json }; Returns: Json };
       rpc_order_read_api: {
+        Args: {
+          p_api_key: string;
+          p_cursor_created_at?: string;
+          p_cursor_id?: string;
+          p_limit?: number;
+          p_order_id?: string;
+        };
+        Returns: Json;
+      };
+      rpc_order_read_api_test: {
         Args: {
           p_api_key: string;
           p_cursor_created_at?: string;

@@ -1,7 +1,6 @@
 'use client';
 import { TableViewport } from '@nexg/ui/table-viewport';
 
-import * as Dialog from '@radix-ui/react-dialog';
 import Image from 'next/image';
 import {
   ArrowLeft,
@@ -17,7 +16,10 @@ import {
   Upload,
   X,
 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { offeringsExportCsv } from './csv';
+import { OfferingsCsvImport } from './csv-import';
+import { download, Modal } from './dialog';
 import { Label, OfferingEditor, PriceSummary, Status, type EditorTab } from './editor';
 import {
   availableSchemas,
@@ -51,69 +53,6 @@ type Panel =
   | null;
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 const emptyOfferings: Offering[] = [];
-function download(name: string, text: string) {
-  const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = name;
-  anchor.click();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-function Modal({
-  open,
-  title,
-  description,
-  onClose,
-  children,
-  footer,
-}: {
-  open: boolean;
-  title: string;
-  description?: string;
-  onClose: () => void;
-  children: ReactNode;
-  footer?: ReactNode;
-}) {
-  const returnFocus = useRef<HTMLElement | null>(null);
-  return (
-    <Dialog.Root
-      open={open}
-      onOpenChange={(value) => {
-        if (!value) onClose();
-      }}
-    >
-      <Dialog.Portal>
-        <Dialog.Overlay className={styles.overlay} />
-        <Dialog.Content
-          className={`${styles.modal} ${styles.root}`}
-          aria-describedby={description ? 'of-dialog-description' : undefined}
-          onOpenAutoFocus={() => {
-            returnFocus.current = document.activeElement as HTMLElement | null;
-          }}
-          onCloseAutoFocus={(event) => {
-            event.preventDefault();
-            if (returnFocus.current?.isConnected) returnFocus.current.focus();
-          }}
-        >
-          <header>
-            <div>
-              <Dialog.Title>{title}</Dialog.Title>
-              {description && (
-                <Dialog.Description id="of-dialog-description">{description}</Dialog.Description>
-              )}
-            </div>
-            <Dialog.Close className="of-icon" aria-label="Close dialog">
-              <X size={19} />
-            </Dialog.Close>
-          </header>
-          <div className={styles.modalBody}>{children}</div>
-          {footer && <footer>{footer}</footer>}
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
-}
-
 /** The same screen accepts scoped onboarding configuration or an isolated 128-specialty preview. */
 export function OfferingsWorkspace({
   source: suppliedSource,
@@ -194,6 +133,7 @@ export function OfferingsWorkspace({
   const [panelError, setPanelError] = useState('');
   const [sampleId, setSampleId] = useState(initialId);
   const [configuredTypes, setConfiguredTypes] = useState<string[]>([]);
+  const [csvOpen, setCsvOpen] = useState(false);
   const nextAction = useRef<(() => void) | null>(null);
   const loadVersion = useRef(0);
   const invalidateLoad = useCallback(() => {
@@ -201,6 +141,9 @@ export function OfferingsWorkspace({
   }, []);
   const dirty = draft !== null && !same(draft, baseline);
   const liveCatalogue = !preview && !setupEditor;
+  // The live page exports the import format, so a file can come straight back.
+  const exportCsv = (items: Offering[]) =>
+    liveCatalogue ? offeringsExportCsv(items.filter((o) => !isExisting?.(o))) : catalogueCsv(items);
   useEffect(() => {
     onSetupDirtyChange?.(dirty);
   }, [dirty, onSetupDirtyChange]);
@@ -631,6 +574,17 @@ export function OfferingsWorkspace({
                   <span>Import</span>
                 </button>
               )}
+              {liveCatalogue && canWriteDrafts && (
+                <button
+                  type="button"
+                  className="of-button"
+                  disabled={loading || !catalogue}
+                  onClick={() => guard(() => setCsvOpen(true))}
+                >
+                  <Upload size={16} />
+                  <span>Import CSV</span>
+                </button>
+              )}
               {canWriteDrafts && (
                 <button
                   type="button"
@@ -754,7 +708,7 @@ export function OfferingsWorkspace({
                     onClick={() =>
                       download(
                         'offerings-selected.csv',
-                        catalogueCsv(offerings.filter((o) => selectedIds.includes(o.id))),
+                        exportCsv(offerings.filter((o) => selectedIds.includes(o.id))),
                       )
                     }
                   >
@@ -1004,7 +958,7 @@ export function OfferingsWorkspace({
                 <button
                   type="button"
                   className="of-link"
-                  onClick={() => download('offerings.csv', catalogueCsv(filtered))}
+                  onClick={() => download('offerings.csv', exportCsv(filtered))}
                 >
                   <Download size={13} />
                   Export
@@ -1071,6 +1025,7 @@ export function OfferingsWorkspace({
                     onConnections={() => guard(() => openPanel('connections'))}
                     onReload={() => guard(() => void load())}
                     setupDraftOnly={liveCatalogue}
+                    canPublish={liveCatalogue}
                     readOnly={readOnlyDraft}
                     onUploadImage={onUploadImage}
                   />
@@ -1179,6 +1134,15 @@ export function OfferingsWorkspace({
             </button>
           )}
         </div>
+      )}
+      {liveCatalogue && canWriteDrafts && (
+        <OfferingsCsvImport
+          open={csvOpen}
+          onClose={() => setCsvOpen(false)}
+          profile={profile}
+          offerings={offerings.filter((o) => !isExisting?.(o))}
+          onImported={() => void load()}
+        />
       )}
       <Modal
         open={panel === 'add'}
