@@ -50,7 +50,14 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
+  /*
+   * `list` in CI too, for one line per test with its time. The job stops at
+   * 20 minutes, and a run cut off there uploads no report and gets no
+   * `github` summary, so its log was the only record and it said nothing:
+   * from 14 to 16 Nov every run timed out that way, and finding out which
+   * tests ate the time took a local run.
+   */
+  reporter: process.env.CI ? [['list'], ['github'], ['html', { open: 'never' }]] : [['list']],
 
   use: {
     trace: 'on-first-retry',

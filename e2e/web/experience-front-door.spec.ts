@@ -19,9 +19,6 @@ for (const width of WIDTHS) {
     ]);
     await page.goto('/experience');
 
-    const skip = page.getByRole('button', { name: /Skip for now/ });
-    if (await skip.count()) await skip.first().click();
-
     await expect(page.locator('h1')).toHaveCount(1);
     await expect(page.locator('h1')).toHaveText('Customize your experience.');
 

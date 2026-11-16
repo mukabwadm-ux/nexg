@@ -2,8 +2,14 @@ import { expect, test } from '@playwright/test';
 
 /**
  * The /ask page after the Design B ("Cream Editorial") restyle: same copy,
- * same form behaviour, no sideways scroll down to 360px, and the floating
- * WhatsApp button clear of the footer's copyright line.
+ * same form behaviour, and no sideways scroll down to 360px.
+ *
+ * It also checked that the floating WhatsApp button stayed clear of the
+ * footer's copyright line. Since 14 Nov 2026 (c59a5f3) that button shows on
+ * Help and contact only, so the check went: reading the position of a
+ * button /ask no longer has waited until every test here timed out. (It
+ * measured too early to catch an overlap anyway: it read both positions
+ * while the page was still scrolling smoothly to the bottom.)
  */
 
 const WIDTHS = [1440, 1024, 768, 390, 360];
@@ -15,13 +21,6 @@ for (const width of WIDTHS) {
       { name: 'nexg_asked', value: '1', url: baseURL ?? 'http://localhost:3000' },
     ]);
     await page.goto('/ask');
-
-    // The location sheet can open a moment after load; close it if it does.
-    const skip = page.getByRole('button', { name: /Skip for now/ }).first();
-    await skip
-      .waitFor({ state: 'visible', timeout: 5_000 })
-      .then(() => skip.click())
-      .catch(() => undefined);
 
     await expect(page.locator('h1')).toHaveCount(1);
     await expect(page.locator('h1')).toHaveText('Ask a concierge');
@@ -52,21 +51,6 @@ for (const width of WIDTHS) {
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
     expect(overflow).toBe(0);
-
-    // At the bottom of the page the WhatsApp button must not cover the copyright.
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    const copyright = await page.getByText(/All rights reserved/).boundingBox();
-    const whatsapp = await page
-      .getByRole('link', { name: 'Chat with us on WhatsApp' })
-      .boundingBox();
-    if (copyright && whatsapp) {
-      const overlaps =
-        copyright.x < whatsapp.x + whatsapp.width &&
-        whatsapp.x < copyright.x + copyright.width &&
-        copyright.y < whatsapp.y + whatsapp.height &&
-        whatsapp.y < copyright.y + copyright.height;
-      expect(overlaps).toBe(false);
-    }
 
     if (width !== 360) {
       await page.evaluate(() => window.scrollTo(0, 0));

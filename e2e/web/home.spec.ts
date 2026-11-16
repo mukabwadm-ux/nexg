@@ -25,19 +25,30 @@ test('the homepage headline has a stable accessible name', async ({ page }) => {
 /**
  * A first visit opens on the page, not on a question.
  *
- * No precision banner over the hero and no location sheet over it; the
- * question is a small prompt beside the location pill, a moment later.
+ * No precision banner over the hero, no location sheet over it, and since
+ * 14 Nov 2026 (c59a5f3) no prompt beside the location pill either. The
+ * question comes with the first search: without an exact spot, the hero
+ * search asks "Where should we deliver?" first, then searches once the
+ * sheet is answered or skipped.
  */
-test('a first visit sees the homepage, then a prompt at the location pill', async ({ page }) => {
+test('a first visit sees the homepage; the first search asks where to deliver', async ({
+  page,
+}) => {
   await page.goto('/');
   await page.waitForTimeout(2500);
 
-  await expect(page.getByRole('dialog', { name: /where should we deliver/i })).toHaveCount(0);
+  const sheet = page.getByRole('dialog', { name: /where should we deliver/i });
+  await expect(sheet).toHaveCount(0);
   await expect(page.getByText(/from your internet connection/i)).toHaveCount(0);
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Where should we deliver?' }),
+  ).toHaveCount(0);
 
-  const prompt = page.getByRole('status').filter({ hasText: 'Where should we deliver?' });
-  await expect(prompt).toBeVisible();
+  const search = page.getByRole('search');
+  await search.getByRole('searchbox').fill('pizza');
+  await search.getByRole('button', { name: 'Search' }).click();
+  await expect(sheet).toBeVisible();
 
-  await prompt.getByRole('button', { name: 'Set my delivery spot' }).click();
-  await expect(page.getByRole('dialog', { name: /where should we deliver/i })).toBeVisible();
+  await sheet.getByRole('button', { name: 'Skip for now' }).click();
+  await expect(page).toHaveURL(/\/discover\?q=pizza$/);
 });

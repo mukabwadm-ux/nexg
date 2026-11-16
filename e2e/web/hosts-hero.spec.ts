@@ -19,13 +19,6 @@ for (const width of WIDTHS) {
     ]);
     await page.goto('/hosts');
 
-    const skip = page.getByRole('button', { name: /Skip for now/ });
-    await skip
-      .first()
-      .waitFor({ timeout: 5000 })
-      .then(() => skip.first().click())
-      .catch(() => {});
-
     const hero = page.locator('main section').first();
 
     await expect(page.locator('h1')).toHaveCount(1);

@@ -19,13 +19,6 @@ for (const width of WIDTHS) {
     ]);
     await page.goto('/stays');
 
-    // The location sheet can open a moment after load; close it if it does.
-    const skip = page.getByRole('button', { name: /Skip for now/ }).first();
-    await skip
-      .waitFor({ state: 'visible', timeout: 5_000 })
-      .then(() => skip.click())
-      .catch(() => undefined);
-
     await expect(page.locator('h1')).toHaveText('Tell us what you need. We’ll find the place.');
     for (const point of ['A person, not a filter', 'Concierge included', 'Nothing to pay to ask']) {
       await expect(page.getByText(point, { exact: true })).toBeVisible();

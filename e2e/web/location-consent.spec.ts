@@ -100,37 +100,41 @@ test.describe('location is never read without a gesture', () => {
 
   test('opening the sheet does not ask — only the button does', async ({ page }) => {
     await page.addInitScript(SPY);
-    /* Not the homepage: there the hero asks beside its location pill and
-       the sheet does not open by itself. */
     await page.goto('/help');
     await page.waitForTimeout(3000);
 
-    /* The sheet opens by itself on a first visit. That must not
-       be enough to prompt: the visitor has to press the button
-       having read what it does. */
+    /* Since 14 Nov 2026 (c59a5f3) the sheet never opens by itself, so
+       open it the way a visitor does, from the Deliver to chip. That
+       must not be enough to prompt: the visitor has to press the
+       button having read what it does. */
+    await page
+      .getByRole('banner')
+      .getByRole('button', { name: /deliver to/i })
+      .click();
     const sheet = page.getByRole('dialog', { name: /where should we deliver/i });
-    if (await sheet.isVisible().catch(() => false)) {
-      const before = await page.evaluate(
-        () => (window as unknown as { __geoCalls: unknown[] }).__geoCalls.length,
-      );
-      expect(before).toBe(0);
+    await expect(sheet).toBeVisible();
+    await page.waitForTimeout(500);
 
-      /* Scoped to the dialog. The homepage hero offers the same
-         thing, and an unscoped match picks whichever is first in
-         the DOM — which is behind the modal and not clickable. */
-      await sheet
-        .getByRole('button', { name: /use my current location/i })
-        .first()
-        .click();
-      await page.waitForTimeout(500);
+    const before = await page.evaluate(
+      () => (window as unknown as { __geoCalls: unknown[] }).__geoCalls.length,
+    );
+    expect(before).toBe(0);
 
-      const after = await page.evaluate(
-        () => (window as unknown as { __geoCalls: { kind: string }[] }).__geoCalls,
-      );
-      /* And now exactly one read, of a position, not a watch. */
-      expect(after).toHaveLength(1);
-      expect(after[0]!.kind).toBe('getCurrentPosition');
-    }
+    /* Scoped to the dialog. The homepage hero offers the same
+       thing, and an unscoped match picks whichever is first in
+       the DOM — which is behind the modal and not clickable. */
+    await sheet
+      .getByRole('button', { name: /use my current location/i })
+      .first()
+      .click();
+    await page.waitForTimeout(500);
+
+    const after = await page.evaluate(
+      () => (window as unknown as { __geoCalls: { kind: string }[] }).__geoCalls,
+    );
+    /* And now exactly one read, of a position, not a watch. */
+    expect(after).toHaveLength(1);
+    expect(after[0]!.kind).toBe('getCurrentPosition');
   });
 
   /*
