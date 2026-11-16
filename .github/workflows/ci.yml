@@ -5,6 +5,12 @@ on:
     branches: [main, nexg-app]
   push:
     branches: [main, nexg-app]
+  workflow_dispatch:
+    inputs:
+      ui_acceptance:
+        description: Run browser acceptance (requires owner testing approval)
+        type: boolean
+        default: false
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -17,6 +23,18 @@ env:
   DISCOVERY_ALLOW_LOCAL_SUPABASE: '1'
 
 jobs:
+  maps-services:
+    name: Map service contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Injected route provider, authentication and quota boundaries
+        run: node --test supabase/functions/maps-routes/handler.test.ts
+
   database:
     name: Migrations, RLS and audit chain
     runs-on: ubuntu-latest
@@ -222,6 +240,7 @@ jobs:
 
   e2e:
     name: Playwright
+    if: github.event_name != 'workflow_dispatch' || inputs.ui_acceptance
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: verify
