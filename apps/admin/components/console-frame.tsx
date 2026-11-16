@@ -85,8 +85,39 @@ export function ConsoleFrame({
 }) {
   const [collapsed, setCollapsed] = React.useState(initiallyCollapsed);
   const [drawer, setDrawer] = React.useState(false);
-  const pathname = usePathname();
-  const tab = useSearchParams().get('tab');
+  const currentPath = usePathname();
+  const search = useSearchParams();
+  const here = `${currentPath}?${search.toString()}`;
+
+  /*
+   * Where a click is taking the person, until the page arrives. The next
+   * page is rendered on the server, and until it lands the old one would
+   * sit there with no sign the click registered. So the sidebar moves to
+   * the new entry and the page area shows its outline straight away.
+   */
+  const [leaving, setLeaving] = React.useState<URL | null>(null);
+  React.useEffect(() => setLeaving(null), [here]);
+  React.useEffect(() => {
+    if (!leaving) return;
+    const giveUp = window.setTimeout(() => setLeaving(null), 10_000);
+    return () => window.clearTimeout(giveUp);
+  }, [leaving]);
+
+  const onClickCapture = (event: React.MouseEvent) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+    const link = (event.target as HTMLElement).closest('a');
+    if (!link || (link.target && link.target !== '_self') || link.hasAttribute('download')) return;
+    const url = new URL(link.href, window.location.href);
+    if (url.origin !== window.location.origin) return;
+    // The same page, or a jump within it (#approvals): nothing to wait for.
+    if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+    setLeaving(url);
+  };
+
+  const pathname = leaving?.pathname ?? currentPath;
+  const tab = leaving ? leaving.searchParams.get('tab') : search.get('tab');
 
   React.useEffect(() => setDrawer(false), [pathname, tab]);
 
@@ -104,7 +135,7 @@ export function ConsoleFrame({
   };
 
   return (
-    <div className="console-frame bg-shell min-h-dvh text-white">
+    <div className="console-frame bg-shell min-h-dvh text-white" onClickCapture={onClickCapture}>
       {/* Phone and tablet: the drawer's backdrop. */}
       {drawer && (
         <button
@@ -189,10 +220,44 @@ export function ConsoleFrame({
       >
         <TopBar nav={nav} staff={staff} signOut={signOut} onMenu={() => setDrawer(true)} />
         <div className="console-canvas flex min-w-0 flex-1 flex-col px-3 pb-3 sm:px-5 sm:pb-5">
-          {children}
+          {leaving ? <PageOutline /> : children}
         </div>
       </div>
     </div>
+  );
+}
+
+/** The shape of a console page while the real one is on its way. */
+function PageOutline() {
+  return (
+    <>
+      <header
+        className="console-header px-1 pb-5 pt-2 sm:px-2"
+        role="status"
+        aria-live="polite"
+        aria-label="Opening page"
+      >
+        <div className="h-8 w-56 max-w-full animate-pulse rounded-lg bg-white/15 sm:h-9" />
+        <div className="mt-3 h-4 w-80 max-w-full animate-pulse rounded bg-white/10" />
+      </header>
+      <main className="px-4 py-5 sm:px-8" aria-hidden="true">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
+          {Array.from({ length: 5 }, (_, i) => (
+            <div
+              key={i}
+              className={cn(
+                'h-[7.5rem] animate-pulse rounded-2xl',
+                i === 0 ? 'bg-gold/30' : 'bg-surface border-border border',
+              )}
+            />
+          ))}
+        </div>
+        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+          <div className="bg-surface border-border h-80 animate-pulse rounded-2xl border" />
+          <div className="bg-surface border-border h-80 animate-pulse rounded-2xl border" />
+        </div>
+      </main>
+    </>
   );
 }
 

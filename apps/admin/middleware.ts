@@ -144,9 +144,21 @@ async function staffSessionMiddleware(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  /*
+   * Page requests read the session from the cookie (a network call only
+   * when the token needs refreshing). Asking Supabase to vouch for it here
+   * as well cost a round trip on every click and every prefetch, and the
+   * page does that check anyway: requireStaff() calls getUser() and every
+   * query runs under RLS with the same token. Sign-in and the review
+   * command keep the full check, since they act on the answer here.
+   */
+  const strict = isSignIn || isReviewApi;
+  const session = strict ? null : (await supabase.auth.getSession()).data.session;
+  const user = strict
+    ? (await supabase.auth.getUser()).data.user
+    : session?.access_token
+      ? { id: 'session' }
+      : null;
 
   if (!user && !isSignIn) {
     if (isReviewApi) return response;
@@ -180,10 +192,8 @@ async function staffSessionMiddleware(request: NextRequest) {
      * as long as that sign-in (an idle hour is still idle) while a new
      * sign-in, which has a new session id, starts clean.
      */
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    const signIn = sessionIdOf(session?.access_token) ?? 'unknown';
+    const current = session ?? (await supabase.auth.getSession()).data.session;
+    const signIn = sessionIdOf(current?.access_token) ?? 'unknown';
     const now = Date.now();
     if (
       isStaffSessionIdle(readStaffSeen(request.cookies.get(STAFF_SEEN_COOKIE)?.value), signIn, now)

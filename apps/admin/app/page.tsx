@@ -59,63 +59,92 @@ export default async function OverviewPage({
     .is('revoked_at', null)
     .eq('role.key', 'super_admin');
 
-  const [staleMerchants, staleRiders, waitingDocuments, approvals, audit, superAdmins] =
-    await Promise.all([
-      supabase
-        .from('merchant')
-        .select('id, trading_name, city(name)')
-        .in('status', pendingStatuses)
-        .lt('created_at', staleBefore),
-      supabase
-        .from('rider')
-        .select('id, first_name, last_name, city(name)')
-        .in('status', pendingStatuses)
-        .lt('created_at', staleBefore),
-      supabase
-        .from('document')
-        .select('id, owner_type', { count: 'exact' })
-        .eq('status', 'uploaded')
-        .is('superseded_at', null),
-      supabase
-        .from('approval_request')
-        .select(
-          'id, kind, reason, requested_by, created_at, staff_user!approval_request_requested_by_fkey(display_name)',
-        )
-        .eq('status', 'pending')
-        .order('created_at', { ascending: true }),
-      /* Through an RPC, not the table: see migration 20260101002700. */
-      supabase.rpc('rpc_audit_recent', { p_limit: 6 }),
-      superAdminCount,
-    ]);
+  const range = rangeFrom(searchParams?.range);
+  const now = Date.now();
+  const start = new Date(now - range.days * 86_400_000);
+  const before = new Date(now - 2 * range.days * 86_400_000);
+  const seesOrders = staff.modules.some((m) => m.key === 'orders' || m.key === 'live_ops');
+
+  const ordersBatch = Promise.all([
+    seesOrders
+      ? supabase
+          .from('order' as never)
+          .select(
+            'created_at, total_cents, commission_cents, stage, merchant:merchant_id(category)',
+          )
+          .gte('created_at', before.toISOString())
+          .order('created_at', { ascending: true })
+          .limit(20_000)
+      : Promise.resolve({ data: null }),
+    supabase.from('merchant').select('id', { count: 'exact', head: true }).eq('status', 'live'),
+    supabase.from('rider').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+  ]);
+
+  /*
+   * One batch for the whole page: each await used to be its own trip to
+   * the database, one after another.
+   */
+  const [
+    staleMerchants,
+    staleRiders,
+    waitingDocuments,
+    approvals,
+    audit,
+    superAdmins,
+    openTickets,
+    { data: deniedModule },
+    [ordersRes, liveMerchants, liveRiders],
+  ] = await Promise.all([
+    supabase
+      .from('merchant')
+      .select('id, trading_name, city(name)')
+      .in('status', pendingStatuses)
+      .lt('created_at', staleBefore),
+    supabase
+      .from('rider')
+      .select('id, first_name, last_name, city(name)')
+      .in('status', pendingStatuses)
+      .lt('created_at', staleBefore),
+    supabase
+      .from('document')
+      .select('id, owner_type', { count: 'exact' })
+      .eq('status', 'uploaded')
+      .is('superseded_at', null),
+    supabase
+      .from('approval_request')
+      .select(
+        'id, kind, reason, requested_by, created_at, staff_user!approval_request_requested_by_fkey(display_name)',
+      )
+      .eq('status', 'pending')
+      .order('created_at', { ascending: true }),
+    /* Through an RPC, not the table: see migration 20260101002700. */
+    supabase.rpc('rpc_audit_recent', { p_limit: 6 }),
+    superAdminCount,
+    /*
+     * Open tickets from the Help page. Only asked for when this person can
+     * open the desk — a row telling somebody about work they are not allowed
+     * to see is a leak with a link on it.
+     */
+    reachesSupport
+      ? supabase
+          .from('support_ticket')
+          .select('created_at', { count: 'exact' })
+          .eq('status', 'open')
+          .order('created_at', { ascending: true })
+          .limit(1)
+      : Promise.resolve({ count: 0, data: [] as { created_at: string }[] }),
+    /*
+     * requireModule sends people here with the module they tried in the URL.
+     * Landing on the overview with no explanation reads as a bug — it did once
+     * already — so say which door was shut and why.
+     */
+    searchParams?.denied
+      ? supabase.from('console_module').select('label').eq('key', searchParams.denied).maybeSingle()
+      : Promise.resolve({ data: null }),
+    ordersBatch,
+  ]);
 
   const needsFirstSuperAdmin = (superAdmins.count ?? 0) === 0;
-
-  /*
-   * Open tickets from the Help page. Only asked for when this person can
-   * open the desk — a row telling somebody about work they are not allowed
-   * to see is a leak with a link on it.
-   */
-  const openTickets = reachesSupport
-    ? await supabase
-        .from('support_ticket')
-        .select('created_at', { count: 'exact' })
-        .eq('status', 'open')
-        .order('created_at', { ascending: true })
-        .limit(1)
-    : { count: 0, data: [] as { created_at: string }[] };
-
-  /*
-   * requireModule sends people here with the module they tried in the URL.
-   * Landing on the overview with no explanation reads as a bug — it did once
-   * already — so say which door was shut and why.
-   */
-  const { data: deniedModule } = searchParams?.denied
-    ? await supabase
-        .from('console_module')
-        .select('label')
-        .eq('key', searchParams.denied)
-        .maybeSingle()
-    : { data: null };
 
   /*
    * "Needs a human now". Every row here is a real query — an empty list means
@@ -203,26 +232,6 @@ export default async function OverviewPage({
    * anyone else the tiles say the figure is not theirs to see rather than
    * showing a zero.
    */
-  const range = rangeFrom(searchParams?.range);
-  const now = Date.now();
-  const start = new Date(now - range.days * 86_400_000);
-  const before = new Date(now - 2 * range.days * 86_400_000);
-  const seesOrders = staff.modules.some((m) => m.key === 'orders' || m.key === 'live_ops');
-
-  const [ordersRes, liveMerchants, liveRiders] = await Promise.all([
-    seesOrders
-      ? supabase
-          .from('order' as never)
-          .select(
-            'created_at, total_cents, commission_cents, stage, merchant:merchant_id(category)',
-          )
-          .gte('created_at', before.toISOString())
-          .order('created_at', { ascending: true })
-          .limit(20_000)
-      : Promise.resolve({ data: null }),
-    supabase.from('merchant').select('id', { count: 'exact', head: true }).eq('status', 'live'),
-    supabase.from('rider').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-  ]);
 
   type OrderRow = {
     created_at: string;

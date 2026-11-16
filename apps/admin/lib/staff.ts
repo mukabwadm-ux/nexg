@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/server';
 
@@ -64,43 +65,91 @@ const STRENGTH: Record<AccessLevel, number> = {
  * sidebar a person sees and the row the matrix shows for their role cannot
  * disagree.
  */
-export async function requireStaff(): Promise<StaffContext> {
+/* React.cache exists in the React build Next ships for the app router;
+   the plain build tests run on lacks it, and there one call per page is fine. */
+const cache: <T extends (...args: never[]) => unknown>(fn: T) => T =
+  (React as { cache?: <T>(fn: T) => T }).cache ?? ((fn) => fn);
+
+export const requireStaff = cache(loadStaff);
+
+/** The user id inside the access token, read without a network call (and
+    without touching session.user, which logs a warning on the server). */
+function subjectOf(token: string | undefined): string | null {
+  const payload = token?.split('.')[1];
+  if (!payload) return null;
+  try {
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const claims = JSON.parse(atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='))) as {
+      sub?: unknown;
+    };
+    return typeof claims.sub === 'string' ? claims.sub : null;
+  } catch {
+    return null;
+  }
+}
+
+/*
+ * Every console page opens with this, so its round trips are the floor
+ * under every page's load time. They used to run one after another (six
+ * waits to the database before the page could ask for its own data); now
+ * everything that only needs the signed-in user id goes in one batch.
+ *
+ * The id comes from the session cookie, which costs nothing to read. That
+ * is safe to lean on because getUser() still checks the session with
+ * Supabase in the same batch and the page stops if it fails, and because
+ * every query is made with that same token, so RLS refuses a forged one.
+ * cache() makes a page that calls this twice pay for it once.
+ */
+async function loadStaff(): Promise<StaffContext> {
   const supabase = createClient();
 
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const userId = subjectOf(session?.access_token);
+  if (!userId) redirect('/sign-in');
 
-  if (!user) redirect('/sign-in');
+  const [checked, staffRes, grantsRes, profileRes, modulesRes, accessRes] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from('staff_user')
+      .select('id, display_name, email, status')
+      .eq('user_id', userId)
+      .maybeSingle(),
+    supabase
+      .from('role_grant')
+      .select(
+        'city_id, city(name), role(key), staff_user!role_grant_staff_user_id_fkey!inner(user_id)',
+      )
+      .eq('staff_user.user_id', userId)
+      .is('revoked_at', null),
+    /* A photo is optional and never worth failing a page over. The column is
+       newer than the generated types, hence the loose read. */
+    (
+      supabase.rpc('rpc_my_staff_profile' as never) as unknown as Promise<{
+        data: { avatar_path?: string | null } | null;
+      }>
+    ).then(async ({ data: mine }) => {
+      if (!mine?.avatar_path) return null;
+      const { data: signed } = await supabase.storage
+        .from('staff-avatars')
+        .createSignedUrl(mine.avatar_path, 3600);
+      return signed?.signedUrl ?? null;
+    }),
+    supabase.from('console_module').select('key, label, section, href, sort, icon').order('sort'),
+    /* The whole matrix is a few hundred rows; filtering here saves a wait. */
+    supabase.from('role_module_access').select('role_key, module_key, level, note'),
+  ]);
 
-  const { data: staff } = await supabase
-    .from('staff_user')
-    .select('id, display_name, email, status')
-    .eq('user_id', user.id)
-    .maybeSingle();
+  const user = checked.data.user;
+  if (!user || user.id !== userId) redirect('/sign-in');
 
+  const staff = staffRes.data;
   if (!staff || staff.status !== 'active') redirect('/sign-in?denied=1');
 
-  /* A photo is optional and never worth failing a page over. The column is
-     newer than the generated types, hence the loose read. */
-  let avatarUrl: string | null = null;
-  const { data: mine } = (await supabase.rpc('rpc_my_staff_profile' as never)) as unknown as {
-    data: { avatar_path?: string | null } | null;
-  };
-  if (mine?.avatar_path) {
-    const { data: signed } = await supabase.storage
-      .from('staff-avatars')
-      .createSignedUrl(mine.avatar_path, 3600);
-    avatarUrl = signed?.signedUrl ?? null;
-  }
+  const avatarUrl = profileRes;
 
-  const { data: grants } = await supabase
-    .from('role_grant')
-    .select('city_id, city(name), role(key)')
-    .eq('staff_user_id', staff.id)
-    .is('revoked_at', null);
-
-  const rows = grants ?? [];
+  const rows = grantsRes.data ?? [];
   const roles = rows.flatMap((g) => {
     const role = g.role as { key: string } | null;
     return role ? [role.key] : [];
@@ -117,12 +166,8 @@ export async function requireStaff(): Promise<StaffContext> {
   ].sort();
 
   /* Modules, merged across every role held. */
-  const [{ data: modules }, { data: access }] = await Promise.all([
-    supabase.from('console_module').select('key, label, section, href, sort, icon').order('sort'),
-    roles.length > 0
-      ? supabase.from('role_module_access').select('module_key, level, note').in('role_key', roles)
-      : Promise.resolve({ data: [] }),
-  ]);
+  const modules = modulesRes.data;
+  const access = (accessRes.data ?? []).filter((a) => roles.includes(a.role_key));
 
   const best = new Map<string, { level: AccessLevel; note: string | null }>();
   for (const a of (access ?? []) as {
