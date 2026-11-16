@@ -1,4 +1,4 @@
--- Every audit action a merchant command logs is registered (20261220000100).
+-- Every audit action a merchant command logs is registered (20261221000100).
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(4);
