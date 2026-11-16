@@ -62,6 +62,8 @@ interface Summary {
   added: number;
   folders: number;
   bytes: number;
+  /** Every bucket together: what the plan's storage limit counts. */
+  project_bytes?: number;
 }
 
 /**
@@ -129,7 +131,10 @@ export default async function CompanyFilesPage({
   const rows = (filesRes.data ?? []) as unknown as FileRow[];
   const failed = summaryRes.error || foldersRes.error || filesRes.error;
   const used = summary ? Number(summary.bytes) : null;
-  const usedPct = used == null ? null : (used / STORAGE_ALLOWANCE_BYTES) * 100;
+  /* The plan's limit is for all of NexG's files together, so the meter
+     shows the whole project and the figure shows Company's own share. */
+  const project = summary?.project_bytes != null ? Number(summary.project_bytes) : null;
+  const usedPct = project == null ? null : (project / STORAGE_ALLOWANCE_BYTES) * 100;
   const base = (t: string) =>
     hrefWith('/company/files', {
       tab: t === 'overview' ? null : t,
@@ -233,11 +238,21 @@ export default async function CompanyFilesPage({
                 wide
                 icon={Database}
                 value={used == null ? null : bytes(used)}
-                label="Storage used"
-                note={`of ${bytes(STORAGE_ALLOWANCE_BYTES)}`}
+                label="Used by Company files"
+                note={
+                  project == null
+                    ? undefined
+                    : `All NexG files: ${bytes(project)} of ${bytes(STORAGE_ALLOWANCE_BYTES)}`
+                }
+                noteTone={usedPct != null && usedPct >= 80 ? 'bad' : undefined}
               >
                 <span className="mt-2 flex items-center gap-2">
-                  <Progress value={usedPct} label="Storage used" className="flex-1" />
+                  <Progress
+                    value={usedPct}
+                    label="All NexG files against the plan's storage"
+                    tone={usedPct != null && usedPct >= 80 ? 'danger' : 'gold'}
+                    className="flex-1"
+                  />
                   <span className="text-ink text-xs font-extrabold tabular-nums">
                     {usedPct == null
                       ? '—'

@@ -9,7 +9,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(54);
+select plan(57);
 
 -- ------------------------------------------------------------------ fixtures
 
@@ -389,6 +389,14 @@ select throws_ok(
   '22023', 'Say why.',
   'Retiring equipment needs a reason');
 
+insert into t values ('phone', public.rpc_company_asset_save(
+  'Test phone 95', (select id from public.company_category where name = 'IT & Electronics'))::text);
+
+select lives_ok(
+  $$select public.rpc_company_asset_assign((select v::uuid from t where k = 'phone'),
+      p_staff_id => '95000000-0000-4000-8000-0000000000b4')$$,
+  'Equipment is handed to any active colleague, Company user or not');
+
 -- ------------------------------------------------------------------- files
 
 insert into t values
@@ -407,6 +415,13 @@ select throws_ok(
   $$select public.rpc_company_file_add('95000000-0000-4000-8000-0000000000a1/f3/Fleet.pdf')$$,
   '42501', 'Upload the file into your own folder first.',
   'Nobody registers somebody else''s upload');
+
+select ok(
+  (select (s ->> 'files')::int = 2
+          and (s ->> 'bytes')::bigint >= 299200
+          and (s ->> 'project_bytes')::bigint >= (s ->> 'bytes')::bigint
+     from public.rpc_company_files_summary() s),
+  'The files summary counts what the owner sees, and storage across every bucket');
 
 select set_config('request.jwt.claims',
   '{"sub":"95000000-0000-4000-8000-0000000000a3","role":"authenticated"}', true);
@@ -465,6 +480,16 @@ select is(
 -- ------------------------------------------------------------------- audit
 
 reset role;
+
+/* A colleague leaves and their console account is removed: the phone they
+   hold stays recorded against their name until it comes back. */
+delete from public.staff_user where id = '95000000-0000-4000-8000-0000000000b4';
+
+select is(
+  (select status || ' ' || assignee_name || ' ' || coalesce(assigned_to::text, 'unlinked')
+     from public.company_asset where id = (select v::uuid from t where k = 'phone')),
+  'in_use Merchants 95 unlinked',
+  'Removing a holder''s account keeps the equipment on their name');
 
 select is(
   (select count(*)::int from audit.audit_event

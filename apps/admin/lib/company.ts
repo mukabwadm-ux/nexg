@@ -241,8 +241,12 @@ export const ACCEPTED_FILE_TYPES = [
 
 export const MAX_FILE_BYTES = 50 * 1024 * 1024;
 
-/** The storage allowance the Storage usage card measures against. */
-export const STORAGE_ALLOWANCE_BYTES = 100 * 1024 ** 3;
+/**
+ * The project's file storage allowance, which every bucket shares: 1 GB on
+ * the Supabase Free plan NexG is on (checked 2026-11-16). Pro includes
+ * 100 GB; change this when the plan changes.
+ */
+export const STORAGE_ALLOWANCE_BYTES = 1024 ** 3;
 
 /** Why an upload would be refused, before it is tried; null when fine. */
 export function uploadProblem(file: { name: string; type: string; size: number }): string | null {

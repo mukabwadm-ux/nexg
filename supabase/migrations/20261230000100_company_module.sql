@@ -449,8 +449,10 @@ create table public.company_asset (
   model text check (model is null or length(model) <= 80),
   serial_number text check (serial_number is null or length(serial_number) <= 80),
   location_id uuid references public.company_location (id) on delete set null,
-  /* Who holds it: a colleague with a console account, or somebody named
-     (a rider, a driver), never both. */
+  /* Who holds it, always by name: a colleague's name at hand-over (with
+     assigned_to linking their console account) or somebody without an
+     account, such as a rider or a driver. The name stays if the account is
+     later removed, so the record still says who has it. */
   assigned_to uuid references public.staff_user (id) on delete set null,
   assignee_name text check (
     assignee_name is null or length(btrim(assignee_name)) between 2 and 120),
@@ -469,10 +471,10 @@ create table public.company_asset (
   created_by uuid references public.staff_user (id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  constraint company_asset_one_holder check (num_nonnulls(assigned_to, assignee_name) <= 1),
+  constraint company_asset_named_holder check (assigned_to is null or assignee_name is not null),
   constraint company_asset_holder_matches_status check (
     case status
-      when 'in_use' then num_nonnulls(assigned_to, assignee_name) = 1
+      when 'in_use' then assignee_name is not null
       when 'available' then num_nonnulls(assigned_to, assignee_name) = 0
       when 'retired' then num_nonnulls(assigned_to, assignee_name) = 0
       else true
@@ -917,9 +919,9 @@ values
   ('company.file_trashed', 'company', 'info', false, false, false, '{}', 'A Company file was moved to the trash'),
   ('company.file_restored', 'company', 'info', false, false, false, '{}', 'A Company file was restored from the trash'),
   ('company.file_deleted', 'company', 'notice', false, false, false, '{}', 'A Company file was deleted for good'),
-  ('company.location_saved', 'company', 'info', false, false, false, '{phone}', 'A warehouse, store or office was added or changed'),
+  ('company.location_saved', 'company', 'info', false, false, false, '{}', 'A warehouse, store or office was added or changed'),
   ('company.location_status_changed', 'company', 'notice', false, false, false, '{}', 'A warehouse, store or office was closed or reopened'),
-  ('company.vendor_saved', 'company', 'info', false, false, false, '{contact_name,email,phone}', 'A vendor or supplier was added or changed'),
+  ('company.vendor_saved', 'company', 'info', false, false, false, '{}', 'A vendor or supplier was added or changed'),
   ('company.vendor_status_changed', 'company', 'notice', false, false, false, '{}', 'A vendor was put on hold, archived or made active again'),
   ('company.category_saved', 'company', 'info', false, false, false, '{}', 'An inventory category was added or changed'),
   ('company.item_created', 'company', 'info', false, false, false, '{}', 'An inventory item was added'),
@@ -931,12 +933,12 @@ values
   ('company.stock_counted', 'company', 'notice', false, false, false, '{}', 'Stock was counted and the quantity on hand corrected'),
   ('company.asset_created', 'company', 'info', false, false, false, '{}', 'An asset was registered'),
   ('company.asset_updated', 'company', 'info', false, false, false, '{}', 'An asset''s details were changed'),
-  ('company.asset_assigned', 'company', 'info', false, false, false, '{assignee_name}', 'An asset was handed to someone'),
-  ('company.asset_returned', 'company', 'info', false, false, false, '{assignee_name}', 'An asset was handed back'),
+  ('company.asset_assigned', 'company', 'info', false, false, false, '{}', 'An asset was handed to someone'),
+  ('company.asset_returned', 'company', 'info', false, false, false, '{}', 'An asset was handed back'),
   ('company.asset_maintenance_scheduled', 'company', 'info', false, false, false, '{}', 'Maintenance was scheduled for an asset'),
   ('company.asset_maintenance_started', 'company', 'info', false, false, false, '{}', 'An asset went in for maintenance'),
   ('company.asset_maintenance_completed', 'company', 'info', false, false, false, '{}', 'An asset came back from maintenance'),
-  ('company.asset_status_changed', 'company', 'notice', false, false, false, '{assignee_name}', 'An asset was retired, reported lost or brought back into use'),
+  ('company.asset_status_changed', 'company', 'notice', false, false, false, '{}', 'An asset was retired, reported lost or brought back into use'),
   ('company.purchase_request_saved', 'company', 'info', false, false, true, '{}', 'A purchase request was drafted or edited'),
   ('company.purchase_request_submitted', 'company', 'info', false, false, true, '{}', 'A purchase request was sent for approval'),
   ('company.purchase_request_approved', 'company', 'notice', false, true, true, '{}', 'A purchase request was approved by someone other than whoever asked'),
@@ -2117,7 +2119,8 @@ begin
     raise exception 'Choose a colleague or type the name of whoever takes it.' using errcode = '22023';
   end if;
   if p_staff_id is not null then
-    select su.display_name into v_holder from public.staff_user su
+    select coalesce(nullif(btrim(su.display_name), ''), su.email) into v_holder
+    from public.staff_user su
     where su.id = p_staff_id and su.status = 'active';
     if v_holder is null then
       raise exception 'That colleague is not active.' using errcode = '22023';
@@ -2136,7 +2139,7 @@ begin
 
   update public.company_asset
   set assigned_to = p_staff_id,
-      assignee_name = case when p_staff_id is null then v_name end,
+      assignee_name = left(v_holder, 120),
       assigned_at = now(),
       status = 'in_use',
       updated_at = now()
@@ -2195,8 +2198,7 @@ begin
   insert into public.company_asset_event (asset_id, kind, detail, staff_id)
   values (p_id, 'returned',
           left(concat_ws(' · ',
-            coalesce((select su.display_name from public.staff_user su where su.id = v_old.assigned_to),
-                     v_old.assignee_name),
+            v_old.assignee_name,
             case when v_new.condition <> v_old.condition then 'Condition ' || v_new.condition end,
             nullif(btrim(p_note), '')), 500),
           v_staff);
@@ -2268,7 +2270,7 @@ begin
       raise exception 'This asset is not in for maintenance.' using errcode = '23514';
     end if;
     update public.company_asset
-    set status = case when num_nonnulls(assigned_to, assignee_name) = 1 then 'in_use' else 'available' end,
+    set status = case when assignee_name is not null then 'in_use' else 'available' end,
         condition = coalesce(p_condition, condition),
         next_service_on = p_due_on,
         updated_at = now()
@@ -2845,7 +2847,8 @@ $$;
 
 /* The Company files KPI row. Counts are of files the caller can see;
    storage is the whole bucket's, trash included, because that is what
-   takes the space. */
+   takes the space. project_bytes is every bucket together, which is what
+   the plan's storage limit counts. */
 create or replace function public.rpc_company_files_summary(
   p_from date default null,
   p_to date default null
@@ -2881,7 +2884,9 @@ begin
     'trash', count(*) filter (where v.deleted_at is not null),
     'added', count(*) filter (where v.deleted_at is null and v.created_at >= v_from and v.created_at < v_to),
     'folders', (select count(*) from public.company_folder),
-    'bytes', (select coalesce(sum(f.size_bytes), 0) from public.company_file f))
+    'bytes', (select coalesce(sum(f.size_bytes), 0) from public.company_file f),
+    'project_bytes', (select coalesce(sum(nullif(o.metadata ->> 'size', '')::bigint), 0)
+                      from storage.objects o))
   into v_result
   from visible v;
 
