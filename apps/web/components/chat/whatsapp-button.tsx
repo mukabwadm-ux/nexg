@@ -1,7 +1,12 @@
 export const WHATSAPP_NUMBER = '254143819478';
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
 
-/** The floating contact button: a link into the NexG WhatsApp chat. */
+/**
+ * The floating contact button: a link into the NexG WhatsApp chat.
+ *
+ * `data-floating-chat` lets the site footer see that the button is on the
+ * page and keep its last row clear of it (packages/ui globals.css).
+ */
 export function WhatsAppButton() {
   return (
     <a
@@ -9,6 +14,7 @@ export function WhatsAppButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"
+      data-floating-chat=""
       className="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-[calc(1.25rem+env(safe-area-inset-right))] z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-2xl transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#128C7E] focus-visible:ring-offset-2 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] sm:right-[calc(1.5rem+env(safe-area-inset-right))]"
     >
       <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor" aria-hidden="true">

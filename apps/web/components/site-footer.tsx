@@ -133,7 +133,11 @@ export async function SiteFooter({
           </nav>
         </div>
 
-        <div className="flex flex-col-reverse gap-4 border-t border-white/[0.08] py-8 sm:flex-row sm:items-center sm:justify-between">
+        {/* data-footer-end: kept clear of the floating WhatsApp button where it shows. */}
+        <div
+          data-footer-end=""
+          className="flex flex-col-reverse gap-4 border-t border-white/[0.08] py-8 sm:flex-row sm:items-center sm:justify-between"
+        >
           <p className="text-sm text-white/55 sm:text-[0.9375rem]">
             © {new Date().getFullYear()} NexG Concierge. All rights reserved.
           </p>

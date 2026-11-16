@@ -6,10 +6,9 @@ import { expect, test } from '@playwright/test';
  *
  * It also checked that the floating WhatsApp button stayed clear of the
  * footer's copyright line. Since 14 Nov 2026 (c59a5f3) that button shows on
- * Help and contact only, so the check went: reading the position of a
- * button /ask no longer has waited until every test here timed out. (It
- * measured too early to catch an overlap anyway: it read both positions
- * while the page was still scrolling smoothly to the bottom.)
+ * Help and contact only, so the check is in help-whatsapp.spec.ts: here,
+ * reading the position of a button /ask no longer has waited until every
+ * test timed out.
  */
 
 const WIDTHS = [1440, 1024, 768, 390, 360];

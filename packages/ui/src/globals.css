@@ -450,6 +450,24 @@ div.ui-table-viewport[data-table-viewport] {
 }
 
 /*
+ * The floating WhatsApp button (apps/web components/chat/whatsapp-button.tsx,
+ * on Help and contact) sits over the window's bottom-right corner, so at the
+ * end of the page it landed on the footer's last row: over the copyright line
+ * on a phone, over the language switcher on a wider screen. While the button
+ * is on the page, that row ends above it, with the button's own edge gap
+ * between them (it is 3.5rem tall and 1.25rem up on phones, 1.5rem from 640px).
+ */
+body:has([data-floating-chat]) [data-footer-end] {
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 640px) {
+  body:has([data-floating-chat]) [data-footer-end] {
+    padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+  }
+}
+
+/*
  * An FAQ answer slides open and closed rather than jumping, where the
  * browser can animate to and from auto height. Elsewhere it opens as before;
  * reduced motion stops the transition (see the base layer).
