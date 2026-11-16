@@ -1,0 +1,141 @@
+/* Hiring: the job list, a job with its applicants, and the job form. */
+
+.hiring-page .hiring-note,
+.hiring-page .hiring-alert {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.hiring-page .hiring-note {
+  background: #fbf7ea;
+  border: 1px solid rgb(253 209 40 / 0.45);
+}
+
+.hiring-page .hiring-alert {
+  background: #fdecea;
+  color: #b42318;
+  border: 1px solid rgb(180 35 24 / 0.25);
+  font-weight: 700;
+}
+
+.hiring-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 800;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hiring-link:hover {
+  text-decoration: underline;
+}
+
+.hiring-sub {
+  display: block;
+  opacity: 0.65;
+}
+
+.hiring-columns {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (min-width: 1180px) {
+  .hiring-columns {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 32rem);
+  }
+}
+
+.hiring-applicants {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hiring-applicant {
+  padding: 14px 0;
+  border-top: 1px solid rgb(0 0 0 / 0.08);
+}
+
+.hiring-applicant:first-child {
+  border-top: 0;
+}
+
+.hiring-applicant.is-withdrawn {
+  opacity: 0.65;
+}
+
+.hiring-applicant-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.hiring-applicant-head small {
+  display: block;
+  margin-top: 2px;
+  opacity: 0.75;
+}
+
+.hiring-applicant-head a {
+  color: inherit;
+}
+
+.hiring-note-text {
+  margin: 8px 0 0;
+  white-space: pre-line;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.hiring-interview {
+  margin: 8px 0 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #1f4e79;
+}
+
+.hiring-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.hiring-actions select {
+  height: 36px;
+  border-radius: 8px;
+  padding: 0 8px;
+  font: inherit;
+  font-size: 0.8125rem;
+}
+
+.hiring-step {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgb(0 0 0 / 0.03);
+}
+
+.hiring-step p {
+  margin: 0 0 8px;
+  font-size: 0.8125rem;
+}
+
+.hiring-step p span {
+  opacity: 0.7;
+}
+
+.hiring-form .hiring-actions {
+  margin-top: 14px;
+}

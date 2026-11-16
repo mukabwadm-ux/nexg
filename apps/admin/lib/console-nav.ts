@@ -149,7 +149,10 @@ export const CONSOLE_NAV: NavGroup[] = [
     key: 'growth',
     label: 'Growth & CRM',
     icon: 'growth',
-    items: [{ label: 'Careers & hiring', href: '/careers', module: 'careers', home: true }],
+    items: [
+      { label: 'Careers & hiring', href: '/careers', module: 'careers', home: true },
+      { label: 'Job board', href: '/jobs', module: 'job_board', home: true },
+    ],
   },
   { key: 'analytics', label: 'Analytics', icon: 'analytics', items: [] },
   {

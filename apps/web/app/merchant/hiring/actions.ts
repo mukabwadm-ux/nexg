@@ -3,6 +3,7 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 
 import { CAREERS_BOARD_TAG } from '@/lib/careers/load';
+import { zonedToInstant } from '@/lib/careers/zoned';
 import { merchantActionClient } from '@/lib/merchant-action-access';
 
 /**
@@ -97,15 +98,6 @@ export async function setVacancyStatus(
     ok: true,
     message: status === 'open' ? 'The job is on the board.' : 'Closed. It is off the board.',
   };
-}
-
-/** "2026-12-14T10:30" as clock time in `timeZone`, as an instant. */
-function zonedToInstant(local: string, timeZone: string): string | null {
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(local)) return null;
-  const asUtc = new Date(`${local}:00Z`);
-  const there = new Date(asUtc.toLocaleString('en-US', { timeZone }));
-  const utc = new Date(asUtc.toLocaleString('en-US', { timeZone: 'UTC' }));
-  return new Date(asUtc.getTime() - (there.getTime() - utc.getTime())).toISOString();
 }
 
 export async function moveApplicant(input: {

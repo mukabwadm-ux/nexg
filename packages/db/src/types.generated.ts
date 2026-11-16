@@ -33656,9 +33656,11 @@ export type Database = {
           created_at: string;
           created_by: string | null;
           description: string;
+          host_id: string | null;
+          hotel_id: string | null;
           id: string;
           job_type: string;
-          merchant_id: string;
+          merchant_id: string | null;
           openings: number;
           posted_at: string | null;
           requirements: string | null;
@@ -33666,6 +33668,9 @@ export type Database = {
           salary_min: number | null;
           salary_period: string | null;
           status: string;
+          taken_down_at: string | null;
+          taken_down_by: string | null;
+          taken_down_reason: string | null;
           title: string;
           updated_at: string;
         };
@@ -33679,9 +33684,11 @@ export type Database = {
           created_at?: string;
           created_by?: string | null;
           description: string;
+          host_id?: string | null;
+          hotel_id?: string | null;
           id?: string;
           job_type: string;
-          merchant_id: string;
+          merchant_id?: string | null;
           openings?: number;
           posted_at?: string | null;
           requirements?: string | null;
@@ -33689,6 +33696,9 @@ export type Database = {
           salary_min?: number | null;
           salary_period?: string | null;
           status?: string;
+          taken_down_at?: string | null;
+          taken_down_by?: string | null;
+          taken_down_reason?: string | null;
           title: string;
           updated_at?: string;
         };
@@ -33701,9 +33711,11 @@ export type Database = {
           created_at?: string;
           created_by?: string | null;
           description?: string;
+          host_id?: string | null;
+          hotel_id?: string | null;
           id?: string;
           job_type?: string;
-          merchant_id?: string;
+          merchant_id?: string | null;
           openings?: number;
           posted_at?: string | null;
           requirements?: string | null;
@@ -33711,6 +33723,9 @@ export type Database = {
           salary_min?: number | null;
           salary_period?: string | null;
           status?: string;
+          taken_down_at?: string | null;
+          taken_down_by?: string | null;
+          taken_down_reason?: string | null;
           title?: string;
           updated_at?: string;
         };
@@ -33784,6 +33799,97 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'waitlist_city_v';
             referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
           },
           {
             foreignKeyName: 'vacancy_merchant_id_fkey';
@@ -33947,6 +34053,13 @@ export type Database = {
             foreignKeyName: 'vacancy_application_vacancy_id_fkey';
             columns: ['vacancy_id'];
             isOneToOne: false;
+            referencedRelation: 'console_vacancy_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_application_vacancy_id_fkey';
+            columns: ['vacancy_id'];
+            isOneToOne: false;
             referencedRelation: 'vacancy';
             referencedColumns: ['id'];
           },
@@ -33975,6 +34088,13 @@ export type Database = {
             columns: ['vacancy_id'];
             isOneToOne: false;
             referencedRelation: 'careers_vacancy_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_saved_vacancy_id_fkey';
+            columns: ['vacancy_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_vacancy_v';
             referencedColumns: ['id'];
           },
           {
@@ -36058,9 +36178,12 @@ export type Database = {
           closes_on: string | null;
           currency: string | null;
           description: string | null;
+          employer_kind: string | null;
           employer_name: string | null;
           employer_photo: string | null;
           employer_verified_at: string | null;
+          host_id: string | null;
+          hotel_id: string | null;
           id: string | null;
           job_type: string | null;
           merchant_id: string | null;
@@ -36144,6 +36267,97 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'waitlist_city_v';
             referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
           },
           {
             foreignKeyName: 'vacancy_merchant_id_fkey';
@@ -40106,6 +40320,113 @@ export type Database = {
           },
           {
             foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'waitlist_city_v';
+            referencedColumns: ['city_id'];
+          },
+        ];
+      };
+      console_vacancy_v: {
+        Row: {
+          applicants: number | null;
+          applicants_new: number | null;
+          area: string | null;
+          category: string | null;
+          city_id: string | null;
+          city_name: string | null;
+          closed_at: string | null;
+          closes_on: string | null;
+          created_at: string | null;
+          currency: string | null;
+          description: string | null;
+          employer_id: string | null;
+          employer_kind: string | null;
+          employer_name: string | null;
+          employer_status: string | null;
+          hired: number | null;
+          id: string | null;
+          job_type: string | null;
+          on_board: boolean | null;
+          openings: number | null;
+          posted_at: string | null;
+          requirements: string | null;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_period: string | null;
+          status: string | null;
+          taken_down_at: string | null;
+          taken_down_reason: string | null;
+          title: string | null;
+          updated_at: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_bounds_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'waitlist_city_v';
@@ -46760,6 +47081,13 @@ export type Database = {
             foreignKeyName: 'vacancy_application_vacancy_id_fkey';
             columns: ['vacancy_id'];
             isOneToOne: false;
+            referencedRelation: 'console_vacancy_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_application_vacancy_id_fkey';
+            columns: ['vacancy_id'];
+            isOneToOne: false;
             referencedRelation: 'vacancy';
             referencedColumns: ['id'];
           },
@@ -46787,6 +47115,13 @@ export type Database = {
             columns: ['vacancy_id'];
             isOneToOne: false;
             referencedRelation: 'careers_vacancy_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'vacancy_saved_vacancy_id_fkey';
+            columns: ['vacancy_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_vacancy_v';
             referencedColumns: ['id'];
           },
           {
@@ -51576,6 +51911,7 @@ export type Database = {
       fn_translations: { Args: { p_locale: string }; Returns: Json };
       fn_unit_listing_ready: { Args: { p_unit_id: string }; Returns: boolean };
       fn_unit_readiness: { Args: { p_unit_id: string }; Returns: Json };
+      fn_vacancy_hiring_team: { Args: { p_vacancy_id: string }; Returns: string[] };
       fn_wa_window: { Args: { p_conversation: string }; Returns: Json };
       fn_web_order_quote: { Args: { p_payload: Json }; Returns: Json };
       fn_wiring_check: {
@@ -59265,6 +59601,42 @@ export type Database = {
         };
         Returns: string;
       };
+      rpc_vacancy_lift_takedown: {
+        Args: { p_reason: string; p_vacancy_id: string };
+        Returns: {
+          area: string | null;
+          category: string;
+          city_id: string;
+          closed_at: string | null;
+          closes_on: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string;
+          host_id: string | null;
+          hotel_id: string | null;
+          id: string;
+          job_type: string;
+          merchant_id: string | null;
+          openings: number;
+          posted_at: string | null;
+          requirements: string | null;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_period: string | null;
+          status: string;
+          taken_down_at: string | null;
+          taken_down_by: string | null;
+          taken_down_reason: string | null;
+          title: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'vacancy';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_vacancy_save: {
         Args: {
           p_area?: string;
@@ -59292,9 +59664,11 @@ export type Database = {
           created_at: string;
           created_by: string | null;
           description: string;
+          host_id: string | null;
+          hotel_id: string | null;
           id: string;
           job_type: string;
-          merchant_id: string;
+          merchant_id: string | null;
           openings: number;
           posted_at: string | null;
           requirements: string | null;
@@ -59302,6 +59676,62 @@ export type Database = {
           salary_min: number | null;
           salary_period: string | null;
           status: string;
+          taken_down_at: string | null;
+          taken_down_by: string | null;
+          taken_down_reason: string | null;
+          title: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'vacancy';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_vacancy_save_for: {
+        Args: {
+          p_area?: string;
+          p_category: string;
+          p_city_id: string;
+          p_closes_on?: string;
+          p_description: string;
+          p_employer: string;
+          p_employer_id: string;
+          p_job_type: string;
+          p_openings?: number;
+          p_publish?: boolean;
+          p_requirements?: string;
+          p_salary_max?: number;
+          p_salary_min?: number;
+          p_salary_period?: string;
+          p_title: string;
+          p_vacancy_id?: string;
+        };
+        Returns: {
+          area: string | null;
+          category: string;
+          city_id: string;
+          closed_at: string | null;
+          closes_on: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string;
+          host_id: string | null;
+          hotel_id: string | null;
+          id: string;
+          job_type: string;
+          merchant_id: string | null;
+          openings: number;
+          posted_at: string | null;
+          requirements: string | null;
+          salary_max: number | null;
+          salary_min: number | null;
+          salary_period: string | null;
+          status: string;
+          taken_down_at: string | null;
+          taken_down_by: string | null;
+          taken_down_reason: string | null;
           title: string;
           updated_at: string;
         };
@@ -59323,9 +59753,11 @@ export type Database = {
           created_at: string;
           created_by: string | null;
           description: string;
+          host_id: string | null;
+          hotel_id: string | null;
           id: string;
           job_type: string;
-          merchant_id: string;
+          merchant_id: string | null;
           openings: number;
           posted_at: string | null;
           requirements: string | null;
@@ -59333,6 +59765,9 @@ export type Database = {
           salary_min: number | null;
           salary_period: string | null;
           status: string;
+          taken_down_at: string | null;
+          taken_down_by: string | null;
+          taken_down_reason: string | null;
           title: string;
           updated_at: string;
         };

@@ -87,7 +87,7 @@ select throws_ok(
   $$select public.rpc_vacancy_save('88000000-0000-0000-0000-00000000000a', 'Test line cook 88',
       'food_beverage', 'full_time', '88000000-0000-0000-0000-0000000000c1',
       'Cook on the line for lunch and dinner service.')$$,
-  '42501', 'Only the owners and managers of this business can post its jobs.',
+  '42501', 'Only the people who hire for this business can post its jobs.',
   'Somebody who is not on the business''s team cannot post its jobs');
 
 -- ------------------------------------------------- the owner of a live business
@@ -379,10 +379,11 @@ set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"88000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
 
-select is(
-  (select status from public.rpc_vacancy_set_status('88000000-0000-0000-0000-0000000000f1', 'open')),
-  'open',
-  'The business can open it again');
+/* Since 20261225000100 a take-down sticks until staff lift it (test 89). */
+select throws_ok(
+  $$select public.rpc_vacancy_set_status('88000000-0000-0000-0000-0000000000f1', 'open')$$,
+  '23514', 'NexG took this job down. Contact NexG to have it put back up.',
+  'and the business cannot put it straight back up');
 
 reset role;
 
@@ -410,7 +411,7 @@ select is(
 
 select is(
   (select count(distinct action)::integer from audit.audit_event
-    where action in ('merchant.vacancy_saved', 'merchant.vacancy_status_changed',
+    where action in ('merchant.vacancy_saved', 'careers.vacancy_taken_down',
                      'merchant.job_application_updated', 'careers.vacancy_applied',
                      'careers.vacancy_application_withdrawn')),
   5,

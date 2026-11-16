@@ -29,6 +29,7 @@ const views: ReadonlyMap<string, string> = new Map([
   ['/host/privacy', 'privacy-requests'],
   ['/host/settings', 'settings'],
   ['/host/team', 'settings/team'],
+  ['/host/hiring', 'hiring'],
   ['/host/refer', 'settings/referrals'],
 ]);
 const idPattern = /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;

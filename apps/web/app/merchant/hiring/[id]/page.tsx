@@ -23,11 +23,11 @@ export default async function HiringJobPage({ params }: { params: { id: string }
 
   const supabase = createClient();
   const [{ data: job }, { data: applicants }, { data: cities }] = await Promise.all([
+    /* Every column, so the page works on either side of the take-down
+       migration (20261225000100), which added taken_down_*. */
     supabase
       .from('vacancy')
-      .select(
-        'id, title, category, job_type, city_id, area, openings, salary_min, salary_max, salary_period, description, requirements, closes_on, status',
-      )
+      .select('*')
       .eq('id', params.id)
       .eq('merchant_id', m.merchant_id)
       .maybeSingle(),
@@ -54,8 +54,10 @@ export default async function HiringJobPage({ params }: { params: { id: string }
   );
   const active = people.filter((p) => p.status !== 'withdrawn').length;
 
-  const lead =
-    vacancy.status === 'open'
+  const takenDown = Boolean(vacancy.taken_down_at);
+  const lead = takenDown
+    ? 'NexG took this job down. It is off the board until NexG lifts that.'
+    : vacancy.status === 'open'
       ? 'On the NexG Careers board now.'
       : vacancy.status === 'draft'
         ? 'A draft. Nobody else can see it until you publish it.'
@@ -76,10 +78,25 @@ export default async function HiringJobPage({ params }: { params: { id: string }
                 See it on the board
               </Link>
             ) : null}
-            <VacancyStatusButton vacancyId={vacancy.id} status={vacancy.status} live={live} />
+            <VacancyStatusButton
+              vacancyId={vacancy.id}
+              status={vacancy.status}
+              live={live && !takenDown}
+            />
           </span>
         }
       />
+
+      {takenDown ? (
+        <p
+          role="alert"
+          className="border-danger/30 bg-danger-bg text-danger rounded-xl border px-4 py-3 text-[0.8125rem] font-bold leading-[1.6]"
+        >
+          NexG took this job down and gave this reason. &ldquo;{vacancy.taken_down_reason}&rdquo;
+          You can still read and answer the people who applied. To put the job back up, contact NexG
+          support.
+        </p>
+      ) : null}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,34rem)]">
         <Panel title={active === 1 ? '1 applicant' : `${active} applicants`}>
@@ -106,7 +123,7 @@ export default async function HiringJobPage({ params }: { params: { id: string }
           <VacancyForm
             cities={cityRows.map(({ id, name }) => ({ id, name }))}
             defaultCityId={vacancy.city_id}
-            live={live}
+            live={live && !takenDown}
             vacancy={vacancy}
           />
         </Panel>

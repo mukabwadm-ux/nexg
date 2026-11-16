@@ -17,12 +17,15 @@ interface JobRow {
   posted_at: string | null;
   closes_on: string | null;
   created_at: string;
+  /* Since 20261225000100. */
+  taken_down_at?: string | null;
 }
 
 const STATUS: Record<string, { label: string; tone: string }> = {
   open: { label: 'On the board', tone: 'bg-success-bg text-success' },
   draft: { label: 'Draft', tone: 'bg-bg text-muted' },
   closed: { label: 'Closed', tone: 'bg-bg text-muted-light' },
+  taken_down: { label: 'Taken down by NexG', tone: 'bg-danger-bg text-danger' },
 };
 
 const day = (iso: string) =>
@@ -39,7 +42,7 @@ export default async function HiringPage() {
   const supabase = createClient();
   const jobsRes = await supabase
     .from('vacancy')
-    .select('id, title, status, job_type, posted_at, closes_on, created_at')
+    .select('*')
     .eq('merchant_id', m.merchant_id)
     .order('created_at', { ascending: false });
 
@@ -106,7 +109,8 @@ export default async function HiringPage() {
           ) : (
             <ul className="divide-border divide-y">
               {jobs.map((job) => {
-                const status = STATUS[job.status] ?? STATUS.draft!;
+                const status =
+                  (job.taken_down_at ? STATUS.taken_down : STATUS[job.status]) ?? STATUS.draft!;
                 const { all, fresh } = counts(job.id);
                 return (
                   <li key={job.id}>

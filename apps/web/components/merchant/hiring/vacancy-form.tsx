@@ -21,6 +21,9 @@ export interface VacancyDraft {
   requirements: string | null;
   closes_on: string | null;
   status: string;
+  /* Since 20261225000100: a take-down by NexG, which only NexG lifts. */
+  taken_down_at?: string | null;
+  taken_down_reason?: string | null;
 }
 
 const field =
@@ -316,7 +319,11 @@ export function VacancyForm({
             </button>
           </>
         )}
-        {!live ? (
+        {vacancy?.taken_down_at ? (
+          <p className="text-muted-light text-[0.75rem] font-semibold">
+            NexG took this job down, so it cannot be published until NexG lifts that.
+          </p>
+        ) : !live ? (
           <p className="text-muted-light text-[0.75rem] font-semibold">
             You can publish once NexG has verified your business.
           </p>

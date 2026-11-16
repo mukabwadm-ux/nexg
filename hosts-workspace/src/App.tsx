@@ -8,6 +8,7 @@ import { Avatar, Button, Empty, Icon, Panel } from './ui';
 import { hostSignIn, WorkspaceProvider, useWorkspace } from './workspace';
 import { CalendarConnectionsPage } from './pages/CalendarConnections';
 import { GuestGuidePreview } from './pages/GuestGuide';
+import { HiringPage } from './pages/Hiring';
 import { HistoryPage } from './pages/History';
 import {
   OverviewPage,
@@ -30,6 +31,7 @@ const nav = [
   ['inbox', 'Inbox', 'message'],
   ['operations', 'Operations', 'task'],
   ['finances', 'Finances', 'money'],
+  ['hiring', 'Hiring', 'team'],
 ];
 const groups: Record<string, string> = {
   'support-tickets': 'inbox',
@@ -130,6 +132,8 @@ function WorkspacePage() {
       return <SettingsPage key={recordId} />;
     case 'help':
       return <HelpPage />;
+    case 'hiring':
+      return <HiringPage key={recordId} />;
     default:
       return <OverviewPage />;
   }

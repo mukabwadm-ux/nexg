@@ -71,7 +71,12 @@ export default function EmployersPage() {
                 </Link>
               </div>
               <p className="text-muted-light mt-3 text-[0.8125rem] font-semibold">
-                Already on NexG? Post a job signs you in to your dashboard.
+                Already on NexG? Post a job signs you in to your dashboard. Hosts, property managers
+                and hotels post from{' '}
+                <Link href="/host?open=hiring" className="text-ink font-bold hover:underline">
+                  Hiring in the host workspace
+                </Link>
+                .
               </p>
             </div>
 
