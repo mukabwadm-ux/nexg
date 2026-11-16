@@ -127,7 +127,7 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
     <ConsoleShell staff={staff} current="/riders">
       <ConsoleHeader
         title={`${rider.first_name} ${rider.last_name ?? ''}`.trim()}
-        breadcrumb="Riders → Application"
+        breadcrumb="Their documents, checks, kit and status on the way to delivering."
         action={<StatusBadge status={rider.status as StatusKey} />}
       />
 

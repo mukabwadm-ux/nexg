@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 
+import { PillTabs } from '@/components/console-kit';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import {
@@ -93,8 +93,12 @@ export default async function FinancePage({
   if (tab === 'overview') {
     const [overview, flow, revenue, decisions, calendar, owed] = await Promise.all([
       supabase.from('fin_overview_v').select('*'),
-      supabase.from('fin_money_flow').select('*').order('sort'),
-      supabase.from('fin_revenue_line').select('*').order('amount_cents', { ascending: false }),
+      supabase.from('fin_money_flow').select('*').eq('period_start', monthStart).order('sort'),
+      supabase
+        .from('fin_revenue_line')
+        .select('*')
+        .eq('period_start', monthStart)
+        .order('amount_cents', { ascending: false }),
       supabase.from('fin_decision').select('*').order('sort'),
       supabase
         .from('fin_calendar_entry')
@@ -108,6 +112,19 @@ export default async function FinancePage({
         .order('owed_cents', { ascending: false })
         .limit(10),
     ]);
+
+    /*
+     * The builders write a fresh set of rows for (start of month, today) on
+     * every run and keep the earlier days' sets, so read only the newest
+     * build of this month. Summing them all counted each line once a day.
+     */
+    const newest = <T extends { period_end: string }>(rows: T[] | null): T[] => {
+      const list = rows ?? [];
+      const end = list.reduce((max, r) => (r.period_end > max ? r.period_end : max), '');
+      return list.filter((r) => r.period_end === end);
+    };
+    const flowRows = newest(flow.data as (FlowRow & { period_end: string })[] | null);
+    const revenueRows = newest(revenue.data as (RevenueRow & { period_end: string })[] | null);
 
     const cityRows = (overview.data as OverviewRow[] | null) ?? [];
 
@@ -163,8 +180,8 @@ export default async function FinancePage({
       <Overview
         totals={totals}
         cities={cityRows}
-        flow={(flow.data as FlowRow[] | null) ?? []}
-        revenue={(revenue.data as RevenueRow[] | null) ?? []}
+        flow={flowRows}
+        revenue={revenueRows}
         decisions={(decisions.data as DecisionRow[] | null) ?? []}
         calendar={(calendar.data as CalendarRow[] | null) ?? []}
         owed={(owed.data as OwedRow[] | null) ?? []}
@@ -303,30 +320,15 @@ export default async function FinancePage({
         }
       />
 
-      <div className="border-border bg-surface flex flex-wrap gap-2 border-b px-4 py-3 sm:px-8">
-        {TABS.map((t) =>
-          t.built ? (
-            <Link
-              key={t.key}
-              href={`/finance?tab=${t.key}`}
-              className={`whitespace-nowrap rounded-full px-4 py-2 text-[0.8125rem] font-extrabold transition-colors ${
-                t.key === tab
-                  ? 'bg-ink text-white'
-                  : 'border-border-strong bg-surface text-ink hover:border-ink border'
-              }`}
-            >
-              {t.label}
-            </Link>
-          ) : (
-            <span
-              key={t.key}
-              title="Designed, not built yet"
-              className="border-border text-muted-light cursor-not-allowed rounded-full border border-dashed px-4 py-2 text-[0.8125rem] font-extrabold"
-            >
-              {t.label}
-            </span>
-          ),
-        )}
+      <div className="px-4 pt-5 sm:px-6">
+        <PillTabs
+          tabs={TABS.map((t) => ({
+            href: `/finance?tab=${t.key}`,
+            label: t.label,
+            active: t.key === tab,
+            disabled: !t.built,
+          }))}
+        />
       </div>
 
       <div className="px-4 py-6 sm:px-8">{body}</div>

@@ -905,7 +905,7 @@
   }
   .root :global(.bu-facts dd small),
   .root :global(.bu-small) {
-    font-size: 10px;
+    font-size: 11px;
   }
   .root :global(.bu-detail-footer) {
     padding: 8px 12px;
@@ -919,7 +919,7 @@
     font-size: 11px;
   }
   .root :global(.bu-chip) {
-    font-size: 10px;
+    font-size: 11px;
     padding: 3px 7px;
   }
   .root :global(.bu-profile-field) {
@@ -1074,7 +1074,7 @@
     align-items: baseline;
   }
   .root :global(.bu-version p) {
-    font-size: 10px;
+    font-size: 11px;
   }
   .root :global(.bu-document-fields) {
     gap: 4px;
@@ -1192,7 +1192,7 @@
   .root :global(.bu-avatar) {
     width: 24px;
     height: 24px;
-    font-size: 9px;
+    font-size: 11px;
   }
   .root :global(.bu-table .bu-hide-mobile) {
     display: none;

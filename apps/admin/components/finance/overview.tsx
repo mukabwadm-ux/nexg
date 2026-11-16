@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import * as React from 'react';
 
+import { ShareDonut, type Slice } from '@/components/charts';
+import { kesCompact, Panel } from '@/components/console-kit';
+
 import {
   Empty,
   SectionTitle,
@@ -134,6 +137,52 @@ export function Overview({
   const inTotal = moneyIn.reduce((a, f) => a + Number(f.amount_cents), 0);
   const outTotal = moneyOut.reduce((a, f) => a + Number(f.amount_cents), 0);
 
+  /* Whole shillings for the donuts; the tables below keep the exact cents. */
+  const slices = (rows: { key: string; label: string; cents: number }[]): Slice[] => {
+    /* One slice per line: the views return a row per city, which would
+       otherwise draw the same line several times. */
+    const byLabel = new Map<string, { key: string; label: string; cents: number }>();
+    for (const r of rows) {
+      const seen = byLabel.get(r.label);
+      if (seen) seen.cents += r.cents;
+      else byLabel.set(r.label, { ...r });
+    }
+    const sorted = [...byLabel.values()]
+      .filter((r) => r.cents > 0)
+      .sort((a, b) => b.cents - a.cents);
+    const top = sorted
+      .slice(0, 5)
+      .map((r) => ({ key: r.key, label: r.label, value: Math.round(r.cents / 100) }));
+    const rest = sorted.slice(5).reduce((sum, r) => sum + r.cents, 0);
+    return rest > 0
+      ? [...top, { key: 'rest', label: 'Everything else', value: Math.round(rest / 100) }]
+      : top;
+  };
+  const revenueTotal = revenue.reduce((a, r) => a + Number(r.amount_cents), 0);
+  const revenueSlices = slices(
+    revenue.map((r) => ({ key: r.account_code, label: r.label, cents: Number(r.amount_cents) })),
+  );
+  const inSlices = slices(
+    moneyIn.map((m) => ({ key: m.bucket, label: m.label, cents: Number(m.amount_cents) })),
+  );
+  const outSlices = slices(
+    moneyOut.map((m) => ({ key: m.bucket, label: m.label, cents: Number(m.amount_cents) })),
+  );
+  const donut = (data: Slice[], cents: number, caption: string, empty: string) =>
+    data.length === 0 ? (
+      <p className="border-border text-muted flex h-[11rem] items-center justify-center rounded-xl border border-dashed px-6 text-center text-sm font-semibold">
+        {empty}
+      </p>
+    ) : (
+      <ShareDonut
+        data={data}
+        unit="kes"
+        stacked
+        centre={kesCompact(cents).replace('KES ', '')}
+        caption={caption}
+      />
+    );
+
   return (
     <div className="space-y-8">
       {/* ─────────────────────────────────── what needs a person */}
@@ -242,6 +291,29 @@ export function Overview({
           </div>
         )}
       </section>
+
+      {/* ──────────────────────────────── the month at a glance */}
+      <div className="grid gap-5 lg:grid-cols-3">
+        <Panel title="Revenue by line" aside="This month">
+          {donut(
+            revenueSlices,
+            revenueTotal,
+            'Revenue',
+            'No revenue has been recognised this month.',
+          )}
+        </Panel>
+        <Panel title="Money in" aside="This month">
+          {donut(inSlices, inTotal, 'In', 'Nothing has come in this month.')}
+        </Panel>
+        <Panel title="Money out" aside="This month">
+          {donut(
+            outSlices,
+            outTotal,
+            'Out',
+            'Nothing has gone out or been booked as owed this month.',
+          )}
+        </Panel>
+      </div>
 
       {/* ──────────────────────────────── in, out, and by line */}
       <div className="grid gap-6 lg:grid-cols-2">

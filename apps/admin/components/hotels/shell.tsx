@@ -1,4 +1,17 @@
-import Link from 'next/link';
+import {
+  Building2,
+  ConciergeBell,
+  LayoutGrid,
+  QrCode,
+  ReceiptText,
+  RotateCcw,
+  ShieldCheck,
+  UserRound,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
+
+import { PillTabs } from '@/components/console-kit';
 
 /**
  * The tabs, in the order the overview sheet lists them.
@@ -57,25 +70,27 @@ export const TAB_TITLE: Record<string, { title: string; subtitle: string }> = {
   },
 };
 
+const HOTEL_ICONS: Record<HotelTab, LucideIcon> = {
+  hosts: Users,
+  listings: LayoutGrid,
+  refunds: RotateCcw,
+  hotels: Building2,
+  charge: ReceiptText,
+  desk: ConciergeBell,
+  qr: QrCode,
+  guests: UserRound,
+  data: ShieldCheck,
+};
+
 export function HotelTabs({ current }: { current: string }) {
   return (
-    <nav
-      className="border-border -mx-4 flex gap-6 overflow-x-auto border-b px-4 sm:-mx-8 sm:px-8"
-      aria-label="Hotels and Airbnb sections"
-    >
-      {HOTEL_TABS.map((tab) => (
-        <Link
-          key={tab.key}
-          href={`/hotels?tab=${tab.key}`}
-          className={`-mb-px shrink-0 border-b-2 pb-3 text-sm font-bold transition-colors ${
-            current === tab.key
-              ? 'border-gold text-ink'
-              : 'text-muted hover:text-ink border-transparent'
-          }`}
-        >
-          {tab.label}
-        </Link>
-      ))}
-    </nav>
+    <PillTabs
+      tabs={HOTEL_TABS.map((tab) => ({
+        href: `/hotels?tab=${tab.key}`,
+        label: tab.label,
+        icon: HOTEL_ICONS[tab.key],
+        active: current === tab.key,
+      }))}
+    />
   );
 }

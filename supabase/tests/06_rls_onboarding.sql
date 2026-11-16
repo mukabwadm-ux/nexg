@@ -10,7 +10,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(28);
+select plan(29);
 
 /*
  * Foreign keys and triggers are suspended for the cleanup below,
@@ -108,8 +108,16 @@ select is(
 
 select is(
   (select count(*)::int from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-000000000001')),
-  5,
-  'a restaurant that serves alcohol owes five documents'
+  3,
+  'a restaurant that serves alcohol owes three documents'
+);
+
+select ok(
+  not exists (
+    select 1 from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-000000000001')
+    where kind in ('owner_id', 'kra_pin')
+  ),
+  'no merchant is asked for an owner ID or a KRA PIN certificate'
 );
 
 select ok(
@@ -125,7 +133,7 @@ where id = 'cccccccc-0000-0000-0000-000000000001';
 
 select is(
   (select count(*)::int from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-000000000001')),
-  4,
+  2,
   'saying no to alcohol drops the liquor licence again'
 );
 
@@ -137,7 +145,7 @@ where id = 'cccccccc-0000-0000-0000-000000000001';
 
 select is(
   (select count(*)::int from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-000000000001')),
-  5,
+  3,
   'the canonical restaurant category keeps its category and answer-based document rules'
 );
 

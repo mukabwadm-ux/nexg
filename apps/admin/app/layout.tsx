@@ -1,4 +1,5 @@
 import '@nexg/ui/globals.css';
+import './console.css';
 
 import { ToastProvider } from '@nexg/ui';
 // Manrope 400/600/700/800 from the repo, never fetched at build time.
@@ -19,6 +20,8 @@ export const viewport: Viewport = {
   themeColor: '#141414',
   width: 'device-width',
   initialScale: 1,
+  /* Edge to edge on phones with a notch; the shared styles keep the sides clear. */
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

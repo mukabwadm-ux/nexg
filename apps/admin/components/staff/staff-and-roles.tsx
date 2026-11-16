@@ -71,25 +71,25 @@ export function StaffAndRoles({
 
   return (
     <main className="px-4 py-6 sm:px-8">
-      <p className="text-muted text-sm font-semibold">
-        Company work accounts only · role and city scope set here
-      </p>
-
-      <nav className="border-border mt-5 flex flex-wrap gap-6 border-b" aria-label="Staff sections">
+      <nav
+        className="border-border bg-surface flex gap-1 overflow-x-auto rounded-2xl border p-1.5 [scrollbar-width:none]"
+        aria-label="Staff sections"
+      >
         {TABS.map((t) => (
           <button
             key={t.key}
             type="button"
             onClick={() => go({ tab: t.key })}
-            className={`-mb-px border-b-2 pb-3 text-sm font-bold transition-colors ${
+            aria-current={tab === t.key ? 'page' : undefined}
+            className={`flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-xl px-4 text-[0.875rem] transition-colors ${
               tab === t.key
-                ? 'border-gold text-ink'
-                : 'text-muted hover:text-ink border-transparent'
+                ? 'bg-gold text-ink font-bold shadow-[0_6px_16px_-8px_rgba(196,140,0,0.8)]'
+                : 'text-muted hover:bg-bg hover:text-ink font-semibold'
             }`}
           >
             {t.label}
             {t.key === 'approvals' && approvals.length > 0 && (
-              <span className="bg-gold text-ink ml-2 rounded-full px-1.5 py-0.5 text-[0.625rem]">
+              <span className="bg-ink ml-2 rounded-full px-1.5 py-0.5 text-[0.625rem] text-white">
                 {approvals.length}
               </span>
             )}

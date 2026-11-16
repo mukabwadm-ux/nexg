@@ -93,7 +93,9 @@ select is(
 -- universal set is three rather than four — a laundry is told it needs three
 -- documents and it needs three. And the Pharmacy and Poisons Board issues two
 -- separate things: one for the address, one for the superintendent. Only a
--- pharmacy that dispenses needs the second.
+-- pharmacy that dispenses needs the second. Since 15 Nov 2026 merchants send
+-- no owner ID or KRA PIN certificate either, so the business permit is the
+-- only document every merchant owes.
 insert into public.merchant (id, legal_name, trading_name, category, contact_name, contact_phone, contact_email, city_id, answers)
 values ('cccccccc-0000-0000-0000-00000000000f', 'Afya Pharmacy Ltd', 'Afya Pharmacy', 'pharmacy',
         'Ann Owner', '+254744000001', 'afya@example.com',
@@ -102,8 +104,8 @@ values ('cccccccc-0000-0000-0000-00000000000f', 'Afya Pharmacy Ltd', 'Afya Pharm
 
 select is(
   (select count(*)::int from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-00000000000f')),
-  5,
-  'a dispensing pharmacy needs the three universal documents plus both licences'
+  3,
+  'a dispensing pharmacy needs the business permit plus both licences'
 );
 
 select ok(

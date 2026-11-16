@@ -1,7 +1,7 @@
 import { Card } from '@nexg/ui';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 
+import { PillTabs } from '@/components/console-kit';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import {
@@ -95,24 +95,13 @@ export default async function FeaturedPage({
       />
 
       <main className="px-4 py-6 sm:px-8">
-        <nav
-          className="border-border -mx-4 flex gap-6 overflow-x-auto border-b px-4 sm:-mx-8 sm:px-8"
-          aria-label="Featured slots sections"
-        >
-          {TABS.map((t) => (
-            <Link
-              key={t.key}
-              href={`/featured?tab=${t.key}${city ? `&city=${city.slug}` : ''}`}
-              className={`-mb-px shrink-0 border-b-2 pb-3 text-sm font-bold transition-colors ${
-                tab === t.key
-                  ? 'border-gold text-ink'
-                  : 'text-muted hover:text-ink border-transparent'
-              }`}
-            >
-              {t.label}
-            </Link>
-          ))}
-        </nav>
+        <PillTabs
+          tabs={TABS.map((t) => ({
+            href: `/featured?tab=${t.key}${city ? `&city=${city.slug}` : ''}`,
+            label: t.label,
+            active: tab === t.key,
+          }))}
+        />
 
         {/*
          * Cities that are not live are shown and disabled rather than

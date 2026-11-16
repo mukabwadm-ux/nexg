@@ -207,10 +207,12 @@ begin
   on conflict do nothing;
 
   /*
-   * All but one, and one of those rejected — which is the state
+   * One document, turned down and asked for again, which is the state
    * worth looking at. A merchant who uploaded something and had it
    * turned down needs to know *why*, and that sentence is the only
-   * thing standing between them and trading.
+   * thing standing between them and trading. (This was the KRA PIN
+   * certificate until 15 Nov 2026. Merchants no longer send one, or an
+   * owner ID, so a laundry owes only its business permit.)
    */
   insert into public.document
     (owner_type, owner_id, requirement_id, storage_path, mime, size_bytes,
@@ -218,13 +220,12 @@ begin
   select 'merchant', v_m_docs, rq.id,
          'merchant/' || v_m_docs || '/' || rq.kind || '/seed.pdf',
          'application/pdf', 102400,
-         (case when rq.kind = 'kra_pin' then 'rejected' else 'verified' end)::public.document_status,
+         (case when rq.kind = 'business_permit' then 'rejected' else 'verified' end)::public.document_status,
          v_admin, now() - interval '1 day',
-         case when rq.kind = 'kra_pin'
-              then 'The photo cuts off the bottom of the certificate. Send one with all four corners in frame.' end,
+         case when rq.kind = 'business_permit'
+              then 'The photo cuts off the bottom of the permit. Send one with all four corners in frame.' end,
          case when rq.has_expiry then current_date + 200 end, 1
   from public.fn_merchant_required_docs(v_m_docs) rq
-  where rq.kind <> 'business_permit'
   on conflict do nothing;
 
   insert into public.document_request

@@ -150,7 +150,7 @@ export function WelcomeConsent({
       aria-modal="false"
       aria-labelledby="welcome-consent-title"
       aria-describedby="welcome-consent-body"
-      className="fixed bottom-3 left-3 right-[5.25rem] z-50 sm:bottom-5 sm:left-5 sm:right-auto sm:w-[23rem]"
+      className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] left-3 right-[5.25rem] z-50 sm:bottom-[calc(1.25rem+env(safe-area-inset-bottom))] sm:left-5 sm:right-auto sm:w-[23rem]"
     >
       <div className="rounded-2xl border border-white/10 bg-[#141414] p-4 text-white shadow-[0_18px_48px_-12px_rgba(20,20,20,0.55)]">
         <div className="flex items-start gap-3">
@@ -212,7 +212,7 @@ export function WelcomeConsent({
           </button>
         </div>
 
-        <p className="mt-2.5 pl-11 text-[0.625rem] font-semibold leading-[1.5] text-white/40">
+        <p className="mt-2.5 pl-11 text-[0.6875rem] font-semibold leading-[1.5] text-white/50">
           {t('consent.footnote')}
         </p>
       </div>

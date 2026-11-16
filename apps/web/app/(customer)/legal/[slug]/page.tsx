@@ -118,7 +118,7 @@ export default function LegalPage({ params }: { params: { slug: string } }) {
                       </span>
                       <a
                         href={`#${section.id}`}
-                        className="text-muted hover:text-ink text-xs font-semibold leading-snug transition-colors"
+                        className="text-muted hover:text-ink inline-block py-1.5 text-xs font-semibold leading-snug transition-colors"
                       >
                         {section.heading}
                       </a>

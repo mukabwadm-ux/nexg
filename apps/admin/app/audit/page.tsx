@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 
 import {
   type ActivityRow,
@@ -22,6 +21,7 @@ import {
   MoneyTab,
   SignInsTab,
 } from '@/components/audit/tabs';
+import { PillTabs } from '@/components/console-kit';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { requireModule, requireStaff } from '@/lib/staff';
@@ -122,24 +122,13 @@ export default async function AuditPage({
       <ConsoleHeader title="Audit log" breadcrumb={SUBTITLE[tab]!} />
 
       <main className="px-4 py-6 sm:px-8">
-        <nav
-          className="border-border -mx-4 flex gap-6 overflow-x-auto border-b px-4 sm:-mx-8 sm:px-8"
-          aria-label="Audit sections"
-        >
-          {TABS.map((t) => (
-            <Link
-              key={t.key}
-              href={`/audit?tab=${t.key}`}
-              className={`-mb-px shrink-0 border-b-2 pb-3 text-sm font-bold transition-colors ${
-                tab === t.key
-                  ? 'border-gold text-ink'
-                  : 'text-muted hover:text-ink border-transparent'
-              }`}
-            >
-              {t.label}
-            </Link>
-          ))}
-        </nav>
+        <PillTabs
+          tabs={TABS.map((t) => ({
+            href: `/audit?tab=${t.key}`,
+            label: t.label,
+            active: tab === t.key,
+          }))}
+        />
 
         {tab === 'activity' &&
           (await loadActivity(supabase, health, filter, moduleFilter, searchParams?.event))}

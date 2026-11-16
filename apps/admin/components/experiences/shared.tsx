@@ -115,8 +115,8 @@ export function Tile({
   tone?: 'danger' | 'success';
 }) {
   return (
-    <Card className="p-4">
-      <p className="text-muted-light text-[0.5625rem] font-extrabold uppercase leading-tight tracking-[0.12em]">
+    <Card data-tile className="p-4">
+      <p className="text-muted text-[0.8125rem] font-semibold leading-tight">
         {label}
       </p>
       <p

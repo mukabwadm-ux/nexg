@@ -818,7 +818,7 @@
   }
   .root :global(.pm-terms) {
     margin-top: 5px;
-    font-size: 10px;
+    font-size: 11px;
   }
   .root :global(.pm-actions) {
     margin-top: 8px;
@@ -903,7 +903,7 @@
     text-overflow: ellipsis;
   }
   .root :global(.pm-app-preview > .pm-note) {
-    font-size: 10px;
+    font-size: 11px;
     padding: 5px 8px;
     margin-top: 5px;
   }

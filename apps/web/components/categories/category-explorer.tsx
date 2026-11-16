@@ -170,7 +170,7 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
               <button
                 key={tab.key}
                 onClick={() => setKindFilter(tab.key)}
-                className={`rounded-full px-4 py-1.5 text-xs font-bold transition-all ${
+                className={`rounded-full px-4 py-2.5 text-xs font-bold transition-all ${
                   isActive
                     ? 'bg-ink ring-ink text-white shadow-sm ring-1'
                     : 'border-border bg-surface text-muted-light hover:border-border-strong hover:text-ink border'
@@ -297,7 +297,7 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
                           <Link
                             key={sub.id}
                             href={discoverCategoryHref(cat.id)}
-                            className="border-border bg-bg text-muted-light hover:border-gold hover:bg-gold/5 hover:text-ink inline-block rounded-lg border px-2.5 py-1 text-xs font-semibold transition-all"
+                            className="border-border bg-bg text-muted-light hover:border-gold hover:bg-gold/5 hover:text-ink inline-block rounded-lg border px-3 py-2 text-xs font-semibold transition-all"
                           >
                             {sub.name}
                           </Link>

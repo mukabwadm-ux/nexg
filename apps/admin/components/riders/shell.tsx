@@ -1,5 +1,18 @@
 import { Card } from '@nexg/ui';
+import {
+  Banknote,
+  Bike,
+  CalendarClock,
+  FileCheck2,
+  HeartPulse,
+  MessageSquare,
+  UserPlus,
+  Wallet,
+  type LucideIcon,
+} from 'lucide-react';
 import Link from 'next/link';
+
+import { PillTabs } from '@/components/console-kit';
 
 import { acknowledgeSos } from '@/app/riders/actions';
 
@@ -25,26 +38,27 @@ export const RIDER_TABS = [
 
 export type RiderTab = (typeof RIDER_TABS)[number]['key'];
 
+const RIDER_ICONS: Record<RiderTab, LucideIcon> = {
+  directory: Bike,
+  pipeline: UserPlus,
+  health: HeartPulse,
+  cash: Banknote,
+  settlement: Wallet,
+  supply: CalendarClock,
+  documents: FileCheck2,
+  comms: MessageSquare,
+};
+
 export function RiderTabs({ current }: { current: string }) {
   return (
-    <nav
-      className="border-border -mx-4 flex gap-6 overflow-x-auto border-b px-4 sm:-mx-8 sm:px-8"
-      aria-label="Riders sections"
-    >
-      {RIDER_TABS.map((tab) => (
-        <Link
-          key={tab.key}
-          href={`/riders?tab=${tab.key}`}
-          className={`-mb-px shrink-0 border-b-2 pb-3 text-sm font-bold transition-colors ${
-            current === tab.key
-              ? 'border-gold text-ink'
-              : 'text-muted hover:text-ink border-transparent'
-          }`}
-        >
-          {tab.label}
-        </Link>
-      ))}
-    </nav>
+    <PillTabs
+      tabs={RIDER_TABS.map((tab) => ({
+        href: `/riders?tab=${tab.key}`,
+        label: tab.label,
+        icon: RIDER_ICONS[tab.key],
+        active: current === tab.key,
+      }))}
+    />
   );
 }
 

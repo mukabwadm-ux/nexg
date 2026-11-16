@@ -12,7 +12,8 @@ import { CardRail } from './card-rail';
 import { discoverMerchantHref } from '@/lib/discover-links';
 
 /** The same card size as Best sellers, so the two rows line up. */
-const STORE_CARD = 'w-[16.5rem] shrink-0 snap-start sm:w-[18rem] lg:w-[calc((100%-3rem)/4)]';
+/* On a phone, the same width as the featured merchants above. */
+const STORE_CARD = 'w-[68%] shrink-0 snap-start sm:w-[18rem] lg:w-[calc((100%-3rem)/4)]';
 
 /**
  * "Find Stores Near You": the live stores that deliver to where the visitor

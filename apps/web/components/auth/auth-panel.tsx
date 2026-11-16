@@ -217,14 +217,14 @@ export function AuthPanel({
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
               <Link
                 href={forgotHref}
-                className="text-ink inline-block text-sm font-bold underline underline-offset-4"
+                className="text-ink tap-area inline-block text-sm font-bold underline underline-offset-4"
               >
                 Forgot password?
               </Link>
               {portal === 'merchant' && emailOtpEnabled ? (
                 <Link
                   href="/merchants/sign-in/email"
-                  className="text-ink inline-block text-sm font-bold underline underline-offset-4"
+                  className="text-ink tap-area inline-block text-sm font-bold underline underline-offset-4"
                 >
                   Sign in with an email code
                 </Link>

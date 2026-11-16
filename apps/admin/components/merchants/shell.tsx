@@ -1,4 +1,23 @@
-import Link from 'next/link';
+import {
+  Activity,
+  BookOpen,
+  ClipboardList,
+  Clock,
+  FileCheck2,
+  GitBranch,
+  KanbanSquare,
+  MapPinned,
+  MessageSquare,
+  PauseCircle,
+  Scale,
+  Store,
+  Target,
+  Trash2,
+  Wallet,
+  type LucideIcon,
+} from 'lucide-react';
+
+import { PillTabs } from '@/components/console-kit';
 
 import { MerchantSearch } from './merchant-search';
 
@@ -40,42 +59,37 @@ export function MerchantTabs({ current }: { current: string }) {
   );
 }
 
+const MERCHANT_ICONS: Record<MerchantTab, LucideIcon> = {
+  directory: Store,
+  applications: ClipboardList,
+  deactivated: PauseCircle,
+  deleted: Trash2,
+  pipeline: KanbanSquare,
+  health: Activity,
+  disputes: Scale,
+  hours: Clock,
+  catalogue: BookOpen,
+  coverage: MapPinned,
+  finance: Wallet,
+  comms: MessageSquare,
+  documents: FileCheck2,
+  acquisition: Target,
+  branches: GitBranch,
+};
+
+/* Designed-but-not-built tabs are shown, not hidden: a missing tab makes
+   the console look smaller than the plan, and a tab that pretends to work
+   is worse than one that says it does not. */
 function MerchantTabStrip({ current }: { current: string }) {
   return (
-    <nav
-      className="border-border -mx-4 flex gap-6 overflow-x-auto border-b px-4 [scrollbar-color:transparent_transparent] [scrollbar-width:thin] hover:[scrollbar-color:rgb(var(--border-strong-rgb))_transparent] sm:-mx-8 sm:px-8"
-      aria-label="Merchants sections"
-    >
-      {MERCHANT_TABS.map((tab) =>
-        tab.built ? (
-          <Link
-            key={tab.key}
-            href={
-              tab.key === 'applications' ? '/merchants/applications' : `/merchants?tab=${tab.key}`
-            }
-            prefetch={tab.key === 'applications' ? false : undefined}
-            aria-current={current === tab.key ? 'page' : undefined}
-            className={`-mb-px shrink-0 border-b-2 pb-3 text-sm font-bold transition-colors ${
-              current === tab.key
-                ? 'border-gold text-ink'
-                : 'text-muted hover:text-ink border-transparent'
-            }`}
-          >
-            {tab.label}
-          </Link>
-        ) : (
-          /* Designed, not built. Shown rather than hidden: a missing tab
-             makes the console look smaller than the plan, and a tab that
-             pretends to work is worse than one that says it does not. */
-          <span
-            key={tab.key}
-            title="Designed, not built yet"
-            className="text-muted-light -mb-px shrink-0 cursor-default border-b-2 border-transparent pb-3 text-sm font-bold opacity-50"
-          >
-            {tab.label}
-          </span>
-        ),
-      )}
-    </nav>
+    <PillTabs
+      tabs={MERCHANT_TABS.map((tab) => ({
+        href: tab.key === 'applications' ? '/merchants/applications' : `/merchants?tab=${tab.key}`,
+        label: tab.label,
+        icon: MERCHANT_ICONS[tab.key],
+        active: current === tab.key,
+        disabled: !tab.built,
+      }))}
+    />
   );
 }
