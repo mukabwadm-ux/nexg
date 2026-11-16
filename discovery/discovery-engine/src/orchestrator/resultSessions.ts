@@ -48,7 +48,7 @@ export class ResultSessions {
   }
   resolve(request: EngineRequest, caller: string, binding: string): { session: Session; offset: number } | undefined {
     if (request.cursor) {
-      const match = /^([a-f0-9-]{36})\.(0|[1-9][0-9]?)\.([A-Za-z0-9_-]{43})$/.exec(request.cursor);
+      const match = /^([a-f0-9-]{36})\.(0|[1-9][0-9]{0,2})\.([A-Za-z0-9_-]{43})$/.exec(request.cursor);
       if (!match) throw restartPaging();
       const value = `${match[1]}.${match[2]}`; const expected = Buffer.from(this.#signature(value)); const actual = Buffer.from(match[3]!);
       if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) throw restartPaging();

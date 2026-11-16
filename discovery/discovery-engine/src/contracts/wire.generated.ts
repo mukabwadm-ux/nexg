@@ -988,6 +988,8 @@ export interface components {
         };
         SupportedFilter: components["schemas"]["AreaFilter"] | components["schemas"]["OpenFilter"] | components["schemas"]["ListedPriceFilter"] | components["schemas"]["TotalFilter"] | components["schemas"]["FulfillmentFilter"] | components["schemas"]["CoverageFilter"] | components["schemas"]["AttributeFilter"] | components["schemas"]["AvailabilityFilter"] | components["schemas"]["PartyFilter"] | components["schemas"]["WorkflowFilter"];
         EngineRequest: {
+            /** @description Filters merchant locations in the selected category. Requires viewportSearch and cannot combine with catalog_area. */
+            viewport?: components["schemas"]["MapViewport"];
             /** @constant */
             contractVersion: "1";
             requestId: string;
@@ -1043,6 +1045,8 @@ export interface components {
             retrieval: components["schemas"]["RetrievalWindow"];
             versions: components["schemas"]["Versions"];
             applied: {
+                /** @description Exact bounds used for this result window. */
+                viewport?: components["schemas"]["MapViewport"];
                 selection: components["schemas"]["Selection"];
                 filterHash: string;
                 constraints: components["schemas"]["AppliedConstraint"][];
@@ -1134,6 +1138,13 @@ export interface components {
             }[];
         };
         EngineCapabilities: {
+            /** @description The current NexG catalogue filters source merchant points by the visible map bounds. */
+            viewportSearch?: boolean;
+            /**
+             * @description Authoritative NexG merchant catalogue for the opt-in viewport feature.
+             * @constant
+             */
+            source?: "nexg";
             /** @constant */
             contractVersion: "1";
             discoveryReleaseId: string;
@@ -1189,6 +1200,13 @@ export interface components {
             categoryId: string;
             subcategoryId: string;
             optionId?: string;
+        };
+        /** @description Inclusive WGS 84 map bounds. South must be below north, and west and east must differ. West greater than east crosses the antimeridian. */
+        MapViewport: {
+            south: number;
+            west: number;
+            north: number;
+            east: number;
         };
         /** @description WGS 84 coordinates of the merchant's branch, as the source records them. */
         GeoPoint: {
@@ -1427,7 +1445,10 @@ export interface operations {
             query: {
                 releaseId: string;
             };
-            header?: never;
+            header?: {
+                /** @description Opt in to Maps v1 capability fields. */
+                "X-Nexg-Features"?: "maps-v1";
+            };
             path?: never;
             cookie?: never;
         };

@@ -18,6 +18,7 @@ export function registerHealthRoutes(app: FastifyInstance, context: RouteContext
   app.get('/api/discovery/capabilities', async request => {
     const query = queryObject(request.query, ['releaseId']);
     if (!query.releaseId) throw new ReadServiceError('INVALID_REQUEST', 400, false, 'correct_request', ['/releaseId']);
-    return context.service.capabilities(query.releaseId, context.budgetFor(request));
+    const mapsFeatures = request.headers['x-nexg-features'] === 'maps-v1';
+    return context.service.capabilities(query.releaseId, context.budgetFor(request), mapsFeatures);
   });
 }

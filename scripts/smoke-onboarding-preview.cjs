@@ -78,8 +78,8 @@ fs.mkdirSync(output, { recursive: true });
       .getByLabel('Operating street address / premises', { exact: false })
       .fill('Westlands, Nairobi');
     await navigate(4);
-    await page.locator('#upload-owner_id').setInputFiles({
-      name: 'owner-id.pdf',
+    await page.locator('#upload-county_permit').setInputFiles({
+      name: 'county-permit.pdf',
       mimeType: 'application/pdf',
       buffer: Buffer.from('%PDF-1.4\nPreview evidence only'),
     });
@@ -96,7 +96,7 @@ fs.mkdirSync(output, { recursive: true });
       page.getByLabel('Operating street address / premises', { exact: false }),
     ).toHaveValue('Westlands, Nairobi');
     await navigate(4);
-    await expect(page.getByText('Selected: owner-id.pdf', { exact: true })).toBeVisible();
+    await expect(page.getByText('Selected: county-permit.pdf', { exact: true })).toBeVisible();
     steps.push(
       'Captured listing, false specialty answer, location and private in-memory file survive navigation and category restoration.',
     );

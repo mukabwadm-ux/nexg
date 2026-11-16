@@ -154,7 +154,9 @@ export function CheckoutForm({
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) {
+      /* A temporary session (the trip planner makes one) is not an account,
+         and the database refuses it an order, so it signs in first too. */
+      if (!user || user.is_anonymous) {
         router.push('/sign-in?next=/checkout');
         return;
       }

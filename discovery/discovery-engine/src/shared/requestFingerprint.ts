@@ -3,6 +3,8 @@ import { canonicalJson, sha256 } from './immutable.js';
 
 /** Preserve the F07 applied-request hash; paging/session semantics remain F10. */
 export function requestFingerprint(request: EngineRequest, normalizedQuery?: string): string {
+  if (request.viewport) return sha256(canonicalJson({ viewport: request.viewport, filters: request.filters,
+    ...(normalizedQuery === undefined ? {} : { query: normalizedQuery, mode: request.mode, selection: request.selection }) }));
   return sha256(canonicalJson(normalizedQuery === undefined ? request.filters
     : { filters: request.filters, query: normalizedQuery, mode: request.mode, selection: request.selection }));
 }

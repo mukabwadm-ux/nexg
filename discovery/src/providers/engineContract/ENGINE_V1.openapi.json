@@ -121,6 +121,15 @@
         "summary": "readEngineCapabilities",
         "parameters": [
           {
+            "name": "X-Nexg-Features",
+            "in": "header",
+            "required": false,
+            "description": "Opt in to Maps v1 capability fields.",
+            "schema": {
+              "const": "maps-v1"
+            }
+          },
+          {
             "name": "releaseId",
             "in": "query",
             "required": true,
@@ -4977,6 +4986,10 @@
       "EngineRequest": {
         "type": "object",
         "properties": {
+          "viewport": {
+            "$ref": "#/components/schemas/MapViewport",
+            "description": "Filters merchant locations in the selected category. Requires viewportSearch and cannot combine with catalog_area."
+          },
           "contractVersion": {
             "const": "1"
           },
@@ -5237,6 +5250,10 @@
           "applied": {
             "type": "object",
             "properties": {
+              "viewport": {
+                "$ref": "#/components/schemas/MapViewport",
+                "description": "Exact bounds used for this result window."
+              },
               "selection": {
                 "$ref": "#/components/schemas/Selection"
               },
@@ -5723,6 +5740,14 @@
       "EngineCapabilities": {
         "type": "object",
         "properties": {
+          "viewportSearch": {
+            "type": "boolean",
+            "description": "The current NexG catalogue filters source merchant points by the visible map bounds."
+          },
+          "source": {
+            "const": "nexg",
+            "description": "Authoritative NexG merchant catalogue for the opt-in viewport feature."
+          },
           "contractVersion": {
             "const": "1"
           },
@@ -6000,6 +6025,39 @@
         "required": [
           "categoryId",
           "subcategoryId"
+        ],
+        "additionalProperties": false
+      },
+      "MapViewport": {
+        "type": "object",
+        "description": "Inclusive WGS 84 map bounds. South must be below north, and west and east must differ. West greater than east crosses the antimeridian.",
+        "properties": {
+          "south": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "west": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "north": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "east": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          }
+        },
+        "required": [
+          "south",
+          "west",
+          "north",
+          "east"
         ],
         "additionalProperties": false
       },

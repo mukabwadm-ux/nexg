@@ -1,5 +1,7 @@
 # Current handoff index
 
+- [Shared services, 12 November 2026](sessions/2026-11-12-shared-services.md). One shared Supabase backend for every NexG app: the phase 1 fixes in #146, the owner decisions D1 to D15 still open, the backend queue, and how to change the shared backend safely. The owner sends the private notes directly.
+
 - [Unified merchant platform, 2 November 2026](sessions/2026-11-02-unified-merchant-platform.md). The Derrick NEXG checkout is the primary source for the combined platform and merchant workspace; the separate merchant folder is a retained local backup.
 
 - [Merchant email OTP](../merchant-email-otp.md). The local onboarding handoff and returning email-code sign-in use Supabase Auth with Resend SMTP. An isolated Auth check passed; delivery and the full real merchant journey still need confirmation with the authorized test inbox. Hosted-project configuration is separate.
