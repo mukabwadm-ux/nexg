@@ -18,8 +18,8 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));
 
-const ENUM_VERSION = '20261225000100';
-const DATA_VERSION = '20261225000200';
+const ENUM_VERSION = '20261226000100';
+const DATA_VERSION = '20261226000200';
 const REGISTRY_REVISION = 'nexg-booking-2026-11-16.1';
 const PREVIOUS_REGISTRY_REVISION = 'nexg-booking-2026-11-09.1';
 const AUDITED_REVISION = 'nexg-booking-2026-10-31.1';
