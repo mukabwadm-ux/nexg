@@ -18,7 +18,7 @@ import { createClient } from '@/lib/supabase/client';
 
 import { RiderShell } from './rider-shell';
 import { useRiderOnboarding } from './store';
-import { VEHICLES, type RiderDraft, type Vehicle } from './types';
+import { OFFERED_VEHICLES, type RiderDraft, type Vehicle } from './types';
 
 const WORDING: EmailCodeWording = {
   exists:
@@ -115,7 +115,7 @@ export function RiderStartStep({
         });
         if (error || !riderId)
           throw new Error(error?.message ?? 'We could not save that. Try again.');
-        const vehicle = VEHICLES.find((v) => v.value === prefill.vehicle)?.value as
+        const vehicle = OFFERED_VEHICLES.find((v) => v.value === prefill.vehicle)?.value as
           | Vehicle
           | undefined;
         if (vehicle)

@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, ChipGroup, Input, PhoneInput, useToast } from '@nexg/ui';
-import { ArrowRight, Bike, Car, Truck } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
@@ -44,11 +44,9 @@ function MotorbikeIcon({ className }: { className?: string }) {
   );
 }
 
+/* Motorbikes only for now: bicycle, car and tuk-tuk deliveries are paused. */
 const VEHICLES = [
   { value: 'motorbike', label: 'Motorbike', icon: <MotorbikeIcon className="h-5 w-5" /> },
-  { value: 'bicycle', label: 'Bicycle', icon: <Bike className="h-5 w-5" /> },
-  { value: 'car', label: 'Car', icon: <Car className="h-5 w-5" /> },
-  { value: 'tuktuk', label: 'Tuk-tuk', icon: <Truck className="h-5 w-5" /> },
 ];
 
 /** For a rider whose city is not open yet; the apply flow captures them. */

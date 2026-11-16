@@ -80,6 +80,13 @@ export const VEHICLES: { value: Vehicle; label: string; blurb: string; icon: str
   { value: 'tuktuk', label: 'Tuk-tuk', blurb: 'bulk & laundry', icon: 'Truck' },
 ];
 
+/**
+ * What a new rider can sign up with today. Motorbikes only for now: bicycle,
+ * car and tuk-tuk deliveries are paused. The full list above stays so a
+ * draft or a rider saved with one of them still reads correctly.
+ */
+export const OFFERED_VEHICLES = VEHICLES.filter((v) => v.value === 'motorbike');
+
 export const SHIFTS: { value: string; label: string }[] = [
   { value: 'mornings', label: 'Mornings' },
   { value: 'afternoons', label: 'Afternoons' },

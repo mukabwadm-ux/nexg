@@ -11,7 +11,7 @@ import { createClient } from '@/lib/supabase/client';
 
 import { RiderShell } from './rider-shell';
 import { useRiderOnboarding } from './store';
-import { looksKenyan, VEHICLES, YEARS, type Vehicle } from './types';
+import { looksKenyan, OFFERED_VEHICLES, YEARS, type Vehicle } from './types';
 
 /**
  * Step 2 — the vehicle, and everything it implies.
@@ -75,7 +75,7 @@ export function RiderRideStep() {
       step={2}
       eyebrow="Your ride"
       title="What will you ride?"
-      intro="Your vehicle decides which documents we need. A bicycle needs none of the vehicle papers."
+      intro="NexG deliveries are by motorbike for now. Your bike and how it is insured decide which documents we need."
       footer={
         <>
           <Button variant="outline" size="lg" onClick={() => router.push('/riders/apply/start')}>
@@ -95,7 +95,7 @@ export function RiderRideStep() {
       }
     >
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {VEHICLES.map((v) => (
+        {OFFERED_VEHICLES.map((v) => (
           <VehicleTile
             key={v.value}
             vehicle={v.value}
@@ -314,7 +314,7 @@ export function RiderRideStep() {
                   ? ' with comprehensive insurance'
                   : ''}
             </strong>{' '}
-            we need {docs.length} documents. A bicycle rider needs 3.
+            we need {docs.length} documents.
           </DocumentsNote>
         </div>
       )}

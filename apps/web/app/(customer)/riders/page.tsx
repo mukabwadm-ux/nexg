@@ -82,7 +82,7 @@ const STEPS = [
 const REQUIREMENTS = [
   '18 years or older with a valid national ID',
   'A valid driving licence for your vehicle class',
-  'Your own motorbike, bicycle, car or tuk-tuk, insured and roadworthy',
+  'Your own motorbike, insured and roadworthy',
   'An Android or iPhone with data for the rider app',
   'A certificate of good conduct and an M-Pesa line in your name',
 ] as const;
@@ -100,7 +100,7 @@ const FAQ = [
   },
   {
     q: 'Do I need my own vehicle?',
-    a: 'Yes. You ride your own motorbike, bicycle, car or tuk-tuk, and it needs to be insured and roadworthy. We check the papers during onboarding.',
+    a: 'Yes. You ride your own motorbike, and it needs to be insured and roadworthy. We check the papers during onboarding.',
   },
   {
     q: 'Can I ride for other apps at the same time?',

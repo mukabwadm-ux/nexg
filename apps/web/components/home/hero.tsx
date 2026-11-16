@@ -11,7 +11,6 @@ import type { Locale } from '@/lib/i18n/dictionaries';
 import { Logo } from '../logo';
 import { HeroVideo } from './hero-video';
 import { SiteMenu } from '../site-menu';
-import { ThemeToggle } from '../theme/theme';
 
 /**
  * The homepage hero: "Everything You Need. Right Where You Are."
@@ -174,17 +173,15 @@ function HeroNav({
             </button>
           </div>
 
-          {/* On a phone: sign in, or your account once signed in (/account
-              sends a signed-out visitor to sign in and back). From sm up the
-              theme switch stays here, as on the other pages. */}
+          {/* Sign in, or your account once signed in: /account sends a
+              signed-out visitor to sign in and brings them back. */}
           <Link
             href="/account"
             aria-label="Sign in or open your account"
-            className={cn(round, 'text-gold sm:hidden')}
+            className={cn(round, 'text-gold')}
           >
-            <User className="h-4 w-4" aria-hidden="true" fill="currentColor" />
+            <User className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" fill="currentColor" />
           </Link>
-          <ThemeToggle className={cn(round, 'hidden sm:flex')} />
           <SiteMenu locale={locale}>
             <button type="button" aria-label="Open menu" className={round}>
               <Menu className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
