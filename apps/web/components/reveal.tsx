@@ -97,8 +97,14 @@ export function Reveal({
         });
       },
       /* A quarter of the section in view, above the bottom fifth of the
-         screen: it plays where the eye already is, not at the very edge. */
-      { threshold: 0.25, rootMargin: '0px 0px -20% 0px' },
+         screen: it plays where the eye already is, not at the very edge.
+         A section taller than about three screens (/categories' 21 cards)
+         can never show a quarter of itself at once, so it plays once it
+         fills half the screen instead; otherwise it would stay hidden. */
+      {
+        threshold: Math.min(0.25, (window.innerHeight * 0.5) / Math.max(box.height, 1)),
+        rootMargin: '0px 0px -20% 0px',
+      },
     );
     observer.observe(element);
     /* About a screen and a half away, the section's lazy photos start
