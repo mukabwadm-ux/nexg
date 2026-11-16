@@ -1,14 +1,11 @@
 import { z } from 'zod';
-import { MERCHANT_TAXONOMY } from './taxonomy';
+import { KNOWN_CATEGORY_IDS, KNOWN_SUBCATEGORY_CATEGORY } from './taxonomy';
 
 const text = (max: number) => z.string().trim().max(max);
 const phone = z.string().regex(/^$|^\+254[17]\d{8}$/);
-const specialtyParents = new Map(
-  MERCHANT_TAXONOMY.flatMap((category) =>
-    category.subcategories.map((specialty) => [specialty.id, category.id] as const),
-  ),
-);
-const categoryIds = new Set(MERCHANT_TAXONOMY.map((category) => category.id));
+/* Current and retired specialties: a stored application is history and must keep parsing. */
+const specialtyParents = KNOWN_SUBCATEGORY_CATEGORY;
+const categoryIds = KNOWN_CATEGORY_IDS;
 
 // Limits apply to retained inactive answers as well as the active selection.
 function safeAnswer(value: unknown, depth = 0): boolean {

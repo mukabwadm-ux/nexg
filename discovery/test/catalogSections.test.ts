@@ -163,7 +163,7 @@ const placeOf = (name: string) => catalogDepartments(grocer, [item(name)])
 // Every product store uses the retail storefront (owner, 9 Nov 2026), so every retail scheme groups its aisles into departments.
 const retailSchemes = ['groceries', 'tech', 'health', 'drinks', 'fashion', 'beauty', 'gifts', 'home', 'adults'];
 /** Beauty's departments cover its products only: its service sections stay out. */
-const serviceOnly: Record<string, string[]> = { beauty: ['hair-services', 'nails-lashes', 'massages', 'facials', 'body', 'spa-days', 'memberships', 'training'] };
+const serviceOnly: Record<string, string[]> = { beauty: ['hair-services', 'nails-lashes', 'massages', 'facials', 'body', 'spa-days', 'memberships', 'training', 'therapy'] };
 type SchemeEntry = { id: string; sections: { id: string }[]; departments?: { id: string; icon: string; keywords: string[]; sections: string[] }[] };
 
 test('every retail scheme: each aisle sits in exactly one department, with an icon the storefront draws', () => {

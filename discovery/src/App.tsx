@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { findCategory } from './data/taxonomy';
+import { isServiceExperience } from './data/experiencePresentation';
 import type { DiscoveryQuery } from './providers/DiscoveryProvider';
 import { createDiscoveryProvider } from './providers/providerFactory';
 import { lazyEngineProvider } from './providers/lazyEngineProvider';
@@ -88,7 +89,7 @@ export default function App() {
   };
 
   return <div className={`discovery-app${category?.id === 'travel-tours' ? ' discovery-app--tours' : ''}`}>
-    <DiscoveryHeader tourSearch={category?.id === 'travel-tours'} experienceSearch={category?.id === 'experiences' && route.subcategoryId !== 'experiences:photography'} search={search} area={route.area} areas={areas.value ?? []} areasUnavailable={areas.loading || areas.error} onSearchChange={setSearch} onSearch={() => navigate({ ...applyQueryChange(route, { search: search.trim() || undefined }), view: 'results', merchantId: undefined, itemId: undefined, operatorSearch: undefined, operatorOffset: undefined })} onAreaChange={(area) => navigate({ ...applyQueryChange(route, { area }) })}
+    <DiscoveryHeader tourSearch={category?.id === 'travel-tours'} experienceSearch={category?.id === 'experiences' && !isServiceExperience(route.subcategoryId)} search={search} area={route.area} areas={areas.value ?? []} areasUnavailable={areas.loading || areas.error} onSearchChange={setSearch} onSearch={() => navigate({ ...applyQueryChange(route, { search: search.trim() || undefined }), view: 'results', merchantId: undefined, itemId: undefined, operatorSearch: undefined, operatorOffset: undefined })} onAreaChange={(area) => navigate({ ...applyQueryChange(route, { area }) })}
       suggest={provider.getSuggestions ? (text, signal) => provider.getSuggestions!(text, signal) : undefined}
       onSuggestion={(choice) => choice.kind === 'category' ? navigate({ categoryId: choice.categoryId, area: route.area })
         : choice.kind === 'subcategory' ? navigate({ categoryId: choice.categoryId, subcategoryId: choice.subcategoryId, area: route.area, view: 'results' })

@@ -241,7 +241,8 @@ export function merchantQuery(params: Record<string, unknown>): MerchantQuery {
  * Derrick NexG's category_config spells ten subcategory keys differently from the demo seed (checked against its
  * migrations on 8 Nov 2026; labels identical). Merchants onboarded through the merchant portal use the config
  * spelling, so both spellings select the same reviewed map row. Key: the seed's pair.
- * Keep equal to SUBCATEGORY_KEY_ALIASES in the website's src/providers/supabaseProvider.ts.
+ * Since NexG's master category list (16 Nov 2026) the reviewed map carries the master keys only, so none of these
+ * applies to it any more (each is skipped as stale); they stay for a map built before then.
  */
 export const PORTAL_SUBCATEGORY_SPELLINGS: Readonly<Record<string, string>> = {
   'airport_transfers/airport_drop-off': 'airport_dropoff',

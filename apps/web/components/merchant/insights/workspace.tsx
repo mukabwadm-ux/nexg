@@ -1,5 +1,6 @@
 'use client';
 
+import { isListedSubcategory } from '@nexg/booking-config/profiles';
 import { DetailPanel, DetailRow as PrimitiveDetailRow, type ColumnDef } from '@nexg/ui';
 import {
   ArrowLeft,
@@ -2106,10 +2107,20 @@ export function InsightsWorkspace({
                 value={snapshot.subcategoryId}
                 onChange={(event) => changeProfile(event.target.value)}
               >
-                {[...new Set(profiles.map((profile) => profile.categoryName))].map((category) => (
+                {[
+                  ...new Set(
+                    profiles
+                      .filter((profile) => isListedSubcategory(profile.subcategoryId))
+                      .map((profile) => profile.categoryName),
+                  ),
+                ].map((category) => (
                   <optgroup key={category} label={category}>
                     {profiles
-                      .filter((profile) => profile.categoryName === category)
+                      .filter(
+                        (profile) =>
+                          profile.categoryName === category &&
+                          isListedSubcategory(profile.subcategoryId),
+                      )
                       .map((profile) => (
                         <option key={profile.subcategoryId} value={profile.subcategoryId}>
                           {profile.name}

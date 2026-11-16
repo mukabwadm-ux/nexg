@@ -1,3 +1,4 @@
+import { CATEGORY_KEY_NAMES } from '@nexg/contracts';
 import { Card } from '@nexg/ui';
 import * as React from 'react';
 
@@ -153,17 +154,11 @@ export function EmptyRow({ colSpan, children }: { colSpan: number; children: Rea
   );
 }
 
-export const CATEGORY_LABEL: Record<string, string> = {
-  restaurant: 'Food',
-  bar_liquor: 'Drinks',
-  laundry: 'Laundry',
-  florist: 'Gifts',
-  beauty_fashion: 'Beauty',
-  pharmacy: 'Pharmacy',
-  supermarket: 'Retail',
-  gift_shop: 'Gifts',
-  other: 'Other',
-};
+/**
+ * A merchant category key (current, legacy enum value or retired category)
+ * → its current name, as the master list of 16 Nov 2026 has it.
+ */
+export const CATEGORY_LABEL: Record<string, string> = { ...CATEGORY_KEY_NAMES, other: 'Other' };
 
 export interface DirectoryRow {
   id: string;

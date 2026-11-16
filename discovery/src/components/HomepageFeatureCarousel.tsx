@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type FocusEvent, type TransitionEvent } from 'react';
-import { Binoculars, CarFront, ChevronLeft, ChevronRight, ConciergeBell, Flower2, Pause, Pill, Plane, Play, Shirt, ShoppingBasket, Smartphone,
-  Sparkles, Store, Ticket, Trophy, UtensilsCrossed, WashingMachine, Wine, type LucideIcon } from 'lucide-react';
+import { Binoculars, CarFront, ChevronLeft, ChevronRight, ConciergeBell, Crown, Flower2, Package, Pause, Pill, Plane, Play, Shirt, ShoppingBasket, Smartphone,
+  Sparkles, Store, Ticket, Trophy, Truck, UtensilsCrossed, WashingMachine, Wine, type LucideIcon } from 'lucide-react';
 import { homepageFeatures } from '../data/homepageFeatures';
 import './homepage.css';
 
@@ -16,21 +16,25 @@ function displayCategoryLabel(label: string) {
 
 const iconByCategory: Record<string, LucideIcon> = {
   'restaurants-food': UtensilsCrossed,
+  'alcohol-beverages': Wine,
+  pharmacy: Pill,
+  'laundry-cleaning': WashingMachine,
+  'airport-transfers': Plane,
+  'travel-tours': Binoculars,
+  experiences: Ticket,
+  'games-sports': Trophy,
+  beauty: Sparkles,
+  wellness: Flower2,
+  'concierge-services': ConciergeBell,
+  'movers-relocation': Truck,
+  'premium-services': Crown,
+  'vehicle-rentals': CarFront,
+  'fashion-apparel': Shirt,
   'groceries-essentials': ShoppingBasket,
   marketplace: Store,
-  'health-pharmacy': Pill,
-  'beauty-wellness': Sparkles,
-  'fashion-apparel': Shirt,
   'tech-electronics': Smartphone,
-  'vehicle-rentals': CarFront,
-  'airport-transfers': Plane,
   'flowers-gifts': Flower2,
-  experiences: Ticket,
-  play: Trophy,
-  'laundry-cleaning': WashingMachine,
-  'concierge-services': ConciergeBell,
-  'travel-tours': Binoculars,
-  'alcohol-beverages': Wine,
+  'courier-services': Package,
 };
 
 function initialCardCount() {

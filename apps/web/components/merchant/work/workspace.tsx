@@ -1,5 +1,6 @@
 'use client';
 
+import { isListedSubcategory } from '@nexg/booking-config/profiles';
 import Link from 'next/link';
 import { listBookingProfiles } from '@nexg/booking-config/profiles';
 import { TableViewport } from '@nexg/ui/table-viewport';
@@ -258,19 +259,27 @@ export function WorkWorkspace({
                         onChange={(event) => changeProfile(event.target.value)}
                         className="mt-1 block w-full rounded-md border border-[#d8dce1] bg-white px-3 py-2 text-sm text-[#14243a]"
                       >
-                        {[...new Set(availableProfiles.map((p) => p.categoryName))].map(
-                          (category) => (
-                            <optgroup key={category} label={category}>
-                              {availableProfiles
-                                .filter((p) => p.categoryName === category)
-                                .map((p) => (
-                                  <option key={p.subcategoryId} value={p.subcategoryId}>
-                                    {p.name.replace('CafÃƒÂ©', 'Café')}
-                                  </option>
-                                ))}
-                            </optgroup>
+                        {[
+                          ...new Set(
+                            availableProfiles
+                              .filter((p) => isListedSubcategory(p.subcategoryId))
+                              .map((p) => p.categoryName),
                           ),
-                        )}
+                        ].map((category) => (
+                          <optgroup key={category} label={category}>
+                            {availableProfiles
+                              .filter(
+                                (p) =>
+                                  p.categoryName === category &&
+                                  isListedSubcategory(p.subcategoryId),
+                              )
+                              .map((p) => (
+                                <option key={p.subcategoryId} value={p.subcategoryId}>
+                                  {p.name.replace('CafÃƒÂ©', 'Café')}
+                                </option>
+                              ))}
+                          </optgroup>
+                        ))}
                       </select>
                     </label>
                     <label className="text-xs font-semibold text-[#526071]">

@@ -1,11 +1,12 @@
 import { evaluatePredicate } from './predicates';
 import { questions, registry, validateSchema } from './registry';
 import type { BookingModel, JSONSchema, ProfileDefinition, QuestionDefinition } from './types';
+import { LISTED_CATEGORIES, subcategoryGroup } from './variants';
 
 export type OnboardingCategory = {
   id: string;
   name: string;
-  subcategories: { id: string; name: string }[];
+  subcategories: { id: string; name: string; group?: string }[];
 };
 export type OnboardingProfile = {
   categoryId: string;
@@ -44,18 +45,21 @@ export type OnboardingAssessment = {
 
 const profiles = new Map(registry.profiles.map((profile) => [profile.subcategoryId, profile]));
 
-/** The compiled merchant registry owns category names and subcategory membership. */
+/**
+ * The categories and subcategories a merchant can choose, in NexG's order
+ * (see variants.ts). Retired subcategories stay valid but are not listed.
+ */
 export function listOnboardingCategories(): OnboardingCategory[] {
-  const categories = new Map<string, OnboardingCategory>();
-  for (const profile of registry.profiles) {
-    let category = categories.get(profile.categoryId);
-    if (!category) {
-      category = { id: profile.categoryId, name: profile.categoryName, subcategories: [] };
-      categories.set(category.id, category);
-    }
-    category.subcategories.push({ id: profile.subcategoryId, name: profile.name });
-  }
-  return [...categories.values()];
+  return LISTED_CATEGORIES.map((category) => ({
+    id: category.id,
+    name: category.name,
+    subcategories: category.subcategoryIds.map((id) => {
+      const profile = profiles.get(id);
+      if (!profile) throw new Error(`Listed subcategory ${id} has no booking profile.`);
+      const group = subcategoryGroup(id);
+      return { id, name: profile.name, ...(group ? { group } : {}) };
+    }),
+  }));
 }
 
 export function resolveOnboardingSelection(

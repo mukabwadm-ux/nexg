@@ -2277,7 +2277,8 @@
     {
       "id": "beauty",
       "categories": [
-        "beauty-wellness"
+        "beauty",
+        "wellness"
       ],
       "allTitle": "All services and products",
       "departments": [
@@ -2623,6 +2624,20 @@
             "weight-loss",
             "athlete*",
             "class*"
+          ]
+        },
+        {
+          "id": "therapy",
+          "title": "Therapy & support",
+          "keywords": [
+            "therap*",
+            "counsel*",
+            "anxiety",
+            "stress",
+            "grief",
+            "burnout",
+            "support",
+            "relationship*"
           ]
         }
       ]
@@ -3002,7 +3017,7 @@
     {
       "id": "play",
       "categories": [
-        "play"
+        "games-sports"
       ],
       "allTitle": "All activities",
       "sections": [
@@ -3795,7 +3810,7 @@
     {
       "id": "health",
       "categories": [
-        "health-pharmacy"
+        "pharmacy"
       ],
       "allTitle": "All products and services",
       "departments": [
@@ -4908,9 +4923,8 @@
     },
     {
       "id": "flights",
-      "categories": [
-        "flights"
-      ],
+      "history": "Retired 16 Nov 2026: the master category list has no Flights category (charters are Premium Services, which uses the concierge scheme). Kept so its published section ids are never reused.",
+      "categories": [],
       "allTitle": "All flights",
       "sections": [
         {
@@ -4966,7 +4980,9 @@
     {
       "id": "concierge",
       "categories": [
-        "concierge-services"
+        "concierge-services",
+        "movers-relocation",
+        "premium-services"
       ],
       "allTitle": "All requests",
       "sections": [
@@ -5083,6 +5099,93 @@
             "assistant*",
             "appointment*",
             "guest*"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "courier",
+      "categories": [
+        "courier-services"
+      ],
+      "allTitle": "All services",
+      "sections": [
+        {
+          "id": "customs",
+          "title": "Customs & paperwork",
+          "priority": 1,
+          "keywords": [
+            "customs*",
+            "import*",
+            "export*",
+            "clearance*",
+            "coordination*"
+          ]
+        },
+        {
+          "id": "insurance",
+          "title": "Insurance & special handling",
+          "priority": 2,
+          "keywords": [
+            "insurance*",
+            "fragile*",
+            "temperature*",
+            "refrigerated*",
+            "packaging*"
+          ]
+        },
+        {
+          "id": "storage",
+          "title": "Storage",
+          "keywords": [
+            "storage*",
+            "warehouse*",
+            "fulfilment*",
+            "pallet*",
+            "inventory*"
+          ]
+        },
+        {
+          "id": "parcels",
+          "title": "Parcels & documents",
+          "keywords": [
+            "parcel*",
+            "package*",
+            "envelope*",
+            "document*",
+            "letter*",
+            "delivery*",
+            "deliveries"
+          ]
+        },
+        {
+          "id": "express",
+          "title": "Same-day & express",
+          "keywords": [
+            "same-day",
+            "same day",
+            "express*",
+            "priority*",
+            "urgent*",
+            "last-mile*"
+          ]
+        },
+        {
+          "id": "freight",
+          "title": "Freight & cargo",
+          "keywords": [
+            "freight*",
+            "cargo*",
+            "container*",
+            "fcl",
+            "lcl",
+            "shipment*",
+            "truck*",
+            "flatbed*",
+            "fleet*",
+            "intercity*",
+            "door-to-door",
+            "door*"
           ]
         }
       ]
@@ -5377,37 +5480,100 @@
       "laundry-cleaning": {
         "list": "Services"
       },
-      "play": {
-        "list": "Activities",
-        "item": "activity",
-        "items": "activities",
-        "demand": "Most booked"
-      },
-      "flights": {
-        "list": "Flights",
-        "item": "flight",
-        "items": "flights",
-        "demand": "Most booked"
+      "courier-services": {
+        "list": "Services",
+        "item": "service",
+        "items": "services",
+        "demand": "Most requested"
       }
     },
     "bySubcategory": {
-      "beauty-wellness:spa": {
+      "wellness:sauna": {
         "list": "Treatments",
         "item": "treatment",
         "items": "treatments"
       },
-      "beauty-wellness:massage": {
+      "wellness:steam-baths": {
         "list": "Treatments",
         "item": "treatment",
         "items": "treatments"
       },
-      "beauty-wellness:gym": {
+      "wellness:jacuzzi": {
+        "list": "Treatments",
+        "item": "treatment",
+        "items": "treatments"
+      },
+      "wellness:hydrotherapy": {
+        "list": "Treatments",
+        "item": "treatment",
+        "items": "treatments"
+      },
+      "wellness:cold-plunge": {
+        "list": "Treatments",
+        "item": "treatment",
+        "items": "treatments"
+      },
+      "wellness:swedish-massage": {
+        "list": "Treatments",
+        "item": "treatment",
+        "items": "treatments"
+      },
+      "wellness:deep-tissue-massage": {
+        "list": "Treatments",
+        "item": "treatment",
+        "items": "treatments"
+      },
+      "wellness:aromatherapy": {
+        "list": "Treatments",
+        "item": "treatment",
+        "items": "treatments"
+      },
+      "wellness:hot-stone-massage": {
+        "list": "Treatments",
+        "item": "treatment",
+        "items": "treatments"
+      },
+      "wellness:couples-massage": {
+        "list": "Treatments",
+        "item": "treatment",
+        "items": "treatments"
+      },
+      "wellness:reflexology": {
+        "list": "Treatments",
+        "item": "treatment",
+        "items": "treatments"
+      },
+      "wellness:gym": {
         "list": "Memberships & classes",
         "item": "option",
         "items": "options",
         "demand": "Most chosen"
       },
-      "beauty-wellness:personal-training": {
+      "wellness:cardio": {
+        "list": "Memberships & classes",
+        "item": "option",
+        "items": "options",
+        "demand": "Most chosen"
+      },
+      "wellness:group-fitness": {
+        "list": "Memberships & classes",
+        "item": "option",
+        "items": "options",
+        "demand": "Most chosen"
+      },
+      "wellness:personal-training": {
+        "list": "Training",
+        "item": "programme",
+        "items": "programmes",
+        "demand": "Most chosen"
+      },
+      "wellness:strength-training": {
+        "list": "Training",
+        "item": "programme",
+        "items": "programmes",
+        "demand": "Most chosen"
+      },
+      "wellness:sports-coaching": {
         "list": "Training",
         "item": "programme",
         "items": "programmes",
@@ -5419,40 +5585,16 @@
         "items": "packages",
         "demand": "Most requested"
       },
-      "vehicle-rentals:vehicle-repair": {
+      "vehicle-rentals:vehicle-detailing": {
         "list": "Services",
         "item": "service",
         "items": "services",
         "demand": "Most booked"
       },
-      "vehicle-rentals:car-wash": {
-        "list": "Services",
-        "item": "service",
-        "items": "services",
-        "demand": "Most booked"
-      },
-      "tech-electronics:device-repairs": {
+      "tech-electronics:electronics-repairs": {
         "list": "Repairs",
         "item": "repair",
         "items": "repairs",
-        "demand": "Most booked"
-      },
-      "tech-electronics:telecom-services": {
-        "list": "Plans & services",
-        "item": "plan",
-        "items": "plans",
-        "demand": "Most chosen"
-      },
-      "health-pharmacy:mobile-diagnostic-services": {
-        "list": "Tests",
-        "item": "test",
-        "items": "tests",
-        "demand": "Most booked"
-      },
-      "experiences:photography": {
-        "list": "Shoots",
-        "item": "shoot",
-        "items": "shoots",
         "demand": "Most booked"
       }
     }

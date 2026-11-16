@@ -48,7 +48,7 @@ export function TourDetail({ merchantId, itemId, provider, onBack, onOperator, o
   const others = merchant && item ? merchant.items.filter((entry) => entry.id !== item.id && entry.merchantId === merchant.id).slice(0, 4) : [];
 
   return <section className="trip-page" aria-busy={catalog.loading} style={{ '--trip-sticky-top': `${headerHeight}px` } as CSSProperties}>
-    <button type="button" className="back-button trip-page__back" onClick={onBack}><ArrowLeft size={18} aria-hidden="true" />Back to Safaris & Tours</button>
+    <button type="button" className="back-button trip-page__back" onClick={onBack}><ArrowLeft size={18} aria-hidden="true" />Back to Travels & Tours</button>
     {catalog.loading || catalog.error ? <CatalogState loading={catalog.loading} error={catalog.error} failure={catalog.failure} retry={catalog.retry} /> : !merchant || !item ? <div className="empty-state" role="status">
       <h1>Trip not found</h1><p>This link does not identify a trip in the operator's current catalog.</p>
       {merchant && <button type="button" className="button" onClick={() => onOperator(merchant.id)}>View {merchant.name} storefront</button>}

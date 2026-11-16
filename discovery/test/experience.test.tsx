@@ -25,12 +25,12 @@ test('event facts show only what the listing says, and the host base is never th
   const facts = experienceFacts(ticket, host);
   assert.deepEqual(facts.map((fact) => fact.key), ['event', 'base', 'price']);
   assert.deepEqual(facts.map((fact) => fact.label), ['Event type', 'Host based in', 'Price']);
-  assert.equal(facts[0]!.value, 'Concerts');
+  assert.equal(facts[0]!.value, 'Concerts & Festivals');
   assert.match(facts[2]!.value, /^From KES\s18,500$/);
   const html = renderToStaticMarkup(<TripFacts facts={facts} label="Experience facts" />);
   assert.match(html, /aria-label="Experience facts"/);
   assert.doesNotMatch(html, /not provided/i);
-  assert.deepEqual(experienceFacts({ ...ticket, price: undefined }, { ...host, area: undefined }).map((fact) => fact.value), ['Concerts', 'Price on request']);
+  assert.deepEqual(experienceFacts({ ...ticket, price: undefined }, { ...host, area: undefined }).map((fact) => fact.value), ['Concerts & Festivals', 'Price on request']);
 });
 
 test('events count tickets; classes and activities count guests', () => {

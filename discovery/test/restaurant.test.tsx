@@ -48,7 +48,7 @@ test('the restaurant storefront: the shared hero with confirmed facts, then the 
   const html = render();
   assert.match(html, /class="store-hero"/);
   assert.match(html, /Back<\/button>/);
-  assert.match(html, /class="store-hero__eyebrow">Restaurant</);
+  assert.match(html, /class="store-hero__eyebrow">Fast Food &amp; Casual Dining</);
   assert.match(html, /Kilimani/);
   assert.match(html, /4 dishes/);
   assert.doesNotMatch(html, /Open now|Closed now/);

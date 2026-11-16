@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent
 import { createPortal } from 'react-dom';
 import { Check, ChevronDown, SlidersHorizontal, X } from 'lucide-react';
 import { categories, findCategory, findSubcategory } from '../data/taxonomy';
+import { isServiceExperience } from '../data/experiencePresentation';
 import type { DiscoveryProvider, DiscoveryQuery, DiscoverySort } from '../providers/DiscoveryProvider';
 import { useProviderRead } from '../hooks/useProviderRead';
 import { HorizontalFilterBar } from './HorizontalFilterBar';
@@ -9,7 +10,7 @@ import { ROOT_ID } from '../styleScope';
 
 /** The menus open inside Discovery's root rather than the page's body, so Discovery's styles (scoped to the root) reach them. */
 const menuHost = () => document.getElementById(ROOT_ID) ?? document.body;
-
+/** A category name as the tiles write it; the master list already uses "&" ("Food & Restaurant"). */
 /** "Restaurants & Food", as the category tiles write it. */
 const display = (label: string) => label.replace(/\s+and\s+/gi, ' & ');
 
@@ -166,13 +167,18 @@ export function DiscoveryFilterBar({ query, provider, onChange, scope = 'results
     closeMenu(true);
     onChange({ sort, offset: 0 });
   };
-  const renderSubcategories = (entry: (typeof categories)[number]) => entry.subcategories.map((child) => child.options.length ? <details key={child.id} className="category-menu__group" open={child.id === subcategory?.id}>
+  // The master list heads runs of subcategories in one category (Wellness: "Spa & Massage", "Salon Services"…); each run opens with its heading.
+  const groupHeading = (entry: (typeof categories)[number], index: number) => {
+    const group = entry.subcategories[index]?.group;
+    return group && group !== entry.subcategories[index - 1]?.group ? <span key={`group:${group}`} className="category-menu__group-heading" role="presentation">{group}</span> : null;
+  };
+  const renderSubcategories = (entry: (typeof categories)[number]) => entry.subcategories.flatMap((child, index) => [groupHeading(entry, index), child.options.length ? <details key={child.id} className="category-menu__group" open={child.id === subcategory?.id}>
     <summary>{child.label}<span className="category-menu__row-meta">{child.options.length} options</span><ChevronDown size={15} strokeWidth={1.75} aria-hidden="true" /></summary>
     <div className="category-menu__nested">
       <button type="button" className="category-menu__choice" aria-pressed={subcategory?.id === child.id && !option} onClick={() => select(entry.id, child.id)}>All {child.label}{subcategory?.id === child.id && !option && <Check size={16} strokeWidth={1.75} aria-hidden="true" />}</button>
       {child.options.map((nested) => <button type="button" key={nested.id} className="category-menu__choice category-menu__choice--nested" aria-pressed={option?.id === nested.id} onClick={() => select(entry.id, child.id, nested.id)}>{nested.label}{option?.id === nested.id && <Check size={16} strokeWidth={1.75} aria-hidden="true" />}</button>)}
     </div>
-  </details> : <button type="button" key={child.id} className="category-menu__choice" aria-pressed={subcategory?.id === child.id} onClick={() => select(entry.id, child.id)}>{child.label}{subcategory?.id === child.id && <Check size={16} strokeWidth={1.75} aria-hidden="true" />}</button>);
+  </details> : <button type="button" key={child.id} className="category-menu__choice" aria-pressed={subcategory?.id === child.id} onClick={() => select(entry.id, child.id)}>{child.label}{subcategory?.id === child.id && <Check size={16} strokeWidth={1.75} aria-hidden="true" />}</button>]);
   const openSheet = () => { setDraftArea(query.area ?? ''); setDraftSearch(query.search ?? ''); sheet.current?.showModal(); };
   const pageCategory = scope === 'category' ? query.categoryId : undefined;
   const hasClearableFilters = Boolean((query.categoryId && !pageCategory) || query.subcategoryId || query.optionId || query.area || query.search || query.openNow || (query.sort && query.sort !== 'recommended'));
@@ -226,6 +232,6 @@ export function DiscoveryFilterBar({ query, provider, onChange, scope = 'results
         <div className="category-menu__list" role="listbox" aria-label="Sort options">{sortOptions.map((entry) => <button type="button" key={entry.value} role="option" aria-selected={selectedSort.value === entry.value} disabled={entry.disabled} className={`category-menu__sort-choice${selectedSort.value === entry.value ? ' category-menu__sort-choice--selected' : ''}`} onClick={() => { if (!entry.disabled) selectSort(entry.value as DiscoverySort); }}><span className="category-menu__sort-copy"><strong>{entry.label}</strong>{entry.detail && <small>{entry.detail}</small>}</span>{selectedSort.value === entry.value && <Check size={17} strokeWidth={1.75} aria-hidden="true" />}</button>)}</div>
       </div>
     </div>, menuHost())}
-    <dialog ref={sheet} className="filter-dialog" aria-labelledby="filter-dialog-title"><div className="dialog-heading"><h2 id="filter-dialog-title">All filters</h2><div className="dialog-heading__actions"><button type="button" className="text-button" disabled={!hasClearableFilters} onClick={clearAll}>Clear all</button><button type="button" className="icon-button" aria-label="Close filters" onClick={() => sheet.current?.close()}><X size={20} strokeWidth={1.75} aria-hidden="true" /></button></div></div><form onSubmit={(event) => { event.preventDefault(); sheet.current?.close(); onChange({ area: draftArea || undefined, search: draftSearch || undefined, offset: 0 }); }}><label>Search<input value={draftSearch} onChange={(event) => setDraftSearch(event.target.value)} placeholder={operatorContext ? 'Trip or operator' : experienceContext && subcategory?.id !== 'experiences:photography' ? 'Experience or host' : 'Merchant or category'} /></label><label>Area<select value={draftArea} disabled={areas.loading || areas.error} onChange={(event) => setDraftArea(event.target.value)}><option value="">All areas</option>{draftArea && !areas.value?.includes(draftArea) && <option value={draftArea}>{draftArea}</option>}{areas.value?.map((area) => <option key={area} value={area}>{area}</option>)}</select></label>{areas.error && <p className="status-message">Areas couldn’t load just now. You can still search.</p>}<button type="submit" className="button button--primary">Apply filters</button></form></dialog>
+    <dialog ref={sheet} className="filter-dialog" aria-labelledby="filter-dialog-title"><div className="dialog-heading"><h2 id="filter-dialog-title">All filters</h2><div className="dialog-heading__actions"><button type="button" className="text-button" disabled={!hasClearableFilters} onClick={clearAll}>Clear all</button><button type="button" className="icon-button" aria-label="Close filters" onClick={() => sheet.current?.close()}><X size={20} strokeWidth={1.75} aria-hidden="true" /></button></div></div><form onSubmit={(event) => { event.preventDefault(); sheet.current?.close(); onChange({ area: draftArea || undefined, search: draftSearch || undefined, offset: 0 }); }}><label>Search<input value={draftSearch} onChange={(event) => setDraftSearch(event.target.value)} placeholder={operatorContext ? 'Trip or operator' : experienceContext && !isServiceExperience(subcategory?.id) ? 'Experience or host' : 'Merchant or category'} /></label><label>Area<select value={draftArea} disabled={areas.loading || areas.error} onChange={(event) => setDraftArea(event.target.value)}><option value="">All areas</option>{draftArea && !areas.value?.includes(draftArea) && <option value={draftArea}>{draftArea}</option>}{areas.value?.map((area) => <option key={area} value={area}>{area}</option>)}</select></label>{areas.error && <p className="status-message">Areas couldn’t load just now. You can still search.</p>}<button type="submit" className="button button--primary">Apply filters</button></form></dialog>
   </>;
 }

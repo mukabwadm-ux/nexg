@@ -34,6 +34,8 @@ export interface ExplorerCategory {
   subcategories: {
     id: string;
     name: string;
+    /** The heading it sits under (Wellness: "Spa & Massage"). */
+    group?: string;
     fields?: string[];
     fulfillmentHint?: string;
   }[];
@@ -58,8 +60,13 @@ const has = (text: string | undefined, query: string) =>
 
 const subcategoryMatches = (sub: Subcategory, query: string) =>
   has(sub.name, query) ||
+  has(sub.group, query) ||
   Boolean(sub.fields?.some((field) => has(field, query))) ||
   has(sub.fulfillmentHint, query);
+
+/* A type under a heading reads "Spa & Massage · Swedish" where it stands alone. */
+const label = (sub: Subcategory, withGroup: boolean) =>
+  withGroup && sub.group ? `${sub.group} · ${sub.name}` : sub.name;
 
 const categoryMatches = (category: ExplorerCategory, query: string) =>
   has(category.name, query) ||
@@ -302,15 +309,25 @@ function CategoryCard({
   const subs = category.subcategories;
   const hits = term ? subs.filter((sub) => subcategoryMatches(sub, term)) : [];
   const ordered = hits.length ? [...hits, ...subs.filter((sub) => !hits.includes(sub))] : subs;
-  const shown = ordered.slice(0, wide ? 7 : 3);
-  const more = subs.length - shown.length;
+  /* Wellness lists 45 types under 9 headings: unmatched types show as their
+     heading, once; a matched type shows under its heading. */
+  const seen = new Set<string>();
+  const chips = ordered.flatMap((sub) => {
+    const hit = hits.includes(sub);
+    if (hit || !sub.group) return [{ key: sub.id, label: label(sub, hit), hit }];
+    if (seen.has(sub.group)) return [];
+    seen.add(sub.group);
+    return [{ key: `group:${sub.group}`, label: sub.group, hit: false }];
+  });
+  const shown = chips.slice(0, wide ? 7 : 3);
+  const more = chips.length - shown.length;
   const count = `${subs.length} ${subs.length === 1 ? 'type' : 'types'}`;
   /* Under the chips' breakpoint the gold line names the first few types. */
   const meta = hits.length
-    ? `Matches ${hits.map((sub) => sub.name).join(', ')}`
-    : subs
+    ? `Matches ${hits.map((sub) => label(sub, true)).join(', ')}`
+    : chips
         .slice(0, 3)
-        .map((sub) => sub.name)
+        .map((chip) => chip.label)
         .join(' · ');
 
   return (
@@ -385,14 +402,14 @@ function CategoryCard({
             <span className="mt-4 hidden flex-wrap gap-1.5 lg:flex">
               {shown.map((sub) => (
                 <span
-                  key={sub.id}
+                  key={sub.key}
                   className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                    hits.includes(sub)
+                    sub.hit
                       ? 'bg-gold text-ink'
                       : 'border border-white/15 bg-white/10 text-white/85 backdrop-blur'
                   }`}
                 >
-                  {sub.name}
+                  {sub.label}
                 </span>
               ))}
               {more > 0 && (

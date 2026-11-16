@@ -7,36 +7,45 @@
 export const DISCOVER_PATH = '/discover';
 
 /**
- * Supabase category keys (and the original enum values still on older merchants) to Discovery's
- * category ids. `discover-links.test.ts` checks this against Discovery's reviewed subcategory map.
+ * Supabase category keys to Discovery's category ids: the 21 categories of the master list (owner, 16 Nov 2026),
+ * the keys it retired (where their merchants moved), and the original merchant_category enum values.
+ * `discover-links.test.ts` checks this against Discovery's reviewed subcategory map.
  */
 export const DISCOVERY_CATEGORY: Record<string, string> = {
-  activities_games_sports: 'play',
-  adults_only: 'adults-only',
-  airport_transfers: 'airport-transfers',
-  alcohol_beverages: 'alcohol-beverages',
-  beauty: 'beauty-wellness',
-  concierge_services: 'concierge-services',
-  experiences: 'experiences',
-  fashion_apparel: 'fashion-apparel',
-  flowers_gifts: 'flowers-gifts',
-  groceries_essentials: 'groceries-essentials',
-  health: 'health-pharmacy',
-  laundry_cleaning: 'laundry-cleaning',
-  marketplace: 'marketplace',
-  pharmacy: 'health-pharmacy',
   restaurants_food: 'restaurants-food',
-  tech_electronics: 'tech-electronics',
+  alcohol_beverages: 'alcohol-beverages',
+  pharmacy: 'pharmacy',
+  laundry_cleaning: 'laundry-cleaning',
+  airport_transfers: 'airport-transfers',
   travel_tours: 'travel-tours',
+  experiences: 'experiences',
+  adults_only: 'adults-only',
+  games_sports: 'games-sports',
+  beauty: 'beauty',
+  wellness: 'wellness',
+  concierge_services: 'concierge-services',
+  movers_relocation: 'movers-relocation',
+  premium_services: 'premium-services',
   vehicle_rentals: 'vehicle-rentals',
+  fashion_apparel: 'fashion-apparel',
+  groceries_essentials: 'groceries-essentials',
+  marketplace: 'marketplace',
+  tech_electronics: 'tech-electronics',
+  flowers_gifts: 'flowers-gifts',
+  logistics_shipping: 'courier-services',
+  // Retired by the master list (its retiredCategories): where their merchants moved.
+  health: 'pharmacy',
+  financial_services: 'concierge-services',
   vehicle_services: 'vehicle-rentals',
-  wellness: 'beauty-wellness',
+  flights: 'travel-tours',
+  other: 'marketplace',
+  activities_games_sports: 'games-sports',
   // Original merchant_category enum values.
   restaurant: 'restaurants-food',
   bar_liquor: 'alcohol-beverages',
   laundry: 'laundry-cleaning',
   florist: 'flowers-gifts',
-  beauty_fashion: 'beauty-wellness',
+  beauty_fashion: 'beauty',
   supermarket: 'groceries-essentials',
   gift_shop: 'flowers-gifts',
 };

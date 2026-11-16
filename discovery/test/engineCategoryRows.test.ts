@@ -17,7 +17,7 @@ function provider(stock: Record<string, string[]>, options: { definitions?: bool
   const requested: { subcategoryId?: string; limit: number }[] = [];
   const context: EngineSchemas['ReleaseContext'] = { contractVersion: '1', discoveryReleaseId: 'release-control', versions,
     collections: options.definitions === false ? [] : [{ id: 'collection-control', categoryId: 'restaurants-food', title: 'Browse restaurants' },
-      { id: 'collection-control-2', categoryId: 'beauty-wellness', title: 'Browse beauty' }] };
+      { id: 'collection-control-2', categoryId: 'beauty', title: 'Browse beauty' }] };
   const fetcher: BrowserFetch = async (input, init) => {
     const path = String(input);
     if (path.endsWith('/release')) return json(context);
@@ -53,18 +53,18 @@ test('engine category pages show one row per subcategory when the release publis
 });
 
 test('other categories keep to four rows, and a release with no definitions still gets rows', async () => {
-  const stock = Object.fromEntries(subcategories('beauty-wellness').map((id, index) => [id, ids(`beauty-${index}`, 3)]));
-  const result = await provider(stock).engine.getCollections('beauty-wellness');
-  assert.deepEqual(result.collections.map(row => row.subcategoryId), subcategories('beauty-wellness').slice(0, 4));
-  const bare = await provider(stock, { definitions: false }).engine.getCollections('beauty-wellness');
+  const stock = Object.fromEntries(subcategories('beauty').map((id, index) => [id, ids(`beauty-${index}`, 3)]));
+  const result = await provider(stock).engine.getCollections('beauty');
+  assert.deepEqual(result.collections.map(row => row.subcategoryId), subcategories('beauty').slice(0, 4));
+  const bare = await provider(stock, { definitions: false }).engine.getCollections('beauty');
   assert.equal(bare.collections.length, 4);
 });
 
 test('a row that cannot load is left out and marked partial; when every row fails the page shows the error', async () => {
-  const all = subcategories('beauty-wellness');
+  const all = subcategories('beauty');
   const stock = Object.fromEntries(all.map((id, index) => [id, ids(`beauty-${index}`, 3)]));
-  const partial = await provider(stock, { failing: [all[0]!] }).engine.getCollections('beauty-wellness');
+  const partial = await provider(stock, { failing: [all[0]!] }).engine.getCollections('beauty');
   assert.deepEqual(partial.collections.map(row => row.subcategoryId), all.slice(1, 5));
   assert.equal(partial.partial, true); assert.deepEqual(partial.reasonCodes, ['SUBCATEGORY_ROW_UNAVAILABLE']);
-  await assert.rejects(provider(stock, { failing: all }).engine.getCollections('beauty-wellness'));
+  await assert.rejects(provider(stock, { failing: all }).engine.getCollections('beauty'));
 });

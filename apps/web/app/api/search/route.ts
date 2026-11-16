@@ -59,15 +59,26 @@ const DESTINATION_SERVICES: {
 ];
 
 const CATEGORY_SEARCH_TERMS: Record<string, string[]> = {
-  restaurants_food: ['food', 'restaurant', 'eat', 'dinner', 'lunch', 'breakfast', 'meal'],
-  alcohol_beverages: ['drink', 'bar', 'liquor', 'wine', 'beer', 'alcohol'],
+  restaurants_food: ['food', 'restaurant', 'eat', 'dinner', 'lunch', 'breakfast', 'meal', 'chef'],
+  alcohol_beverages: ['drink', 'bar', 'liquor', 'wine', 'beer', 'alcohol', 'juice', 'water'],
+  pharmacy: ['pharmacy', 'chemist', 'medicine', 'pharmaceutical', 'drugs', 'health'],
   laundry_cleaning: ['laundry', 'dry clean', 'washing', 'ironing'],
-  flowers_gifts: ['flower', 'florist', 'bouquet', 'roses', 'gift', 'present', 'souvenir'],
-  beauty: ['massage', 'spa', 'salon', 'beauty', 'hair', 'nails', 'barber'],
-  fashion_apparel: ['fashion', 'clothing', 'clothes', 'boutique'],
-  pharmacy: ['pharmacy', 'chemist', 'medicine', 'pharmaceutical', 'drugs'],
-  health: ['pharmacy', 'chemist', 'medicine', 'health'],
-  groceries_essentials: ['supermarket', 'grocer', 'groceries', 'shopping', 'shop'],
+  airport_transfers: ['airport', 'transfer', 'chauffeur', 'pickup'],
+  travel_tours: ['travel', 'tour', 'safari', 'holiday', 'flight', 'hotel', 'visa'],
+  experiences: ['event', 'wedding', 'party', 'concert', 'nightlife', 'experience'],
+  games_sports: ['game', 'gaming', 'sport', 'football', 'golf', 'playstation', 'xbox'],
+  beauty: ['beauty', 'makeup', 'nails', 'skincare', 'perfume', 'cosmetics'],
+  wellness: ['massage', 'spa', 'salon', 'barber', 'gym', 'fitness', 'yoga', 'nutrition'],
+  concierge_services: ['concierge', 'errand', 'personal assistant', 'shopping'],
+  movers_relocation: ['movers', 'moving', 'relocation', 'packing', 'storage'],
+  premium_services: ['vip', 'luxury', 'yacht', 'private jet', 'butler', 'premium'],
+  vehicle_rentals: ['car hire', 'car rental', 'rent a car', 'van', 'chauffeur', 'detailing'],
+  fashion_apparel: ['fashion', 'clothing', 'clothes', 'boutique', 'shoes', 'tailor'],
+  groceries_essentials: ['supermarket', 'grocer', 'groceries', 'vegetables', 'fruit', 'meat'],
+  marketplace: ['marketplace', 'shop', 'home', 'kitchen', 'pets', 'books'],
+  tech_electronics: ['phone', 'laptop', 'electronics', 'tech', 'repair', 'appliances'],
+  flowers_gifts: ['flower', 'florist', 'bouquet', 'roses', 'gift', 'present', 'hamper'],
+  logistics_shipping: ['courier', 'parcel', 'delivery', 'shipping', 'package'],
 };
 
 type CategorySearchRow = {

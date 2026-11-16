@@ -1,6 +1,6 @@
 import { availableSchemas, type Offering, type OfferingProfile } from '../offerings/model';
 import { schemas } from '../offerings/schemas';
-import { subcategoryVariant } from '@nexg/booking-config/profiles';
+import { listedCategoryName, subcategoryVariant } from '@nexg/booking-config/profiles';
 import config from './config.json';
 
 /** All values are exact sample minor units, carrying the currency's own precision. */
@@ -51,13 +51,19 @@ export type Descriptor = (typeof config.descriptors)[number];
 export type ProfileInfo = (typeof config.profiles)[number];
 export function profileInfo(id: string): ProfileInfo | undefined {
   const own = config.profiles.find((p) => p.subcategoryId === id);
-  if (own) return own;
-  /* A subcategory variant uses its base's money view under its own name. */
+  if (own) return { ...own, categoryName: listedCategoryName(own.categoryId) ?? own.categoryName };
+  /* A subcategory variant uses its base's money view under its own name and category. */
   const variant = subcategoryVariant(id);
   const base =
     variant && config.profiles.find((p) => p.subcategoryId === variant.baseSubcategoryId);
   return base && variant
-    ? { ...base, subcategoryId: variant.subcategoryId, specialtyNeeds: variant.specialtyNeeds }
+    ? {
+        ...base,
+        subcategoryId: variant.subcategoryId,
+        categoryId: variant.categoryId,
+        categoryName: listedCategoryName(variant.categoryId) ?? base.categoryName,
+        specialtyNeeds: variant.specialtyNeeds,
+      }
     : undefined;
 }
 export function resolveMoneyView(

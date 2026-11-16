@@ -15,12 +15,9 @@ import { Rail, RailHeading } from './Rail';
 import { TransferSearch } from './transfers/TransferSearch';
 import './discovery.css';
 
-/** A category's page title, worded the way its tile on the home page says it ("Restaurants & Food"). */
+/** A category's page title: its name in the master category list, as its tile on the home page says it. */
 export function categoryTitle(category: Pick<DiscoveryCategory, 'id' | 'label'>): string {
-  if (category.id === 'travel-tours') return 'Safaris & Tours';
-  if (category.id === 'experiences') return 'Experiences & Events';
-  if (category.id === 'tech-electronics') return 'Electronics';
-  return category.label.replace(/\s+and\s+/gi, ' & ');
+  return category.label;
 }
 
 /** Route an offering to its own page: a trip, a ticketed experience, or the merchant's store. */

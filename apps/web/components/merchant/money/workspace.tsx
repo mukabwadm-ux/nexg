@@ -1,5 +1,6 @@
 'use client';
 
+import { isListedSubcategory } from '@nexg/booking-config/profiles';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Download, History, MapPin, RefreshCw, Settings2 } from 'lucide-react';
 import { MerchantLivePreviewShell } from '../live-preview-shell';
@@ -835,7 +836,11 @@ export function MoneyWorkspace({
                 onChange={(e) => changeProfile(e.target.value)}
               >
                 {invalidProfile && <option value="">Choose a registered specialty</option>}
-                {[...new Set(profiles.map((p) => p.categoryId))].map((cat) => (
+                {[
+                  ...new Set(
+                    profiles.filter((p) => isListedSubcategory(p.id)).map((p) => p.categoryId),
+                  ),
+                ].map((cat) => (
                   <optgroup
                     key={cat}
                     label={
@@ -844,7 +849,7 @@ export function MoneyWorkspace({
                     }
                   >
                     {profiles
-                      .filter((p) => p.categoryId === cat)
+                      .filter((p) => p.categoryId === cat && isListedSubcategory(p.id))
                       .map((p) => (
                         <option key={p.id} value={p.id}>
                           {p.name}

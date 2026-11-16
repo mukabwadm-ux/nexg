@@ -28,13 +28,13 @@ const phones = store('c0000000-0000-4000-8000-0000000000a1', 'Control Phones', '
 const kitchen = store('c0000000-0000-4000-8000-0000000000a3', 'Control Kitchen', 'restaurants-food_restaurant');
 const spa = store('c0000000-0000-4000-8000-0000000000a4', 'Control Spa', 'wellness_massage');
 const gym = store('c0000000-0000-4000-8000-0000000000a5', 'Control Gym', 'wellness_gym');
-const clinic = store('c0000000-0000-4000-8000-0000000000a6', 'Control Clinic', 'health_clinics');
+const studio = store('c0000000-0000-4000-8000-0000000000a6', 'Control Studio', 'no-such-group');
 const errands = store('c0000000-0000-4000-8000-0000000000a7', 'Control Errands', 'concierge-services_courier-errands');
 const hire = store('c0000000-0000-4000-8000-0000000000a8', 'Control Hire', 'vehicle-rentals_car-rental');
 const bikes = store('c0000000-0000-4000-8000-0000000000a9', 'Control Bikes', 'vehicle-rentals_bike-rental');
 const transfers = store('c0000000-0000-4000-8000-0000000000b1', 'Control Transfers', 'airport-transfers_airport-pickup');
 const concerts = store('c0000000-0000-4000-8000-0000000000b2', 'Control Concerts', 'experiences_concerts');
-const classes = store('c0000000-0000-4000-8000-0000000000b3', 'Control Classes', 'experiences_workshops');
+const outings = store('c0000000-0000-4000-8000-0000000000b3', 'Control Outings', 'experiences_recreation');
 const safaris = store('c0000000-0000-4000-8000-0000000000b4', 'Control Safaris', 'travel-tours_game-drives');
 
 const phone = (extra: Partial<CatalogItem> = {}) => offering('f0000000-0000-4000-8000-000000000001', phones, 'Control Phone', { price: 22000, currency: 'KES', ...extra });
@@ -67,13 +67,14 @@ test('one sheet, one block per kind, resolved from the kind, the subcategory and
   assert.deepEqual([spaBlock.profile?.dateLabel, spaBlock.profile?.askTime, spaBlock.profile?.peopleLabel], ['Preferred date', true, 'Guests']);
   const gymBlock = blockFor(gym, membership);
   assert.ok(gymBlock.type === 'request' && gymBlock.profile?.askTime === false, 'a gym membership starts on a day, not at a time');
-  const clinicBlock = blockFor(clinic, offering('visit', clinic, 'Control Visit'));
-  assert.ok(clinicBlock.type === 'request' && clinicBlock.form === 'service' && !clinicBlock.profile, 'care keeps the plain questions');
+  const studioBlock = itemSheetBlock(studio, offering('visit', studio, 'Control Visit'), 'service', { context: 'discovery', today: '2026-11-09' });
+  assert.ok(studioBlock.type === 'request' && studioBlock.form === 'service' && !studioBlock.profile, 'a service with no booking profile keeps the plain questions');
   assert.deepEqual(blockFor(errands, offering('parcel', errands, 'Control Parcel')), { type: 'request', form: 'task' });
 
   assert.deepEqual(blockFor(hire, car), { type: 'vehicle', journey: 'rental', bike: false, direction: undefined });
   assert.deepEqual(blockFor(bikes, offering('bike', bikes, 'Control Bike')), { type: 'vehicle', journey: 'rental', bike: true, direction: undefined });
-  assert.deepEqual(blockFor(transfers, offering('sedan', transfers, 'Control Sedan')), { type: 'vehicle', journey: 'transfer', bike: false, direction: 'pickup' });
+  assert.deepEqual(blockFor(transfers, offering('sedan', transfers, 'Control Sedan')), { type: 'vehicle', journey: 'transfer', bike: false, direction: undefined },
+    'Airport Pickup & Drop-off runs both ways');
 
   const event = blockFor(concerts, ticket, { detail: true });
   assert.ok(event.type === 'detail' && event.page === 'event');
@@ -82,8 +83,8 @@ test('one sheet, one block per kind, resolved from the kind, the subcategory and
   const trip = blockFor(safaris, drive, { detail: true });
   assert.ok(trip.type === 'detail' && trip.page === 'trip');
   assert.equal(detailAction.trip, 'View trip');
-  const lesson = blockFor(classes, offering('lesson', classes, 'Control Lesson'), { detail: true });
-  assert.ok(lesson.type === 'detail' && lesson.page === 'class' && detailAction[lesson.page] === 'View class');
+  const outing = blockFor(outings, offering('outing', outings, 'Control Outing'), { detail: true });
+  assert.ok(outing.type === 'detail' && outing.page === 'activity' && detailAction[outing.page] === 'View activity');
 
   assert.deepEqual([storeLabel('product'), storeLabel('dish'), storeLabel('service'), storeLabel('vehicle'), storeLabel('activity')],
     ['Order from', 'Order from', 'Request from', 'Request from', 'Offered by']);

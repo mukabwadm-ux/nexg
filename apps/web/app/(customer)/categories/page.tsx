@@ -49,6 +49,7 @@ export default async function CategoriesPage() {
             {
               id: subcategory.id,
               name: subcategory.name,
+              ...(typeof subcategory.group === 'string' ? { group: subcategory.group } : {}),
               fields: Array.isArray(subcategory.fields)
                 ? subcategory.fields.filter((field): field is string => typeof field === 'string')
                 : [],

@@ -1,14 +1,15 @@
 import { Button } from '@nexg/ui';
+import { categoryName, currentCategoryId } from '@nexg/contracts';
 import {
   Activity,
   BellRing,
   Car,
   Compass,
-  DollarSign,
+  Crown,
   Flower2,
-  Gift,
-  Heart,
   Laptop,
+  Package,
+  PartyPopper,
   Pill,
   Plane,
   ShieldAlert,
@@ -16,10 +17,10 @@ import {
   ShoppingCart,
   Sparkles,
   Store,
+  Trophy,
   Truck,
   UtensilsCrossed,
   Wine,
-  Wrench,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -29,79 +30,53 @@ import type { DeliveryRate } from '@/lib/delivery-fee';
 import { DeliveryFee } from './delivery-fee';
 import { discoverMerchantHref } from '@/lib/discover-links';
 
-export const CATEGORY_LABEL: Record<string, string> = {
-  restaurant: 'Food',
-  bar_liquor: 'Drinks',
-  laundry: 'Laundry',
-  florist: 'Flowers',
-  beauty_fashion: 'Beauty & Fashion',
-  pharmacy: 'Pharmacy',
-  supermarket: 'Groceries',
-  gift_shop: 'Gifts',
-  other: 'Other',
-  adults_only: 'Adults Only',
-  airport_transfers: 'Airport Transfers',
-  alcohol_beverages: 'Alcohol & Drinks',
-  fashion_apparel: 'Fashion & Apparel',
-  beauty: 'Beauty & Wellness',
-  vehicle_rentals: 'Vehicle Rentals',
-  experiences: 'Experiences',
-  financial_services: 'Financial Services',
-  flowers_gifts: 'Flowers & Gifts',
-  restaurants_food: 'Restaurants & Food',
-  groceries_essentials: 'Groceries & Essentials',
-  laundry_cleaning: 'Laundry & Cleaning',
-  marketplace: 'Marketplace',
-  health: 'Health & Medical',
-  tech_electronics: 'Tech & Electronics',
-  travel_tours: 'Travel & Tours',
-  vehicle_services: 'Vehicle Services',
-  wellness: 'Wellness',
-  concierge_services: 'App Services',
-  logistics_shipping: 'Logistics & Shipping',
-};
+/** A category key as merchant rows carry it (current, legacy or retired), shown by its current name. */
+export function categoryLabel(key: string | null | undefined): string | undefined {
+  /* 'other' also stands in for a missing category, so it reads as itself. */
+  return key === 'other' ? 'Other' : categoryName(key);
+}
 
-export const CATEGORY_ICON: Record<string, typeof Store> = {
-  restaurant: UtensilsCrossed,
-  bar_liquor: Wine,
-  laundry: Shirt,
-  florist: Flower2,
-  beauty_fashion: Sparkles,
-  pharmacy: Pill,
-  supermarket: ShoppingCart,
-  gift_shop: Gift,
-  other: Store,
-  adults_only: ShieldAlert,
-  airport_transfers: Plane,
-  alcohol_beverages: Wine,
-  fashion_apparel: Shirt,
-  beauty: Sparkles,
-  vehicle_rentals: Car,
-  experiences: Compass,
-  financial_services: DollarSign,
-  flowers_gifts: Flower2,
+/** Icons for NexG's 21 categories, by current category id. */
+const ICON_BY_CATEGORY: Record<string, typeof Store> = {
   restaurants_food: UtensilsCrossed,
-  groceries_essentials: ShoppingCart,
+  alcohol_beverages: Wine,
+  pharmacy: Pill,
   laundry_cleaning: Shirt,
-  marketplace: Store,
-  health: Heart,
-  tech_electronics: Laptop,
+  airport_transfers: Plane,
   travel_tours: Compass,
-  vehicle_services: Wrench,
+  experiences: PartyPopper,
+  adults_only: ShieldAlert,
+  games_sports: Trophy,
+  beauty: Sparkles,
   wellness: Activity,
   concierge_services: BellRing,
-  logistics_shipping: Truck,
+  movers_relocation: Truck,
+  premium_services: Crown,
+  vehicle_rentals: Car,
+  fashion_apparel: Shirt,
+  groceries_essentials: ShoppingCart,
+  marketplace: Store,
+  tech_electronics: Laptop,
+  flowers_gifts: Flower2,
+  logistics_shipping: Package,
 };
+
+/** The icon for a category key (current, legacy or retired). */
+export function categoryIcon(key: string | null | undefined): typeof Store | undefined {
+  const id = currentCategoryId(key);
+  return id ? ICON_BY_CATEGORY[id] : undefined;
+}
 
 export const CATEGORY_ICON_BY_NAME: Record<string, typeof Store> = {
   Activity,
   BellRing,
   Car,
   Compass,
-  DollarSign,
+  Crown,
   Flower2,
-  Heart,
   Laptop,
+  Package,
+  PartyPopper,
   Pill,
   Plane,
   ShieldAlert,
@@ -109,42 +84,35 @@ export const CATEGORY_ICON_BY_NAME: Record<string, typeof Store> = {
   ShoppingCart,
   Sparkles,
   Store,
+  Trophy,
   Truck,
   UtensilsCrossed,
   Wine,
-  Wrench,
 };
 
-/** What the button says depends on what the business actually does. */
+/** What the button says depends on what the business actually does (by current category id). */
 const CTA: Record<string, string> = {
-  restaurant: 'View menu',
-  bar_liquor: 'Shop',
-  laundry: 'View services',
-  florist: 'Shop',
-  pharmacy: 'Shop',
-  supermarket: 'Shop',
-  beauty_fashion: 'Shop',
-  gift_shop: 'Shop',
-  adults_only: 'Browse',
-  airport_transfers: 'Book transfer',
-  alcohol_beverages: 'Shop drinks',
-  fashion_apparel: 'Shop collection',
-  beauty: 'View treatments',
-  vehicle_rentals: 'Reserve vehicle',
-  experiences: 'Explore events',
-  financial_services: 'View services',
-  flowers_gifts: 'Order gifts',
   restaurants_food: 'View menu',
-  groceries_essentials: 'Shop groceries',
+  alcohol_beverages: 'Shop drinks',
+  pharmacy: 'Shop pharmacy',
   laundry_cleaning: 'Book laundry',
-  marketplace: 'Shop store',
-  health: 'Book consultation',
-  tech_electronics: 'Shop tech',
+  airport_transfers: 'Book transfer',
   travel_tours: 'Explore tours',
-  vehicle_services: 'Book service',
+  experiences: 'Explore events',
+  adults_only: 'Browse',
+  games_sports: 'Play & book',
+  beauty: 'View treatments',
   wellness: 'Book session',
   concierge_services: 'Request concierge',
-  logistics_shipping: 'Get quote',
+  movers_relocation: 'Get a moving quote',
+  premium_services: 'Reserve',
+  vehicle_rentals: 'Reserve vehicle',
+  fashion_apparel: 'Shop collection',
+  groceries_essentials: 'Shop groceries',
+  marketplace: 'Shop store',
+  tech_electronics: 'Shop tech',
+  flowers_gifts: 'Order gifts',
+  logistics_shipping: 'Send a parcel',
 };
 
 export interface ExploreMerchant {
@@ -171,30 +139,6 @@ export interface ExploreMerchant {
   placeholder?: boolean;
 }
 
-/** The current merchant taxonomy, in the order the Explore category row shows it. */
-export const TAXONOMY_CATEGORIES = [
-  'restaurants_food',
-  'groceries_essentials',
-  'alcohol_beverages',
-  'flowers_gifts',
-  'beauty',
-  'wellness',
-  'health',
-  'fashion_apparel',
-  'tech_electronics',
-  'laundry_cleaning',
-  'marketplace',
-  'experiences',
-  'travel_tours',
-  'airport_transfers',
-  'vehicle_rentals',
-  'vehicle_services',
-  'logistics_shipping',
-  'financial_services',
-  'concierge_services',
-  'adults_only',
-] as const;
-
 /** "[Westlands Kitchen]" -> "Westlands Kitchen": some names were entered in brackets. */
 const unbracket = (text: string) => text.replace(/[[\]]/g, '').trim() || text;
 
@@ -208,7 +152,7 @@ export function MerchantCard({
 }) {
   const category = merchant.category_key ?? merchant.category ?? 'other';
   const Icon =
-    CATEGORY_ICON[category] ?? CATEGORY_ICON_BY_NAME[merchant.category_icon_name ?? ''] ?? Store;
+    categoryIcon(category) ?? CATEGORY_ICON_BY_NAME[merchant.category_icon_name ?? ''] ?? Store;
   const open = merchant.accepting_orders !== false;
   const placeholder = merchant.placeholder === true;
   const Wrapper = placeholder ? 'div' : Link;
@@ -276,7 +220,7 @@ export function MerchantCard({
           <p className="text-muted mt-1.5 truncate text-sm">
             {merchant.category_other ??
               merchant.category_label ??
-              CATEGORY_LABEL[category] ??
+              categoryLabel(category) ??
               category}
             {merchant.branch_name && ` · ${unbracket(merchant.branch_name)}`}
           </p>
@@ -307,7 +251,9 @@ export function MerchantCard({
             asChild
             className="h-11 shrink-0 rounded-full px-5 text-[0.9375rem] font-bold"
           >
-            <Link href={discoverMerchantHref(merchant.id)}>{CTA[category] ?? 'View'}</Link>
+            <Link href={discoverMerchantHref(merchant.id)}>
+              {CTA[currentCategoryId(category) ?? ''] ?? 'View'}
+            </Link>
           </Button>
         )}
       </div>

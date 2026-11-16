@@ -2,12 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { buildSubcategoryMap, demoCatalog, parseJourneys, parseSqlInserts, parseSqlValues, parseSupabaseSeed, renderSeedSql,
-  type Configuration, type GapFill, type SeedMerchant, type Snapshot, type SubcategoryMap } from '../scripts/demo-seed/lib';
+import { buildSubcategoryMap, demoCatalog, parseSqlInserts, parseSqlValues, parseSupabaseSeed, renderSeedSql, translateKeys,
+  type Configuration, type GapFill, type KeyTranslation, type SeedMerchant, type Snapshot, type SubcategoryMap } from '../scripts/demo-seed/lib';
 
 // Local demo seed (owner decision, 8 Nov 2026). These checks read files only; no database is involved.
 const read = (path: string) => readFileSync(path, 'utf8').replace(/^﻿/, '');
-const configuration = JSON.parse(read('docs/discovery/DISCOVERY_CONFIGURATION_V1.1.json')) as Configuration;
+const configuration = JSON.parse(read('docs/discovery/MASTER_NAVIGATION.json')) as Configuration;
+const master = JSON.parse(read('../packages/contracts/src/data/category-master.json')) as Pick<KeyTranslation, 'categories' | 'retiredSubcategories'>;
+const overlay = JSON.parse(read('docs/discovery/MASTER_CATEGORIES_OVERLAY.json')) as Pick<KeyTranslation, 'demoKeys' | 'seedSpellings'>;
+const translation: KeyTranslation = { categories: master.categories, retiredSubcategories: master.retiredSubcategories, demoKeys: overlay.demoKeys, seedSpellings: overlay.seedSpellings };
 const committed = JSON.parse(read('demo-seed/subcategory-map.json')) as SubcategoryMap;
 
 test('seed SQL values keep doubled quotes, numbers, booleans, null and raw expressions', () => {
@@ -31,29 +34,34 @@ test('seed blocks give one merchant and its branch, and reject a mismatched id',
   assert.throws(() => parseSupabaseSeed(block('M0003', 'c1000000-0000-4000-8000-000000000004', 'Wrong Number')), /unexpected merchant id/);
 });
 
-test('journeys are read per category and subcategory label', () => {
-  const journeys = parseJourneys(['## 10. Restaurants And Food — 2 subcategories', '', '| Order / exact subcategory | L4 | Journey |', '| --- | --- | --- |',
-    '| 1. Restaurant | Menu item | **PURCHASE** — Cart → payment |', '| 7. Catering | Event date | **SERVICE** — Quote → request |'].join('\n'));
-  assert.equal(journeys.get('Restaurants And Food\u0000Restaurant'), 'PURCHASE');
-  assert.equal(journeys.get('Restaurants And Food\u0000Catering'), 'SERVICE');
+test('old demo keys move the way the migration moves live merchants', () => {
+  const move = (category: string, subcategory: string) => Object.values(translateKeys(translation, category, subcategory) ?? { left: 'out' }).join('/');
+  // The seed's own spelling first, then the master list's retired subcategories, which name the new category.
+  assert.equal(move('restaurants_food', 'caf'), 'restaurants_food/cafes_bakeries_pastries');
+  assert.equal(move('pharmacy', 'pharmacy'), 'pharmacy/prescription_otc_medication');
+  assert.equal(move('health', 'mental_health_therapy'), 'wellness/stress_management');
+  assert.equal(move('vehicle_services', 'car_wash'), 'vehicle_rentals/vehicle_detailing');
+  assert.equal(move('fashion_apparel', 'accessories'), 'fashion_apparel/bags');
+  // Kept keys stay; demo-only keys and the demo API's Play groups have their own homes.
+  assert.equal(move('alcohol_beverages', 'beer'), 'alcohol_beverages/beer');
+  assert.equal(move('beauty', 'salon_barber'), 'wellness/hair_styling');
+  assert.equal(move('activities_games_sports', 'go_karting'), 'games_sports/outdoor_sports');
+  // The demo API's banks are left out of the demo seed (null in the overlay).
+  assert.equal(move('financial_services', 'forex'), 'out');
+  assert.throws(() => move('restaurants_food', 'pizzeria'), /no place in the master category list/);
 });
 
-test('the committed map covers every demo subcategory and every Discovery subcategory', () => {
+test('the committed map has one row per master subcategory and places every seeded demo merchant', () => {
   assert.deepEqual({ ...committed.summary, discoverySubcategoriesWithoutDemo: committed.summary.discoverySubcategoriesWithoutDemo.length },
-    { demoSubcategories: 150, mapped: 138, unmapped: 12, merchants: 750, mappedMerchants: 690, items: 15780, discoverySubcategoriesWithoutDemo: 4 });
-  for (const row of committed.subcategories) {
-    if (row.status === 'mapped') assert.ok(row.discovery && row.journey && row.action, row.demoSubcategoryId);
-    else assert.ok(!row.discovery && !row.journey && !row.action, row.demoSubcategoryId);
-  }
+    { subcategories: 214, withDemoMerchants: 85, demoGroups: 150, merchants: 715, items: 15360, discoverySubcategoriesWithoutDemo: 129,
+      demoGroupsLeftOut: ['banking', 'business-services', 'forex', 'insurance', 'payments', 'remittance', 'sacco-services'].map(key => `financial-services_${key}`) });
   const discovery = configuration.categories.flatMap(category => category.subcategories.map(subcategory => subcategory.discovery_key));
-  const covered = new Set([...committed.subcategories.flatMap(row => row.discovery ? [row.discovery.subcategoryId] : []), ...committed.summary.discoverySubcategoriesWithoutDemo]);
-  assert.equal(discovery.length, 115);
-  // Flights waits for a flights category in Derrick NexG (owner, 9 Nov 2026), so only its four subcategories have no stores.
-  assert.deepEqual(committed.summary.discoverySubcategoriesWithoutDemo, discovery.filter(id => id.startsWith("flights:")));
-  assert.deepEqual([...covered].sort(), [...discovery].sort());
-  // Only categories that Discovery keeps off customer screens, plus Health Coaching, stay unmapped.
-  assert.deepEqual(committed.subcategories.filter(row => row.status === 'unmapped').map(row => row.demoSubcategoryId).filter(id => !/^(financial-services|logistics-shipping)_/.test(id)),
-    ['health_coaching']);
+  assert.deepEqual(committed.subcategories.map(row => row.discovery?.subcategoryId), discovery);
+  for (const row of committed.subcategories) assert.ok(row.status === 'mapped' && row.journey && row.action, row.demoSubcategoryId);
+  const groups = committed.subcategories.flatMap(row => row.demoGroups);
+  // The demo API's banks are left out: the master list sends Financial Services to Concierge, which suits live merchants, not demo banks.
+  assert.equal(new Set(groups).size, 143, 'every other demo group lands in exactly one row');
+  assert.equal(groups.length, 143);
 });
 
 const snapshotText = read('demo-seed/source/demo-api-snapshot.json');
@@ -65,18 +73,16 @@ const snapshot = catalog.snapshot;
 const sha = (text: string) => createHash('sha256').update(text).digest('hex');
 
 test('the committed map is what the sources produce today', () => {
-  const journeys = parseJourneys(read('docs/discovery/CATEGORY_FLOWS.md'));
-  assert.deepEqual(buildSubcategoryMap({ snapshot, seed: catalog.seed, configuration, journeys }), committed);
+  assert.deepEqual(buildSubcategoryMap({ snapshot, seed: catalog.seed, configuration, translation }), committed);
 });
 
-test('gap-fill merchants fill exactly the empty Discovery subcategories, in the demo style, with whole-shilling prices', () => {
+test('gap-fill merchants keep the demo style and whole-shilling prices, and land where their keys move', () => {
   const added = snapshot.merchants.slice(-gapFill.groups.length * 5);
   assert.deepEqual([added[0]?.id, added.at(-1)?.id], ['M0641', 'M0750']);
   assert.equal(new Set(snapshot.merchants.map(merchant => merchant.name)).size, snapshot.merchants.length);
   for (const group of gapFill.groups) {
-    const row = committed.subcategories.find(entry => entry.demoSubcategoryId === group.demoSubcategoryId);
-    assert.equal(row?.discovery?.subcategoryId, group.discoverySubcategoryId, group.demoSubcategoryId);
-    assert.deepEqual(row?.supabase, group.supabase);
+    const row = committed.subcategories.find(entry => entry.demoGroups.includes(group.demoSubcategoryId));
+    assert.deepEqual(row?.supabase, translateKeys(translation, group.supabase.category, group.supabase.subcategory), group.demoSubcategoryId);
   }
   const areas = new Set(snapshot.areas);
   const seedByCode = new Map(catalog.seed.map(row => [row.code, row]));
@@ -107,12 +113,16 @@ test('the committed seed SQL is current, guarded and complete', () => {
   }
   // Only adult and alcohol items are age-restricted; pharmacy rules are not an ID check.
   const restrictedGroups = new Set(committed.subcategories.filter(row => row.journey === 'RESTRICTED_PURCHASE'
-    && ['adults-only', 'alcohol-beverages'].includes(row.discovery?.categoryId ?? '')).map(row => row.demoSubcategoryId));
+    && ['adults-only', 'alcohol-beverages'].includes(row.discovery?.categoryId ?? '')).flatMap(row => row.demoGroups));
   const restrictedMerchants = snapshot.merchants.filter(merchant => restrictedGroups.has(merchant.subcategoryId) && merchant.items.length);
   assert.deepEqual([...tables].map(([table, entry]) => [table, entry.rows.length]),
-    [['merchant', 750], ['merchant_branch', 750], ['catalogue_section', 750], ['catalogue_item', 15780], ['document', restrictedMerchants.length]]);
+    [['merchant', 715], ['merchant_branch', 715], ['catalogue_section', 715], ['catalogue_item', 15360], ['document', restrictedMerchants.length]]);
   const column = (table: string, name: string) => { const entry = tables.get(table)!; const at = entry.columns.indexOf(name); return entry.rows.map(row => row[at]); };
   const merchants = new Set(column('merchant', 'id'));
+  // Demo merchants carry the master list's keys, as the migration leaves live merchants.
+  const pairs = new Set(configuration.categories.flatMap(category => category.subcategories.map(sub => `${sub.supabase.category}/${sub.supabase.subcategory}`)));
+  const categoryKeys = column('merchant', 'category'); const subcategoryKeys = column('merchant', 'subcategory');
+  assert.ok(categoryKeys.every((key, index) => pairs.has(`${key}/${subcategoryKeys[index]}`)));
   const sections = new Set(column('catalogue_section', 'id'));
   const items = column('catalogue_item', 'id');
   assert.equal(new Set(items).size, items.length);

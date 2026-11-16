@@ -142,7 +142,8 @@ test('every product store, and only a product store, uses the retail storefront'
   for (const id of ['groceries-essentials_supermarket', 'tech-electronics_smartphones', 'tech-electronics_smart-devices', 'pharmacy_pharmacy', 'pharmacy_supplements',
     'fashion-apparel_mens-fashion', 'beauty_skincare', 'alcohol-beverages_liquor-stores', 'alcohol-beverages_non-alcoholic-drinks', 'flowers-gifts_flowers', 'marketplace_books',
     'adults-only_cigars']) assert.ok(retail(id), id);
-  for (const id of ['restaurants-food_restaurant', 'wellness_spa', 'health_clinics', 'tech-electronics_telecom-services', 'tech-electronics_device-repairs',
+  // Games & Sports' equipment sells products, but its scheme (activities) has no departments: the generic storefront.
+  for (const id of ['restaurants-food_restaurant', 'wellness_spa', 'concierge-services_reservations', 'games-sports_sports-equipment', 'tech-electronics_telecom-services', 'tech-electronics_device-repairs',
     'vehicle-rentals_car-rental', 'travel-tours_safaris', 'experiences_concerts', 'laundry-cleaning_laundry', 'no-such-group', undefined]) assert.ok(!retail(id), String(id));
 });
 

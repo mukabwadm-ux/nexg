@@ -1,5 +1,6 @@
 'use client';
 
+import { categoryName, currentCategoryId, getCategoryImage } from '@nexg/contracts';
 import { useLocation } from '@nexg/location';
 import { ArrowRight, Clock, MapPin, Navigation } from 'lucide-react';
 import Image from 'next/image';
@@ -22,25 +23,12 @@ const STORE_CARD = 'w-[68%] shrink-0 snap-start sm:w-[18rem] lg:w-[calc((100%-3r
  * section is never empty (lib/stores-near.ts decides the order).
  */
 
-/* Merchant categories come in two spellings (the merchant record and the
-   category config); both lead to the same label and stand-in photo. */
-const CATEGORY: Record<string, { label: string; photo: string }> = {
-  restaurant: { label: 'Restaurant', photo: 'restaurants' },
-  restaurants_food: { label: 'Restaurant', photo: 'restaurants' },
-  bar_liquor: { label: 'Drinks', photo: 'drinks' },
-  alcohol_beverages: { label: 'Drinks', photo: 'drinks' },
-  florist: { label: 'Flowers & gifts', photo: 'flowers' },
-  flowers_gifts: { label: 'Flowers & gifts', photo: 'flowers' },
-  gift_shop: { label: 'Gifts', photo: 'gifts' },
-  laundry: { label: 'Laundry', photo: 'laundry' },
-  laundry_cleaning: { label: 'Laundry', photo: 'laundry' },
-  beauty_fashion: { label: 'Beauty', photo: 'beauty' },
-  beauty: { label: 'Beauty', photo: 'beauty' },
-  pharmacy: { label: 'Pharmacy', photo: 'pharmacy' },
-  health: { label: 'Health', photo: 'health' },
-  supermarket: { label: 'Groceries', photo: 'groceries' },
-  groceries_essentials: { label: 'Groceries', photo: 'groceries' },
-};
+/* A store's category, from either spelling it carries (the merchant enum or
+   the category key), shown by its current name with its stand-in photo. */
+function storeCategory(store: { category_key?: string | null; category?: string | null }) {
+  const id = currentCategoryId(store.category_key) ?? currentCategoryId(store.category);
+  return id ? { label: categoryName(id)!, photo: getCategoryImage(id) } : undefined;
+}
 
 /** "[Westlands Kitchen]" → "Westlands Kitchen": some names were entered in brackets. */
 const unbracket = (text: string) => text.replace(/[[\]]/g, '').trim() || text;
@@ -57,12 +45,11 @@ const formatKm = (km: number) =>
 const hhmm = (time: string | null) => (time ? time.slice(0, 5) : null);
 
 function StoreCard({ store }: { store: RankedStore }) {
-  const category = CATEGORY[store.category_key ?? ''] ?? CATEGORY[store.category ?? ''];
+  const category = storeCategory(store);
   const open = store.accepting_orders !== false && !store.closed_today;
   const minutes =
     store.prep_minutes != null && store.prep_minutes > 0 ? Math.round(store.prep_minutes) : null;
-  const photo =
-    store.cover_photo_path ?? (category ? `/images/categories/${category.photo}.jpg` : null);
+  const photo = store.cover_photo_path ?? category?.photo ?? null;
   const closes = hhmm(store.closes_today);
   const name = unbracket(store.trading_name);
   const area = store.branch_name ? unbracket(store.branch_name) : null;

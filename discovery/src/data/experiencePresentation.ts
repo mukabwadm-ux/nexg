@@ -11,10 +11,19 @@ function experienceSubcategory(merchant: Pick<Merchant, 'subcategoryId'>) {
     && (subcategory.id === merchant.subcategoryId || subcategory.sourceIds.includes(merchant.subcategoryId)));
 }
 
-/** Route recognized activity/event offerings directly; commissioned photography stays with its provider. */
+/**
+ * Events & Experiences subcategories that are commissioned services (event planning, weddings and birthdays,
+ * corporate events): they list their providers, not ticketed experiences.
+ */
+export function isServiceExperience(subcategoryId?: string): boolean {
+  const subcategory = experiences?.subcategories.find((entry) => entry.id === subcategoryId);
+  return subcategory?.journey === 'SERVICE' || subcategory?.journey === 'REQUEST';
+}
+
+/** Route recognized activity/event offerings directly; a commissioned service stays with its provider. */
 export function isDirectExperienceMerchant(merchant: Merchant): boolean {
   const subcategory = experienceSubcategory(merchant);
-  return Boolean(subcategory && subcategory.id !== 'experiences:photography');
+  return Boolean(subcategory && !isServiceExperience(subcategory.id));
 }
 
 /** Display the official nested label when the original source group identifies one. */
@@ -43,9 +52,9 @@ export interface ExperienceBooking {
 const counted = (one: string, many: string) => (value: number) => `${value} ${value === 1 ? one : many}`;
 
 export function experienceBooking(merchant: Pick<Merchant, 'subcategoryId'>): ExperienceBooking {
-  const group = experienceSubcategory(merchant)?.id;
-  if (group === 'experiences:events') return { fact: 'event', typeLabel: 'Event type', countLabel: 'Tickets', count: counted('ticket', 'tickets'), action: 'Request tickets' };
-  if (group === 'experiences:workshops-classes') return { fact: 'class', typeLabel: 'Format', countLabel: 'Guests', count: counted('guest', 'guests'), action: 'Request booking' };
+  const base = experienceSubcategory(merchant)?.base;
+  if (base === 'concerts' || base === 'festivals') return { fact: 'event', typeLabel: 'Event type', countLabel: 'Tickets', count: counted('ticket', 'tickets'), action: 'Request tickets' };
+  if (base === 'workshops' || base === 'classes') return { fact: 'class', typeLabel: 'Format', countLabel: 'Guests', count: counted('guest', 'guests'), action: 'Request booking' };
   return { fact: 'sport', typeLabel: 'Type', countLabel: 'Guests', count: counted('guest', 'guests'), action: 'Request booking' };
 }
 

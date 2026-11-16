@@ -1,3 +1,4 @@
+import { categoryName } from '@nexg/contracts';
 import { Button } from '@nexg/ui';
 import {
   Bike,
@@ -30,7 +31,10 @@ const STALE_DAYS = 2;
 /* Orders that never became a sale do not count towards order value. */
 const NOT_SALES = new Set(['cancelled', 'refunded']);
 
+/* A merchant's category by its current name; an unknown key reads as itself. */
 const categoryLabel = (key: string) => {
+  const name = categoryName(key);
+  if (name) return name;
   const words = key.replace(/_/g, ' ');
   return words.charAt(0).toUpperCase() + words.slice(1);
 };

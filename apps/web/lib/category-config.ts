@@ -202,6 +202,7 @@ function readSubcategories(value: Json, category: string): CategorySubcategory[]
     return {
       id: subcategory.id,
       name: subcategory.name,
+      ...(typeof subcategory.group === 'string' ? { group: subcategory.group } : {}),
       ...(typeof subcategory.icon === 'string' ? { icon: subcategory.icon } : {}),
       ...(typeof subcategory.fulfillmentHint === 'string'
         ? { fulfillmentHint: subcategory.fulfillmentHint }

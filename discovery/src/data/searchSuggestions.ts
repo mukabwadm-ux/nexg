@@ -1,12 +1,9 @@
 import type { SearchSuggestions } from '../providers/DiscoveryProvider';
 import { categories, type DiscoveryCategory } from './taxonomy';
 
-/** A category's name as its home-page tile says it; the same rules as categoryTitle in CategoryDiscovery.tsx. */
+/** A category's name as its home-page tile says it: its name in the master category list. */
 function categoryTitle(category: Pick<DiscoveryCategory, 'id' | 'label'>): string {
-  if (category.id === 'travel-tours') return 'Safaris & Tours';
-  if (category.id === 'experiences') return 'Experiences & Events';
-  if (category.id === 'tech-electronics') return 'Electronics';
-  return category.label.replace(/\s+and\s+/gi, ' & ');
+  return category.label;
 }
 
 /**

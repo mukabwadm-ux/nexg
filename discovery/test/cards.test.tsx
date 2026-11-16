@@ -19,18 +19,18 @@ const kinds = ['product', 'dish', 'service', 'activity', 'task', 'vehicle'] as c
 test('every subcategory gets a card kind from its journey, and restaurant purchases are dishes', () => {
   const counts: Partial<Record<OfferingKind, number>> = {};
   for (const category of categories) for (const subcategory of category.subcategories) {
-    // Flights waits for a flights category in Derrick NexG (owner, 9 Nov 2026); everything else has a source group.
+    // Every master subcategory has a source group: its Supabase pair.
     const source = subcategory.sourceIds[0];
-    if (category.id !== 'flights') assert.ok(source, `${subcategory.id} has a source group`);
-    const kind = offeringKind({ subcategoryId: source ?? subcategory.id });
-    if (source) assert.equal(offeringKind({ subcategoryId: subcategory.id }), kind, subcategory.id);
+    assert.ok(source, `${subcategory.id} has a source group`);
+    const kind = offeringKind({ subcategoryId: source });
+    assert.equal(offeringKind({ subcategoryId: subcategory.id }), kind, subcategory.id);
     counts[kind] = (counts[kind] ?? 0) + 1;
   }
-  // Play adds 13 activities; Flights adds 2 activities and 2 quoted charters (tasks).
-  assert.deepEqual(counts, { product: 46, dish: 6, service: 11, activity: 23, task: 23, vehicle: 6 });
+  // The master category list (16 Nov 2026): 214 subcategories.
+  assert.deepEqual(counts, { product: 76, dish: 9, service: 37, activity: 29, task: 50, vehicle: 13 });
   assert.equal(offeringKind({ subcategoryId: 'restaurants-food_restaurant' }), 'dish');
   assert.equal(offeringKind({ subcategoryId: 'restaurants-food_catering' }), 'task');
-  assert.equal(offeringKind({ subcategoryId: 'beauty-wellness:massage' }), 'service');
+  assert.equal(offeringKind({ subcategoryId: 'wellness:swedish-massage' }), 'service');
   assert.equal(offeringKind({ subcategoryId: 'concierge-services_courier-errands' }), 'task');
   assert.equal(offeringKind({ subcategoryId: 'no-such-group' }), 'product');
 });
@@ -191,7 +191,8 @@ test('the generic storefront: one hero with confirmed facts, then the store’s 
 
   const transfer = render({ id: 'merchant-control', name: 'Control Transfers', subcategoryId: 'airport-transfers_airport-pickup', items: [named('item-d', 'JKIA Sedan Pickup', 4200)] });
   assert.match(transfer, /Plan your transfer/);
-  assert.match(transfer, /placeholder="e.g. JKIA Terminal 1A"/);
+  // "Airport Pickup & Drop-off" runs both ways, so the examples name either end.
+  assert.match(transfer, /placeholder="e.g. JKIA, Wilson Airport or an address"/);
   assert.match(transfer, /Select<svg/);
   assert.doesNotMatch(transfer, /Check dates/);
 });

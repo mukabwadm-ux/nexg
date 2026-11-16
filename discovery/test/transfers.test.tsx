@@ -61,7 +61,8 @@ test('vehicle classes come from the transfers scheme, and services are never car
 test('a listing runs the way its name says, else its operator’s subcategory, and names its airport', () => {
   assert.equal(itemDirection(pickups, { name: 'JKIA Sedan Pickup' }), 'pickup');
   assert.equal(itemDirection(pickups, { name: 'JKIA Sedan Drop-off' }), 'dropoff');
-  assert.equal(itemDirection(pickups, { name: 'Executive Sedan' }), 'pickup');
+  // The master list's Airport Pickup & Drop-off runs both ways, so an unnamed listing there has no direction.
+  assert.equal(itemDirection(pickups, { name: 'Executive Sedan' }), undefined);
   assert.equal(itemDirection(dropoffs, { name: 'Executive Sedan' }), 'dropoff');
   assert.equal(itemDirection(executive, { name: 'Executive Sedan' }), undefined);
   assert.equal(itemDirection(executive, { name: 'Sedan pickup and drop-off' }), undefined);

@@ -18,6 +18,12 @@ describe('Discovery links', () => {
     expect(discoverCategoryHref('restaurants_food')).toBe('/discover?category=restaurants-food');
     expect(discoverCategoryHref('bar_liquor')).toBe('/discover?category=alcohol-beverages');
     expect(discoverCategoryHref('travel-tours')).toBe('/discover?category=travel-tours');
+    expect(discoverCategoryHref('logistics_shipping')).toBe('/discover?category=courier-services');
+    expect(discoverCategoryHref('games_sports')).toBe('/discover?category=games-sports');
+    // Keys the master category list retired (16 Nov 2026) open where their merchants moved.
+    expect(discoverCategoryHref('health')).toBe('/discover?category=pharmacy');
+    expect(discoverCategoryHref('financial_services')).toBe('/discover?category=concierge-services');
+    expect(discoverCategoryHref('vehicle_services')).toBe('/discover?category=vehicle-rentals');
     expect(discoverCategoryHref('not_a_category', { search: ' sushi ' })).toBe('/discover?q=sushi');
     expect(discoverCategoryHref()).toBe('/discover');
   });
@@ -38,5 +44,7 @@ describe('Discovery links', () => {
         row.discovery.categoryId,
       ]);
     }
+    // The map has a row for every subcategory of the master list, so all 21 categories are covered.
+    expect(new Set(map.subcategories.map((row) => row.supabase.category)).size).toBe(21);
   });
 });

@@ -27,9 +27,11 @@ test('promoted stores rise above a similar match but never above a much closer o
 });
 
 test('the box lists search first, then categories, stores and items', () => {
-  assert.equal(taxonomySuggestions('bakery')[0]?.label, 'Bakery');
-  assert.deepEqual(taxonomySuggestions('bowl').map((entry) => entry.label), ['Bowling']);
-  assert.equal(taxonomySuggestions('rest')[0]?.label, 'Restaurants & Food');
+  // Names from the master category list (16 Nov 2026).
+  assert.equal(taxonomySuggestions('bakery')[0]?.label, 'Bakery Products');
+  assert.deepEqual(taxonomySuggestions('golf').map((entry) => entry.label), ['Golf & Swimming']);
+  assert.deepEqual(taxonomySuggestions('pharm').map((entry) => [entry.kind, entry.label]), [['category', 'Pharmaceutical Services'], ['subcategory', 'Pharmacy Delivery']]);
+  assert.ok(taxonomySuggestions('rest').some((entry) => entry.kind === 'category' && entry.label === 'Food & Restaurant'));
   assert.deepEqual(taxonomySuggestions('   '), []);
   const list = suggestionList('ugali', {
     merchants: [{ id: 'm1', name: 'Ugali House', context: 'Restaurant · Westlands' }],

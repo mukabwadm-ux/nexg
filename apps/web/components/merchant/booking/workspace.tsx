@@ -1,5 +1,6 @@
 'use client';
 
+import { isListedSubcategory } from '@nexg/booking-config/profiles';
 import {
   CalendarDays,
   Check,
@@ -1240,7 +1241,11 @@ function SetupForm({
       current = false;
     };
   }, [subcategoryId, model, apiBase]);
-  const groups = [...new Set(profiles.map((p) => p.categoryName ?? humanize(p.categoryId)))];
+  /* Retired activities stay valid but are offered only to a business already on one. */
+  const offered = profiles.filter(
+    (p) => isListedSubcategory(p.subcategoryId) || p.subcategoryId === subcategoryId,
+  );
+  const groups = [...new Set(offered.map((p) => p.categoryName ?? humanize(p.categoryId)))];
   return (
     <form
       className="space-y-5"
@@ -1284,7 +1289,7 @@ function SetupForm({
           ) : null}
           {groups.map((group) => (
             <optgroup key={group} label={group}>
-              {profiles
+              {offered
                 .filter((p) => (p.categoryName ?? humanize(p.categoryId)) === group)
                 .map((p) => (
                   <option key={p.subcategoryId} value={p.subcategoryId}>

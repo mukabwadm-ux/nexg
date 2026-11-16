@@ -56,7 +56,7 @@ const featureSeeds: HomepageFeatureSeed[] = [
   },
   {
     id: 'care-and-wellness',
-    categoryIds: ['health-pharmacy', 'beauty-wellness'],
+    categoryIds: ['pharmacy', 'wellness', 'beauty'],
     title: 'Feel good, every day',
     description: 'Find everyday wellness essentials and small moments of care.',
     action: 'Explore feel-good finds',

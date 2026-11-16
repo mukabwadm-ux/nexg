@@ -1,20 +1,13 @@
 import { Tag } from '@nexg/ui';
-import {
-  ArrowRight,
-  Flower2,
-  Pill,
-  Shirt,
-  ShoppingCart,
-  Sparkles,
-  UtensilsCrossed,
-  Wine,
-} from 'lucide-react';
+import { currentCategoryId } from '@nexg/contracts';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import type { Translate } from '@/lib/i18n/dictionaries';
 
 import { CardRail, RAIL_CARD } from './card-rail';
+import { categoryIcon, categoryLabel } from '@/components/explore/merchant-card';
 import { discoverCategoryHref, discoverMerchantHref } from '@/lib/discover-links';
 
 /**
@@ -57,36 +50,12 @@ export interface FeaturedMerchant {
   prep_minutes: number | null;
 }
 
-const CATEGORY_LABEL: Record<string, string> = {
-  restaurant: 'Restaurant',
-  bar_liquor: 'Drinks',
-  laundry: 'Laundry',
-  florist: 'Flowers & gifts',
-  beauty_fashion: 'Beauty & fashion',
-  pharmacy: 'Pharmacy',
-  supermarket: 'Supermarket',
-  gift_shop: 'Gift shop',
-  other: 'Other',
-};
-
-const CATEGORY_ICON: Record<string, typeof UtensilsCrossed> = {
-  restaurant: UtensilsCrossed,
-  bar_liquor: Wine,
-  laundry: Shirt,
-  florist: Flower2,
-  beauty_fashion: Sparkles,
-  pharmacy: Pill,
-  supermarket: ShoppingCart,
-  gift_shop: Sparkles,
-  other: Sparkles,
-};
-
 /** Matches Explore's own cards, so the same shop reads the same everywhere. */
 const CATEGORY_CTA: Record<string, string> = {
-  restaurant: 'merchant.cta.menu',
-  bar_liquor: 'merchant.cta.shop',
-  laundry: 'merchant.cta.services',
-  florist: 'merchant.cta.shop',
+  restaurants_food: 'merchant.cta.menu',
+  alcohol_beverages: 'merchant.cta.shop',
+  laundry_cleaning: 'merchant.cta.services',
+  flowers_gifts: 'merchant.cta.shop',
 };
 
 /** The cards the artboard draws for an empty homepage. */
@@ -100,28 +69,28 @@ const PLACEHOLDERS = [
     name: 'Italian restaurant',
     meta: 'Fine dining · Westlands',
     cta: 'merchant.cta.menu',
-    category: 'restaurant',
+    category: 'restaurants_food',
     image: 'restaurants',
   },
   {
     name: 'Wine & spirits shop',
-    meta: 'Drinks · Parklands',
+    meta: 'Wines & spirits · Parklands',
     cta: 'merchant.cta.shop',
-    category: 'bar_liquor',
+    category: 'alcohol_beverages',
     image: 'drinks',
   },
   {
     name: 'Florist',
     meta: 'Flowers & gifts · Kilimani',
     cta: 'merchant.cta.shop',
-    category: 'florist',
+    category: 'flowers_gifts',
     image: 'flowers',
   },
   {
     name: 'Laundry & dry cleaning',
     meta: 'Wash, iron, press · Kilimani',
     cta: 'merchant.cta.services',
-    category: 'laundry',
+    category: 'laundry_cleaning',
     image: 'laundry',
   },
 ] as const;
@@ -146,7 +115,7 @@ function Card({
 }: {
   href: string;
   photo: string | null;
-  icon: typeof UtensilsCrossed;
+  icon: typeof Sparkles;
   sponsored: string;
   minutes: number | null;
   minUnit: string;
@@ -254,7 +223,7 @@ export function FeaturedMerchants({
               key={merchant.name}
               href={discoverCategoryHref(merchant.category)}
               photo={`/images/categories/${merchant.image}.jpg`}
-              icon={CATEGORY_ICON[merchant.category] ?? Sparkles}
+              icon={categoryIcon(merchant.category) ?? Sparkles}
               sponsored={t('merchant.sponsored')}
               minutes={null}
               minUnit={t('merchant.min')}
@@ -265,7 +234,7 @@ export function FeaturedMerchants({
           ))
         : rows.map((merchant) => {
             const category = merchant.merchant_category ?? 'other';
-            const where = [CATEGORY_LABEL[category] ?? 'Merchant', merchant.branch_name]
+            const where = [categoryLabel(category) ?? 'Merchant', merchant.branch_name]
               .filter(Boolean)
               .join(' · ');
             return (
@@ -275,7 +244,7 @@ export function FeaturedMerchants({
                    slot that earned it, rather than guessed at later. */
                 href={discoverMerchantHref(merchant.merchant_id)}
                 photo={merchant.cover_photo_path}
-                icon={CATEGORY_ICON[category] ?? Sparkles}
+                icon={categoryIcon(category) ?? Sparkles}
                 sponsored={t('merchant.sponsored')}
                 minutes={merchant.prep_minutes}
                 minUnit={t('merchant.min')}
@@ -283,7 +252,7 @@ export function FeaturedMerchants({
                    they paid to say. */
                 meta={merchant.blurb ?? where}
                 name={merchant.trading_name}
-                cta={t(CATEGORY_CTA[category] ?? 'merchant.cta.view')}
+                cta={t(CATEGORY_CTA[currentCategoryId(category) ?? ''] ?? 'merchant.cta.view')}
               />
             );
           })}

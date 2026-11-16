@@ -152,7 +152,9 @@ describe('reconciled source inventory', () => {
     // The audited 128 plus the subcategory variants (src/data/subcategory-variants.json).
     const total = 128 + SUBCATEGORY_VARIANTS.length;
     expect(profiles).toHaveLength(total);
-    expect(new Set(profiles.map((profile) => profile.categoryId)).size).toBe(21);
+    // The 21 listed categories plus the retired ones whose profiles stay valid
+    // for applications already in progress (Health, Financial and Vehicle Services).
+    expect(new Set(profiles.map((profile) => profile.categoryId)).size).toBe(24);
     expect(new Set(profiles.map((profile) => profile.subcategoryId)).size).toBe(total);
     const models = new Set(listBookingModels().map((model) => model.id));
     for (const profile of profiles) {

@@ -9,9 +9,9 @@ interface CategoryRailProps {
   label: string;
 }
 
+/** The master category list's names are already worded for display. */
 function displayCategoryLabel(item: { id: string; label: string }) {
-  if (item.id === 'tech-electronics') return 'Electronics';
-  return item.label.replace(/\s+and\s+/gi, ' & ');
+  return item.label;
 }
 
 /**

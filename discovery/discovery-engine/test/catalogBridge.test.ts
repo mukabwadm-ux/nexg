@@ -95,15 +95,16 @@ test('the engine\'s existing source reader accepts bridge pages unchanged, inclu
   assert.deepEqual(observed.map(row => [row.presentation.ref.id, row.presentation.area, row.presentation.items.length]), [[id('c1', 1), 'Kilimani', 2]]);
 });
 
-test('the reviewed map is checked row by row and gains the merchant portal\'s ten spellings', async () => {
+test('the reviewed map is checked row by row; on the master list\'s keys it needs none of the portal\'s old spellings', async () => {
   const raw = JSON.parse(await readFile(join(workspace, 'demo-seed/subcategory-map.json'), 'utf8')) as { subcategories: BridgeMapRow[] };
   const rows = portalMapRows(raw);
   const pair = (category: string, subcategory: string) => rows.filter(row => row.supabase.category === category && row.supabase.subcategory === subcategory);
-  assert.equal(pair('restaurants_food', 'cafe').length, 1);
-  assert.equal(pair('restaurants_food', 'cafe')[0]!.demoSubcategoryId, pair('restaurants_food', 'caf')[0]!.demoSubcategoryId);
+  // NexG's master category list (16 Nov 2026): one row per Supabase pair, the keys the portal and migrated merchants use.
+  assert.equal(pair('restaurants_food', 'cafes_bakeries_pastries').length, 1);
+  assert.equal(pair('restaurants_food', 'caf').length, 0);
   const present = Object.keys(PORTAL_SUBCATEGORY_SPELLINGS).filter(key => raw.subcategories.some(row => `${row.supabase.category}/${row.supabase.subcategory}` === key));
-  assert.equal(present.length, 10, 'every spelling still names a pair in the reviewed map');
-  assert.equal(rows.length, raw.subcategories.length + present.length);
+  assert.equal(present.length, 0, 'no old spelling names a pair in the reviewed map');
+  assert.equal(rows.length, raw.subcategories.length);
   assert.throws(() => portalMapRows({}), /Invalid subcategory map/);
   assert.throws(() => portalMapRows({ subcategories: [{ ...map[0]!, discovery: null }] }), /Invalid subcategory map row/);
   assert.throws(() => portalMapRows({ subcategories: [{ ...map[0]!, supabase: { category: 'Restaurants Food', subcategory: 'caf' } }] }), /Invalid subcategory map row/);

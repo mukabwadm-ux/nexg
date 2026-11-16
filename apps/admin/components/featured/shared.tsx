@@ -1,3 +1,4 @@
+import { CATEGORY_KEY_NAMES } from '@nexg/contracts';
 import { Card } from '@nexg/ui';
 import Link from 'next/link';
 import * as React from 'react';
@@ -64,17 +65,11 @@ export const KIND_LABEL: Record<string, string> = {
   popular_request: 'Best seller',
 };
 
-export const CATEGORY_LABEL: Record<string, string> = {
-  restaurant: 'Food',
-  bar_liquor: 'Drinks',
-  laundry: 'Laundry',
-  florist: 'Flowers',
-  beauty_fashion: 'Beauty',
-  pharmacy: 'Pharmacy',
-  supermarket: 'Retail',
-  gift_shop: 'Gifts',
-  other: 'Other',
-};
+/**
+ * A merchant category key (current, legacy enum value or retired category)
+ * → its current name, as the master list of 16 Nov 2026 has it.
+ */
+export const CATEGORY_LABEL: Record<string, string> = { ...CATEGORY_KEY_NAMES, other: 'Other' };
 
 export const SLOT_TONE: Record<string, string> = {
   live: 'bg-success-bg text-success',

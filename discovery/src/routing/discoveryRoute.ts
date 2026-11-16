@@ -1,4 +1,5 @@
 import type { DiscoveryQuery } from '../providers/DiscoveryProvider';
+import { currentTaxonomyIds } from '../data/taxonomy';
 
 export interface RouteState extends DiscoveryQuery {
   view?: 'results' | 'experience' | 'tour' | 'movies'; merchantId?: string; itemId?: string; operatorSearch?: string; operatorOffset?: number;
@@ -15,11 +16,14 @@ export const routeDepartment = (route: Pick<RouteState, 'merchantId' | 'departme
   route.merchantId && route.department?.merchantId === route.merchantId ? route.department.id : undefined;
 export function parseRoute(search: string, state?: { discoveryRequest?: DiscoveryQuery['engineRequest'] }): RouteState {
   const params = new URLSearchParams(search);
+  // Old taxonomy ids (before the master list, 16 Nov 2026) open the page their stores moved to; the app then
+  // rewrites the address. Unknown ids stay as they are.
+  const taxonomyIds = currentTaxonomyIds(params.get('category') || undefined, params.get('subcategory') || undefined);
   const offset = Number(params.get('offset')); const operatorOffset = Number(params.get('operatorOffset'));
   const allowedSorts = ['recommended', 'rating', 'delivery', 'price_low', 'price_high'] as const;
   return {
     // Keep obsolete IDs for typed server recovery; dropping them could broaden scope.
-    categoryId: params.get('category') || undefined, subcategoryId: params.get('subcategory') || undefined, optionId: params.get('option') || undefined,
+    categoryId: taxonomyIds.categoryId, subcategoryId: taxonomyIds.subcategoryId, optionId: params.get('option') || undefined,
     search: params.get('q') || undefined, area: params.get('area') || undefined, openNow: params.get('open') === '1' ? true : undefined,
     sort: allowedSorts.find(value => value === params.get('sort')) ?? 'recommended',
     offset: Number.isSafeInteger(offset) && offset >= 0 ? offset : 0,

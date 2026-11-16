@@ -20,13 +20,13 @@ function store(id: string, path?: EngineSchemas['TaxonomyPath'], extra: Partial<
     items: [], itemsCount: { kind: 'unknown' }, itemsCompletion: 'unknown' };
 }
 const stores = [
-  store('cafe', { categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:caf' }, { location: { latitude: -1.2921, longitude: 36.7856 } }),
-  store('makeup', { categoryId: 'beauty-wellness', subcategoryId: 'beauty-wellness:beauty-products', optionId: 'beauty-wellness:beauty-products:makeup' }),
-  store('grocer', { categoryId: 'groceries-essentials', subcategoryId: 'groceries-essentials:supermarket' }),
-  store('butcher', { categoryId: 'groceries-essentials', subcategoryId: 'groceries-essentials:butchery' }),
-  store('massage', { categoryId: 'beauty-wellness', subcategoryId: 'beauty-wellness:massage' }),
+  store('cafe', { categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:cafes-bakeries-pastries' }, { location: { latitude: -1.2921, longitude: 36.7856 } }),
+  store('makeup', { categoryId: 'beauty', subcategoryId: 'beauty:makeup' }),
+  store('grocer', { categoryId: 'groceries-essentials', subcategoryId: 'groceries-essentials:household-groceries' }),
+  store('butcher', { categoryId: 'groceries-essentials', subcategoryId: 'groceries-essentials:meat-poultry-seafood' }),
+  store('massage', { categoryId: 'wellness', subcategoryId: 'wellness:swedish-massage' }),
   store('safari', { categoryId: 'travel-tours', subcategoryId: 'travel-tours:safaris' }),
-  store('workshop', { categoryId: 'experiences', subcategoryId: 'experiences:workshops-classes' }),
+  store('workshop', { categoryId: 'experiences', subcategoryId: 'experiences:adventure-outdoor-experiences' }),
   store('unplaced'),
 ];
 
@@ -47,11 +47,9 @@ test('engine stores carry their Discovery place, its names and their coordinates
   const byId = await engineStores();
   const cafe = byId.get('cafe')!;
   assert.deepEqual({ categoryId: cafe.categoryId, category: cafe.category, subcategoryId: cafe.subcategoryId, subcategory: cafe.subcategory, latitude: cafe.latitude, longitude: cafe.longitude },
-    { categoryId: 'restaurants-food', category: findCategory('restaurants-food')!.label, subcategoryId: 'restaurants-food:caf', subcategory: 'Café', latitude: -1.2921, longitude: 36.7856 });
-  // A nested option names the store more precisely than its subcategory does.
-  const makeup = findSubcategory('beauty-wellness', 'beauty-wellness:beauty-products')!.options.find(option => option.id === 'beauty-wellness:beauty-products:makeup')!;
-  assert.equal(byId.get('makeup')!.subcategory, makeup.label);
-  assert.equal(byId.get('makeup')!.subcategoryId, 'beauty-wellness:beauty-products');
+    { categoryId: 'restaurants-food', category: findCategory('restaurants-food')!.label, subcategoryId: 'restaurants-food:cafes-bakeries-pastries', subcategory: 'Cafés, Bakeries & Pastries', latitude: -1.2921, longitude: 36.7856 });
+  assert.equal(byId.get('makeup')!.subcategory, findSubcategory('beauty', 'beauty:makeup')!.label);
+  assert.equal(byId.get('makeup')!.subcategoryId, 'beauty:makeup');
   // An unknown place and missing coordinates stay unset, never guessed.
   const unplaced = byId.get('unplaced')!;
   for (const key of ['categoryId', 'category', 'subcategoryId', 'subcategory', 'latitude', 'longitude'] as const) assert.equal(unplaced[key], undefined, key);
@@ -61,7 +59,7 @@ test('engine stores carry their Discovery place, its names and their coordinates
 test('Discovery IDs open the same storefronts as the source groups they stand for', async () => {
   const byId = await engineStores();
   const get = (id: string) => byId.get(id)!;
-  assert.equal(subcategoryOf(get('cafe'))?.subcategory.id, 'restaurants-food:caf');
+  assert.equal(subcategoryOf(get('cafe'))?.subcategory.id, 'restaurants-food:cafes-bakeries-pastries');
   assert.equal(isRetailStore(get('grocer')), true);
   assert.equal(isSupermarket(get('grocer')), true);
   assert.equal(isGroceryStore(get('butcher')), true);
@@ -73,7 +71,7 @@ test('Discovery IDs open the same storefronts as the source groups they stand fo
   for (const id of ['cafe', 'massage', 'safari', 'workshop', 'unplaced']) assert.equal(isRetailStore(get(id)), false, id);
   // Source groups, as the Supabase and platform providers send them, still work exactly as before.
   const withSource = (subcategoryId: string): Merchant => ({ ...get('unplaced'), subcategoryId });
-  assert.equal(isSupermarket(withSource(findSubcategory('groceries-essentials', 'groceries-essentials:supermarket')!.sourceIds[0]!)), true);
+  assert.equal(isSupermarket(withSource(findSubcategory('groceries-essentials', 'groceries-essentials:household-groceries')!.sourceIds[0]!)), true);
   assert.equal(isTourOperator(withSource(findSubcategory('travel-tours', 'travel-tours:safaris')!.sourceIds[0]!)), true);
-  assert.equal(isDirectExperienceMerchant(withSource(findSubcategory('experiences', 'experiences:workshops-classes')!.sourceIds[0]!)), true);
+  assert.equal(isDirectExperienceMerchant(withSource(findSubcategory('experiences', 'experiences:adventure-outdoor-experiences')!.sourceIds[0]!)), true);
 });

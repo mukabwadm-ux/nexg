@@ -19,16 +19,27 @@ const publicDir = resolve(__dirname, '../../../apps/web/public');
 describe('merchant agreements', () => {
   it('gives every merchant category exactly one known agreement', () => {
     const categories = MERCHANT_TAXONOMY.map((category) => category.id).sort();
-    expect(Object.keys(CATEGORY_AGREEMENT).sort()).toEqual(categories);
+    // The 21 listed categories plus the retired ones, kept for past acceptances.
+    expect(Object.keys(CATEGORY_AGREEMENT).sort()).toEqual(
+      [...categories, 'financial_services', 'health', 'vehicle_services'].sort(),
+    );
     for (const id of categories) expect(agreementForCategory(id)).toBeDefined();
     expect(agreementForCategory('nope')).toBeUndefined();
     expect(agreementForCategory(null)).toBeUndefined();
   });
 
-  it('uses each of the 18 agreements, with three interim categories', () => {
+  it('uses each of the 18 agreements, with six interim categories', () => {
     expect(MERCHANT_AGREEMENTS).toHaveLength(18);
     expect(new Set(Object.values(CATEGORY_AGREEMENT)).size).toBe(18);
-    expect([...INTERIM].sort()).toEqual(['concierge_services', 'health', 'vehicle_rentals']);
+    expect([...INTERIM].sort()).toEqual([
+      'concierge_services',
+      'games_sports',
+      'health',
+      'movers_relocation',
+      'premium_services',
+      'vehicle_rentals',
+    ]);
+    expect(agreementForCategory('movers_relocation')?.id).toBe('logistics-and-shipping');
     expect(agreementForCategory('vehicle_rentals')?.id).toBe('vehicle-services');
     expect(agreementForCategory('health')?.id).toBe('wellness');
     expect(agreementForCategory('concierge_services')?.id).toBe('marketplace');

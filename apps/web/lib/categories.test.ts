@@ -5,7 +5,7 @@ import { categoryTiles, POPULAR_CATEGORIES, TILE_IDS } from './categories';
 const t = (key: string) => key;
 const configured = [
   { category: 'flowers_gifts', label: 'Flowers & Gifts', image_path: null },
-  { category: 'laundry_cleaning', label: 'Laundry & Cleaning', image_path: null },
+  { category: 'laundry_cleaning', label: 'Laundry Services', image_path: null },
 ];
 
 describe('categoryTiles', () => {
@@ -32,7 +32,7 @@ describe('categoryTiles', () => {
     expect(new Set(labels).size).toBe(labels.length);
     expect(labels).toContain('home.pc.flowers');
     expect(labels).toContain('home.pc.gifts');
-    expect(labels).toContain('Laundry & Cleaning');
+    expect(labels).toContain('Laundry Services');
   });
 
   it('counts taps only for tiles that exist', () => {

@@ -6,8 +6,17 @@
 >
 > - **Stores with no subcategory** are listed under their category (most live stores have none yet). On a category
 >   page they're on the last rail, "More stores", or "All stores" when no type has a rail of its own.
-> - **Play and Flights are hidden** (`HIDDEN_CATEGORY_IDS` in `src/data/taxonomy.ts`) until the platform has
->   categories for them.
+> - **Navigation is NexG's master category list** (owner, 16 Nov 2026): 21 categories in the master order, with the
+>   master names and subcategories (Wellness under its group headings in the Category menu). `scripts/taxonomy/build.mjs`
+>   generates `docs/discovery/MASTER_NAVIGATION.json` from `packages/contracts/src/data/category-master.json` and
+>   `docs/discovery/MASTER_CATEGORIES_OVERLAY.json` (Discovery ids, pack icons, journeys, old ids); `npm test` fails when it
+>   is out of date. Subcategories with no matching pack icon draw their category's icon. Retired categories are gone, not
+>   hidden; old ids in an address (`?category=health-pharmacy`, `play`, `flights`, `beauty-wellness` and their
+>   subcategories) open the page their stores moved to.
+> - **The icon-pack taxonomy is history.** `docs/discovery/TAXONOMY_V1.1.json` and `DISCOVERY_CONFIGURATION_V1.1.json`
+>   (18 categories, among them Health And Pharmacy, Play and Flights) stay unchanged only because the Discovery Engine's
+>   baseline release pins them by hash; the website reads them only for the list of pack icon files (`vite.config.ts`,
+>   `scripts/icons/build-web-icons.mjs`). The paragraphs below about 16/98 are history too.
 > - **The Discovery Engine (`discovery-engine/`) isn't in this repository yet.** It comes in its own PR with the
 >   original icon pack it checks. The website only needs `src/providers/catalogBridge.ts`, moved here from the engine.
 >   The opt-in engine provider keeps a copy of the engine's contract in `src/providers/engineContract/` and needs the
@@ -24,7 +33,7 @@
 
 Independent Discovery frontend and repository, V1.1. This project owns its screens/components and will be merged into NEXG-PLATFORM after standalone development and review.
 
-The final icon pack governs **16 categories and 98 subcategories**, their labels, taxonomy order and artwork. The homepage has a separate priority order in the discovery configuration; it does not change category IDs or L2/L3 order. Adults Only and Alcohol & Beverages appear near the end. The initial ranking is a product judgment because current revenue and usage analytics are not available here. The earlier 99-entry chat baseline is preserved in documentation history. Original source images are used unchanged.
+*History (before 16 Nov 2026):* the final icon pack governed **16 categories and 98 subcategories**, their labels, taxonomy order and artwork. The homepage has a separate priority order in the discovery configuration; it does not change category IDs or L2/L3 order. Adults Only and Alcohol & Beverages appear near the end. The initial ranking is a product judgment because current revenue and usage analytics are not available here. The earlier 99-entry chat baseline is preserved in documentation history. Original source images are used unchanged.
 
 The 16/98 counts describe the current release. The owner's 16 October update requires ongoing taxonomy editing, preview and per-screen arrangement through [Discovery Studio](discovery-studio/README.md). Future published versions may change the tree and layout while preserving node/source identities. The Studio editor is planned; the existing runtime still uses the baseline files.
 
@@ -43,7 +52,7 @@ F10 adds an explicit engine provider (`VITE_DISCOVERY_PROVIDER=engine`) through 
 
 ## Current scope
 
-- Standalone L1/L2 navigation from the final taxonomy/icon pack.
+- Standalone L1/L2 navigation from NexG's master category list, drawn with the original icon pack.
 - One shared L3 results component, one non-wrapping filter bar and nested Category options.
 - One adaptive MerchantCard and an L4 storefront/item-detail reader using original IDs.
 - Read-only platform adapter with explicit unmapped/outage states and deterministic name/ID ordering.

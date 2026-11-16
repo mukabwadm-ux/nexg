@@ -1,9 +1,10 @@
 import { z } from 'zod';
-import { BOOKING_REGISTRY_REVISIONS, validateBookingAnswer } from '@nexg/booking-config';
 import {
-  listOnboardingCategories,
-  resolveOnboardingSelection,
-} from '@nexg/booking-config/onboarding';
+  BOOKING_REGISTRY_REVISIONS,
+  listBookingProfiles,
+  validateBookingAnswer,
+} from '@nexg/booking-config';
+import { resolveOnboardingSelection } from '@nexg/booking-config/onboarding';
 import {
   MerchantApplicationCapture,
   MerchantApplicationRecord,
@@ -128,10 +129,9 @@ export const ReviewQueueQuery = z
   .strict();
 export const ReviewMerchantId = Id;
 
+/* Every registered scope, including retired ones that older applications still carry. */
 const scopeParents = new Map(
-  listOnboardingCategories().flatMap((category) =>
-    category.subcategories.map((subcategory) => [subcategory.id, category.id] as const),
-  ),
+  listBookingProfiles().map((profile) => [profile.subcategoryId, profile.categoryId] as const),
 );
 /** Validate retained scopes against the shared registry without inventing missing setup. */
 export function validateReviewCapture(capture: MerchantApplicationCapture) {

@@ -21,6 +21,23 @@ import {
   toggleMultiSelection,
 } from './question-logic';
 import { questionsForSubcategory } from './subcategory-questions';
+import type { CategorySubcategory } from './types';
+
+/** Subcategories in runs under their heading; a list without headings is one run. */
+function subcategoryGroups(subcategories: CategorySubcategory[]) {
+  const runs: { group?: string; subcategories: CategorySubcategory[] }[] = [];
+  for (const subcategory of subcategories) {
+    const last = runs[runs.length - 1];
+    if (last && last.group === subcategory.group) last.subcategories.push(subcategory);
+    else runs.push({ group: subcategory.group, subcategories: [subcategory] });
+  }
+  return runs;
+}
+
+/** "Swedish" reads as "Spa & Massage: Swedish" where the name alone is unclear. */
+function subcategoryTitle(subcategory: Pick<CategorySubcategory, 'name' | 'group'>) {
+  return subcategory.group ? `${subcategory.group}: ${subcategory.name}` : subcategory.name;
+}
 
 const PICKUP = [
   { value: 'front_counter', label: 'Front counter' },
@@ -325,31 +342,40 @@ export function CategoryStep() {
                   : 'Select the closest match to tailor your listing and setup.')}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {config.subcategories?.map((subcategory) => {
-              const selected = selectedBusinessTypeIds.includes(subcategory.id);
-              return (
-                <button
-                  key={subcategory.id}
-                  type="button"
-                  aria-pressed={selected}
-                  disabled={savingSubcategory || savingCategory}
-                  onClick={() =>
-                    void changeBusinessTypes(
-                      toggleMultiSelection(selectedBusinessTypeIds, subcategory.id),
-                    )
-                  }
-                  className={`focus-visible:ring-gold rounded-full px-3.5 py-2 text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60 ${
-                    selected
-                      ? 'bg-ink text-white'
-                      : 'border-border-strong bg-surface text-ink hover:border-ink border'
-                  }`}
-                >
-                  {subcategory.name}
-                </button>
-              );
-            })}
-          </div>
+          {subcategoryGroups(config.subcategories ?? []).map(({ group, subcategories }) => (
+            <div key={group ?? 'all'} className={group ? 'mt-3 first:mt-0' : undefined}>
+              {group && (
+                <h3 className="text-muted mb-2 text-[0.6875rem] font-bold uppercase tracking-wider">
+                  {group}
+                </h3>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {subcategories.map((subcategory) => {
+                  const selected = selectedBusinessTypeIds.includes(subcategory.id);
+                  return (
+                    <button
+                      key={subcategory.id}
+                      type="button"
+                      aria-pressed={selected}
+                      disabled={savingSubcategory || savingCategory}
+                      onClick={() =>
+                        void changeBusinessTypes(
+                          toggleMultiSelection(selectedBusinessTypeIds, subcategory.id),
+                        )
+                      }
+                      className={`focus-visible:ring-gold rounded-full px-3.5 py-2 text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60 ${
+                        selected
+                          ? 'bg-ink text-white'
+                          : 'border-border-strong bg-surface text-ink hover:border-ink border'
+                      }`}
+                    >
+                      {subcategory.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </section>
       )}
 
@@ -378,8 +404,8 @@ export function CategoryStep() {
         >
           <h2 id={`setup-heading-${subcategory.id}`} className="text-ink text-sm font-bold">
             {subcategory.workflow
-              ? `How ${subcategory.name.toLowerCase()} will work`
-              : `Your ${subcategory.name.toLowerCase()} setup`}
+              ? `How ${subcategoryTitle(subcategory).toLowerCase()} will work`
+              : `Your ${subcategoryTitle(subcategory).toLowerCase()} setup`}
           </h2>
           <p className="text-muted mt-1 text-xs leading-relaxed">
             {subcategory.workflow

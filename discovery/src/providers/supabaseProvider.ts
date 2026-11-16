@@ -50,31 +50,16 @@ const DEMO_MERCHANT = /^c1000000-0000-4000-8000-\d{12}$/;
 const KEY = /^[a-z0-9_-]+$/;
 const NO_MEDIA: DemoMedia = { merchants: new Map(), items: new Map() };
 
-/**
- * Derrick NexG's category_config spells ten subcategory keys differently from the demo seed (checked
- * against its migrations on 8 Nov 2026, labels identical). Merchants onboarded through the console use
- * the config spelling, so both spellings select the same reviewed map row. Key: the seed's pair.
- */
-export const SUBCATEGORY_KEY_ALIASES: Readonly<Record<string, string>> = {
-  'airport_transfers/airport_drop-off': 'airport_dropoff',
-  'airport_transfers/meet__greet': 'meet_greet',
-  'vehicle_rentals/long-term_rental': 'long_term_rental',
-  'restaurants_food/caf': 'cafe',
-  'marketplace/home__living': 'home_living',
-  'pharmacy/pharmacy': 'pharmacy_retail',
-  'health/mental_health_therapy': 'mental_health',
-  'tech_electronics/accessories': 'tech_accessories',
-  'logistics_shipping/road_freight__trucking': 'road_freight',
-  'logistics_shipping/warehousing__storage': 'warehousing',
-};
-
 const unavailable = () => new ProviderReadError({ kind: 'unavailable' });
 const missing = () => new ProviderReadError({ kind: 'missing' });
 const invalid = () => new ProviderReadError({ kind: 'invalid' });
 const unsupported = () => new ProviderReadError({ kind: 'unsupported' });
 const pairKey = (row: Pick<BridgeMapRow, 'supabase'>) => `${row.supabase.category}/${row.supabase.subcategory}`;
 
-/** Checks the reviewed map and adds the config spellings. A stale alias is skipped (a test keeps them current). */
+/**
+ * Checks the reviewed map: one row per Supabase pair of the master category list (owner, 16 Nov 2026). Merchants carry
+ * only the master list's keys once its migration has run, so the seed's old spellings need no aliases any more.
+ */
 export function supabaseMapRows(source: unknown): BridgeMapRow[] {
   const rows = source && typeof source === 'object' ? (source as { subcategories?: unknown }).subcategories : undefined;
   if (!Array.isArray(rows)) throw new Error('Invalid subcategory map');
@@ -95,12 +80,7 @@ export function supabaseMapRows(source: unknown): BridgeMapRow[] {
   });
   const pairs = new Set(checked.map(pairKey));
   if (pairs.size !== checked.length) throw new Error('Duplicate Supabase keys in the subcategory map');
-  const aliases = Object.entries(SUBCATEGORY_KEY_ALIASES).flatMap(([pair, subcategory]) => {
-    const row = checked.find((entry) => pairKey(entry) === pair);
-    const alias = row ? { ...row, supabase: { category: row.supabase.category, subcategory } } : undefined;
-    return alias && KEY.test(subcategory) && !pairs.has(pairKey(alias)) ? [alias] : [];
-  });
-  return [...checked, ...aliases];
+  return checked;
 }
 
 // The catalog bridge's row checks (catalogBridge.ts merchantRow and itemRow), plus UUID identities.
@@ -293,7 +273,7 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
   readonly #fetch: SupabaseFetch;
   readonly #now: () => number;
   readonly #rows: BridgeMapRow[];
-  /** Mapped rows whose Discovery category is on screen (hidden categories, such as Play, are left out). */
+  /** Mapped rows whose Discovery category exists (an operator group for a retired category, such as Flights, is left out). */
   readonly #visible: BridgeMapRow[];
   readonly #mediaSource: (() => Promise<DemoMedia>) | undefined;
   readonly #timeoutMs: number;
@@ -405,7 +385,7 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
   async getSuggestions(search: string, signal?: AbortSignal): Promise<SearchSuggestions> {
     const term = search.trim();
     if (term.length < 2 || term.length > MAX_TEXT) return { merchants: [], items: [] };
-    // Only categories on screen (hidden ones, such as Play, are left out), read whole, so stores with no subcategory count.
+    // Only categories Discovery has, read whole, so stores with no subcategory count.
     const rows = this.#visible;
     const scope = merchantFilters({ rows, categories: sortedKeys(rows.map((row) => row.supabase.category)) });
     // Letters in order with anything between: "ugli" still finds "Ugali". The ranking puts close matches first.
@@ -434,7 +414,7 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     }), term, (entry) => entry.name);
     const ids = [...new Set(items.map((item) => item.merchantId))].slice(0, 12);
     if (!ids.length) return { merchants, items: [] };
-    // The items' stores, only where Discovery shows them: an item at a hidden or unmapped store is never suggested.
+    // The items' stores, only where Discovery shows them: an item at a store in no Discovery category is never suggested.
     const owners = await this.#read('merchant_public', { select: 'id,trading_name', ...scope, id: `in.(${ids.join(',')})`, limit: String(ids.length) }, false, signal);
     const names = new Map(owners.rows.map((value) => { const row = fields(value); return [uuid(row.id), required(row.trading_name)] as const; }));
     const perStore = new Map<string, number>();
@@ -451,8 +431,7 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
   /**
    * A subcategory or option selects its demo groups. A category, or everything, selects the whole platform
    * categories its mapped groups come from, so stores with no subcategory, or an unmapped one, are listed there.
-   * Platform categories with no Discovery category (Financial Services, Logistics & Shipping, Something else)
-   * stay off customer screens.
+   * A Supabase category with no Discovery category stays off customer screens.
    */
   #scope(query: DiscoveryQuery): Scope | 'unmapped' | 'empty' {
     const category = findCategory(query.categoryId);
@@ -468,7 +447,7 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     if (area !== undefined && (area !== area.trim() || area.includes(','))) return 'empty';
     const sourceIds = option?.sourceIds ?? subcategory?.sourceIds;
     const rows = this.#visible.filter((row) => sourceIds
-      ? sourceIds.includes(row.demoSubcategoryId) || (!option && row.supabase.category === 'flights' && row.discovery?.subcategoryId === subcategory?.id)
+      ? sourceIds.includes(row.demoSubcategoryId)
       : !category || row.discovery!.categoryId === category.id);
     if (!rows.length) return 'unmapped';
     const categories = sourceIds ? [] : sortedKeys(rows.map((row) => row.supabase.category));

@@ -19,9 +19,15 @@ import {
 import { listBookingProfiles as baseProfiles, getBookingProfile as baseProfile } from './profiles';
 export {
   baseSubcategoryId,
+  isListedSubcategory,
+  LISTED_CATEGORIES,
+  listedCategoryName,
+  RETIRED_CATEGORIES,
+  subcategoryGroup,
   subcategoryVariant,
   SUBCATEGORY_VARIANTS,
   VARIANT_REGISTRY_REVISION,
+  type ListedCategory,
   type SubcategoryVariant,
 } from './variants';
 import { VARIANT_BASE_REVISION } from './variants';
@@ -58,6 +64,8 @@ export const BOOKING_REGISTRY_REVISION = registry.revision;
  */
 export const BOOKING_REGISTRY_REVISIONS: readonly string[] = [
   VARIANT_BASE_REVISION,
+  // The Laundry & Cleaning additions (9 Nov 2026), before the master category list.
+  'nexg-booking-2026-11-09.1',
   registry.revision,
 ];
 

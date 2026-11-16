@@ -43,14 +43,21 @@ export function vehicleJourney(merchant: Pick<Merchant, 'subcategoryId'>): Vehic
   return journey === 'RENTAL' ? 'rental' : journey === 'TRANSFER' ? 'transfer' : undefined;
 }
 
-/** Bike hire asks the car hire questions without the driver option. */
-export const isBikeHire = (merchant: Pick<Merchant, 'subcategoryId'>) => subcategoryOf(merchant)?.subcategory.id === 'vehicle-rentals:bike-rental';
+/**
+ * Bike hire asks the car hire questions without the driver option. The master category list (16 Nov 2026) folds bike
+ * hire into car hire, so only the demo API's bike group is still recognised.
+ */
+export const isBikeHire = (merchant: Pick<Merchant, 'subcategoryId'>) => merchant.subcategoryId === 'vehicle-rentals_bike-rental';
 
-/** Which way an airport transfer runs, so the examples point the right way. */
+/**
+ * Which way an airport transfer runs, so the examples point the right way. The master list's "Airport Pickup &
+ * Drop-off" runs both ways, so only the demo API's drop-off group still names one (its pickup group's id is now
+ * the combined subcategory's).
+ */
 export type TransferDirection = 'pickup' | 'dropoff';
+const demoDirections: Record<string, TransferDirection> = { 'airport-transfers_airport-drop-off': 'dropoff' };
 export function transferDirection(merchant: Pick<Merchant, 'subcategoryId'>): TransferDirection | undefined {
-  const id = subcategoryOf(merchant)?.subcategory.id;
-  return id === 'airport-transfers:airport-pickup' ? 'pickup' : id === 'airport-transfers:airport-drop-off' ? 'dropoff' : undefined;
+  return merchant.subcategoryId ? demoDirections[merchant.subcategoryId] : undefined;
 }
 const examples: Record<TransferDirection | 'any', { pickup: string; dropoff: string }> = {
   pickup: { pickup: 'e.g. JKIA Terminal 1A', dropoff: 'e.g. your hotel or home address' },

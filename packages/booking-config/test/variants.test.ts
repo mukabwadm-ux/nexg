@@ -3,36 +3,60 @@ import { describe, expect, it } from 'vitest';
 import { BOOKING_REGISTRY_REVISION, baseSubcategoryId, getBookingProfile } from '../src/index';
 import { listOnboardingCategories, resolveOnboardingSelection } from '../src/onboarding';
 import { registry } from '../src/registry';
-import { SUBCATEGORY_VARIANTS, VARIANT_REGISTRY_REVISION } from '../src/variants';
+import {
+  isListedSubcategory,
+  SUBCATEGORY_VARIANTS,
+  VARIANT_REGISTRY_REVISION,
+} from '../src/variants';
 
 const laundryIds = [
-  'laundry',
-  'dry_cleaning',
+  'washing_dry_cleaning',
   'ironing',
-  'home_cleaning',
-  'office_cleaning',
-  'wash_and_fold',
-  'stain_removal',
-  'clothing_alterations',
-  'curtain_cleaning',
-  'carpet_cleaning',
-  'wedding_gown_cleaning',
-  'corporate_uniform_laundry',
-  'fumigation',
   'express_laundry',
+  'shoe_leather_cleaning',
+  'carpet_cleaning',
   'laundry_pickup_delivery',
-  'garment_care',
-  'laundry_order_tracking',
 ];
 
 describe('subcategory variants', () => {
-  it('lists every Laundry & Cleaning subcategory once, under its category', () => {
+  it('lists the Laundry Services subcategories in the master order', () => {
     const laundry = listOnboardingCategories().find((c) => c.id === 'laundry_cleaning');
-    expect(laundry?.name).toBe('Laundry & Cleaning');
-    expect(laundry?.subcategories.map((s) => s.id).sort()).toEqual([...laundryIds].sort());
+    expect(laundry?.name).toBe('Laundry Services');
+    expect(laundry?.subcategories.map((s) => s.id)).toEqual(laundryIds);
     expect(laundry?.subcategories.find((s) => s.id === 'express_laundry')?.name).toBe(
-      'Express Laundry (2-hour service)',
+      'Express Laundry',
     );
+    expect(laundry?.subcategories.find((s) => s.id === 'ironing')?.name).toBe('Ironing & Pressing');
+  });
+
+  it('lists Wellness types under their group headings', () => {
+    const wellness = listOnboardingCategories().find((c) => c.id === 'wellness');
+    expect(wellness?.name).toBe('Wellness, Spa, Fitness & Nutrition');
+    expect(wellness?.subcategories[0]).toEqual({
+      id: 'swedish_massage',
+      name: 'Swedish',
+      group: 'Spa & Massage',
+    });
+    expect(new Set(wellness?.subcategories.map((s) => s.group))).toEqual(
+      new Set([
+        'Spa & Massage',
+        'Salon Services',
+        'Barber Services',
+        'Fitness & Gym',
+        'Nutrition & Diet',
+        'Sports & Training',
+        'Recovery & Relaxation',
+        'Wellness Programs',
+        'Wellness Products',
+      ]),
+    );
+  });
+
+  it('keeps retired subcategories valid but unlisted', () => {
+    expect(isListedSubcategory('wash_and_fold')).toBe(false);
+    expect(isListedSubcategory('clinics')).toBe(false);
+    expect(getBookingProfile('wash_and_fold')?.defaultModelId).toBe('LINKED_WINDOWS');
+    expect(resolveOnboardingSelection('health', ['clinics']).issues).toEqual([]);
   });
 
   it('uses the base profile booking model, questions and rules, with unique rule ids', () => {
@@ -40,7 +64,7 @@ describe('subcategory variants', () => {
       const profile = registry.profiles.find((p) => p.subcategoryId === variant.subcategoryId);
       const base = registry.profiles.find((p) => p.subcategoryId === variant.baseSubcategoryId);
       expect(profile && base).toBeTruthy();
-      expect(profile!.categoryId).toBe(base!.categoryId);
+      expect(profile!.categoryId).toBe(variant.categoryId);
       expect(profile!.defaultModelId).toBe(base!.defaultModelId);
       expect(profile!.candidateModelIds).toEqual(base!.candidateModelIds);
       expect(profile!.sourceQuestionIds).toEqual(base!.sourceQuestionIds);
@@ -49,6 +73,17 @@ describe('subcategory variants', () => {
     }
     const ruleIds = registry.profiles.flatMap((p) => p.rules.map((r) => r.id));
     expect(new Set(ruleIds).size).toBe(ruleIds.length);
+  });
+
+  it('gives new categories profiles from other categories', () => {
+    expect(getBookingProfile('residential_moving')).toMatchObject({
+      categoryId: 'movers_relocation',
+      categoryName: 'Movers & Relocation',
+      defaultModelId: 'REQUEST_QUOTE',
+    });
+    expect(getBookingProfile('luxury_car_rentals')?.defaultModelId).toBe('ASSET_INTERVAL');
+    expect(getBookingProfile('pharmacy_retail')?.categoryName).toBe('Pharmaceutical Services');
+    expect(resolveOnboardingSelection('games_sports', ['board_games']).issues).toEqual([]);
   });
 
   it('maps pickup laundry to linked windows and fumigation to a field visit', () => {

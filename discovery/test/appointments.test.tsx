@@ -28,18 +28,22 @@ const request = (extra: Partial<AppointmentRequest> = {}): AppointmentRequest =>
 const dialogOf = (html: string) => html.slice(html.indexOf('<dialog'), html.indexOf('</dialog>'));
 const massage = [service('item-a', 'Hot Stone Massage', 10600, { description: 'Hot Stone Massage from Control Wellness. Massage in the Wellness vertical.' }), service('item-b', 'Classic Facial', 6500)];
 
-test('massage, spa, gym and personal training all open the appointment storefront', () => {
-  for (const id of ['wellness_massage', 'wellness_spa', 'wellness_gym', 'wellness_personal-training', 'beauty-wellness:massage']) {
+test('massage, spa, gym, training, salons, barbers and nails all open the appointment storefront', () => {
+  // Demo API groups, master list source ids and Discovery ids alike.
+  for (const id of ['wellness_massage', 'wellness_spa', 'wellness_gym', 'wellness_personal-training', 'wellness:swedish-massage', 'wellness_sauna',
+    'wellness:braiding', 'wellness_skin-fades', 'beauty:manicure-pedicure', 'wellness_nutrition-consultations']) {
     assert.ok(isAppointmentProvider(storeOf(id, [])), id);
   }
   assert.equal(isAppointmentProvider(storeOf('groceries-essentials_supermarket', [])), false);
+  // A product subcategory with a salon's booking profile still sells products.
+  assert.equal(isAppointmentProvider(storeOf('beauty_haircare', [])), false);
 });
 
 test('one hero with confirmed facts, then the store’s own sections in its own words', () => {
   kept.clear();
   const html = render(storeOf('wellness_massage', massage));
   assert.match(html, /class="store-hero"/);
-  assert.match(html, /store-hero__eyebrow">Massage</);
+  assert.match(html, /store-hero__eyebrow">Swedish</);
   assert.match(html, /Kilimani/);
   assert.match(html, /2 treatments/);
   assert.doesNotMatch(html, /Open now|Closed now/, 'the open state shows only when the source knows it');

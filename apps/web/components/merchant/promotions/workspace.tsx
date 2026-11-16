@@ -1,4 +1,5 @@
 'use client';
+import { isListedSubcategory } from '@nexg/booking-config/profiles';
 /* eslint-disable @next/next/no-img-element -- sample media may be a local data URL */
 
 import { MERCHANT_TAXONOMY } from '@nexg/contracts';
@@ -424,7 +425,7 @@ export function PromotionsWorkspace({
           {MERCHANT_TAXONOMY.map((category) => (
             <optgroup label={category.name} key={category.id}>
               {profiles
-                .filter((p) => p.categoryId === category.id)
+                .filter((p) => p.categoryId === category.id && isListedSubcategory(p.id))
                 .map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}

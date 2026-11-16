@@ -1,10 +1,5 @@
 import type { CatalogItem, Merchant } from '../providers/DiscoveryProvider';
-import { findCategory } from './taxonomy';
-
-/** Source identity selects the presentation; a category query cannot turn another merchant into a massage provider. */
-export function isMassageProvider(merchant: Merchant) {
-  return merchant.subcategoryId === 'wellness_massage' || merchant.subcategoryId === 'beauty-wellness:massage';
-}
+import { subcategoryOf } from './offeringKinds';
 
 /** Today (or `date`) as a local "YYYY-MM-DD" key. Date pickers across the site use it as their minimum. */
 export function localDateKey(date = new Date()) {
@@ -12,8 +7,8 @@ export function localDateKey(date = new Date()) {
 }
 
 /**
- * The questions the appointment storefront asks for each booking type (massage, spa, gym, personal training,
- * salon & barber, nails & beauty). Labels and examples only: nothing here claims a duration, a place, a staff
+ * The questions the appointment storefront asks for each booking profile the master category list names
+ * (massage, spa, gym, personal training, hair, beauty treatments, coaching). Labels and examples only: nothing here claims a duration, a place, a staff
  * member or a free slot, because the catalogue supplies none of them. What a store calls its list ("Treatments",
  * "Memberships & classes", "Services") comes from catalogNaming in catalogSections.ts.
  */
@@ -28,27 +23,28 @@ export interface ServiceProfile {
   notesPlaceholder: string;
 }
 
+/** Keyed by the booking profile (`base`) a subcategory reuses in the master category list. */
 const profiles: Record<string, ServiceProfile> = {
-  'beauty-wellness:massage': { dateLabel: 'Preferred date', askTime: true, peopleLabel: 'Guests', notesPlaceholder: 'e.g. the pressure you like, or areas to focus on' },
-  'beauty-wellness:spa': { dateLabel: 'Preferred date', askTime: true, peopleLabel: 'Guests', notesPlaceholder: 'e.g. skin sensitivities, or anything you’d rather avoid' },
-  'beauty-wellness:gym': { dateLabel: 'Preferred start date', askTime: false, peopleLabel: 'People', notesPlaceholder: 'e.g. your goals, or the classes you’re interested in' },
-  'beauty-wellness:personal-training': { dateLabel: 'Preferred first session', askTime: true, peopleLabel: 'People', notesPlaceholder: 'e.g. your goals, or injuries to work around' },
-  'beauty-wellness:salon-barber': { dateLabel: 'Preferred date', askTime: true, peopleLabel: 'People', notesPlaceholder: 'e.g. the cut or style you want' },
-  'beauty-wellness:nails-beauty-services': { dateLabel: 'Preferred date', askTime: true, peopleLabel: 'People', notesPlaceholder: 'e.g. the colour, shape or look you want' },
+  massage: { dateLabel: 'Preferred date', askTime: true, peopleLabel: 'Guests', notesPlaceholder: 'e.g. the pressure you like, or areas to focus on' },
+  spa: { dateLabel: 'Preferred date', askTime: true, peopleLabel: 'Guests', notesPlaceholder: 'e.g. skin sensitivities, or anything you’d rather avoid' },
+  gym: { dateLabel: 'Preferred start date', askTime: false, peopleLabel: 'People', notesPlaceholder: 'e.g. your goals, or the classes you’re interested in' },
+  personal_training: { dateLabel: 'Preferred first session', askTime: true, peopleLabel: 'People', notesPlaceholder: 'e.g. your goals, or injuries to work around' },
+  haircare: { dateLabel: 'Preferred date', askTime: true, peopleLabel: 'People', notesPlaceholder: 'e.g. the cut or style you want' },
+  makeup: { dateLabel: 'Preferred date', askTime: true, peopleLabel: 'People', notesPlaceholder: 'e.g. the colour, shape or look you want' },
+  coaching: { dateLabel: 'Preferred first session', askTime: true, peopleLabel: 'People', notesPlaceholder: 'e.g. your goals, or anything you’d like them to know first' },
 };
 
 function bookingSubcategory(merchant: Merchant) {
-  if (!merchant.subcategoryId) return undefined;
-  return findCategory('beauty-wellness')?.subcategories.find((entry) => profiles[entry.id]
-    && (entry.id === merchant.subcategoryId || entry.sourceIds.includes(merchant.subcategoryId!)));
+  const subcategory = subcategoryOf(merchant)?.subcategory;
+  return subcategory?.journey === 'APPOINTMENT' && profiles[subcategory.base] ? subcategory : undefined;
 }
 
-/** Every Beauty And Wellness booking type (spa, massage, gym, training, salon, nails) uses the appointment storefront. */
+/** Every appointment booking type (massage, spa, gym, training, salons and barbers, nails, coaching) uses the appointment storefront. */
 export const isAppointmentProvider = (merchant: Merchant) => Boolean(bookingSubcategory(merchant));
 
 export function serviceProfile(merchant: Merchant): ServiceProfile {
   const subcategory = bookingSubcategory(merchant);
-  return profiles[subcategory?.id ?? 'beauty-wellness:massage']!;
+  return profiles[subcategory?.base ?? 'massage']!;
 }
 
 /**

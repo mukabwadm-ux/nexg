@@ -34,6 +34,8 @@ export interface BadgeRule {
 export interface CategorySubcategory {
   id: string;
   name: string;
+  /** The heading it sits under in the picker (Wellness: "Spa & Massage"). */
+  group?: string;
   icon?: string;
   fulfillmentHint?: string;
   workflowHint?: string;

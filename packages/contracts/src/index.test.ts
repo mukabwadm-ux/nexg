@@ -136,28 +136,49 @@ describe('parse shapes the error for a response', () => {
 });
 
 describe('merchant taxonomy', () => {
-  it('has 21 categories and 140 subcategories (128 audited plus 12 laundry additions)', async () => {
+  it("has the 21 master categories and 214 subcategories, in the owner's order", async () => {
     const { ALL_CATEGORIES, ALL_SUBCATEGORIES } = await import('./taxonomy');
     expect(ALL_CATEGORIES.length).toBe(21);
-    expect(ALL_SUBCATEGORIES.length).toBe(140);
+    expect(ALL_SUBCATEGORIES.length).toBe(214);
+    expect(ALL_CATEGORIES.map((category) => category.name)).toEqual([
+      'Food & Restaurant',
+      'Alcohol & Beverages',
+      'Pharmaceutical Services',
+      'Laundry Services',
+      'Airport Transfers',
+      'Travels & Tours',
+      'Events & Experiences',
+      'Adult Section',
+      'Games & Sports',
+      'Beauty & Cosmetics',
+      'Wellness, Spa, Fitness & Nutrition',
+      'Concierge Services',
+      'Movers & Relocation',
+      'Premium Services & Reservations',
+      'Car Hire & Vehicle Services',
+      'Apparels & Clothing',
+      'Green & Groceries',
+      'Marketplace',
+      'Electronics & Technology',
+      'Flowers & Gifts',
+      'Courier Services',
+    ]);
+    expect(new Set(ALL_SUBCATEGORIES.map((sub) => sub.id)).size).toBe(214);
+    for (const category of ALL_CATEGORIES)
+      for (const sub of category.subcategories) expect(sub.categoryId).toBe(category.id);
   });
 
-  it('gives each Adults Only specialty a distinct, staged workflow', async () => {
-    const { getCategoryById } = await import('./taxonomy');
-    const category = getCategoryById('adults_only');
-
-    expect(category?.subcategories).toHaveLength(6);
-    for (const subcategory of category?.subcategories ?? []) {
-      expect(subcategory.workflow?.status).toBe('designed');
-      expect(subcategory.workflow?.groups).toHaveLength(3);
-      expect(subcategory.defaultWorkflow).not.toContain('Browse → item → variant/quantity');
-      expect(subcategory.workflow?.policyNote).toMatch(/verification|not yet implemented/i);
-    }
-
-    const workflows = (category?.subcategories ?? []).map((subcategory) =>
-      subcategory.workflow?.groups.flatMap((group) => group.steps).join(' '),
-    );
-    expect(new Set(workflows).size).toBe(6);
+  it("builds each subcategory on its base profile's workflow fields", async () => {
+    const { getSubcategoryById, getCategoryById, subcategoryLabel } = await import('./taxonomy');
+    const seafood = getSubcategoryById('seafood_grill');
+    expect(seafood).toMatchObject({ name: 'Seafood & Grill', categoryId: 'restaurants_food' });
+    expect(seafood?.defaultWorkflow).toBe(getSubcategoryById('restaurant')?.defaultWorkflow);
+    const swedish = getSubcategoryById('swedish_massage')!;
+    expect(swedish.group).toBe('Spa & Massage');
+    expect(subcategoryLabel(swedish)).toBe('Spa & Massage · Swedish');
+    expect(getCategoryById('wellness')?.subcategories).toHaveLength(45);
+    // Retired subcategories still resolve, for records made before 16 Nov 2026.
+    expect(getSubcategoryById('cigarettes')?.name).toBe('Cigarettes');
   });
 
   it('only asks for preparation time where the business category needs it', async () => {
@@ -179,19 +200,20 @@ describe('merchant taxonomy', () => {
 
     expect(MERCHANT_TAXONOMY.every((category) => getCatalogueExample(category.id))).toBe(true);
     expect(getCatalogueExample('fashion_apparel')?.name).toContain('Linen shirt');
-    expect(getCatalogueExample('adults_only', 'cigarettes')?.name).toContain('20-pack');
-    expect(getCatalogueExample('adults_only', 'adult_products')?.name).not.toBe(
-      getCatalogueExample('adults_only', 'cigarettes')?.name,
-    );
+    expect(getCatalogueExample('adults_only', 'adult_wellness')?.name).toContain('wellness kit');
     expect(getCatalogueExample('vehicle_rentals')?.photoHint).toContain('vehicle');
   });
 
   it('resolves categories by id and legacy alias', async () => {
     const { getCategoryById } = await import('./taxonomy');
-    expect(getCategoryById('restaurants_food')?.name).toBe('Restaurants & Food');
+    expect(getCategoryById('restaurants_food')?.name).toBe('Food & Restaurant');
     // Legacy alias
-    expect(getCategoryById('restaurant')?.name).toBe('Restaurants & Food');
-    expect(getCategoryById('supermarket')?.name).toBe('Groceries & Essentials');
+    expect(getCategoryById('restaurant')?.name).toBe('Food & Restaurant');
+    expect(getCategoryById('supermarket')?.name).toBe('Green & Groceries');
+    // Retired categories resolve to the one that replaced them.
+    expect(getCategoryById('health')?.id).toBe('pharmacy');
+    expect(getCategoryById('vehicle_services')?.name).toBe('Car Hire & Vehicle Services');
+    expect(getCategoryById('flights')?.id).toBe('travel_tours');
   });
 
   it('searches taxonomy by query', async () => {

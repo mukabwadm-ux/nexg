@@ -1,18 +1,30 @@
+import { currentCategoryId } from '@nexg/contracts';
 import { Card, cn } from '@nexg/ui';
 import {
+  Activity,
+  BellRing,
+  Car,
   ChevronRight,
   ClipboardList,
+  Compass,
+  Crown,
   FileClock,
   Flower2,
-  Gift,
+  Laptop,
+  Package,
+  PartyPopper,
   PauseCircle,
   Pill,
+  Plane,
   Scale,
   Search,
+  ShieldAlert,
   Shirt,
   ShoppingCart,
   Sparkles,
   Store,
+  Trophy,
+  Truck,
   UtensilsCrossed,
   Wine,
   type LucideIcon,
@@ -93,21 +105,36 @@ function Avatar({ name }: { name: string | null }) {
   );
 }
 
-const CATEGORY_ICON: Record<string, LucideIcon> = {
-  restaurant: UtensilsCrossed,
-  bar_liquor: Wine,
-  laundry: Shirt,
-  florist: Flower2,
-  beauty_fashion: Sparkles,
+/** Icons for the 21 categories, by current category id. */
+const ICON_BY_CATEGORY: Record<string, LucideIcon> = {
+  restaurants_food: UtensilsCrossed,
+  alcohol_beverages: Wine,
   pharmacy: Pill,
-  supermarket: ShoppingCart,
-  gift_shop: Gift,
-  other: Store,
+  laundry_cleaning: Shirt,
+  airport_transfers: Plane,
+  travel_tours: Compass,
+  experiences: PartyPopper,
+  adults_only: ShieldAlert,
+  games_sports: Trophy,
+  beauty: Sparkles,
+  wellness: Activity,
+  concierge_services: BellRing,
+  movers_relocation: Truck,
+  premium_services: Crown,
+  vehicle_rentals: Car,
+  fashion_apparel: Shirt,
+  groceries_essentials: ShoppingCart,
+  marketplace: Store,
+  tech_electronics: Laptop,
+  flowers_gifts: Flower2,
+  logistics_shipping: Package,
 };
+const categoryIcon = (key: string | null | undefined): LucideIcon =>
+  ICON_BY_CATEGORY[currentCategoryId(key) ?? ''] ?? Store;
 
 function CategoryChip({ category }: { category: string | null }) {
   const key = category ?? 'other';
-  const Icon = CATEGORY_ICON[key] ?? Store;
+  const Icon = categoryIcon(key);
   return (
     <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-[#FFF4CC] px-2 py-1 text-xs font-bold text-[#7A5C00]">
       <Icon aria-hidden="true" className="h-3.5 w-3.5" />
@@ -276,7 +303,7 @@ export function Directory({
         {['all', ...categories].map((c) => {
           const on = category === c;
           const key = Object.keys(CATEGORY_LABEL).find((k) => CATEGORY_LABEL[k] === c);
-          const Icon = c === 'all' ? Store : (CATEGORY_ICON[key ?? 'other'] ?? Store);
+          const Icon = c === 'all' ? Store : categoryIcon(key);
           const n = c === 'all' ? searched.length : searched.filter((r) => labelOf(r) === c).length;
           return (
             <Link

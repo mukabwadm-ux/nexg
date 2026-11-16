@@ -1,0 +1,881 @@
+{
+  "revision": "nexg-categories-2026-11-16.1",
+  "note": "Hand-maintained. NexG's 21 categories and their subcategories, as the owner set them on 16 Nov 2026. Each subcategory names `base`: the audited booking profile whose setup questions, model and workflow it reuses (packages/booking-config). A subcategory whose id equals its base IS that profile, renamed. `group` heads a set of subcategories in pickers (Wellness). `extra` subcategories are kept for a live feature but are not in the owner's list. `retired` maps every old subcategory and category to where its merchants now sit. Run `node scripts/categories/build.mjs` after editing this file.",
+  "categories": [
+    {
+      "id": "restaurants_food",
+      "name": "Food & Restaurant",
+      "desc": "Restaurants, cafés, bakeries and private chefs",
+      "subcategories": [
+        {
+          "id": "fast_food_casual_dining",
+          "name": "Fast Food & Casual Dining",
+          "base": "fast_food"
+        },
+        { "id": "fine_dining", "name": "Fine Dining", "base": "restaurant" },
+        {
+          "id": "african_cuisine",
+          "name": "African Cuisine (East, West, Central & Southern African)",
+          "base": "restaurant"
+        },
+        { "id": "italian_cuisine", "name": "Italian Cuisine", "base": "restaurant" },
+        {
+          "id": "asian_cuisine",
+          "name": "Asian Cuisine (Chinese, Japanese, Indian, Thai)",
+          "base": "restaurant"
+        },
+        {
+          "id": "mediterranean_middle_eastern",
+          "name": "Mediterranean & Middle Eastern Cuisine",
+          "base": "restaurant"
+        },
+        { "id": "seafood_grill", "name": "Seafood & Grill", "base": "restaurant" },
+        { "id": "vegetarian_vegan", "name": "Vegetarian & Vegan", "base": "restaurant" },
+        { "id": "cafes_bakeries_pastries", "name": "Cafés, Bakeries & Pastries", "base": "cafe" },
+        { "id": "catering", "name": "Catering & Private Chefs", "base": "catering" }
+      ]
+    },
+    {
+      "id": "alcohol_beverages",
+      "name": "Alcohol & Beverages",
+      "desc": "Wines, spirits, beer, juices and drinks delivery",
+      "subcategories": [
+        { "id": "wines_champagne", "name": "Wines & Champagne", "base": "wine" },
+        { "id": "spirits", "name": "Whisky, Vodka, Gin, Rum & Tequila", "base": "spirits" },
+        { "id": "beer", "name": "Beer & Cider", "base": "beer" },
+        { "id": "cocktails_mocktails", "name": "Cocktails & Mocktails", "base": "cocktail_mixers" },
+        {
+          "id": "fresh_juices_smoothies",
+          "name": "Fresh Juices & Smoothies",
+          "base": "cocktail_mixers"
+        },
+        {
+          "id": "soft_energy_drinks",
+          "name": "Soft Drinks & Energy Drinks",
+          "base": "cocktail_mixers"
+        },
+        {
+          "id": "water_beverage_delivery",
+          "name": "Water & Beverage Delivery",
+          "base": "liquor_stores"
+        }
+      ]
+    },
+    {
+      "id": "pharmacy",
+      "name": "Pharmaceutical Services",
+      "desc": "Medication, refills, supplements and medical supplies",
+      "subcategories": [
+        {
+          "id": "prescription_otc_medication",
+          "name": "Prescription & OTC Medication",
+          "base": "pharmacy_retail"
+        },
+        { "id": "pharmacy_delivery", "name": "Pharmacy Delivery", "base": "pharmacy_retail" },
+        { "id": "prescription_refills", "name": "Prescription Refills", "base": "pharmacy_retail" },
+        { "id": "supplements", "name": "Vitamins & Supplements", "base": "supplements" },
+        {
+          "id": "medical_supplies",
+          "name": "Medical Supplies & First Aid",
+          "base": "medical_supplies"
+        },
+        { "id": "healthcare_products", "name": "Healthcare Products", "base": "medical_supplies" }
+      ]
+    },
+    {
+      "id": "laundry_cleaning",
+      "name": "Laundry Services",
+      "desc": "Washing, dry cleaning, ironing and laundry pickup",
+      "subcategories": [
+        { "id": "washing_dry_cleaning", "name": "Washing & Dry Cleaning", "base": "laundry" },
+        { "id": "ironing", "name": "Ironing & Pressing", "base": "ironing" },
+        { "id": "express_laundry", "name": "Express Laundry", "base": "laundry" },
+        {
+          "id": "shoe_leather_cleaning",
+          "name": "Shoe & Leather Cleaning",
+          "base": "dry_cleaning"
+        },
+        {
+          "id": "carpet_cleaning",
+          "name": "Carpet, Curtain & Bedding Cleaning",
+          "base": "dry_cleaning"
+        },
+        { "id": "laundry_pickup_delivery", "name": "Laundry Pickup & Delivery", "base": "laundry" }
+      ]
+    },
+    {
+      "id": "airport_transfers",
+      "name": "Airport Transfers",
+      "desc": "Airport pickups, chauffeurs and meet & greet",
+      "subcategories": [
+        { "id": "airport_pickup", "name": "Airport Pickup & Drop-off", "base": "airport_pickup" },
+        {
+          "id": "executive_transfer",
+          "name": "VIP & Executive Transfers",
+          "base": "executive_transfer"
+        },
+        { "id": "chauffeur_services", "name": "Chauffeur Services", "base": "executive_transfer" },
+        {
+          "id": "group_family_transfers",
+          "name": "Group & Family Transfers",
+          "base": "airport_pickup"
+        },
+        { "id": "meet_greet", "name": "Meet & Greet", "base": "meet_greet" },
+        { "id": "luggage_assistance", "name": "Luggage Assistance", "base": "meet_greet" }
+      ]
+    },
+    {
+      "id": "travel_tours",
+      "name": "Travels & Tours",
+      "desc": "Bookings, safaris, tours, holidays and visas",
+      "subcategories": [
+        {
+          "id": "flight_hotel_bookings",
+          "name": "Flight & Hotel Bookings",
+          "base": "travel_packages"
+        },
+        {
+          "id": "domestic_international_travel",
+          "name": "Domestic & International Travel",
+          "base": "travel_packages"
+        },
+        { "id": "safaris", "name": "Safari & Wildlife Tours", "base": "safaris" },
+        { "id": "city_cultural_tours", "name": "City & Cultural Tours", "base": "city_tours" },
+        {
+          "id": "holiday_honeymoon_packages",
+          "name": "Holiday & Honeymoon Packages",
+          "base": "travel_packages"
+        },
+        {
+          "id": "adventure_beach_holidays",
+          "name": "Adventure & Beach Holidays",
+          "base": "adventure_tours"
+        },
+        { "id": "visa_assistance", "name": "Visa Assistance", "base": "travel_packages" },
+        {
+          "id": "car_hire_travel_insurance",
+          "name": "Car Hire & Travel Insurance",
+          "base": "travel_packages"
+        }
+      ]
+    },
+    {
+      "id": "experiences",
+      "name": "Events & Experiences",
+      "desc": "Celebrations, events, nightlife and experiences",
+      "subcategories": [
+        { "id": "weddings_birthdays", "name": "Weddings & Birthdays", "base": "private_events" },
+        { "id": "corporate_events", "name": "Corporate Events", "base": "private_events" },
+        { "id": "concerts_festivals", "name": "Concerts & Festivals", "base": "concerts" },
+        { "id": "parties_nightlife", "name": "Parties & Nightlife", "base": "festivals" },
+        { "id": "romantic_experiences", "name": "Romantic Experiences", "base": "recreation" },
+        { "id": "private_dining", "name": "Private Dining", "base": "private_events" },
+        {
+          "id": "adventure_outdoor_experiences",
+          "name": "Adventure & Outdoor Experiences",
+          "base": "recreation"
+        },
+        { "id": "event_planning", "name": "Event Planning", "base": "private_events" }
+      ],
+      "extra": [
+        {
+          "id": "cinemas",
+          "name": "Cinemas",
+          "note": "Cinema programme and seat booking (20261212090200) need experiences/cinemas."
+        }
+      ]
+    },
+    {
+      "id": "adults_only",
+      "name": "Adult Section",
+      "desc": "Adult wellness, couples' experiences and sexual health",
+      "subcategories": [
+        { "id": "adult_wellness", "name": "Adult Wellness", "base": "adult_wellness" },
+        { "id": "couples_experiences", "name": "Couples' Experiences", "base": "recreation" },
+        { "id": "romantic_getaways", "name": "Romantic Getaways", "base": "travel_packages" },
+        {
+          "id": "sexual_health_products",
+          "name": "Sexual Health Products",
+          "base": "adult_products"
+        },
+        {
+          "id": "intimacy_relationship_education",
+          "name": "Intimacy & Relationship Education",
+          "base": "workshops"
+        },
+        {
+          "id": "adult_lifestyle_experiences",
+          "name": "Adult Lifestyle Experiences",
+          "base": "recreation"
+        }
+      ]
+    },
+    {
+      "id": "games_sports",
+      "name": "Games & Sports",
+      "new": {
+        "icon": "Trophy",
+        "color": "#16a34a",
+        "bg": "#f0fdf4",
+        "image": "experiences",
+        "cardKind": "services",
+        "etaStyle": "turnaround"
+      },
+      "desc": "Gaming, sports, equipment and match tickets",
+      "subcategories": [
+        { "id": "video_online_gaming", "name": "Video & Online Gaming", "base": "gaming" },
+        { "id": "playstation_xbox", "name": "PlayStation & Xbox", "base": "gaming" },
+        { "id": "board_games", "name": "Board Games", "base": "gaming" },
+        {
+          "id": "football_basketball_tennis",
+          "name": "Football, Basketball & Tennis",
+          "base": "sports_activities"
+        },
+        { "id": "golf_swimming", "name": "Golf & Swimming", "base": "sports_activities" },
+        { "id": "outdoor_sports", "name": "Outdoor Sports", "base": "sports_activities" },
+        { "id": "sports_equipment", "name": "Sports Equipment", "base": "general_retail" },
+        { "id": "sports_events_tickets", "name": "Sports Events & Tickets", "base": "concerts" }
+      ]
+    },
+    {
+      "id": "beauty",
+      "name": "Beauty & Cosmetics",
+      "desc": "Makeup, skincare, hair, nails and fragrances",
+      "subcategories": [
+        { "id": "makeup", "name": "Makeup & Makeovers", "base": "makeup" },
+        {
+          "id": "skincare_facial_treatments",
+          "name": "Skincare & Facial Treatments",
+          "base": "makeup"
+        },
+        { "id": "haircare", "name": "Haircare & Hair Styling", "base": "haircare" },
+        { "id": "manicure_pedicure", "name": "Manicure & Pedicure", "base": "makeup" },
+        { "id": "eyelashes_eyebrows", "name": "Eyelashes & Eyebrows", "base": "makeup" },
+        {
+          "id": "cosmetics_stores",
+          "name": "Beauty Products & Cosmetics",
+          "base": "cosmetics_stores"
+        },
+        { "id": "fragrances", "name": "Perfumes & Fragrances", "base": "fragrances" },
+        { "id": "personal_grooming", "name": "Personal Grooming", "base": "haircare" }
+      ]
+    },
+    {
+      "id": "wellness",
+      "name": "Wellness, Spa, Fitness & Nutrition",
+      "desc": "Spa, salons, barbers, fitness, nutrition and recovery",
+      "subcategories": [
+        { "id": "swedish_massage", "name": "Swedish", "group": "Spa & Massage", "base": "massage" },
+        {
+          "id": "deep_tissue_massage",
+          "name": "Deep Tissue",
+          "group": "Spa & Massage",
+          "base": "massage"
+        },
+        {
+          "id": "aromatherapy",
+          "name": "Aromatherapy",
+          "group": "Spa & Massage",
+          "base": "massage"
+        },
+        {
+          "id": "hot_stone_massage",
+          "name": "Hot Stone",
+          "group": "Spa & Massage",
+          "base": "massage"
+        },
+        {
+          "id": "couples_massage",
+          "name": "Couples Massage",
+          "group": "Spa & Massage",
+          "base": "massage"
+        },
+        { "id": "reflexology", "name": "Reflexology", "group": "Spa & Massage", "base": "massage" },
+        {
+          "id": "ladies_salons",
+          "name": "Ladies' Salons",
+          "group": "Salon Services",
+          "base": "haircare"
+        },
+        {
+          "id": "hair_styling",
+          "name": "Hair Styling",
+          "group": "Salon Services",
+          "base": "haircare"
+        },
+        { "id": "braiding", "name": "Braiding", "group": "Salon Services", "base": "haircare" },
+        { "id": "weaving", "name": "Weaving", "group": "Salon Services", "base": "haircare" },
+        { "id": "dreadlocks", "name": "Dreadlocks", "group": "Salon Services", "base": "haircare" },
+        {
+          "id": "wig_installation",
+          "name": "Wig Installation",
+          "group": "Salon Services",
+          "base": "haircare"
+        },
+        {
+          "id": "hair_treatments",
+          "name": "Hair Treatments",
+          "group": "Salon Services",
+          "base": "haircare"
+        },
+        {
+          "id": "mens_haircuts",
+          "name": "Men's Haircuts",
+          "group": "Barber Services",
+          "base": "haircare"
+        },
+        {
+          "id": "skin_fades",
+          "name": "Skin Fades",
+          "group": "Barber Services",
+          "base": "haircare"
+        },
+        {
+          "id": "beard_grooming",
+          "name": "Beard Grooming",
+          "group": "Barber Services",
+          "base": "haircare"
+        },
+        { "id": "shaving", "name": "Shaving", "group": "Barber Services", "base": "haircare" },
+        {
+          "id": "childrens_haircuts",
+          "name": "Children's Haircuts",
+          "group": "Barber Services",
+          "base": "haircare"
+        },
+        { "id": "gym", "name": "Gym Memberships", "group": "Fitness & Gym", "base": "gym" },
+        {
+          "id": "personal_training",
+          "name": "Personal Training",
+          "group": "Fitness & Gym",
+          "base": "personal_training"
+        },
+        {
+          "id": "strength_training",
+          "name": "Strength Training",
+          "group": "Fitness & Gym",
+          "base": "personal_training"
+        },
+        { "id": "cardio", "name": "Cardio", "group": "Fitness & Gym", "base": "gym" },
+        {
+          "id": "group_fitness",
+          "name": "Group Fitness",
+          "group": "Fitness & Gym",
+          "base": "classes"
+        },
+        {
+          "id": "nutrition_consultations",
+          "name": "Nutrition Consultations",
+          "group": "Nutrition & Diet",
+          "base": "coaching"
+        },
+        {
+          "id": "meal_plans",
+          "name": "Meal Plans",
+          "group": "Nutrition & Diet",
+          "base": "coaching"
+        },
+        {
+          "id": "weight_management",
+          "name": "Weight Management",
+          "group": "Nutrition & Diet",
+          "base": "coaching"
+        },
+        {
+          "id": "sports_nutrition",
+          "name": "Sports Nutrition",
+          "group": "Nutrition & Diet",
+          "base": "coaching"
+        },
+        { "id": "yoga", "name": "Yoga", "group": "Sports & Training", "base": "classes" },
+        { "id": "pilates", "name": "Pilates", "group": "Sports & Training", "base": "classes" },
+        { "id": "swimming", "name": "Swimming", "group": "Sports & Training", "base": "classes" },
+        { "id": "boxing", "name": "Boxing", "group": "Sports & Training", "base": "classes" },
+        {
+          "id": "martial_arts",
+          "name": "Martial Arts",
+          "group": "Sports & Training",
+          "base": "classes"
+        },
+        {
+          "id": "sports_coaching",
+          "name": "Sports Coaching",
+          "group": "Sports & Training",
+          "base": "personal_training"
+        },
+        { "id": "sauna", "name": "Sauna", "group": "Recovery & Relaxation", "base": "spa" },
+        {
+          "id": "steam_baths",
+          "name": "Steam Baths",
+          "group": "Recovery & Relaxation",
+          "base": "spa"
+        },
+        { "id": "jacuzzi", "name": "Jacuzzi", "group": "Recovery & Relaxation", "base": "spa" },
+        {
+          "id": "hydrotherapy",
+          "name": "Hydrotherapy",
+          "group": "Recovery & Relaxation",
+          "base": "spa"
+        },
+        {
+          "id": "cold_plunge",
+          "name": "Cold Plunge",
+          "group": "Recovery & Relaxation",
+          "base": "spa"
+        },
+        {
+          "id": "meditation",
+          "name": "Meditation",
+          "group": "Wellness Programs",
+          "base": "coaching"
+        },
+        {
+          "id": "stress_management",
+          "name": "Stress Management",
+          "group": "Wellness Programs",
+          "base": "coaching"
+        },
+        {
+          "id": "sleep_wellness",
+          "name": "Sleep Wellness",
+          "group": "Wellness Programs",
+          "base": "coaching"
+        },
+        {
+          "id": "wellness_retreats",
+          "name": "Wellness Retreats",
+          "group": "Wellness Programs",
+          "base": "travel_packages"
+        },
+        {
+          "id": "fitness_equipment",
+          "name": "Fitness Equipment",
+          "group": "Wellness Products",
+          "base": "general_retail"
+        },
+        {
+          "id": "protein_products",
+          "name": "Protein Products",
+          "group": "Wellness Products",
+          "base": "supplements"
+        },
+        {
+          "id": "wellness_accessories",
+          "name": "Wellness Accessories",
+          "group": "Wellness Products",
+          "base": "general_retail"
+        }
+      ]
+    },
+    {
+      "id": "concierge_services",
+      "name": "Concierge Services",
+      "desc": "Personal assistants, shopping, errands and reservations",
+      "subcategories": [
+        {
+          "id": "personal_assistance",
+          "name": "Personal Assistant Services",
+          "base": "personal_assistance"
+        },
+        { "id": "shopping_assistance", "name": "Personal Shopping", "base": "shopping_assistance" },
+        { "id": "grocery_shopping", "name": "Grocery Shopping", "base": "shopping_assistance" },
+        { "id": "reservations", "name": "Restaurant & Hotel Reservations", "base": "reservations" },
+        { "id": "gift_sourcing", "name": "Gift Procurement", "base": "gift_sourcing" },
+        { "id": "errand_running", "name": "Errand Running", "base": "personal_assistance" },
+        { "id": "flower_delivery", "name": "Flower Delivery", "base": "gift_sourcing" },
+        {
+          "id": "lifestyle_management",
+          "name": "Lifestyle Management",
+          "base": "personal_assistance"
+        },
+        { "id": "vip_assistance", "name": "VIP Guest Assistance", "base": "vip_assistance" },
+        {
+          "id": "private_butler_services",
+          "name": "Private Butler Services",
+          "base": "vip_assistance"
+        }
+      ]
+    },
+    {
+      "id": "movers_relocation",
+      "name": "Movers & Relocation",
+      "new": {
+        "icon": "Truck",
+        "color": "#ea580c",
+        "bg": "#fff7ed",
+        "image": "logistics",
+        "cardKind": "services",
+        "etaStyle": "turnaround"
+      },
+      "desc": "Home and office moves, packing, storage and assembly",
+      "subcategories": [
+        { "id": "residential_moving", "name": "Residential Moving", "base": "moving_assistance" },
+        { "id": "office_relocation", "name": "Office Relocation", "base": "moving_assistance" },
+        {
+          "id": "international_moving",
+          "name": "International Moving",
+          "base": "moving_assistance"
+        },
+        { "id": "furniture_moving", "name": "Furniture Moving", "base": "moving_assistance" },
+        { "id": "packing_unpacking", "name": "Packing & Unpacking", "base": "moving_assistance" },
+        { "id": "storage_services", "name": "Storage Services", "base": "warehousing" },
+        { "id": "furniture_assembly", "name": "Furniture Assembly", "base": "home_cleaning" },
+        { "id": "vehicle_transportation", "name": "Vehicle Transportation", "base": "road_freight" }
+      ]
+    },
+    {
+      "id": "premium_services",
+      "name": "Premium Services & Reservations",
+      "new": {
+        "icon": "Crown",
+        "color": "#b45309",
+        "bg": "#fffbeb",
+        "image": "travel-tours",
+        "cardKind": "services",
+        "etaStyle": "turnaround"
+      },
+      "desc": "VIP reservations, charters, luxury rentals and exclusive access",
+      "subcategories": [
+        {
+          "id": "vip_restaurant_reservations",
+          "name": "VIP Restaurant Reservations",
+          "base": "reservations"
+        },
+        {
+          "id": "luxury_hotel_villa_reservations",
+          "name": "Luxury Hotel & Villa Reservations",
+          "base": "reservations"
+        },
+        {
+          "id": "vip_lounge_club_access",
+          "name": "VIP Lounge & Club Access",
+          "base": "reservations"
+        },
+        { "id": "private_jet_charters", "name": "Private Jet Charters", "base": "travel_packages" },
+        { "id": "yacht_charters", "name": "Yacht Charters", "base": "travel_packages" },
+        { "id": "luxury_car_rentals", "name": "Luxury Car Rentals", "base": "car_rental" },
+        { "id": "exclusive_event_access", "name": "Exclusive Event Access", "base": "concerts" },
+        {
+          "id": "personal_butler_services",
+          "name": "Personal Butler Services",
+          "base": "vip_assistance"
+        },
+        {
+          "id": "premium_travel_experiences",
+          "name": "Premium Travel Experiences",
+          "base": "luxury_safaris"
+        }
+      ]
+    },
+    {
+      "id": "vehicle_rentals",
+      "name": "Car Hire & Vehicle Services",
+      "desc": "Car hire, chauffeur-driven cars, vans and detailing",
+      "subcategories": [
+        { "id": "car_rental", "name": "Economy & Luxury Car Rentals", "base": "car_rental" },
+        { "id": "suv_4x4_rentals", "name": "SUV & 4x4 Rentals", "base": "car_rental" },
+        { "id": "self_drive", "name": "Self-Drive & Chauffeur-Driven Cars", "base": "self_drive" },
+        {
+          "id": "corporate_rental",
+          "name": "Wedding & Corporate Car Hire",
+          "base": "corporate_rental"
+        },
+        { "id": "van_minibus_rentals", "name": "Van & Minibus Rentals", "base": "car_rental" },
+        { "id": "long_term_rental", "name": "Long-Term Vehicle Hire", "base": "long_term_rental" },
+        { "id": "vehicle_detailing", "name": "Vehicle Detailing", "base": "car_wash" }
+      ]
+    },
+    {
+      "id": "fashion_apparel",
+      "name": "Apparels & Clothing",
+      "desc": "Fashion, footwear, bags, jewellery and tailoring",
+      "subcategories": [
+        {
+          "id": "mens_womens_fashion",
+          "name": "Men's & Women's Fashion",
+          "base": "womens_fashion"
+        },
+        { "id": "kids_fashion", "name": "Children's Clothing", "base": "kids_fashion" },
+        {
+          "id": "designer_luxury_wear",
+          "name": "Designer & Luxury Wear",
+          "base": "womens_fashion"
+        },
+        { "id": "casual_formal_wear", "name": "Casual & Formal Wear", "base": "mens_fashion" },
+        {
+          "id": "sportswear_activewear",
+          "name": "Sportswear & Activewear",
+          "base": "mens_fashion"
+        },
+        {
+          "id": "traditional_cultural_wear",
+          "name": "Traditional & Cultural Wear",
+          "base": "womens_fashion"
+        },
+        { "id": "shoes", "name": "Shoes & Footwear", "base": "shoes" },
+        { "id": "bags", "name": "Bags & Accessories", "base": "bags" },
+        { "id": "watches", "name": "Watches & Jewellery", "base": "watches" },
+        { "id": "tailoring_alterations", "name": "Tailoring & Alterations", "base": "dry_cleaning" }
+      ]
+    },
+    {
+      "id": "groceries_essentials",
+      "name": "Green & Groceries",
+      "desc": "Fresh produce, meat, dairy, bakery and grocery bundles",
+      "subcategories": [
+        { "id": "fresh_produce", "name": "Fresh Fruits & Vegetables", "base": "fresh_produce" },
+        { "id": "organic_store", "name": "Organic Produce", "base": "organic_store" },
+        { "id": "meat_poultry_seafood", "name": "Meat, Poultry & Seafood", "base": "butchery" },
+        { "id": "dairy_eggs", "name": "Dairy & Eggs", "base": "supermarket" },
+        { "id": "bakery_products", "name": "Bakery Products", "base": "supermarket" },
+        { "id": "cereals_grains", "name": "Cereals & Grains", "base": "supermarket" },
+        { "id": "household_groceries", "name": "Household Groceries", "base": "supermarket" },
+        { "id": "frozen_foods", "name": "Frozen Foods", "base": "supermarket" },
+        { "id": "healthy_foods", "name": "Healthy Foods", "base": "organic_store" },
+        {
+          "id": "grocery_bundles_delivery",
+          "name": "Grocery Bundles & Delivery",
+          "base": "supermarket"
+        }
+      ]
+    },
+    {
+      "id": "marketplace",
+      "name": "Marketplace",
+      "desc": "Electronics, home, kitchen, baby, pets, books and gifts",
+      "subcategories": [
+        { "id": "electronics_gadgets", "name": "Electronics & Gadgets", "base": "general_retail" },
+        { "id": "home_living", "name": "Home & Furniture", "base": "home_living" },
+        { "id": "kitchenware", "name": "Kitchenware", "base": "kitchenware" },
+        {
+          "id": "beauty_personal_care",
+          "name": "Beauty & Personal Care",
+          "base": "general_retail"
+        },
+        { "id": "fashion_accessories", "name": "Fashion & Accessories", "base": "general_retail" },
+        {
+          "id": "baby_childrens_products",
+          "name": "Baby & Children's Products",
+          "base": "general_retail"
+        },
+        {
+          "id": "sports_fitness_equipment",
+          "name": "Sports & Fitness Equipment",
+          "base": "general_retail"
+        },
+        {
+          "id": "automotive_accessories",
+          "name": "Automotive Accessories",
+          "base": "general_retail"
+        },
+        { "id": "books", "name": "Books & Stationery", "base": "books" },
+        { "id": "pet_supplies", "name": "Pet Supplies", "base": "general_retail" },
+        { "id": "arts_crafts_gifts", "name": "Arts, Crafts & Gifts", "base": "decor" }
+      ]
+    },
+    {
+      "id": "tech_electronics",
+      "name": "Electronics & Technology",
+      "desc": "Phones, computers, wearables, appliances and repairs",
+      "subcategories": [
+        { "id": "smartphones", "name": "Mobile Phones & Tablets", "base": "smartphones" },
+        { "id": "computers", "name": "Laptops & Computers", "base": "computers" },
+        {
+          "id": "smartwatches_wearables",
+          "name": "Smartwatches & Wearables",
+          "base": "smart_devices"
+        },
+        { "id": "audio", "name": "Audio & Entertainment Systems", "base": "audio" },
+        { "id": "cameras_photography", "name": "Cameras & Photography", "base": "smartphones" },
+        { "id": "gaming", "name": "Gaming Consoles", "base": "gaming" },
+        {
+          "id": "tech_accessories",
+          "name": "Phone & Computer Accessories",
+          "base": "tech_accessories"
+        },
+        { "id": "smart_devices", "name": "Smart Home Devices", "base": "smart_devices" },
+        { "id": "home_appliances", "name": "Home Appliances", "base": "appliances" },
+        { "id": "electronics_repairs", "name": "Electronics Repairs", "base": "telecom_services" }
+      ]
+    },
+    {
+      "id": "flowers_gifts",
+      "name": "Flowers & Gifts",
+      "desc": "Bouquets, arrangements, hampers and same-day gifts",
+      "subcategories": [
+        { "id": "flowers", "name": "Fresh Flowers & Bouquets", "base": "flowers" },
+        {
+          "id": "luxury_floral_arrangements",
+          "name": "Luxury Floral Arrangements",
+          "base": "flowers"
+        },
+        {
+          "id": "occasion_gifts",
+          "name": "Birthday & Anniversary Gifts",
+          "base": "occasion_gifts"
+        },
+        { "id": "wedding_event_flowers", "name": "Wedding & Event Flowers", "base": "flowers" },
+        { "id": "corporate_gifts", "name": "Corporate Gifts", "base": "gift_hampers" },
+        { "id": "gift_hampers", "name": "Gift Hampers & Baskets", "base": "gift_hampers" },
+        { "id": "chocolates", "name": "Chocolates & Sweet Hampers", "base": "chocolates" },
+        { "id": "personalized_gifts", "name": "Personalized Gifts", "base": "personalized_gifts" },
+        { "id": "perfumes_gift_sets", "name": "Perfumes & Gift Sets", "base": "gift_hampers" },
+        { "id": "gift_cards_wrapping", "name": "Gift Cards & Wrapping", "base": "occasion_gifts" },
+        { "id": "same_day_deliveries", "name": "Surprise & Same-Day Deliveries", "base": "flowers" }
+      ]
+    },
+    {
+      "id": "logistics_shipping",
+      "name": "Courier Services",
+      "desc": "Parcels, same-day and express delivery, local and international",
+      "subcategories": [
+        {
+          "id": "parcel_package_delivery",
+          "name": "Parcel & Package Delivery",
+          "base": "road_freight"
+        },
+        { "id": "same_day_delivery", "name": "Same-Day Delivery", "base": "road_freight" },
+        {
+          "id": "express_priority_delivery",
+          "name": "Express & Priority Delivery",
+          "base": "road_freight"
+        },
+        {
+          "id": "local_domestic_courier",
+          "name": "Local & Domestic Courier",
+          "base": "road_freight"
+        },
+        { "id": "international_shipping", "name": "International Shipping", "base": "air_freight" },
+        {
+          "id": "document_business_delivery",
+          "name": "Document & Business Delivery",
+          "base": "road_freight"
+        },
+        { "id": "food_grocery_courier", "name": "Food & Grocery Courier", "base": "road_freight" },
+        {
+          "id": "pickup_dropoff_services",
+          "name": "Pickup & Drop-off Services",
+          "base": "road_freight"
+        },
+        {
+          "id": "bulk_corporate_deliveries",
+          "name": "Bulk & Corporate Deliveries",
+          "base": "road_freight"
+        },
+        {
+          "id": "fragile_special_handling",
+          "name": "Fragile & Special-Handling Deliveries",
+          "base": "road_freight"
+        }
+      ]
+    }
+  ],
+  "retiredCategories": {
+    "health": "pharmacy",
+    "financial_services": "concierge_services",
+    "vehicle_services": "vehicle_rentals",
+    "flights": "travel_tours",
+    "other": "marketplace"
+  },
+  "retiredSubcategories": {
+    "restaurant": "fast_food_casual_dining",
+    "fast_food": "fast_food_casual_dining",
+    "cafe": "cafes_bakeries_pastries",
+    "bakery": "cafes_bakeries_pastries",
+    "desserts": "cafes_bakeries_pastries",
+    "juice_bar": "cafes_bakeries_pastries",
+    "cloud_kitchen": "fast_food_casual_dining",
+    "wine": "wines_champagne",
+    "champagne": "wines_champagne",
+    "cocktail_mixers": "cocktails_mocktails",
+    "liquor_stores": "spirits",
+    "pharmacy_retail": "prescription_otc_medication",
+    "baby_products": "healthcare_products",
+    "laundry": "washing_dry_cleaning",
+    "dry_cleaning": "washing_dry_cleaning",
+    "home_cleaning": "carpet_cleaning",
+    "office_cleaning": "carpet_cleaning",
+    "wash_and_fold": "washing_dry_cleaning",
+    "stain_removal": "washing_dry_cleaning",
+    "clothing_alterations": "washing_dry_cleaning",
+    "curtain_cleaning": "carpet_cleaning",
+    "wedding_gown_cleaning": "washing_dry_cleaning",
+    "corporate_uniform_laundry": "washing_dry_cleaning",
+    "fumigation": "carpet_cleaning",
+    "garment_care": "ironing",
+    "laundry_order_tracking": "laundry_pickup_delivery",
+    "airport_dropoff": "airport_pickup",
+    "game_drives": "safaris",
+    "luxury_safaris": "safaris",
+    "city_tours": "city_cultural_tours",
+    "cultural_tours": "city_cultural_tours",
+    "adventure_tours": "adventure_beach_holidays",
+    "travel_packages": "holiday_honeymoon_packages",
+    "concerts": "concerts_festivals",
+    "festivals": "concerts_festivals",
+    "conferences": "corporate_events",
+    "private_events": "event_planning",
+    "photography": "event_planning",
+    "workshops": "event_planning",
+    "classes": "event_planning",
+    "sports_activities": "adventure_outdoor_experiences",
+    "recreation": "adventure_outdoor_experiences",
+    "adult_products": "sexual_health_products",
+    "cigarettes": "adult_wellness",
+    "cigars": "adult_wellness",
+    "vapes": "adult_wellness",
+    "adult_accessories": "sexual_health_products",
+    "skincare": "skincare_facial_treatments",
+    "spa": "swedish_massage",
+    "massage": "swedish_massage",
+    "travel_planning": "lifestyle_management",
+    "property_coordination": "lifestyle_management",
+    "moving_assistance": "errand_running",
+    "cleaning_coordination": "errand_running",
+    "bike_rental": "car_rental",
+    "mens_fashion": "mens_womens_fashion",
+    "womens_fashion": "mens_womens_fashion",
+    "accessories": "bags",
+    "supermarket": "household_groceries",
+    "convenience_store": "household_groceries",
+    "butchery": "meat_poultry_seafood",
+    "seafood": "meat_poultry_seafood",
+    "furniture": "home_living",
+    "appliances": "electronics_gadgets",
+    "decor": "home_living",
+    "stationery": "books",
+    "office_supplies": "books",
+    "general_retail": "home_living",
+    "telecom_services": "electronics_repairs",
+    "cakes": "chocolates",
+    "sea_freight": "international_shipping",
+    "air_freight": "international_shipping",
+    "road_freight": "local_domestic_courier",
+    "warehousing": "bulk_corporate_deliveries",
+    "clinics": "healthcare_products",
+    "telemedicine": "healthcare_products",
+    "labs": "healthcare_products",
+    "mental_health": "stress_management",
+    "coaching": "stress_management",
+    "banking": "lifestyle_management",
+    "forex": "lifestyle_management",
+    "insurance": "lifestyle_management",
+    "payments": "lifestyle_management",
+    "remittance": "lifestyle_management",
+    "sacco_services": "lifestyle_management",
+    "business_services": "lifestyle_management",
+    "car_wash": "vehicle_detailing",
+    "tire_service": "vehicle_detailing",
+    "battery_service": "vehicle_detailing",
+    "vehicle_assistance": "vehicle_detailing",
+    "vehicle_inspection": "vehicle_detailing",
+    "helicopter_charters": "private_jet_charters",
+    "private_charters": "private_jet_charters",
+    "scenic_flights": "flight_hotel_bookings",
+    "safari_flights": "flight_hotel_bookings"
+  },
+  "merchantOverrides": {
+    "Sokoni Grill House": "seafood_grill",
+    "Hifadhi Sushi & Asian": "asian_cuisine"
+  }
+}

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 
-import { CATEGORY_ICON } from '@/components/explore/merchant-card';
+import { categoryIcon } from '@/components/explore/merchant-card';
 import type { BestSeller } from '@/lib/best-sellers';
 import { discoverCategoryHref } from '@/lib/discover-links';
 
@@ -192,7 +192,7 @@ function ProductPhoto({ item }: { item: BestSeller }) {
       />
     );
   }
-  const Icon = CATEGORY_ICON[item.category] ?? Store;
+  const Icon = categoryIcon(item.category) ?? Store;
   return (
     <span className="from-bg to-border/60 absolute inset-0 flex items-center justify-center bg-gradient-to-br dark:from-[#F1ECE1]">
       <Icon aria-hidden="true" className="text-gold/60 h-12 w-12" />

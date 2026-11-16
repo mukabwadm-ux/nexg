@@ -1,11 +1,18 @@
 /**
  * @nexg/contracts/taxonomy — The authoritative NexG Merchant Taxonomy.
  *
- * 21 Top-Level Merchant Verticals and 140 Subcategories (the audited 128 plus
- * the Laundry & Cleaning additions in packages/booking-config/src/data/subcategory-variants.json).
- * Derived from the official NexG Nairobi Merchant Seed Catalog & Taxonomy spec.
+ * NexG's 21 categories and their subcategories, as the owner set them on
+ * 16 Nov 2026: `./data/category-master.json`. Each subcategory reuses the
+ * workflow fields of an audited profile (`PROFILE_TAXONOMY` below, the 21
+ * original verticals and 140 subcategories), named by its `base`.
+ *
+ * Retired categories and subcategories still resolve through the lookups
+ * (getCategoryById redirects a retired category to the one that replaced it),
+ * but are never listed.
  */
 import { z } from 'zod';
+
+import master from './data/category-master.json';
 
 export const MerchantSubcategorySchema = z.object({
   id: z.string(),
@@ -15,6 +22,8 @@ export const MerchantSubcategorySchema = z.object({
   fulfillmentHint: z.string(),
   workflowHint: z.string(),
   fields: z.array(z.string()),
+  /** The heading this subcategory sits under in pickers (Wellness). */
+  group: z.string().optional(),
   suggestedItemCount: z.number().int().default(30),
   defaultWorkflow: z.string(),
   catalogueExample: z
@@ -64,6 +73,24 @@ export interface CatalogueExample {
 }
 
 const CATEGORY_CATALOGUE_EXAMPLES: Record<string, CatalogueExample> = {
+  games_sports: {
+    name: '5-a-side pitch · 1 hour',
+    description: 'Add the activity, session length, group size, and what is included.',
+    pricePlaceholder: 'e.g. 3,000',
+    photoHint: 'Show the venue, equipment, or game guests will use.',
+  },
+  movers_relocation: {
+    name: 'One-bedroom move · within Nairobi',
+    description: 'Add the move size, crew and vehicle, packing, and what the price covers.',
+    pricePlaceholder: 'e.g. 15,000',
+    photoHint: 'Show your truck, crew, or a packed load.',
+  },
+  premium_services: {
+    name: 'VIP table booking · up to 6 guests',
+    description: 'Add the venue or service, guest numbers, and what the package includes.',
+    pricePlaceholder: 'e.g. 25,000',
+    photoHint: 'Show the venue, vehicle, or experience guests can expect.',
+  },
   adults_only: {
     name: 'Discreet wellness product',
     description: 'Add the product type, size, and useful details for the guest.',
@@ -246,7 +273,11 @@ export function getCatalogueExample(
   return specialtyExample ?? CATEGORY_CATALOGUE_EXAMPLES[category.id];
 }
 
-export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
+/**
+ * The audited verticals and subcategories every current subcategory takes its
+ * workflow fields from. Not listed anywhere; see MERCHANT_TAXONOMY.
+ */
+const PROFILE_TAXONOMY: readonly MerchantCategory[] = [
   {
     id: 'adults_only',
     name: 'Adults Only',
@@ -2833,8 +2864,89 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = [
   },
 ] as const;
 
+type MasterCategory = {
+  id: string;
+  name: string;
+  desc: string;
+  new?: {
+    icon: string;
+    color: string;
+    bg: string;
+    image: string;
+    cardKind: string;
+    etaStyle: string;
+  };
+  subcategories: { id: string; name: string; base: string; group?: string }[];
+};
+
+const PROFILE_SUBCATEGORIES = new Map(
+  PROFILE_TAXONOMY.flatMap((category) => category.subcategories).map((sub) => [sub.id, sub]),
+);
+
+/** NexG's 21 categories, in display order, with their subcategories. */
+export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = (
+  master.categories as MasterCategory[]
+).map((entry, index) => {
+  const audited = PROFILE_TAXONOMY.find((category) => category.id === entry.id);
+  const meta = audited ?? {
+    icon: entry.new!.icon,
+    color: entry.new!.color,
+    bg: entry.new!.bg,
+    cardKind: entry.new!.cardKind as MerchantCategory['cardKind'],
+    etaStyle: entry.new!.etaStyle as MerchantCategory['etaStyle'],
+  };
+  return {
+    id: entry.id,
+    name: entry.name,
+    icon: meta.icon,
+    color: meta.color,
+    bg: meta.bg,
+    desc: entry.desc,
+    cardKind: meta.cardKind,
+    etaStyle: meta.etaStyle,
+    ...(audited?.prepTimeRequired !== undefined
+      ? { prepTimeRequired: audited.prepTimeRequired }
+      : {}),
+    sort: index + 1,
+    subcategories: entry.subcategories.map((sub) => {
+      const base = PROFILE_SUBCATEGORIES.get(sub.base);
+      if (!base) throw new Error(`Subcategory ${sub.id} has no base profile ${sub.base}.`);
+      return {
+        ...base,
+        id: sub.id,
+        name: sub.name,
+        categoryId: entry.id,
+        ...(sub.group ? { group: sub.group } : {}),
+      };
+    }),
+  };
+});
+
+/**
+ * Every subcategory an application may carry → its category: the current list,
+ * plus the retired subcategories under the category they were captured in.
+ * Applications are history, so a retired specialty stays valid there.
+ */
+export const KNOWN_SUBCATEGORY_CATEGORY: ReadonlyMap<string, string> = new Map([
+  ...PROFILE_TAXONOMY.flatMap((category) =>
+    category.subcategories.map((sub) => [sub.id, category.id] as const),
+  ),
+  ...MERCHANT_TAXONOMY.flatMap((category) =>
+    category.subcategories.map((sub) => [sub.id, category.id] as const),
+  ),
+]);
+/** Every category an application may carry: the 21 current ones and the retired ones. */
+export const KNOWN_CATEGORY_IDS: ReadonlySet<string> = new Set(KNOWN_SUBCATEGORY_CATEGORY.values());
+
+/** Retired category id → the category that replaced it (owner, 16 Nov 2026). */
+export const RETIRED_CATEGORY_MAP: Readonly<Record<string, string>> = master.retiredCategories;
+/** Retired subcategory id → the subcategory that replaced it (owner, 16 Nov 2026). */
+export const RETIRED_SUBCATEGORY_MAP: Readonly<Record<string, string>> =
+  master.retiredSubcategories;
+
 /** Legacy alias map to guarantee 100% backward compatibility */
 const LEGACY_CATEGORY_MAP: Record<string, string> = {
+  ...master.retiredCategories,
   restaurant: 'restaurants_food',
   supermarket: 'groceries_essentials',
   pharmacy: 'pharmacy',
@@ -2845,6 +2957,12 @@ const LEGACY_CATEGORY_MAP: Record<string, string> = {
   gift_shop: 'flowers_gifts',
   airport: 'airport_transfers',
 };
+
+const NEW_CATEGORY_IMAGES = Object.fromEntries(
+  (master.categories as MasterCategory[])
+    .filter((category) => category.new)
+    .map((category) => [category.id, `/images/categories/${category.new!.image}.jpg`]),
+);
 
 /**
  * Authoritative map linking each vertical / category to its unique CC0 photograph.
@@ -2880,6 +2998,7 @@ export const CATEGORY_IMAGE_MAP: Readonly<Record<string, string>> = {
   vehicle_rentals: '/images/categories/vehicle-rentals.jpg',
   vehicle_services: '/images/categories/vehicle-services.jpg',
   wellness: '/images/categories/wellness.jpg',
+  ...NEW_CATEGORY_IMAGES,
 };
 
 /**
@@ -2894,7 +3013,7 @@ export function getCategoryImage(catId: string): string {
   );
 }
 
-/** All 21 categories with attached image paths */
+/** The 21 categories with attached image paths */
 export const ALL_CATEGORIES: readonly MerchantCategory[] = MERCHANT_TAXONOMY.map((cat) => ({
   ...cat,
   image: getCategoryImage(cat.id),
@@ -2919,10 +3038,40 @@ export function getCategoryById(id: string): MerchantCategory | undefined {
 }
 
 /**
+ * The current category id for any key a record may carry: a current id, a
+ * legacy enum value ('restaurant') or a retired category ('health' →
+ * 'pharmacy', 'other' → 'marketplace'). Undefined for an unknown key.
+ */
+export function currentCategoryId(key: string | null | undefined): string | undefined {
+  return key ? getCategoryById(key)?.id : undefined;
+}
+
+/** The category's current name for any key a record may carry; undefined if unknown. */
+export function categoryName(key: string | null | undefined): string | undefined {
+  return key ? getCategoryById(key)?.name : undefined;
+}
+
+/**
+ * Every category key a record may carry (current ids, legacy enum values and
+ * retired categories) → the current category name. For lookup tables that
+ * index by key.
+ */
+export const CATEGORY_KEY_NAMES: Readonly<Record<string, string>> = Object.fromEntries(
+  [...MERCHANT_TAXONOMY.map((category) => category.id), ...Object.keys(LEGACY_CATEGORY_MAP)]
+    .map((key) => [key, getCategoryById(key)?.name] as const)
+    .filter((entry): entry is readonly [string, string] => entry[1] !== undefined),
+);
+
+/**
  * Look up a subcategory by ID.
  */
 export function getSubcategoryById(id: string): MerchantSubcategory | undefined {
-  return ALL_SUBCATEGORIES.find((sub) => sub.id === id);
+  return ALL_SUBCATEGORIES.find((sub) => sub.id === id) ?? PROFILE_SUBCATEGORIES.get(id);
+}
+
+/** A subcategory as its picker shows it: "Spa & Massage · Swedish" when it has a group. */
+export function subcategoryLabel(sub: Pick<MerchantSubcategory, 'name' | 'group'>): string {
+  return sub.group ? `${sub.group} · ${sub.name}` : sub.name;
 }
 
 /**

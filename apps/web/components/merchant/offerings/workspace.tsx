@@ -1,4 +1,5 @@
 'use client';
+import { isListedSubcategory, listedCategoryName } from '@nexg/booking-config/profiles';
 import { TableViewport } from '@nexg/ui/table-viewport';
 
 import Image from 'next/image';
@@ -1165,7 +1166,7 @@ export function OfferingsWorkspace({
       <Modal
         open={panel === 'sample'}
         title="Preview a merchant specialty"
-        description="Test the same screen across all 128 subcategories. Each specialty keeps its own browser-only catalogue."
+        description="Test the same screen across every subcategory merchants can choose. Each specialty keeps its own browser-only catalogue."
         onClose={() => setPanel(null)}
         footer={
           <button
@@ -1180,10 +1181,17 @@ export function OfferingsWorkspace({
         <div className="of-fields">
           <Label title="Sample specialty">
             <select value={sampleId} onChange={(e) => setSampleId(e.target.value)}>
-              {[...new Set(profiles.map((p) => p.categoryId))].map((category) => (
-                <optgroup key={category} label={category.replaceAll('_', ' ')}>
+              {[
+                ...new Set(
+                  profiles.filter((p) => isListedSubcategory(p.id)).map((p) => p.categoryId),
+                ),
+              ].map((category) => (
+                <optgroup
+                  key={category}
+                  label={listedCategoryName(category) ?? category.replaceAll('_', ' ')}
+                >
                   {profiles
-                    .filter((p) => p.categoryId === category)
+                    .filter((p) => p.categoryId === category && isListedSubcategory(p.id))
                     .map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.name}

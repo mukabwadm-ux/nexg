@@ -1,4 +1,5 @@
 'use client';
+import { isListedSubcategory } from '@nexg/booking-config/profiles';
 import {
   useCallback,
   useEffect,
@@ -665,10 +666,14 @@ export function BusinessWorkspace({
                   setCandidate(null);
                 }}
               >
-                {[...new Set(profiles.map((p) => p.categoryName))].map((name) => (
+                {[
+                  ...new Set(
+                    profiles.filter((p) => isListedSubcategory(p.id)).map((p) => p.categoryName),
+                  ),
+                ].map((name) => (
                   <optgroup key={name} label={name}>
                     {profiles
-                      .filter((p) => p.categoryName === name)
+                      .filter((p) => p.categoryName === name && isListedSubcategory(p.id))
                       .map((p) => (
                         <option key={p.id} value={p.id}>
                           {p.name}

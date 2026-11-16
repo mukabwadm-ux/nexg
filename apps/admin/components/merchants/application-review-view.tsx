@@ -1,5 +1,5 @@
 import { Card } from '@nexg/ui';
-import { MERCHANT_TAXONOMY } from '@nexg/contracts';
+import { categoryName as currentCategoryName, getSubcategoryById } from '@nexg/contracts';
 import Link from 'next/link';
 
 import type {
@@ -26,12 +26,10 @@ export const applicationReviewStates = [
   'all',
 ] as const;
 type Capture = ApplicationReviewRecord['payload'];
-const categoryName = (id: string | null) =>
-  MERCHANT_TAXONOMY.find((category) => category.id === id)?.name ?? id ?? 'Not selected';
-const specialtyName = (id: string) =>
-  MERCHANT_TAXONOMY.flatMap((category) => category.subcategories).find(
-    (specialty) => specialty.id === id,
-  )?.name ?? id;
+/* Older applications can name a retired category or specialty: a retired
+   category shows the one that replaced it, a retired specialty its own name. */
+const categoryName = (id: string | null) => currentCategoryName(id) ?? id ?? 'Not selected';
+const specialtyName = (id: string) => getSubcategoryById(id)?.name ?? id;
 function date(value: string | null) {
   return value
     ? new Date(value).toLocaleString('en-GB', {

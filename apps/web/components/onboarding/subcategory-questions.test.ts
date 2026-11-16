@@ -10,14 +10,14 @@ const categoriesWithTailoredSetup = new Set([
   'fashion_apparel',
   'vehicle_rentals',
   'experiences',
-  'financial_services',
+  'games_sports',
   'marketplace',
-  'health',
   'tech_electronics',
   'travel_tours',
-  'vehicle_services',
   'wellness',
   'concierge_services',
+  'movers_relocation',
+  'premium_services',
   'laundry_cleaning',
 ]);
 

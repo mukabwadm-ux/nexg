@@ -28,8 +28,38 @@ export interface SnapshotMerchant {
 export interface Snapshot { counts: { merchants: number; items: number; areas: number }; areas: string[]; merchants: SnapshotMerchant[] }
 
 interface ConfigurationOption { id: string; label: string; source_subcategory_ids: string[] }
-interface ConfigurationSubcategory { name: string; discovery_key: string; source_subcategory_ids: string[]; nested_option_candidates: ConfigurationOption[] }
-export interface Configuration { categories: { category: string; discovery_key: string; subcategories: ConfigurationSubcategory[] }[] }
+interface ConfigurationSubcategory {
+  name: string; discovery_key: string; supabase: { category: string; subcategory: string }; source_subcategory_ids: string[];
+  nested_option_candidates: ConfigurationOption[]; journey: Journey;
+}
+interface ConfigurationCategory { category: string; discovery_key: string; supabase_category: string; source_category_ids: string[]; subcategories: ConfigurationSubcategory[] }
+/** docs/discovery/MASTER_NAVIGATION.json, generated from the master category list by scripts/taxonomy/build.mjs. */
+export interface Configuration { categories: ConfigurationCategory[] }
+
+/**
+ * How a demo merchant's Supabase keys become the master list's keys (owner, 16 Nov 2026), the way the database
+ * migration moves live merchants: the seed's own spelling first (seedSpellings), then demo-only keys category_config
+ * never had (demoKeys), then the master list's retired subcategories. The subcategory then names its category.
+ * A demo key mapped to null leaves its group out of the demo seed (the demo API's banks: not concierge material).
+ * From the master list (category-master.json) and docs/discovery/MASTER_CATEGORIES_OVERLAY.json.
+ */
+export interface KeyTranslation {
+  categories: { id: string; subcategories: { id: string }[] }[];
+  retiredSubcategories: Record<string, string>;
+  demoKeys: Record<string, string | null>;
+  seedSpellings: Record<string, string>;
+}
+export function translateKeys(translation: KeyTranslation, category: string, subcategory: string): { category: string; subcategory: string } | null {
+  const pair = `${category}/${subcategory}`;
+  const demo = translation.demoKeys[pair];
+  if (demo === null) return null;
+  const [demoCategory, demoSubcategory] = demo ? demo.split('/') : [];
+  const spelled = demoSubcategory ?? translation.seedSpellings[pair] ?? subcategory;
+  const next = translation.retiredSubcategories[spelled] ?? spelled;
+  const home = translation.categories.find(entry => entry.subcategories.some(sub => sub.id === next))?.id;
+  if (!home || (demoCategory && demoCategory !== home)) fail(`${pair} has no place in the master category list`);
+  return { category: home, subcategory: next };
+}
 
 /** Default journeys from CATEGORY_FLOWS.md. A verified offering workflow always overrides them. */
 export type Journey = 'PURCHASE' | 'RESTRICTED_PURCHASE' | 'APPOINTMENT' | 'RENTAL' | 'SERVICE' | 'TICKET' | 'TOUR' | 'CARE' | 'REQUEST' | 'TRANSFER';
@@ -40,11 +70,17 @@ const journeys: Record<Journey, Action> = {
   SERVICE: 'request', REQUEST: 'request',
 };
 
+/**
+ * One row per subcategory of the master list: its Supabase pair and where Discovery shows it. The demo* fields keep
+ * the demo API's shape the catalog bridge serves: the source group id (<category>_<subcategory>, kebab-case), the
+ * master names, and the demo API groups (demoGroups) whose merchants now sit here.
+ */
 export interface SubcategoryRow {
   demoSubcategoryId: string;
   demoLabel: string;
   demoCategoryId: string;
   demoCategoryLabel: string;
+  demoGroups: string[];
   merchants: number;
   items: number;
   supabase: { category: string; subcategory: string };
@@ -56,7 +92,7 @@ export interface SubcategoryRow {
 
 export interface SubcategoryMap {
   note: string;
-  summary: { demoSubcategories: number; mapped: number; unmapped: number; merchants: number; mappedMerchants: number; items: number; discoverySubcategoriesWithoutDemo: string[] };
+  summary: { subcategories: number; withDemoMerchants: number; demoGroups: number; merchants: number; items: number; discoverySubcategoriesWithoutDemo: string[]; demoGroupsLeftOut: string[] };
   subcategories: SubcategoryRow[];
 }
 
@@ -145,63 +181,60 @@ export function parseSupabaseSeed(sql: string): SeedMerchant[] {
   });
 }
 
-/** Reads the default journey of every subcategory row in CATEGORY_FLOWS.md, keyed by category and subcategory label. */
-export function parseJourneys(markdown: string): Map<string, Journey> {
-  const result = new Map<string, Journey>();
-  let category: string | undefined;
-  for (const line of markdown.split(/\r?\n/)) {
-    const heading = /^## \d+\. (.+?) — \d+ subcategories/.exec(line);
-    if (heading) { category = heading[1]; continue; }
-    const row = /^\| \d+\. (.+?) \|.*\| \*\*([A-Z_]+)\*\*/.exec(line);
-    if (!row || !category) continue;
-    if (!(row[2]! in journeys)) fail(`Unknown journey ${row[2]} for ${row[1]}`);
-    result.set(`${category}\u0000${row[1]}`, row[2] as Journey);
-  }
-  return result;
-}
-
-/** Matches each demo subcategory to its Supabase keys, Discovery subcategory and default journey. */
-export function buildSubcategoryMap(input: { snapshot: Snapshot; seed: SeedMerchant[]; configuration: Configuration; journeys: Map<string, Journey> }): SubcategoryMap {
+/**
+ * Matches each demo API group to the master list's subcategory its Supabase keys move to, and gives every
+ * subcategory of the master list one row: its keys, its Discovery subcategory, its default journey and the
+ * demo merchants that land there.
+ */
+export function buildSubcategoryMap(input: { snapshot: Snapshot; seed: SeedMerchant[]; configuration: Configuration; translation: KeyTranslation }): SubcategoryMap {
   const seedByCode = new Map(input.seed.map(row => [row.code, row]));
-  const discoveryBySource = new Map<string, { category: Configuration['categories'][number]; subcategory: ConfigurationSubcategory }>();
-  for (const category of input.configuration.categories) for (const subcategory of category.subcategories) for (const id of subcategory.source_subcategory_ids) {
-    if (discoveryBySource.has(id)) fail(`Source subcategory ${id} is mapped twice`);
-    discoveryBySource.set(id, { category, subcategory });
+  const entries = input.configuration.categories.flatMap(category => category.subcategories.map(subcategory => ({ category, subcategory })));
+  const byPair = new Map(entries.map(entry => [`${entry.subcategory.supabase.category}/${entry.subcategory.supabase.subcategory}`, entry]));
+  const sources = new Map<string, string>();
+  for (const { subcategory } of entries) for (const id of subcategory.source_subcategory_ids) {
+    if (sources.has(id)) fail(`Source subcategory ${id} is mapped twice`);
+    sources.set(id, subcategory.discovery_key);
   }
   const groups = new Map<string, SnapshotMerchant[]>();
   for (const merchant of input.snapshot.merchants) groups.set(merchant.subcategoryId, [...(groups.get(merchant.subcategoryId) ?? []), merchant]);
-  // A configured source group with no demo merchants would show an empty screen while looking mapped.
-  for (const id of discoveryBySource.keys()) if (!groups.has(id)) fail(`Configured source group ${id} has no demo merchants`);
-  const rows = [...groups.entries()].map(([demoSubcategoryId, merchants]): SubcategoryRow => {
-    const first = merchants[0]!;
+  const landed = new Map<string, { group: string; merchants: SnapshotMerchant[] }[]>();
+  const leftOut: string[] = [];
+  for (const [group, merchants] of groups) {
     const pairs = new Set(merchants.map(merchant => {
       const seed = seedByCode.get(merchant.id) ?? fail(`${merchant.id} is missing from the Supabase seed`);
       if (seed.tradingName !== merchant.name) fail(`${merchant.id}: seed name "${seed.tradingName}" differs from "${merchant.name}"`);
       return `${seed.category}/${seed.subcategory}`;
     }));
-    if (pairs.size !== 1) fail(`${demoSubcategoryId} spans several Supabase subcategories: ${[...pairs].join(', ')}`);
+    if (pairs.size !== 1) fail(`${group} spans several Supabase subcategories: ${[...pairs].join(', ')}`);
     const [category, subcategory] = [...pairs][0]!.split('/') as [string, string];
-    const match = discoveryBySource.get(demoSubcategoryId);
-    const journey = match ? input.journeys.get(`${match.category.category}\u0000${match.subcategory.name}`) ?? fail(`No journey for ${match.subcategory.name}`) : null;
+    const next = translateKeys(input.translation, category, subcategory);
+    if (!next) { leftOut.push(group); continue; }
+    const entry = byPair.get(`${next.category}/${next.subcategory}`) ?? fail(`${group}: no Discovery subcategory for ${next.category}/${next.subcategory}`);
+    // The platform provider reads the demo API's group ids, so the configuration must list each one where it lands.
+    if (sources.get(group) !== entry.subcategory.discovery_key) fail(`${group} lands in ${entry.subcategory.discovery_key}, but the configuration doesn't list it there`);
+    const key = entry.subcategory.discovery_key;
+    landed.set(key, [...(landed.get(key) ?? []), { group, merchants }]);
+  }
+  const rows = entries.map(({ category, subcategory }): SubcategoryRow => {
+    const demo = (landed.get(subcategory.discovery_key) ?? []).sort((left, right) => left.group.localeCompare(right.group));
+    const merchants = demo.flatMap(entry => entry.merchants);
     return {
-      demoSubcategoryId, demoLabel: first.subcategory, demoCategoryId: first.categoryId, demoCategoryLabel: first.category,
+      demoSubcategoryId: subcategory.source_subcategory_ids[0] ?? fail(`${subcategory.discovery_key} has no source id`),
+      demoLabel: subcategory.name, demoCategoryId: category.source_category_ids[0] ?? fail(`${category.discovery_key} has no source id`), demoCategoryLabel: category.category,
+      demoGroups: demo.map(entry => entry.group),
       merchants: merchants.length, items: merchants.reduce((total, merchant) => total + merchant.items.length, 0),
-      supabase: { category, subcategory },
-      discovery: match ? { categoryId: match.category.discovery_key, subcategoryId: match.subcategory.discovery_key, label: match.subcategory.name,
-        optionIds: match.subcategory.nested_option_candidates.filter(option => option.source_subcategory_ids.includes(demoSubcategoryId)).map(option => option.id) } : null,
-      journey, action: journey ? journeys[journey] : null, status: match ? 'mapped' : 'unmapped',
+      supabase: { ...subcategory.supabase },
+      discovery: { categoryId: category.discovery_key, subcategoryId: subcategory.discovery_key, label: subcategory.name, optionIds: [] },
+      journey: subcategory.journey, action: journeys[subcategory.journey] ?? fail(`Unknown journey ${subcategory.journey}`), status: 'mapped',
     };
-  }).sort((left, right) => left.demoSubcategoryId.localeCompare(right.demoSubcategoryId));
-  const covered = new Set(rows.flatMap(row => row.discovery ? [row.discovery.subcategoryId] : []));
-  const mapped = rows.filter(row => row.status === 'mapped');
+  });
   return {
-    note: 'Generated by scripts/demo-seed/build.ts. Journeys are default intent from CATEGORY_FLOWS.md; a verified offering workflow overrides them.',
+    note: 'Generated by scripts/demo-seed/build.ts from the master category list (via docs/discovery/MASTER_NAVIGATION.json). One row per Supabase subcategory; demoGroups are the demo API groups whose merchants moved there. Journeys are default intent; a verified offering workflow overrides them.',
     summary: {
-      demoSubcategories: rows.length, mapped: mapped.length, unmapped: rows.length - mapped.length,
-      merchants: rows.reduce((total, row) => total + row.merchants, 0), mappedMerchants: mapped.reduce((total, row) => total + row.merchants, 0),
-      items: rows.reduce((total, row) => total + row.items, 0),
-      discoverySubcategoriesWithoutDemo: input.configuration.categories.flatMap(category => category.subcategories)
-        .filter(subcategory => !covered.has(subcategory.discovery_key)).map(subcategory => subcategory.discovery_key),
+      subcategories: rows.length, withDemoMerchants: rows.filter(row => row.merchants).length, demoGroups: groups.size,
+      merchants: rows.reduce((total, row) => total + row.merchants, 0), items: rows.reduce((total, row) => total + row.items, 0),
+      discoverySubcategoriesWithoutDemo: rows.filter(row => !row.merchants).map(row => row.discovery!.subcategoryId),
+      demoGroupsLeftOut: leftOut.sort(),
     },
     subcategories: rows,
   };
@@ -313,7 +346,8 @@ function inserts(table: string, columns: string[], rows: (string | number | bool
  * (with undeliverable demo contacts), one section per merchant, and every demo item with its price.
  */
 export function renderSeedSql(input: { snapshot: Snapshot; seed: SeedMerchant[]; map: SubcategoryMap; sources: { snapshotSha256: string; supabaseSeedSha256: string; gapFillSha256: string } }): string {
-  const rows = new Map(input.map.subcategories.map(row => [row.demoSubcategoryId, row]));
+  const rows = new Map(input.map.subcategories.flatMap(row => row.demoGroups.map(group => [group, row] as const)));
+  const leftOut = new Set(input.map.summary.demoGroupsLeftOut);
   const seedByCode = new Map(input.seed.map(row => [row.code, row]));
   const merchants: (string | number | boolean | null)[][] = [];
   const branches: (string | number | boolean | null)[][] = [];
@@ -322,13 +356,15 @@ export function renderSeedSql(input: { snapshot: Snapshot; seed: SeedMerchant[];
   const licences: (string | number | boolean | null)[][] = [];
   const itemIds = new Set<string>();
   for (const merchant of [...input.snapshot.merchants].sort((left, right) => left.id.localeCompare(right.id))) {
+    if (leftOut.has(merchant.subcategoryId)) continue;
     const seed = seedByCode.get(merchant.id) ?? fail(`${merchant.id} is missing from the Supabase seed`);
     const row = rows.get(merchant.subcategoryId) ?? fail(`${merchant.id}: subcategory ${merchant.subcategoryId} is not in the map`);
     const number = codeNumber(merchant.id, 'M');
     const merchantId = fixedId(demoIdPrefixes.merchant, number);
     if (merchantId !== seed.merchantId) fail(`${merchant.id}: seed id ${seed.merchantId} breaks the fixed range`);
     const code = merchant.id.toLowerCase();
-    merchants.push([merchantId, seed.legalName, seed.tradingName, seed.category, seed.subcategory, `Demo contact, ${seed.tradingName}`,
+    // The master list's keys (owner, 16 Nov 2026), as the migration gives live merchants.
+    merchants.push([merchantId, seed.legalName, seed.tradingName, row.supabase.category, row.supabase.subcategory, `Demo contact, ${seed.tradingName}`,
       `+254000${String(number).padStart(6, '0')}`, `${code}@example.com`, null, 'live', true, null, true]);
     branches.push([seed.branchId, merchantId, seed.branchName, seed.address, true, seed.latitude, seed.longitude]);
     const sectionId = fixedId(demoIdPrefixes.section, number);
@@ -410,19 +446,21 @@ export function renderSeedSql(input: { snapshot: Snapshot; seed: SeedMerchant[];
 export function renderMapReview(map: SubcategoryMap, configuration: Configuration): string {
   const lines = ['# Demo subcategory map (for review)', '',
     'Generated by `scripts/demo-seed/build.ts` from `subcategory-map.json`. Edit the sources, not this file.', '',
-    `${map.summary.demoSubcategories} demo subcategories: ${map.summary.mapped} mapped onto Discovery (${map.summary.mappedMerchants} of ${map.summary.merchants} merchants), ${map.summary.unmapped} not mapped. ${map.summary.items} items in all.`, '',
-    'Journey is the default from `CATEGORY_FLOWS.md`. Action: buy, book or request.', ''];
+    `Discovery shows NexG's master category list (owner, 16 Nov 2026): ${map.summary.subcategories} subcategories, ${map.summary.withDemoMerchants} with demo merchants. `
+      + `${map.summary.demoGroups - map.summary.demoGroupsLeftOut.length} of the demo API's ${map.summary.demoGroups} groups (${map.summary.merchants} merchants, ${map.summary.items} items) are seeded, `
+      + 'moved to the master list\'s keys the way the database migration moves live merchants.', '',
+    'Journey is the default from the configuration. Action: buy, book or request.', ''];
   for (const category of configuration.categories) {
-    lines.push(`## ${category.category}`, '', '| Discovery subcategory | Demo subcategory | Supabase keys | Merchants | Items | Journey | Action |', '|---|---|---|---|---|---|---|');
+    lines.push(`## ${category.category}`, '', '| Discovery subcategory | Supabase keys | Demo groups | Merchants | Items | Journey | Action |', '|---|---|---|---|---|---|---|');
     for (const subcategory of category.subcategories) {
-      const rows = map.subcategories.filter(row => row.discovery?.subcategoryId === subcategory.discovery_key);
-      if (!rows.length) lines.push(`| ${subcategory.name} | — (no demo merchants) | — | 0 | 0 | — | — |`);
-      for (const row of rows) lines.push(`| ${subcategory.name} | ${row.demoLabel} (\`${row.demoSubcategoryId}\`) | \`${row.supabase.category}\` / \`${row.supabase.subcategory}\` | ${row.merchants} | ${row.items} | ${row.journey} | ${row.action} |`);
+      const row = map.subcategories.find(entry => entry.discovery?.subcategoryId === subcategory.discovery_key) ?? fail(`No map row for ${subcategory.discovery_key}`);
+      const groups = row.demoGroups.length ? row.demoGroups.map(group => `\`${group}\``).join(', ') : '—';
+      lines.push(`| ${subcategory.name} | \`${row.supabase.category}\` / \`${row.supabase.subcategory}\` | ${groups} | ${row.merchants} | ${row.items} | ${row.journey} | ${row.action} |`);
     }
     lines.push('');
   }
-  lines.push('## Not mapped onto Discovery', '', 'These demo merchants exist in Supabase but have no Discovery subcategory yet, so Discovery doesn\'t show them.', '',
-    '| Demo category | Demo subcategory | Supabase keys | Merchants | Items |', '|---|---|---|---|---|');
-  for (const row of map.subcategories.filter(entry => entry.status === 'unmapped')) lines.push(`| ${row.demoCategoryLabel} | ${row.demoLabel} (\`${row.demoSubcategoryId}\`) | \`${row.supabase.category}\` / \`${row.supabase.subcategory}\` | ${row.merchants} | ${row.items} |`);
+  lines.push('## Left out of the demo seed', '',
+    'These demo API groups are not seeded, and Discovery doesn\'t show them: MASTER_CATEGORIES_OVERLAY.json maps their keys to null.', '');
+  for (const group of map.summary.demoGroupsLeftOut) lines.push(`- \`${group}\``);
   return lines.join('\n') + '\n';
 }

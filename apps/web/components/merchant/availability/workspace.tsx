@@ -1,5 +1,6 @@
 'use client';
 
+import { isListedSubcategory } from '@nexg/booking-config/profiles';
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import {
   AlertCircle,
@@ -1840,7 +1841,7 @@ export function AvailabilityWorkspace({
         {panel === 'sample' && (
           <Modal
             title="Availability sample configuration"
-            description="Preview all128 specialties using the existing catalogue. This does not change onboarding or connect a live system."
+            description="Preview any specialty merchants can choose, using the existing catalogue. This does not change onboarding or connect a live system."
             onClose={closePanel}
           >
             <div className="av-form">
@@ -1850,10 +1851,14 @@ export function AvailabilityWorkspace({
                   value={sampleId}
                   onChange={(e) => setSampleId(e.target.value)}
                 >
-                  {[...new Set(profiles.map((p) => p.categoryId))].map((cat) => (
+                  {[
+                    ...new Set(
+                      profiles.filter((p) => isListedSubcategory(p.id)).map((p) => p.categoryId),
+                    ),
+                  ].map((cat) => (
                     <optgroup key={cat} label={categoryName(cat)}>
                       {profiles
-                        .filter((p) => p.categoryId === cat)
+                        .filter((p) => p.categoryId === cat && isListedSubcategory(p.id))
                         .map((p) => (
                           <option key={p.id} value={p.id}>
                             {p.name}

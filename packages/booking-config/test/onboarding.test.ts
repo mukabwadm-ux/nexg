@@ -1,4 +1,4 @@
-import { SUBCATEGORY_VARIANTS } from '../src/variants';
+import { LISTED_CATEGORIES, SUBCATEGORY_VARIANTS } from '../src/variants';
 import { describe, expect, it } from 'vitest';
 import {
   assessOnboardingAnswers,
@@ -11,29 +11,33 @@ const signedIn = { otpVerified: true, signedIn: true };
 const capturing = { otpVerified: false, signedIn: false };
 
 describe('compiled onboarding inventory', () => {
-  it('exposes all registered input configurations under their existing categories', () => {
+  it('lists the 21 master categories, each listed subcategory backed by a registry profile', () => {
     const categories = listOnboardingCategories();
     expect(categories).toHaveLength(21);
-    expect(categories.flatMap((category) => category.subcategories)).toHaveLength(
-      128 + SUBCATEGORY_VARIANTS.length,
+    expect(categories.map((category) => category.id)).toEqual(
+      LISTED_CATEGORIES.map((category) => category.id),
     );
-    expect(
-      categories.flatMap((category) =>
-        category.subcategories.map((subcategory) => ({
-          categoryId: category.id,
-          categoryName: category.name,
-          subcategoryId: subcategory.id,
-          name: subcategory.name,
-        })),
-      ),
-    ).toEqual(
-      registry.profiles.map((profile) => ({
+    const listed = categories.flatMap((category) =>
+      category.subcategories.map((subcategory) => ({
+        categoryId: category.id,
+        categoryName: category.name,
+        subcategoryId: subcategory.id,
+        name: subcategory.name,
+      })),
+    );
+    expect(listed).toHaveLength(214);
+    const byId = new Map(registry.profiles.map((profile) => [profile.subcategoryId, profile]));
+    for (const entry of listed) {
+      const profile = byId.get(entry.subcategoryId)!;
+      expect({
         categoryId: profile.categoryId,
         categoryName: profile.categoryName,
         subcategoryId: profile.subcategoryId,
         name: profile.name,
-      })),
-    );
+      }).toEqual(entry);
+    }
+    // Every audited profile and variant stays in the registry, listed or not.
+    expect(registry.profiles).toHaveLength(128 + SUBCATEGORY_VARIANTS.length);
   });
 
   it.each(registry.profiles)(
@@ -120,8 +124,8 @@ describe('compiled onboarding inventory', () => {
     selection.profiles[0]!.candidateModelIds.length = 0;
     selection.questions[0]!.schema.type = 'number';
     expect(listOnboardingCategories()[0]!.subcategories[0]).toEqual({
-      id: 'adult_products',
-      name: 'Adult Products',
+      id: 'fast_food_casual_dining',
+      name: 'Fast Food & Casual Dining',
     });
     expect(resolveOnboardingSelection('adults_only', ['adult_products']).profiles[0]).toMatchObject(
       {

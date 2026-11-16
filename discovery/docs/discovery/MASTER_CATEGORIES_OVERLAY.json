@@ -1,0 +1,646 @@
+{
+  "note": "Hand-maintained. What Discovery adds to the master category list (packages/contracts/src/data/category-master.json): each category's Discovery id and icon, the pack icons that match a subcategory (a subcategory with none draws its category's icon), default journeys, the old Discovery ids that still open the right page, and how demo API groups move (demoKeys; null leaves a demo group out of the demo seed). Run `node scripts/taxonomy/build.mjs` (from discovery/) after editing this file or the master list.",
+  "categories": {
+    "restaurants_food": {
+      "id": "restaurants-food",
+      "icon": "00_Main_Category_Icons/10_restaurants_food.png"
+    },
+    "alcohol_beverages": {
+      "id": "alcohol-beverages",
+      "icon": "00_Main_Category_Icons/03_alcohol_beverages.png"
+    },
+    "pharmacy": {
+      "id": "pharmacy",
+      "icon": "00_Main_Category_Icons/13_health_pharmacy.png",
+      "legacyIds": [
+        "health-pharmacy"
+      ]
+    },
+    "laundry_cleaning": {
+      "id": "laundry-cleaning",
+      "icon": "00_Main_Category_Icons/12_laundry_cleaning.png"
+    },
+    "airport_transfers": {
+      "id": "airport-transfers",
+      "icon": "00_Main_Category_Icons/02_airport_transfers.png"
+    },
+    "travel_tours": {
+      "id": "travel-tours",
+      "icon": "00_Main_Category_Icons/15_safaris_tours.png",
+      "legacyIds": [
+        "flights"
+      ]
+    },
+    "experiences": {
+      "id": "experiences",
+      "icon": "00_Main_Category_Icons/07_experiences.png"
+    },
+    "adults_only": {
+      "id": "adults-only",
+      "icon": "00_Main_Category_Icons/01_adults_only.png"
+    },
+    "games_sports": {
+      "id": "games-sports",
+      "icon": "00_Main_Category_Icons/17_play.png",
+      "legacyIds": [
+        "play"
+      ]
+    },
+    "beauty": {
+      "id": "beauty",
+      "icon": "00_Main_Category_Icons/05_beauty_wellness.png",
+      "legacyIds": [
+        "beauty-wellness"
+      ]
+    },
+    "wellness": {
+      "id": "wellness",
+      "icon": "05_Beauty_And_Wellness/05_02_Spa.png"
+    },
+    "concierge_services": {
+      "id": "concierge-services",
+      "icon": "00_Main_Category_Icons/16_concierge_services.png"
+    },
+    "movers_relocation": {
+      "id": "movers-relocation",
+      "icon": "16_Concierge_Services/16_07_Moving_Assistance.png"
+    },
+    "premium_services": {
+      "id": "premium-services",
+      "icon": "16_Concierge_Services/16_09_VIP_Assistance.png"
+    },
+    "vehicle_rentals": {
+      "id": "vehicle-rentals",
+      "icon": "00_Main_Category_Icons/06_vehicle_rentals.png"
+    },
+    "fashion_apparel": {
+      "id": "fashion-apparel",
+      "icon": "00_Main_Category_Icons/04_apparel.png"
+    },
+    "groceries_essentials": {
+      "id": "groceries-essentials",
+      "icon": "00_Main_Category_Icons/11_groceries_essentials.png"
+    },
+    "marketplace": {
+      "id": "marketplace",
+      "icon": "00_Main_Category_Icons/09_marketplace.png"
+    },
+    "tech_electronics": {
+      "id": "tech-electronics",
+      "icon": "00_Main_Category_Icons/14_tech_electronics.png"
+    },
+    "flowers_gifts": {
+      "id": "flowers-gifts",
+      "icon": "00_Main_Category_Icons/08_flowers_gifts.png"
+    },
+    "logistics_shipping": {
+      "id": "courier-services",
+      "icon": "16_Concierge_Services/16_10_Courier_And_Errands.png"
+    }
+  },
+  "subcategoryIcons": {
+    "adult_wellness": "01_Adults_Only/01_03_Adult_Wellness.png",
+    "adventure_beach_holidays": "15_Safaris_And_Tours/15_04_Adventure_Tours.png",
+    "adventure_outdoor_experiences": "07_Experiences/07_04_Sports_And_Recreation.png",
+    "airport_pickup": "02_Airport_Transfers/02_01_Airport_Pickup.png",
+    "aromatherapy": "05_Beauty_And_Wellness/05_03_Massage.png",
+    "audio": "14_Tech_And_Electronics/14_05_Audio.png",
+    "baby_childrens_products": "13_Health_And_Pharmacy/13_03_Baby_Products.png",
+    "bags": "04_Apparel/04_05_Bags.png",
+    "bakery_products": "10_Restaurants_And_Food/10_04_Bakery.png",
+    "beard_grooming": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+    "beer": "03_Alcohol_And_Beverages/03_03_Beer.png",
+    "books": "09_Marketplace/09_02_Books_And_Stationery.png",
+    "braiding": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+    "cafes_bakeries_pastries": "10_Restaurants_And_Food/10_03_Cafe.png",
+    "car_rental": "06_Vehicle_Rentals/06_01_Car_Rental.png",
+    "cardio": "05_Beauty_And_Wellness/05_04_Gym.png",
+    "carpet_cleaning": "12_Laundry_And_Cleaning/12_04_Home_Cleaning.png",
+    "catering": "10_Restaurants_And_Food/10_07_Catering.png",
+    "childrens_haircuts": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+    "chocolates": "08_Flowers_And_Gifts/08_04_Chocolates.png",
+    "city_cultural_tours": "15_Safaris_And_Tours/15_02_City_Tours.png",
+    "cocktails_mocktails": "03_Alcohol_And_Beverages/03_05_Cocktail_Mixers.png",
+    "cold_plunge": "05_Beauty_And_Wellness/05_02_Spa.png",
+    "computers": "14_Tech_And_Electronics/14_03_Computers.png",
+    "concerts_festivals": "07_Experiences/07_01_Events.png",
+    "cosmetics_stores": "05_Beauty_And_Wellness/05_01_Beauty_Products.png",
+    "couples_massage": "05_Beauty_And_Wellness/05_03_Massage.png",
+    "deep_tissue_massage": "05_Beauty_And_Wellness/05_03_Massage.png",
+    "dreadlocks": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+    "electronics_repairs": "14_Tech_And_Electronics/14_08_Device_Repairs.png",
+    "errand_running": "16_Concierge_Services/16_10_Courier_And_Errands.png",
+    "executive_transfer": "02_Airport_Transfers/02_04_Executive_Transfer.png",
+    "fashion_accessories": "04_Apparel/04_07_Fashion_Accessories.png",
+    "fast_food_casual_dining": "10_Restaurants_And_Food/10_02_Fast_Food.png",
+    "fine_dining": "10_Restaurants_And_Food/10_01_Restaurant.png",
+    "flight_hotel_bookings": "16_Concierge_Services/16_05_Travel_Planning.png",
+    "flower_delivery": "08_Flowers_And_Gifts/08_01_Flowers.png",
+    "flowers": "08_Flowers_And_Gifts/08_01_Flowers.png",
+    "football_basketball_tennis": "17_Play/17_06_Football_Pitches.png",
+    "fresh_juices_smoothies": "10_Restaurants_And_Food/10_06_Juice_Bar.png",
+    "fresh_produce": "11_Groceries_And_Essentials/11_03_Fresh_Produce.png",
+    "gaming": "14_Tech_And_Electronics/14_04_Gaming.png",
+    "gift_hampers": "08_Flowers_And_Gifts/08_02_Gift_Hampers.png",
+    "gift_sourcing": "16_Concierge_Services/16_04_Gift_Sourcing.png",
+    "golf_swimming": "17_Play/17_11_Public_Swim_Sessions.png",
+    "grocery_bundles_delivery": "11_Groceries_And_Essentials/11_01_Supermarket.png",
+    "group_fitness": "05_Beauty_And_Wellness/05_04_Gym.png",
+    "gym": "05_Beauty_And_Wellness/05_04_Gym.png",
+    "hair_styling": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+    "hair_treatments": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+    "holiday_honeymoon_packages": "15_Safaris_And_Tours/15_05_Travel_Packages.png",
+    "home_living": "09_Marketplace/09_01_Home_And_Living.png",
+    "hot_stone_massage": "05_Beauty_And_Wellness/05_03_Massage.png",
+    "household_groceries": "11_Groceries_And_Essentials/11_07_Household_Essentials.png",
+    "hydrotherapy": "05_Beauty_And_Wellness/05_02_Spa.png",
+    "ironing": "12_Laundry_And_Cleaning/12_03_Ironing.png",
+    "jacuzzi": "05_Beauty_And_Wellness/05_02_Spa.png",
+    "kids_fashion": "04_Apparel/04_03_Kids_Fashion.png",
+    "ladies_salons": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+    "luxury_car_rentals": "06_Vehicle_Rentals/06_01_Car_Rental.png",
+    "manicure_pedicure": "05_Beauty_And_Wellness/05_07_Nails_And_Beauty_Services.png",
+    "meat_poultry_seafood": "11_Groceries_And_Essentials/11_04_Butchery.png",
+    "medical_supplies": "13_Health_And_Pharmacy/13_02_Medical_Supplies.png",
+    "meet_greet": "02_Airport_Transfers/02_03_Meet_And_Greet.png",
+    "mens_haircuts": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+    "mens_womens_fashion": "04_Apparel/04_02_Womens_Fashion.png",
+    "occasion_gifts": "08_Flowers_And_Gifts/08_06_Occasion_Gifts.png",
+    "organic_store": "11_Groceries_And_Essentials/11_06_Organic_Store.png",
+    "outdoor_sports": "17_Play/17_07_Outdoor_Team_Games.png",
+    "personal_assistance": "16_Concierge_Services/16_02_Personal_Assistance.png",
+    "personal_training": "05_Beauty_And_Wellness/05_05_Personal_Training.png",
+    "personalized_gifts": "08_Flowers_And_Gifts/08_05_Personalized_Gifts.png",
+    "pet_supplies": "09_Marketplace/09_05_Pet_Supplies.png",
+    "playstation_xbox": "14_Tech_And_Electronics/14_04_Gaming.png",
+    "prescription_otc_medication": "13_Health_And_Pharmacy/13_01_Pharmacy.png",
+    "private_jet_charters": "18_Flights/18_04_Private_Charters.png",
+    "protein_products": "13_Health_And_Pharmacy/13_04_Supplements.png",
+    "reflexology": "05_Beauty_And_Wellness/05_03_Massage.png",
+    "reservations": "16_Concierge_Services/16_01_Reservations.png",
+    "residential_moving": "16_Concierge_Services/16_07_Moving_Assistance.png",
+    "safaris": "15_Safaris_And_Tours/15_01_Safaris.png",
+    "sauna": "05_Beauty_And_Wellness/05_02_Spa.png",
+    "sexual_health_products": "01_Adults_Only/01_01_Erotic_Products.png",
+    "shaving": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+    "shoes": "04_Apparel/04_04_Shoes.png",
+    "shopping_assistance": "16_Concierge_Services/16_03_Shopping_Assistance.png",
+    "skin_fades": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+    "smart_devices": "14_Tech_And_Electronics/14_07_Smart_Devices.png",
+    "smartphones": "14_Tech_And_Electronics/14_01_Smartphones.png",
+    "soft_energy_drinks": "03_Alcohol_And_Beverages/03_07_NonAlcoholic_Drinks.png",
+    "spirits": "03_Alcohol_And_Beverages/03_02_Spirits.png",
+    "sports_coaching": "05_Beauty_And_Wellness/05_05_Personal_Training.png",
+    "steam_baths": "05_Beauty_And_Wellness/05_02_Spa.png",
+    "strength_training": "05_Beauty_And_Wellness/05_05_Personal_Training.png",
+    "stress_management": "13_Health_And_Pharmacy/13_08_Mental_Health.png",
+    "supplements": "13_Health_And_Pharmacy/13_04_Supplements.png",
+    "swedish_massage": "05_Beauty_And_Wellness/05_03_Massage.png",
+    "swimming": "17_Play/17_12_Swimming_Lessons.png",
+    "tech_accessories": "14_Tech_And_Electronics/14_02_Tech_Accessories.png",
+    "vehicle_detailing": "06_Vehicle_Rentals/06_04_Car_Wash.png",
+    "video_online_gaming": "17_Play/17_02_Arcade_And_Timed_Play.png",
+    "vip_assistance": "16_Concierge_Services/16_09_VIP_Assistance.png",
+    "vip_restaurant_reservations": "16_Concierge_Services/16_01_Reservations.png",
+    "washing_dry_cleaning": "12_Laundry_And_Cleaning/12_01_Laundry.png",
+    "watches": "04_Apparel/04_06_Watches.png",
+    "weaving": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+    "wig_installation": "05_Beauty_And_Wellness/05_06_Salon_And_Barber.png",
+    "wines_champagne": "03_Alcohol_And_Beverages/03_01_Wine.png"
+  },
+  "journeyByBase": {
+    "adult_products": "RESTRICTED_PURCHASE",
+    "adult_wellness": "RESTRICTED_PURCHASE",
+    "adventure_tours": "TOUR",
+    "air_freight": "SERVICE",
+    "airport_pickup": "TRANSFER",
+    "appliances": "PURCHASE",
+    "audio": "PURCHASE",
+    "bags": "PURCHASE",
+    "beer": "RESTRICTED_PURCHASE",
+    "books": "PURCHASE",
+    "butchery": "PURCHASE",
+    "cafe": "PURCHASE",
+    "car_rental": "RENTAL",
+    "car_wash": "SERVICE",
+    "catering": "SERVICE",
+    "chocolates": "PURCHASE",
+    "city_tours": "TOUR",
+    "classes": "TICKET",
+    "coaching": "APPOINTMENT",
+    "cocktail_mixers": "RESTRICTED_PURCHASE",
+    "computers": "PURCHASE",
+    "concerts": "TICKET",
+    "corporate_rental": "RENTAL",
+    "cosmetics_stores": "PURCHASE",
+    "decor": "PURCHASE",
+    "dry_cleaning": "SERVICE",
+    "executive_transfer": "TRANSFER",
+    "fast_food": "PURCHASE",
+    "festivals": "TICKET",
+    "flowers": "PURCHASE",
+    "fragrances": "PURCHASE",
+    "fresh_produce": "PURCHASE",
+    "gaming": "PURCHASE",
+    "general_retail": "PURCHASE",
+    "gift_hampers": "PURCHASE",
+    "gift_sourcing": "REQUEST",
+    "gym": "APPOINTMENT",
+    "haircare": "PURCHASE",
+    "home_cleaning": "SERVICE",
+    "home_living": "PURCHASE",
+    "ironing": "SERVICE",
+    "kids_fashion": "PURCHASE",
+    "kitchenware": "PURCHASE",
+    "laundry": "SERVICE",
+    "liquor_stores": "RESTRICTED_PURCHASE",
+    "long_term_rental": "RENTAL",
+    "luxury_safaris": "TOUR",
+    "makeup": "PURCHASE",
+    "massage": "APPOINTMENT",
+    "medical_supplies": "PURCHASE",
+    "meet_greet": "TRANSFER",
+    "mens_fashion": "PURCHASE",
+    "moving_assistance": "REQUEST",
+    "occasion_gifts": "PURCHASE",
+    "organic_store": "PURCHASE",
+    "personal_assistance": "REQUEST",
+    "personal_training": "APPOINTMENT",
+    "personalized_gifts": "PURCHASE",
+    "pharmacy_retail": "RESTRICTED_PURCHASE",
+    "private_events": "TICKET",
+    "recreation": "TICKET",
+    "reservations": "REQUEST",
+    "restaurant": "PURCHASE",
+    "road_freight": "SERVICE",
+    "safaris": "TOUR",
+    "self_drive": "RENTAL",
+    "shoes": "PURCHASE",
+    "shopping_assistance": "REQUEST",
+    "smart_devices": "PURCHASE",
+    "smartphones": "PURCHASE",
+    "spa": "APPOINTMENT",
+    "spirits": "RESTRICTED_PURCHASE",
+    "sports_activities": "TICKET",
+    "supermarket": "PURCHASE",
+    "supplements": "PURCHASE",
+    "tech_accessories": "PURCHASE",
+    "telecom_services": "SERVICE",
+    "travel_packages": "TOUR",
+    "vip_assistance": "REQUEST",
+    "warehousing": "SERVICE",
+    "watches": "PURCHASE",
+    "wine": "RESTRICTED_PURCHASE",
+    "womens_fashion": "PURCHASE",
+    "workshops": "TICKET"
+  },
+  "journeys": {
+    "beard_grooming": "APPOINTMENT",
+    "board_games": "TICKET",
+    "braiding": "APPOINTMENT",
+    "car_hire_travel_insurance": "REQUEST",
+    "childrens_haircuts": "APPOINTMENT",
+    "corporate_events": "SERVICE",
+    "dreadlocks": "APPOINTMENT",
+    "event_planning": "SERVICE",
+    "eyelashes_eyebrows": "APPOINTMENT",
+    "flight_hotel_bookings": "REQUEST",
+    "fresh_juices_smoothies": "PURCHASE",
+    "hair_styling": "APPOINTMENT",
+    "hair_treatments": "APPOINTMENT",
+    "ladies_salons": "APPOINTMENT",
+    "manicure_pedicure": "APPOINTMENT",
+    "mens_haircuts": "APPOINTMENT",
+    "private_jet_charters": "SERVICE",
+    "shaving": "APPOINTMENT",
+    "skin_fades": "APPOINTMENT",
+    "soft_energy_drinks": "PURCHASE",
+    "video_online_gaming": "TICKET",
+    "visa_assistance": "REQUEST",
+    "water_beverage_delivery": "PURCHASE",
+    "weaving": "APPOINTMENT",
+    "weddings_birthdays": "SERVICE",
+    "wig_installation": "APPOINTMENT",
+    "yacht_charters": "SERVICE"
+  },
+  "demoKeys": {
+    "financial_services/banking": null,
+    "financial_services/business_services": null,
+    "financial_services/forex": null,
+    "financial_services/insurance": null,
+    "financial_services/payments": null,
+    "financial_services/remittance": null,
+    "financial_services/sacco_services": null,
+    "activities_games_sports/arcade_games": "games_sports/video_online_gaming",
+    "activities_games_sports/bowling": "games_sports/board_games",
+    "activities_games_sports/escape_rooms": "games_sports/board_games",
+    "activities_games_sports/indoor_courts": "games_sports/football_basketball_tennis",
+    "activities_games_sports/outdoor_courts": "games_sports/football_basketball_tennis",
+    "activities_games_sports/football_pitches": "games_sports/football_basketball_tennis",
+    "activities_games_sports/outdoor_team_games": "games_sports/outdoor_sports",
+    "activities_games_sports/go_karting": "games_sports/outdoor_sports",
+    "activities_games_sports/paintball": "games_sports/outdoor_sports",
+    "activities_games_sports/ziplining": "games_sports/outdoor_sports",
+    "activities_games_sports/swimming_sessions": "games_sports/golf_swimming",
+    "activities_games_sports/swimming_lessons": "games_sports/golf_swimming",
+    "activities_games_sports/pool_lane_hire": "games_sports/golf_swimming",
+    "alcohol_beverages/non_alcoholic_drinks": "alcohol_beverages/soft_energy_drinks",
+    "beauty/nails_beauty_services": "beauty/manicure_pedicure",
+    "beauty/salon_barber": "wellness/hair_styling",
+    "concierge_services/courier_errands": "concierge_services/errand_running",
+    "groceries_essentials/household_essentials": "groceries_essentials/household_groceries",
+    "health/therapy": "wellness/stress_management",
+    "marketplace/hardware_diy": "marketplace/home_living",
+    "tech_electronics/device_repairs": "tech_electronics/electronics_repairs"
+  },
+  "seedSpellings": {
+    "airport_transfers/airport_drop-off": "airport_dropoff",
+    "airport_transfers/meet__greet": "meet_greet",
+    "vehicle_rentals/long-term_rental": "long_term_rental",
+    "restaurants_food/caf": "cafe",
+    "marketplace/home__living": "home_living",
+    "pharmacy/pharmacy": "pharmacy_retail",
+    "health/mental_health_therapy": "mental_health",
+    "tech_electronics/accessories": "tech_accessories",
+    "logistics_shipping/road_freight__trucking": "road_freight",
+    "logistics_shipping/warehousing__storage": "warehousing"
+  },
+  "legacySubcategoryIds": {
+    "adults-only:erotic-products": "adults-only:sexual-health-products",
+    "adults-only:tobacco-vapes": "adults-only:adult-wellness",
+    "airport-transfers:airport-drop-off": "airport-transfers:airport-pickup",
+    "alcohol-beverages:champagne": "alcohol-beverages:wines-champagne",
+    "alcohol-beverages:cocktail-mixers": "alcohol-beverages:cocktails-mocktails",
+    "alcohol-beverages:liquor-stores": "alcohol-beverages:spirits",
+    "alcohol-beverages:non-alcoholic-drinks": "alcohol-beverages:soft-energy-drinks",
+    "alcohol-beverages:wine": "alcohol-beverages:wines-champagne",
+    "beauty-wellness:beauty-products": "beauty:makeup",
+    "beauty-wellness:gym": "wellness:gym",
+    "beauty-wellness:massage": "wellness:swedish-massage",
+    "beauty-wellness:nails-beauty-services": "beauty:manicure-pedicure",
+    "beauty-wellness:personal-training": "wellness:personal-training",
+    "beauty-wellness:salon-barber": "wellness:hair-styling",
+    "beauty-wellness:spa": "wellness:swedish-massage",
+    "concierge-services:cleaning-coordination": "concierge-services:errand-running",
+    "concierge-services:courier-errands": "concierge-services:errand-running",
+    "concierge-services:moving-assistance": "concierge-services:errand-running",
+    "concierge-services:property-coordination": "concierge-services:lifestyle-management",
+    "concierge-services:travel-planning": "concierge-services:lifestyle-management",
+    "experiences:events": "experiences:concerts-festivals",
+    "experiences:photography": "experiences:event-planning",
+    "experiences:sports-recreation": "experiences:adventure-outdoor-experiences",
+    "experiences:workshops-classes": "experiences:event-planning",
+    "fashion-apparel:fashion-accessories": "fashion-apparel:bags",
+    "fashion-apparel:men-s-fashion": "fashion-apparel:mens-womens-fashion",
+    "fashion-apparel:women-s-fashion": "fashion-apparel:mens-womens-fashion",
+    "flights:helicopter-charters": "premium-services:private-jet-charters",
+    "flights:private-charters": "premium-services:private-jet-charters",
+    "flights:safari-flights": "travel-tours:flight-hotel-bookings",
+    "flights:scenic-flights": "travel-tours:flight-hotel-bookings",
+    "flowers-gifts:cakes": "flowers-gifts:chocolates",
+    "groceries-essentials:butchery": "groceries-essentials:meat-poultry-seafood",
+    "groceries-essentials:convenience-store": "groceries-essentials:household-groceries",
+    "groceries-essentials:household-essentials": "groceries-essentials:household-groceries",
+    "groceries-essentials:seafood": "groceries-essentials:meat-poultry-seafood",
+    "groceries-essentials:supermarket": "groceries-essentials:household-groceries",
+    "health-pharmacy:baby-products": "pharmacy:healthcare-products",
+    "health-pharmacy:hospitals-clinics": "pharmacy:healthcare-products",
+    "health-pharmacy:medical-supplies": "pharmacy:medical-supplies",
+    "health-pharmacy:mental-health": "wellness:stress-management",
+    "health-pharmacy:mobile-diagnostic-services": "pharmacy:healthcare-products",
+    "health-pharmacy:pharmacy": "pharmacy:prescription-otc-medication",
+    "health-pharmacy:supplements": "pharmacy:supplements",
+    "health-pharmacy:telemedicine": "pharmacy:healthcare-products",
+    "health-pharmacy:therapy": "wellness:stress-management",
+    "laundry-cleaning:dry-cleaning": "laundry-cleaning:washing-dry-cleaning",
+    "laundry-cleaning:home-cleaning": "laundry-cleaning:carpet-cleaning",
+    "laundry-cleaning:laundry": "laundry-cleaning:washing-dry-cleaning",
+    "laundry-cleaning:office-cleaning": "laundry-cleaning:carpet-cleaning",
+    "marketplace:books-stationery": "marketplace:books",
+    "marketplace:general-retail": "marketplace:home-living",
+    "marketplace:hardware-diy": "marketplace:home-living",
+    "play:arcade-timed-play": "games-sports:video-online-gaming",
+    "play:bowling": "games-sports:board-games",
+    "play:escape-rooms": "games-sports:board-games",
+    "play:football-pitches": "games-sports:football-basketball-tennis",
+    "play:go-karting": "games-sports:outdoor-sports",
+    "play:indoor-sports-courts": "games-sports:football-basketball-tennis",
+    "play:outdoor-sports-courts": "games-sports:football-basketball-tennis",
+    "play:outdoor-team-games": "games-sports:outdoor-sports",
+    "play:paintball": "games-sports:outdoor-sports",
+    "play:pool-lane-hire": "games-sports:golf-swimming",
+    "play:public-swim-sessions": "games-sports:golf-swimming",
+    "play:swimming-lessons": "games-sports:golf-swimming",
+    "play:ziplining-high-ropes": "games-sports:outdoor-sports",
+    "restaurants-food:bakery": "restaurants-food:cafes-bakeries-pastries",
+    "restaurants-food:caf": "restaurants-food:cafes-bakeries-pastries",
+    "restaurants-food:desserts": "restaurants-food:cafes-bakeries-pastries",
+    "restaurants-food:fast-food": "restaurants-food:fast-food-casual-dining",
+    "restaurants-food:juice-bar": "restaurants-food:cafes-bakeries-pastries",
+    "restaurants-food:restaurant": "restaurants-food:fast-food-casual-dining",
+    "tech-electronics:device-repairs": "tech-electronics:electronics-repairs",
+    "tech-electronics:telecom-services": "tech-electronics:electronics-repairs",
+    "travel-tours:adventure-tours": "travel-tours:adventure-beach-holidays",
+    "travel-tours:city-tours": "travel-tours:city-cultural-tours",
+    "travel-tours:cultural-tours": "travel-tours:city-cultural-tours",
+    "travel-tours:travel-packages": "travel-tours:holiday-honeymoon-packages",
+    "vehicle-rentals:bike-rental": "vehicle-rentals:car-rental",
+    "vehicle-rentals:car-wash": "vehicle-rentals:vehicle-detailing",
+    "vehicle-rentals:vehicle-repair": "vehicle-rentals:vehicle-detailing"
+  },
+  "demoApiSourceIds": {
+    "adults_only/adult_wellness": [
+      "adults-only_cigarettes",
+      "adults-only_cigars",
+      "adults-only_vapes"
+    ],
+    "adults_only/sexual_health_products": [
+      "adults-only_adult-accessories",
+      "adults-only_adult-products"
+    ],
+    "airport_transfers/airport_pickup": [
+      "airport-transfers_airport-drop-off"
+    ],
+    "alcohol_beverages/cocktails_mocktails": [
+      "alcohol-beverages_cocktail-mixers"
+    ],
+    "alcohol_beverages/soft_energy_drinks": [
+      "alcohol-beverages_non-alcoholic-drinks"
+    ],
+    "alcohol_beverages/spirits": [
+      "alcohol-beverages_liquor-stores"
+    ],
+    "alcohol_beverages/wines_champagne": [
+      "alcohol-beverages_champagne",
+      "alcohol-beverages_wine"
+    ],
+    "beauty/manicure_pedicure": [
+      "beauty_nails-beauty-services"
+    ],
+    "beauty/skincare_facial_treatments": [
+      "beauty_skincare"
+    ],
+    "concierge_services/errand_running": [
+      "concierge-services_cleaning-coordination",
+      "concierge-services_courier-errands",
+      "concierge-services_moving-assistance"
+    ],
+    "concierge_services/lifestyle_management": [
+      "concierge-services_property-coordination",
+      "concierge-services_travel-planning"
+    ],
+    "experiences/adventure_outdoor_experiences": [
+      "experiences_recreation",
+      "experiences_sports-activities"
+    ],
+    "experiences/concerts_festivals": [
+      "experiences_concerts",
+      "experiences_festivals"
+    ],
+    "experiences/corporate_events": [
+      "experiences_conferences"
+    ],
+    "experiences/event_planning": [
+      "experiences_classes",
+      "experiences_photography",
+      "experiences_private-events",
+      "experiences_workshops"
+    ],
+    "fashion_apparel/bags": [
+      "fashion-apparel_accessories"
+    ],
+    "fashion_apparel/mens_womens_fashion": [
+      "fashion-apparel_mens-fashion",
+      "fashion-apparel_womens-fashion"
+    ],
+    "flowers_gifts/chocolates": [
+      "flowers-gifts_cakes"
+    ],
+    "games_sports/board_games": [
+      "activities-games-sports_bowling",
+      "activities-games-sports_escape-rooms"
+    ],
+    "games_sports/football_basketball_tennis": [
+      "activities-games-sports_football-pitches",
+      "activities-games-sports_indoor-courts",
+      "activities-games-sports_outdoor-courts"
+    ],
+    "games_sports/golf_swimming": [
+      "activities-games-sports_pool-lane-hire",
+      "activities-games-sports_swimming-lessons",
+      "activities-games-sports_swimming-sessions"
+    ],
+    "games_sports/outdoor_sports": [
+      "activities-games-sports_go-karting",
+      "activities-games-sports_outdoor-team-games",
+      "activities-games-sports_paintball",
+      "activities-games-sports_ziplining"
+    ],
+    "games_sports/video_online_gaming": [
+      "activities-games-sports_arcade-games"
+    ],
+    "groceries_essentials/household_groceries": [
+      "groceries-essentials_convenience-store",
+      "groceries-essentials_household-essentials",
+      "groceries-essentials_supermarket"
+    ],
+    "groceries_essentials/meat_poultry_seafood": [
+      "groceries-essentials_butchery",
+      "groceries-essentials_seafood"
+    ],
+    "laundry_cleaning/carpet_cleaning": [
+      "laundry-cleaning_home-cleaning",
+      "laundry-cleaning_office-cleaning"
+    ],
+    "laundry_cleaning/washing_dry_cleaning": [
+      "laundry-cleaning_dry-cleaning",
+      "laundry-cleaning_laundry"
+    ],
+    "logistics_shipping/bulk_corporate_deliveries": [
+      "logistics-shipping_warehousing-storage"
+    ],
+    "logistics_shipping/international_shipping": [
+      "logistics-shipping_air-freight",
+      "logistics-shipping_sea-freight"
+    ],
+    "logistics_shipping/local_domestic_courier": [
+      "logistics-shipping_road-freight-trucking"
+    ],
+    "marketplace/books": [
+      "marketplace_office-supplies",
+      "marketplace_stationery"
+    ],
+    "marketplace/electronics_gadgets": [
+      "marketplace_appliances"
+    ],
+    "marketplace/home_living": [
+      "marketplace_decor",
+      "marketplace_furniture",
+      "marketplace_general-retail",
+      "marketplace_hardware-diy"
+    ],
+    "pharmacy/healthcare_products": [
+      "health_clinics",
+      "health_labs",
+      "health_telemedicine",
+      "pharmacy_baby-products"
+    ],
+    "pharmacy/prescription_otc_medication": [
+      "pharmacy_pharmacy"
+    ],
+    "restaurants_food/cafes_bakeries_pastries": [
+      "restaurants-food_bakery",
+      "restaurants-food_café",
+      "restaurants-food_desserts",
+      "restaurants-food_juice-bar"
+    ],
+    "restaurants_food/fast_food_casual_dining": [
+      "restaurants-food_cloud-kitchen",
+      "restaurants-food_fast-food",
+      "restaurants-food_restaurant"
+    ],
+    "tech_electronics/electronics_repairs": [
+      "tech-electronics_device-repairs",
+      "tech-electronics_telecom-services"
+    ],
+    "tech_electronics/tech_accessories": [
+      "tech-electronics_accessories"
+    ],
+    "travel_tours/adventure_beach_holidays": [
+      "travel-tours_adventure-tours"
+    ],
+    "travel_tours/city_cultural_tours": [
+      "travel-tours_city-tours",
+      "travel-tours_cultural-tours"
+    ],
+    "travel_tours/holiday_honeymoon_packages": [
+      "travel-tours_travel-packages"
+    ],
+    "travel_tours/safaris": [
+      "travel-tours_game-drives",
+      "travel-tours_luxury-safaris"
+    ],
+    "vehicle_rentals/car_rental": [
+      "vehicle-rentals_bike-rental"
+    ],
+    "vehicle_rentals/vehicle_detailing": [
+      "vehicle-services_battery-service",
+      "vehicle-services_car-wash",
+      "vehicle-services_tire-service",
+      "vehicle-services_vehicle-assistance",
+      "vehicle-services_vehicle-inspection"
+    ],
+    "wellness/hair_styling": [
+      "beauty_salon-barber"
+    ],
+    "wellness/stress_management": [
+      "health_coaching",
+      "health_mental-health-therapy",
+      "health_therapy"
+    ],
+    "wellness/swedish_massage": [
+      "wellness_massage",
+      "wellness_spa"
+    ]
+  }
+}

@@ -24,14 +24,14 @@ interface MassageStorefrontProps {
   onCloseItem: () => void;
 }
 
-/** The hero's count carries the store type's own mark. */
+/** The hero's count carries the store type's own mark, by the booking profile its subcategory reuses. */
 const countIcons: Record<string, LucideIcon> = {
-  'beauty-wellness:massage': HandHeart,
-  'beauty-wellness:spa': Flower2,
-  'beauty-wellness:gym': Dumbbell,
-  'beauty-wellness:personal-training': Dumbbell,
-  'beauty-wellness:salon-barber': Scissors,
-  'beauty-wellness:nails-beauty-services': Sparkles,
+  massage: HandHeart,
+  spa: Flower2,
+  gym: Dumbbell,
+  personal_training: Dumbbell,
+  haircare: Scissors,
+  makeup: Sparkles,
 };
 
 /**
@@ -84,7 +84,7 @@ export function MassageStorefront({ merchant, activeItem, itemMissing = false, o
   // Only facts the catalogue confirms: the place, the count, the open state when known, and display facts the source sends.
   const facts = merchant.displayFacts;
   const rating = facts?.rating && Number.isFinite(facts.rating.value) && facts.rating.value >= 0 && facts.rating.value <= 5 ? facts.rating : undefined;
-  const CountIcon = (subcategory && countIcons[subcategory.id]) ?? ClipboardList;
+  const CountIcon = (subcategory && countIcons[subcategory.base]) ?? ClipboardList;
   const place = merchant.area || merchant.address;
   const heroFacts: ReactNode[] = [
     place && <><MapPin size={16} strokeWidth={1.75} aria-hidden="true" />{place}</>,

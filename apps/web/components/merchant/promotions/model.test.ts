@@ -42,7 +42,8 @@ const profile = profiles.find((p) => p.id === 'makeup')!;
 describe('adaptive promotions', () => {
   it('resolves every registered specialty through its actual offering schema', () => {
     expect(profiles).toHaveLength(PROFILE_COUNT);
-    expect(new Set(profiles.map((p) => p.categoryId)).size).toBe(21);
+    // 21 listed categories plus Health, Financial and Vehicle Services, whose profiles stay valid.
+    expect(new Set(profiles.map((p) => p.categoryId)).size).toBe(24);
     const models = new Set<string>();
     for (const entry of profiles) {
       const item = seedCatalogue(entry).offerings[0]!;

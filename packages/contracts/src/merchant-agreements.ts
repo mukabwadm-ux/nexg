@@ -166,17 +166,28 @@ export const CATEGORY_AGREEMENT: Readonly<Record<string, string>> = {
   wellness: 'wellness',
   concierge_services: 'marketplace',
   logistics_shipping: 'logistics-and-shipping',
+  games_sports: 'experiences',
+  movers_relocation: 'logistics-and-shipping',
+  premium_services: 'marketplace',
 };
 
 /**
  * Categories using another category's agreement until their own exists:
- * Vehicle Rentals → Vehicle Services, Health → Wellness, App Services
- * (concierge_services) → Marketplace.
+ * Car Hire & Vehicle Services (vehicle_rentals) → Vehicle Services, Health →
+ * Wellness, Concierge Services → Marketplace, and the three categories added
+ * on 16 Nov 2026: Games & Sports → Experiences, Movers & Relocation →
+ * Logistics & Shipping, Premium Services & Reservations → Marketplace.
+ *
+ * Health, Financial Services and Vehicle Services are retired categories;
+ * they keep their agreement for merchants who accepted it before.
  */
 export const INTERIM: ReadonlySet<string> = new Set([
   'vehicle_rentals',
   'health',
   'concierge_services',
+  'games_sports',
+  'movers_relocation',
+  'premium_services',
 ]);
 
 const byId = new Map(MERCHANT_AGREEMENTS.map((agreement) => [agreement.id, agreement]));

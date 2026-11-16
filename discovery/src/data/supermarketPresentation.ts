@@ -1,13 +1,17 @@
 import type { CatalogItem, Merchant } from '../providers/DiscoveryProvider';
 import { offeringKind, subcategoryOf } from './offeringKinds';
-import { findCategory, findSubcategory } from './taxonomy';
+import { sectionScheme } from './catalogSections';
+import { findCategory } from './taxonomy';
 
 // Each check accepts a Discovery subcategory ID (engine mode) or one of its source groups (Supabase and platform modes).
-export const isSupermarket = (merchant: Merchant) => Boolean(merchant.subcategoryId && (merchant.subcategoryId === 'groceries-essentials:supermarket'
-  || findSubcategory('groceries-essentials', 'groceries-essentials:supermarket')?.sourceIds.includes(merchant.subcategoryId)));
+/** A general grocer: a Green & Groceries subcategory on the master list's supermarket booking profile (household groceries, bundles…). */
+export const isSupermarket = (merchant: Merchant) => {
+  const match = subcategoryOf(merchant);
+  return match?.category.id === 'groceries-essentials' && match.subcategory.base === 'supermarket';
+};
 
 /**
- * Every Groceries And Essentials shop (supermarket, butchery, fresh produce…). In the retail storefront a grocer calls
+ * Every Green & Groceries shop (supermarket, butchery, fresh produce…). In the retail storefront a grocer calls
  * its list "Aisles" and counts its products with a basket.
  */
 export const isGroceryStore = (merchant: Merchant) => Boolean(merchant.subcategoryId
@@ -16,10 +20,12 @@ export const isGroceryStore = (merchant: Merchant) => Boolean(merchant.subcatego
 /**
  * Every product store uses the retail storefront (owner, 9 Nov 2026): groceries, electronics, pharmacy, fashion, beauty
  * products, drinks, flowers and gifts, marketplace and adults. It needs a subcategory Discovery knows whose journey is a
- * purchase. Restaurants (dishes), services, requests, vehicles and activities keep their own storefronts, and a store
- * whose subcategory Discovery doesn't know keeps the generic one.
+ * purchase, in a category whose section scheme has departments. Restaurants (dishes), services, requests, vehicles and
+ * activities keep their own storefronts; a store whose subcategory Discovery doesn't know, or whose scheme has no
+ * departments (Games & Sports' equipment and consoles, on the activity scheme), keeps the generic one.
  */
-export const isRetailStore = (merchant: Pick<Merchant, 'subcategoryId'>) => Boolean(subcategoryOf(merchant)) && offeringKind(merchant) === 'product';
+export const isRetailStore = (merchant: Pick<Merchant, 'subcategoryId'>) => Boolean(subcategoryOf(merchant)) && offeringKind(merchant) === 'product'
+  && Boolean(sectionScheme(merchant)?.departments?.length);
 
 const plain = (text: string) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim().toLocaleLowerCase('en-KE');
 

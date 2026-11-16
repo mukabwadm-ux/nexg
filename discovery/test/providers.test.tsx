@@ -172,9 +172,9 @@ test('legacy platform provider retains exact numeric totals and existing offsets
   Object.assign(globalThis, { window: { setTimeout, clearTimeout } });
   globalThis.fetch = async () => json({ merchants: ['legacy-a', 'legacy-b'].map(id => ({ id, name: id, items: [] })), total: 2 });
   try {
-    const first = await platformMerchantProvider.getMerchants({ categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:restaurant', limit: 1 });
+    const first = await platformMerchantProvider.getMerchants({ categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:fast-food-casual-dining', limit: 1 });
     assert.deepEqual(first.merchants.map(row => row.id), ['legacy-a']); assert.equal(first.total, 2); assert.equal(first.hasMore, true);
-    const next = await platformMerchantProvider.getMerchants({ categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:restaurant', limit: 1, offset: 1 });
+    const next = await platformMerchantProvider.getMerchants({ categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:fast-food-casual-dining', limit: 1, offset: 1 });
     assert.deepEqual(next.merchants.map(row => row.id), ['legacy-b']); assert.equal(next.offset, 1); assert.equal(next.hasMore, false);
   } finally { globalThis.fetch = originalFetch; Object.assign(globalThis, { window: originalWindow }); }
 });
@@ -188,6 +188,19 @@ test('shared read task preserves typed failure and ignores an aborted old respon
   assert.deepEqual(snapshots, [{ key: 'old', loading: true }, { key: 'new', loading: true }, { key: 'new', loading: false, value: 'Current selection' }]);
   startProviderRead('failed', async () => { throw new ProviderReadError({ kind: 'restart' }); }, value => snapshots.push(value));
   await new Promise(resolve => setImmediate(resolve)); assert.deepEqual(snapshots.at(-1), { key: 'failed', loading: false, failure: { kind: 'restart' } });
+});
+
+test('old taxonomy ids in an address open the page their stores moved to', () => {
+  // Categories and subcategories retired by the master category list (16 Nov 2026).
+  assert.deepEqual([parseRoute('?category=health-pharmacy').categoryId, parseRoute('?category=play').categoryId, parseRoute('?category=flights').categoryId,
+    parseRoute('?category=beauty-wellness').categoryId], ['pharmacy', 'games-sports', 'travel-tours', 'beauty']);
+  const massage = parseRoute('?category=beauty-wellness&subcategory=beauty-wellness:massage');
+  assert.deepEqual([massage.categoryId, massage.subcategoryId, massage.view], ['wellness', 'wellness:swedish-massage', 'results']);
+  const charters = parseRoute('?category=flights&subcategory=flights:private-charters');
+  assert.deepEqual([charters.categoryId, charters.subcategoryId], ['premium-services', 'premium-services:private-jet-charters']);
+  // Ids that kept their meaning are untouched, and so is an id no taxonomy ever had.
+  assert.deepEqual([parseRoute('?category=restaurants-food&subcategory=restaurants-food:catering').subcategoryId, parseRoute('?category=nope').categoryId],
+    ['restaurants-food:catering', 'nope']);
 });
 
 test('route/Back parsing keeps source IDs and cursor, while changed filters invalidate paging and exact context', () => {

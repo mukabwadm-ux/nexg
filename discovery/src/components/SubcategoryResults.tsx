@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 import { findCategory, findSubcategory } from '../data/taxonomy';
+import { isServiceExperience } from '../data/experiencePresentation';
 import type { CatalogItem, DiscoveryProvider, DiscoveryQuery, Merchant, MerchantResult, OfferingResult } from '../providers/DiscoveryProvider';
 import { offeringKind } from '../data/offeringKinds';
 import { OfferingSheet } from './cards/OfferingSheet';
@@ -37,7 +38,7 @@ export function SubcategoryResults({ query, provider, onChange, onOpen, onExperi
   const option = subcategory?.options.find((entry) => entry.id === query.optionId);
   const tourResults = category?.id === 'travel-tours';
   const pageSize = query.engineRequest?.limit ?? (tourResults ? 12 : 24);
-  const offeringResults = tourResults || (category?.id === 'experiences' && subcategory?.id !== 'experiences:photography');
+  const offeringResults = tourResults || (category?.id === 'experiences' && !isServiceExperience(subcategory?.id));
   const catalog = useProviderRead<MerchantResult | OfferingResult>(JSON.stringify(query), (signal) => tourResults
     ? provider.getTourOfferings({ ...query, limit: pageSize }, signal) : offeringResults
     ? provider.getExperienceOfferings({ ...query, limit: pageSize }, signal)

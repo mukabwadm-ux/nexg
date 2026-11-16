@@ -2,7 +2,15 @@ import summaries from './data/profiles.json';
 import type { BookingProfileSummary } from './types';
 import { withSubcategoryVariants } from './variants';
 export type { BookingProfileSummary, BookingModel } from './types';
-export { baseSubcategoryId, subcategoryVariant, SUBCATEGORY_VARIANTS } from './variants';
+export {
+  baseSubcategoryId,
+  isListedSubcategory,
+  LISTED_CATEGORIES,
+  listedCategoryName,
+  subcategoryGroup,
+  subcategoryVariant,
+  SUBCATEGORY_VARIANTS,
+} from './variants';
 
 const profiles = withSubcategoryVariants(
   summaries as unknown as BookingProfileSummary[],

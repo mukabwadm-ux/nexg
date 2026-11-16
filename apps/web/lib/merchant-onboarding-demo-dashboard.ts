@@ -401,7 +401,7 @@ export function merchantOnboardingDemoDashboard(
     attentionItems: itemRows,
     attentionPanel: {
       title: 'Needs attention',
-      description: `${context?.categoryName ?? 'Restaurants & Food'} sample activity`,
+      description: `${context?.categoryName ?? 'Food & Restaurant'} sample activity`,
       details: itemRows.map((item) => `${item.title} · ${item.detail}`),
     },
     activityPanel: {
