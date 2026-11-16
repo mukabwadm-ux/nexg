@@ -8,6 +8,7 @@ import { CalendarDays, Clock3 } from 'lucide-react';
 import { BookingsBoard } from '../bookings-board';
 import type { HolidayRow } from '../hours-vocab';
 import type { BookingBoardData } from '@/lib/booking/board-data';
+import { HolidayList } from '../holiday-hours';
 import { HolidaysCard } from './holidays';
 import { dateAdd, localDate, type DayHours } from './model';
 import { HoursView } from './views';
@@ -113,7 +114,18 @@ export function LiveAvailability({
                   )}
                 </section>
               )}
-              {holidays ? <HolidaysCard holidays={holidays} canEdit={canEdit} /> : null}
+              {holidays ? (
+                canEdit ? (
+                  <section className="av-card mt-4" aria-labelledby="av-holidays-title">
+                    <div className="av-card-heading">
+                      <h2 id="av-holidays-title">Public holidays</h2>
+                    </div>
+                    <HolidayList holidays={holidays} branchId={null} branchName="every branch" />
+                  </section>
+                ) : (
+                  <HolidaysCard holidays={holidays} canEdit={false} />
+                )
+              ) : null}
             </div>
           </>
         )}

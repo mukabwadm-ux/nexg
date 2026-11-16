@@ -80,14 +80,19 @@ export default async function MerchantAvailabilityPage({
   /* Null when the database has no holiday calendar yet: code goes live
      before its migration is applied by hand. */
   const holidays = holidayRes.error ? null : ((holidayRes.data as HolidayRow[] | null) ?? []);
-  /* A holiday the business closes for is a closed date, unless a date
-     override already speaks for the day, which wins in the database too. */
+  /* A holiday the business closes for, or keeps custom hours on, is a
+     dated day of its own, unless a date override already speaks for the
+     day, which wins in the database too. */
   for (const holiday of holidays ?? []) {
-    if (holiday.closed !== true || dateHours[holiday.date]) continue;
+    if (dateHours[holiday.date]) continue;
+    const custom = holiday.closed === false && !!holiday.opens && !!holiday.closes;
+    if (holiday.closed !== true && !custom) continue;
+    const start = holiday.opens?.slice(0, 5) ?? '';
+    const end = holiday.closes?.slice(0, 5) ?? '';
     dateHours[holiday.date] = {
       day: (new Date(`${holiday.date}T12:00:00Z`).getUTCDay() + 6) % 7,
-      state: 'closed',
-      intervals: [],
+      state: custom ? 'open' : 'closed',
+      intervals: custom ? [{ start, end, nextDay: end <= start }] : [],
       label: holiday.label,
     };
   }
