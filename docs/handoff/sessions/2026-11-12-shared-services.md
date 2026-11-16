@@ -57,7 +57,7 @@ Also in the PR:
 
 - `supabase test db`: 73 files, 1,320 tests, all pass.
 - `db lint`: nothing new.
-- Again on 15 Nov, after merging with `main` and #149: 87 files, 1,573 tests, all pass. Types regenerate unchanged.
+- Again on 15 Nov, after merging with `main` and #149: 87 files, 1,574 tests, all pass. Types regenerate unchanged.
 
 **CI:** every check passes except Playwright, which is not a required check. Its 18 failures are main's own website tests, and #146 touches none of those pages:
 
@@ -71,7 +71,7 @@ Also in the PR:
 
 Either order is safe, but don't leave a long gap between them.
 
-On 15 Nov, production had `20261220000100` but not #149's `0200` and `0300`, nor `main`'s `20261222090000`. Apply them in version order: `20261220000200`, `0300`, `20261222090000`, then `20261223000100` to `0700`. Production had no pending bookings and no dispatch jobs then, so the first run of the release job and the new start rule changed no existing rows.
+On 16 Nov, production had every migration up to `main`'s `20261222090000` except #149's `20261220000200` and `0300`. Nine are left to apply: those two, then `20261223000100` to `0700`. The two sort before `20261222090000`, which is already applied, so `supabase db push` refuses them without `--include-all`. The script passes flags through: dry-run with `bash scripts/push-to-production.sh --dry-run --include-all` and check that it lists exactly those nine. Production had no pending bookings and no dispatch jobs on 16 Nov, so the release job's first run and the new start rule would change no existing rows.
 
 **Owner decisions behind it (12 Nov):**
 
