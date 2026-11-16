@@ -14,7 +14,8 @@ export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 
 /**
- * All categories explorer.
+ * All categories: a dark header with search and filters, then every active
+ * category as a photograph card (components/categories/category-explorer).
  */
 export default async function CategoriesPage() {
   const supabase = createPublicClient();
@@ -62,7 +63,7 @@ export default async function CategoriesPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-[120rem] px-4 py-12 sm:px-[30px] lg:py-16">
+      <main>
         <CategoryExplorer categories={categories} />
       </main>
       <SiteFooter />

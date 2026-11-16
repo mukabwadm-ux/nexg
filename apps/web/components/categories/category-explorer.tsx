@@ -1,35 +1,24 @@
 'use client';
 
 import {
-  Activity,
   ArrowRight,
-  BellRing,
-  Car,
   Compass,
-  DollarSign,
-  Flower2,
   Gift,
-  Heart,
-  Laptop,
-  Pill,
+  type LucideIcon,
   Plane,
   Search,
-  ShieldAlert,
-  Shirt,
-  ShoppingCart,
-  Sparkles,
   Store,
-  Truck,
-  UtensilsCrossed,
-  Wine,
-  Wrench,
+  Ticket,
   X,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { getCategoryImage } from '@nexg/contracts';
+import { CATEGORY_IMAGE_MAP, getCategoryImage } from '@nexg/contracts';
+import { PageHero } from '@/components/company/page-hero';
+import { Reveal } from '@/components/reveal';
 import { discoverCategoryHref } from '@/lib/discover-links';
 
 export interface ExplorerCategory {
@@ -50,292 +39,379 @@ export interface ExplorerCategory {
   }[];
 }
 
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
-  Utensils: UtensilsCrossed,
-  UtensilsCrossed: UtensilsCrossed,
-  Wine: Wine,
-  Shirt: Shirt,
-  Flower2: Flower2,
-  Flower: Flower2,
-  Sparkles: Sparkles,
-  Pill: Pill,
-  Pills: Pill,
-  ShoppingCart: ShoppingCart,
-  Store: Store,
-  Gift: Gift,
-  ShieldAlert: ShieldAlert,
-  Plane: Plane,
-  Car: Car,
-  Compass: Compass,
-  DollarSign: DollarSign,
-  Heart: Heart,
-  Laptop: Laptop,
-  Wrench: Wrench,
-  Activity: Activity,
-  BellRing: BellRing,
-  Truck: Truck,
-  Ship: Truck,
-};
+type Kind = 'all' | 'menu' | 'products' | 'services';
+type Subcategory = ExplorerCategory['subcategories'][number];
 
-type CardKindFilter = 'all' | 'products' | 'services' | 'menu';
+/** How a category's merchants are ordered from (category_config.card_kind). */
+const KINDS: readonly { key: Kind; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'menu', label: 'Food & drink' },
+  { key: 'products', label: 'Shopping' },
+  { key: 'services', label: 'Services' },
+];
 
+/* Marks for a category with no photograph of its own (category_config.icon). */
+const FALLBACK_ICON: Record<string, LucideIcon> = { Compass, Gift, Plane, Ticket };
+
+const has = (text: string | undefined, query: string) =>
+  Boolean(text && text.toLowerCase().includes(query));
+
+const subcategoryMatches = (sub: Subcategory, query: string) =>
+  has(sub.name, query) ||
+  Boolean(sub.fields?.some((field) => has(field, query))) ||
+  has(sub.fulfillmentHint, query);
+
+const categoryMatches = (category: ExplorerCategory, query: string) =>
+  has(category.name, query) ||
+  has(category.desc, query) ||
+  has(category.id, query) ||
+  category.subcategories.some((sub) => subcategoryMatches(sub, query));
+
+/**
+ * All categories: the company pages' dark header with the search and the
+ * order-type filter in it, then every category as a tall photograph card
+ * (the homepage's card, a dark fade at the foot carrying the words). The
+ * first card in the list runs two columns wide. Each card is one link to
+ * Discovery for that category; the subcategories on it are labels, not
+ * links, because they all led to the same place.
+ */
 export function CategoryExplorer({ categories }: { categories: ExplorerCategory[] }) {
+  const router = useRouter();
   const [query, setQuery] = React.useState('');
-  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
-  const [kindFilter, setKindFilter] = React.useState<CardKindFilter>('all');
+  const [kind, setKind] = React.useState<Kind>('all');
+  const term = query.trim().toLowerCase();
 
-  const trimmed = query.trim().toLowerCase();
+  const visible = React.useMemo(
+    () =>
+      categories.filter(
+        (category) =>
+          (kind === 'all' || category.cardKind === kind) &&
+          (!term || categoryMatches(category, term)),
+      ),
+    [categories, kind, term],
+  );
 
-  const filteredCategories = React.useMemo(() => {
-    let result = categories;
+  const counts = React.useMemo(() => {
+    const byKind: Record<Kind, number> = {
+      all: categories.length,
+      menu: 0,
+      products: 0,
+      services: 0,
+    };
+    for (const category of categories)
+      if (category.cardKind in byKind) byKind[category.cardKind as Kind] += 1;
+    return byKind;
+  }, [categories]);
 
-    // Filter by kind
-    if (kindFilter !== 'all') {
-      result = result.filter((c) => c.cardKind === kindFilter);
-    }
-
-    // Filter by selected category pill
-    if (selectedCategory) {
-      result = result.filter((c) => c.id === selectedCategory);
-    }
-
-    // Filter by query string
-    if (trimmed) {
-      result = result.filter((c) => {
-        const matchCat =
-          c.name.toLowerCase().includes(trimmed) ||
-          c.desc.toLowerCase().includes(trimmed) ||
-          c.id.toLowerCase().includes(trimmed);
-        const matchSub = c.subcategories.some(
-          (s) =>
-            s.name.toLowerCase().includes(trimmed) ||
-            s.fields?.some((f) => f.toLowerCase().includes(trimmed)) ||
-            s.fulfillmentHint?.toLowerCase().includes(trimmed),
-        );
-        return matchCat || matchSub;
-      });
-    }
-
-    return result;
-  }, [categories, trimmed, selectedCategory, kindFilter]);
-
-  const totalSubcatsFound = React.useMemo(() => {
-    return filteredCategories.reduce((acc, c) => acc + c.subcategories.length, 0);
-  }, [filteredCategories]);
+  const types = visible.reduce((sum, category) => sum + category.subcategories.length, 0);
+  const reset = () => {
+    setQuery('');
+    setKind('all');
+  };
 
   return (
-    <div className="space-y-10">
-      {/* Header */}
-      <div className="mx-auto max-w-3xl text-center">
-        <h1 className="text-ink text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
-          All Categories
-        </h1>
-
-        {/* Live Search Bar */}
-        <div className="relative mt-8">
-          <Search className="text-muted-light pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2" />
+    <>
+      <PageHero
+        eyebrow="All categories"
+        compact
+        title="Everything you need,"
+        gold="in one place."
+        lede={`${categories.length} kinds of business across Nairobi, from restaurants and pharmacies to car hire and days out. Pick one to see who serves where you are.`}
+      >
+        <form
+          role="search"
+          onSubmit={(event) => {
+            event.preventDefault();
+            /* One result: go straight to it. Otherwise close the keyboard so
+               the matching cards are in view. */
+            const only = visible.length === 1 ? visible[0] : undefined;
+            if (only) router.push(discoverCategoryHref(only.id));
+            else (document.activeElement as HTMLElement | null)?.blur();
+          }}
+          className="focus-within:ring-gold mt-9 flex max-w-2xl items-center rounded-full bg-white p-1.5 shadow-2xl focus-within:ring-2"
+        >
+          <Search className="ml-3.5 h-5 w-5 shrink-0 text-[#141414]" aria-hidden="true" />
           <input
-            type="text"
+            type="search"
             value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              if (selectedCategory) setSelectedCategory(null);
-            }}
-            placeholder="Search categories (e.g. Fine Dining, Vapes, Chauffeur, Safari, Electronics)..."
-            className="border-border bg-surface text-ink placeholder:text-muted-light focus:border-gold focus:ring-gold/20 h-14 w-full rounded-2xl border pl-12 pr-10 text-base shadow-sm transition-all focus:outline-none focus:ring-4"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Try sushi, florist or safari"
+            aria-label="Search categories"
+            autoComplete="off"
+            enterKeyHint="search"
+            className="h-12 min-w-0 flex-1 appearance-none rounded-none border-0 bg-transparent px-3 text-base text-[#141414] shadow-none placeholder:text-[#6b6560] focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 [&::-webkit-search-cancel-button]:hidden"
           />
           {query && (
             <button
+              type="button"
               onClick={() => setQuery('')}
-              className="text-muted-light hover:text-ink absolute right-4 top-1/2 -translate-y-1/2 p-1"
               aria-label="Clear search"
+              className="focus-visible:ring-gold flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#141414] transition-colors hover:bg-[#f1ece1] focus-visible:outline-none focus-visible:ring-2"
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4" aria-hidden="true" />
             </button>
           )}
-        </div>
+        </form>
 
-        {/* Type / Kind Filter Tabs */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-          {(
-            [
-              { key: 'all', label: `All Verticals (${categories.length})` },
-              { key: 'products', label: 'Products & Retail' },
-              { key: 'services', label: 'Services & Rentals' },
-              { key: 'menu', label: 'Food & Dining' },
-            ] as const
-          ).map((tab) => {
-            const isActive = kindFilter === tab.key;
+        <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Filter by type">
+          {KINDS.map((option) => {
+            const active = kind === option.key;
             return (
               <button
-                key={tab.key}
-                onClick={() => setKindFilter(tab.key)}
-                className={`rounded-full px-4 py-2.5 text-xs font-bold transition-all ${
-                  isActive
-                    ? 'bg-ink ring-ink text-white shadow-sm ring-1'
-                    : 'border-border bg-surface text-muted-light hover:border-border-strong hover:text-ink border'
+                key={option.key}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setKind(option.key)}
+                className={`focus-visible:ring-gold inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 ${
+                  active
+                    ? 'bg-gold text-ink'
+                    : 'border border-white/20 text-white/80 hover:bg-white/10 hover:text-white'
                 }`}
               >
-                {tab.label}
+                {option.label}
+                <span className={active ? 'text-ink/60' : 'text-white/45'}>
+                  {counts[option.key]}
+                </span>
               </button>
             );
           })}
         </div>
+      </PageHero>
 
-        {/* Active Filter Pill */}
-        {selectedCategory && (
-          <div className="mt-4 flex items-center justify-center gap-2">
-            <span className="text-muted-light text-xs font-medium">Viewing vertical:</span>
-            <span className="border-border bg-surface text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold">
-              {categories.find((c) => c.id === selectedCategory)?.name}
-              <button
-                onClick={() => setSelectedCategory(null)}
-                className="text-muted-light hover:text-gold ml-1"
-                aria-label="Clear category filter"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Categories Grid */}
-      {filteredCategories.length === 0 ? (
-        <div className="border-border bg-surface rounded-3xl border p-12 text-center shadow-sm">
-          <p className="text-muted-light text-base font-semibold">
-            No merchant verticals found matching &ldquo;{query}&rdquo;
+      <section className="mx-auto max-w-[120rem] px-4 py-10 sm:px-[30px] sm:py-14">
+        <Reveal variant="gallery" speed={1.4}>
+          <p data-reveal-head aria-live="polite" className="text-muted text-sm font-semibold">
+            {term
+              ? `${visible.length} ${visible.length === 1 ? 'category matches' : 'categories match'} “${query.trim()}”`
+              : `${visible.length} ${visible.length === 1 ? 'category' : 'categories'} · ${types} types of shop and service`}
           </p>
-          <button
-            onClick={() => {
-              setQuery('');
-              setKindFilter('all');
-              setSelectedCategory(null);
-            }}
-            className="text-gold mt-3 text-sm font-bold underline underline-offset-4"
-          >
-            Clear all filters and view all categories
-          </button>
-        </div>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredCategories.map((cat) => {
-            const Icon = ICON_MAP[cat.icon] || Store;
-            const imageSrc = cat.imageUrl || cat.image || getCategoryImage(cat.id);
-            const matchingSubs = trimmed
-              ? cat.subcategories.filter(
-                  (s) =>
-                    s.name.toLowerCase().includes(trimmed) ||
-                    s.fields?.some((f) => f.toLowerCase().includes(trimmed)) ||
-                    s.fulfillmentHint?.toLowerCase().includes(trimmed),
-                )
-              : cat.subcategories;
 
-            return (
-              <div
-                key={cat.id}
-                className="border-border bg-surface hover:border-gold/40 group flex flex-col justify-between overflow-hidden rounded-3xl border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-              >
-                <div>
-                  {/* Category Photographic Banner */}
-                  <div className="bg-surface-raised relative h-48 w-full overflow-hidden sm:h-52">
-                    <Image
-                      src={imageSrc}
-                      alt={cat.name}
-                      fill
-                      sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                      priority={cat.sort <= 3}
-                      unoptimized={imageSrc.startsWith('http')}
-                    />
-
-                    {/* Gradient Overlay for high contrast */}
-                    <div className="from-ink/90 via-ink/35 absolute inset-0 bg-gradient-to-t to-transparent" />
-
-                    {/* Top Badges */}
-                    <div className="absolute left-4 right-4 top-4 flex items-center justify-between gap-2">
-                      <span className="rounded-full bg-black/40 px-3 py-1 text-[0.6875rem] font-bold uppercase tracking-wider text-white backdrop-blur-md">
-                        {cat.cardKind}
-                      </span>
-                      <span className="rounded-full bg-white/20 px-3 py-1 text-[0.6875rem] font-black uppercase tracking-wider text-white backdrop-blur-md">
-                        {cat.subcategories.length} verticals
-                      </span>
-                    </div>
-
-                    {/* Floating Title & Icon at Bottom of Banner */}
-                    <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3">
-                      <div
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white shadow-md transition-transform duration-300 group-hover:scale-110"
-                        style={{ backgroundColor: cat.color || '#946414' }}
-                      >
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <h2 className="text-xl font-black tracking-tight text-white drop-shadow">
-                        {cat.name}
-                      </h2>
-                    </div>
-                  </div>
-
-                  {/* Card Content */}
-                  <div className="p-6">
-                    <p className="text-muted-light line-clamp-2 text-sm leading-relaxed">
-                      {cat.desc}
-                    </p>
-
-                    {/* Subcategories list */}
-                    <div className="mt-5 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wider">
-                          Subcategories
-                        </span>
-                        <span className="text-muted-light text-[0.6875rem] font-medium">
-                          {cat.subcategories.length} specialized
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {matchingSubs.slice(0, 7).map((sub) => (
-                          <Link
-                            key={sub.id}
-                            href={discoverCategoryHref(cat.id)}
-                            className="border-border bg-bg text-muted-light hover:border-gold hover:bg-gold/5 hover:text-ink inline-block rounded-lg border px-3 py-2 text-xs font-semibold transition-all"
-                          >
-                            {sub.name}
-                          </Link>
-                        ))}
-                        {matchingSubs.length > 7 && (
-                          <Link
-                            href={discoverCategoryHref(cat.id)}
-                            className="text-gold inline-block px-1.5 py-1 text-xs font-bold transition-colors hover:underline"
-                          >
-                            +{matchingSubs.length - 7} more
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Footer Link */}
-                <div className="border-border bg-surface border-t px-6 py-4">
-                  <Link
-                    href={discoverCategoryHref(cat.id)}
-                    className="group/link text-ink hover:text-gold flex items-center justify-between text-xs font-extrabold transition-colors"
-                  >
-                    <span>Browse all in {cat.name}</span>
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover/link:translate-x-1" />
-                  </Link>
-                </div>
+          {visible.length === 0 ? (
+            <div className="border-border bg-surface mt-6 rounded-[1.75rem] border px-6 py-12 text-center sm:px-12">
+              <p className="text-ink text-xl font-extrabold tracking-tight sm:text-2xl">
+                Nothing here matches “{query.trim()}” yet.
+              </p>
+              <p className="text-muted mx-auto mt-3 max-w-xl text-[0.9375rem] font-semibold leading-[1.75]">
+                A concierge can still find it. Describe what you need and get a price and a time
+                before anything is bought.
+              </p>
+              <div className="mt-7 flex flex-wrap justify-center gap-3">
+                <Link
+                  href="/ask"
+                  className="bg-gold text-ink hover:bg-gold/90 focus-visible:ring-gold inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                >
+                  Ask a concierge <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={reset}
+                  className="border-border-strong text-ink hover:bg-bg focus-visible:ring-gold inline-flex h-12 items-center rounded-full border px-6 text-sm font-bold focus-visible:outline-none focus-visible:ring-2"
+                >
+                  Show all categories
+                </button>
               </div>
-            );
-          })}
-        </div>
-      )}
+            </div>
+          ) : (
+            <ul className="mt-6 grid grid-flow-dense grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-4">
+              {visible.map((category, index) => (
+                <CategoryCard
+                  key={category.id}
+                  category={category}
+                  term={term}
+                  wide={index === 0}
+                  priority={index < 4}
+                  /* Only the first rows play the entrance (and wait for their
+                     photos); the rest are below the fold and simply show. */
+                  reveal={index < 8}
+                />
+              ))}
+            </ul>
+          )}
+        </Reveal>
+      </section>
 
-      {/* Summary Footer */}
-      <div className="border-border text-muted-light border-t pt-6 text-center text-xs font-medium">
-        Showing {filteredCategories.length} categories · {totalSubcatsFound} subcategories available
-        across Nairobi · Category imagery is configured by NexG
-      </div>
-    </div>
+      {/* Left out while the empty state already offers the concierge. */}
+      <section
+        hidden={visible.length === 0}
+        className="mx-auto max-w-[120rem] px-4 pb-16 sm:px-[30px] sm:pb-20"
+      >
+        <div className="text-ink relative overflow-hidden rounded-[2rem] bg-[#FDD128] px-6 py-10 sm:px-12 sm:py-14 lg:flex lg:items-center lg:justify-between lg:gap-12">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-40 -right-24 h-[26rem] w-[26rem] rounded-full bg-white/30 blur-3xl"
+          />
+          <div className="relative max-w-2xl">
+            <p className="text-ink/70 text-xs font-extrabold uppercase tracking-[0.2em]">
+              Not on the list?
+            </p>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.75rem]">
+              Ask a concierge for anything.
+            </h2>
+            <p className="text-ink/75 mt-3 text-base font-semibold leading-[1.75]">
+              Describe what you need. A concierge quotes a price and a time, and nothing is bought
+              until you approve it.
+            </p>
+          </div>
+          <div className="relative mt-8 flex flex-wrap gap-3 lg:mt-0 lg:shrink-0">
+            <Link
+              href="/ask"
+              className="bg-ink focus-visible:ring-ink inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-bold text-white transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FDD128]"
+            >
+              Ask a concierge <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+            <Link
+              href="/merchants"
+              className="border-ink/25 focus-visible:ring-ink inline-flex h-12 items-center rounded-full border px-6 text-sm font-bold transition-colors hover:bg-white/30 focus-visible:outline-none focus-visible:ring-2"
+            >
+              List your business
+            </Link>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+/*
+ * One tall photograph card, as on the homepage: the photo fills it and a
+ * dark fade at the foot carries the words. On a phone it is a compact tile
+ * (name and how many types); the description, the subcategories and the
+ * button join as the card grows. While searching, the matching
+ * subcategories come first, in gold.
+ */
+function CategoryCard({
+  category,
+  term,
+  wide,
+  priority,
+  reveal,
+}: {
+  category: ExplorerCategory;
+  term: string;
+  wide: boolean;
+  priority: boolean;
+  reveal: boolean;
+}) {
+  /* An uploaded photo, else the category's own stock photo. A category with
+     neither shows its mark rather than another category's photo. */
+  const src =
+    category.imageUrl ||
+    category.image ||
+    (CATEGORY_IMAGE_MAP[category.id] ? getCategoryImage(category.id) : null);
+  const Icon = FALLBACK_ICON[category.icon] ?? Store;
+  const subs = category.subcategories;
+  const hits = term ? subs.filter((sub) => subcategoryMatches(sub, term)) : [];
+  const ordered = hits.length ? [...hits, ...subs.filter((sub) => !hits.includes(sub))] : subs;
+  const shown = ordered.slice(0, wide ? 7 : 3);
+  const more = subs.length - shown.length;
+  const count = `${subs.length} ${subs.length === 1 ? 'type' : 'types'}`;
+  /* Under the chips' breakpoint the gold line names the first few types. */
+  const meta = hits.length
+    ? `Matches ${hits.map((sub) => sub.name).join(', ')}`
+    : subs
+        .slice(0, 3)
+        .map((sub) => sub.name)
+        .join(' · ');
+
+  return (
+    <li data-reveal-item={reveal ? '' : undefined} className={wide ? 'col-span-2' : undefined}>
+      <Link
+        href={discoverCategoryHref(category.id)}
+        aria-label={`${category.name}, ${hits.length ? meta : count}`}
+        className="focus-visible:ring-gold focus-visible:ring-offset-bg group relative flex h-[13.5rem] flex-col justify-end overflow-hidden rounded-[1.25rem] bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E] text-white ring-1 ring-black/5 transition-shadow duration-300 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:h-[20rem] sm:rounded-[1.75rem] lg:h-[25rem] 2xl:h-[27rem] dark:ring-white/[0.07]"
+      >
+        {src ? (
+          <Image
+            src={src}
+            alt=""
+            fill
+            sizes={
+              wide
+                ? '(min-width: 1536px) 50vw, (min-width: 1024px) 66vw, 100vw'
+                : '(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, 50vw'
+            }
+            priority={priority}
+            unoptimized={src.startsWith('http')}
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          />
+        ) : (
+          <span
+            aria-hidden="true"
+            className="text-gold/45 absolute inset-x-0 top-[18%] flex justify-center"
+          >
+            <Icon className="h-14 w-14 sm:h-20 sm:w-20" strokeWidth={1.25} />
+          </span>
+        )}
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-t from-[#0b0907] via-[#0b0907]/75 via-40% to-transparent to-80%"
+        />
+
+        {subs.length > 0 && (
+          <span className="text-ink absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-[0.5625rem] font-extrabold uppercase tracking-[0.16em] sm:left-4 sm:top-4 sm:px-3 sm:py-1.5 sm:text-[0.625rem]">
+            {count}
+          </span>
+        )}
+
+        <span className="relative block p-4 sm:p-6">
+          {meta && (
+            <span
+              className={`text-gold block truncate text-xs font-semibold sm:text-[0.8125rem] ${
+                hits.length ? '' : 'lg:hidden'
+              }`}
+            >
+              {meta}
+            </span>
+          )}
+          <span
+            className={`mt-1 block font-extrabold leading-[1.1] tracking-tight ${
+              wide
+                ? 'text-xl sm:text-3xl lg:text-[2.25rem]'
+                : 'text-[1.0625rem] sm:text-2xl lg:text-[1.75rem]'
+            }`}
+          >
+            {category.name}
+          </span>
+          {category.desc && (
+            <span
+              className={`mt-2 hidden text-sm font-medium leading-relaxed text-white/70 sm:line-clamp-2 ${
+                wide ? 'max-w-xl' : ''
+              }`}
+            >
+              {category.desc}
+            </span>
+          )}
+          {shown.length > 0 && (
+            <span className="mt-4 hidden flex-wrap gap-1.5 lg:flex">
+              {shown.map((sub) => (
+                <span
+                  key={sub.id}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                    hits.includes(sub)
+                      ? 'bg-gold text-ink'
+                      : 'border border-white/15 bg-white/10 text-white/85 backdrop-blur'
+                  }`}
+                >
+                  {sub.name}
+                </span>
+              ))}
+              {more > 0 && (
+                <span className="px-1 py-1 text-xs font-bold text-white/60">+{more} more</span>
+              )}
+            </span>
+          )}
+          <span
+            className={`mt-5 hidden h-11 items-center justify-between rounded-full border border-white/25 bg-white/10 pl-5 pr-1.5 text-sm font-bold backdrop-blur transition-colors group-hover:bg-white/20 sm:flex ${
+              wide ? 'sm:max-w-xs' : ''
+            }`}
+          >
+            See who serves you
+            <span className="bg-gold text-ink flex h-8 w-8 items-center justify-center rounded-full transition-transform group-hover:translate-x-0.5">
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </span>
+          </span>
+        </span>
+      </Link>
+    </li>
   );
 }

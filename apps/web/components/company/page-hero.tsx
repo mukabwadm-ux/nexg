@@ -8,6 +8,7 @@ export function PageHero({
   title,
   gold,
   lede,
+  compact = false,
   children,
 }: {
   eyebrow: string;
@@ -15,11 +16,17 @@ export function PageHero({
   /** Printed after the title, in gold. */
   gold?: string;
   lede: string;
+  /** Less height on a phone, for a page whose content should show sooner. */
+  compact?: boolean;
   children?: React.ReactNode;
 }) {
   return (
     <section className="mx-auto max-w-[120rem] px-4 pt-6 sm:px-[30px]">
-      <div className="bg-ink relative overflow-hidden rounded-[2rem] border-t-[3px] border-[#FDD128] px-6 py-16 text-white sm:px-12 sm:py-20 lg:px-16 lg:py-24">
+      <div
+        className={`bg-ink relative overflow-hidden rounded-[2rem] border-t-[3px] border-[#FDD128] px-6 text-white sm:px-12 sm:py-20 lg:px-16 lg:py-24 ${
+          compact ? 'py-10' : 'py-16'
+        }`}
+      >
         <span
           aria-hidden="true"
           className="pointer-events-none absolute -right-32 -top-40 h-[28rem] w-[28rem] rounded-full bg-[#FDD128]/15 blur-3xl"
