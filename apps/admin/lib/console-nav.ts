@@ -26,6 +26,7 @@ export type NavIcon =
   | 'growth'
   | 'analytics'
   | 'reports'
+  | 'company'
   | 'system';
 
 export interface NavItem {
@@ -160,6 +161,19 @@ export const CONSOLE_NAV: NavGroup[] = [
     label: 'Reports',
     icon: 'reports',
     items: [{ label: 'Exports & downloads', href: '/finance?tab=exports', module: 'finance' }],
+  },
+  {
+    key: 'company',
+    label: 'Company',
+    icon: 'company',
+    items: [
+      { label: 'Company files', href: '/company/files', module: 'company', home: true },
+      { label: 'Company inventory', href: '/company/inventory', module: 'company', home: true },
+      { label: 'Assets & equipment', href: '/company/assets', module: 'company', home: true },
+      { label: 'Procurement', href: '/company/procurement', module: 'company', home: true },
+      { label: 'Vendors & suppliers', href: '/company/vendors', module: 'company', home: true },
+      { label: 'Warehouses & stores', href: '/company/warehouses', module: 'company', home: true },
+    ],
   },
   {
     key: 'system',

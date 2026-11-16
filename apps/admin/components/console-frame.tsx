@@ -5,6 +5,7 @@ import {
   BarChart3,
   BedDouble,
   Bike,
+  Building2,
   ChevronDown,
   ChevronsLeft,
   ChevronsRight,
@@ -57,6 +58,7 @@ const ICONS: Record<NavIcon, React.ComponentType<{ className?: string }>> = {
   growth: TrendingUp,
   analytics: BarChart3,
   reports: FolderOpen,
+  company: Building2,
   system: Settings,
 };
 

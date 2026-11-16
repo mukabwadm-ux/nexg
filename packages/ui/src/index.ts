@@ -81,6 +81,45 @@ export {
 export { KpiTile, VALUE_PLACEHOLDER, type KpiTileProps } from './components/kpi-tile';
 export { EmptyState, type EmptyStateProps } from './components/empty-state';
 
+// Overlays and in-place navigation (shadcn/ui on Radix)
+export {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  type DropdownMenuItemProps,
+} from './components/dropdown-menu';
+export {
+  Popover,
+  PopoverAnchor,
+  PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
+} from './components/popover';
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/tabs';
+export { Progress, type ProgressProps } from './components/progress';
+export {
+  DateRangePicker,
+  RangeCalendar,
+  type DateRangePickerProps,
+  type RangeCalendarProps,
+} from './components/date-range-picker';
+/* Plain helpers, callable from server components as well. */
+export {
+  addDays,
+  DEFAULT_RANGE_PRESETS,
+  formatDay,
+  formatRange,
+  todayInNairobi,
+  type DateRange,
+  type DateRangePreset,
+} from './lib/date-range';
+
 // Composite
 export { DataTable, type ColumnDef, type DataTableProps } from './components/data-table';
 export { TableViewport, type TableViewportProps } from './components/table-viewport';

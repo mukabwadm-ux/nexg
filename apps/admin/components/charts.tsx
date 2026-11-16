@@ -144,6 +144,8 @@ export interface Slice {
   key: string;
   label: string;
   value: number;
+  /** A colour that means something (green for in stock); the palette otherwise. */
+  color?: string;
 }
 
 /** A share-of-total donut with its legend; the total in the middle. */
@@ -165,7 +167,7 @@ export function ShareDonut({
 }) {
   const total = data.reduce((sum, s) => sum + s.value, 0);
   const config: ChartConfig = Object.fromEntries(
-    data.map((s, i) => [s.key, { label: s.label, color: PALETTE[i % PALETTE.length] }]),
+    data.map((s, i) => [s.key, { label: s.label, color: s.color ?? PALETTE[i % PALETTE.length] }]),
   );
 
   return (
@@ -190,7 +192,7 @@ export function ShareDonut({
             stroke="none"
           >
             {data.map((s, i) => (
-              <Cell key={s.key} fill={PALETTE[i % PALETTE.length]} />
+              <Cell key={s.key} fill={s.color ?? PALETTE[i % PALETTE.length]} />
             ))}
             <Label
               content={({ viewBox }) => {
@@ -233,7 +235,7 @@ export function ShareDonut({
             <span
               aria-hidden="true"
               className="h-2.5 w-2.5 shrink-0 rounded-full"
-              style={{ background: PALETTE[i % PALETTE.length] }}
+              style={{ background: s.color ?? PALETTE[i % PALETTE.length] }}
             />
             <span className="min-w-0 flex-1 truncate font-semibold">{s.label}</span>
             <span className="text-muted-light tabular-nums">

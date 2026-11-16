@@ -7261,6 +7261,1087 @@ export type Database = {
           },
         ];
       };
+      company_asset: {
+        Row: {
+          assigned_at: string | null;
+          assigned_to: string | null;
+          assignee_name: string | null;
+          brand: string | null;
+          category_id: string;
+          condition: string;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          location_id: string | null;
+          model: string | null;
+          name: string;
+          next_service_on: string | null;
+          notes: string | null;
+          photo_path: string | null;
+          purchase_cost_cents: number | null;
+          purchase_date: string | null;
+          serial_number: string | null;
+          status: string;
+          tag: string;
+          updated_at: string;
+          vendor_id: string | null;
+          warranty_until: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          assigned_at?: string | null;
+          assigned_to?: string | null;
+          assignee_name?: string | null;
+          brand?: string | null;
+          category_id: string;
+          condition?: string;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          location_id?: string | null;
+          model?: string | null;
+          name: string;
+          next_service_on?: string | null;
+          notes?: string | null;
+          photo_path?: string | null;
+          purchase_cost_cents?: number | null;
+          purchase_date?: string | null;
+          serial_number?: string | null;
+          status?: string;
+          tag?: string;
+          updated_at?: string;
+          vendor_id?: string | null;
+          warranty_until?: string | null;
+        };
+        Update: {
+          assigned_at?: string | null;
+          assigned_to?: string | null;
+          assignee_name?: string | null;
+          brand?: string | null;
+          category_id?: string;
+          condition?: string;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          location_id?: string | null;
+          model?: string | null;
+          name?: string;
+          next_service_on?: string | null;
+          notes?: string | null;
+          photo_path?: string | null;
+          purchase_cost_cents?: number | null;
+          purchase_date?: string | null;
+          serial_number?: string | null;
+          status?: string;
+          tag?: string;
+          updated_at?: string;
+          vendor_id?: string | null;
+          warranty_until?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_asset_assigned_to_fkey';
+            columns: ['assigned_to'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_asset_category_id_fkey';
+            columns: ['category_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_category';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_asset_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_asset_location_id_fkey';
+            columns: ['location_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_location';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_asset_vendor_id_fkey';
+            columns: ['vendor_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_vendor';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_asset_event: {
+        Row: {
+          asset_id: string;
+          at: string;
+          cost_cents: number | null;
+          detail: string | null;
+          due_on: string | null;
+          id: number;
+          kind: string;
+          staff_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          asset_id: string;
+          at?: string;
+          cost_cents?: number | null;
+          detail?: string | null;
+          due_on?: string | null;
+          id?: never;
+          kind: string;
+          staff_id?: string | null;
+        };
+        Update: {
+          asset_id?: string;
+          at?: string;
+          cost_cents?: number | null;
+          detail?: string | null;
+          due_on?: string | null;
+          id?: never;
+          kind?: string;
+          staff_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_asset_event_asset_id_fkey';
+            columns: ['asset_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_asset';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_asset_event_staff_id_fkey';
+            columns: ['staff_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_category: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          icon: string;
+          id: string;
+          name: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          icon?: string;
+          id?: string;
+          name: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          icon?: string;
+          id?: string;
+          name?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_category_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_file: {
+        Row: {
+          created_at: string;
+          deleted_at: string | null;
+          deleted_by: string | null;
+          description: string | null;
+          folder_id: string | null;
+          id: string;
+          mime_type: string;
+          name: string;
+          owner_id: string | null;
+          size_bytes: number;
+          storage_path: string;
+          updated_at: string;
+          visibility: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          deleted_at?: string | null;
+          deleted_by?: string | null;
+          description?: string | null;
+          folder_id?: string | null;
+          id?: string;
+          mime_type: string;
+          name: string;
+          owner_id?: string | null;
+          size_bytes: number;
+          storage_path: string;
+          updated_at?: string;
+          visibility?: string;
+        };
+        Update: {
+          created_at?: string;
+          deleted_at?: string | null;
+          deleted_by?: string | null;
+          description?: string | null;
+          folder_id?: string | null;
+          id?: string;
+          mime_type?: string;
+          name?: string;
+          owner_id?: string | null;
+          size_bytes?: number;
+          storage_path?: string;
+          updated_at?: string;
+          visibility?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_file_deleted_by_fkey';
+            columns: ['deleted_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_file_folder_id_fkey';
+            columns: ['folder_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_folder';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_file_folder_id_fkey';
+            columns: ['folder_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_folder_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_file_owner_id_fkey';
+            columns: ['owner_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_file_share: {
+        Row: {
+          created_at: string;
+          file_id: string;
+          shared_by: string | null;
+          staff_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          file_id: string;
+          shared_by?: string | null;
+          staff_id: string;
+        };
+        Update: {
+          created_at?: string;
+          file_id?: string;
+          shared_by?: string | null;
+          staff_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_file_share_file_id_fkey';
+            columns: ['file_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_file';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_file_share_shared_by_fkey';
+            columns: ['shared_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_file_share_staff_id_fkey';
+            columns: ['staff_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_file_star: {
+        Row: {
+          created_at: string;
+          file_id: string;
+          staff_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          file_id: string;
+          staff_id: string;
+        };
+        Update: {
+          created_at?: string;
+          file_id?: string;
+          staff_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_file_star_file_id_fkey';
+            columns: ['file_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_file';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_file_star_staff_id_fkey';
+            columns: ['staff_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_folder: {
+        Row: {
+          color: string;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          name: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          color?: string;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          name: string;
+          updated_at?: string;
+        };
+        Update: {
+          color?: string;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          name?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_folder_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_item: {
+        Row: {
+          archived_at: string | null;
+          category_id: string;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          id: string;
+          name: string;
+          photo_path: string | null;
+          reorder_level: number;
+          sku: string | null;
+          unit: string;
+          unit_cost_cents: number;
+          updated_at: string;
+          vendor_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          archived_at?: string | null;
+          category_id: string;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          id?: string;
+          name: string;
+          photo_path?: string | null;
+          reorder_level?: number;
+          sku?: string | null;
+          unit?: string;
+          unit_cost_cents?: number;
+          updated_at?: string;
+          vendor_id?: string | null;
+        };
+        Update: {
+          archived_at?: string | null;
+          category_id?: string;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          id?: string;
+          name?: string;
+          photo_path?: string | null;
+          reorder_level?: number;
+          sku?: string | null;
+          unit?: string;
+          unit_cost_cents?: number;
+          updated_at?: string;
+          vendor_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_item_category_id_fkey';
+            columns: ['category_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_category';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_item_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_item_vendor_id_fkey';
+            columns: ['vendor_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_vendor';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_location: {
+        Row: {
+          active: boolean;
+          address: string | null;
+          city_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          kind: string;
+          manager_id: string | null;
+          name: string;
+          notes: string | null;
+          phone: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          active?: boolean;
+          address?: string | null;
+          city_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          kind?: string;
+          manager_id?: string | null;
+          name: string;
+          notes?: string | null;
+          phone?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          address?: string | null;
+          city_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          kind?: string;
+          manager_id?: string | null;
+          name?: string;
+          notes?: string | null;
+          phone?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_location_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_location_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_bounds_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_location_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_location_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_location_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_location_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_location_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_location_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_location_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_location_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'waitlist_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_location_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_location_manager_id_fkey';
+            columns: ['manager_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_purchase_line: {
+        Row: {
+          description: string;
+          id: string;
+          item_id: string | null;
+          quantity: number;
+          received_quantity: number;
+          request_id: string;
+          sort: number;
+          unit_cost_cents: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          description: string;
+          id?: string;
+          item_id?: string | null;
+          quantity: number;
+          received_quantity?: number;
+          request_id: string;
+          sort?: number;
+          unit_cost_cents: number;
+        };
+        Update: {
+          description?: string;
+          id?: string;
+          item_id?: string | null;
+          quantity?: number;
+          received_quantity?: number;
+          request_id?: string;
+          sort?: number;
+          unit_cost_cents?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_purchase_line_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_purchase_line_request_id_fkey';
+            columns: ['request_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_purchase_request';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_purchase_order: {
+        Row: {
+          cancel_reason: string | null;
+          cancelled_at: string | null;
+          expected_on: string | null;
+          id: string;
+          issued_at: string;
+          issued_by: string | null;
+          location_id: string;
+          notes: string | null;
+          number: string;
+          received_at: string | null;
+          request_id: string;
+          status: string;
+          total_cents: number;
+          updated_at: string;
+          vendor_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          cancel_reason?: string | null;
+          cancelled_at?: string | null;
+          expected_on?: string | null;
+          id?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          location_id: string;
+          notes?: string | null;
+          number?: string;
+          received_at?: string | null;
+          request_id: string;
+          status?: string;
+          total_cents: number;
+          updated_at?: string;
+          vendor_id: string;
+        };
+        Update: {
+          cancel_reason?: string | null;
+          cancelled_at?: string | null;
+          expected_on?: string | null;
+          id?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          location_id?: string;
+          notes?: string | null;
+          number?: string;
+          received_at?: string | null;
+          request_id?: string;
+          status?: string;
+          total_cents?: number;
+          updated_at?: string;
+          vendor_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_purchase_order_issued_by_fkey';
+            columns: ['issued_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_purchase_order_location_id_fkey';
+            columns: ['location_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_location';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_purchase_order_request_id_fkey';
+            columns: ['request_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_purchase_request';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_purchase_order_vendor_id_fkey';
+            columns: ['vendor_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_vendor';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_purchase_request: {
+        Row: {
+          created_at: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          department: string;
+          id: string;
+          justification: string | null;
+          location_id: string | null;
+          needed_by: string | null;
+          number: string;
+          priority: string;
+          requested_by: string | null;
+          status: string;
+          submitted_at: string | null;
+          title: string;
+          total_cents: number;
+          updated_at: string;
+          vendor_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          department?: string;
+          id?: string;
+          justification?: string | null;
+          location_id?: string | null;
+          needed_by?: string | null;
+          number?: string;
+          priority?: string;
+          requested_by?: string | null;
+          status?: string;
+          submitted_at?: string | null;
+          title: string;
+          total_cents?: number;
+          updated_at?: string;
+          vendor_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          department?: string;
+          id?: string;
+          justification?: string | null;
+          location_id?: string | null;
+          needed_by?: string | null;
+          number?: string;
+          priority?: string;
+          requested_by?: string | null;
+          status?: string;
+          submitted_at?: string | null;
+          title?: string;
+          total_cents?: number;
+          updated_at?: string;
+          vendor_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_purchase_request_decided_by_fkey';
+            columns: ['decided_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_purchase_request_location_id_fkey';
+            columns: ['location_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_location';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_purchase_request_requested_by_fkey';
+            columns: ['requested_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_purchase_request_vendor_id_fkey';
+            columns: ['vendor_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_vendor';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_stock: {
+        Row: {
+          created_at: string;
+          item_id: string;
+          location_id: string;
+          quantity: number;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          item_id: string;
+          location_id: string;
+          quantity?: number;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          item_id?: string;
+          location_id?: string;
+          quantity?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_stock_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_stock_location_id_fkey';
+            columns: ['location_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_location';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_stock_movement: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          from_location_id: string | null;
+          id: string;
+          item_id: string;
+          kind: string;
+          note: string | null;
+          purchase_order_id: string | null;
+          quantity: number;
+          reason: string | null;
+          to_location_id: string | null;
+          unit_cost_cents: number | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          from_location_id?: string | null;
+          id?: string;
+          item_id: string;
+          kind: string;
+          note?: string | null;
+          purchase_order_id?: string | null;
+          quantity: number;
+          reason?: string | null;
+          to_location_id?: string | null;
+          unit_cost_cents?: number | null;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          from_location_id?: string | null;
+          id?: string;
+          item_id?: string;
+          kind?: string;
+          note?: string | null;
+          purchase_order_id?: string | null;
+          quantity?: number;
+          reason?: string | null;
+          to_location_id?: string | null;
+          unit_cost_cents?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_stock_movement_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_stock_movement_from_location_id_fkey';
+            columns: ['from_location_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_location';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_stock_movement_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_stock_movement_purchase_order_id_fkey';
+            columns: ['purchase_order_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_purchase_order';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_stock_movement_to_location_id_fkey';
+            columns: ['to_location_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_location';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_vendor: {
+        Row: {
+          address: string | null;
+          categories: string[];
+          city_id: string | null;
+          contact_name: string | null;
+          created_at: string;
+          created_by: string | null;
+          email: string | null;
+          id: string;
+          name: string;
+          notes: string | null;
+          payment_terms: string;
+          phone: string | null;
+          rating: number | null;
+          status: string;
+          tax_pin: string | null;
+          updated_at: string;
+          website: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          address?: string | null;
+          categories?: string[];
+          city_id?: string | null;
+          contact_name?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          email?: string | null;
+          id?: string;
+          name: string;
+          notes?: string | null;
+          payment_terms?: string;
+          phone?: string | null;
+          rating?: number | null;
+          status?: string;
+          tax_pin?: string | null;
+          updated_at?: string;
+          website?: string | null;
+        };
+        Update: {
+          address?: string | null;
+          categories?: string[];
+          city_id?: string | null;
+          contact_name?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          email?: string | null;
+          id?: string;
+          name?: string;
+          notes?: string | null;
+          payment_terms?: string;
+          phone?: string | null;
+          rating?: number | null;
+          status?: string;
+          tax_pin?: string | null;
+          updated_at?: string;
+          website?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'company_vendor_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_vendor_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_bounds_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_vendor_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_vendor_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_vendor_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_vendor_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_vendor_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_vendor_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_vendor_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_vendor_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'waitlist_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_vendor_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       component_availability: {
         Row: {
           available: boolean;
@@ -36734,6 +37815,105 @@ export type Database = {
         };
         Relationships: [];
       };
+      company_activity_v: {
+        Row: {
+          actor: string | null;
+          asset_id: string | null;
+          at: string | null;
+          cost_cents: number | null;
+          detail: string | null;
+          from_location: string | null;
+          id: string | null;
+          item_id: string | null;
+          kind: string | null;
+          quantity: number | null;
+          reason: string | null;
+          source: string | null;
+          subject: string | null;
+          to_location: string | null;
+          unit: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
+      company_folder_v: {
+        Row: {
+          bytes: number | null;
+          color: string | null;
+          created_at: string | null;
+          created_by: string | null;
+          file_count: number | null;
+          id: string | null;
+          last_change: string | null;
+          name: string | null;
+          updated_at: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: 'company_folder_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      company_stock_v: {
+        Row: {
+          category_icon: string | null;
+          category_id: string | null;
+          category_name: string | null;
+          created_at: string | null;
+          item_id: string | null;
+          location_active: boolean | null;
+          location_id: string | null;
+          location_kind: string | null;
+          location_name: string | null;
+          name: string | null;
+          photo_path: string | null;
+          quantity: number | null;
+          reorder_level: number | null;
+          sku: string | null;
+          status: string | null;
+          unit: string | null;
+          unit_cost_cents: number | null;
+          updated_at: string | null;
+          value_cents: number | null;
+          vendor_id: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: 'company_item_category_id_fkey';
+            columns: ['category_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_category';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_item_vendor_id_fkey';
+            columns: ['vendor_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_vendor';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_stock_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_stock_location_id_fkey';
+            columns: ['location_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_location';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       component_public: {
         Row: {
           booking_lead_hours: number | null;
@@ -51092,6 +52272,19 @@ export type Database = {
       };
       fn_cod_allowed: { Args: Record<PropertyKey, never>; Returns: boolean };
       fn_compact_reference: { Args: { p_reference: string }; Returns: string };
+      fn_company_stock_add: {
+        Args: {
+          p_item_id: string;
+          p_location_id: string;
+          p_quantity: number;
+          p_unit_cost_cents?: number;
+        };
+        Returns: undefined;
+      };
+      fn_company_stock_take: {
+        Args: { p_item_id: string; p_location_id: string; p_quantity: number };
+        Returns: undefined;
+      };
       fn_component_cost: {
         Args: {
           p_basis: Database['public']['Enums']['price_basis'];
@@ -52961,6 +54154,209 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_company_asset_assign: {
+        Args: { p_assignee_name?: string; p_id: string; p_note?: string; p_staff_id?: string };
+        Returns: undefined;
+      };
+      rpc_company_asset_maintenance: {
+        Args: {
+          p_condition?: string;
+          p_cost_cents?: number;
+          p_due_on?: string;
+          p_id: string;
+          p_note?: string;
+          p_step: string;
+        };
+        Returns: undefined;
+      };
+      rpc_company_asset_return: {
+        Args: { p_condition?: string; p_id: string; p_note?: string };
+        Returns: undefined;
+      };
+      rpc_company_asset_save: {
+        Args: {
+          p_brand?: string;
+          p_category_id: string;
+          p_condition?: string;
+          p_id?: string;
+          p_location_id?: string;
+          p_model?: string;
+          p_name: string;
+          p_next_service_on?: string;
+          p_notes?: string;
+          p_photo_path?: string;
+          p_purchase_cost_cents?: number;
+          p_purchase_date?: string;
+          p_serial_number?: string;
+          p_vendor_id?: string;
+          p_warranty_until?: string;
+        };
+        Returns: string;
+      };
+      rpc_company_asset_set_status: {
+        Args: { p_id: string; p_reason?: string; p_status: string };
+        Returns: undefined;
+      };
+      rpc_company_category_save: {
+        Args: { p_icon?: string; p_id?: string; p_name: string };
+        Returns: string;
+      };
+      rpc_company_file_add: {
+        Args: {
+          p_description?: string;
+          p_folder_id?: string;
+          p_name?: string;
+          p_path: string;
+          p_visibility?: string;
+        };
+        Returns: string;
+      };
+      rpc_company_file_purge: { Args: { p_id: string }; Returns: string };
+      rpc_company_file_share: { Args: { p_id: string; p_staff_ids: string[] }; Returns: number };
+      rpc_company_file_star: { Args: { p_id: string; p_starred?: boolean }; Returns: boolean };
+      rpc_company_file_trash: { Args: { p_id: string; p_trash?: boolean }; Returns: undefined };
+      rpc_company_file_update: {
+        Args: {
+          p_description?: string;
+          p_folder_id?: string;
+          p_id: string;
+          p_name: string;
+          p_visibility?: string;
+        };
+        Returns: undefined;
+      };
+      rpc_company_files_summary: { Args: { p_from?: string; p_to?: string }; Returns: Json };
+      rpc_company_folder_delete: { Args: { p_id: string }; Returns: undefined };
+      rpc_company_folder_save: {
+        Args: { p_color?: string; p_id?: string; p_name: string };
+        Returns: string;
+      };
+      rpc_company_inventory_summary: { Args: { p_from?: string }; Returns: Json };
+      rpc_company_item_archive: {
+        Args: { p_archived?: boolean; p_id: string };
+        Returns: undefined;
+      };
+      rpc_company_item_save: {
+        Args: {
+          p_category_id: string;
+          p_description?: string;
+          p_id?: string;
+          p_location_id?: string;
+          p_name: string;
+          p_opening_quantity?: number;
+          p_photo_path?: string;
+          p_reorder_level?: number;
+          p_sku?: string;
+          p_unit?: string;
+          p_unit_cost_cents?: number;
+          p_vendor_id?: string;
+        };
+        Returns: string;
+      };
+      rpc_company_location_save: {
+        Args: {
+          p_address?: string;
+          p_city_id?: string;
+          p_id?: string;
+          p_kind?: string;
+          p_manager_id?: string;
+          p_name: string;
+          p_notes?: string;
+          p_phone?: string;
+        };
+        Returns: string;
+      };
+      rpc_company_location_set_active: {
+        Args: { p_active: boolean; p_id: string; p_reason?: string };
+        Returns: undefined;
+      };
+      rpc_company_people: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          company_level: string;
+          display_name: string;
+          email: string;
+          id: string;
+        }[];
+      };
+      rpc_company_po_cancel: { Args: { p_po_id: string; p_reason: string }; Returns: undefined };
+      rpc_company_po_issue: {
+        Args: {
+          p_expected_on?: string;
+          p_location_id?: string;
+          p_notes?: string;
+          p_request_id: string;
+          p_vendor_id?: string;
+        };
+        Returns: string;
+      };
+      rpc_company_po_receive: {
+        Args: { p_lines: Json; p_note?: string; p_po_id: string };
+        Returns: string;
+      };
+      rpc_company_purchase_cancel: {
+        Args: { p_id: string; p_reason?: string };
+        Returns: undefined;
+      };
+      rpc_company_purchase_decide: {
+        Args: { p_approve: boolean; p_id: string; p_note?: string };
+        Returns: undefined;
+      };
+      rpc_company_purchase_save: {
+        Args: {
+          p_department?: string;
+          p_id?: string;
+          p_justification?: string;
+          p_lines: Json;
+          p_location_id?: string;
+          p_needed_by?: string;
+          p_priority?: string;
+          p_submit?: boolean;
+          p_title: string;
+          p_vendor_id?: string;
+        };
+        Returns: string;
+      };
+      rpc_company_purchase_submit: { Args: { p_id: string }; Returns: undefined };
+      rpc_company_stock_count: {
+        Args: { p_counted: number; p_item_id: string; p_location_id: string; p_note?: string };
+        Returns: string;
+      };
+      rpc_company_stock_move: {
+        Args: {
+          p_from_location_id?: string;
+          p_item_id: string;
+          p_kind: string;
+          p_note?: string;
+          p_quantity: number;
+          p_reason?: string;
+          p_to_location_id?: string;
+          p_unit_cost_cents?: number;
+        };
+        Returns: string;
+      };
+      rpc_company_vendor_save: {
+        Args: {
+          p_address?: string;
+          p_categories?: string[];
+          p_city_id?: string;
+          p_contact_name?: string;
+          p_email?: string;
+          p_id?: string;
+          p_name: string;
+          p_notes?: string;
+          p_payment_terms?: string;
+          p_phone?: string;
+          p_rating?: number;
+          p_tax_pin?: string;
+          p_website?: string;
+        };
+        Returns: string;
+      };
+      rpc_company_vendor_set_status: {
+        Args: { p_id: string; p_reason?: string; p_status: string };
+        Returns: undefined;
       };
       rpc_complete_plan: {
         Args: { p_override_note?: string; p_plan_id: string };
