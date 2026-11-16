@@ -1,9 +1,20 @@
 import { EmptyState, StatusBadge } from '@nexg/ui';
-import { ArrowRight, Inbox } from 'lucide-react';
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  Hourglass,
+  Inbox,
+  MessageSquareReply,
+  Ticket,
+  UserCheck,
+} from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { reply, setStatus } from '@/app/support/actions';
+import { ShareDonut, TrendArea } from '@/components/charts';
+import { Kpi, KpiGrid, Panel, PillTabs } from '@/components/console-kit';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { TicketThread, type ThreadMessage } from '@/components/ticket-thread';
@@ -150,46 +161,165 @@ export default async function SupportAndTicketsPage({
   };
 
   const waiting = all.filter((t) => t.status === 'open').length;
+  const handling = all.filter((t) => t.status === 'assigned').length;
+  const answered = all.filter((t) => t.status === 'answered').length;
+  const resolved = all.filter((t) => t.status === 'resolved' || t.status === 'closed').length;
+
+  /* How long people wait for a first answer, over the tickets that have one. */
+  const replyMinutes = all
+    .filter((t) => t.first_reply_at)
+    .map(
+      (t) => (new Date(t.first_reply_at!).getTime() - new Date(t.created_at).getTime()) / 60_000,
+    );
+  const avgReply = replyMinutes.length
+    ? replyMinutes.reduce((a, b) => a + b, 0) / replyMinutes.length
+    : null;
+  const duration = (minutes: number) =>
+    minutes < 60
+      ? `${Math.max(1, Math.round(minutes))} min`
+      : minutes < 1440
+        ? `${Math.floor(minutes / 60)} h ${Math.round(minutes % 60)} min`
+        : `${(minutes / 1440).toFixed(1)} days`;
+
+  /* The last 30 days, Nairobi time: what came in, and what got a first answer. */
+  const nairobiDay = (at: string | number) =>
+    new Date(at).toLocaleDateString('en-CA', { timeZone: 'Africa/Nairobi' });
+  const days = new Map<string, { created: number; replied: number }>();
+  for (let i = 29; i >= 0; i--)
+    days.set(nairobiDay(Date.now() - i * 86_400_000), { created: 0, replied: 0 });
+  for (const t of all) {
+    const c = days.get(nairobiDay(t.created_at));
+    if (c) c.created += 1;
+    if (t.first_reply_at) {
+      const r = days.get(nairobiDay(t.first_reply_at));
+      if (r) r.replied += 1;
+    }
+  }
+  const trend = [...days].map(([day, v]) => ({ day, ...v }));
+  const inMonth = trend.reduce((sum, d) => sum + d.created, 0);
+
+  const tally = (pick: (t: (typeof all)[number]) => string, label: (k: string) => string) => {
+    const counts = new Map<string, number>();
+    for (const t of all) counts.set(pick(t), (counts.get(pick(t)) ?? 0) + 1);
+    return [...counts]
+      .sort((a, b) => b[1] - a[1])
+      .map(([key, value]) => ({ key, label: label(key), value }));
+  };
+  const byTopic = tally(
+    (t) => t.topic,
+    (k) => TOPIC_LABEL[k] ?? k.replace(/_/g, ' '),
+  );
+  const byRole = tally(
+    (t) => t.from_role ?? 'unknown',
+    (k) => (k.charAt(0).toUpperCase() + k.slice(1)).replace(/_/g, ' '),
+  );
 
   return (
     <ConsoleShell staff={staff} current="/support">
       <ConsoleHeader
         title="Support & tickets"
-        breadcrumb="Operate → Support & tickets · everything logged from the Help page"
+        breadcrumb="Everything sent from the Help page, as tickets with a reference people can quote."
         action={
-          <span className="text-muted text-xs font-semibold">
+          <span className="rounded-xl border border-white/20 px-4 py-2.5 text-sm font-semibold text-white/80">
             {waiting} waiting · {all.length} in total
           </span>
         }
       />
 
       <main className="px-4 py-5 sm:px-8">
-        <div className="flex flex-wrap gap-2">
-          {QUEUES.map((option) => {
-            const count = all.filter((t) =>
-              (option.statuses as readonly string[]).includes(t.status),
-            ).length;
-            const active = option.key === queueKey;
-            return (
-              <Link
-                key={option.key}
-                href={href({ queue: option.key })}
-                className={`rounded-full border px-4 py-2 text-[0.8125rem] font-bold transition-colors ${
-                  active
-                    ? 'border-ink bg-ink text-white'
-                    : 'border-border-strong bg-surface text-ink hover:border-ink'
-                }`}
-              >
-                {option.label}
-                {count > 0 && (
-                  <span className={active ? 'ml-2 text-white/60' : 'text-muted-light ml-2'}>
-                    {count}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </div>
+        {all.length > 0 && (
+          <>
+            <KpiGrid>
+              <Kpi
+                featured
+                icon={Ticket}
+                label="All tickets"
+                value={all.length.toLocaleString('en-KE')}
+                note={`${inMonth} in the last 30 days`}
+              />
+              <Kpi
+                icon={Hourglass}
+                label="Waiting"
+                value={waiting.toLocaleString('en-KE')}
+                note="Nobody has picked up"
+                href="/support"
+              />
+              <Kpi
+                icon={UserCheck}
+                label="Being handled"
+                value={handling.toLocaleString('en-KE')}
+                note="Assigned to someone"
+                href="/support?queue=mine"
+              />
+              <Kpi
+                icon={MessageSquareReply}
+                label="Answered"
+                value={answered.toLocaleString('en-KE')}
+                note="Waiting on the person"
+                href="/support?queue=answered"
+              />
+              <Kpi
+                icon={CheckCircle2}
+                label="Resolved"
+                value={resolved.toLocaleString('en-KE')}
+                note={
+                  all.length
+                    ? `${Math.round((resolved / all.length) * 100)}% of all tickets`
+                    : undefined
+                }
+                href="/support?queue=done"
+              />
+              <Kpi
+                icon={Clock}
+                label="Average first reply"
+                value={avgReply === null ? null : duration(avgReply)}
+                note={
+                  avgReply === null ? 'No replies yet' : `Across ${replyMinutes.length} answered`
+                }
+              />
+            </KpiGrid>
+
+            <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]">
+              <Panel title="Ticket trend" aside="Last 30 days">
+                <TrendArea
+                  data={trend}
+                  height={200}
+                  series={[
+                    { key: 'created', label: 'New tickets' },
+                    { key: 'replied', label: 'First replies', color: '#1F9D55' },
+                  ]}
+                />
+              </Panel>
+              <Panel title="Tickets by topic">
+                <ShareDonut
+                  data={byTopic}
+                  centre={all.length.toLocaleString('en-KE')}
+                  caption="Tickets"
+                  stacked
+                />
+              </Panel>
+              <Panel title="Who wrote in">
+                <ShareDonut
+                  data={byRole}
+                  centre={all.length.toLocaleString('en-KE')}
+                  caption="Tickets"
+                  stacked
+                />
+              </Panel>
+            </div>
+          </>
+        )}
+
+        <PillTabs
+          className="mt-5"
+          tabs={QUEUES.map((option) => ({
+            href: href({ queue: option.key }),
+            label: option.label,
+            count: all.filter((t) => (option.statuses as readonly string[]).includes(t.status))
+              .length,
+            active: option.key === queueKey,
+          }))}
+        />
 
         {all.length === 0 ? (
           <div className="mt-8">

@@ -1,6 +1,6 @@
 import { Card } from '@nexg/ui';
-import Link from 'next/link';
 import * as React from 'react';
+import { PillTabs } from '@/components/console-kit';
 
 /** The vocabulary every Settings tab shares. */
 
@@ -222,12 +222,12 @@ export function Tile({
   tone?: 'danger' | 'warning' | 'success';
 }) {
   return (
-    <Card className="p-4">
-      <p className="text-muted-light text-[0.5625rem] font-extrabold uppercase leading-tight tracking-[0.12em]">
+    <Card data-tile className="p-4">
+      <p className="text-muted text-[0.8125rem] font-semibold leading-tight">
         {label}
       </p>
       <p
-        className={`mt-2 text-[1.75rem] font-extrabold leading-tight tracking-tight ${
+        className={`mt-1.5 text-[1.5rem] font-extrabold leading-tight tracking-[-0.02em] ${
           tone === 'danger'
             ? 'text-danger'
             : tone === 'warning'
@@ -335,24 +335,13 @@ export function Td({ children }: { children: React.ReactNode }) {
 
 export function SettingsTabs({ current }: { current: string }) {
   return (
-    <nav
-      className="border-border -mx-4 flex gap-6 overflow-x-auto border-b px-4 sm:-mx-8 sm:px-8"
-      aria-label="Settings sections"
-    >
-      {TABS.map((t) => (
-        <Link
-          key={t.key}
-          href={`/settings?tab=${t.key}`}
-          className={`-mb-px shrink-0 border-b-2 pb-3 text-sm font-bold transition-colors ${
-            current === t.key
-              ? 'border-gold text-ink'
-              : 'text-muted hover:text-ink border-transparent'
-          }`}
-        >
-          {t.label}
-        </Link>
-      ))}
-    </nav>
+    <PillTabs
+          tabs={TABS.map((t) => ({
+            href: `/settings?tab=${t.key}`,
+            label: t.label,
+            active: current === t.key,
+          }))}
+        />
   );
 }
 

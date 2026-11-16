@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { PillTabs } from '@/components/console-kit';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { Pill } from '@/components/live/shared';
@@ -223,30 +224,15 @@ export default async function MessagingPage({
         }
       />
 
-      <div className="border-border bg-surface flex flex-wrap gap-2 border-b px-4 py-3 sm:px-8">
-        {TABS.map((t) =>
-          t.built ? (
-            <Link
-              key={t.key}
-              href={`/messaging?tab=${t.key}`}
-              className={`whitespace-nowrap rounded-full px-4 py-2 text-[0.8125rem] font-extrabold transition-colors ${
-                t.key === tab
-                  ? 'bg-ink text-white'
-                  : 'border-border-strong bg-surface text-ink hover:border-ink border'
-              }`}
-            >
-              {t.label}
-            </Link>
-          ) : (
-            <span
-              key={t.key}
-              title="Designed, not built yet"
-              className="border-border text-muted-light cursor-not-allowed rounded-full border border-dashed px-4 py-2 text-[0.8125rem] font-extrabold"
-            >
-              {t.label}
-            </span>
-          ),
-        )}
+      <div className="px-4 pt-5 sm:px-6">
+        <PillTabs
+          tabs={TABS.map((t) => ({
+            href: `/messaging?tab=${t.key}`,
+            label: t.label,
+            active: t.key === tab,
+            disabled: !t.built,
+          }))}
+        />
       </div>
 
       <div className="space-y-5 px-4 py-5 sm:px-8">

@@ -196,7 +196,11 @@ export default async function MerchantApplicationPage({
     <ConsoleShell staff={staff} current="/merchants">
       <ConsoleHeader
         title={name}
-        breadcrumb={trading ? 'Merchants → Merchant' : 'Merchants → Application'}
+        breadcrumb={
+          trading
+            ? 'Their record, documents, performance and money in one place.'
+            : 'An application on its way through onboarding.'
+        }
         action={<StatusBadge status={merchant.status as StatusKey} />}
       />
 

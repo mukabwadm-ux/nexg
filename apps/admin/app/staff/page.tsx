@@ -93,7 +93,7 @@ export default async function StaffPage({
     <ConsoleShell staff={staff} current="/staff">
       <ConsoleHeader
         title="Staff & roles"
-        breadcrumb="Control → Staff & roles"
+        breadcrumb="Who works on the console, what each role can reach, and the approvals waiting."
         action={
           <span className="text-muted text-xs font-semibold">
             {rows.length} account{rows.length === 1 ? '' : 's'}

@@ -85,14 +85,14 @@ export function Tile({
   children: React.ReactNode;
 }) {
   return (
-    <Card className="p-5">
-      <p className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
-        {label}
-      </p>
-      <p className={`mt-2 text-4xl font-extrabold ${tone === 'danger' ? 'text-danger' : ''}`}>
+    <Card data-tile className="p-4">
+      <p className="text-muted text-[0.8125rem] font-semibold leading-tight">{label}</p>
+      <p
+        className={`mt-1.5 text-[1.5rem] font-extrabold leading-tight tracking-[-0.02em] ${tone === 'danger' ? 'text-danger' : ''}`}
+      >
         {value}
       </p>
-      <p className="text-muted mt-2 text-xs font-semibold leading-[1.6]">{children}</p>
+      <p className="text-muted-light mt-1.5 text-xs font-semibold leading-[1.6]">{children}</p>
     </Card>
   );
 }

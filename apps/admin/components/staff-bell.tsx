@@ -112,7 +112,7 @@ export function StaffBell() {
         onClick={() => setOpen(!open)}
         aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications, nothing new'}
         aria-expanded={open}
-        className="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white"
+        className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white"
       >
         <Bell className="h-4 w-4" aria-hidden="true" />
         {unread > 0 ? (
@@ -129,7 +129,7 @@ export function StaffBell() {
         <div
           role="dialog"
           aria-label="Notifications"
-          className="fixed bottom-16 left-3 z-50 w-[min(24rem,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-black/10 bg-white text-slate-900 shadow-2xl"
+          className="absolute right-0 top-full z-50 mt-2 w-[min(24rem,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-black/10 bg-white text-slate-900 shadow-2xl"
         >
           <div className="flex items-center justify-between gap-2 border-b border-black/10 px-4 py-3">
             <h2 className="text-sm font-extrabold tracking-tight">Notifications</h2>

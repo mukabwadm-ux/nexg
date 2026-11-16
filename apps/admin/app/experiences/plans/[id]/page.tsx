@@ -165,7 +165,7 @@ export default async function PlanWorkbenchPage({ params }: { params: { id: stri
     <ConsoleShell staff={staff} current="/experiences">
       <ConsoleHeader
         title={`${workPlan.guest_name ?? '[Guest name]'} · ${workPlan.reference}`}
-        breadcrumb="Grow → Experiences → Plan workbench"
+        breadcrumb="Build the day against the guest’s budget and mood, then send it for approval."
       />
       <Workbench
         plan={workPlan}

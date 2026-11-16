@@ -1,79 +1,34 @@
-import {
-  Bike,
-  Briefcase,
-  Building,
-  CircleDot,
-  Home,
-  LifeBuoy,
-  Radio,
-  Scroll,
-  Settings,
-  ShoppingBag,
-  Sparkles,
-  Star,
-  Store,
-  Tags,
-  Users,
-  Wallet,
-} from 'lucide-react';
-import Link from 'next/link';
+import { cookies } from 'next/headers';
+import * as React from 'react';
 
 import { signOut } from '@/app/sign-in/actions';
+import { ConsoleFrame } from '@/components/console-frame';
 import { IdleTimer } from '@/components/idle-timer';
-import { Logo } from '@/components/logo';
-import { StaffBell } from '@/components/staff-bell';
+import { navFor } from '@/lib/console-nav';
 import type { StaffContext } from '@/lib/staff';
 
 /**
- * The console chrome: dark rail on the left, grouped by what the section is
- * for, with the signed-in staff member pinned to the bottom.
+ * The console chrome around every page: the grouped sidebar, the top bar
+ * and the page canvas (see ConsoleFrame).
  *
- * The rail is built from role_module_access, not from a list in this file.
- * A module a role cannot reach is simply absent — which is what the
- * permission matrix promises, and the only way to keep that promise is for
- * both to read the same table.
+ * The sidebar is built from role_module_access through lib/console-nav: an
+ * entry whose module a role cannot reach is simply absent, which is what the
+ * permission matrix promises. Groups that are designed but not built are
+ * shown greyed rather than linked.
  *
- * Modules that are designed but not built are shown greyed rather than
- * linked. Leaving them out entirely would make the console look smaller
- * than the plan; linking them would 404.
+ * `current` is kept for the pages that pass it; the frame reads the address
+ * itself, tab included, to mark the open view.
  */
-const SECTION_ORDER = ['Operate', 'Partners', 'Grow', 'Money', 'Control'];
-
-/*
- * console_module.icon holds a name; this is the only place that decides
- * what it looks like. An unknown name gets the neutral dot rather than
- * nothing, so a module added by someone editing rows arrives with a rail
- * entry that reads properly instead of a gap where the icon should be.
- */
-const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  home: Home,
-  'life-buoy': LifeBuoy,
-  radio: Radio,
-  'shopping-bag': ShoppingBag,
-  store: Store,
-  bike: Bike,
-  building: Building,
-  star: Star,
-  sparkles: Sparkles,
-  briefcase: Briefcase,
-  wallet: Wallet,
-  users: Users,
-  settings: Settings,
-  'scroll-text': Scroll,
-  tags: Tags,
-};
-
 export function ConsoleShell({
   staff,
-  current,
   children,
 }: {
   staff: StaffContext;
-  current: string;
+  current?: string;
   children: React.ReactNode;
 }) {
-  const initials = staff.displayName
-    .replace(/[[\]]/g, '')
+  const name = staff.displayName.replace(/[[\]]/g, '').trim() || staff.email;
+  const initials = name
     .split(/\s+/)
     .map((part) => part[0])
     .filter(Boolean)
@@ -81,127 +36,38 @@ export function ConsoleShell({
     .join('')
     .toUpperCase();
 
-  const sections = SECTION_ORDER.map((heading) => ({
-    heading,
-    items: staff.modules.filter((m) => m.section === heading),
-  })).filter((s) => s.items.length > 0);
-
   const scope = staff.allCities
     ? 'All cities'
     : staff.cities.length > 0
       ? staff.cities.join(', ')
       : 'No city scope';
+  const role = staff.isSuperAdmin
+    ? 'Super admin'
+    : staff.roles.map((r) => r.replace(/_/g, ' ')).join(' · ') || 'No role';
+
+  const nav = navFor(new Set(staff.modules.map((m) => m.key)));
+  const collapsed = cookies().get('console_rail')?.value === 'collapsed';
 
   return (
-    <div className="lg:grid lg:min-h-dvh lg:grid-cols-[15rem_minmax(0,1fr)]">
+    <>
       {/* The idle rule's client half; the middleware is the other half. */}
       <IdleTimer />
-      <aside aria-label="Console sidebar" className="bg-ink flex flex-col text-white lg:min-h-dvh">
-        <div className="flex items-center gap-2 px-5 py-5">
-          <Logo className="h-12 w-auto shrink-0" onDark priority />
-          <span className="border-gold/40 text-gold rounded-full border px-2 py-0.5 text-[0.5625rem] font-extrabold uppercase tracking-[0.16em]">
-            Admin
-          </span>
-        </div>
-
-        <nav className="flex-1 overflow-y-auto px-3 pb-4" aria-label="Console">
-          {sections.map((section) => (
-            <div key={section.heading} className="mt-5 first:mt-0">
-              <p className="px-3 text-[0.5625rem] font-extrabold uppercase tracking-[0.18em] text-white/35">
-                {section.heading}
-              </p>
-              <ul className="mt-2 space-y-1">
-                {section.items.map((item) => {
-                  const active =
-                    item.href === '/'
-                      ? current === '/'
-                      : !!item.href && current.startsWith(item.href);
-
-                  const Icon = ICONS[item.icon ?? ''] ?? CircleDot;
-
-                  if (!item.href) {
-                    return (
-                      <li key={item.key}>
-                        <span
-                          title="Designed, not built yet"
-                          className="flex cursor-default items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-bold text-white/25"
-                        >
-                          <Icon className="h-[1.05rem] w-[1.05rem] shrink-0" />
-                          <span className="min-w-0 truncate">{item.label}</span>
-                        </span>
-                      </li>
-                    );
-                  }
-
-                  return (
-                    <li key={item.key}>
-                      <Link
-                        href={item.href}
-                        aria-current={active ? 'page' : undefined}
-                        className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
-                          active
-                            ? 'bg-gold text-ink'
-                            : 'text-white/70 hover:bg-white/5 hover:text-white'
-                        }`}
-                      >
-                        <Icon
-                          className={`h-[1.05rem] w-[1.05rem] shrink-0 ${
-                            active ? '' : 'text-white/45'
-                          }`}
-                        />
-                        <span className="min-w-0 truncate">{item.label}</span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-3 border-t border-white/10 px-5 py-4">
-          <Link
-            href="/account"
-            aria-label="Your profile"
-            className="flex min-w-0 flex-1 items-center gap-3"
-          >
-            {staff.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL
-              <img
-                src={staff.avatarUrl}
-                alt=""
-                className="h-9 w-9 shrink-0 rounded-full object-cover"
-              />
-            ) : (
-              <span
-                aria-hidden="true"
-                className="bg-gold text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-extrabold"
-              >
-                {initials || '—'}
-              </span>
-            )}
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-[0.8125rem] font-bold">{staff.email}</span>
-              <span className="block truncate text-[0.625rem] font-semibold uppercase tracking-wide text-white/40">
-                {(staff.isSuperAdmin ? 'Super admin' : staff.roles.join(' · ') || 'No role') +
-                  ' · ' +
-                  scope}
-              </span>
-            </span>
-          </Link>
-          <StaffBell />
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="text-[0.625rem] font-bold uppercase tracking-wide text-white/40 transition-colors hover:text-white"
-            >
-              Out
-            </button>
-          </form>
-        </div>
-      </aside>
-
-      <div className="min-w-0">{children}</div>
-    </div>
+      <React.Suspense>
+        <ConsoleFrame
+          nav={nav}
+          collapsed={collapsed}
+          signOut={signOut}
+          staff={{
+            name,
+            email: staff.email,
+            role: `${role} · ${scope}`,
+            initials,
+            avatarUrl: staff.avatarUrl,
+          }}
+        >
+          {children}
+        </ConsoleFrame>
+      </React.Suspense>
+    </>
   );
 }

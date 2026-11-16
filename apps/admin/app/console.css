@@ -1,0 +1,87 @@
+/*
+ * The console canvas: the page's title sits on the black frame and
+ * everything after it on one light, rounded sheet — the white panel the
+ * admin portal designs put every page's content on.
+ */
+.console-canvas > :not(.console-header) {
+  background: rgb(var(--bg-rgb));
+  color: rgb(var(--ink-rgb));
+}
+
+.console-canvas > .console-header + *,
+.console-canvas > :first-child:not(.console-header) {
+  border-top-left-radius: 1.25rem;
+  border-top-right-radius: 1.25rem;
+}
+
+.console-canvas > :last-child:not(.console-header) {
+  flex: 1 1 auto;
+  border-bottom-left-radius: 1.25rem;
+  border-bottom-right-radius: 1.25rem;
+}
+
+/* The sidebar's scroll: thin, and only when there is something to scroll. */
+.console-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.14) transparent;
+}
+.console-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.console-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.14);
+}
+
+.console-frame ::selection {
+  background: rgb(var(--gold-rgb) / 0.45);
+  color: rgb(var(--ink-rgb));
+}
+
+/* Figures in tables and tiles line up. */
+.console-canvas table,
+.console-canvas [data-figure] {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Module KPI tiles. Every module's Tile carries data-tile; the designs give
+ * each page's KPI row soft depth and draw its first card in gold, so the
+ * first tile of a grid gets that here rather than in ten copies of Tile.
+ */
+.console-canvas [data-tile] {
+  border-radius: 1rem;
+  box-shadow:
+    0 1px 2px rgb(20 20 20 / 0.04),
+    0 10px 26px -20px rgb(20 20 20 / 0.35);
+}
+
+.console-canvas .grid > [data-tile]:first-child,
+.console-canvas .grid > :first-child > [data-tile]:only-child {
+  border-color: transparent;
+  background: linear-gradient(135deg, #ffe27a, #fdd128 55%, #f0b90b);
+  box-shadow: 0 10px 28px -14px rgb(196 140 0 / 0.75);
+}
+
+.console-canvas .grid > [data-tile]:first-child :is(.text-muted, .text-muted-light),
+.console-canvas .grid > :first-child > [data-tile]:only-child :is(.text-muted, .text-muted-light) {
+  color: rgb(20 20 20 / 0.72);
+}
+
+/*
+ * Header actions sit on the black band. Pages wrote them for a light
+ * page, so re-tint the usual text and border classes here rather than
+ * in every page; real buttons keep their own colours.
+ */
+.console-header-actions :is(.text-muted, .text-muted-light, .text-ink) {
+  color: rgb(255 255 255 / 0.78);
+}
+.console-header-actions .text-gold-text {
+  color: rgb(var(--gold-rgb));
+}
+.console-header-actions :is(.border-border, .border-border-strong) {
+  border-color: rgb(255 255 255 / 0.22);
+}
+.console-header-actions .hover\:border-ink:hover {
+  border-color: rgb(255 255 255 / 0.6);
+}

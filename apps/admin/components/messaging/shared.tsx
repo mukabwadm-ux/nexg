@@ -110,8 +110,8 @@ export function Tile({
   tone?: 'plain' | 'warn' | 'good';
 }) {
   return (
-    <div className="border-border bg-surface rounded-xl border p-4">
-      <p className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide">
+    <div data-tile className="border-border bg-surface rounded-2xl border p-4">
+      <p className="text-muted text-[0.8125rem] font-semibold leading-tight">
         {label}
       </p>
       <p

@@ -20,7 +20,7 @@ export default async function AccountPage() {
 
   return (
     <ConsoleShell staff={staff} current="/account">
-      <ConsoleHeader title="Your profile" breadcrumb="Account → Profile" />
+      <ConsoleHeader title="Your profile" breadcrumb="Your name, photo and sign-in details." />
       <ProfileForms
         profile={
           profile ?? {

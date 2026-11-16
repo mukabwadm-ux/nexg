@@ -171,11 +171,11 @@ export function SecurityTab({ rows }: { rows: StaffRow[] }) {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <Card className="p-5">
-      <p className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
-        {label}
+    <Card data-tile className="p-4">
+      <p className="text-muted text-[0.8125rem] font-semibold leading-tight">{label}</p>
+      <p className="mt-1.5 text-[1.5rem] font-extrabold leading-tight tracking-[-0.02em]">
+        {value}
       </p>
-      <p className="mt-2 text-3xl font-extrabold">{value}</p>
     </Card>
   );
 }

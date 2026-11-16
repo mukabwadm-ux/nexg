@@ -5,6 +5,7 @@ import { AllExperiences } from '@/components/experiences/all-experiences';
 import { ExperienceCatalogue } from '@/components/experiences/catalogue-manager';
 import { Queue } from '@/components/experiences/queue';
 import type { GuestRow, QueueRow, ReviewRow, Stats } from '@/components/experiences/shared';
+import { PillTabs } from '@/components/console-kit';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { requireModule, requireStaff } from '@/lib/staff';
@@ -83,34 +84,14 @@ export default async function ExperiencesPage({
       />
 
       <main className="px-4 py-6 sm:px-8">
-        <nav
-          className="border-border flex flex-wrap gap-6 border-b"
-          aria-label="Experiences sections"
-        >
-          {TABS.map((t) =>
-            t.built ? (
-              <Link
-                key={t.key}
-                href={`/experiences?tab=${t.key}`}
-                className={`-mb-px border-b-2 pb-3 text-sm font-bold transition-colors ${
-                  tab === t.key
-                    ? 'border-gold text-ink'
-                    : 'text-muted hover:text-ink border-transparent'
-                }`}
-              >
-                {t.label}
-              </Link>
-            ) : (
-              <span
-                key={t.key}
-                title="Designed, not built yet"
-                className="text-muted-light -mb-px cursor-default border-b-2 border-transparent pb-3 text-sm font-bold opacity-50"
-              >
-                {t.label}
-              </span>
-            ),
-          )}
-        </nav>
+        <PillTabs
+          tabs={TABS.map((t) => ({
+            href: `/experiences?tab=${t.key}`,
+            label: t.label,
+            active: t.key === tab,
+            disabled: !t.built,
+          }))}
+        />
 
         {tab === 'all' && (
           <AllExperiences
