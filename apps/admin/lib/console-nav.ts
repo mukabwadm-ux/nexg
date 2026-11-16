@@ -62,6 +62,7 @@ export const CONSOLE_NAV: NavGroup[] = [
     items: [
       { label: 'Live operations', href: '/live', module: 'live_ops', home: true },
       { label: 'Orders', href: '/orders', module: 'orders', home: true },
+      { label: 'Order transactions', href: '/transactions', module: 'orders', home: true },
       { label: 'Experience days', href: '/experiences', module: 'experiences', home: true },
     ],
   },
@@ -119,13 +120,17 @@ export const CONSOLE_NAV: NavGroup[] = [
     label: 'Finance',
     icon: 'finance',
     items: [
-      { label: 'Overview', href: '/finance?tab=overview', module: 'finance', home: true },
-      { label: 'Transactions', href: '/transactions', module: 'finance', home: true },
-      { label: 'Settlements & payouts', href: '/finance?tab=settlement', module: 'finance' },
-      { label: 'Reconciliation', href: '/finance?tab=reconciliation', module: 'finance' },
-      { label: 'Invoices', href: '/finance?tab=invoices', module: 'finance' },
-      { label: 'Fees & commissions', href: '/finance?tab=fees', module: 'finance' },
-      { label: 'Tax', href: '/finance?tab=tax', module: 'finance' },
+      { label: 'Office finance', href: '/finance/office', module: 'finance', home: true },
+      { label: 'Transactions', href: '/finance/transactions', module: 'finance', home: true },
+      {
+        label: 'Settlements & payouts',
+        href: '/finance/settlements',
+        module: 'finance',
+        home: true,
+      },
+      { label: 'Reconciliations', href: '/finance/reconciliation', module: 'finance', home: true },
+      { label: 'Invoices', href: '/finance/invoices', module: 'finance', home: true },
+      { label: 'Reports', href: '/finance/reports', module: 'finance', home: true },
     ],
   },
   {
@@ -160,7 +165,9 @@ export const CONSOLE_NAV: NavGroup[] = [
     key: 'reports',
     label: 'Reports',
     icon: 'reports',
-    items: [{ label: 'Exports & downloads', href: '/finance?tab=exports', module: 'finance' }],
+    items: [
+      { label: 'Exports & downloads', href: '/finance/reports?tab=exports', module: 'finance' },
+    ],
   },
   {
     key: 'company',

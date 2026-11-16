@@ -51,11 +51,11 @@ import {
   toCents,
   useRunner,
   useShowMore,
-} from '@/components/company/client-kit';
+} from '@/components/portal/client-kit';
 import { ActivityFeed, type ActivityRow } from '@/components/company/feeds';
 import { CategoryIcon } from '@/components/company/icons';
 import { PhotoField, type CategoryRow, type Option } from '@/components/company/inventory';
-import { Person, Pill } from '@/components/company/kit';
+import { Person, Pill } from '@/components/portal/kit';
 import { createClient } from '@/lib/supabase/client';
 import { ASSET_CONDITION, ASSET_STATUS, day, daysUntil, kes, todayInNairobi } from '@/lib/company';
 

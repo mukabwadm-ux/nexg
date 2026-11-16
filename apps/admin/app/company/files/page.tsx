@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import type { Metadata } from 'next';
 
-import { RangeControl } from '@/components/company/client-kit';
+import { RangeControl } from '@/components/portal/client-kit';
 import {
   FilesBoard,
   QuickFolders,
@@ -22,7 +22,7 @@ import {
   type FolderRow,
   type PersonRow,
 } from '@/components/company/files';
-import { CompanyHeader, CompanyTabs, Sheet, Stat, StatGrid } from '@/components/company/kit';
+import { PageHeader, ViewTabs, Sheet, Stat, StatGrid } from '@/components/portal/kit';
 import { ConsoleShell } from '@/components/console-shell';
 import {
   bytes,
@@ -169,7 +169,7 @@ export default async function CompanyFilesPage({
 
   return (
     <ConsoleShell staff={staff}>
-      <CompanyHeader
+      <PageHeader
         icon={FolderOpen}
         title="Company files"
         subtitle="Central repository for company documents, policies, contracts and operational files."
@@ -187,7 +187,7 @@ export default async function CompanyFilesPage({
       />
 
       <main className="space-y-5 px-3 py-5 sm:px-6 sm:py-6">
-        <CompanyTabs
+        <ViewTabs
           active={tab}
           tabs={TABS.map((t) => ({
             key: t.key,

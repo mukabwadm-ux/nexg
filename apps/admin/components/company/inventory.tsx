@@ -32,9 +32,9 @@ import {
   toCents,
   useRunner,
   useShowMore,
-} from '@/components/company/client-kit';
+} from '@/components/portal/client-kit';
 import { CategoryIcon } from '@/components/company/icons';
-import { Pill } from '@/components/company/kit';
+import { Pill } from '@/components/portal/kit';
 import { createClient } from '@/lib/supabase/client';
 import { quantity, shillings, STOCK_STATUS, suggestedOrder, UNITS } from '@/lib/company';
 

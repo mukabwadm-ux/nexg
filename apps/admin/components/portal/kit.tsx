@@ -3,10 +3,10 @@ import { Triangle, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
-import { initials, type Tone } from '@/lib/company';
+import { initials, type Tone } from '@/lib/portal';
 
 /**
- * The pieces the Company pages are made of, after the admin portal designs:
+ * The pieces the portal-design pages (Company, Finance) are made of:
  * a page title with its big gold icon, a bar of views whose open one is a
  * black pill with a gold icon, KPI cards on soft cream, coloured pills for
  * types and statuses, and initials for people. Server components; the
@@ -15,7 +15,7 @@ import { initials, type Tone } from '@/lib/company';
 
 /* ───────────────────────────────────────────────────────────── the title */
 
-export function CompanyHeader({
+export function PageHeader({
   icon: Icon,
   title,
   subtitle,
@@ -49,7 +49,7 @@ export function CompanyHeader({
 
 /* ───────────────────────────────────────────────────────────── the views */
 
-export interface CompanyTab {
+export interface ViewTab {
   key: string;
   label: string;
   icon: LucideIcon;
@@ -60,7 +60,7 @@ export interface CompanyTab {
 }
 
 /** The page's views; the open one is the black pill with a gold icon. */
-export function CompanyTabs({ tabs, active }: { tabs: CompanyTab[]; active: string }) {
+export function ViewTabs({ tabs, active }: { tabs: ViewTab[]; active: string }) {
   return (
     <nav
       aria-label="Views"
@@ -184,6 +184,7 @@ export function Stat({
   delta,
   href,
   wide = false,
+  visual,
   children,
 }: {
   icon: LucideIcon;
@@ -197,6 +198,8 @@ export function Stat({
   href?: string;
   /** Twice as wide on large screens, like the designs' storage card. */
   wide?: boolean;
+  /** Drawn in place of the icon, such as a utilisation ring. */
+  visual?: React.ReactNode;
   /** Extra content under the figure, such as a meter. */
   children?: React.ReactNode;
 }) {
@@ -205,15 +208,17 @@ export function Stat({
   const good = delta ? (delta.upIsBad ? !up : up) : true;
   const body = (
     <>
-      <span
-        aria-hidden="true"
-        className={cn(
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-full sm:h-11 sm:w-11',
-          t.ring,
-        )}
-      >
-        <Icon className={cn('h-[1.35rem] w-[1.35rem]', t.icon)} strokeWidth={1.8} />
-      </span>
+      {visual ?? (
+        <span
+          aria-hidden="true"
+          className={cn(
+            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full sm:h-11 sm:w-11',
+            t.ring,
+          )}
+        >
+          <Icon className={cn('h-[1.35rem] w-[1.35rem]', t.icon)} strokeWidth={1.8} />
+        </span>
+      )}
       <span className="w-full min-w-0 flex-1">
         <span
           data-figure
@@ -367,6 +372,43 @@ export function PanelHead({
       </h2>
       {children && <div className="flex flex-wrap items-center gap-2">{children}</div>}
     </div>
+  );
+}
+
+/** A percentage ring for a KPI card: gold to 100%, red beyond it. */
+export function Ring({ value, label }: { value: number | null; label: string }) {
+  const pct = value == null ? 0 : Math.max(0, value);
+  const over = pct > 100;
+  const r = 22;
+  const c = 2 * Math.PI * r;
+  const shown = Math.min(pct, 100);
+  return (
+    <span
+      className="relative flex h-14 w-14 shrink-0 items-center justify-center"
+      role="img"
+      aria-label={label}
+    >
+      <svg
+        viewBox="0 0 56 56"
+        className="absolute inset-0 h-full w-full -rotate-90"
+        aria-hidden="true"
+      >
+        <circle cx="28" cy="28" r={r} fill="none" stroke="rgb(var(--border-rgb))" strokeWidth="6" />
+        <circle
+          cx="28"
+          cy="28"
+          r={r}
+          fill="none"
+          stroke={over ? 'rgb(var(--danger-rgb))' : '#F5B800'}
+          strokeWidth="6"
+          strokeLinecap="round"
+          strokeDasharray={`${(shown / 100) * c} ${c}`}
+        />
+      </svg>
+      <span className={cn('text-[0.75rem] font-extrabold tabular-nums', over && 'text-danger')}>
+        {value == null ? '—' : `${Math.round(pct)}%`}
+      </span>
+    </span>
   );
 }
 

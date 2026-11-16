@@ -13,16 +13,9 @@ import {
 import type { Metadata } from 'next';
 
 import { ShareDonut, TrendArea } from '@/components/charts';
-import { RangeControl } from '@/components/company/client-kit';
+import { RangeControl } from '@/components/portal/client-kit';
 import type { Option } from '@/components/company/inventory';
-import {
-  CompanyHeader,
-  CompanyTabs,
-  PanelHead,
-  Sheet,
-  Stat,
-  StatGrid,
-} from '@/components/company/kit';
+import { PageHeader, ViewTabs, PanelHead, Sheet, Stat, StatGrid } from '@/components/portal/kit';
 import {
   NewPurchase,
   OrdersTable,
@@ -174,7 +167,7 @@ export default async function ProcurementPage({
 
   return (
     <ConsoleShell staff={staff}>
-      <CompanyHeader
+      <PageHeader
         icon={ShoppingCart}
         title="Procurement"
         subtitle="Purchase requests, approvals and purchase orders for everything NexG buys for itself."
@@ -187,7 +180,7 @@ export default async function ProcurementPage({
       />
 
       <main className="space-y-5 px-3 py-5 sm:px-6 sm:py-6">
-        <CompanyTabs
+        <ViewTabs
           active={tab}
           tabs={[
             { key: 'overview', label: 'Overview', icon: LayoutGrid, href: href('overview') },

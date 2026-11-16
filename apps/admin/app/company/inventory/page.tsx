@@ -17,7 +17,7 @@ import {
 import type { Metadata } from 'next';
 
 import { ShareDonut } from '@/components/charts';
-import { RangeControl } from '@/components/company/client-kit';
+import { RangeControl } from '@/components/portal/client-kit';
 import { ActivityFeed, type ActivityRow } from '@/components/company/feeds';
 import {
   AddItem,
@@ -27,14 +27,7 @@ import {
   type StockRow,
 } from '@/components/company/inventory';
 import { InventoryReports, MovementsTable } from '@/components/company/inventory-views';
-import {
-  CompanyHeader,
-  CompanyTabs,
-  PanelHead,
-  Sheet,
-  Stat,
-  StatGrid,
-} from '@/components/company/kit';
+import { PageHeader, ViewTabs, PanelHead, Sheet, Stat, StatGrid } from '@/components/portal/kit';
 import { ConsoleShell } from '@/components/console-shell';
 import {
   change,
@@ -173,7 +166,7 @@ export default async function CompanyInventoryPage({
 
   return (
     <ConsoleShell staff={staff}>
-      <CompanyHeader
+      <PageHeader
         icon={Boxes}
         title="Company inventory"
         subtitle="Track assets, equipment, supplies and company resources across all locations."
@@ -188,7 +181,7 @@ export default async function CompanyInventoryPage({
       />
 
       <main className="space-y-5 px-3 py-5 sm:px-6 sm:py-6">
-        <CompanyTabs
+        <ViewTabs
           active={tab}
           tabs={TABS.map((t) => ({
             key: t.key,

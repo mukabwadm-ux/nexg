@@ -41,9 +41,9 @@ import {
   toCents,
   useRunner,
   useShowMore,
-} from '@/components/company/client-kit';
+} from '@/components/portal/client-kit';
 import type { Option } from '@/components/company/inventory';
-import { Person, Pill } from '@/components/company/kit';
+import { Person, Pill } from '@/components/portal/kit';
 import {
   day,
   dateTime,

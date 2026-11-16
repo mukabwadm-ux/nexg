@@ -5,15 +5,10 @@ import { ArrowLeftRight } from 'lucide-react';
 import * as React from 'react';
 
 import { ShareDonut } from '@/components/charts';
-import {
-  ExportButton,
-  FilterSelect,
-  SearchBox,
-  useShowMore,
-} from '@/components/company/client-kit';
+import { ExportButton, FilterSelect, SearchBox, useShowMore } from '@/components/portal/client-kit';
 import { describe, type ActivityRow } from '@/components/company/feeds';
 import type { StockRow } from '@/components/company/inventory';
-import { PanelHead, Pill, Sheet } from '@/components/company/kit';
+import { PanelHead, Pill, Sheet } from '@/components/portal/kit';
 import { dateTime, kes, kesShort, quantity, STOCK_STATUS, type Tone } from '@/lib/company';
 
 const KIND: Record<string, { label: string; tone: Tone }> = {

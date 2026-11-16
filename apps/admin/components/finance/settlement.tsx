@@ -130,7 +130,7 @@ export function Settlement({
           {runs.map((r) => (
             <Link
               key={r.id}
-              href={`/finance?tab=settlement&run=${r.id}`}
+              href={`/finance/settlements?tab=batches&run=${r.id}`}
               className={`rounded-full px-3 py-1.5 text-[0.75rem] font-extrabold transition-colors ${
                 r.id === run.id
                   ? 'bg-ink text-white'

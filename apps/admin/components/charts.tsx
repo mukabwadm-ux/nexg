@@ -47,6 +47,9 @@ const formatter = (unit: Unit) => (value: number | string) =>
 const dayLabel = (iso: string) =>
   new Date(`${iso}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 
+const monthLabel = (iso: string) =>
+  new Date(`${iso}T00:00:00`).toLocaleDateString('en-GB', { month: 'short' });
+
 export interface Series {
   key: string;
   label: string;
@@ -61,12 +64,16 @@ export function TrendArea({
   series,
   unit = 'count',
   height = 240,
+  step = 'day',
 }: {
   data: ({ day: string } & Record<string, number | string>)[];
   series: Series[];
   unit?: Unit;
   height?: number;
+  /** `month` when each point is a month (the first day of it): "Jun", "Jul". */
+  step?: 'day' | 'month';
 }) {
+  const label = step === 'month' ? monthLabel : dayLabel;
   const id = React.useId().replace(/:/g, '');
   const config: ChartConfig = Object.fromEntries(
     series.map((s, i) => [s.key, { label: s.label, color: s.color ?? PALETTE[i] }]),
@@ -102,7 +109,7 @@ export function TrendArea({
             axisLine={false}
             tickMargin={10}
             minTickGap={28}
-            tickFormatter={dayLabel}
+            tickFormatter={label}
           />
           <YAxis
             tickLine={false}
@@ -117,7 +124,7 @@ export function TrendArea({
             content={
               <ChartTooltipContent
                 indicator="dot"
-                labelFormatter={(label) => dayLabel(String(label))}
+                labelFormatter={(value) => label(String(value))}
                 formatter={formatter(unit)}
               />
             }

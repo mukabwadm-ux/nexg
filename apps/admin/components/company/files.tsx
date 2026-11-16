@@ -53,8 +53,8 @@ import {
   TextField,
   useRunner,
   useShowMore,
-} from '@/components/company/client-kit';
-import { Person, Pill } from '@/components/company/kit';
+} from '@/components/portal/client-kit';
+import { Person, Pill } from '@/components/portal/kit';
 import { createClient } from '@/lib/supabase/client';
 import {
   ACCEPTED_FILE_TYPES,

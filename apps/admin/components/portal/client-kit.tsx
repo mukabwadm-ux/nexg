@@ -20,7 +20,7 @@ import { Download, MoreHorizontal, Search, X } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
-import { toCsv } from '@/lib/company';
+import { toCsv } from '@/lib/portal';
 
 export interface Outcome {
   ok: boolean;

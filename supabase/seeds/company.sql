@@ -161,3 +161,66 @@ begin
   on conflict do nothing;
 end;
 $$;
+
+-- Office finance (Finance → Office finance): sample expenses and budgets,
+-- local only. Recorded by Dev Ops and approved by Dev Admin, so the
+-- two-person rule holds in the sample too.
+do $$
+declare
+  v_admin uuid := '00000000-0000-4000-8000-00000000000a';
+  v_ops uuid := '00000000-0000-4000-8000-00000000000b';
+  v_month date := date_trunc('month', current_date)::date;
+  m int;
+begin
+  if to_regclass('public.fin_office_expense') is null
+     or not exists (select 1 from public.staff_user where id = v_admin)
+     or exists (select 1 from public.fin_office_expense where description like 'Sample:%') then
+    return;
+  end if;
+
+  /* Six months of rent, salaries and utilities, paid. */
+  for m in 0..5 loop
+    insert into public.fin_office_expense (
+      spent_on, description, category, payee, location_id, amount_cents, status,
+      submitted_by, submitted_at, decided_by, decided_at, payment_method, payment_reference,
+      paid_on, paid_by)
+    values
+      ((v_month - make_interval(months => m))::date + 2, 'Sample: office rent – Nairobi HQ',
+       'rent_utilities', 'Westlands Towers Ltd', 'c0a00000-0000-4000-8000-000000000001',
+       100000000, 'paid', v_ops, now() - make_interval(months => m, days => -2), v_admin,
+       now() - make_interval(months => m, days => -2), 'bank_transfer', 'FT-RENT-' || m,
+       (v_month - make_interval(months => m))::date + 3, v_admin),
+      ((v_month - make_interval(months => m))::date + 9, 'Sample: staff salaries',
+       'salaries_wages', 'Payroll', null, 80000000 + m * 1500000, 'paid', v_ops,
+       now() - make_interval(months => m, days => -9), v_admin,
+       now() - make_interval(months => m, days => -9), 'bank_transfer', 'FT-PAY-' || m,
+       (v_month - make_interval(months => m))::date + 10, v_admin),
+      ((v_month - make_interval(months => m))::date + 11, 'Sample: electricity',
+       'rent_utilities', 'Kenya Power', 'c0a00000-0000-4000-8000-000000000001',
+       9800000 + m * 650000, 'paid', v_ops, now() - make_interval(months => m, days => -11),
+       v_admin, now() - make_interval(months => m, days => -11), 'mpesa', 'SAMPLE' || m || 'KPLC',
+       (v_month - make_interval(months => m))::date + 12, v_admin);
+  end loop;
+
+  insert into public.fin_office_expense (
+    spent_on, description, category, payee, vendor_id, amount_cents, status, submitted_by,
+    submitted_at, decided_by, decided_at, notes)
+  values
+    (current_date - 8, 'Sample: laptop for operations', 'it_systems', 'Tech Hub Kenya Ltd',
+     'c0b00000-0000-4000-8000-000000000001', 27800000, 'approved', v_ops, now() - interval '8 days',
+     v_admin, now() - interval '7 days', 'Replaces the reception desktop'),
+    (current_date - 4, 'Sample: office supplies', 'office_supplies', 'OfficeMart Supplies',
+     'c0b00000-0000-4000-8000-000000000004', 12000000, 'submitted', v_ops, now() - interval '4 days',
+     null, null, 'Paper, toner and cleaning'),
+    (current_date - 2, 'Sample: taxi to client meetings', 'transport_travel', 'Bolt Business',
+     null, 1850000, 'submitted', v_ops, now() - interval '2 days', null, null, null);
+
+  insert into public.fin_office_budget (month, category, amount_cents, set_by) values
+    (v_month, 'rent_utilities', 110000000, v_admin),
+    (v_month, 'salaries_wages', 80000000, v_admin),
+    (v_month, 'office_supplies', 15000000, v_admin),
+    (v_month, 'it_systems', 20000000, v_admin),
+    (v_month, 'transport_travel', 5000000, v_admin)
+  on conflict (month, category) do nothing;
+end;
+$$;

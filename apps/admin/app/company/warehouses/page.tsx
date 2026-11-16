@@ -2,17 +2,10 @@ import { CircleAlert, Laptop, LayoutGrid, Layers, PowerOff, Wallet, Warehouse } 
 import type { Metadata } from 'next';
 
 import { ShareDonut } from '@/components/charts';
-import { RangeControl } from '@/components/company/client-kit';
+import { RangeControl } from '@/components/portal/client-kit';
 import { ActivityFeed, type ActivityRow } from '@/components/company/feeds';
 import type { Option, StockRow } from '@/components/company/inventory';
-import {
-  CompanyHeader,
-  CompanyTabs,
-  PanelHead,
-  Sheet,
-  Stat,
-  StatGrid,
-} from '@/components/company/kit';
+import { PageHeader, ViewTabs, PanelHead, Sheet, Stat, StatGrid } from '@/components/portal/kit';
 import {
   AddLocation,
   LocationsBoard,
@@ -118,7 +111,7 @@ export default async function WarehousesPage({
 
   return (
     <ConsoleShell staff={staff}>
-      <CompanyHeader
+      <PageHeader
         icon={Warehouse}
         title="Warehouses & stores"
         subtitle="Every office, warehouse, store and rider hub where NexG keeps stock and equipment, and what each one holds."
@@ -131,7 +124,7 @@ export default async function WarehousesPage({
       />
 
       <main className="space-y-5 px-3 py-5 sm:px-6 sm:py-6">
-        <CompanyTabs
+        <ViewTabs
           active={tab}
           tabs={[
             {

@@ -29,9 +29,9 @@ import {
   TextField,
   useRunner,
   useShowMore,
-} from '@/components/company/client-kit';
+} from '@/components/portal/client-kit';
 import type { Option } from '@/components/company/inventory';
-import { Pill } from '@/components/company/kit';
+import { Pill } from '@/components/portal/kit';
 import {
   day,
   kes,

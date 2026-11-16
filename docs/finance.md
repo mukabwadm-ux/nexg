@@ -13,8 +13,22 @@ ledger.*            every shilling that has moved, append-only
    ↓   (triggers, never a call somebody has to remember)
 public.fin_*        projections — what the screens read
    ↓
-/finance            Overview · Weekly settlement
+/finance/*          Office finance · Transactions · Settlements & payouts ·
+                    Reconciliations · Invoices · Reports
 ```
+
+Since November 2026 the screens have their own addresses (the old `/finance?tab=` links redirect):
+
+| Screen | Reads |
+| --- | --- |
+| `/finance/office` | `fin_office_expense`, `fin_office_budget` (office spending, two-person approval) |
+| `/finance/transactions` | `rpc_finance_transactions` / `rpc_finance_transaction_summary`: payments, refunds, B2C payouts, settlement lines, office expenses in one shape |
+| `/finance/settlements` | `fin_settlement_run` and its lines, `fin_party_owed`, `fin_calendar_entry`; "Build payout run" calls `rpc_settlement_build` |
+| `/finance/reconciliation` | `fin_provider_recon_v`, `fin_clearing_aging_v`, `fin_webhook_gap_v`, `fin_invariant_v`, `fin_run_line_v.verifies` |
+| `/finance/invoices` | `rpc_finance_invoices` (host invoices, hotel and merchant statements, in cents) and `tax_invoice` |
+| `/finance/reports` | the above for the headline figures; Financial (the old Overview), Fees, Tax and Exports tabs |
+
+The `rpc_finance_*` readers count operational records (a payment, a refund, a settlement line), not ledger balances; balances still come only from the ledger and its projections.
 
 Three rules hold the whole thing together.
 

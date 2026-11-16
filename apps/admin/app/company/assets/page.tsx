@@ -13,19 +13,19 @@ import type { Metadata } from 'next';
 
 import { ShareDonut } from '@/components/charts';
 import { AssetsTable, RegisterAsset, type AssetRow } from '@/components/company/assets';
-import { RangeControl } from '@/components/company/client-kit';
+import { RangeControl } from '@/components/portal/client-kit';
 import { ActivityFeed, type ActivityRow } from '@/components/company/feeds';
 import type { CategoryRow, Option } from '@/components/company/inventory';
 import {
-  CompanyHeader,
-  CompanyTabs,
+  PageHeader,
+  ViewTabs,
   PanelHead,
   Person,
   Pill,
   Sheet,
   Stat,
   StatGrid,
-} from '@/components/company/kit';
+} from '@/components/portal/kit';
 import { ConsoleShell } from '@/components/console-shell';
 import {
   companyAccess,
@@ -154,7 +154,7 @@ export default async function CompanyAssetsPage({
 
   return (
     <ConsoleShell staff={staff}>
-      <CompanyHeader
+      <PageHeader
         icon={Laptop}
         title="Assets & equipment"
         subtitle="Who holds each laptop, phone, motorbike and machine, what condition it is in, and when it is serviced."
@@ -169,7 +169,7 @@ export default async function CompanyAssetsPage({
       />
 
       <main className="space-y-5 px-3 py-5 sm:px-6 sm:py-6">
-        <CompanyTabs
+        <ViewTabs
           active={tab}
           tabs={TABS.map((t) => ({
             key: t.key,

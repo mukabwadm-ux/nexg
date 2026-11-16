@@ -26,10 +26,10 @@ import {
   TextArea,
   TextField,
   useRunner,
-} from '@/components/company/client-kit';
+} from '@/components/portal/client-kit';
 import { CategoryIcon } from '@/components/company/icons';
 import type { Option, StockRow } from '@/components/company/inventory';
-import { Person, Pill } from '@/components/company/kit';
+import { Person, Pill } from '@/components/portal/kit';
 import { ASSET_STATUS, kes, LOCATION_KINDS, quantity, STOCK_STATUS } from '@/lib/company';
 
 export interface LocationRow {

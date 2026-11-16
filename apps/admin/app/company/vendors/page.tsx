@@ -11,16 +11,9 @@ import {
 } from 'lucide-react';
 import type { Metadata } from 'next';
 
-import { RangeControl } from '@/components/company/client-kit';
+import { RangeControl } from '@/components/portal/client-kit';
 import type { Option } from '@/components/company/inventory';
-import {
-  CompanyHeader,
-  CompanyTabs,
-  PanelHead,
-  Sheet,
-  Stat,
-  StatGrid,
-} from '@/components/company/kit';
+import { PageHeader, ViewTabs, PanelHead, Sheet, Stat, StatGrid } from '@/components/portal/kit';
 import {
   AddVendor,
   VendorsTable,
@@ -127,7 +120,7 @@ export default async function VendorsPage({
 
   return (
     <ConsoleShell staff={staff}>
-      <CompanyHeader
+      <PageHeader
         icon={Truck}
         title="Vendors & suppliers"
         subtitle="The businesses NexG buys from: who to call, what they supply, their terms and what has been ordered."
@@ -140,7 +133,7 @@ export default async function VendorsPage({
       />
 
       <main className="space-y-5 px-3 py-5 sm:px-6 sm:py-6">
-        <CompanyTabs
+        <ViewTabs
           active={tab}
           tabs={TABS.map((t) => ({
             key: t.key,
