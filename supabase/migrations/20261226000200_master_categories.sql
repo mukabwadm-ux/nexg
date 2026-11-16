@@ -11,7 +11,10 @@
 --    Flights and "Something else" are switched off. Cinemas stays under Events &
 --    Experiences for the cinema seat booking.
 -- 2. merchant: every merchant on a retired category or subcategory moves to the
---    one that replaces it (category, category_key and subcategory).
+--    one that replaces it (category, category_key and subcategory), except a
+--    merchant with an application. Its category and first subcategory must match
+--    the application (tg_merchant_application_write_guard), so it keeps them
+--    until it changes them through the application; retired ones stay valid.
 -- 3. merchant_application_registry: revision nexg-booking-2026-11-16.1, copied from
 --    nexg-booking-2026-11-09.1. The taxonomy keeps every old subcategory so
 --    applications in progress still validate, and adds the new ones with their
@@ -478,7 +481,7 @@ begin
 end;
 $fn$;
 
--- 2. Merchants on retired subcategories or categories.
+-- 2. Merchants on retired subcategories or categories, without an application.
 create temporary table _merchant_move on commit drop as
 select m.id,
   coalesce(o.new_id, l.id, r.new_id) as subcategory
@@ -490,7 +493,8 @@ left join (values
   and coalesce(m.category_key, m.category::text) = 'restaurants_food'
 left join _master l on l.id = m.subcategory
 left join _retired_sub r on r.old_id = m.subcategory
-where m.subcategory is not null;
+where m.subcategory is not null
+  and not exists (select 1 from public.merchant_application a where a.merchant_id = m.id);
 
 update public.merchant m
 set subcategory = mv.subcategory,
@@ -507,7 +511,8 @@ set category = r.new_id::public.merchant_category,
   category_key = r.new_id,
   updated_at = now()
 from _retired_category r
-where m.subcategory is null and coalesce(m.category_key, m.category::text) = r.old_id;
+where m.subcategory is null and coalesce(m.category_key, m.category::text) = r.old_id
+  and not exists (select 1 from public.merchant_application a where a.merchant_id = m.id);
 
 -- 3. Application registry revision.
 insert into public.merchant_application_registry
@@ -554,8 +559,9 @@ begin
     where m.deleted_at is null and m.subcategory is not null
       and not exists (select 1 from _master l where l.id = m.subcategory)
       and m.subcategory <> 'cinemas'
+      and not exists (select 1 from public.merchant_application a where a.merchant_id = m.id)
   ) then
-    raise exception 'A merchant is still on a retired subcategory.';
+    raise exception 'A merchant without an application is still on a retired subcategory.';
   end if;
   if not exists (
     select 1 from public.merchant_application_registry
