@@ -100,9 +100,7 @@ export function Tile({
 }) {
   return (
     <div data-tile className="border-border bg-surface rounded-2xl border p-4">
-      <p className="text-muted text-[0.8125rem] font-semibold leading-tight">
-        {label}
-      </p>
+      <p className="text-muted text-[0.8125rem] font-semibold leading-tight">{label}</p>
       <p
         className={`mt-1.5 text-2xl font-extrabold tabular-nums tracking-tight ${
           tone === 'warn' ? 'text-danger' : ''

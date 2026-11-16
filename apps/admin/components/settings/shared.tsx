@@ -223,9 +223,7 @@ export function Tile({
 }) {
   return (
     <Card data-tile className="p-4">
-      <p className="text-muted text-[0.8125rem] font-semibold leading-tight">
-        {label}
-      </p>
+      <p className="text-muted text-[0.8125rem] font-semibold leading-tight">{label}</p>
       <p
         className={`mt-1.5 text-[1.5rem] font-extrabold leading-tight tracking-[-0.02em] ${
           tone === 'danger'
@@ -336,12 +334,12 @@ export function Td({ children }: { children: React.ReactNode }) {
 export function SettingsTabs({ current }: { current: string }) {
   return (
     <PillTabs
-          tabs={TABS.map((t) => ({
-            href: `/settings?tab=${t.key}`,
-            label: t.label,
-            active: current === t.key,
-          }))}
-        />
+      tabs={TABS.map((t) => ({
+        href: `/settings?tab=${t.key}`,
+        label: t.label,
+        active: current === t.key,
+      }))}
+    />
   );
 }
 
