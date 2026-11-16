@@ -65,12 +65,14 @@ export default async function HiringPage() {
         title="Hiring"
         lead="Post jobs on NexG Careers and choose who to hire. Applicants send a note and a CV, and hear back at every step."
         actions={
-          <Link
-            href="/merchant/hiring/new"
-            className="bg-gold text-ink inline-flex h-10 items-center rounded-lg px-4 text-[0.875rem] font-extrabold"
-          >
-            Post a job
-          </Link>
+          jobsRes.error ? undefined : (
+            <Link
+              href="/merchant/hiring/new"
+              className="bg-gold text-ink inline-flex h-10 items-center rounded-lg px-4 text-[0.875rem] font-extrabold"
+            >
+              Post a job
+            </Link>
+          )
         }
       />
 
