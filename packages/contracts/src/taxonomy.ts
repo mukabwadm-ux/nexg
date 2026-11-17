@@ -2876,7 +2876,7 @@ type MasterCategory = {
     cardKind: string;
     etaStyle: string;
   };
-  subcategories: { id: string; name: string; base: string; group?: string }[];
+  subcategories: { id: string; name: string; base: string; group?: string; addFields?: string[] }[];
 };
 
 const PROFILE_SUBCATEGORIES = new Map(
@@ -2916,6 +2916,10 @@ export const MERCHANT_TAXONOMY: readonly MerchantCategory[] = (
         id: sub.id,
         name: sub.name,
         categoryId: entry.id,
+        fields: [
+          ...base.fields,
+          ...(sub.addFields ?? []).filter((field) => !base.fields.includes(field)),
+        ],
         ...(sub.group ? { group: sub.group } : {}),
       };
     }),

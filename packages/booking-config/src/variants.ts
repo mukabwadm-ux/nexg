@@ -27,6 +27,8 @@ export type SubcategoryVariant = {
   baseSubcategoryId: string;
   specialtyNeeds: string;
   group?: string;
+  /** Booking questions the base profile lacks, asked as well (the Adult Section's age check). */
+  extraQuestionIds?: string[];
 };
 export type ListedCategory = { id: string; name: string; subcategoryIds: string[] };
 
@@ -98,7 +100,12 @@ export function withSubcategoryVariants<T extends { categoryId: string }>(
       throw new Error(
         `Subcategory variant ${variant.subcategoryId} needs base ${variant.baseSubcategoryId}, which is missing.`,
       );
-    added.push(retag(clone(base, variant), variant.categoryId, variant.name));
+    added.push(
+      withExtraQuestions(
+        retag(clone(base, variant), variant.categoryId, variant.name),
+        variant.extraQuestionIds,
+      ),
+    );
   }
   const all = [...items.map((item) => retag(item, item.categoryId, renames[idOf(item)])), ...added];
   const rank = (item: T, index: number) => {
@@ -111,6 +118,18 @@ export function withSubcategoryVariants<T extends { categoryId: string }>(
     .map((item, index) => ({ item, key: rank(item, index) }))
     .sort((a, b) => a.key - b.key)
     .map(({ item }) => item);
+}
+
+/** Appends a variant's extra question ids to whichever question list the projection carries. */
+function withExtraQuestions<T>(item: T, extra: readonly string[] | undefined): T {
+  if (!extra?.length) return item;
+  const record = item as Record<string, unknown>;
+  for (const key of ['sourceQuestionIds', 'questions']) {
+    const list = record[key];
+    if (Array.isArray(list) && list.every((id) => typeof id === 'string'))
+      record[key] = [...list, ...extra.filter((id) => !list.includes(id))];
+  }
+  return item;
 }
 
 /** Sets category, current category name and (when the item has one) name. */

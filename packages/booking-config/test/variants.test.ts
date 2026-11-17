@@ -67,12 +67,23 @@ describe('subcategory variants', () => {
       expect(profile!.categoryId).toBe(variant.categoryId);
       expect(profile!.defaultModelId).toBe(base!.defaultModelId);
       expect(profile!.candidateModelIds).toEqual(base!.candidateModelIds);
-      expect(profile!.sourceQuestionIds).toEqual(base!.sourceQuestionIds);
+      expect(profile!.sourceQuestionIds).toEqual([
+        ...base!.sourceQuestionIds,
+        ...(variant.extraQuestionIds ?? []).filter((id) => !base!.sourceQuestionIds.includes(id)),
+      ]);
       expect(baseSubcategoryId(variant.subcategoryId)).toBe(variant.baseSubcategoryId);
       expect(getBookingProfile(variant.subcategoryId)?.defaultModelId).toBe(base!.defaultModelId);
     }
     const ruleIds = registry.profiles.flatMap((p) => p.rules.map((r) => r.id));
     expect(new Set(ruleIds).size).toBe(ruleIds.length);
+  });
+
+  it('asks every Adult Section specialty how age is checked', () => {
+    const adult = listOnboardingCategories().find((c) => c.id === 'adults_only')!;
+    for (const sub of adult.subcategories)
+      expect(
+        registry.profiles.find((p) => p.subcategoryId === sub.id)?.sourceQuestionIds,
+      ).toContain('Q_AGE_GATE_METHOD');
   });
 
   it('gives new categories profiles from other categories', () => {

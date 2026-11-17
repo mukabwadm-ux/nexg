@@ -754,14 +754,20 @@
       "name": "Couples' Experiences",
       "categoryId": "adults_only",
       "baseSubcategoryId": "recreation",
-      "specialtyNeeds": "Dated recreation activity capacity and equipment with booking window; walk-ins require a live capacity check."
+      "specialtyNeeds": "Dated recreation activity capacity and equipment with booking window; walk-ins require a live capacity check.",
+      "extraQuestionIds": [
+        "Q_AGE_GATE_METHOD"
+      ]
     },
     {
       "subcategoryId": "romantic_getaways",
       "name": "Romantic Getaways",
       "categoryId": "adults_only",
       "baseSubcategoryId": "travel_packages",
-      "specialtyNeeds": "Accepted itinerary/quote and third-party flight/accommodation confirmations; included flight never implies NEXG seat inventory."
+      "specialtyNeeds": "Accepted itinerary/quote and third-party flight/accommodation confirmations; included flight never implies NEXG seat inventory.",
+      "extraQuestionIds": [
+        "Q_AGE_GATE_METHOD"
+      ]
     },
     {
       "subcategoryId": "sexual_health_products",
@@ -775,14 +781,20 @@
       "name": "Intimacy & Relationship Education",
       "categoryId": "adults_only",
       "baseSubcategoryId": "workshops",
-      "specialtyNeeds": "Dated workshop capacity, facilitator/equipment and duration; walk-in admissions still consume the same session pool."
+      "specialtyNeeds": "Dated workshop capacity, facilitator/equipment and duration; walk-in admissions still consume the same session pool.",
+      "extraQuestionIds": [
+        "Q_AGE_GATE_METHOD"
+      ]
     },
     {
       "subcategoryId": "adult_lifestyle_experiences",
       "name": "Adult Lifestyle Experiences",
       "categoryId": "adults_only",
       "baseSubcategoryId": "recreation",
-      "specialtyNeeds": "Dated recreation activity capacity and equipment with booking window; walk-ins require a live capacity check."
+      "specialtyNeeds": "Dated recreation activity capacity and equipment with booking window; walk-ins require a live capacity check.",
+      "extraQuestionIds": [
+        "Q_AGE_GATE_METHOD"
+      ]
     },
     {
       "subcategoryId": "video_online_gaming",

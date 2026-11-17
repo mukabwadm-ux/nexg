@@ -52,7 +52,19 @@ const variants = [];
 // Old variants stay (applications already reference them); reused ones take their new name.
 for (const old of oldVariants) {
   const now = listed.get(old.subcategoryId);
-  variants.push(now ? { ...old, name: now.name, baseSubcategoryId: now.base } : old);
+  /* The previous file is the source of the old variants; the master list decides everything a listed
+     one carries now (on a re-run every listed variant comes through here). */
+  const { extraQuestionIds: _previous, ...kept } = old;
+  variants.push(
+    now
+      ? {
+          ...kept,
+          name: now.name,
+          baseSubcategoryId: now.base,
+          ...(now.addQuestions ? { extraQuestionIds: now.addQuestions } : {}),
+        }
+      : old,
+  );
 }
 for (const sub of listed.values()) {
   if (sub.id === sub.base || oldVariantById.has(sub.id)) continue;
@@ -64,6 +76,7 @@ for (const sub of listed.values()) {
     baseSubcategoryId: sub.base,
     specialtyNeeds: base.specialtyNeeds,
     ...(sub.group ? { group: sub.group } : {}),
+    ...(sub.addQuestions ? { extraQuestionIds: sub.addQuestions } : {}),
   });
 }
 for (const v of variants) {
@@ -115,11 +128,10 @@ ${newCategories.map((c) => `alter type public.merchant_category add value if not
 `,
 );
 
-/* Every specialty in these categories asks how the merchant checks a customer's
-   age, whatever base profile it reuses (owner, 17 Nov 2026). Alcohol &
-   Beverages already gets it from every base profile it uses (test 43 checks). */
-const AGE_CHECK_CATEGORIES = ['adults_only'];
-
+/* The Adult Section's age check on every specialty (owner, 17 Nov 2026) is not generated here:
+   20261226000200 is applied, so this script must reproduce it byte for byte. The database got it
+   from 20270102120100_adult_age_check.sql; the code gets it from the master list's addFields and
+   addQuestions (contracts fields, booking-config extraQuestionIds). */
 const TEMPLATE = {
   games_sports: 'experiences',
   movers_relocation: 'concierge_services',
@@ -284,23 +296,6 @@ set label = s.label,
 from subs s
 where cc.category = s.category;
 
--- 1b2. Every specialty in an age-restricted category asks how the merchant
---      checks age, whatever base profile it reuses (owner, 17 Nov 2026; first
---      applied by 20270102120100_adult_age_check.sql).
-update public.category_config cc
-set subcategories = (
-    select jsonb_agg(
-      case when coalesce(e.value -> 'fields', '[]'::jsonb) ? 'age_gate_method' then e.value
-        else jsonb_set(e.value, '{fields}',
-          '["age_gate_method"]'::jsonb || coalesce(e.value -> 'fields', '[]'::jsonb), true) end
-      order by e.ordinality)
-    from jsonb_array_elements(cc.subcategories) with ordinality e(value, ordinality)),
-  updated_at = now()
-where cc.category in (${AGE_CHECK_CATEGORIES.map(q).join(', ')})
-  and jsonb_typeof(cc.subcategories) = 'array'
-  and exists (select 1 from jsonb_array_elements(cc.subcategories) e(value)
-    where not coalesce(e.value -> 'fields', '[]'::jsonb) ? 'age_gate_method');
-
 -- 1c. The agreement each new category's merchants accept (interim, as in
 --     packages/contracts/src/merchant-agreements.ts).
 insert into public.merchant_agreement_category (category, agreement_id, interim) values
@@ -402,25 +397,6 @@ select ${q(REGISTRY_REVISION)},
 from public.merchant_application_registry r
 where r.revision = ${q(PREVIOUS_REGISTRY_REVISION)}
 on conflict (revision) do nothing;
-
--- 3b. Specialties asked the age check (1b2) may answer it in an application.
-update public.merchant_application_registry r
-set profile_questions = r.profile_questions || (
-    select jsonb_object_agg(s.id,
-      (select jsonb_agg(x order by x) from (
-         select jsonb_array_elements_text(r.profile_questions -> s.id)
-         union select 'age_gate_method') qs(x)))
-    from (select jsonb_array_elements_text(r.taxonomy -> c) as id
-          from unnest(array[${AGE_CHECK_CATEGORIES.map(q).join(', ')}]) c) s
-    where jsonb_typeof(r.profile_questions -> s.id) = 'array'
-      and not (r.profile_questions -> s.id) ? 'age_gate_method')
-where r.revision = ${q(REGISTRY_REVISION)}
-  and r.question_schemas ? 'age_gate_method'
-  and exists (
-    select 1 from unnest(array[${AGE_CHECK_CATEGORIES.map(q).join(', ')}]) c,
-      jsonb_array_elements_text(r.taxonomy -> c) s(id)
-    where jsonb_typeof(r.profile_questions -> s.id) = 'array'
-      and not (r.profile_questions -> s.id) ? 'age_gate_method');
 
 do $$
 begin
