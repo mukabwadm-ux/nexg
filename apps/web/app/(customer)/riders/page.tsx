@@ -15,7 +15,7 @@ import Link from 'next/link';
 
 import { RIDER_CITY_SLUG } from '@/components/rider-onboarding/types';
 import { RiderAppPreview } from '@/components/riders/rider-app-preview';
-import { RiderApplyCard } from '@/components/riders/rider-apply-card';
+import { RiderRegistrationForm } from '@/components/riders/rider-registration-form';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -127,21 +127,20 @@ export const revalidate = 3600;
 export default async function RidersPage() {
   const supabase = createPublicClient();
 
-  // The cities open for applications (section 4.2): Nairobi only for now
-  // (RIDER_CITY_SLUG). The card adds an "Other" chip, which is how someone
-  // in a waitlist city reaches us.
-  const { data: cities } = await supabase
+  // The city riders apply for: Nairobi only for now (RIDER_CITY_SLUG). The
+  // form does not ask; it files every application under this city.
+  const { data: city } = await supabase
     .from('city')
-    .select('id, name, slug, status')
+    .select('id')
     .neq('status', 'waitlist')
     .eq('slug', RIDER_CITY_SLUG)
-    .order('sort', { ascending: true });
+    .maybeSingle();
 
   return (
     <>
       <SiteHeader
         signIn={{ label: 'Sign in', href: '/riders/sign-in' }}
-        action={{ label: 'Apply now', href: '/riders/apply' }}
+        action={{ label: 'Apply now', href: '/riders#apply' }}
       />
 
       <main>
@@ -167,7 +166,7 @@ export default async function RidersPage() {
 
               <div className="mt-6 flex flex-wrap gap-2">
                 <Button size="lg" asChild>
-                  <Link href="/riders/apply">Start your application</Link>
+                  <Link href="#apply">Start your application</Link>
                 </Button>
                 <Button variant="outline" size="lg" asChild>
                   <Link href="#how">How it works</Link>
@@ -193,7 +192,31 @@ export default async function RidersPage() {
               </dl>
             </div>
 
-            <RiderApplyCard cities={cities ?? []} />
+            {/* The whole application, on this page (owner, 17 Nov 2026). Every
+                "Apply now" and "Become A Rider" comes here. */}
+            <div id="apply" role="region" aria-labelledby="apply-title" className="scroll-mt-24">
+              <h2
+                id="apply-title"
+                className="flex items-center gap-2 text-lg font-extrabold sm:text-xl"
+              >
+                Become a rider
+              </h2>
+              <p className="text-muted-light mt-0.5 text-[0.8125rem] font-semibold">
+                Takes about two minutes.
+              </p>
+              <div className="mt-4">
+                <RiderRegistrationForm cityId={city?.id ?? null} />
+              </div>
+              <p className="text-muted mt-6 text-sm font-semibold">
+                Already on NexG?{' '}
+                <Link
+                  href="/riders/sign-in"
+                  className="text-gold-text dark:text-gold rounded-sm font-extrabold underline underline-offset-4 dark:hover:text-[#FEDD5C]"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
           </div>
         </section>
 
@@ -448,7 +471,7 @@ export default async function RidersPage() {
               </p>
             </div>
             <Button size="lg" asChild trailingIcon={<ArrowRight className="h-4 w-4" />}>
-              <Link href="/riders/apply">Become A Rider</Link>
+              <Link href="#apply">Become A Rider</Link>
             </Button>
           </Card>
         </section>

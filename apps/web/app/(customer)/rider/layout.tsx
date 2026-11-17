@@ -68,7 +68,7 @@ export interface RiderHome {
 export default async function RiderLayout({ children }: { children: React.ReactNode }) {
   const { h, active, nav } = await riderContext();
 
-  if (!h) redirect('/riders/apply');
+  if (!h) redirect('/riders#apply');
 
   return (
     <RiderShell

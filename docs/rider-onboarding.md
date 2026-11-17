@@ -1,5 +1,26 @@
 # Rider onboarding
 
+> **Since 17 Nov 2026 the application is one form on `/riders`**
+> (`components/riders/rider-registration-form.tsx`), styled like the merchant
+> form on `/merchants`. It asks for:
+>
+> - first and last name;
+> - an M-Pesa number;
+> - an email confirmed with a code;
+> - the number plate;
+> - the Rider Agreement.
+>
+> Riders ride motorbikes in Nairobi, so neither is asked. Submit calls
+> `rpc_rider_start`, `rpc_rider_set_vehicle`, `rpc_rider_save_step`,
+> `rpc_rider_payout_name_check` and `rpc_rider_submit`. Since
+> `20270102000100`, `rpc_rider_submit` no longer waits for documents.
+>
+> Photos, areas and the kit follow in the rider dashboard (`/rider`).
+> Activation still needs every essential document verified.
+>
+> `/riders/apply/*` now redirects to `/riders#apply`. The five steps described
+> below no longer exist; the rest of this page is history.
+
 Five steps and a status page, at `/riders/apply/*` and `/riders/status`.
 Written for whoever changes it next. It shares the shell, the chips, the
 readiness ring, the document components and the resume mechanism with

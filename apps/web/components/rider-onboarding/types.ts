@@ -66,17 +66,11 @@ export interface CityOption {
 }
 
 /**
- * The one open city a new rider can sign up for today: Nairobi (owner,
- * 17 Nov 2026). Mombasa, Kisumu and Nakuru stay open to customers but are left
- * off the rider forms. Waitlist cities still show on the Start step as "soon",
- * and the full city list stays so a draft saved elsewhere still reads correctly.
+ * The only city riders apply for: Nairobi (owner, 17 Nov 2026). The form on
+ * /riders does not ask; every application is filed under this city. Mombasa,
+ * Kisumu and Nakuru stay open to customers.
  */
 export const RIDER_CITY_SLUG = 'nairobi';
-
-/** The cities the rider Start step offers: Nairobi and the waitlist cities. */
-export function offeredRiderCities<T extends Pick<CityOption, 'slug' | 'status'>>(cities: T[]) {
-  return cities.filter((c) => c.slug === RIDER_CITY_SLUG || c.status === 'waitlist');
-}
 
 export interface SlotOption {
   id: string;
@@ -121,20 +115,6 @@ export const YEARS: { value: string; label: string }[] = [
   { value: '3_5', label: '3–5' },
   { value: '5_plus', label: '5+' },
 ];
-
-/** Step number → route, and how long the top bar says is left. */
-export const RIDER_STEPS = [
-  { step: 1, path: '/riders/apply/start', minutes: 6 },
-  { step: 2, path: '/riders/apply/ride', minutes: 5 },
-  { step: 3, path: '/riders/apply/areas', minutes: 4 },
-  { step: 4, path: '/riders/apply/documents', minutes: 3 },
-  { step: 5, path: '/riders/apply/payout', minutes: 1 },
-  { step: 6, path: '/riders/status', minutes: 0 },
-] as const;
-
-export function riderPathForStep(step: number): string {
-  return RIDER_STEPS.find((s) => s.step === step)?.path ?? '/riders/apply/start';
-}
 
 /**
  * Kenyan plates read `KMDA 421K`. Non-Kenyan formats are warned about, never

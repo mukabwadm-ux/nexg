@@ -52,7 +52,7 @@ describe('landingFor', () => {
 
   it('sends an account with nothing yet to where that partner starts', () => {
     expect(landingFor('merchant', guest, '/merchant')).toBe('/merchants/apply');
-    expect(landingFor('rider', guest, undefined)).toBe('/riders/apply');
+    expect(landingFor('rider', guest, undefined)).toBe('/riders#apply');
     expect(landingFor('host', null, undefined)).toBe('/hosts');
   });
 

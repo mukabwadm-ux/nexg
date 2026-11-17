@@ -166,7 +166,7 @@ export function RiderStatusStep({ facts }: { facts: RiderStatusFacts }) {
                     icon={<Smartphone className="h-4 w-4" />}
                     label="Add the photos still outstanding"
                     meta={`${k} left`}
-                    href="/riders/apply/documents"
+                    href="/rider/documents"
                   />
                 )}
               </ul>
@@ -192,14 +192,14 @@ export function RiderStatusStep({ facts }: { facts: RiderStatusFacts }) {
               ))}
             </ul>
             <Button variant="outline" className="mt-4" asChild>
-              <Link href="/riders/apply/documents">Retake now</Link>
+              <Link href="/rider/documents">Retake now</Link>
             </Button>
           </div>
         )}
 
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <Button size="lg" asChild>
-            <Link href={k > 0 ? '/riders/apply/documents' : '/riders'}>
+            <Link href={k > 0 ? '/rider/documents' : '/riders'}>
               <span className="flex items-center gap-3">
                 {k > 0 ? 'Finish my photos' : 'Install the rider app'}
                 <span aria-hidden="true" className="text-gold">

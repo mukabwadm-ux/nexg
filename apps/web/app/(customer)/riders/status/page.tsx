@@ -25,7 +25,7 @@ export default async function RiderStatusPage() {
     .limit(1)
     .maybeSingle();
 
-  if (!row) redirect('/riders/apply/start');
+  if (!row) redirect('/riders#apply');
   const draft = row as unknown as RiderDraft;
 
   const [

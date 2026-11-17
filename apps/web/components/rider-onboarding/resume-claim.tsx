@@ -8,8 +8,6 @@ import * as React from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { ensureApplicantSession } from '@/lib/uploads';
 
-import { riderPathForStep } from './types';
-
 /**
  * Opening a rider resume link.
  *
@@ -49,7 +47,8 @@ export function RiderResumeClaim({ token }: { token: string }) {
       }
 
       const result = data as unknown as { rider_id: string; step: number };
-      router.replace(result.step >= 6 ? '/riders/status' : riderPathForStep(result.step));
+      /* Not submitted yet: the form on /riders opens with the saved details. */
+      router.replace(result.step >= 6 ? '/riders/status' : '/riders#apply');
     })();
 
     return () => {
@@ -68,7 +67,7 @@ export function RiderResumeClaim({ token }: { token: string }) {
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Button asChild>
-            <Link href="/riders/apply">Open my application</Link>
+            <Link href="/riders#apply">Open my application</Link>
           </Button>
           <Button variant="outline" asChild>
             <Link href="/help">Talk to the rider team</Link>

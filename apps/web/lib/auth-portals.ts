@@ -32,7 +32,7 @@ export const PORTALS: Record<Portal, PortalInfo> = {
     start: '/merchants/apply',
     label: 'Merchant',
   },
-  rider: { signIn: '/riders/sign-in', home: '/rider', start: '/riders/apply', label: 'Rider' },
+  rider: { signIn: '/riders/sign-in', home: '/rider', start: '/riders#apply', label: 'Rider' },
   /* Hosts start on the public page; their onboarding lives inside the
      workspace once an account exists. */
   host: { signIn: '/hosts/sign-in', home: '/host', start: '/hosts', label: 'Host' },
