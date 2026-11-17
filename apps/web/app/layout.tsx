@@ -5,7 +5,7 @@ import type { Metadata, Viewport } from 'next';
 import { RegisterServiceWorker } from '@/components/notifications/register-sw';
 import { REVEAL_SCRIPT } from '@/components/reveal-script';
 import { THEME_SCRIPT } from '@/components/theme/script';
-import { ThemeSync } from '@/components/theme/theme';
+import { ThemeSync } from '@/components/theme/theme-sync';
 
 export const metadata: Metadata = {
   title: {

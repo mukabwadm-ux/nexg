@@ -4,55 +4,14 @@ import { Moon, Sun } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
 
-import { THEME_KEY, UNTHEMED } from './script';
+import { THEME_KEY } from './script';
+import { apply } from './theme-dom';
 
-/**
- * Light and dark themes for the public site.
- *
- * A visitor who has not chosen follows their device (prefers-color-scheme).
- * Choosing with the sun/moon button saves the choice in this browser. The
- * theme is the `dark` class on <html>, which redefines the colour tokens
- * (packages/ui tokens.css). The merchant console and its previews are not
- * themed: they always stay light.
+/*
+ * Light and dark themes for the public site: see theme-dom.ts. ThemeSync,
+ * which the root layout renders, lives in theme-sync.tsx; keep it out of this
+ * module (theme-sync.tsx says why).
  */
-
-type Choice = 'light' | 'dark' | null;
-
-function readChoice(): Choice {
-  try {
-    const value = window.localStorage.getItem(THEME_KEY);
-    return value === 'light' || value === 'dark' ? value : null;
-  } catch {
-    return null;
-  }
-}
-
-function systemDark(): boolean {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches;
-}
-
-function apply(dark: boolean, pathname: string) {
-  document.documentElement.classList.toggle('dark', dark && !UNTHEMED.test(pathname));
-}
-
-/**
- * Keeps the class right as the visitor moves between pages (into or out of
- * the console) and when their device switches while they have not chosen.
- * Rendered once, in the root layout.
- */
-export function ThemeSync() {
-  const pathname = usePathname() ?? '/';
-  React.useEffect(() => {
-    const choice = readChoice();
-    apply(choice ? choice === 'dark' : systemDark(), pathname);
-    if (choice) return;
-    const query = window.matchMedia('(prefers-color-scheme: dark)');
-    const onChange = () => apply(query.matches, pathname);
-    query.addEventListener('change', onChange);
-    return () => query.removeEventListener('change', onChange);
-  }, [pathname]);
-  return null;
-}
 
 /** The sun/moon button in the headers. */
 export function ThemeToggle({ className = '' }: { className?: string }) {
