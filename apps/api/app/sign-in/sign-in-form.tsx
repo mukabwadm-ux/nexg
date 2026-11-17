@@ -1,6 +1,14 @@
 'use client';
 
-import { Button, Card, Input, useToast, withCaptcha } from '@nexg/ui';
+import {
+  Button,
+  CAPTCHA_FIELD,
+  Card,
+  captchaSiteKey,
+  Input,
+  useEarlyCaptcha,
+  useToast,
+} from '@nexg/ui';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
@@ -20,18 +28,36 @@ export function SignInForm({ next }: { next?: string }) {
 
   const [pending, setPending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  /* The security check starts as the page opens, so its token is usually
+     ready by the time the password is typed (see useEarlyCaptcha). Started
+     on submit, a check that wanted a click waited two minutes, then the
+     sign-in went without a token and was refused. */
+  const { take: captcha, prepare } = useEarlyCaptcha();
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setPending(true);
     setError(null);
 
-    const formData = await withCaptcha(new FormData(event.currentTarget));
+    const formData = new FormData(event.currentTarget);
+    const token = await captcha();
+    if (token) {
+      formData.set(CAPTCHA_FIELD, token);
+    } else if (captchaSiteKey()) {
+      // Without a token the sign-in would only be refused; say why instead.
+      setPending(false);
+      setError(
+        'The security check did not finish. If a check box appeared at the bottom of the page, tick it, then press Sign in again.',
+      );
+      prepare();
+      return;
+    }
     const result = await signIn(formData);
     setPending(false);
 
     if (!result.ok) {
       setError(result.message);
+      prepare();
       return;
     }
 

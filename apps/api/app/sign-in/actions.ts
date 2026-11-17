@@ -14,7 +14,8 @@ import { createClient } from '@/lib/session';
  *
  * A failed sign-in says "that email and password do not match" and
  * never which of the two was wrong. The first tells anybody who asks
- * which email addresses are registered.
+ * which email addresses are registered. A failed security check and too
+ * many attempts are named, because neither says anything about the email.
  */
 
 export interface AuthResult {
@@ -48,6 +49,14 @@ export async function signIn(formData: FormData): Promise<AuthResult> {
   });
 
   if (error) {
+    // Neither of these says whether the email is registered, so they can be named.
+    const code = (error as { code?: string }).code ?? '';
+    if (code === 'captcha_failed' || /captcha/i.test(error.message)) {
+      return { ok: false, message: 'The security check did not go through. Press Sign in again.' };
+    }
+    if (code === 'over_request_rate_limit' || error.status === 429) {
+      return { ok: false, message: 'Too many attempts. Wait a minute, then try again.' };
+    }
     return { ok: false, message: 'That email and password do not match.' };
   }
 
