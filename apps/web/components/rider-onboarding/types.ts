@@ -65,6 +65,19 @@ export interface CityOption {
   status: 'live' | 'soft_launch' | 'waitlist';
 }
 
+/**
+ * The one open city a new rider can sign up for today: Nairobi (owner,
+ * 17 Nov 2026). Mombasa, Kisumu and Nakuru stay open to customers but are left
+ * off the rider forms. Waitlist cities still show on the Start step as "soon",
+ * and the full city list stays so a draft saved elsewhere still reads correctly.
+ */
+export const RIDER_CITY_SLUG = 'nairobi';
+
+/** The cities the rider Start step offers: Nairobi and the waitlist cities. */
+export function offeredRiderCities<T extends Pick<CityOption, 'slug' | 'status'>>(cities: T[]) {
+  return cities.filter((c) => c.slug === RIDER_CITY_SLUG || c.status === 'waitlist');
+}
+
 export interface SlotOption {
   id: string;
   hub_name: string;

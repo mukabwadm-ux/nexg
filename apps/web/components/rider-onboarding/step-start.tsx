@@ -18,7 +18,7 @@ import { createClient } from '@/lib/supabase/client';
 
 import { RiderShell } from './rider-shell';
 import { useRiderOnboarding } from './store';
-import { OFFERED_VEHICLES, type RiderDraft, type Vehicle } from './types';
+import { OFFERED_VEHICLES, offeredRiderCities, type RiderDraft, type Vehicle } from './types';
 
 const WORDING: EmailCodeWording = {
   exists:
@@ -55,8 +55,12 @@ export function RiderStartStep({
 
   const [firstName, setFirstName] = React.useState(draft?.first_name ?? prefill.firstName ?? '');
   const [phone, setPhone] = React.useState<string | null>(draft?.phone ?? prefill.phone ?? null);
+  /* Nairobi and the waitlist cities only (types.ts). A draft or link naming
+     another city starts with nothing chosen, so the rider picks again. */
+  const choices = offeredRiderCities(cities);
   const [cityId, setCityId] = React.useState<string | null>(
-    draft?.city_id ?? (cities.some((c) => c.id === prefill.cityId) ? prefill.cityId! : null),
+    () =>
+      [draft?.city_id, prefill.cityId].find((id) => id && choices.some((c) => c.id === id)) ?? null,
   );
   const [email, setEmail] = React.useState('');
   const [starting, setStarting] = React.useState(false);
@@ -361,7 +365,7 @@ export function RiderStartStep({
       <div className="border-border bg-surface mt-4 rounded-2xl border p-5 sm:p-6">
         <p className="text-[0.9375rem] font-extrabold">Where will you ride?</p>
         <div className="mt-4 flex flex-wrap gap-2">
-          {cities.map((city) => (
+          {choices.map((city) => (
             <Chip
               key={city.id}
               selected={cityId === city.id}

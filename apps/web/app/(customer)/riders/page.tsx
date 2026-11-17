@@ -13,6 +13,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { RIDER_CITY_SLUG } from '@/components/rider-onboarding/types';
 import { RiderAppPreview } from '@/components/riders/rider-app-preview';
 import { RiderApplyCard } from '@/components/riders/rider-apply-card';
 import { SiteFooter } from '@/components/site-footer';
@@ -126,12 +127,14 @@ export const revalidate = 3600;
 export default async function RidersPage() {
   const supabase = createPublicClient();
 
-  // The cities open for applications (section 4.2). The card adds an
-  // "Other" chip, which is how someone in a waitlist city reaches us.
+  // The cities open for applications (section 4.2): Nairobi only for now
+  // (RIDER_CITY_SLUG). The card adds an "Other" chip, which is how someone
+  // in a waitlist city reaches us.
   const { data: cities } = await supabase
     .from('city')
     .select('id, name, slug, status')
     .neq('status', 'waitlist')
+    .eq('slug', RIDER_CITY_SLUG)
     .order('sort', { ascending: true });
 
   return (
