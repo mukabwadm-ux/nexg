@@ -1,6 +1,6 @@
 import { CodeBlock, CodeTabs } from '@/components/docs/code';
 import { DocPage } from '@/components/docs/doc-page';
-import { A, C, Callout, H2, List, P, Table } from '@/components/docs/prose';
+import { A, C, H2, List, P, Table } from '@/components/docs/prose';
 import { pageMetadata } from '@/lib/reference/navigation';
 
 export const metadata = pageMetadata('/docs/auth');
@@ -43,6 +43,7 @@ export default function AuthPage() {
         { id: 'no-key', label: 'Requests without a key' },
         { id: 'refusals', label: 'When a key is refused' },
         { id: 'safety', label: 'Keeping keys safe' },
+        { id: 'revoking', label: 'Revoking a key' },
         { id: 'oauth', label: 'OAuth' },
       ]}
     >
@@ -158,14 +159,18 @@ export default function AuthPage() {
         <li>Never commit a key, paste it into a ticket or chat, or log it.</li>
         <li>Give each system its own key with only the scopes it needs.</li>
       </List>
+      <H2 id="revoking">Revoking a key</H2>
       <P>
-        To replace a key, issue a new one, deploy it, then have the old one revoked. The
-        database already supports revoking a key; until the console can list and revoke keys,
-        ask NexG to revoke it for you.
+        The <A href="/developers">developer console</A> lists your keys under Your API keys, named
+        by their first characters. Revoke one there and every request with it is refused from that
+        moment; a revoked key cannot be switched back on. The owner of a merchant can revoke its
+        keys, in the console or in Settings › API &amp; webhooks on nexgapp.com, and whoever issued
+        a key with no merchant can revoke that one.
       </P>
-      <Callout tone="soon" title="Listing and revoking keys in the console">
-        <p>The console issues keys today. Seeing your keys and revoking them there is coming soon.</p>
-      </Callout>
+      <P>
+        To replace a key, issue a new one, deploy it, then revoke the old one. If a key may have
+        leaked, revoke it first and replace it after.
+      </P>
 
       <H2 id="oauth">OAuth</H2>
       <P>

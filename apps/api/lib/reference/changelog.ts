@@ -12,6 +12,16 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-17',
     kind: 'added',
+    title: 'Revoking keys',
+    body: [
+      'The developer console now lists your keys, named by their first characters, and revokes them. Every request with a revoked key is refused from that moment.',
+      'A merchant’s keys can be revoked by its owner, in the console or in Settings › API & webhooks on nexgapp.com. A key with no merchant can be revoked by whoever issued it.',
+    ],
+    endpoints: [],
+  },
+  {
+    date: '2026-11-17',
+    kind: 'added',
     title: 'Order events',
     body: [
       'NexG now posts an event to your server when one of your bookings is created or its status changes, so you no longer have to poll. Add an https endpoint, live or test, in the developer console, under Webhooks.',

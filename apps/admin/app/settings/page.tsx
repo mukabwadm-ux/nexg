@@ -15,6 +15,7 @@ import {
   ApiTab,
   type ApiTestRow,
 } from '@/components/settings/api';
+import type { AdminApiKey } from '@/components/settings/api-keys';
 import { SaveBar, ScheduledBanner } from '@/components/settings/controls';
 import { EmailRoutingTab, type EmailRouteRow } from '@/components/settings/email-routing';
 import type { HolidayAdminRow } from '@/components/settings/holidays';
@@ -107,8 +108,9 @@ export default async function SettingsPage({
   let apiTests: ApiTestRow[] = [];
   let apiCanEdit = false;
   let apiOverview: ApiOverview | null = null;
+  let apiKeys: AdminApiKey[] | null = null;
   if (tab === 'api') {
-    const [conn, runs, may, overview] = await Promise.all([
+    const [conn, runs, may, overview, keys] = await Promise.all([
       s
         .from('api_connection_v' as never)
         .select('*')
@@ -123,7 +125,16 @@ export default async function SettingsPage({
       /* Webhook and API-key status. Missing until its migration has run; the
          tab then shows the webhooks without live status. */
       s.rpc('rpc_api_overview' as never),
+      /* Staff read every key (api_key_read); never the hash. */
+      s
+        .from('api_key' as never)
+        .select(
+          'id, merchant_id, key_prefix, environment, scopes, state, created_at, last_used_at, expires_at, revoked_at, revoke_reason, merchant:merchant_id(trading_name)',
+        )
+        .order('created_at', { ascending: false })
+        .limit(200),
     ]);
+    apiKeys = keys.error ? null : adminKeys(keys.data);
     apiConnections = (conn.data as ApiConnectionRow[] | null) ?? [];
     apiTests = (runs.data as ApiTestRow[] | null) ?? [];
     apiCanEdit = may.data === true;
@@ -388,6 +399,7 @@ export default async function SettingsPage({
             canEdit={apiCanEdit}
             integrations={props.integrations}
             overview={apiOverview}
+            keys={apiKeys}
             origins={{
               web: (process.env.NEXT_PUBLIC_WEB_ORIGIN ?? 'https://nexgapp.com').replace(
                 /\/+$/,
@@ -413,4 +425,45 @@ function rank(pair: string): number {
   if (pair.includes('super_admin')) return 4;
   if (!pair.startsWith('single:')) return 3;
   return 1;
+}
+
+interface ApiKeyRow {
+  id: string;
+  merchant_id: string | null;
+  key_prefix: string;
+  environment: string | null;
+  scopes: string[] | null;
+  state: string;
+  created_at: string;
+  last_used_at: string | null;
+  expires_at: string | null;
+  revoked_at: string | null;
+  revoke_reason: string | null;
+  merchant: { trading_name: string } | { trading_name: string }[] | null;
+}
+
+/** API keys as the API tab lists them, newest first. */
+function adminKeys(data: unknown): AdminApiKey[] {
+  const now = Date.now();
+  return ((data as ApiKeyRow[] | null) ?? []).map((k) => {
+    const merchant = Array.isArray(k.merchant) ? k.merchant[0] : k.merchant;
+    return {
+      id: k.id,
+      merchantId: k.merchant_id,
+      merchantName: merchant?.trading_name ?? null,
+      prefix: k.key_prefix,
+      environment: k.environment === 'test' ? 'test' : 'live',
+      scopes: k.scopes ?? [],
+      state:
+        k.state !== 'active'
+          ? 'revoked'
+          : k.expires_at && Date.parse(k.expires_at) <= now
+            ? 'expired'
+            : 'active',
+      createdAt: k.created_at,
+      lastUsedAt: k.last_used_at,
+      revokedAt: k.revoked_at,
+      revokeReason: k.revoke_reason,
+    };
+  });
 }

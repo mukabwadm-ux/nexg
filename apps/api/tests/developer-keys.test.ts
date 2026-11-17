@@ -14,6 +14,7 @@ const { rpc, getUser, maybeSingle, createServerClient } = vi.hoisted(() => {
 });
 vi.mock('@supabase/ssr', () => ({ createServerClient }));
 vi.mock('next/headers', () => ({ cookies: () => ({ getAll: () => [], set: () => undefined }) }));
+vi.mock('next/cache', () => ({ revalidatePath: () => undefined }));
 
 import { issueApiKey } from '../app/developers/actions';
 

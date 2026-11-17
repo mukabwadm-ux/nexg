@@ -15,6 +15,7 @@ import {
   connectPaybill,
 } from '@/app/settings/api-actions';
 
+import { type AdminApiKey, ApiKeysSection } from './api-keys';
 import { type IntegrationRow, Pill, STATUS_LABEL, STATUS_TONE, Tile } from './shared';
 
 export interface ApiConnectionRow {
@@ -152,6 +153,7 @@ export function ApiTab({
   origins,
   integrations,
   overview,
+  keys,
 }: {
   connections: ApiConnectionRow[];
   tests: ApiTestRow[];
@@ -160,6 +162,8 @@ export function ApiTab({
   integrations: IntegrationRow[];
   /** Null until the database update for this tab is in place, or when it cannot be read. */
   overview: ApiOverview | null;
+  /** Every API key; null when they could not be read; left out, the list is not shown. */
+  keys?: AdminApiKey[] | null;
 }) {
   const [adding, setAdding] = React.useState<'sandbox' | 'live' | null>(null);
   const byId = new Map(connections.map((c) => [c.id, c]));
@@ -182,6 +186,10 @@ export function ApiTab({
         <IntegrationsSection integrations={integrations} />
         <WebhooksSection origins={origins} overview={overview} />
       </div>
+
+      {keys !== undefined && (
+        <ApiKeysSection keys={keys} consoleUrl={`${origins.api}/developers`} />
+      )}
 
       {/* ───────────────────────────────────────────── environments */}
       <div className="grid gap-6 xl:grid-cols-2">

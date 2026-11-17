@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { z } from 'zod';
@@ -180,6 +181,9 @@ export async function issueApiKey(formData: FormData): Promise<IssueResult> {
   if (!row) {
     return { ok: false, message: 'The key could not be issued.' };
   }
+
+  // The new key joins the list under Your API keys, in this same response.
+  revalidatePath('/developers');
 
   return {
     ok: true,

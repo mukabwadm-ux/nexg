@@ -6,6 +6,7 @@ import * as React from 'react';
 
 import {
   loadDeveloperAccess,
+  revokeDeveloperKey,
   type DeveloperAccess,
   type DeveloperEndpoint,
   type DeveloperKey,
@@ -44,7 +45,16 @@ function TestBadge() {
   );
 }
 
-function KeysTable({ keys }: { keys: DeveloperKey[] }) {
+function KeysTable({
+  keys,
+  onRevoke,
+  pending = false,
+}: {
+  keys: DeveloperKey[];
+  /** Given to the owner only: the database lets no one else revoke a key. */
+  onRevoke?: (key: DeveloperKey) => void;
+  pending?: boolean;
+}) {
   if (!keys.length) {
     return (
       <Empty title="No API keys yet">
@@ -62,6 +72,11 @@ function KeysTable({ keys }: { keys: DeveloperKey[] }) {
             <th>Can</th>
             <th>Status</th>
             <th>Last used</th>
+            {onRevoke && (
+              <th>
+                <span className="sr-only">Actions</span>
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -87,6 +102,20 @@ function KeysTable({ keys }: { keys: DeveloperKey[] }) {
                 </Badge>
               </td>
               <td className={s.muted}>{when(k.lastUsedAt) ?? 'Not used yet'}</td>
+              {onRevoke && (
+                <td>
+                  {k.state === 'active' && (
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => onRevoke(k)}
+                      className={buttonVariants({ variant: 'outline', size: 'sm' })}
+                    >
+                      Revoke
+                    </button>
+                  )}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
@@ -162,6 +191,22 @@ export function LiveDeveloperAccess({
   initial?: DeveloperAccess;
 }) {
   const [access, setAccess] = React.useState<DeveloperAccess | null>(initial ?? null);
+  const [pending, startTransition] = React.useTransition();
+  const [notice, setNotice] = React.useState<{ ok: boolean; text: string } | null>(null);
+
+  function revoke(key: DeveloperKey) {
+    const reason = window.prompt(
+      `Revoke the key ${key.prefix}…?\n\nAny system still using it is refused at once, and it cannot be switched back on. If a system still needs access, create a new key in the developer console first.\n\nWhy are you revoking it? (optional)`,
+      '',
+    );
+    if (reason === null) return;
+    startTransition(async () => {
+      setNotice(null);
+      const result = await revokeDeveloperKey(merchantId, key.id, reason);
+      if (result.ok) setAccess(result.access);
+      setNotice({ ok: result.ok, text: result.message });
+    });
+  }
 
   React.useEffect(() => {
     if (initial) return;
@@ -227,9 +272,22 @@ export function LiveDeveloperAccess({
         <>
           <Card
             title="API keys"
-            description="Keys for this business. The key itself is shown only once, in the console, and NexG does not keep a copy."
+            description={
+              access.isOwner
+                ? 'Keys for this business. The key itself is shown only once, in the console, and NexG does not keep a copy. Revoke a key the moment it may have leaked.'
+                : 'Keys for this business. The key itself is shown only once, in the console, and NexG does not keep a copy. Only the business owner can revoke a key.'
+            }
           >
-            <KeysTable keys={access.keys} />
+            {notice && (
+              <div role={notice.ok ? 'status' : 'alert'} style={{ marginBottom: 12 }}>
+                <Note tone={notice.ok ? 'success' : 'warning'}>{notice.text}</Note>
+              </div>
+            )}
+            <KeysTable
+              keys={access.keys}
+              onRevoke={access.isOwner ? revoke : undefined}
+              pending={pending}
+            />
           </Card>
           <Card
             title="Webhook endpoints"

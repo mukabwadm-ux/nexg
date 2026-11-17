@@ -125,3 +125,20 @@ export async function connectPaybill(): Promise<ApiOutcome> {
   revalidatePath('/settings');
   return { ok: r.ok !== false, message: r.message ?? 'Asked Safaricom.' };
 }
+
+/**
+ * Revokes an API key at once. Any staff member may (rpc_api_key_revoke),
+ * and the audit log names them with the reason given.
+ */
+export async function revokeApiKey(keyId: string, reason: string): Promise<ApiOutcome> {
+  const { data, error } = await call('rpc_api_key_revoke', {
+    p_key_id: keyId,
+    p_reason: reason.trim().slice(0, 200) || null,
+  });
+  return result(
+    error,
+    data === false
+      ? 'That key was already revoked.'
+      : 'Revoked. Requests with that key are refused from now on.',
+  );
+}

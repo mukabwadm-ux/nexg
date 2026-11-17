@@ -6,8 +6,9 @@ import { createClient } from '@/lib/supabase/server';
 
 /**
  * What Settings › API & webhooks shows a real workspace: the business's API
- * keys and webhook endpoints, read-only. Keys and endpoints are created in
- * the developer console on api.nexgapp.com, where a key is shown once.
+ * keys and webhook endpoints. Keys and endpoints are created in the developer
+ * console on api.nexgapp.com, where a key is shown once; the owner can
+ * revoke a key here too (revokeDeveloperKey).
  *
  * Row-level security decides what comes back: members of the merchant read
  * its key records (never the key, and the hash is not selected); webhook
@@ -133,5 +134,46 @@ export async function loadDeveloperAccess(merchantId: string): Promise<Developer
               lastStatusCode: e.last_status_code,
             }))
         : null,
+  };
+}
+
+export type RevokeOutcome =
+  | { ok: true; message: string; access: DeveloperAccess }
+  | { ok: false; message: string };
+
+/**
+ * Revokes one of the business's API keys. rpc_api_key_revoke decides who
+ * may: the business owner, in a current session, as only the owner may
+ * issue a key. The key stops working at once and cannot be switched back on.
+ */
+export async function revokeDeveloperKey(
+  merchantId: string,
+  keyId: string,
+  reason?: string,
+): Promise<RevokeOutcome> {
+  const uuid = z.string().uuid();
+  if (!uuid.safeParse(merchantId).success || !uuid.safeParse(keyId).success) {
+    return { ok: false, message: 'No such key.' };
+  }
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, message: 'Sign in again to revoke a key.' };
+
+  const why = reason?.trim().slice(0, 200);
+  const { data, error } = await supabase.rpc('rpc_api_key_revoke', {
+    p_key_id: keyId,
+    ...(why ? { p_reason: why } : {}),
+  });
+  if (error) return { ok: false, message: error.message || 'The key could not be revoked.' };
+
+  return {
+    ok: true,
+    message:
+      data === false
+        ? 'That key was already revoked.'
+        : 'Revoked. Anything still using that key is refused from now on.',
+    access: await loadDeveloperAccess(merchantId),
   };
 }

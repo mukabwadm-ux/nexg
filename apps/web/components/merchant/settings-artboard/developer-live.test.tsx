@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/app/merchant/settings/developer-actions', () => ({
   loadDeveloperAccess: vi.fn(),
+  revokeDeveloperKey: vi.fn(),
 }));
 
 import type { DeveloperAccess } from '@/app/merchant/settings/developer-actions';
@@ -64,6 +65,19 @@ describe('Settings › API & webhooks for a real workspace', () => {
     expect(html).toContain('Worked (200)');
     expect(html).not.toContain('Only the business owner');
     expect(html).not.toContain('Developer access is not available');
+  });
+
+  it('offers the owner Revoke on each active key, and nothing on a revoked one', () => {
+    const html = render(ACCESS);
+    expect(html.match(/>Revoke</g)).toHaveLength(1);
+    expect(html).toContain('Revoke a key the moment it may have leaked.');
+  });
+
+  it('shows a team member the keys without Revoke', () => {
+    const html = render({ ...ACCESS, isOwner: false });
+    expect(html).toContain('a1b2c3d4…');
+    expect(html).not.toMatch(/>Revoke</);
+    expect(html).toContain('Only the business owner can revoke a key.');
   });
 
   it('tells a team member that only the owner creates keys', () => {

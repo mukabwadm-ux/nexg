@@ -2,10 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { listConsoleKeys } from '@/lib/keys';
 import { createClient } from '@/lib/session';
 import { listDeveloperMerchants } from '@/lib/merchants';
 import { listWebhookEndpoints, rpcCaller } from '@/lib/webhooks';
 
+import { ApiKeys } from './api-keys';
 import { DeveloperConsole } from './developer-console';
 import { Webhooks } from './webhooks';
 
@@ -37,7 +39,14 @@ export default async function DevelopersPage() {
   }
 
   const merchants = await listDeveloperMerchants(supabase);
-  const webhooks = await listWebhookEndpoints(rpcCaller(supabase));
+  const [keys, webhooks] = await Promise.all([
+    listConsoleKeys(
+      supabase,
+      user.id,
+      merchants.map((m) => m.id),
+    ),
+    listWebhookEndpoints(rpcCaller(supabase)),
+  ]);
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
@@ -50,6 +59,10 @@ export default async function DevelopersPage() {
       </header>
 
       <DeveloperConsole merchants={merchants} email={user.email ?? null} />
+
+      <div className="mt-8">
+        <ApiKeys merchants={merchants} initial={keys} />
+      </div>
 
       <div className="mt-8">
         <Webhooks merchants={merchants} initial={webhooks} />
