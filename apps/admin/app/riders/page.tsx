@@ -220,7 +220,8 @@ async function loadHealth(supabase: Supabase, rows: RiderRow[], badges: Badges) 
       .order('happened_at', { ascending: false })
       .limit(40),
     supabase.from('rider_health_weight_config').select('key, label, weight_pct'),
-    supabase.from('fraud_rule').select('kind, label, enabled'),
+    /* Every column, so this works before and after rules gained subject_type. */
+    supabase.from('fraud_rule').select('*').order('kind'),
   ]);
 
   return (
@@ -228,7 +229,9 @@ async function loadHealth(supabase: Supabase, rows: RiderRow[], badges: Badges) 
       riders={rows}
       incidents={(incidents as IncidentRow[] | null) ?? []}
       weights={(weights as Weight[] | null) ?? []}
-      fraudRules={(fraud as FraudRuleRow[] | null) ?? []}
+      fraudRules={((fraud as FraudRuleRow[] | null) ?? []).filter(
+        (r) => (r.subject_type ?? 'rider') === 'rider',
+      )}
       badges={badges}
     />
   );

@@ -131,6 +131,7 @@ export const CONSOLE_NAV: NavGroup[] = [
       { label: 'Reconciliations', href: '/finance/reconciliation', module: 'finance', home: true },
       { label: 'Invoices', href: '/finance/invoices', module: 'finance', home: true },
       { label: 'Reports', href: '/finance/reports', module: 'finance', home: true },
+      { label: 'Fraud checks', href: '/finance/fraud', module: 'finance', home: true },
     ],
   },
   {

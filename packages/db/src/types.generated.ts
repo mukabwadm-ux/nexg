@@ -14429,27 +14429,73 @@ export type Database = {
           },
         ];
       };
+      fraud_check_state: {
+        Row: {
+          id: number;
+          last_duration_ms: number | null;
+          last_errors: NonNullable<Json>;
+          last_raised: NonNullable<Json>;
+          last_run_at: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          id?: number;
+          last_duration_ms?: number | null;
+          last_errors?: NonNullable<Json>;
+          last_raised?: NonNullable<Json>;
+          last_run_at?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          id?: number;
+          last_duration_ms?: number | null;
+          last_errors?: NonNullable<Json>;
+          last_raised?: NonNullable<Json>;
+          last_run_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       fraud_rule: {
         Row: {
+          automated: boolean;
+          description: string | null;
           enabled: boolean;
-          kind: Database['public']['Enums']['fraud_signal_kind'];
+          kind: string;
           label: string;
           params: NonNullable<Json>;
+          severity: string;
+          sort: number;
+          subject_type: string;
+          updated_at: string | null;
           updated_by: string | null;
         };
         ComputedFields: never;
         Insert: {
+          automated?: boolean;
+          description?: string | null;
           enabled?: boolean;
-          kind: Database['public']['Enums']['fraud_signal_kind'];
+          kind: string;
           label: string;
           params?: NonNullable<Json>;
+          severity?: string;
+          sort?: number;
+          subject_type?: string;
+          updated_at?: string | null;
           updated_by?: string | null;
         };
         Update: {
+          automated?: boolean;
+          description?: string | null;
           enabled?: boolean;
-          kind?: Database['public']['Enums']['fraud_signal_kind'];
+          kind?: string;
           label?: string;
           params?: NonNullable<Json>;
+          severity?: string;
+          sort?: number;
+          subject_type?: string;
+          updated_at?: string | null;
           updated_by?: string | null;
         };
         Relationships: [
@@ -14464,43 +14510,75 @@ export type Database = {
       };
       fraud_signal: {
         Row: {
+          amount_cents: number | null;
+          dedupe_key: string;
           details: NonNullable<Json>;
           detected_at: string;
           id: string;
-          kind: Database['public']['Enums']['fraud_signal_kind'];
+          kind: string;
           order_reference: string | null;
+          review_note: string | null;
           reviewed_at: string | null;
           reviewed_by: string | null;
-          rider_id: string;
+          rider_id: string | null;
           score: number | null;
+          severity: string;
           status: string;
+          subject_id: string | null;
+          subject_label: string | null;
+          subject_type: string;
+          summary: string | null;
+          fn_fraud_may_review: boolean | null;
         };
-        ComputedFields: never;
+        ComputedFields: 'fn_fraud_may_review';
         Insert: {
+          amount_cents?: number | null;
+          dedupe_key: string;
           details?: NonNullable<Json>;
           detected_at?: string;
           id?: string;
-          kind: Database['public']['Enums']['fraud_signal_kind'];
+          kind: string;
           order_reference?: string | null;
+          review_note?: string | null;
           reviewed_at?: string | null;
           reviewed_by?: string | null;
-          rider_id: string;
+          rider_id?: string | null;
           score?: number | null;
+          severity?: string;
           status?: string;
+          subject_id?: string | null;
+          subject_label?: string | null;
+          subject_type?: string;
+          summary?: string | null;
         };
         Update: {
+          amount_cents?: number | null;
+          dedupe_key?: string;
           details?: NonNullable<Json>;
           detected_at?: string;
           id?: string;
-          kind?: Database['public']['Enums']['fraud_signal_kind'];
+          kind?: string;
           order_reference?: string | null;
+          review_note?: string | null;
           reviewed_at?: string | null;
           reviewed_by?: string | null;
-          rider_id?: string;
+          rider_id?: string | null;
           score?: number | null;
+          severity?: string;
           status?: string;
+          subject_id?: string | null;
+          subject_label?: string | null;
+          subject_type?: string;
+          summary?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: 'fraud_signal_kind_fkey';
+            columns: ['kind'];
+            isOneToOne: false;
+            referencedRelation: 'fraud_rule';
+            referencedColumns: ['kind'];
+          },
           {
             foreignKeyName: 'fraud_signal_reviewed_by_fkey';
             columns: ['reviewed_by'];
@@ -53934,6 +54012,44 @@ export type Database = {
         };
         Returns: undefined;
       };
+      fn_fraud_check_customers: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_fraud_check_expenses: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_fraud_check_payments: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_fraud_check_riders: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_fraud_customer_label: { Args: { p_guest_id: string }; Returns: string };
+      fn_fraud_kes: { Args: { p_cents: number }; Returns: string };
+      fn_fraud_may_review: {
+        Args: {
+          p_signal: Omit<
+            Database['public']['Tables']['fraud_signal']['Row'],
+            Database['public']['Tables']['fraud_signal']['ComputedFields']
+          >;
+        };
+        Returns: boolean;
+      };
+      fn_fraud_on: { Args: { p_kind: string }; Returns: boolean };
+      fn_fraud_param: {
+        Args: { p_default: number; p_key: string; p_kind: string };
+        Returns: number;
+      };
+      fn_fraud_raise: {
+        Args: {
+          p_amount_cents?: number;
+          p_dedupe_key: string;
+          p_details?: Json;
+          p_kind: string;
+          p_order_reference?: string;
+          p_rider_id?: string;
+          p_subject_id: string;
+          p_subject_label: string;
+          p_subject_type: string;
+          p_summary: string;
+        };
+        Returns: string;
+      };
+      fn_fraud_rider_label: { Args: { p_rider_id: string }; Returns: string };
+      fn_fraud_staff_label: { Args: { p_staff_id: string }; Returns: string };
+      fn_fraud_sweep: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_geo_cell: {
         Args: { p_lat: number; p_lng: number; p_precision?: number };
         Returns: string;
@@ -57465,23 +57581,55 @@ export type Database = {
           isSetofReturn: false;
         };
       };
-      rpc_fraud_signal_review: {
-        Args: { p_action: string; p_signal_id: string };
+      rpc_fraud_checks_run: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_fraud_flag_decide: {
+        Args: { p_confirm: boolean; p_id: string; p_note?: string };
         Returns: {
+          amount_cents: number | null;
+          dedupe_key: string;
           details: NonNullable<Json>;
           detected_at: string;
           id: string;
-          kind: Database['public']['Enums']['fraud_signal_kind'];
+          kind: string;
           order_reference: string | null;
+          review_note: string | null;
           reviewed_at: string | null;
           reviewed_by: string | null;
-          rider_id: string;
+          rider_id: string | null;
           score: number | null;
+          severity: string;
           status: string;
+          subject_id: string | null;
+          subject_label: string | null;
+          subject_type: string;
+          summary: string | null;
         };
         SetofOptions: {
           from: '*';
           to: 'fraud_signal';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_fraud_overview: { Args: { p_days?: number }; Returns: Json };
+      rpc_fraud_rule_set: {
+        Args: { p_enabled: boolean; p_kind: string; p_params?: Json };
+        Returns: {
+          automated: boolean;
+          description: string | null;
+          enabled: boolean;
+          kind: string;
+          label: string;
+          params: NonNullable<Json>;
+          severity: string;
+          sort: number;
+          subject_type: string;
+          updated_at: string | null;
+          updated_by: string | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'fraud_rule';
           isOneToOne: true;
           isSetofReturn: false;
         };
@@ -63055,14 +63203,6 @@ export type Database = {
         | 'recharged_card'
         | 'void';
       folio_sync: 'pms' | 'manual';
-      fraud_signal_kind:
-        | 'gps_jump'
-        | 'delivered_far_from_pin'
-        | 'delivered_too_fast'
-        | 'shared_device'
-        | 'plate_photo_mismatch'
-        | 'cash_marked_mpesa'
-        | 'offer_farming';
       guest_consent_kind: 'service_sms' | 'marketing' | 'analytics';
       handoff_mode:
         | 'guest_meets_at_gate'
@@ -64855,15 +64995,6 @@ export const Constants = {
         'void',
       ],
       folio_sync: ['pms', 'manual'],
-      fraud_signal_kind: [
-        'gps_jump',
-        'delivered_far_from_pin',
-        'delivered_too_fast',
-        'shared_device',
-        'plate_photo_mismatch',
-        'cash_marked_mpesa',
-        'offer_farming',
-      ],
       guest_consent_kind: ['service_sms', 'marketing', 'analytics'],
       handoff_mode: [
         'guest_meets_at_gate',

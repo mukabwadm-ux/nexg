@@ -27,6 +27,7 @@ Since November 2026 the screens have their own addresses (the old `/finance?tab=
 | `/finance/reconciliation` | `fin_provider_recon_v`, `fin_clearing_aging_v`, `fin_webhook_gap_v`, `fin_invariant_v`, `fin_run_line_v.verifies` |
 | `/finance/invoices` | `rpc_finance_invoices` (host invoices, hotel and merchant statements, in cents) and `tax_invoice` |
 | `/finance/reports` | the above for the headline figures; Financial (the old Overview), Fees, Tax and Exports tabs |
+| `/finance/fraud` | `rpc_fraud_overview`: the fraud flag queue (`fraud_signal`), the checks (`fraud_rule`) and the last run (`fraud_check_state`) |
 
 The `rpc_finance_*` readers count operational records (a payment, a refund, a settlement line), not ledger balances; balances still come only from the ledger and its projections.
 
@@ -72,6 +73,28 @@ Nine named questions in `public.fin_invariant`, run every five minutes by `cron_
 They gate payouts. A run cannot generate files while a question is unanswered, **and a monitor that has not run counts as unanswered**. That last part is the whole point: a check that cannot run is not a check that passed.
 
 Switching them on found four orders that had taken money and left no ledger trace. That is what `fn_ledger_backfill` is for, and it is idempotent, so running it again is safe.
+
+---
+
+## Fraud checks
+
+Since 2027-01-05 (`20270105000100_fraud_checks.sql`), `fraud_signal` has been one queue for flags about riders, customers, staff, payments and office expenses. `fn_fraud_sweep` runs every five minutes (pg_cron `fraud-checks`), and also when someone presses **Run checks now**. Each finding is raised once (`dedupe_key`).
+
+The checks:
+
+- **Payments:** one M-Pesa code on two records; a typed M-Pesa code that is not one; a cash order confirmed delivered by staff.
+- **Riders:** delivered within minutes of pickup; delivered but never paid; moved off jobs after accepting them; one phone on two accounts.
+  - Two more run from triggers: a GPS jump, and delivered far from the pin. Both wait for the rider app to send positions.
+  - The plate photo check is applied by hand.
+- **Customers:** many refunds; cash orders turned away after pickup (also kept in `guest.refusal_count`).
+- **Office expenses:** the same receipt twice; the same payee and amount within days; approved by whoever recorded it.
+
+Rules for flags:
+
+- A flag never blocks anything by itself. A person confirms it, or dismisses it with a reason.
+- Full Finance reviews every flag. Rider ops review flags about riders they work, and a confirmed rider flag gives that rider a 90-day strike.
+- Nobody reviews a flag about themselves, or about an expense they recorded, approved or paid.
+- Flags hold distances, masked phone numbers and hashes, never coordinates or device tokens.
 
 ---
 

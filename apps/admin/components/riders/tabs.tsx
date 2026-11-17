@@ -182,6 +182,9 @@ export interface FraudRuleRow {
   kind: string;
   label: string;
   enabled: boolean;
+  /** Rules cover riders, payments, customers, staff and expenses; this tab shows riders. */
+  subject_type?: string;
+  sort?: number;
 }
 
 export function HealthTab({
@@ -361,6 +364,12 @@ export function HealthTab({
                 </li>
               ))}
             </ul>
+            <Link
+              href="/finance/fraud?who=rider"
+              className="text-ink hover:text-gold-text mt-4 inline-block text-[0.75rem] font-bold underline underline-offset-4"
+            >
+              Review rider flags
+            </Link>
           </Card>
         </div>
       </div>
