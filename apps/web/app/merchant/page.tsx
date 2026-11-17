@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { HomeLive } from '@/components/merchant/home-live';
 import { ConnectedApplication } from '@/components/onboarding/connected-application';
 import { loadMerchantHomeSource } from '@/lib/merchant-home-source';
+import { MERCHANT_PAYOUTS_HREF } from '@/lib/merchant-payouts';
 import { HomeSetup } from '@/components/merchant/home-setup';
 import { DashboardLive } from '@/components/merchant/dashboard-live';
 import { DashboardSetup } from '@/components/merchant/dashboard-setup';
@@ -139,7 +140,11 @@ export default async function MerchantDashboard() {
 
   const progress = progressRes.data as SetupProgress | null;
   const branches = (branchRes.data as BranchCard[] | null) ?? [];
-  const attention = (attentionRes.data as AttentionRow[] | null) ?? [];
+  /* The payout row's link in merchant_attention_v is /merchant/money; it now
+     opens the payout page itself, where the owner adds the account. */
+  const attention = ((attentionRes.data as AttentionRow[] | null) ?? []).map((row) =>
+    row.kind === 'payout' ? { ...row, href: MERCHANT_PAYOUTS_HREF } : row,
+  );
 
   /* Documents are optional while onboarding, so the dashboard is where
      they get chased. Nothing goes live until they are verified. */

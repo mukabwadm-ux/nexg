@@ -70,7 +70,7 @@ const steps: Array<{
     title: 'Payout method',
     description: 'Set up how you want to receive your payouts.',
     action: 'Set up payouts',
-    section: 'money',
+    section: 'money/payouts',
     icon: 'payout',
   },
   {
@@ -194,6 +194,7 @@ export function HomeSetup({
     menu: '/offerings',
     documents: '/business?tab=documents',
     money: '/money',
+    'money/payouts': '/money',
     support: '/settings',
   };
   const destination = (section: string) => {

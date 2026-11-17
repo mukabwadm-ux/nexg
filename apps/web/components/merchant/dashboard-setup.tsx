@@ -66,7 +66,7 @@ const STEPS = [
     key: 'step_payout' as const,
     title: 'Payout method',
     body: 'M-Pesa till, paybill or bank account, verified with a KES 1 test credit.',
-    href: '/merchant/money',
+    href: '/merchant/money/payouts',
     action: 'Set up payouts',
   },
   {

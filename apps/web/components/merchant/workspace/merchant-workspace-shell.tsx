@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 
+import { businessInitials } from './business-initials';
 import { WorkspaceMobileNavigation } from './mobile-navigation';
 import { workspaceNavIcon, type MerchantWorkspaceNavLabel } from './navigation';
 import { WorkspaceFrame } from './workspace-frame';
@@ -37,7 +38,7 @@ function isOn(pathname: string, href: string) {
 /** Presentation only. Every destination still checks current server access. */
 export function MerchantWorkspaceShell({
   businessName,
-  accountInitials = 'ME',
+  accountInitials,
   nav,
   setupDestinations = [],
   approvalLabel,
@@ -45,6 +46,9 @@ export function MerchantWorkspaceShell({
   children,
 }: MerchantWorkspaceShellProps) {
   const pathname = usePathname() ?? '/merchant';
+  /* The signed-in business, by name, where the generic label used to be. */
+  const displayName = businessName?.trim() || 'Merchant workspace';
+  const initials = accountInitials ?? businessInitials(businessName);
   const [lockSelection, setLockSelection] = useState<{
     label: MerchantWorkspaceNavLabel;
     pathname: string;
@@ -108,30 +112,32 @@ export function MerchantWorkspaceShell({
   return (
     <WorkspaceFrame
       activeLabel={activeLabel}
-      businessName={businessName}
-      accountInitials={accountInitials}
+      businessName={displayName}
+      accountInitials={initials}
       navigation={navigation}
       sidebarHome={
         <Link
           href="/merchant"
           prefetch={false}
           className={styles.sidebarContext}
-          aria-label="Merchant workspace Home"
-          title={businessName}
+          aria-label={`${displayName}, workspace Home`}
+          title={displayName}
           onClick={() => setLockSelection(null)}
         >
           <span className={styles.businessAvatar} aria-hidden="true">
-            {accountInitials}
+            {initials}
           </span>
           <div>
-            <strong>Merchant workspace</strong>
-            <small>Business workspace</small>
+            <strong>{displayName}</strong>
+            <small>Merchant workspace</small>
           </div>
         </Link>
       }
       headerStart={
         <>
-          <WorkspaceMobileNavigation homeHref="/merchant">{navigation}</WorkspaceMobileNavigation>
+          <WorkspaceMobileNavigation homeHref="/merchant" title={displayName}>
+            {navigation}
+          </WorkspaceMobileNavigation>
           <div className={styles.breadcrumb} aria-label="Breadcrumb">
             <Link href="/merchant" prefetch={false} onClick={() => setLockSelection(null)}>
               Workspace

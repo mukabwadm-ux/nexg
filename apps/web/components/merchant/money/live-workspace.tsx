@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { dateTime, kes, type TxnRow } from '@/components/merchant-money/breakdown';
 import { day, kesWhole } from '@/components/partner/bits';
 import { ReceiptList } from '@/components/receipts/receipt-list';
+import { MERCHANT_PAYOUTS_HREF } from '@/lib/merchant-payouts';
 import type { Receipt } from '@/lib/receipts';
 
 import {
@@ -190,17 +191,24 @@ export function LiveMoneyWorkspace({
         ready={sourceAvailable}
         description="Review order payments, statements and confirmed payouts from NexG Finance."
         actions={
-          <Link className="mo-button" href="/merchant/support">
-            Contact Finance support
-          </Link>
+          <>
+            <Link className="mo-button mo-primary" href={MERCHANT_PAYOUTS_HREF}>
+              Payout account
+            </Link>
+            <Link className="mo-button" href="/merchant/support">
+              Contact Finance support
+            </Link>
+          </>
         }
       >
         <MoneyTabs tabs={tabs} active={tab} onSelect={changeTab} />
         {tab === 'Overview' && <Metrics metrics={metrics} onInfo={setDefinition} />}
         {payoutView && (
           <p className="mo-note">
-            {payoutDestination(home)}. Contact support to request a verified change to your payout
-            destination.
+            {payoutDestination(home)}.{' '}
+            <Link href={MERCHANT_PAYOUTS_HREF} className="font-bold underline">
+              Add or change your payout account
+            </Link>
           </p>
         )}
         {tab === 'Receipts' ? (

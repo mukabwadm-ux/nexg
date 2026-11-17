@@ -11,9 +11,12 @@ import styles from './workspace.module.css';
 export function WorkspaceMobileNavigation({
   children,
   homeHref = '/merchant-live-preview',
+  title = 'Merchant workspace',
 }: {
   children: ReactNode;
   homeHref?: string;
+  /** The drawer's heading: the signed-in business's name in the real workspace. */
+  title?: string;
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -39,13 +42,13 @@ export function WorkspaceMobileNavigation({
               className="text-sm font-bold text-white"
               onClick={() => setOpen(false)}
             >
-              Merchant workspace
+              {title}
             </Link>
             <Dialog.Close className={styles.darkIconButton} aria-label="Close workspace navigation">
               <X size={20} aria-hidden="true" />
             </Dialog.Close>
           </div>
-          <Dialog.Title className="sr-only">Merchant workspace</Dialog.Title>
+          <Dialog.Title className="sr-only">{title}</Dialog.Title>
           <Dialog.Description className={styles.drawerDescription}>
             Choose where you want to work.
           </Dialog.Description>

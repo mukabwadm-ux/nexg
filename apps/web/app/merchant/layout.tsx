@@ -114,7 +114,14 @@ export default async function MerchantLayout({ children }: { children: React.Rea
           approvalLabel={approvalLabel}
           setupDestinations={
             me.access.setup
-              ? ['/merchant/menu', '/merchant/stores', '/merchant/hours', '/merchant/documents']
+              ? [
+                  '/merchant/menu',
+                  '/merchant/stores',
+                  '/merchant/hours',
+                  '/merchant/documents',
+                  /* An owner still waiting for approval can say where to be paid. */
+                  '/merchant/money/payouts',
+                ]
               : []
           }
           nav={destinations.map((item) => ({
