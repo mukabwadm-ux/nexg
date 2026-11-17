@@ -113,7 +113,7 @@ const FAQ = [
   },
   {
     q: 'Which cities are you recruiting in?',
-    a: 'We are onboarding riders in the cities that are live and soft-launching now, and building a waitlist everywhere else.',
+    a: 'We are onboarding riders in Nairobi now, and building a waitlist everywhere else.',
   },
 ] as const;
 
