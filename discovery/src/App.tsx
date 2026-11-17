@@ -16,6 +16,7 @@ import { ExperienceDetail } from './components/ExperienceDetail';
 import { TourDetail } from './components/TourDetail';
 import { FilmPage } from './components/cinema/FilmPage';
 import { MoviesPage } from './components/cinema/MoviesPage';
+import { AdultGate, hasAdultConsent, isAdultRoute, rememberAdultConsent } from './components/AdultGate';
 
 const provider = createDiscoveryProvider(import.meta.env.VITE_DISCOVERY_PROVIDER, { platform: platformMerchantProvider, engine: lazyEngineProvider });
 const readRoute = () => parseRoute(location.search, history.state);
@@ -31,6 +32,9 @@ export default function App() {
   const category = findCategory(route.categoryId);
   const isResults = route.view === 'results' || Boolean(route.search) || Boolean(route.categoryId && !category);
   const isCategoryDiscovery = Boolean(category) && !isResults && !route.merchantId;
+  /* The Adult Section and its subcategories wait for the visitor to confirm they are 18 or older. */
+  const [adultConsent, setAdultConsent] = useState(hasAdultConsent);
+  const adultGate = isAdultRoute(route) && !adultConsent;
 
   useEffect(() => {
     history.replaceState({ ...history.state, discovery: true }, '', routeUrl(route));
@@ -95,7 +99,8 @@ export default function App() {
         : choice.kind === 'subcategory' ? navigate({ categoryId: choice.categoryId, subcategoryId: choice.subcategoryId, area: route.area, view: 'results' })
         : navigate({ area: route.area, merchantId: choice.merchantId, itemId: choice.kind === 'item' ? choice.itemId : undefined })} />
     <main className={`discovery-main${isCategoryDiscovery ? ' discovery-main--category' : ''}`}>
-      {route.film && !route.merchantId ? <FilmPage key={route.film} filmId={route.film} provider={provider} onBack={backFromMerchant} onCinema={(merchantId) => navigate({ ...route, view: route.view === 'movies' ? undefined : route.view, film: undefined, merchantId })} />
+      {adultGate ? <AdultGate onAccept={() => { rememberAdultConsent(); setAdultConsent(true); }} onDecline={() => navigate({ area: route.area }, true)} />
+        : route.film && !route.merchantId ? <FilmPage key={route.film} filmId={route.film} provider={provider} onBack={backFromMerchant} onCinema={(merchantId) => navigate({ ...route, view: route.view === 'movies' ? undefined : route.view, film: undefined, merchantId })} />
         : route.view === 'movies' ? <MoviesPage onBack={() => history.state?.fromDiscovery ? history.back() : navigate({ area: route.area }, true)} onFilm={(film) => navigate({ area: route.area, view: 'movies', film })} />
         : route.view === 'tour' && route.merchantId && route.itemId ? <TourDetail key={`${route.merchantId}:${route.itemId}`} merchantId={route.merchantId} itemId={route.itemId} provider={provider} onBack={backFromMerchant} onOperator={openMerchant} onOpen={openTour} /> : route.view === 'experience' && route.merchantId && route.itemId ? <ExperienceDetail key={`${route.merchantId}:${route.itemId}`} merchantId={route.merchantId} itemId={route.itemId} provider={provider} onBack={backFromMerchant} onMerchant={openMerchant} onOpen={openExperience} /> : route.merchantId ? <Storefront onFilm={(film) => navigate({ ...route, merchantId: undefined, itemId: undefined, film })} onHome={() => navigate({ area: route.area })} operatorSearch={route.operatorSearch} operatorOffset={route.operatorOffset} onOperatorChange={(operatorSearch, operatorOffset) => navigate({ ...route, operatorSearch: operatorSearch || undefined, operatorOffset }, true, true)} onTour={openTour} onExperience={openExperience} merchantId={route.merchantId} itemId={route.itemId} categoryId={route.categoryId} provider={provider} onBack={backFromMerchant} department={routeDepartment(route)} onDepartment={(id) => navigate({ ...route, department: id && route.merchantId ? { merchantId: route.merchantId, id } : undefined }, false, true)} /> : isResults ? <SubcategoryResults query={route} provider={provider} onChange={changeFilters} onOpen={openMerchant} onExperience={openExperience} onTour={openTour} /> : category ? <CategoryDiscovery onViewAll={(query) => navigate({ ...query, view: 'results' })} onTour={openTour} onExperience={openExperience} category={category} provider={provider} query={route} onChange={changeCategoryFilters} onSubcategory={(subcategoryId) => navigate({ ...applyQueryChange(route, { subcategoryId, optionId: undefined }), view: 'results' })} onOpen={openMerchant} /> : <DiscoveryHomepage area={route.area} provider={provider} onMovies={() => navigate({ area: route.area, view: 'movies' })} onCategory={(categoryId) => navigate({ categoryId, area: route.area })} onOpen={openMerchant} onViewAll={() => navigate({ area: route.area, view: 'results' })} />}
     </main>

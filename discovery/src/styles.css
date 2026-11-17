@@ -253,3 +253,13 @@ dialog::backdrop{background:#000a;-webkit-backdrop-filter:blur(4px);backdrop-fil
 .storefront{padding-bottom:40px}
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* The Adult Section's consent step (components/AdultGate.tsx): a card over Discovery's dark ground, under the site
+   header, until the visitor confirms they are 18 or older. Nothing of the section is drawn behind it. */
+.adult-gate{position:fixed;inset:var(--site-header-height,0px) 0 0;z-index:40;display:grid;place-items:center;padding:24px var(--gutter,16px);background:rgba(17,19,21,.88);backdrop-filter:blur(6px)}
+.adult-gate__panel{width:min(100%,460px);padding:32px 28px 26px;border:1px solid var(--line);border-radius:24px;background:#1a1d20;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.adult-gate__badge{display:inline-grid;place-items:center;width:64px;height:64px;border-radius:50%;background:rgba(229,182,95,.12);box-shadow:0 0 0 1px var(--gold);color:var(--gold);font-size:20px;font-weight:700}
+.adult-gate h1{margin:18px 0 10px;font-size:24px;font-weight:700;line-height:1.2;outline:none}
+.adult-gate p{margin:0;color:var(--muted);font-size:15px;line-height:1.6}
+.adult-gate__actions{display:grid;gap:10px;margin-top:24px}
+.adult-gate .adult-gate__note{margin-top:14px;font-size:12px}
