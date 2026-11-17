@@ -221,9 +221,7 @@ export async function nativeVpsStayCheckout(
       base.password ||
       !(
         base.protocol === 'https:' ||
-        (process.env.NODE_ENV !== 'production' &&
-          base.protocol === 'http:' &&
-          ['127.0.0.1', 'localhost', '[::1]'].includes(base.hostname))
+        (base.protocol === 'http:' && ['127.0.0.1', 'localhost', '[::1]'].includes(base.hostname))
       )
     )
       return unavailable();

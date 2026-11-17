@@ -19,14 +19,22 @@ delete process.env.BOOKING_DB_PUSH;
 const fixtureURL = process.env.BOOKING_TEST_POSTGRES_URL
   ? new URL(process.env.BOOKING_TEST_POSTGRES_URL)
   : undefined;
+// CI provisions one disposable loopback service in .github/workflows/ci.yml.
+// This test creates and drops only its own uniquely named child database.
+const isLocalFixture =
+  fixtureURL?.hostname === '127.0.0.1' &&
+  ((fixtureURL.pathname === '/nexg_stays_test' && fixtureURL.username === 'nexg_fixture') ||
+    (fixtureURL.pathname === '/nexg_stays_pr' && fixtureURL.username === 'nexg_stays_pr'));
+const isActionsFixture =
+  process.env.GITHUB_ACTIONS === 'true' &&
+  fixtureURL?.hostname === 'localhost' &&
+  fixtureURL.port === '5432' &&
+  fixtureURL.pathname === '/postgres' &&
+  fixtureURL.username === 'booking';
 if (
   fixtureURL &&
   (!['postgres:', 'postgresql:'].includes(fixtureURL.protocol) ||
-    fixtureURL.hostname !== '127.0.0.1' ||
-    !(
-      (fixtureURL.pathname === '/nexg_stays_test' && fixtureURL.username === 'nexg_fixture') ||
-      (fixtureURL.pathname === '/nexg_stays_pr' && fixtureURL.username === 'nexg_stays_pr')
-    ) ||
+    (!isLocalFixture && !isActionsFixture) ||
     fixtureURL.search ||
     fixtureURL.hash)
 )
