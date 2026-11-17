@@ -50,6 +50,8 @@ import {
   type WaitlistCityRow,
   type WaitlistSignupRow,
 } from '@/components/settings/waitlist';
+import { SigningTab, type SignerRecord } from '@/components/settings/signing';
+import { AGREEMENTS_BUCKET } from '@/lib/merchant-agreement-signing';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -128,6 +130,23 @@ export default async function SettingsPage({
     apiOverview = overview.error
       ? null
       : ((overview.data as unknown as ApiOverview | null) ?? null);
+  }
+
+  /* NexG's signatory, signature and letterhead for merchant agreements:
+     super admins and legal only; the signature through a short-lived link. */
+  let signer: SignerRecord | null = null;
+  let signerError: string | null = null;
+  let signatureUrl: string | null = null;
+  if (tab === 'signing') {
+    const { data, error } = await s.rpc('rpc_merchant_agreement_signer_read');
+    signer = error ? null : (data as unknown as SignerRecord);
+    signerError = error?.message ?? null;
+    const path = (data as unknown as { current?: { signature_path?: string } } | null)?.current
+      ?.signature_path;
+    if (path) {
+      const link = await s.storage.from(AGREEMENTS_BUCKET).createSignedUrl(path, 300);
+      signatureUrl = link.data?.signedUrl ?? null;
+    }
   }
 
   let emailRoutes: EmailRouteRow[] = [];
@@ -359,6 +378,9 @@ export default async function SettingsPage({
         {tab === 'payments' && <PaymentsTab {...props} />}
         {tab === 'notifications' && <NotificationsTab />}
         {tab === 'emails' && <EmailRoutingTab routes={emailRoutes} />}
+        {tab === 'signing' && (
+          <SigningTab record={signer} signatureUrl={signatureUrl} error={signerError} />
+        )}
         {tab === 'api' && (
           <ApiTab
             connections={apiConnections}

@@ -14,6 +14,7 @@ export const TABS = [
   { key: 'notifications', label: 'Notifications & templates' },
   { key: 'emails', label: 'Email routing' },
   { key: 'branding', label: 'Branding & legal' },
+  { key: 'signing', label: 'Agreement signing' },
   { key: 'retention', label: 'Data & retention' },
   { key: 'waitlist', label: 'Waitlist' },
 ] as const;
@@ -53,6 +54,11 @@ export const TAB_COPY: Record<string, { title: string; subtitle: string }> = {
     title: 'Waitlist',
     subtitle:
       'Everyone who asked to be told when we open, and the state of the city they asked about',
+  },
+  signing: {
+    title: 'Agreement signing',
+    subtitle:
+      'Who signs merchant agreements for NexG, the signature applied when a merchant is approved, and the letterhead they carry',
   },
   branding: {
     title: 'Branding & legal',

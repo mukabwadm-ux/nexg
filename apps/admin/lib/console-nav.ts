@@ -193,6 +193,7 @@ export const CONSOLE_NAV: NavGroup[] = [
       { label: 'Sessions & security', href: '/staff?tab=security', module: 'staff' },
       { label: 'Configuration', href: '/settings', module: 'settings', home: true },
       { label: 'Integrations', href: '/settings?tab=api', module: 'settings' },
+      { label: 'Agreement signing', href: '/settings?tab=signing', module: 'settings' },
       { label: 'Audit logs', href: '/audit', module: 'audit', home: true },
     ],
   },

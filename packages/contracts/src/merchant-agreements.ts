@@ -19,6 +19,8 @@
  * agreement of their own yet and use an interim one (see INTERIM).
  */
 
+import { z } from 'zod';
+
 export interface MerchantAgreement {
   /** Stable id and file name: /legal/merchant-agreements/<id>.pdf */
   id: string;
@@ -206,4 +208,106 @@ export function agreementForCategory(
 /** Where the PDF is served, opened in a new tab wherever it is linked. */
 export function merchantAgreementHref(agreement: Pick<MerchantAgreement, 'id'>): string {
   return `/legal/merchant-agreements/${agreement.id}.pdf`;
+}
+
+/* ------------------------------------------------------------------------ */
+/* The merchant's details its signed agreement is filled in with.            */
+/* ------------------------------------------------------------------------ */
+
+/** A KRA PIN: A (a person) or P (a business), nine digits, a letter. */
+export const KRA_PIN_PATTERN = /^[AP][0-9]{9}[A-Z]$/;
+/** PVT-AB12CD3, BN-AB12CD3, C.12345, CPR/2010/12345 … */
+export const REGISTRATION_NUMBER_PATTERN = /^[A-Z0-9][A-Z0-9 ./-]{1,59}$/;
+
+/** Titles the form offers for the person signing; any other can be typed. */
+export const SIGNATORY_TITLES = [
+  'Owner',
+  'Sole proprietor',
+  'Director',
+  'Managing director',
+  'Partner',
+  'Manager',
+] as const;
+
+const tidy = (value: string) => value.trim().replace(/\s+/g, ' ');
+const text = (min: number, max: number, message: string) =>
+  z.string().transform(tidy).pipe(z.string().min(min, message).max(max, message));
+
+/**
+ * What rpc_merchant_agreement_details_save accepts, checked the same way
+ * and with the same messages, so the form can say what is wrong before it
+ * is sent. The registration number may wait until the business is
+ * registered: its agreement is signed once it is given.
+ */
+export const MerchantAgreementDetails = z
+  .object({
+    legal_name: text(
+      2,
+      200,
+      'Enter the business’s registered name, as on its registration certificate.',
+    ),
+    registration_number: z
+      .string()
+      .transform((value) => tidy(value).toUpperCase())
+      .refine(
+        (value) => value === '' || REGISTRATION_NUMBER_PATTERN.test(value),
+        'Enter the registration number on the business’s certificate, for example PVT-AB12CD3 or BN-AB12CD3.',
+      )
+      .transform((value) => value || null),
+    kra_pin: z
+      .string()
+      .transform((value) => value.replace(/\s+/g, '').toUpperCase())
+      .refine(
+        (value) => KRA_PIN_PATTERN.test(value),
+        'Enter the KRA PIN: a letter, nine digits and a letter, for example P051234567X.',
+      ),
+    address: text(5, 300, 'Enter the business’s physical address.'),
+    postal_address: z
+      .string()
+      .transform(tidy)
+      .refine(
+        (value) => value === '' || (value.length >= 3 && value.length <= 120),
+        'Enter the P.O. Box in full, for example P.O. Box 12345-00100, Nairobi, or leave it empty.',
+      )
+      .transform((value) => value || null),
+    signatory_name: text(
+      2,
+      120,
+      'Enter the name and title of the person who signs for the business.',
+    ),
+    signatory_title: text(
+      2,
+      80,
+      'Enter the name and title of the person who signs for the business.',
+    ),
+    representative_name: text(
+      2,
+      120,
+      'Enter the name and title of the business’s representative for disputes.',
+    ),
+    representative_title: text(
+      2,
+      80,
+      'Enter the name and title of the business’s representative for disputes.',
+    ),
+    principal_name: text(2, 120, 'Enter the owner’s or managing director’s name.'),
+  })
+  .strict();
+export type MerchantAgreementDetailsInput = z.input<typeof MerchantAgreementDetails>;
+export type MerchantAgreementDetails = z.output<typeof MerchantAgreementDetails>;
+
+/** An empty form, ready to fill. */
+export function emptyAgreementDetails(): MerchantAgreementDetailsInput {
+  return {
+    legal_name: '',
+    registration_number: '',
+    kra_pin: '',
+    address: '',
+    postal_address: '',
+    signatory_name: '',
+    signatory_title: '',
+    representative_name: '',
+    representative_title: '',
+    principal_name: '',
+  };
 }

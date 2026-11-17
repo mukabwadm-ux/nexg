@@ -9,7 +9,9 @@ import {
   INTERIM,
   MERCHANT_AGREEMENTS,
   MERCHANT_AGREEMENTS_PUBLISHED_ON,
+  MerchantAgreementDetails,
   agreementForCategory,
+  emptyAgreementDetails,
   merchantAgreementHref,
 } from './merchant-agreements';
 import { MERCHANT_TAXONOMY } from './taxonomy';
@@ -54,5 +56,46 @@ describe('merchant agreements', () => {
       expect(sha256, agreement.id).toBe(agreement.sha256);
       expect(agreement.version).toBe(`${MERCHANT_AGREEMENTS_PUBLISHED_ON}+${sha256.slice(0, 12)}`);
     }
+  });
+});
+
+describe('merchant agreement details', () => {
+  const valid = {
+    legal_name: '  Glow   Beauty Limited ',
+    registration_number: 'pvt-glow99',
+    kra_pin: 'p 051234567x',
+    address: 'Shop 9, Yaya Centre, Nairobi',
+    postal_address: '',
+    signatory_name: 'Wanjiku Owner',
+    signatory_title: 'Director',
+    representative_name: 'Otieno Manager',
+    representative_title: 'Operations Manager',
+    principal_name: 'Wanjiku Owner',
+  };
+
+  it('tidies the details the way the database stores them', () => {
+    expect(MerchantAgreementDetails.parse(valid)).toEqual({
+      ...valid,
+      legal_name: 'Glow Beauty Limited',
+      registration_number: 'PVT-GLOW99',
+      kra_pin: 'P051234567X',
+      postal_address: null,
+    });
+  });
+
+  it('lets the registration number wait, but not the KRA PIN', () => {
+    expect(
+      MerchantAgreementDetails.parse({ ...valid, registration_number: ' ' }).registration_number,
+    ).toBeNull();
+    const result = MerchantAgreementDetails.safeParse({ ...valid, kra_pin: 'P05123' });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toBe(
+      'Enter the KRA PIN: a letter, nine digits and a letter, for example P051234567X.',
+    );
+    expect(MerchantAgreementDetails.safeParse({ ...valid, iban: 'x' }).success).toBe(false);
+  });
+
+  it('starts empty', () => {
+    expect(Object.keys(emptyAgreementDetails()).sort()).toEqual(Object.keys(valid).sort());
   });
 });

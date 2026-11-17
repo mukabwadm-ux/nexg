@@ -20,6 +20,7 @@ import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
 import { ApplicationReviewUnavailable } from '@/components/merchants/application-review-view';
 import { BookingReadiness } from '@/components/merchants/booking-readiness';
+import { MerchantAgreementSigned } from '@/components/merchants/agreement-signed';
 import { MerchantDocumentsSection } from '@/components/merchants/documents-section';
 import { MerchantCatalogue, MerchantOverview } from '@/components/merchants/merchant-overview';
 import { MerchantSearch } from '@/components/merchants/merchant-search';
@@ -275,6 +276,8 @@ export default async function MerchantApplicationPage({
         <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
           <div className="space-y-10">
             <MerchantDocumentsSection merchantId={params.id} {...documents} />
+
+            <MerchantAgreementSigned merchantId={params.id} />
 
             <MerchantCatalogue
               items={

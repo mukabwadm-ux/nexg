@@ -2,6 +2,12 @@ import Link from 'next/link';
 
 import { loadSetupLocations } from '@/app/merchant/location-setup-actions';
 import { loadSetupDocuments } from '@/app/merchant/setup-documents-actions';
+import type { AgreementDetailsRecord } from '@/components/merchant/agreement-details';
+import {
+  AgreementPanel,
+  type AgreementStatus,
+  type SignedAgreementCopy,
+} from '@/components/merchant/agreement-panel';
 import { AddBranch } from '@/components/merchant/branch-client';
 import {
   BusinessDocumentTools,
@@ -28,41 +34,56 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
   const mayManageSetup = me.access.setup && me.access.state !== 'legacy';
   const mayManageDocuments = mayManageSetup || me.access.state === 'legacy';
 
-  const [profile, taxonomy, branches, members, reviews, application, evidence, locationDetails] =
-    await Promise.all([
-      db
-        .from('merchant_home_v')
-        .select('name, status, contact_email, contact_phone')
-        .eq('merchant_id', me.id)
-        .maybeSingle(),
-      db.from('merchant').select('subcategory').eq('id', me.id).maybeSingle(),
-      db
-        .from('merchant_branch')
-        .select('id, name, address_text, closed_at, paused_at')
-        .eq('merchant_id', me.id)
-        .is('deleted_at', null)
-        .order('sort'),
-      db
-        .from('merchant_member_v')
-        .select(
-          'user_id, invite_id, first_name, email, invite_contact, role, branches, status, caps, created_at',
-        )
-        .eq('merchant_id', me.id)
-        .order('created_at'),
-      db
-        .from('merchant_rating_v')
-        .select(
-          'id, branch_id, guest_first_name, stars, comment, reply_body, reply_status, created_at',
-        )
-        .eq('merchant_id', me.id)
-        .order('created_at', { ascending: false })
-        .limit(100),
-      mayManageSetup
-        ? loadApplicationView(db, me.id, { includePayout: false }).catch(() => null)
-        : null,
-      mayManageDocuments ? loadSetupDocuments() : null,
-      mayManageSetup ? loadSetupLocations() : null,
-    ]);
+  const [
+    profile,
+    taxonomy,
+    branches,
+    members,
+    reviews,
+    application,
+    evidence,
+    locationDetails,
+    agreement,
+    agreementDetails,
+    agreementCopies,
+  ] = await Promise.all([
+    db
+      .from('merchant_home_v')
+      .select('name, status, contact_email, contact_phone')
+      .eq('merchant_id', me.id)
+      .maybeSingle(),
+    db.from('merchant').select('subcategory').eq('id', me.id).maybeSingle(),
+    db
+      .from('merchant_branch')
+      .select('id, name, address_text, closed_at, paused_at')
+      .eq('merchant_id', me.id)
+      .is('deleted_at', null)
+      .order('sort'),
+    db
+      .from('merchant_member_v')
+      .select(
+        'user_id, invite_id, first_name, email, invite_contact, role, branches, status, caps, created_at',
+      )
+      .eq('merchant_id', me.id)
+      .order('created_at'),
+    db
+      .from('merchant_rating_v')
+      .select(
+        'id, branch_id, guest_first_name, stars, comment, reply_body, reply_status, created_at',
+      )
+      .eq('merchant_id', me.id)
+      .order('created_at', { ascending: false })
+      .limit(100),
+    mayManageSetup
+      ? loadApplicationView(db, me.id, { includePayout: false }).catch(() => null)
+      : null,
+    mayManageDocuments ? loadSetupDocuments() : null,
+    mayManageSetup ? loadSetupLocations() : null,
+    // The merchant agreement and, once NexG has signed it, the signed copy.
+    db.rpc('rpc_merchant_agreement_status', { p_merchant_id: me.id }),
+    db.rpc('rpc_merchant_agreement_details_read', { p_merchant_id: me.id }),
+    db.rpc('rpc_merchant_agreement_signed_list', { p_merchant_id: me.id }),
+  ]);
 
   if (profile.error || !profile.data?.name || branches.error || members.error || reviews.error) {
     return (
@@ -288,13 +309,29 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
           <p className="text-sm">The application owner manages locations.</p>
         ),
         team: <InviteMember merchantId={me.id} branches={branchChoices} />,
-        documents: mayManageDocuments ? (
+        documents: (
           <>
-            {evidence && !evidence.ok && <p role="alert">{evidence.message}</p>}
-            <BusinessDocumentTools />
+            <div className="mb-4">
+              <AgreementPanel
+                merchantId={me.id}
+                status={(agreement.data as unknown as AgreementStatus | null) ?? null}
+                details={
+                  mayManageSetup
+                    ? ((agreementDetails.data as unknown as AgreementDetailsRecord | null) ?? null)
+                    : null
+                }
+                signed={(agreementCopies.data as unknown as SignedAgreementCopy[] | null) ?? null}
+              />
+            </div>
+            {mayManageDocuments ? (
+              <>
+                {evidence && !evidence.ok && <p role="alert">{evidence.message}</p>}
+                <BusinessDocumentTools />
+              </>
+            ) : (
+              <p className="text-sm">The application owner manages document evidence.</p>
+            )}
           </>
-        ) : (
-          <p className="text-sm">The application owner manages document evidence.</p>
         ),
       }}
     />

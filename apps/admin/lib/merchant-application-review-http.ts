@@ -23,6 +23,11 @@ export interface ReviewTransportPorts {
   approvalBlocker?: (merchantId: string, signal: AbortSignal) => Promise<string | null>;
   /** Takes an approved merchant live. Returns null when live, else why not. */
   goLive?: (merchantId: string, signal: AbortSignal) => Promise<string | null>;
+  /**
+   * Signs the approved merchant's agreement. Runs after the decision and
+   * outside its deadline, and never changes it; says what happened.
+   */
+  issueAgreement?: (merchantId: string) => Promise<{ issued: boolean; detail: string }>;
 }
 const BODY_LIMIT = 12 * 1024;
 const DEADLINE_MS = 10000;
@@ -238,6 +243,21 @@ export function merchantApplicationReviewHandler(ports: ReviewTransportPorts) {
         }
         headers['x-merchant-live'] = notLive ? 'false' : 'true';
         if (notLive) headers['x-merchant-live-detail'] = encodeURIComponent(notLive.slice(0, 300));
+      }
+      if (input.decision === 'approved' && ports.issueAgreement) {
+        // The approval is saved either way; signing is reported, not assumed.
+        let agreement: { issued: boolean; detail: string };
+        try {
+          agreement = await ports.issueAgreement(input.merchantId);
+        } catch {
+          agreement = {
+            issued: false,
+            detail:
+              'The merchant agreement could not be signed. Use Issue signed agreement on the merchant record.',
+          };
+        }
+        headers['x-merchant-agreement'] = agreement.issued ? 'signed' : 'waiting';
+        headers['x-merchant-agreement-detail'] = encodeURIComponent(agreement.detail.slice(0, 400));
       }
       return Response.json(record, { headers });
     } catch (error) {

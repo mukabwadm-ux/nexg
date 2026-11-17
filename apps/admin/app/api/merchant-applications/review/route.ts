@@ -2,10 +2,13 @@ import {
   approvalBlocker,
   merchantApplicationReviewHandler,
 } from '@/lib/merchant-application-review-http';
+import { issueSignedAgreement, issueSummary } from '@/lib/merchant-agreement-signing';
 import { createClient } from '@/lib/supabase/server';
 import type { ReviewRpcResult } from '@/lib/merchant-application-review-contracts';
 
 export const runtime = 'nodejs';
+/* The decision keeps its 10-second deadline; signing the agreement after it needs a little more. */
+export const maxDuration = 30;
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -71,6 +74,13 @@ export async function POST(request: Request) {
       return listed.error
         ? `Live, but not shown in Discovery yet (${listed.error.message}).`
         : null;
+    },
+    issueAgreement: async (merchantId) => {
+      const result = await issueSignedAgreement(client, merchantId);
+      return {
+        issued: result.status === 'issued' || result.status === 'signed',
+        detail: issueSummary(result),
+      };
     },
   })(request);
 }

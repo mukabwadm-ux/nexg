@@ -6,25 +6,39 @@ import {
   merchantAgreementHref,
 } from '@nexg/contracts/merchant-agreements';
 import { getCategoryById } from '@nexg/contracts';
+import type { MerchantAgreementDetailsInput } from '@nexg/contracts/merchant-agreements';
 import { FileText } from 'lucide-react';
 
+import { AgreementDetailsFields } from '@/components/merchant/agreement-details';
 import { NEW_TAB } from '@/lib/legal-documents';
+
+/** The details the signed agreement is filled in with, when the database takes them. */
+export interface AgreementDetailsControl {
+  value: MerchantAgreementDetailsInput;
+  onChange: (value: MerchantAgreementDetailsInput) => void;
+  sameAsSignatory: boolean;
+  onSameAsSignatoryChange: (same: boolean) => void;
+  error?: string | null;
+}
 
 /**
  * The merchant agreement for the category the applicant picked, with the
  * "I have read and agree" box that submission requires. The agreement opens
- * in a new tab so the application stays where it was.
+ * in a new tab so the application stays where it was. Above the box, the
+ * details NexG fills the agreement in with before signing it on approval.
  */
 export function AgreementConsent({
   categoryId,
   checked,
   onChange,
   error,
+  details,
 }: {
   categoryId: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
   error?: string | null;
+  details?: AgreementDetailsControl | null;
 }) {
   const agreement = agreementForCategory(categoryId);
   const categoryName = getCategoryById(categoryId)?.name;
@@ -57,6 +71,29 @@ export function AgreementConsent({
           Read the agreement (PDF)
         </a>
       </p>
+      {details ? (
+        <div className="border-border mt-4 border-t pt-4" data-agreement-details>
+          <p className="text-ink text-sm font-extrabold">Your details for the agreement</p>
+          <p className="text-muted mt-1 text-xs font-semibold leading-[1.6]">
+            NexG fills these into your agreement and signs it when your application is approved.
+            Your signed copy is then in Business › Documents.
+          </p>
+          <div className="mt-3">
+            <AgreementDetailsFields
+              idPrefix="application-agreement"
+              value={details.value}
+              onChange={details.onChange}
+              sameAsSignatory={details.sameAsSignatory}
+              onSameAsSignatoryChange={details.onSameAsSignatoryChange}
+            />
+          </div>
+          {details.error ? (
+            <p role="alert" className="text-danger mt-2 text-xs font-bold">
+              {details.error}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
       <label className="mt-3 flex items-start gap-3">
         <input
           type="checkbox"

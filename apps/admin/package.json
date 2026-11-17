@@ -16,6 +16,7 @@
     "@nexg/booking-config": "workspace:*",
     "@nexg/contracts": "workspace:*",
     "@nexg/db": "workspace:*",
+    "@nexg/merchant-agreement": "workspace:*",
     "@nexg/ui": "workspace:*",
     "@supabase/ssr": "0.5.2",
     "@supabase/supabase-js": "2.47.10",

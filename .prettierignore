@@ -20,3 +20,7 @@ apps/booking-engine/migrations/
 
 # NexG Discovery is its own project with its own code style.
 discovery/
+
+# Generated from the Word originals by scripts/merchant-agreements/build-template.mjs; kept on one line.
+packages/merchant-agreement/src/template.generated.ts
+packages/merchant-agreement/src/logo.generated.ts

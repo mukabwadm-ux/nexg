@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { deleteMerchant } from '@/app/merchants/actions';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
+import { MerchantAgreementSigned } from '@/components/merchants/agreement-signed';
 import { ApplicationAgreement } from '@/components/merchants/application-agreement';
 import { ApplicationReviewActor } from '@/components/merchants/application-review-actor';
 import {
@@ -105,6 +106,7 @@ export default async function ManagedMerchantApplicationPage({
             </span>
           </a>
           <ApplicationAgreement merchantId={params.id} />
+          <MerchantAgreementSigned merchantId={params.id} />
           <ApplicationReviewDetail {...source} />
           <div className="mt-10 max-w-4xl">
             <MerchantDocumentsSection merchantId={params.id} {...documents} />

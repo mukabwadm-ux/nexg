@@ -12,9 +12,19 @@ import {
   payoutDeclaration,
   payoutForm,
 } from '@/lib/merchant-application-client';
-import { agreementForCategory } from '@nexg/contracts/merchant-agreements';
+import {
+  MerchantAgreementDetails,
+  agreementForCategory,
+  type MerchantAgreementDetailsInput,
+} from '@nexg/contracts/merchant-agreements';
 import { sendMerchantPasswordSetupLink } from '@/app/(customer)/sign-in/actions';
 import { AgreementConsent } from '@/components/merchant/agreement-consent';
+import {
+  detailsFormFrom,
+  representativeIsSignatory,
+  withRepresentative,
+  type AgreementDetailsRecord,
+} from '@/components/merchant/agreement-details';
 import { createClient } from '@/lib/supabase/client';
 import { subscribeProtectedActor } from '@/lib/supabase/protected-actor';
 import type { MerchantSavedHomeSource } from '@/lib/merchant-home-source';
@@ -103,6 +113,16 @@ export function ConnectedApplication({
   /* The category whose merchant agreement the applicant has ticked. */
   const [agreementAcceptedFor, setAgreementAcceptedFor] = useState<string | null>(null);
   const [agreementError, setAgreementError] = useState<string | null>(null);
+  /*
+   * The details NexG fills the signed agreement in with. Null until the
+   * database answers, and stays null where it does not take them yet (before
+   * 20270103000100) or the agreement is already signed with them.
+   */
+  const [agreementDetails, setAgreementDetails] = useState<MerchantAgreementDetailsInput | null>(
+    null,
+  );
+  const [detailsSameAsSignatory, setDetailsSameAsSignatory] = useState(true);
+  const [detailsError, setDetailsError] = useState<string | null>(null);
   const closeSetupEditor = () => setSetupEditor(null);
   const refreshSetup = () => router.refresh();
   const openLegacySetup = useCallback(
@@ -132,6 +152,34 @@ export function ConnectedApplication({
   const lastActivity = useRef(0);
   const currentEmail = useRef('');
   const setupLinkSent = useRef(false);
+  /*
+   * Whether the database takes the agreement details, and what is saved.
+   * Without a saved application, asking about an id nobody owns still tells
+   * the two apart: "not yours" means the function is there.
+   */
+  useEffect(() => {
+    let live = true;
+    const saved = record.current;
+    void createClient()
+      .rpc('rpc_merchant_agreement_details_read', {
+        p_merchant_id: saved?.merchant_id ?? '00000000-0000-0000-0000-000000000000',
+      })
+      .then(({ data, error }) => {
+        if (!live || (error && error.code !== '42501' && error.code !== 'P0002')) return;
+        const details = error ? null : (data as unknown as AgreementDetailsRecord);
+        if (details?.locked) return;
+        const business = saved?.payload.business;
+        const form = detailsFormFrom(details, {
+          legalName: business?.name,
+          signatory: [business?.firstName, business?.lastName].filter(Boolean).join(' '),
+        });
+        setAgreementDetails(form);
+        setDetailsSameAsSignatory(representativeIsSignatory(form));
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
   useEffect(() => {
     alive.current = true;
     abort.current = new AbortController();
@@ -498,6 +546,35 @@ export function ConnectedApplication({
           'Your acceptance of the merchant agreement could not be saved. Please retry.',
       );
   }
+  /*
+   * The details the agreement is filled in with: required to submit, so the
+   * signed copy has no blanks, and saved with a draft once they are
+   * complete. `quiet` (a draft) skips incomplete ones instead of stopping.
+   */
+  async function saveAgreementDetails(merchantId: string, quiet = false) {
+    if (!agreementDetails) return;
+    const parsed = MerchantAgreementDetails.safeParse(
+      withRepresentative(agreementDetails, detailsSameAsSignatory),
+    );
+    if (!parsed.success) {
+      if (quiet) return;
+      const message = parsed.error.issues[0]?.message ?? 'Complete your details for the agreement.';
+      setDetailsError(message);
+      throw new Error(`Your details for the agreement: ${message}`);
+    }
+    const { error } = await createClient().rpc('rpc_merchant_agreement_details_save', {
+      p_merchant_id: merchantId,
+      p_details: parsed.data,
+    });
+    if (error) {
+      if (quiet) return;
+      setDetailsError(error.message);
+      throw new Error(
+        error.message || 'Your details for the agreement could not be saved. Please retry.',
+      );
+    }
+    setDetailsError(null);
+  }
 
   async function submit(input: Record<string, unknown>) {
     if (emailOtpEnabled) {
@@ -529,6 +606,7 @@ export function ConnectedApplication({
         );
         return { applicationId: saved.merchant_id, status: saved.review.state, redirecting: true };
       }
+      await saveAgreementDetails(saved.merchant_id);
       await acceptAgreement(saved.merchant_id, String(input.categoryId ?? ''));
       const submitted = MerchantApplicationRecord.parse(
         await post({
@@ -653,7 +731,13 @@ export function ConnectedApplication({
         onStatusChange={undefined}
         onBackToMarketplace={undefined}
         authenticatedSession={undefined}
-        onSaveDraft={(input: Record<string, unknown>) => serialize(() => save(input))}
+        onSaveDraft={(input: Record<string, unknown>) =>
+          serialize(async () => {
+            const saved = await save(input);
+            await saveAgreementDetails(saved.merchant_id, true);
+            return saved;
+          })
+        }
         onSubmit={submit}
         renderAgreement={(categoryId: string) => (
           <AgreementConsent
@@ -664,6 +748,20 @@ export function ConnectedApplication({
               setAgreementAcceptedFor(checked ? categoryId : null);
               setAgreementError(null);
             }}
+            details={
+              agreementDetails
+                ? {
+                    value: agreementDetails,
+                    onChange: (value) => {
+                      setAgreementDetails(value);
+                      setDetailsError(null);
+                    },
+                    sameAsSignatory: detailsSameAsSignatory,
+                    onSameAsSignatoryChange: setDetailsSameAsSignatory,
+                    error: detailsError,
+                  }
+                : null
+            }
           />
         )}
         canSubmit={!emailOtpEnabled || emailIsVerified}
