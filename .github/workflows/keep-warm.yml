@@ -1,0 +1,83 @@
+name: Keep portals warm
+
+# Production runs on Vercel's Hobby plan. A server function that has had no
+# requests for a while shuts down, and every deploy starts with none running,
+# so the next visitor waits for one to start: 3–5 s for a sign-in page from
+# Kenya, against under 1 s when it is running. This workflow sends a few cheap
+# requests every few minutes and right after each production deploy, so the
+# portals' sign-in pages and homes are already running when someone opens them.
+#
+# What it requests, and why so little:
+# - Each app serves all its pages from one function, and the web app's API
+#   routes (with /host) from another; checked on the 2026-11-17 deployments.
+#   One request to any page keeps that function running for every page in
+#   it, so there is one request per function: the web pages (all portals and
+#   their sign-in pages), the web API routes the host workspace uses, the
+#   admin console and the developer console.
+# - Pages are requested the way Next.js prefetches them (the RSC and
+#   Next-Router-Prefetch headers). For a page with no loading.tsx above it,
+#   Next 14 answers with the route tree alone (under 200 bytes) without
+#   rendering anything, so the request costs almost no CPU, which the Hobby
+#   plan meters. Signed out, /api/host-workspace answers 401 at once.
+# - Idle functions were cold again after 12 and 18 minutes (about warm after
+#   8), so every 5 minutes, the shortest schedule GitHub allows. GitHub runs
+#   schedules late when it is busy, worst at the top of the hour, hence
+#   minute 2. It also pauses schedules in a repository with no commits for
+#   60 days.
+# - It never fails the run: a failure would email on every schedule during an
+#   outage. Anything that is not answered, or answers 5xx, shows as a warning.
+
+on:
+  schedule:
+    - cron: '2-59/5 * * * *'
+  # Vercel reports each deploy as a commit status; warm a new deployment as
+  # soon as it is live instead of leaving its first visitor to start it.
+  status:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    name: Ping the portals
+    # On status events, only a finished Vercel deploy; Vercel also reports
+    # "Skipped - Not affected" as a success when a commit leaves an app as it was.
+    if: >-
+      github.event_name != 'status' ||
+      (startsWith(github.event.context, 'Vercel') &&
+       github.event.state == 'success' &&
+       !startsWith(github.event.description, 'Skipped'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Request each portal once
+        shell: bash
+        run: |
+          warn=0
+          {
+            echo '| Request | Status | Seconds |'
+            echo '| --- | --- | --- |'
+          } >> "$GITHUB_STEP_SUMMARY"
+          while read -r mode url; do
+            [ -z "$mode" ] && continue
+            if [ "$mode" = prefetch ]; then
+              headers=(-H 'RSC: 1' -H 'Next-Router-Prefetch: 1')
+            else
+              headers=()
+            fi
+            result=$(curl -sS -o /dev/null --max-time 30 -A 'nexg-keep-warm' "${headers[@]}" \
+              -w '%{http_code} %{time_total}' "$url") || true
+            read -r code seconds <<< "${result:-000 0}"
+            echo "$code ${seconds}s $mode $url"
+            echo "| $mode $url | $code | $seconds |" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$code" = 000 ] || [ "$code" -ge 500 ]; then
+              echo "::warning::$url answered $code"
+              warn=1
+            fi
+          done <<'URLS'
+          prefetch https://www.nexgapp.com/merchants/sign-in
+          get https://www.nexgapp.com/api/host-workspace
+          prefetch https://admin.nexgapp.com/sign-in
+          prefetch https://api.nexgapp.com/sign-in
+          URLS
+          [ "$warn" = 0 ] || echo "Some requests were not answered; see the warnings."
