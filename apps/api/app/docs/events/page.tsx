@@ -196,6 +196,12 @@ export default function EventsPage() {
           With a test endpoint, book with a test key: the sandbox booking sends{' '}
           <C>booking.created</C> to your test endpoints, never to live ones.
         </li>
+        <li>
+          Then <A href="/docs/environments#moving-test-bookings">move the test booking</A> to
+          confirmed, in_progress, completed or cancelled. Each move sends{' '}
+          <C>booking.status_changed</C>. The console&apos;s <Strong>Test bookings</Strong> card
+          does both without code.
+        </li>
         <li>Never use a live endpoint&apos;s secret in a test, or the other way round.</li>
       </List>
     </DocPage>

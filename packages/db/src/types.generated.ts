@@ -53762,6 +53762,11 @@ export type Database = {
           retry_after: number;
         }[];
       };
+      fn_api_test_order_move: {
+        Args: { p_id: string; p_merchant_id: string; p_status: string };
+        Returns: Json;
+      };
+      fn_api_test_order_next: { Args: { p_stage: string }; Returns: string[] };
       fn_api_test_order_object: { Args: { p_id: string }; Returns: Json };
       fn_api_webhook_can_manage: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_api_webhook_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -55012,6 +55017,12 @@ export type Database = {
       rpc_api_connection_test_result: { Args: { p_test_id: string }; Returns: Json };
       rpc_api_key_revoke: { Args: { p_key_id: string; p_reason?: string }; Returns: boolean };
       rpc_api_overview: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_api_test_order_move: { Args: { p_order_id: string; p_status: string }; Returns: Json };
+      rpc_api_test_order_sample: {
+        Args: { p_merchant_id: string; p_service: string };
+        Returns: Json;
+      };
+      rpc_api_test_orders: { Args: { p_limit?: number }; Returns: Json };
       rpc_api_webhook_deliveries: {
         Args: { p_endpoint_id: string; p_limit?: number };
         Returns: Json;
@@ -60245,6 +60256,10 @@ export type Database = {
           p_reason_code: string;
           p_reason_text?: string;
         };
+        Returns: Json;
+      };
+      rpc_order_status_api_test: {
+        Args: { p_api_key: string; p_order_id: string; p_status: string };
         Returns: Json;
       };
       rpc_outbox_due: {

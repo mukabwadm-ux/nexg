@@ -833,6 +833,135 @@ export const ENDPOINTS: EndpointDoc[] = [
     source: 'apps/api/app/v1/orders/route.ts',
   },
   {
+    slug: 'move-test-order',
+    method: 'POST',
+    host: 'api',
+    path: '/v1/test/orders/{id}/status',
+    status: 'live',
+    group: 'Orders',
+    title: 'Move a test booking',
+    summary: 'Sandbox only: move a test booking to a later status, to try status-change events.',
+    description: [
+      'A real booking changes status as the merchant and NexG work on it. A test booking has nobody working on it, so this endpoint moves it for you: book with a test key, move the booking to confirmed, in_progress, completed or cancelled, and watch booking.status_changed arrive at your test endpoint.',
+      'A booking only moves forward: requested, confirmed, in_progress, completed. You may skip steps, and you may cancel it at any point before it is completed. Completed and cancelled are final. Each status gets the first stage a real order uses for it: confirmed, picked_up, delivered or cancelled.',
+      'Test keys only. A live key is refused with 403: real bookings move only as the work happens. The developer console does the same with buttons, under Test bookings.',
+    ],
+    auth: { kind: 'key', scope: 'merchant_write', merchantBound: true },
+    rateCost: 5,
+    cache: 'no-store',
+    paginated: false,
+    params: [
+      {
+        name: 'id',
+        in: 'path',
+        type: 'uuid',
+        required: true,
+        description: 'The order_id of a test booking, from Book a service or List your orders.',
+      },
+      {
+        name: 'X-Api-Key',
+        in: 'header',
+        type: 'string',
+        required: true,
+        description: 'A test key (nexg_test_…) bound to your merchant, with merchant_write.',
+      },
+      {
+        name: 'Content-Type',
+        in: 'header',
+        type: 'string',
+        required: true,
+        description: 'application/json',
+      },
+    ],
+    example: {
+      path: { id: '7c6b5a49-3827-4615-a4b3-c2d1e0f9a8b7' },
+      body: { status: 'confirmed' },
+    },
+    requestResources: [
+      {
+        title: 'Status change',
+        at: 'body',
+        fields: [
+          {
+            name: 'status',
+            type: "'confirmed' | 'in_progress' | 'completed' | 'cancelled'",
+            description:
+              'Where to move the booking: a status later than the one it has, or cancelled.',
+          },
+        ],
+      },
+    ],
+    responseStatus: '200 OK',
+    responseExample: {
+      ok: true,
+      data: {
+        order: {
+          order_id: '7c6b5a49-3827-4615-a4b3-c2d1e0f9a8b7',
+          reference: 'TEST-261117-A1B2C3',
+          service: 'airport_transfer',
+          quantity: 2,
+          status: 'confirmed',
+          stage: 'confirmed',
+          payment_method: 'on_account',
+          payment_status: 'pending',
+          currency: 'KES',
+          total_cents: 200000,
+          scheduled_for: '2026-11-18T03:30:00+00:00',
+          pickup_label: 'JKIA Terminal 1A',
+          dropoff_label: 'Woodvale Grove, Westlands, Nairobi',
+          created_at: '2026-11-17T09:12:44.512+00:00',
+        },
+        previous_status: 'requested',
+      },
+      meta: { api_version: 'v1' },
+    },
+    responseResources: [
+      { schema: 'ApiOrder', title: 'Order', at: 'data.order', fields: ORDER_FIELDS },
+      {
+        title: 'Before the move',
+        at: 'data',
+        fields: [
+          {
+            name: 'previous_status',
+            type: 'string',
+            description: 'The status the booking had before this move.',
+          },
+        ],
+      },
+    ],
+    errors: [
+      ...credentialErrors('merchant_write', false),
+      {
+        status: 400,
+        code: 'invalid_request',
+        when: 'The id is not a UUID, or the body is not JSON with a status of confirmed, in_progress, completed or cancelled.',
+      },
+      {
+        status: 400,
+        code: 'invalid_request',
+        when: 'The booking cannot move there: it already has that status, the status comes before its own, or it is completed or cancelled. The message says which.',
+      },
+      {
+        status: 403,
+        code: 'not_found',
+        when: 'The key is a live key, or it is not bound to a merchant.',
+      },
+      {
+        status: 404,
+        code: 'not_found',
+        when: 'Your merchant has no test booking with that id.',
+      },
+      { status: 500, code: 'internal_error', when: 'NexG could not move the booking.' },
+      UNEXPECTED_ERROR,
+    ],
+    notes: [
+      'Each move sends booking.status_changed to your enabled test endpoints, with the booking as GET /v1/orders/{id} returns it, previous_status and previous_stage. Cancelling sends it too.',
+      'Test bookings made in the developer console move the same way, and appear in List your orders for your test keys.',
+    ],
+    since: '2026-11-17',
+    source: 'apps/api/app/v1/test/orders/[id]/status/route.ts',
+  },
+  {
     slug: 'bank-webhook',
     method: 'POST',
     host: 'web',

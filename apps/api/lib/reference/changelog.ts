@@ -12,6 +12,16 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-17',
     kind: 'added',
+    title: 'Test bookings that move',
+    body: [
+      'A test booking no longer stays requested. Move it to confirmed, in_progress, completed or cancelled with POST /v1/test/orders/{id}/status and a test key, and each move sends booking.status_changed to your test endpoints, so you can build for status changes before you go live.',
+      'The developer console can do the same without code: under Test bookings, make a sample booking and move it on with a button.',
+    ],
+    endpoints: ['move-test-order'],
+  },
+  {
+    date: '2026-11-17',
+    kind: 'added',
     title: 'Revoking keys',
     body: [
       'The developer console now lists your keys, named by their first characters, and revokes them. Every request with a revoked key is refused from that moment.',

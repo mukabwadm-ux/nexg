@@ -35,6 +35,27 @@ export function orderWriter() {
   ) as unknown as { rpc: (name: PlaceFunction, args: Record<string, unknown>) => RpcResult };
 }
 
+/** Moves a test booking to a later status. There is no live twin. */
+export const SANDBOX_MOVE_FUNCTION = 'rpc_order_status_api_test';
+
+/**
+ * The client that moves a test booking, for POST /v1/test/orders/{id}/status.
+ *
+ * Service role, like the other sandbox functions: the function is granted
+ * to service_role only. It resolves the key, refuses a live one, checks
+ * merchant_write and decides the merchant; this client decides nothing.
+ * Server only.
+ */
+export function sandboxMover() {
+  return createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false, autoRefreshToken: false } },
+  ) as unknown as {
+    rpc: (name: typeof SANDBOX_MOVE_FUNCTION, args: Record<string, unknown>) => RpcResult;
+  };
+}
+
 /**
  * The client that reads a merchant's orders for the API.
  *

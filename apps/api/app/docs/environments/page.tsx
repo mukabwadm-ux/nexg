@@ -26,6 +26,11 @@ Location: /v1/orders/0b7e5c1a-3f2d-4c8e-9a61-5d4f3e2b1a09
   "meta": { "api_version": "v1" }
 }`;
 
+const MOVE_TEST_BOOKING = `curl -X POST https://api.nexgapp.com/v1/test/orders/0b7e5c1a-3f2d-4c8e-9a61-5d4f3e2b1a09/status \
+  -H "X-Api-Key: $NEXG_TEST_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "confirmed"}'`;
+
 export default function EnvironmentsPage() {
   return (
     <DocPage
@@ -34,6 +39,7 @@ export default function EnvironmentsPage() {
         { id: 'base-urls', label: 'Base URLs' },
         { id: 'today', label: 'Sandbox and live today' },
         { id: 'test-keys', label: 'Test keys' },
+        { id: 'moving-test-bookings', label: 'Moving a test booking' },
         { id: 'sandbox-to-live', label: 'From sandbox to live' },
         { id: 'keys', label: 'Keys and environments' },
       ]}
@@ -127,6 +133,11 @@ export default function EnvironmentsPage() {
             'Sent to your test endpoints.',
             'Sent to your live endpoints.',
           ],
+          [
+            'Status changes',
+            'You move a test booking yourself, through the API or the developer console.',
+            'As the merchant and NexG work on the booking.',
+          ],
         ]}
       />
       <P>
@@ -140,6 +151,37 @@ export default function EnvironmentsPage() {
         <C>live</C> or <C>test</C>, so your logs show which kind of key made each call.
       </P>
       <CodeBlock className="mt-6" code={TEST_BOOKING} language="http" title="A test booking" />
+
+      <H2 id="moving-test-bookings">Moving a test booking</H2>
+      <P>
+        A real booking changes status as the merchant and NexG work on it. Nobody works on a test
+        booking, so you move it yourself. Each move sends <C>booking.status_changed</C> to your
+        test endpoints: the same event a live booking sends, so you can build for it before you go
+        live.
+      </P>
+      <List>
+        <li>
+          <Strong>With the API:</Strong>{' '}
+          <A href="/docs/reference/move-test-order">POST /v1/test/orders/{'{id}'}/status</A>, with
+          a test key that has <C>merchant_write</C> and the status to move to.
+        </li>
+        <li>
+          <Strong>Without code:</Strong> in the <A href="/developers">developer console</A>, under{' '}
+          <Strong>Test bookings</Strong>, make a sample booking and press Confirm, Start, Complete
+          or Cancel.
+        </li>
+      </List>
+      <P>
+        A booking only moves forward: requested, confirmed, in_progress, completed. You may skip
+        ahead, and you may cancel it at any point before it is completed. Completed and cancelled
+        are final. A live key cannot move anything.
+      </P>
+      <CodeBlock
+        className="mt-6"
+        code={MOVE_TEST_BOOKING}
+        language="curl"
+        title="Confirm a test booking"
+      />
 
       <H2 id="sandbox-to-live">From sandbox to live</H2>
       <P>

@@ -5,10 +5,12 @@ import { redirect } from 'next/navigation';
 import { listConsoleKeys } from '@/lib/keys';
 import { createClient } from '@/lib/session';
 import { listDeveloperMerchants } from '@/lib/merchants';
+import { listTestBookings } from '@/lib/sandbox';
 import { listWebhookEndpoints, rpcCaller } from '@/lib/webhooks';
 
 import { ApiKeys } from './api-keys';
 import { DeveloperConsole } from './developer-console';
+import { TestBookings } from './test-bookings';
 import { Webhooks } from './webhooks';
 
 /**
@@ -39,14 +41,18 @@ export default async function DevelopersPage() {
   }
 
   const merchants = await listDeveloperMerchants(supabase);
-  const [keys, webhooks] = await Promise.all([
+  const [keys, webhooks, testBookings, services] = await Promise.all([
     listConsoleKeys(
       supabase,
       user.id,
       merchants.map((m) => m.id),
     ),
     listWebhookEndpoints(rpcCaller(supabase)),
+    listTestBookings(rpcCaller(supabase)),
+    supabase.from('api_service').select('code, label').eq('active', true).order('label'),
   ]);
+  const testEndpoint =
+    webhooks.ok && webhooks.endpoints.some((e) => e.environment === 'test' && e.enabled);
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
@@ -66,6 +72,15 @@ export default async function DevelopersPage() {
 
       <div className="mt-8">
         <Webhooks merchants={merchants} initial={webhooks} />
+      </div>
+
+      <div className="mt-8">
+        <TestBookings
+          merchants={merchants}
+          services={services.data ?? []}
+          initial={testBookings}
+          testEndpoint={testEndpoint}
+        />
       </div>
 
       <p className="text-ink/50 mt-8 text-xs">
