@@ -25,13 +25,15 @@ describe('merchant cookie refresh', () => {
   ])(
     'keeps anonymous auth entry public and cookie-bearing responses uncached: %s',
     async (path) => {
+      // The middleware refreshes through getSession (a cookie read that calls
+      // Supabase only to refresh the token); pages still check with getUser.
       sdk.createServerClient.mockImplementation((_url, _key, options) => ({
         auth: {
-          getUser: async () => {
+          getSession: async () => {
             options.cookies.setAll([
               { name: 'sb-auth', value: '', options: { path: '/', maxAge: 0 } },
             ]);
-            return { data: { user: null }, error: null };
+            return { data: { session: null }, error: null };
           },
         },
       }));
@@ -50,14 +52,14 @@ describe('merchant cookie refresh', () => {
   it('passes SDK cookie updates to the downstream request and browser, retaining every cookie batch', async () => {
     sdk.createServerClient.mockImplementation((_url, _key, options) => ({
       auth: {
-        getUser: async () => {
+        getSession: async () => {
           options.cookies.setAll([
             { name: 'sb-access', value: 'refreshed', options: { path: '/', httpOnly: true } },
           ]);
           options.cookies.setAll([
             { name: 'sb-refresh', value: 'rotated', options: { path: '/', sameSite: 'lax' } },
           ]);
-          return { data: { user: { id: 'user-1' } }, error: null };
+          return { data: { session: { access_token: 'refreshed' } }, error: null };
         },
       },
     }));

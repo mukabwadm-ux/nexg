@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, CAPTCHA_FIELD, Card, getCaptchaToken, Input } from '@nexg/ui';
+import { Button, CAPTCHA_FIELD, Card, Input, useEarlyCaptcha } from '@nexg/ui';
 import { Lock } from 'lucide-react';
 import * as React from 'react';
 
@@ -26,24 +26,9 @@ export function SignInForm({
         : null,
   );
 
-  /*
-   * The captcha check used to start only when Sign in was pressed: load
-   * Cloudflare's script, run the check, then sign in. Start it as the page
-   * opens instead, so the token is usually ready by the time the password
-   * is typed. A token is single-use and good for five minutes, so one that
-   * has sat for four is dropped and a fresh one asked for.
-   */
-  const early = React.useRef<{ at: number; token: Promise<string | undefined> } | null>(null);
-  const prepare = React.useCallback(() => {
-    early.current = { at: Date.now(), token: getCaptchaToken() };
-  }, []);
-  React.useEffect(prepare, [prepare]);
-
-  const captcha = () => {
-    const ready = early.current;
-    early.current = null;
-    return ready && Date.now() - ready.at < 240_000 ? ready.token : getCaptchaToken();
-  };
+  /* The captcha check starts as the page opens, so the token is usually
+     ready by the time the password is typed (see useEarlyCaptcha). */
+  const { take: captcha, prepare } = useEarlyCaptcha();
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

@@ -9,7 +9,14 @@ import * as React from 'react';
 import { requestPasswordRecovery, updateRecoveredPassword } from '@/app/(customer)/sign-in/actions';
 import { PORTALS, type Portal } from '@/lib/auth-portals';
 
-/** A full page load for the host workspace, which is served as its own HTML. */
+/**
+ * Where to go once signed in. A full page load for the host workspace,
+ * which is served as its own HTML; a client navigation everywhere else.
+ *
+ * No router.refresh() after the push: every caller follows a server action
+ * that set the session cookies, which already clears Next's router cache,
+ * and the extra refresh rendered the destination a second time.
+ */
 export function goTo(router: ReturnType<typeof useRouter>, destination: string) {
   if (
     destination === '/host' ||
@@ -20,7 +27,6 @@ export function goTo(router: ReturnType<typeof useRouter>, destination: string) 
     return;
   }
   router.push(destination);
-  router.refresh();
 }
 
 export function ForgotPasswordForm({

@@ -115,11 +115,17 @@ for (const portal of PORTALS) {
         expect(ways, `${path} offers no way to sign out.`).toBeGreaterThan(0);
 
         /* And something on it. A framed page with an empty main
-           is the same dead end wearing a sidebar. */
-        const chars = await page.evaluate(
-          () => (document.querySelector('main')?.innerText ?? '').trim().length,
-        );
-        expect(chars, `${path} rendered a frame around nothing.`).toBeGreaterThan(200);
+           is the same dead end wearing a sidebar. Polled, not read
+           once: a board streams in behind its loading outline
+           (loading.tsx), and React can reveal it a moment after the
+           page's load event. The outline alone is 8 characters. */
+        await expect
+          .poll(
+            () =>
+              page.evaluate(() => (document.querySelector('main')?.innerText ?? '').trim().length),
+            { message: `${path} rendered a frame around nothing.` },
+          )
+          .toBeGreaterThan(200);
       });
     }
   });

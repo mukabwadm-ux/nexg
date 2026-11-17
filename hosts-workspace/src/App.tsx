@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { errorMessage, workspaceRequest, WorkspaceConnectionError } from './client';
+import { errorMessage, workspaceSnapshot, WorkspaceConnectionError } from './client';
 import type { WorkspaceSnapshot } from './model';
 import { RecordDialog } from './RecordDialog';
 import { personalAppearance, workspaceReminders } from './settings';
@@ -54,7 +54,7 @@ export default function App() {
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     const request = new AbortController();
-    workspaceRequest<WorkspaceSnapshot>('', { signal: request.signal })
+    workspaceSnapshot<WorkspaceSnapshot>(request.signal)
       .then(setSnapshot)
       .catch((cause) => {
         if (request.signal.aborted) return;

@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { requireRider } from '@/lib/partner';
+import { perRequest } from '@/lib/per-request';
 import { createClient } from '@/lib/supabase/server';
 
 import { riderNav, type RiderNavItem } from './shell';
@@ -22,7 +23,8 @@ interface RiderContext {
   nav: RiderNavItem[];
 }
 
-export async function riderContext(): Promise<RiderContext> {
+/* Once per request: the layout and the page both call it. */
+export const riderContext = perRequest(async function riderContext(): Promise<RiderContext> {
   const me = await requireRider();
   const supabase = createClient();
 
@@ -51,7 +53,7 @@ export async function riderContext(): Promise<RiderContext> {
       cashDue,
     }),
   };
-}
+});
 
 /**
  * The heading every rider board but the dashboard carries.

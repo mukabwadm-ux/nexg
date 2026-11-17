@@ -132,11 +132,41 @@ export default async function MerchantDashboard() {
 
   const person = firstName(m.contact_name, m.name);
 
-  const [progressRes, branchRes, attentionRes] = await Promise.all([
-    supabase.from('merchant_setup_progress_v').select('*').eq('merchant_id', me.id).maybeSingle(),
-    supabase.from('merchant_branch_live_v').select('*').eq('merchant_id', me.id).order('name'),
-    supabase.from('merchant_attention_v').select('*').eq('merchant_id', me.id).order('sort'),
-  ]);
+  /*
+   * Everything the dashboard reads, in one batch: these used to go out as
+   * three batches one after another. Documents are optional while
+   * onboarding, so the dashboard is where they get chased; nothing goes live
+   * until they are verified. The live half reads three more things, and a
+   * merchant still in setup pays for none of them.
+   */
+  const none = Promise.resolve({ data: null, error: null });
+  const [progressRes, branchRes, attentionRes, reqRes, docRes, orderRes, moneyRes, barRes] =
+    await Promise.all([
+      supabase.from('merchant_setup_progress_v').select('*').eq('merchant_id', me.id).maybeSingle(),
+      supabase.from('merchant_branch_live_v').select('*').eq('merchant_id', me.id).order('name'),
+      supabase.from('merchant_attention_v').select('*').eq('merchant_id', me.id).order('sort'),
+      supabase.rpc('fn_merchant_required_docs', { p_merchant_id: me.id }),
+      supabase
+        .from('document')
+        .select('requirement_id')
+        .eq('owner_type', 'merchant')
+        .eq('owner_id', me.id),
+      dashboard
+        ? supabase
+            .from('merchant_orders_v')
+            .select('*')
+            .eq('merchant_id', me.id)
+            .not('what_now', 'in', '("done","closed")')
+            .order('placed_at')
+            .limit(12)
+        : none,
+      dashboard
+        ? supabase.from('merchant_week_money_v').select('*').eq('merchant_id', me.id).maybeSingle()
+        : none,
+      dashboard
+        ? supabase.from('merchant_week_bars_v').select('*').eq('merchant_id', me.id).order('day')
+        : none,
+    ]);
 
   const progress = progressRes.data as SetupProgress | null;
   const branches = (branchRes.data as BranchCard[] | null) ?? [];
@@ -146,42 +176,12 @@ export default async function MerchantDashboard() {
     row.kind === 'payout' ? { ...row, href: MERCHANT_PAYOUTS_HREF } : row,
   );
 
-  /* Documents are optional while onboarding, so the dashboard is where
-     they get chased. Nothing goes live until they are verified. */
-  const [reqRes, docRes] = await Promise.all([
-    supabase.rpc('fn_merchant_required_docs', { p_merchant_id: me.id }),
-    supabase
-      .from('document')
-      .select('requirement_id')
-      .eq('owner_type', 'merchant')
-      .eq('owner_id', me.id),
-  ]);
   const have = new Set(
     ((docRes.data as { requirement_id: string }[] | null) ?? []).map((d) => d.requirement_id),
   );
   const missingDocs = ((reqRes.data as { id: string }[] | null) ?? []).filter(
     (r) => !have.has(r.id),
   ).length;
-
-  /* The live half reads three more things. A merchant still in
-     setup pays for none of them. */
-  const [orderRes, moneyRes, barRes] = dashboard
-    ? await Promise.all([
-        supabase
-          .from('merchant_orders_v')
-          .select('*')
-          .eq('merchant_id', me.id)
-          .not('what_now', 'in', '("done","closed")')
-          .order('placed_at')
-          .limit(12),
-        supabase.from('merchant_week_money_v').select('*').eq('merchant_id', me.id).maybeSingle(),
-        supabase.from('merchant_week_bars_v').select('*').eq('merchant_id', me.id).order('day'),
-      ])
-    : [
-        { data: null, error: null },
-        { data: null, error: null },
-        { data: null, error: null },
-      ];
 
   return (
     <>

@@ -26,14 +26,14 @@ describe('decision recovery session middleware', () => {
       ).toBe(false);
       sdk.createServerClient.mockImplementation((_url, _key, options) => ({
         auth: {
-          getUser: async () => {
+          getSession: async () => {
             options.cookies.setAll([
               { name: 'sb-access', value: 'refreshed', options: { path: '/', httpOnly: true } },
             ]);
             options.cookies.setAll([
               { name: 'sb-refresh', value: 'rotated', options: { path: '/', sameSite: 'lax' } },
             ]);
-            return { data: { user: { id: 'user-1' } }, error: null };
+            return { data: { session: { access_token: 'refreshed' } }, error: null };
           },
         },
       }));

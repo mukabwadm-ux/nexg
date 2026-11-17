@@ -1,6 +1,14 @@
 'use client';
 
-import { Button, Card, Input, PhoneInput, useToast, withCaptcha } from '@nexg/ui';
+import {
+  Button,
+  CAPTCHA_FIELD,
+  Card,
+  Input,
+  PhoneInput,
+  useEarlyCaptcha,
+  useToast,
+} from '@nexg/ui';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -66,6 +74,8 @@ export function AuthPanel({
 }) {
   const { toast } = useToast();
   const router = useRouter();
+  /* The captcha check runs as the form opens, not when Sign in is pressed. */
+  const captcha = useEarlyCaptcha();
 
   const canCreate = portal === 'merchant' && initialTab === 'create';
   const [tab, setTab] = React.useState<'signin' | 'create'>(canCreate ? 'create' : 'signin');
@@ -84,13 +94,15 @@ export function AuthPanel({
     formData.set('role', portal === 'merchant' ? 'merchant' : 'guest');
     if (next) formData.set('next', next);
     if (phone) formData.set('phone', phone);
-    await withCaptcha(formData);
+    const token = await captcha.take();
+    if (token) formData.set(CAPTCHA_FIELD, token);
 
     const result = tab === 'signin' ? await signIn(formData) : await createAccount(formData);
     setPending(false);
 
     if (!result.ok) {
       setError(result.message);
+      captcha.prepare(); // the token was spent; have the next one ready for a retry
       return;
     }
 

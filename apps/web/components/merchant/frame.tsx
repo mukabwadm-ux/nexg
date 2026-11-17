@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import type { MerchantHome } from '@/app/merchant/layout';
 import { requireMerchant } from '@/lib/partner';
+import { perRequest } from '@/lib/per-request';
 import { createClient } from '@/lib/supabase/server';
 
 import { merchantNav, type MerchantNavItem } from './shell';
@@ -25,6 +26,21 @@ interface MerchantContext {
   nav: MerchantNavItem[];
 }
 
+/*
+ * The two summaries, each read once per request: the layout and the page
+ * both draw from them.
+ */
+const shellSummary = perRequest(async (merchantId: string) =>
+  createClient()
+    .from('merchant')
+    .select('id,trading_name,status,contact_name')
+    .eq('id', merchantId)
+    .maybeSingle(),
+);
+const operationalSummary = perRequest(async (merchantId: string) =>
+  createClient().from('merchant_home_v').select('*').eq('merchant_id', merchantId).maybeSingle(),
+);
+
 export async function merchantContext(
   options: { setup?: boolean; draft?: boolean } = {},
 ): Promise<MerchantContext> {
@@ -36,23 +52,20 @@ export async function merchantContext(
   const shellOnly =
     !me.access.operations || ((options.setup || options.draft) && me.access.state !== 'legacy');
   if (shellOnly) {
-    // This is a safe shell summary, not an operational view with hidden data.
-    const { data, error } = await supabase
-      .from('merchant')
-      .select('id,trading_name,status,contact_name')
-      .eq('id', me.id)
-      .maybeSingle();
-    if (error) throw new Error('Your business setup could not be loaded. Please retry.');
     /*
      * Once staff approve a new-form application (which also takes it live),
      * the merchant gets the operational context, so its home is the
      * dashboard rather than the registration checklist. Draft editors keep
      * the shell, and so does anyone whose operational summary cannot be read.
+     * Both summaries are read together rather than one after the other.
      */
-    if (me.access.operations && !options.draft) {
-      const operational = await operationalContext(me, supabase);
-      if (operational.m) return operational;
-    }
+    const [{ data, error }, operational] = await Promise.all([
+      // This is a safe shell summary, not an operational view with hidden data.
+      shellSummary(me.id),
+      me.access.operations && !options.draft ? operationalContext(me, supabase) : null,
+    ]);
+    if (error) throw new Error('Your business setup could not be loaded. Please retry.');
+    if (operational?.m) return operational;
     const m = data
       ? ({
           merchant_id: data.id,
@@ -119,11 +132,7 @@ async function operationalContext(
   me: MerchantContext['me'],
   supabase: MerchantContext['supabase'],
 ): Promise<MerchantContext> {
-  const { data } = await supabase
-    .from('merchant_home_v')
-    .select('*')
-    .eq('merchant_id', me.id)
-    .maybeSingle();
+  const { data } = await operationalSummary(me.id);
 
   const m = data as MerchantHome | null;
   const live = m?.status === 'live';

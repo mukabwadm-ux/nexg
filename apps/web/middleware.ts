@@ -259,9 +259,14 @@ async function refreshMerchantSession(request: NextRequest) {
         },
       },
     });
-    // Refresh through the installed SDK. Pages and commands still authorize
-    // identity, current membership, application revision and session deadlines.
-    await client.auth.getUser();
+    // Refresh through the installed SDK: getSession reads the session from the
+    // cookie and calls Supabase only when the access token needs refreshing.
+    // getUser asked Supabase to vouch for it on every request and prefetch,
+    // and middleware runs at the edge nearest the visitor, so that was a trip
+    // to the database's region each time. Pages and commands still authorize
+    // with getUser: identity, current membership, application revision and
+    // session deadlines.
+    await client.auth.getSession();
   }
   response.headers.set('Cache-Control', 'private, no-store, max-age=0');
   response.headers.set('Pragma', 'no-cache');
