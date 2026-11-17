@@ -6,7 +6,19 @@ import { join, dirname, resolve } from 'node:path';
 import { ContractError } from '../src/contracts/index.js';
 import { BaselineReleaseReader, exportRelease } from '../src/releases/baselineReleaseReader.js';
 import { resolveSelection, sealRelease, validateReleaseArtifact, safeRelativePath, type ReleaseParts } from '../src/releases/artifact.js';
-import { release, releaseWithUnmappedSubcategory, workspace } from './helpers.js';
+import { MasterReleaseReader } from '../src/releases/masterReleaseReader.js';
+import { release as master, workspace } from './helpers.js';
+
+/* The icon-pack baseline (18 categories, 115 subcategories) stays importable and pinned as history; the
+   engine publishes the master release (21/214) since 16 Nov 2026. These tests check the baseline. */
+const release = await new BaselineReleaseReader(workspace).resolvePublishedRelease();
+function releaseWithUnmappedSubcategory(nodeId = 'beauty-wellness:salon-barber') {
+  const parts = structuredClone(release) as ReleaseParts;
+  const mapping = parts.mappings.find(entry => entry.nodeId === nodeId)!;
+  mapping.sourceSubcategoryIds = []; mapping.status = 'unmapped'; mapping.note = 'Isolated unmapped-behaviour control.';
+  const { nodes, placements, mappings, collections, assets, sourceFiles, policy, fallback, schemaVersion, compatibility } = parts;
+  return sealRelease({ nodes, placements, mappings, collections, assets, sourceFiles, policy, fallback, schemaVersion, compatibility });
+}
 
 test('B00 imports approved identities, dynamic counts and separate L1 order', () => {
   assert.deepEqual(release.declaredCounts, { categories: 18, subcategories: 115, options: 37 });
@@ -100,4 +112,38 @@ test('bad baseline refresh retains the prior validated release; bad startup has 
 test('asset paths reject traversal, absolute paths and alternate separators', () => {
   assert.equal(safeRelativePath('ICONS/pack/icon.png'), true);
   assert.deepEqual(['../icon.png', '/icon.png', 'C:/icon.png', 'ICONS/../icon.png', 'ICONS\\icon.png'].map(safeRelativePath), [false, false, false, false, false]);
+});
+
+test('the master release carries the 21 NexG categories and 214 subcategories, with the ids the site uses', async () => {
+  const navigation = JSON.parse(await readFile(join(workspace, 'docs/discovery/MASTER_NAVIGATION.json'), 'utf8')) as {
+    categories: { discovery_key: string; category: string; subcategories: { discovery_key: string; name: string; source_subcategory_ids: string[] }[] }[];
+  };
+  assert.match(master.releaseId, /^master-[a-f0-9]{64}$/);
+  assert.deepEqual(master.declaredCounts, { categories: 21, subcategories: 214, options: 0 });
+  assert.deepEqual(master.nodes.filter(node => node.kind === 'category').map(node => node.id), navigation.categories.map(category => category.discovery_key));
+  for (const category of navigation.categories) for (const sub of category.subcategories) {
+    const node = master.nodes.find(entry => entry.id === sub.discovery_key);
+    assert.deepEqual({ parent: node?.parentId, label: node?.label }, { parent: category.discovery_key, label: sub.name });
+    assert.deepEqual(master.mappings.find(mapping => mapping.nodeId === sub.discovery_key)?.sourceSubcategoryIds, sub.source_subcategory_ids);
+  }
+  for (const retired of ['health-pharmacy', 'flights', 'play', 'beauty-wellness']) assert.equal(master.nodes.some(node => node.id === retired), false);
+  assert.equal(master.nodes.filter(node => node.kind !== 'option').every(node => master.assets.some(asset => asset.path === node.assetPath)), true);
+  assert.equal(master.collections.every(collection => collection.enabled === false), true);
+});
+test('the master release is reproducible, and a changed MASTER_NAVIGATION.json is refused', async () => {
+  assert.equal(sealRelease(structuredClone(master), 'master').releaseId, master.releaseId);
+  const temporaryRoot = await mkdtemp(join(tmpdir(), 'nexg-discovery-master-'));
+  try {
+    for (const file of master.sourceFiles) {
+      const destination = join(temporaryRoot, file.path); await mkdir(dirname(destination), { recursive: true });
+      await cp(join(workspace, file.path), destination);
+    }
+    const reader = new MasterReleaseReader(temporaryRoot);
+    assert.equal((await reader.resolvePublishedRelease()).releaseId, master.releaseId);
+    await writeFile(join(temporaryRoot, 'docs/discovery/MASTER_NAVIGATION.json'), '{}');
+    assert.equal((await reader.refresh()).reason, 'RELEASE_REFRESH_REJECTED');
+    await assert.rejects(new MasterReleaseReader(temporaryRoot).resolvePublishedRelease(), ContractError);
+  } finally {
+    await rm(temporaryRoot, { recursive: true, force: true });
+  }
 });

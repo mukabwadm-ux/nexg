@@ -32,6 +32,8 @@ export class ReadBudget {
   }
   get signal(): AbortSignal { return this.#controller.signal; }
   get trace(): TraceScope | undefined { return this.options.trace; }
+  /** Source-call slots not yet reserved: a source read that fans out per group stops here. */
+  get remainingCalls(): number { return Math.max(0, this.#maxCalls - this.#reserved); }
   get snapshot(): ReadBudgetSnapshot { return { calls: this.#calls, uniqueDetails: this.#details.size, maxObservedConcurrency: this.#peak }; }
   /** Also check monotonic time after synchronous parsing/validation work. */
   assertOpen(): void {

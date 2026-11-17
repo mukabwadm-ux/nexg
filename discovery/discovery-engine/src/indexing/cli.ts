@@ -4,7 +4,7 @@ import { TypesenseIndexAdapter } from '../adapters/typesense/indexAdapter.js';
 import { TypesenseCandidateReader } from '../adapters/typesense/candidateReader.js';
 import { PlatformDiscoveryProvider } from '../adapters/platform/serverDiscoveryProvider.js';
 import { PlatformCatalogPreviewSource } from '../adapters/platform/catalogPreviewSource.js';
-import { BaselineReleaseReader } from '../releases/baselineReleaseReader.js';
+import { MasterReleaseReader } from '../releases/masterReleaseReader.js';
 import { CatalogIndexCoordinator } from './coordinator.js';
 import { FileWriterLock } from './writerLock.js';
 import { IndexingError, parseIndexInput, requireIndex, type IndexPurpose } from './contracts.js';
@@ -15,7 +15,7 @@ const [command, first, second, third, fourth] = process.argv.slice(2);
 try {
   const key = process.env.DISCOVERY_SEARCH_API_KEY ?? (await readFile(new URL('artifacts/local/typesense.key', engineRoot), 'utf8')).trim();
   const index = new TypesenseIndexAdapter({ origin: process.env.DISCOVERY_SEARCH_ORIGIN ?? 'http://127.0.0.1:8108', apiKey: key });
-  const release = await new BaselineReleaseReader(workspace).resolvePublishedRelease();
+  const release = await new MasterReleaseReader(workspace).resolvePublishedRelease();
   const coordinator = new CatalogIndexCoordinator(index, new FileWriterLock(fileURLToPath(new URL('artifacts/local/', engineRoot))), release);
   const purpose = (value: string | undefined): IndexPurpose => { requireIndex(['preview', 'serving', 'evaluation'].includes(value!), 'PURPOSE_REQUIRED'); return value as IndexPurpose; };
   let result: unknown;

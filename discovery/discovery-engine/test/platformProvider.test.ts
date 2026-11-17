@@ -31,7 +31,7 @@ test('the bridge path keeps taxonomy paths and branch coordinates, while legacy 
   const taxonomyPaths = taxonomyPathIndex(release);
   const control = { ...sourceControl(), subcategoryId: 'restaurants-food_café', latitude: -1.2921, longitude: 36.7856 };
   const { presentation } = normalizeMerchant(control, 'platform-catalog', observedAt, undefined, { taxonomyPaths });
-  assert.deepEqual(presentation.taxonomyPaths, [{ categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:caf' }]);
+  assert.deepEqual(presentation.taxonomyPaths, [{ categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:cafes-bakeries-pastries' }]);
   assert.deepEqual(presentation.location, { latitude: -1.2921, longitude: 36.7856 });
   assert.deepEqual(presentation.items[0]!.listedPrice, { state: 'unknown', reason: 'not_verified' });
   for (const [latitude, longitude] of [[0, 0], [91, 36.78], [-1.29, 181], ['-1.29', 36.78], [null, null], [Number.NaN, 36.78]]) {

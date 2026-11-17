@@ -78,9 +78,13 @@ export class DiscoveryReadService {
       area = filter.areaId;
     }
     const node = request.selection.optionId ?? request.selection.subcategoryId;
+    /* A whole category: each subcategory's groups, round-robin (every subcategory's first group, then
+       every second one…), so a source that can read only some of them still covers each subcategory. */
+    const perSubcategory = node ? [] : this.release.nodes.filter(item => item.kind === 'subcategory' && item.parentId === request.selection.categoryId)
+      .map(item => this.release.mappings.find(mapping => mapping.nodeId === item.id)!.sourceSubcategoryIds);
     const ids = node ? this.release.mappings.find(mapping => mapping.nodeId === node)!.sourceSubcategoryIds
-      : this.release.nodes.filter(item => item.kind === 'subcategory' && item.parentId === request.selection.categoryId)
-        .flatMap(item => this.release.mappings.find(mapping => mapping.nodeId === item.id)!.sourceSubcategoryIds);
+      : Array.from({ length: Math.max(0, ...perSubcategory.map(list => list.length)) }, (_unused, index) => perSubcategory.flatMap(list => list[index] ?? []))
+        .flat();
     return { sourceSubcategoryIds: [...new Set(ids)], limit: request.limit, ...(area ? { area } : {}),
       ...(request.viewport ? { viewport: request.viewport } : {}) };
   }

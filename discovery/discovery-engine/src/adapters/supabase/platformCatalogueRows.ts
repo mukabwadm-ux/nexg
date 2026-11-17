@@ -1,11 +1,8 @@
 import type { BridgeMapRow } from './catalogBridge.js';
 
-/** Platform groups for the operator catalog. The bridge fields preserve its existing wire IDs. */
+/** Platform groups for the operator catalog. The bridge fields preserve its existing wire IDs.
+ *  Flights was retired on 16 Nov 2026 (its groups moved to Travels & Tours and Premium Services). */
 const groups = [
-  ['flights', 'Flights', 'helicopter_charters', 'Helicopter Charters'],
-  ['flights', 'Flights', 'scenic_flights', 'Scenic Flights'],
-  ['flights', 'Flights', 'safari_flights', 'Safari Flights'],
-  ['flights', 'Flights', 'private_charters', 'Private Charters'],
   ['experiences', 'Experiences', 'cinemas', 'Cinemas'],
 ] as const;
 

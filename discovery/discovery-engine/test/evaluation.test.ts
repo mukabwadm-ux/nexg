@@ -45,9 +45,9 @@ test('ineligible and unknown facts never earn relevance credit; unjudged refs an
 });
 test('every released category/subcategory/option and language remains present even without positive judgments', () => {
   const report = evaluate(bundleControl(), release);
-  assert.equal(report.macro.categoriesTotal, 18); assert.equal(report.macro.subcategoriesTotal, 115); assert.equal(report.macro.subcategoriesScored, 1);
+  assert.equal(report.macro.categoriesTotal, 21); assert.equal(report.macro.subcategoriesTotal, 214); assert.equal(report.macro.subcategoriesScored, 1);
   assert.equal(report.slices.length, release.nodes.length + 3);
-  const missing = report.slices.find(row => row.id === 'health-pharmacy:hospitals-clinics')!;
+  const missing = report.slices.find(row => row.id === 'pharmacy:healthcare-products')!;
   assert.equal(missing.queries, 0); assert.equal(missing.ndcg10, null); assert.equal(report.slices.find(row => row.id === 'sw')!.scored, 0);
 });
 test('corrupted manifests, duplicate/foreign refs, missing results, impossible empty labels and conflicting selections fail closed', () => {
@@ -55,7 +55,7 @@ test('corrupted manifests, duplicate/foreign refs, missing results, impossible e
   const changes: ((bundle: ReturnType<typeof bundleControl>) => void)[] = [
     bundle => { bundle.manifest.inputSha256 = '0'.repeat(64); }, bundle => { bundle.runs[0]!.refs = ['a', 'a']; },
     bundle => { bundle.runs[0]!.refs = ['foreign']; }, bundle => { bundle.runs = []; },
-    bundle => { bundle.queries[0]!.expectedEmpty = 'known_empty'; }, bundle => { bundle.queries[0]!.selection.categoryId = 'beauty-wellness'; },
+    bundle => { bundle.queries[0]!.expectedEmpty = 'known_empty'; }, bundle => { bundle.queries[0]!.selection.categoryId = 'beauty'; },
     bundle => { bundle.queries.push(bundle.queries[0]!); }, bundle => { bundle.runs[0]!.status = 'failed'; },
   ];
   for (const change of changes) { const bundle = bundleControl(); change(bundle); assert.throws(() => evaluate(bundle, release)); }

@@ -69,11 +69,13 @@ test('results validate actual release selection and preserve bounded counts and 
 
 test('category browsing unions approved child source mappings without legacy category expansion', async t => {
   const urls: URL[] = []; const { app } = await setup(t, controlFetch(url => { urls.push(url); }));
-  const request = merchantRequest(); request.selection = { categoryId: 'beauty-wellness' };
+  const request = merchantRequest(); request.selection = { categoryId: 'beauty' };
   const response = await app.inject({ method: 'POST', url: '/api/discovery/results', payload: request });
   assert.equal(response.statusCode, 200); assert.equal(response.json().refs.length, 1);
-  const expected = [...new Set(release.nodes.filter(node => node.kind === 'subcategory' && node.parentId === 'beauty-wellness')
-    .flatMap(node => release.mappings.find(mapping => mapping.nodeId === node.id)!.sourceSubcategoryIds))];
+  /* Round-robin: every subcategory's first group, then every second one. */
+  const lists = release.nodes.filter(node => node.kind === 'subcategory' && node.parentId === 'beauty')
+    .map(node => release.mappings.find(mapping => mapping.nodeId === node.id)!.sourceSubcategoryIds);
+  const expected = [...new Set(Array.from({ length: Math.max(...lists.map(list => list.length)) }, (_unused, index) => lists.flatMap(list => list[index] ?? [])).flat())];
   assert.deepEqual(urls.map(url => url.searchParams.get('subcategory')), expected);
   assert.ok(urls.every(url => !url.searchParams.has('category')));
 });
@@ -86,10 +88,13 @@ test('every current category and subcategory resolves its own approved source gr
     request.selection = node.kind === 'category' ? { categoryId: node.id } : { categoryId: node.parentId!, subcategoryId: node.id };
     const response = await app.inject({ method: 'POST', url: '/api/discovery/results', payload: request });
     assert.equal(response.statusCode, 200, node.id);
+    /* A whole category reads its subcategories' groups round-robin, at most one request's 16 calls
+       (Wellness alone has 51 groups since the 16 Nov 2026 master list). */
+    const lists = release.nodes.filter(child => child.kind === 'subcategory' && child.parentId === node.id)
+      .map(child => release.mappings.find(mapping => mapping.nodeId === child.id)!.sourceSubcategoryIds);
     const expected = node.kind === 'subcategory' ? release.mappings.find(mapping => mapping.nodeId === node.id)!.sourceSubcategoryIds
-      : release.nodes.filter(child => child.kind === 'subcategory' && child.parentId === node.id)
-        .flatMap(child => release.mappings.find(mapping => mapping.nodeId === child.id)!.sourceSubcategoryIds);
-    assert.deepEqual(urls.map(url => url.searchParams.get('subcategory')), [...new Set(expected)], node.id);
+      : Array.from({ length: Math.max(0, ...lists.map(list => list.length)) }, (_unused, index) => lists.flatMap(list => list[index] ?? [])).flat();
+    assert.deepEqual(urls.map(url => url.searchParams.get('subcategory')), [...new Set(expected)].slice(0, 16), node.id);
     assert.ok(urls.length <= 16); parseSchema('EnginePage', response.json());
   }
   assert.equal(nodes.length, release.declaredCounts.categories + release.declaredCounts.subcategories);

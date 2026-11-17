@@ -15,9 +15,9 @@ const id = (prefix: string, value: number) => `${prefix}000000-0000-4000-8000-${
 const owner = 'nexg-supabase-catalog';
 const map = portalMapRows({ subcategories: [
   { demoSubcategoryId: 'restaurants-food_café', demoLabel: 'Café', demoCategoryId: 'restaurants-food', demoCategoryLabel: 'Restaurants & Food',
-    supabase: { category: 'restaurants_food', subcategory: 'caf' }, discovery: { categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:caf' }, status: 'mapped' },
+    supabase: { category: 'restaurants_food', subcategory: 'caf' }, discovery: { categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:cafes-bakeries-pastries' }, status: 'mapped' },
   { demoSubcategoryId: 'beauty_makeup', demoLabel: 'Makeup', demoCategoryId: 'beauty', demoCategoryLabel: 'Beauty',
-    supabase: { category: 'beauty', subcategory: 'makeup' }, discovery: { categoryId: 'beauty-wellness', subcategoryId: 'beauty-wellness:beauty-products' }, status: 'mapped' },
+    supabase: { category: 'beauty', subcategory: 'makeup' }, discovery: { categoryId: 'beauty', subcategoryId: 'beauty:makeup' }, status: 'mapped' },
   { demoSubcategoryId: 'financial-services_banking', demoLabel: 'Banking', demoCategoryId: 'financial-services', demoCategoryLabel: 'Financial Services',
     supabase: { category: 'financial_services', subcategory: 'banking' }, discovery: null, status: 'unmapped' },
 ] });
@@ -52,9 +52,9 @@ function connector(options: { load?: () => Promise<CatalogRows>; now?: () => num
 }
 
 test('taxonomy paths come only from the release mappings, with the option when exactly one maps the group', () => {
-  assert.deepEqual(taxonomyPathsFor(paths, 'restaurants-food_café'), [{ categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:caf' }]);
+  assert.deepEqual(taxonomyPathsFor(paths, 'restaurants-food_café'), [{ categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:cafes-bakeries-pastries' }]);
   assert.deepEqual(taxonomyPathsFor(paths, 'beauty_makeup'),
-    [{ categoryId: 'beauty-wellness', subcategoryId: 'beauty-wellness:beauty-products', optionId: 'beauty-wellness:beauty-products:makeup' }]);
+    [{ categoryId: 'beauty', subcategoryId: 'beauty:makeup' }]);
   assert.equal(taxonomyPathsFor(paths, 'not-a-source-group'), undefined);
   assert.equal(taxonomyPathsFor(paths, undefined), undefined);
   assert.equal(taxonomyPathsFor(undefined, 'beauty_makeup'), undefined);
@@ -67,10 +67,10 @@ test('taxonomy paths come only from the release mappings, with the option when e
     }
   }
   // An unmapped subcategory gives its old source group no path.
-  assert.equal(taxonomyPathsFor(taxonomyPathIndex(releaseWithUnmappedSubcategory('beauty-wellness:salon-barber')), 'beauty_salon-barber'), undefined);
+  assert.equal(taxonomyPathsFor(taxonomyPathIndex(releaseWithUnmappedSubcategory('wellness:hair-styling')), 'beauty_salon-barber'), undefined);
   // Responses get copies; the index never changes.
   const copy = taxonomyPathsFor(paths, 'beauty_makeup')!; copy[0]!.subcategoryId = 'changed';
-  assert.equal(taxonomyPathsFor(paths, 'beauty_makeup')![0]!.subcategoryId, 'beauty-wellness:beauty-products');
+  assert.equal(taxonomyPathsFor(paths, 'beauty_makeup')![0]!.subcategoryId, 'beauty:makeup');
 });
 
 test('settings accept only a plain project URL and a public key, and errors never repeat the key', () => {
@@ -105,7 +105,7 @@ test('stores keep Supabase IDs and gain taxonomy paths, listed KES prices, coord
     ({ ref: { kind: 'offering', ownerId: owner, id: id('f1', number), merchantId: id('c1', 1) }, name, ...extra, listedPrice });
   assert.deepEqual(jua.presentation, {
     ref: { kind: 'merchant', ownerId: owner, id: id('c1', 1), merchantId: id('c1', 1) }, name: 'Jua Café', area: 'Kilimani',
-    taxonomyPaths: [{ categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:caf' }], location: { latitude: -1.2921, longitude: 36.7856 },
+    taxonomyPaths: [{ categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:cafes-bakeries-pastries' }], location: { latitude: -1.2921, longitude: 36.7856 },
     items: [
       offering(1, 'Espresso', { state: 'known', value: { minor: 45_000, currency: 'KES' }, evidence: { source: { ownerId: owner, id: id('f1', 1) }, observedAt: loadedAt } },
         { description: 'Double shot' }),
@@ -121,7 +121,7 @@ test('stores keep Supabase IDs and gain taxonomy paths, listed KES prices, coord
   assert.deepEqual((await withBudget(budget => source.getMerchants({ sourceSubcategoryIds: cafes, area: 'Westlands', limit: 24 }, budget))).map(row => row.presentation.name), ['Amani Café']);
   const makeup = await withBudget(budget => source.getMerchants({ sourceSubcategoryIds: ['beauty_makeup', 'beauty_makeup'], limit: 24 }, budget));
   assert.deepEqual(makeup.map(row => row.presentation.taxonomyPaths),
-    [[{ categoryId: 'beauty-wellness', subcategoryId: 'beauty-wellness:beauty-products', optionId: 'beauty-wellness:beauty-products:makeup' }]]);
+    [[{ categoryId: 'beauty', subcategoryId: 'beauty:makeup' }]]);
   // Unmapped groups never browse, and the limit holds across groups.
   assert.deepEqual(await withBudget(budget => source.getMerchants({ sourceSubcategoryIds: ['financial-services_banking'], limit: 24 }, budget)), []);
   assert.equal((await withBudget(budget => source.getMerchants({ sourceSubcategoryIds: [...cafes, 'beauty_makeup'], limit: 2 }, budget))).length, 2);
@@ -178,17 +178,17 @@ test('the engine serves connector stores through its public routes with prices, 
   t.after(async () => { await server.app.close(); await source.close(); });
   assert.deepEqual((await server.app.inject('/api/discovery/health')).json(), { contractVersion: '1', status: 'ok', readiness: 'R1' });
   const request = { contractVersion: '1', requestId: 'connector-control', discoveryReleaseId: release.releaseId, mode: 'merchant',
-    selection: { categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:caf' }, filters: [], sort: 'recommended', limit: 24 };
+    selection: { categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:cafes-bakeries-pastries' }, filters: [], sort: 'recommended', limit: 24 };
   const response = await server.app.inject({ method: 'POST', url: '/api/discovery/results', payload: request });
   assert.equal(response.statusCode, 200);
   const page = parseSchema('EnginePage', response.json());
   assert.deepEqual(page.presentations.merchants.map(row => row.name).sort(), ['Amani Café', 'Jua Café', 'Portal Café']);
-  assert.ok(page.presentations.merchants.every(row => row.ref.ownerId === owner && row.taxonomyPaths?.[0]?.subcategoryId === 'restaurants-food:caf'));
+  assert.ok(page.presentations.merchants.every(row => row.ref.ownerId === owner && row.taxonomyPaths?.[0]?.subcategoryId === 'restaurants-food:cafes-bakeries-pastries'));
   const espresso = page.presentations.merchants.flatMap(row => row.items).find(item => item.name === 'Espresso')!;
   assert.deepEqual(espresso.listedPrice.state === 'known' ? espresso.listedPrice.value : undefined, { minor: 45_000, currency: 'KES' });
   const detail = await server.app.inject(`/api/discovery/merchants/${id('c1', 4)}`);
   assert.equal(detail.statusCode, 200);
-  assert.deepEqual(parseSchema('PublicMerchant', detail.json()).taxonomyPaths?.[0]?.optionId, 'beauty-wellness:beauty-products:makeup');
+  assert.deepEqual(parseSchema('PublicMerchant', detail.json()).taxonomyPaths?.[0]?.subcategoryId, 'beauty:makeup');
   assert.equal((await server.app.inject(`/api/discovery/merchants/${id('c1', 99)}`)).statusCode, 404);
   assert.deepEqual((await server.app.inject('/api/discovery/areas')).json(), { areas: ['Karen', 'Kilimani', 'Westlands'] });
 });

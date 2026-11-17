@@ -110,7 +110,7 @@ test('actual Typesense 30.2 indexing lifecycle', async t => {
   await t.test('F09 released collection and View all share the actual index/current-provider predicate', async () => {
     const categoryId = release.nodes.find(node => node.id === indexSelection)!.parentId!;
     const active = sealRelease({ ...structuredClone(release), collections: [definition('protocol-query-collection', {
-      categoryId, maxItems: 2, predicate: { kind: 'query-matches' } })] });
+      categoryId, maxItems: 2, predicate: { kind: 'query-matches' } })] }, 'master');
     const composedCoordinator = new CatalogIndexCoordinator(index, new FileWriterLock(directory), active, () => indexNow);
     await composedCoordinator.build(input(base), 'serving');
     const provider: ServerDiscoveryProvider = { ownerId: 'protocol-index-owner', configured: true, probe: async () => true,
@@ -169,7 +169,7 @@ test('actual Typesense 30.2 indexing lifecycle', async t => {
     const expiredFact = new TypesenseCandidateReader(index, release, () => indexNow + 10001);
     await assert.rejects(expiredFact.search(current.collection, { query: '*', selectionId: indexSelection, mode: 'merchant', limit: 24 }, 'serving'), error => error instanceof IndexingError && error.code === 'STALE_SOURCE_FACT');
     const changed = structuredClone(release); changed.nodes[0]!.label = 'New approved release label';
-    const incompatible = new TypesenseCandidateReader(index, sealRelease(changed), () => indexNow);
+    const incompatible = new TypesenseCandidateReader(index, sealRelease(changed, 'master'), () => indexNow);
     await assert.rejects(incompatible.search(current.collection, { query: '*', selectionId: indexSelection, mode: 'merchant', limit: 24 }, 'serving'), error => error instanceof IndexingError && error.code === 'INDEX_RELEASE_INCOMPATIBLE');
     await assert.rejects(coordinator.rollback(first.collection, 'serving'), error => error instanceof IndexingError && error.code === 'UNSAFE_SOURCE_ROLLBACK');
     await assert.rejects(index.removeUnpublished(current.collection, AbortSignal.timeout(1000)), error => error instanceof IndexingError && error.code === 'PUBLISHED_GENERATION_DELETE_FORBIDDEN');

@@ -1,9 +1,10 @@
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BaselineReleaseReader, exportRelease } from './releases/baselineReleaseReader.js';
+import { exportRelease } from './releases/baselineReleaseReader.js';
+import { MasterReleaseReader } from './releases/masterReleaseReader.js';
 
 const workspace = fileURLToPath(new URL('../../../', import.meta.url));
-const release = await new BaselineReleaseReader(workspace).resolvePublishedRelease();
+const release = await new MasterReleaseReader(workspace).resolvePublishedRelease();
 const outputIndex = process.argv.indexOf('--output');
 if (outputIndex !== -1) {
   const output = process.argv[outputIndex + 1];

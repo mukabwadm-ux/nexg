@@ -13,7 +13,7 @@ export const jsonResponse = (value: unknown, status = 200, headers: Record<strin
   new Response(JSON.stringify(value), { status, headers: { 'content-type': 'application/json', ...headers } });
 
 export function merchantRequest(): EngineRequest {
-  const node = release.nodes.find(node => node.kind === 'subcategory' && node.parentId === 'beauty-wellness'
+  const node = release.nodes.find(node => node.kind === 'subcategory' && node.parentId === 'beauty'
     && release.mappings.find(mapping => mapping.nodeId === node.id)?.sourceSubcategoryIds.length === 1)!;
   return { ...request(), mode: 'merchant', selection: { categoryId: node.parentId!, subcategoryId: node.id } };
 }

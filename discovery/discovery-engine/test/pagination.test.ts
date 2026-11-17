@@ -86,7 +86,7 @@ test('cursors reject tampering, another caller, altered query/area/selection/pag
   const cases: Partial<EngineRequest>[] = [
     { cursor: `${cursor.slice(0, -1)}!` }, { cursor, query: 'different' }, { cursor, limit: 3 },
     { cursor, filters: [{ kind: 'catalog_area', areaId: 'protocol-area' }] },
-    { cursor, selection: { categoryId: 'beauty-wellness' } },
+    { cursor, selection: { categoryId: 'beauty' } },
   ];
   for (const change of cases) {
     const response = await server.send(change); assert.equal(response.statusCode, 409);

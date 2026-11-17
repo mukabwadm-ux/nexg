@@ -41,7 +41,9 @@ export function safeRelativePath(value: string): boolean {
 function unique(values: readonly string[], path: string): void {
   requireValue(values.every(value => typeof value === 'string' && value.length > 0 && value.length <= 512) && new Set(values).size === values.length, path);
 }
-export function sealRelease(parts: ReleaseParts): Readonly<ReleaseArtifact> {
+/** Release ids are <kind>-<checksum>: the icon-pack baseline, or the master list (since 16 Nov 2026). */
+export type ReleaseKind = 'baseline' | 'master';
+export function sealRelease(parts: ReleaseParts, kind: ReleaseKind = 'baseline'): Readonly<ReleaseArtifact> {
   const payload = {
     ...structuredClone({ schemaVersion: parts.schemaVersion, compatibility: parts.compatibility, nodes: parts.nodes, placements: parts.placements,
       mappings: parts.mappings, collections: parts.collections, assets: parts.assets, sourceFiles: parts.sourceFiles, policy: parts.policy, fallback: parts.fallback }),
@@ -54,7 +56,7 @@ export function sealRelease(parts: ReleaseParts): Readonly<ReleaseArtifact> {
     collectionRevision: revision(parts.collections), policyRevision: revision(parts.policy), assetRevision: revision(parts.assets),
   };
   const checksum = sha256(canonicalJson(payload));
-  return validateReleaseArtifact({ ...payload, releaseId: `baseline-${checksum}`, checksum });
+  return validateReleaseArtifact({ ...payload, releaseId: `${kind}-${checksum}`, checksum });
 }
 
 // This checks integrity/compatibility. Only a trusted reader selects an active release.
@@ -111,7 +113,7 @@ export function validateReleaseArtifact(value: unknown): Readonly<ReleaseArtifac
       requireValue((artifact as unknown as Record<string, unknown>)[field] === revision(data), `/${field}`);
     }
     const { releaseId, checksum, ...payload } = artifact;
-    requireValue(checksum === sha256(canonicalJson(payload)) && releaseId === `baseline-${checksum}`, '/checksum');
+    requireValue(checksum === sha256(canonicalJson(payload)) && (releaseId === `baseline-${checksum}` || releaseId === `master-${checksum}`), '/checksum');
     return deepFreeze(artifact);
   } catch (error) {
     if (error instanceof ContractError) throw error;

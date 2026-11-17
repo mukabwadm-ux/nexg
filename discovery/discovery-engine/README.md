@@ -12,9 +12,11 @@ Run `npm --prefix discovery-engine run check` and root `npm test`. Start the ind
 
 This folder was renamed from recommendation-engine at the owner's request. It now describes the complete discovery system. Recommendation remains a distinct engine within that system. Earlier recommendation plans are preserved unchanged in [history](docs/history/README.md).
 
-The goal is useful discovery across every category/subcategory in the selected published release, currently 16 categories and 98 subcategories: understand a request, find eligible merchants and offerings, rank suitable options, compose useful collections, and measure whether the guest succeeds. Catalog facts and transaction decisions remain owned by the existing platform.
+The goal is useful discovery across every category/subcategory in the selected published release, currently NexG’s master list of 21 categories and 214 subcategories: understand a request, find eligible merchants and offerings, rank suitable options, compose useful collections, and measure whether the guest succeeds. Catalog facts and transaction decisions remain owned by the existing platform.
 
-[Discovery Studio](../discovery-studio/README.md) separately owns planned taxonomy editing, per-screen arrangement, preview and release management. The engine consumes compatible versioned releases; the current 16/98 snapshot is a starting baseline, not a permanent limit.
+[Discovery Studio](../discovery-studio/README.md) separately owns planned taxonomy editing, per-screen arrangement, preview and release management. The engine consumes compatible versioned releases.
+
+**Master release (since 16 Nov 2026).** The service publishes `master-<checksum>`, built by `src/releases/masterReleaseReader.ts` from `../docs/discovery/MASTER_NAVIGATION.json`: the same file, and so the same category and subcategory ids, the Discovery frontend uses. `config/master-approval.v1.json` pins it and every icon copy it names (`node scripts/pin-web-icons.mjs`; CI runs `--check`). A subcategory without an icon of its own draws its category’s, and the master list has no option level. Its collections, one per mapped subcategory, are disabled like the baseline’s. The icon-pack baseline (`baseline-<checksum>`, 18 categories, 115 subcategories, `config/baseline-approval.v1.json`) stays pinned and importable as history. A whole-category read lists its source groups round-robin across subcategories; the platform adapter reads as many as the request’s 16 source calls allow, and the page’s count stays a lower bound over bounded candidates.
 
 ## Start here
 

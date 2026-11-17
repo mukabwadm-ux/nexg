@@ -6,7 +6,7 @@ import { DiscoveryReadService } from '../orchestrator/readService.js';
 import type { ServerDiscoveryProvider } from '../providers/DiscoveryProvider.js';
 import { PlatformDiscoveryProvider } from '../adapters/platform/serverDiscoveryProvider.js';
 import { SupabaseConnector } from '../adapters/supabase/connector.js';
-import { BaselineReleaseReader } from '../releases/baselineReleaseReader.js';
+import { MasterReleaseReader } from '../releases/masterReleaseReader.js';
 import { taxonomyPathIndex } from '../releases/taxonomyPaths.js';
 import { validateReleaseArtifact, type ReleaseArtifact } from '../releases/artifact.js';
 import { parseSchema } from '../contracts/validate.js';
@@ -51,7 +51,7 @@ export interface ReadServerOptions {
 /** Composition root only. Modules receive interfaces and no listening socket. */
 export async function buildReadOnlyServer(options: ReadServerOptions) {
   const release = options.release ? validateReleaseArtifact(options.release)
-    : await new BaselineReleaseReader(options.workspaceRoot ?? fileURLToPath(new URL('../../../../', import.meta.url))).resolvePublishedRelease();
+    : await new MasterReleaseReader(options.workspaceRoot ?? fileURLToPath(new URL('../../../../', import.meta.url))).resolvePublishedRelease();
   const root = options.workspaceRoot ?? fileURLToPath(new URL('../../../../', import.meta.url));
   const taxonomyPaths = taxonomyPathIndex(release);
   // The Supabase connector starts reading only once the whole server is built (see the end of this function).

@@ -29,7 +29,7 @@ test('selection never silently repairs unknown IDs or conflicting parent-child s
   assert.equal(parseEngineRequest({ ...request(), selection: { categoryId: 'restaurants-food' } }, release).selection.categoryId, 'restaurants-food');
   rejects({ ...request(), selection: { categoryId: 'invented' } });
   const sub = release.nodes.find(node => node.kind === 'subcategory' && node.parentId === 'restaurants-food')!;
-  rejects({ ...request(), selection: { categoryId: 'beauty-wellness', subcategoryId: sub.id } }, 'CONSTRAINT_CONFLICT');
+  rejects({ ...request(), selection: { categoryId: 'beauty', subcategoryId: sub.id } }, 'CONSTRAINT_CONFLICT');
   rejects({ ...request(), discoveryReleaseId: 'another-release' }, 'RELEASE_INCOMPATIBLE');
 });
 test('request semantics reject zero party, invalid timezone, reversed dates and incomparable range currency', () => {

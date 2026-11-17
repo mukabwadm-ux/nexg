@@ -14,6 +14,9 @@
  *   discovery-engine/config/baseline-approval.v1.json   SHA-256 of the taxonomy, the configuration,
  *                                                       the index and every icon copy, and the
  *                                                       binding from each index row to its file
+ *   discovery-engine/config/master-approval.v1.json     SHA-256 of MASTER_NAVIGATION.json and every
+ *                                                       icon copy it names (the master release the
+ *                                                       service publishes since 16 Nov 2026)
  *
  * Re-run it after the taxonomy or an icon copy changes, and review the diff: a changed pin is a
  * changed release.
@@ -88,9 +91,33 @@ for (const path of pinned) {
 files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
 const approval = JSON.stringify({ schemaVersion: '1', authority, assetBindings: bindings, files }, null, 2) + '\n';
 
+/* The master release (NexG's 21 categories since 16 Nov 2026): MASTER_NAVIGATION.json and each icon
+   copy it names. A subcategory with no icon of its own draws its category's, so icons may repeat. */
+const masterPath = 'docs/discovery/MASTER_NAVIGATION.json';
+const masterApprovalPath = 'discovery-engine/config/master-approval.v1.json';
+const masterAuthority =
+  'Derived pins for the master release: NexG’s 21 categories and 214 subcategories as the owner set them ' +
+  'on 16 November 2026 (packages/contracts/src/data/category-master.json, generated into ' +
+  'docs/discovery/MASTER_NAVIGATION.json), and the 256 px WebP copy of each icon it names. Regenerate ' +
+  'with scripts/pin-web-icons.mjs.';
+const master = await readJson(masterPath);
+const masterIcons = new Set();
+for (const category of master.categories) {
+  masterIcons.add(copyPath(category.icon_reference));
+  for (const sub of category.subcategories) if (sub.icon_reference) masterIcons.add(copyPath(sub.icon_reference));
+}
+const masterFiles = [{ path: masterPath, sha256: sha256(await readFile(join(root, masterPath))) }];
+for (const path of masterIcons) {
+  masterFiles.push({ path: iconRoot + path, sha256: sha256(await readFile(join(root, iconRoot + path))) });
+}
+masterFiles.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+const masterApproval =
+  JSON.stringify({ schemaVersion: '1', authority: masterAuthority, files: masterFiles }, null, 2) + '\n';
+
 const targets = [
   [indexPath, index],
   [approvalPath, approval],
+  [masterApprovalPath, masterApproval],
 ];
 if (checking) {
   const stale = [];

@@ -6,10 +6,10 @@ import { merchantRequest } from './readControls.js';
 
 // Isolated release/schema controls only. Never catalog seeds or runtime defaults.
 export function definition(id = 'protocol-explore', changes: Partial<ExecutableCollectionDefinition> = {}): ExecutableCollectionDefinition {
-  return { id, categoryId: 'beauty-wellness', titleKey: 'discovery.collections.explore', predicateVersion: '1',
+  return { id, categoryId: 'beauty', titleKey: 'discovery.collections.explore', predicateVersion: '1',
     predicate: { kind: 'scoped-explore' }, mode: 'merchant', minDistinct: 2, maxItems: 4, enabled: true, ...changes } as ExecutableCollectionDefinition;
 }
-export const collectionRelease = (definitions: ExecutableCollectionDefinition[]) => sealRelease({ ...structuredClone(release), collections: definitions });
+export const collectionRelease = (definitions: ExecutableCollectionDefinition[]) => sealRelease({ ...structuredClone(release), collections: definitions }, 'master');
 export const collectionRequest = (artifact: Readonly<ReleaseArtifact>, changes: Partial<EngineRequest> = {}): EngineRequest =>
   ({ ...merchantRequest(), discoveryReleaseId: artifact.releaseId, ...changes });
 

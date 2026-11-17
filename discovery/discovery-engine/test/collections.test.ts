@@ -15,7 +15,7 @@ test('compatible executable collection releases change only collection identity;
   assert.notEqual(active.releaseId, release.releaseId); assert.notEqual(active.collectionRevision, release.collectionRevision);
   assert.equal(active.taxonomyRevision, release.taxonomyRevision); assert.equal(active.mappingRevision, release.mappingRevision);
   assert.ok(release.collections.every(value => value.enabled === false)); assert.equal(active.collections[0]!.enabled, true);
-  assert.equal(sealRelease(structuredClone(release)).releaseId, release.releaseId);
+  assert.equal(sealRelease(structuredClone(release), 'master').releaseId, release.releaseId);
   for (const invalid of [definition('bad', { minDistinct: 1 }), definition('bad', { predicateVersion: '2' as '1' }),
     definition('bad', { predicate: { kind: 'requested-task-fit' } }), definition('bad', { selection: { categoryId: 'airport-transfers' } })]) {
     assert.throws(() => collectionRelease([invalid]), code('RELEASE_INCOMPATIBLE'));
@@ -34,7 +34,7 @@ test('definitions can be disabled again without losing their key or executable p
 });
 
 test('exact destination preserves query, filters, source scope, mode and sort while intersecting selectors', () => {
-  const artifact = collectionRelease([definition('query', { predicate: { kind: 'query-matches' }, selection: { categoryId: 'beauty-wellness' }, filters: [{ kind: 'catalog_area', areaId: 'east' }] })]);
+  const artifact = collectionRelease([definition('query', { predicate: { kind: 'query-matches' }, selection: { categoryId: 'beauty' }, filters: [{ kind: 'catalog_area', areaId: 'east' }] })]);
   const request = collectionRequest(artifact, { query: '"Protocol merchant"', sort: 'rating', filters: [{ kind: 'catalog_area', areaId: 'east' }] });
   const prepared = prepareCollections({ request, definitionIds: ['query'] }, artifact).prepared[0]!;
   assert.deepEqual(prepared.viewAllRequest, request); assert.equal(prepared.readRequest.limit, 48);

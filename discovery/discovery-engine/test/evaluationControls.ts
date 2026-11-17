@@ -5,7 +5,7 @@ import { release } from './helpers.js';
 
 /** Isolated metric/approval controls. Never real inventory, judgments or owner approvals. */
 export function queryControl(id = 'q1'): JudgedQuery {
-  return { id, familyId: id, language: 'en', selection: { categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:restaurant' }, crossCategory: false,
+  return { id, familyId: id, language: 'en', selection: { categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:fast-food-casual-dining' }, crossCategory: false,
     expectedEmpty: 'unknown', caseKind: 'relevance', review: 'judged', judgments: [{ ref: 'a', grade: 3, eligible: 'yes' }, { ref: 'b', grade: 1, eligible: 'yes' }] };
 }
 export function bundleControl(): EvaluationBundle {

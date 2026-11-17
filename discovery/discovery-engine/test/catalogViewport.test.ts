@@ -18,7 +18,7 @@ import { withBudget } from './readControls.js';
 
 const viewport = { south: -1, west: 178, north: 1, east: -178 };
 const category = { categoryId: 'restaurants-food' };
-const subcategory = { ...category, subcategoryId: 'restaurants-food:caf' };
+const subcategory = { ...category, subcategoryId: 'restaurants-food:cafes-bakeries-pastries' };
 const defaultRequest: EngineRequest = {
   contractVersion: '1', discoveryReleaseId: release.releaseId, requestId: 'viewport-read',
   mode: 'merchant', selection: category, filters: [], sort: 'recommended', limit: 24,

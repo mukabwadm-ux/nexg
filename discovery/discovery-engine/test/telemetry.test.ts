@@ -37,7 +37,7 @@ test('actual local OTLP receiver gets standard hex IDs/nanosecond times and fixe
     assert.notEqual(span.traceId, '11111111111111111111111111111111');
   }
   const serialized = JSON.stringify(received);
-  for (const secret of ['COOKIE_SECRET', 'AUTH_SECRET', 'PRIVATE_SECRET', 'protocol-control', 'catalog.test', 'beauty-wellness', '11111111111111111111111111111111']) assert.equal(serialized.includes(secret), false, secret);
+  for (const secret of ['COOKIE_SECRET', 'AUTH_SECRET', 'PRIVATE_SECRET', 'protocol-control', 'catalog.test', 'beauty', '11111111111111111111111111111111']) assert.equal(serialized.includes(secret), false, secret);
   assert.equal(received[0]!.path, '/v1/traces');
   const metrics = telemetry.snapshot(); assert.equal(metrics.routes.results?.count, 1); assert.equal(metrics.routes.results?.sourceCalls, 1);
   assert.equal(metrics.routes.results?.underfilled, 1); assert.equal(metrics.export.exported, 5);

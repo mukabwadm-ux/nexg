@@ -35,7 +35,11 @@ export class PlatformDiscoveryProvider implements ServerDiscoveryProvider {
       || scope.sourceSubcategoryIds.some(id => typeof id !== 'string' || !id || id.length > 256)
       || (scope.area !== undefined && (!scope.area || scope.area === 'all' || scope.area.length > 256))) throw sourceUnavailable(false);
     const connection = this.#connection();
-    const groups = [...new Set(scope.sourceSubcategoryIds)];
+    /* One call per group. A whole category can carry more groups than one request may call (Wellness has
+       51 since the 16 Nov 2026 master list); the scope lists them round-robin across subcategories, so the
+       groups read first cover every subcategory it can. The page stays honest: its count is a lower bound
+       over bounded candidates. With no call left it still tries one, so the budget refuses it loudly. */
+    const groups = [...new Set(scope.sourceSubcategoryIds)].slice(0, Math.max(1, budget.remainingCalls));
     // One HTTP page per source group stays at 48 stores, inside the 2 MiB response limit.
     const perGroup = Math.min(scope.limit, 48);
     const pages = await Promise.all(groups.map(async id => {

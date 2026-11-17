@@ -153,7 +153,7 @@ test('freshness rejects expired/future sources and full rebuild supports a new c
   const { coordinator, index } = setup(); const input = snapshotControl(); await coordinator.build(source(input), 'serving');
   assert.throws(() => validateSourceStamp({ ...input.source, asOf: new Date(indexNow - 300001).toISOString() }, 'serving', indexNow), isCode('STALE_SOURCE'));
   assert.throws(() => validateSourceStamp({ ...input.source, asOf: new Date(indexNow + 1).toISOString() }, 'serving', indexNow), isCode('STALE_SOURCE'));
-  const parts = structuredClone(release); parts.nodes[0]!.label = 'Updated approved label'; const updated = sealRelease(parts);
+  const parts = structuredClone(release); parts.nodes[0]!.label = 'Updated approved label'; const updated = sealRelease(parts, 'master');
   const rebuilt = await new CatalogIndexCoordinator(index, lock, updated, () => indexNow).build(source(input), 'serving');
   assert.equal(rebuilt.manifest.releaseId, updated.releaseId); assert.notEqual(rebuilt.manifest.releaseId, release.releaseId);
 });
@@ -172,7 +172,7 @@ test('rollback may restore an equivalent source checkpoint but never resurrect o
 
 test('legacy provider capture is bounded merchant context and cannot be promoted to serving', async () => {
   const provider = new PlatformDiscoveryProvider({ origin: 'http://catalog.test', fetcher: controlFetch() });
-  const previewSource = new PlatformCatalogPreviewSource(provider, release, 'beauty-wellness');
+  const previewSource = new PlatformCatalogPreviewSource(provider, release, 'beauty');
   const input = await previewSource.read(AbortSignal.timeout(1000));
   assert.equal(input.records[0]!.projection.id, 'protocol-control'); assert.equal(input.source.snapshotId, null); assert.equal(input.source.complete, false);
   assert.equal(input.records[0]!.projection.provenance.state, 'unknown'); assert.equal(input.records[0]!.projection.sourceRevision.state, 'unknown');
