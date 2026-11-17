@@ -154,7 +154,7 @@ where id = 'cccccccc-0000-0000-0000-000000000001';
 
 update public.merchant
 set category = 'adults_only',
-    subcategory = 'adult_products',
+    subcategory = 'sexual_health_products',
     answers = '{"packaging_style":"discreet","age_gate_method":"both","signature_required":"yes"}'::jsonb
 where id = 'cccccccc-0000-0000-0000-000000000001';
 
@@ -165,7 +165,7 @@ select is(
 );
 
 update public.merchant
-set answers = '{"packaging_style":"discreet","age_gate_method":"both","signature_required":"yes","min_order":"500","business_types":["adult_products"],"adult_fulfillment_methods":["delivery"],"adult_handover_process":"id_at_handover","adult_packaging_presentation":"plain"}'::jsonb
+set answers = '{"packaging_style":"discreet","age_gate_method":"both","signature_required":"yes","min_order":"500","business_types":["sexual_health_products"],"adult_fulfillment_methods":["delivery"],"adult_handover_process":"id_at_handover","adult_packaging_presentation":"plain"}'::jsonb
 where id = 'cccccccc-0000-0000-0000-000000000001';
 
 select is(
@@ -187,7 +187,7 @@ set local request.jwt.claims = '{"sub":"55555555-5555-5555-5555-555555555555","r
 
 select lives_ok(
   $$select public.rpc_merchant_set_subcategory(
-    'cccccccc-0000-0000-0000-000000000001', 'restaurant'
+    'cccccccc-0000-0000-0000-000000000001', 'fine_dining'
   )$$,
   'an owner can save a specialty that belongs to their category'
 );
@@ -195,7 +195,7 @@ select lives_ok(
 select is(
   (select subcategory from public.merchant
    where id = 'cccccccc-0000-0000-0000-000000000001'),
-  'restaurant',
+  'fine_dining',
   'the selected specialty persists on the merchant draft'
 );
 
@@ -215,7 +215,7 @@ select is(
 
 select throws_ok(
   $$select public.rpc_merchant_set_subcategory(
-    'cccccccc-0000-0000-0000-000000000001', 'adult_products'
+    'cccccccc-0000-0000-0000-000000000001', 'sexual_health_products'
   )$$,
   '23514',
   'Choose a specialty shown for this business category.',

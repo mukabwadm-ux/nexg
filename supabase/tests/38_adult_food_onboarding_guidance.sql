@@ -56,10 +56,10 @@ select is(
     select count(*)::integer
     from public.category_config cc
     cross join lateral jsonb_array_elements(cc.subcategories) subcategory(value)
-    cross join lateral jsonb_array_elements(subcategory.value -> 'questions') question(value)
     where cc.category = 'restaurants_food'
+      and jsonb_array_length(coalesce(subcategory.value -> 'questions', '[]'::jsonb)) < 2
   ),
-  16,
+  0,
   'each food specialty has two tailored setup questions'
 );
 
@@ -71,8 +71,8 @@ select is(
     where cc.category = 'restaurants_food'
       and jsonb_array_length(subcategory.value -> 'questions') >= 2
   ),
-  8,
-  'all eight food specialties have tailored setup questions'
+  10,
+  'all ten food specialties have tailored setup questions'
 );
 
 select ok(
@@ -82,10 +82,10 @@ select ok(
     cross join lateral jsonb_array_elements(cc.subcategories) subcategory(value)
     cross join lateral jsonb_array_elements(subcategory.value -> 'questions') question(value)
     where cc.category = 'restaurants_food'
-      and subcategory.value ->> 'id' = 'cloud_kitchen'
-      and question.value ->> 'key' = 'cloud_kitchen_brand_relation'
+      and subcategory.value ->> 'id' = 'fast_food_casual_dining'
+      and question.value ->> 'key' = 'fast_food_combo_offers'
   ),
-  'cloud kitchens are asked whether their guest-facing brand differs from the kitchen'
+  'fast food and casual dining merchants are asked about combo offers'
 );
 
 select ok(
@@ -147,10 +147,10 @@ select ok(
     cross join lateral jsonb_array_elements(cc.subcategories) subcategory(value)
     cross join lateral jsonb_array_elements(subcategory.value -> 'questions') question(value)
     where cc.category = 'restaurants_food'
-      and subcategory.value ->> 'id' = 'desserts'
-      and question.value ->> 'key' = 'dessert_temperature_handling'
+      and subcategory.value ->> 'id' = 'fine_dining'
+      and question.value ->> 'key' = 'restaurant_service_style'
   ),
-  'dessert merchants are asked about storage needs'
+  'restaurant specialties are asked about their service style'
 );
 
 select ok(
@@ -160,10 +160,10 @@ select ok(
     cross join lateral jsonb_array_elements(cc.subcategories) subcategory(value)
     cross join lateral jsonb_array_elements(subcategory.value -> 'questions') question(value)
     where cc.category = 'restaurants_food'
-      and subcategory.value ->> 'id' = 'cafe'
+      and subcategory.value ->> 'id' = 'cafes_bakeries_pastries'
       and question.value ->> 'key' = 'cafe_drink_sizes'
   ),
-  'cafes are asked which drink sizes they offer'
+  'cafes and bakeries are asked which drink sizes they offer'
 );
 
 select * from finish();

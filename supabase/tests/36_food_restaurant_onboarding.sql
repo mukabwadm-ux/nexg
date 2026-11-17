@@ -33,8 +33,8 @@ select is(
     where cc.category = 'restaurants_food'
       and question.value ->> 'key' = 'business_types'
   ),
-  8,
-  'all eight food specialties are available'
+  10,
+  'all ten food specialties on the master list (16 Nov 2026) are available'
 );
 
 select is(
@@ -45,19 +45,22 @@ select is(
     where cc.category = 'restaurants_food'
       and subcategory.value ? 'catalogueExample'
   ),
-  8,
-  'each food specialty has its own catalogue example'
+  10,
+  'each food specialty has a catalogue example'
 );
 
 select is(
   (
-    select count(distinct subcategory.value #>> '{catalogueExample,name}')::integer
+    select count(*)::integer
     from public.category_config cc
     cross join lateral jsonb_array_elements(cc.subcategories) subcategory(value)
     where cc.category = 'restaurants_food'
+      and coalesce(subcategory.value #>> '{catalogueExample,name}', '') = ''
   ),
-  8,
-  'food specialty item-name placeholders are category-specific'
+  0,
+  /* Specialties built on the same base profile share its example item (owner,
+     17 Nov 2026: tailored examples per specialty can come later). */
+  'every food specialty shows an example item name'
 );
 
 select is(

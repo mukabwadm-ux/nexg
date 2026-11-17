@@ -22,8 +22,8 @@ select is(
     where category.category = 'laundry_cleaning'
       and question.value ->> 'key' = 'business_types'
   ),
-  17,
-  'all seventeen laundry and cleaning specialties are selectable (the original five plus twelve)'
+  6,
+  'all six laundry specialties on the master list (16 Nov 2026) are selectable'
 );
 
 select is(
@@ -49,7 +49,7 @@ with question_answers as (
     question.value ->> 'key' as key,
     case
       when question.value ->> 'key' = 'business_types'
-        then '["laundry","dry_cleaning"]'::jsonb
+        then '["washing_dry_cleaning","shoe_leather_cleaning"]'::jsonb
       else to_jsonb('answered'::text)
     end as value
   from public.category_config category
@@ -61,7 +61,7 @@ with question_answers as (
   cross join lateral jsonb_array_elements(category.subcategories) specialty(value)
   cross join lateral jsonb_array_elements_text(specialty.value -> 'fields') field(value)
   where category.category = 'laundry_cleaning'
-    and specialty.value ->> 'id' in ('laundry', 'dry_cleaning')
+    and specialty.value ->> 'id' in ('washing_dry_cleaning', 'shoe_leather_cleaning')
 ), complete_answers as (
   select jsonb_object_agg(key, value) as value
   from (
@@ -97,7 +97,7 @@ with question_answers as (
     question.value ->> 'key' as key,
     case
       when question.value ->> 'key' = 'business_types'
-        then '["laundry","dry_cleaning"]'::jsonb
+        then '["washing_dry_cleaning","shoe_leather_cleaning"]'::jsonb
       else to_jsonb('answered'::text)
     end as value
   from public.category_config category
@@ -109,7 +109,7 @@ with question_answers as (
   cross join lateral jsonb_array_elements(category.subcategories) specialty(value)
   cross join lateral jsonb_array_elements_text(specialty.value -> 'fields') field(value)
   where category.category = 'laundry_cleaning'
-    and specialty.value ->> 'id' = 'laundry'
+    and specialty.value ->> 'id' = 'washing_dry_cleaning'
 ), incomplete_answers as (
   select jsonb_object_agg(key, value) as value
   from (
