@@ -52783,6 +52783,37 @@ export type Database = {
           source: string;
         }[];
       };
+      fn_merchant_holiday_city: {
+        Args: { p_merchant_id: string };
+        Returns: {
+          centre: unknown;
+          city_manager_id: string | null;
+          country: string;
+          created_at: string;
+          currency: string;
+          hours: Json | null;
+          id: string;
+          late_night_from: string | null;
+          launched_at: string | null;
+          max_radius_km: number | null;
+          name: string;
+          slug: string;
+          sort: number;
+          status: Database['public']['Enums']['city_status'];
+          status_changed_at: string | null;
+          status_changed_by: string | null;
+          status_reason: string | null;
+          template_id: string | null;
+          timezone: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'city';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       fn_merchant_is_featured: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_is_live: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_liquor_licensed: { Args: { p_merchant_id: string }; Returns: boolean };
