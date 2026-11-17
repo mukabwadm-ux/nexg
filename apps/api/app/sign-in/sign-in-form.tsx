@@ -1,18 +1,11 @@
 'use client';
 
-import {
-  Button,
-  CAPTCHA_FIELD,
-  Card,
-  captchaSiteKey,
-  Input,
-  useEarlyCaptcha,
-  useToast,
-} from '@nexg/ui';
+import { Button, CAPTCHA_FIELD, Card, captchaSiteKey, Input, useToast } from '@nexg/ui';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { signIn } from './actions';
+import { TurnstileBox, type TurnstileHandle } from './turnstile-box';
 
 /**
  * The sign-in for the developer console.
@@ -21,6 +14,10 @@ import { signIn } from './actions';
  * that sign in to nexgapp.com and to the staff console. Asking an
  * integrator to create a second account is asking them to remember a
  * second password, and the ones who forget it do not come back.
+ *
+ * The security check (Cloudflare Turnstile) sits in the form, above the
+ * button: run invisibly in a corner, a check that wanted a click went
+ * unnoticed and every sign-in was refused.
  */
 export function SignInForm({ next }: { next?: string }) {
   const { toast } = useToast();
@@ -28,36 +25,36 @@ export function SignInForm({ next }: { next?: string }) {
 
   const [pending, setPending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  /* The security check starts as the page opens, so its token is usually
-     ready by the time the password is typed (see useEarlyCaptcha). Started
-     on submit, a check that wanted a click waited two minutes, then the
-     sign-in went without a token and was refused. */
-  const { take: captcha, prepare } = useEarlyCaptcha();
+  const [token, setToken] = React.useState<string | null>(null);
+  const [checkError, setCheckError] = React.useState<string | null>(null);
+  const check = React.useRef<TurnstileHandle | null>(null);
+  const needsCheck = Boolean(captchaSiteKey());
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setPending(true);
     setError(null);
-
     const formData = new FormData(event.currentTarget);
-    const token = await captcha();
-    if (token) {
+
+    if (needsCheck) {
+      if (!token) {
+        setError(
+          checkError
+            ? `The security check could not run on this page (Cloudflare error ${checkError}). Reload the page and try again; if it keeps happening, tell NexG support this code.`
+            : 'Complete the security check above the Sign in button first.',
+        );
+        return;
+      }
       formData.set(CAPTCHA_FIELD, token);
-    } else if (captchaSiteKey()) {
-      // Without a token the sign-in would only be refused; say why instead.
-      setPending(false);
-      setError(
-        'The security check did not finish. If a check box appeared at the bottom of the page, tick it, then press Sign in again.',
-      );
-      prepare();
-      return;
     }
+
+    setPending(true);
     const result = await signIn(formData);
     setPending(false);
+    // A token is good for one sign-in, whatever the answer.
+    check.current?.reset();
 
     if (!result.ok) {
       setError(result.message);
-      prepare();
       return;
     }
 
@@ -84,6 +81,15 @@ export function SignInForm({ next }: { next?: string }) {
           label="Password"
           autoComplete="current-password"
           required
+        />
+
+        <TurnstileBox
+          handle={check}
+          onToken={(value) => {
+            setToken(value);
+            if (value) setCheckError(null);
+          }}
+          onError={setCheckError}
         />
 
         {error && (
