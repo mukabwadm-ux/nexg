@@ -1,13 +1,22 @@
 import type { ComponentProps } from 'react';
 
+import { categoryLabel } from '@/components/explore/merchant-card';
+import type { SavedCard } from '@/components/merchant/promotions/creative-composer';
 import { LivePromotionsWorkspace } from '@/components/merchant/promotions/live-workspace';
-import type { PromotionRow } from '@/components/merchant/promotions/promotion-manager';
+import type {
+  PromotionMedia,
+  PromotionRow,
+} from '@/components/merchant/promotions/promotion-manager';
 import type { Booking, Featured } from '@/components/partner/merchant-featured';
 import { requireMerchant } from '@/lib/partner';
+import { signMedia } from '@/lib/promo-media-server';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = { title: 'Promotions' };
 export const dynamic = 'force-dynamic';
+
+/* Long enough to preview and send without the links lapsing. */
+const SIGNED_FOR = 60 * 60;
 
 function nextMonday() {
   const today = new Date(Date.now() + 3 * 3_600_000);
@@ -15,8 +24,67 @@ function nextMonday() {
   return today.toISOString().slice(0, 10);
 }
 
+type Client = ReturnType<typeof createClient>;
+
+interface CreativeRow {
+  id: string;
+  booking_id: string;
+  status: string;
+  version: number;
+  blurb: string | null;
+  rejection_reason: string | null;
+  media_kind: string | null;
+  media_path: string | null;
+  poster_path: string | null;
+}
+
+/**
+ * The newest homepage card sent for the open placement, with its media
+ * signed for showing, and whether an approved card is still up meanwhile.
+ */
+async function openCard(
+  client: Client,
+  booking: Booking | undefined,
+): Promise<{ card: SavedCard | null; approvedCardUp: boolean }> {
+  if (!booking || booking.placement_kind !== 'homepage')
+    return { card: null, approvedCardUp: false };
+  const { data } = await client
+    .from('featured_creative')
+    .select(
+      'id, booking_id, status, version, blurb, rejection_reason, media_kind, media_path, poster_path',
+    )
+    .eq('booking_id', booking.id)
+    .in('status', ['draft', 'pending_review', 'approved', 'rejected'])
+    .order('version', { ascending: false })
+    .limit(4);
+  const rows = (data ?? []) as CreativeRow[];
+  const latest = rows[0];
+  if (!latest) return { card: null, approvedCardUp: false };
+  const signed = await signMedia(client, [latest.media_path, latest.poster_path], SIGNED_FOR);
+  const src = latest.media_path ? signed[latest.media_path] : undefined;
+  return {
+    card: {
+      creativeId: latest.id,
+      status: latest.status as SavedCard['status'],
+      blurb: latest.blurb,
+      rejectionReason: latest.rejection_reason,
+      media:
+        latest.media_path && src && (latest.media_kind === 'image' || latest.media_kind === 'video')
+          ? {
+              kind: latest.media_kind,
+              src,
+              poster: latest.poster_path ? (signed[latest.poster_path] ?? null) : null,
+              path: latest.media_path,
+              posterPath: latest.poster_path,
+            }
+          : null,
+    },
+    approvedCardUp: latest.status !== 'approved' && rows.some((row) => row.status === 'approved'),
+  };
+}
+
 async function featuredRequest(
-  client: ReturnType<typeof createClient>,
+  client: Client,
   merchantId: string,
   merchant: { city_id: string | null; status: string | null } | null,
   bookings: Booking[] | null,
@@ -41,7 +109,11 @@ async function featuredRequest(
     };
   }
 
-  const [placements, eligibility, products] = await Promise.all([
+  const openBooking = bookings.find((b) =>
+    ['requested', 'quoted', 'waitlisted', 'booked', 'live'].includes(b.status),
+  );
+
+  const [placements, eligibility, products, publicRow, rule, card] = await Promise.all([
     client
       .from('featured_placement')
       .select('id, kind, category, position, label, description, city_id')
@@ -62,6 +134,14 @@ async function featuredRequest(
       .not('price_kes', 'is', null)
       .order('name')
       .limit(200),
+    /* The merchant as the homepage card shows them, for the preview. */
+    client
+      .from('merchant_public')
+      .select('trading_name, category, branch_name, cover_photo_path, prep_minutes')
+      .eq('id', merchantId)
+      .maybeSingle(),
+    client.from('featured_rule').select('value').eq('key', 'creative.banned_terms').maybeSingle(),
+    openCard(client, openBooking),
   ]);
   const check = eligibility.data;
   if (
@@ -90,6 +170,11 @@ async function featuredRequest(
     }),
   );
 
+  const shown = publicRow.data;
+  const banned = Array.isArray(rule.data?.value)
+    ? (rule.data.value as unknown[]).filter((term): term is string => typeof term === 'string')
+    : [];
+
   return {
     request: {
       merchantId,
@@ -103,17 +188,87 @@ async function featuredRequest(
           ? []
           : [{ id: product.id, name: product.name, price_kes: product.price_kes }],
       ),
+      subject: shown?.trading_name
+        ? {
+            name: shown.trading_name,
+            category: shown.category,
+            branchName: shown.branch_name,
+            coverPhoto: shown.cover_photo_path,
+            prepMinutes: shown.prep_minutes,
+          }
+        : null,
+      bannedTerms: banned,
+      card: card.card,
+      approvedCardUp: card.approvedCardUp,
     },
   };
+}
+
+interface PromotionCreativeRow {
+  id: string;
+  promotion_id: string;
+  status: string;
+  rejection_reason: string | null;
+  media_kind: string;
+  media_path: string;
+  poster_path: string | null;
+  updated_at: string;
+}
+
+/** Each promotion's newest picture, and its approved one when that differs, signed for showing. */
+async function promotionMedia(
+  client: Client,
+  merchantId: string,
+): Promise<Record<string, PromotionMedia>> {
+  const { data, error } = await client
+    .from('merchant_promotion_creative')
+    .select(
+      'id, promotion_id, status, rejection_reason, media_kind, media_path, poster_path, updated_at',
+    )
+    .eq('merchant_id', merchantId)
+    .in('status', ['pending_review', 'approved', 'rejected'])
+    .order('updated_at', { ascending: false })
+    .limit(200);
+  if (error || !data) return {};
+  const rows = data as PromotionCreativeRow[];
+  const signed = await signMedia(
+    client,
+    rows.flatMap((row) => [row.media_path, row.poster_path]),
+    SIGNED_FOR,
+  );
+  const out: Record<string, PromotionMedia> = {};
+  for (const row of rows) {
+    if (out[row.promotion_id]) {
+      if (row.status === 'approved') out[row.promotion_id]!.approvedUp = true;
+      continue;
+    }
+    const src = signed[row.media_path];
+    out[row.promotion_id] = {
+      status: row.status as PromotionMedia['status'],
+      rejectionReason: row.rejection_reason,
+      approvedUp: false,
+      media:
+        src && (row.media_kind === 'image' || row.media_kind === 'video')
+          ? {
+              kind: row.media_kind,
+              src,
+              poster: row.poster_path ? (signed[row.poster_path] ?? null) : null,
+              path: row.media_path,
+              posterPath: row.poster_path,
+            }
+          : null,
+    };
+  }
+  return out;
 }
 
 export default async function MerchantPromotions() {
   const merchant = await requireMerchant();
   const client = createClient();
-  const [home, history, promotions, items] = await Promise.all([
+  const [home, history, promotions, items, media] = await Promise.all([
     client
       .from('merchant_home_v')
-      .select('name, status, city_id')
+      .select('name, status, city_id, category')
       .eq('merchant_id', merchant.id)
       .maybeSingle(),
     client
@@ -139,6 +294,7 @@ export default async function MerchantPromotions() {
       .not('price_kes', 'is', null)
       .order('name')
       .limit(500),
+    promotionMedia(client, merchant.id),
   ]);
   const bookings = history.error ? null : history.data;
   const controls = await featuredRequest(
@@ -147,10 +303,11 @@ export default async function MerchantPromotions() {
     home.error ? null : home.data,
     bookings,
   );
+  const businessName = home.data?.name ?? 'Your business';
 
   return (
     <LivePromotionsWorkspace
-      businessName={home.data?.name ?? 'Your business'}
+      businessName={businessName}
       bookings={bookings}
       promotions={promotions.error ? null : ((promotions.data ?? []) as unknown as PromotionRow[])}
       items={(items.data ?? []).flatMap((item) =>
@@ -158,6 +315,13 @@ export default async function MerchantPromotions() {
           ? []
           : [{ id: item.id, name: item.name, price_kes: item.price_kes }],
       )}
+      merchantId={merchant.id}
+      store={{
+        id: merchant.id,
+        name: businessName,
+        type: home.data?.category ? (categoryLabel(home.data.category) ?? null) : null,
+      }}
+      media={media}
       {...controls}
     />
   );

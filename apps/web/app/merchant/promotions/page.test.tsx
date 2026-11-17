@@ -20,6 +20,7 @@ function query(data: unknown) {
   return Object.assign(result, {
     select: () => result,
     eq: () => result,
+    in: () => result,
     not: () => result,
     order: () => result,
     limit: () => result,
@@ -41,7 +42,15 @@ function sources(bookings: unknown[], eligible: boolean) {
   from.mockImplementation((table: string) => {
     if (table === 'merchant_home_v')
       return query({ name: 'Example Merchant', status: 'live', city_id: 'city-1' });
-    if (table === 'catalogue_item' || table === 'merchant_promotion') return query([]);
+    if (
+      table === 'catalogue_item' ||
+      table === 'merchant_promotion' ||
+      table === 'featured_creative' ||
+      table === 'merchant_promotion_creative'
+    )
+      return query([]);
+    if (table === 'merchant_public') return query(null);
+    if (table === 'featured_rule') return query({ value: ['best'] });
     return query(table === 'featured_booking' ? bookings : [placement]);
   });
   rpc.mockImplementation(async (name: string) => ({
@@ -84,5 +93,8 @@ describe('live Promotions workspace', () => {
     const html = renderToStaticMarkup(await MerchantPromotions());
     expect(html).toContain('Withdraw this request');
     expect(html).toContain('Requested week of');
+    /* A homepage request can carry the merchant's own card. */
+    expect(html).toContain('Your homepage card');
+    expect(html).toContain('Add your own image or video');
   });
 });

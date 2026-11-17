@@ -4,6 +4,21 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { requestFeatured, withdrawFeatured, type Outcome } from '@/app/merchant/actions';
+import { saveFeaturedCard, withdrawFeaturedCard } from '@/app/merchant/promo-media-actions';
+import type { CardMedia } from '@/components/home/featured-merchants';
+import {
+  BLURB_MAX,
+  CardFields,
+  bannedIn,
+  useMediaSend,
+  type SavedCard,
+} from '@/components/merchant/promotions/creative-composer';
+import {
+  FeaturedCardPreview,
+  PreviewDialog,
+  type CardSubject,
+} from '@/components/merchant/promotions/creative-preview';
+import { removeMedia, releasePicked, type PickedMedia } from '@/lib/promo-media-client';
 
 import { DASH, Panel, Pill, day, kesWhole } from './bits';
 
@@ -60,6 +75,27 @@ const TONE: Record<string, string> = {
   expired: 'bg-bg text-muted-light',
 };
 
+const CARD_STATE: Record<SavedCard['status'], { label: string; tone: string }> = {
+  draft: { label: 'NOT SENT', tone: 'bg-bg text-muted' },
+  pending_review: { label: 'IN REVIEW', tone: 'bg-info-bg text-info' },
+  approved: { label: 'APPROVED', tone: 'bg-success-bg text-success' },
+  rejected: { label: 'NOT APPROVED', tone: 'bg-danger-bg text-danger' },
+};
+
+/** What the preview shows for a picked file, a saved one, or neither (the cover photo). */
+function previewMedia(
+  picked: PickedMedia | null,
+  saved: SavedCard['media'] | null,
+): CardMedia | null {
+  if (picked) {
+    return picked.kind === 'video'
+      ? { kind: 'video', src: picked.url, poster: picked.poster?.url ?? null }
+      : { kind: 'image', src: picked.url };
+  }
+  if (saved) return { kind: saved.kind, src: saved.src, poster: saved.poster ?? null };
+  return null;
+}
+
 export function Featured({
   merchantId,
   status,
@@ -69,6 +105,10 @@ export function Featured({
   nextMonday,
   products = [],
   showHistory = true,
+  subject = null,
+  bannedTerms = [],
+  card = null,
+  approvedCardUp = false,
 }: {
   merchantId: string;
   status: string;
@@ -79,6 +119,14 @@ export function Featured({
   /** Available, priced products, for the Best sellers slot. */
   products?: PromotableProduct[];
   showHistory?: boolean;
+  /** The merchant as their homepage card shows them, for the preview. */
+  subject?: CardSubject | null;
+  /** Claims a sponsored card may not make (featured_rule). */
+  bannedTerms?: string[];
+  /** The newest homepage card sent for the open placement. */
+  card?: SavedCard | null;
+  /** An approved card stays on the homepage while a newer one is reviewed. */
+  approvedCardUp?: boolean;
 }) {
   const router = useRouter();
   const [busy, setBusy] = React.useState(false);
@@ -88,6 +136,21 @@ export function Featured({
   const [weeks, setWeeks] = React.useState(1);
   const [note, setNote] = React.useState('');
   const [itemId, setItemId] = React.useState(products[0]?.id ?? '');
+
+  /* The homepage card being put together, for a new request or the open one. */
+  const [picked, setPicked] = React.useState<PickedMedia | null>(null);
+  const [blurb, setBlurb] = React.useState('');
+  const [editingCard, setEditingCard] = React.useState(false);
+  const [preview, setPreview] = React.useState<{ placement: Placement | null } | null>(null);
+  const media = useMediaSend();
+
+  React.useEffect(() => () => releasePicked(picked), [picked]);
+
+  const clearCard = () => {
+    releasePicked(picked);
+    setPicked(null);
+    setBlurb('');
+  };
 
   const run = async (fn: () => Promise<Outcome>) => {
     setBusy(true);
@@ -115,6 +178,60 @@ export function Featured({
   );
   const eligible = Boolean(eligibility?.passed);
   const why = (eligibility?.remedy ?? eligibility?.reason) as string | undefined;
+  const cardFilled = Boolean(picked) || blurb.trim().length > 0;
+  const blurbBanned = bannedIn(blurb, bannedTerms).length > 0;
+
+  const openPreview = (placement: Placement | null) => {
+    media.reset();
+    setPreview({ placement });
+  };
+
+  async function sendFromPreview() {
+    if (!preview) return;
+    const placement = preview.placement;
+    const outcome = placement
+      ? await media.send(merchantId, picked, (ref) =>
+          requestFeatured({
+            merchantId,
+            placementId: placement.id,
+            weekStart: week,
+            weeks,
+            note,
+            card: { media: ref, blurb },
+          }),
+        )
+      : openBooking
+        ? await media.send(
+            merchantId,
+            picked,
+            (ref) => saveFeaturedCard({ bookingId: openBooking.id, media: ref, blurb }),
+            /* A changed line with no new file keeps the current media. */
+            card?.media && !picked
+              ? { kind: card.media.kind, path: card.media.path, posterPath: card.media.posterPath }
+              : null,
+          )
+        : null;
+    if (!outcome?.ok) return;
+    setPreview(null);
+    setSaid(outcome);
+    clearCard();
+    setEditingCard(false);
+    setOpen(null);
+    router.refresh();
+  }
+
+  async function takeDown(bookingId: string) {
+    if (!window.confirm('Take your card down? Your slot will show your business photo and name.'))
+      return;
+    await run(async () => {
+      const outcome = await withdrawFeaturedCard(bookingId);
+      const freed = (outcome.data?.freed as string[] | undefined) ?? [];
+      if (outcome.ok && freed.length) void removeMedia(freed);
+      return outcome;
+    });
+  }
+
+  const previewSubject = subject ?? null;
 
   return (
     <div className="space-y-5">
@@ -165,6 +282,105 @@ export function Featured({
               {busy ? 'Withdrawing…' : 'Withdraw this request'}
             </button>
           )}
+
+          {openBooking.placement_kind === 'homepage' && (
+            <section
+              className="border-border mt-4 border-t pt-4"
+              aria-labelledby="featured-card-title"
+            >
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 id="featured-card-title" className="text-[0.875rem] font-extrabold">
+                  Your homepage card
+                </h3>
+                {card && (
+                  <Pill tone={CARD_STATE[card.status].tone}>{CARD_STATE[card.status].label}</Pill>
+                )}
+              </div>
+              <p className="text-muted mt-1 text-[0.8125rem] font-semibold">
+                {!card
+                  ? 'Your card shows your business photo and name. Add your own image or video to stand out.'
+                  : card.status === 'pending_review'
+                    ? approvedCardUp
+                      ? 'Your new card is with NexG for review. Your approved card stays up until then.'
+                      : 'With NexG for review. Until it is approved, your card shows your business photo and name.'
+                    : card.status === 'approved'
+                      ? 'Approved. It shows whenever your slot is live.'
+                      : card.status === 'rejected'
+                        ? `Not approved: ${card.rejectionReason ?? 'see your messages'}. Change it and send it again.`
+                        : 'Not sent yet.'}
+              </p>
+              {card?.blurb && (
+                <p className="text-muted-light mt-1 text-[0.75rem] font-semibold">
+                  Line: “{card.blurb}”
+                </p>
+              )}
+
+              {editingCard ? (
+                <div className="bg-bg mt-3 space-y-3 rounded-xl p-3">
+                  <CardFields
+                    id="featured-card-edit"
+                    picked={picked}
+                    onPick={setPicked}
+                    blurb={blurb}
+                    onBlurb={setBlurb}
+                    saved={card?.media ?? null}
+                    bannedTerms={bannedTerms}
+                    disabled={media.busy}
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      className="bg-ink rounded-lg px-4 py-2 text-[0.8125rem] font-extrabold text-white disabled:opacity-40"
+                      disabled={
+                        media.busy ||
+                        blurbBanned ||
+                        (!picked && !blurb.trim() && !card?.media) ||
+                        !previewSubject
+                      }
+                      onClick={() => openPreview(null)}
+                    >
+                      Preview and send
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-lg px-3 py-2 text-[0.8125rem] font-extrabold underline underline-offset-4"
+                      onClick={() => {
+                        clearCard();
+                        setEditingCard(false);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-3 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    disabled={busy}
+                    className="bg-ink rounded-lg px-3 py-2 text-[0.75rem] font-extrabold text-white disabled:opacity-40"
+                    onClick={() => {
+                      clearCard();
+                      setBlurb(card?.blurb ?? '');
+                      setEditingCard(true);
+                    }}
+                  >
+                    {card ? 'Change your card' : 'Add your own image or video'}
+                  </button>
+                  {card && card.status !== 'rejected' && (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void takeDown(openBooking.id)}
+                      className="text-[0.75rem] font-extrabold underline underline-offset-4 disabled:opacity-40"
+                    >
+                      Take your card down
+                    </button>
+                  )}
+                </div>
+              )}
+            </section>
+          )}
         </Panel>
       ) : !eligible ? (
         <Panel title="Not eligible yet">
@@ -211,7 +427,10 @@ export function Featured({
                     </div>
                     <button
                       type="button"
-                      onClick={() => setOpen(open === p.id ? null : p.id)}
+                      onClick={() => {
+                        clearCard();
+                        setOpen(open === p.id ? null : p.id);
+                      }}
                       className="bg-ink shrink-0 rounded-lg px-3 py-2 text-[0.75rem] font-extrabold text-white"
                     >
                       Ask for it
@@ -289,31 +508,81 @@ export function Featured({
                           </span>
                         </label>
                       )}
+                      {p.kind === 'homepage' ? (
+                        <div className="border-border space-y-2 border-t pt-3">
+                          <p className="text-[0.8125rem] font-extrabold">Your homepage card</p>
+                          <CardFields
+                            id={`featured-card-${p.id}`}
+                            picked={picked}
+                            onPick={setPicked}
+                            blurb={blurb}
+                            onBlurb={setBlurb}
+                            bannedTerms={bannedTerms}
+                            disabled={busy || media.busy}
+                          />
+                          <p className="text-muted-light text-[0.6875rem] font-semibold">
+                            NexG reviews your card before it goes on the homepage. Until then, and
+                            if you send none, the card shows your business photo and name.
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-muted-light text-[0.6875rem] font-semibold">
+                          {p.kind === 'popular_request'
+                            ? 'This slot shows your product’s own photo, so there is no card to design.'
+                            : 'This slot puts your store first in its category as it already looks, so there is no card to design.'}
+                        </p>
+                      )}
                       <input
                         value={note}
                         onChange={(e) => setNote(e.target.value)}
                         placeholder="Anything we should know (optional)"
                         className="border-border-strong w-full rounded-lg border px-3 py-2 text-[0.8125rem] font-semibold"
                       />
-                      <button
-                        type="button"
-                        disabled={busy || (p.kind === 'popular_request' && !itemId)}
-                        onClick={() =>
-                          run(() =>
-                            requestFeatured({
-                              merchantId,
-                              placementId: p.id,
-                              weekStart: week,
-                              weeks,
-                              note,
-                              itemId: p.kind === 'popular_request' ? itemId : undefined,
-                            }),
-                          )
-                        }
-                        className="bg-ink rounded-lg px-4 py-2 text-[0.8125rem] font-extrabold text-white disabled:opacity-40"
-                      >
-                        {busy ? 'Asking…' : 'Ask for this slot'}
-                      </button>
+                      <div className="flex flex-wrap gap-2">
+                        {p.kind === 'homepage' && cardFilled ? (
+                          /* A card is sent only from its preview. */
+                          <button
+                            type="button"
+                            disabled={busy || media.busy || blurbBanned || !previewSubject}
+                            onClick={() => openPreview(p)}
+                            className="bg-ink rounded-lg px-4 py-2 text-[0.8125rem] font-extrabold text-white disabled:opacity-40"
+                          >
+                            Preview and send
+                          </button>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              disabled={busy || (p.kind === 'popular_request' && !itemId)}
+                              onClick={() =>
+                                run(() =>
+                                  requestFeatured({
+                                    merchantId,
+                                    placementId: p.id,
+                                    weekStart: week,
+                                    weeks,
+                                    note,
+                                    itemId: p.kind === 'popular_request' ? itemId : undefined,
+                                  }),
+                                )
+                              }
+                              className="bg-ink rounded-lg px-4 py-2 text-[0.8125rem] font-extrabold text-white disabled:opacity-40"
+                            >
+                              {busy ? 'Asking…' : 'Ask for this slot'}
+                            </button>
+                            {p.kind === 'homepage' && previewSubject && (
+                              <button
+                                type="button"
+                                disabled={busy}
+                                onClick={() => openPreview(p)}
+                                className="rounded-lg px-3 py-2 text-[0.8125rem] font-extrabold underline underline-offset-4"
+                              >
+                                Preview your card
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </div>
                     </div>
                   )}
                 </li>
@@ -337,6 +606,34 @@ export function Featured({
             ))}
           </ul>
         </Panel>
+      )}
+
+      {previewSubject && (
+        <PreviewDialog
+          open={preview !== null}
+          title="Your homepage card"
+          intro="This is the card guests see in Featured Merchants on the NexG homepage, on a phone and on a computer, while your slot is live. The video plays muted and on a loop."
+          notes={[
+            'NexG reviews your card before it goes on the homepage, and tells you in your messages either way.',
+            preview?.placement
+              ? 'Sending asks for the slot and sends the card together. Nothing is charged until somebody has spoken to you and you have paid.'
+              : 'Until the new card is approved, your slot keeps what it shows now.',
+            `Your line can be up to ${BLURB_MAX} characters and cannot claim to be the best, the cheapest or similar.`,
+          ]}
+          busy={media.busy}
+          progress={media.progress}
+          status={media.status}
+          error={media.error}
+          submitLabel={preview?.placement ? 'Send request and card' : 'Send card for review'}
+          onSubmit={() => void sendFromPreview()}
+          onClose={() => setPreview(null)}
+        >
+          <FeaturedCardPreview
+            subject={previewSubject}
+            media={previewMedia(picked, preview?.placement ? null : (card?.media ?? null))}
+            blurb={blurb.trim() || null}
+          />
+        </PreviewDialog>
       )}
     </div>
   );

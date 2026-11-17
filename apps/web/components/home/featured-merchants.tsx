@@ -1,4 +1,4 @@
-import { Tag } from '@nexg/ui';
+import { cn, Tag } from '@nexg/ui';
 import { currentCategoryId } from '@nexg/contracts';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import Image from 'next/image';
@@ -8,15 +8,17 @@ import type { Translate } from '@/lib/i18n/dictionaries';
 
 import { CardRail, RAIL_CARD } from './card-rail';
 import { categoryIcon, categoryLabel } from '@/components/explore/merchant-card';
+import { CreativeVideo } from '@/components/promo-media/creative-video';
 import { discoverCategoryHref, discoverMerchantHref } from '@/lib/discover-links';
 
 /**
  * The featured merchant cards on the homepage.
  *
  * These read `public.featured_live_v` — a sold, paid slot that is live
- * this week, with an approved creative, for a merchant still visible
- * in `merchant_public`. The view decides all of that; this component
- * only draws it.
+ * this week, for a merchant still visible in `merchant_public`. The view
+ * decides all of that; this component only draws it. A card with an
+ * approved creative shows the merchant's own image or video and line; one
+ * without shows their cover photo.
  *
  * Every row arrives with `badge = 'SPONSORED'`, which is the point: a
  * paid card cannot reach this list without the label, because the
@@ -48,6 +50,16 @@ export interface FeaturedMerchant {
   accepting_orders: boolean | null;
   closed_today: boolean | null;
   prep_minutes: number | null;
+  /** The approved creative's own image or video, signed for showing. */
+  media?: CardMedia | null;
+}
+
+/** A merchant's own image or video on the card, ready to show. */
+export interface CardMedia {
+  kind: 'image' | 'video';
+  src: string;
+  /** A video's still frame. */
+  poster?: string | null;
 }
 
 /** Matches Explore's own cards, so the same shop reads the same everywhere. */
@@ -57,6 +69,24 @@ const CATEGORY_CTA: Record<string, string> = {
   laundry_cleaning: 'merchant.cta.services',
   flowers_gifts: 'merchant.cta.shop',
 };
+
+/** The words on a real merchant's card, worked out once for the band and the preview. */
+export function featuredCardWords(
+  merchant: Pick<FeaturedMerchant, 'merchant_category' | 'branch_name' | 'blurb'>,
+  t: Translate,
+) {
+  const category = merchant.merchant_category ?? 'other';
+  const where = [categoryLabel(category) ?? 'Merchant', merchant.branch_name]
+    .filter(Boolean)
+    .join(' · ');
+  return {
+    category,
+    /* The merchant's approved blurb, when there is one: it is what they
+       paid to say. */
+    meta: merchant.blurb ?? where,
+    cta: t(CATEGORY_CTA[currentCategoryId(category) ?? ''] ?? 'merchant.cta.view'),
+  };
+}
 
 /** The cards the artboard draws for an empty homepage. */
 /*
@@ -96,15 +126,22 @@ const PLACEHOLDERS = [
 ] as const;
 
 /*
- * One tall photograph card: the photo fills it, a dark fade at the foot
- * carries the words, and a glass button sits at the bottom. The whole card
- * is one link: on a phone that is the difference between a comfortable
- * target and a thin strip (ground rule 7), and one link per card is one
- * thing for a screen reader to announce.
+ * One tall card: the photo, image or video fills it, a dark fade at the foot
+ * carries the words, and a glass button sits at the bottom.
+ *
+ * The whole card is one link (ground rule 7: on a phone that is the
+ * difference between a comfortable target and a thin strip): the link holds
+ * the words and stretches over the card. A video's pause button sits beside
+ * it, above the stretch, so the page never puts a button inside a link.
+ *
+ * `variant` pins the layout to the phone or desktop size, for the merchant's
+ * preview, which draws both at once whatever the screen it is on. Left out,
+ * the card follows the screen as usual.
  */
-function Card({
+export function FeaturedCard({
   href,
   photo,
+  media,
   icon: Icon,
   sponsored,
   minutes,
@@ -112,9 +149,13 @@ function Card({
   meta,
   name,
   cta,
+  variant,
+  reveal = true,
 }: {
-  href: string;
+  /** Null draws the card without a link, as in the merchant's preview. */
+  href: string | null;
   photo: string | null;
+  media?: CardMedia | null;
   icon: typeof Sparkles;
   sponsored: string;
   minutes: number | null;
@@ -122,23 +163,89 @@ function Card({
   meta: string;
   name: string;
   cta: string;
+  variant?: 'phone' | 'desktop';
+  /** Part of the homepage's entrance animation. */
+  reveal?: boolean;
 }) {
   /* The merchant's own preparation time, when they have set one. With none
      recorded the chip is left out rather than a guess a guest might plan
      around (ground rule 3). */
   const eta =
     minutes != null && Number.isFinite(minutes) && minutes > 0 ? Math.round(minutes) : null;
-  return (
-    <li data-reveal-item className={RAIL_CARD}>
-      <Link
-        href={href}
-        className="focus-visible:ring-gold group relative flex aspect-[15/14] max-h-[21rem] flex-col justify-end overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E] ring-1 ring-white/[0.07] transition-shadow hover:ring-white/20 focus-visible:outline-none focus-visible:ring-2 sm:max-h-[25rem]"
+  const picture = media ? (media.kind === 'image' ? media.src : null) : photo;
+  const video = media?.kind === 'video' ? media : null;
+
+  const words = (
+    <span
+      className={cn(
+        'relative block',
+        variant === 'phone' ? 'p-5' : variant === 'desktop' ? 'p-6' : 'p-5 sm:p-6',
+      )}
+    >
+      <span className="text-gold block truncate text-[0.8125rem] font-semibold">{meta}</span>
+      <span className="mt-1.5 line-clamp-2 block text-2xl font-extrabold leading-tight tracking-tight">
+        {name}
+      </span>
+      <span
+        className={cn(
+          'mt-5 flex h-12 items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 text-[0.9375rem] font-bold backdrop-blur transition-colors group-hover:bg-white/20',
+          /* Room for the video's pause button beside it. */
+          video && 'mr-14',
+        )}
       >
-        {photo ? (
+        {cta}
+        <ArrowRight className="h-4 w-4" aria-hidden="true" />
+      </span>
+    </span>
+  );
+
+  return (
+    <li
+      data-reveal-item={reveal ? '' : undefined}
+      className={
+        variant === 'phone'
+          ? 'w-[68%] shrink-0 snap-start'
+          : variant === 'desktop'
+            ? 'w-[calc((100%-3rem)/4)] shrink-0 snap-start'
+            : RAIL_CARD
+      }
+    >
+      <div
+        className={cn(
+          'has-[a:focus-visible]:ring-gold group relative flex aspect-[15/14] flex-col justify-end overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E] text-white ring-1 ring-white/[0.07] transition-shadow hover:ring-white/20 has-[a:focus-visible]:ring-2',
+          variant === 'phone'
+            ? 'max-h-[21rem]'
+            : variant === 'desktop'
+              ? 'max-h-[25rem]'
+              : 'max-h-[21rem] sm:max-h-[25rem]',
+        )}
+      >
+        {video ? (
+          <CreativeVideo
+            src={video.src}
+            poster={video.poster}
+            className="transition-transform duration-500 group-hover:scale-105"
+            /* Beside the card's button, in its glass style, clear of the chips
+               at the top, which on a phone have no room for a third. */
+            buttonClassName={cn(
+              'h-12 w-12 border border-white/25 bg-white/10 hover:bg-white/20',
+              variant === 'phone'
+                ? 'bottom-5 right-5'
+                : variant === 'desktop'
+                  ? 'bottom-6 right-6'
+                  : 'bottom-5 right-5 sm:bottom-6 sm:right-6',
+            )}
+            label={`${name} video`}
+          />
+        ) : picture ? (
           <Image
-            src={photo}
+            src={picture}
             alt=""
             fill
+            /* A merchant's own upload arrives as a signed link (or, in the
+               preview, from memory), which the image optimiser cannot fetch
+               or cache; it is already sized for the card. */
+            unoptimized={Boolean(media)}
             sizes="(min-width: 1024px) 24vw, (min-width: 640px) 50vw, 82vw"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
@@ -154,7 +261,7 @@ function Card({
         )}
         <span
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-[#0b0907] via-[#0b0907]/80 via-45% to-transparent to-85%"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0b0907] via-[#0b0907]/80 via-45% to-transparent to-85%"
         />
 
         <span className="text-ink absolute left-4 top-4 rounded-full bg-white px-3 py-1.5 text-[0.625rem] font-extrabold uppercase tracking-[0.16em]">
@@ -166,17 +273,17 @@ function Card({
           </span>
         )}
 
-        <span className="relative block p-5 sm:p-6">
-          <span className="text-gold block truncate text-[0.8125rem] font-semibold">{meta}</span>
-          <span className="mt-1.5 line-clamp-2 block text-2xl font-extrabold leading-tight tracking-tight">
-            {name}
-          </span>
-          <span className="mt-5 flex h-12 items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 text-[0.9375rem] font-bold backdrop-blur transition-colors group-hover:bg-white/20">
-            {cta}
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </span>
-        </span>
-      </Link>
+        {href ? (
+          <Link
+            href={href}
+            className="block after:absolute after:inset-0 after:rounded-[1.75rem] focus-visible:outline-none"
+          >
+            {words}
+          </Link>
+        ) : (
+          words
+        )}
+      </div>
     </li>
   );
 }
@@ -219,7 +326,7 @@ export function FeaturedMerchants({
       {rows.length === 0
         ? /* Nothing sold yet: each card opens Explore for its kind of business. */
           PLACEHOLDERS.map((merchant) => (
-            <Card
+            <FeaturedCard
               key={merchant.name}
               href={discoverCategoryHref(merchant.category)}
               photo={`/images/categories/${merchant.image}.jpg`}
@@ -233,26 +340,22 @@ export function FeaturedMerchants({
             />
           ))
         : rows.map((merchant) => {
-            const category = merchant.merchant_category ?? 'other';
-            const where = [categoryLabel(category) ?? 'Merchant', merchant.branch_name]
-              .filter(Boolean)
-              .join(' · ');
+            const words = featuredCardWords(merchant, t);
             return (
-              <Card
+              <FeaturedCard
                 key={merchant.booking_id ?? merchant.merchant_id}
                 /* The booking id travels so a tap can be attributed to the
                    slot that earned it, rather than guessed at later. */
                 href={discoverMerchantHref(merchant.merchant_id)}
                 photo={merchant.cover_photo_path}
-                icon={categoryIcon(category) ?? Sparkles}
+                media={merchant.media}
+                icon={categoryIcon(words.category) ?? Sparkles}
                 sponsored={t('merchant.sponsored')}
                 minutes={merchant.prep_minutes}
                 minUnit={t('merchant.min')}
-                /* The merchant's approved blurb, when there is one: it is what
-                   they paid to say. */
-                meta={merchant.blurb ?? where}
+                meta={words.meta}
                 name={merchant.trading_name}
-                cta={t(CATEGORY_CTA[currentCategoryId(category) ?? ''] ?? 'merchant.cta.view')}
+                cta={words.cta}
               />
             );
           })}

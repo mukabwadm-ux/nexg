@@ -319,12 +319,14 @@ reset role;
 select public.cron_featured_activate();
 
 /*
- * The creative is still pending review, so nothing goes live. An
- * unreviewed card on the homepage is the one thing this gate exists
- * to prevent.
+ * The creative is still pending review. The paid week goes live anyway
+ * (since 20270101120100 the Monday cron no longer waits for artwork), but
+ * the card shows the merchant's own photo and name: an unreviewed card on
+ * the homepage is the one thing review exists to prevent.
  */
 select is(
-  (select count(*)::int from public.featured_live_v),
+  (select count(*)::int from public.featured_live_v
+    where has_creative or blurb is not null or media_path is not null),
   0,
   'an unapproved creative never reaches a guest'
 );

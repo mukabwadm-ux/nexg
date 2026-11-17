@@ -102,6 +102,20 @@ export interface Merchant {
   items: CatalogItem[];
   itemsCount?: EngineSchemas['Count'];
   itemsCompletion?: EngineSchemas['PublicMerchant']['itemsCompletion'];
+  /** Storefronts only: a running promotion with the merchant's own picture or video, approved by NexG. */
+  promotion?: StorePromotion;
+}
+
+/** A promotion as the store's banner shows it. The discount itself is taken off at checkout. */
+export interface StorePromotion {
+  name: string;
+  /** "15% off" or "KES 200 off". */
+  benefit: string;
+  /** "On everything" or "On {item}". */
+  scope: string;
+  /** When it ends (ISO), if it has an end. */
+  endsAt?: string;
+  media: { kind: 'image'; src: string } | { kind: 'video'; src: string; poster: string };
 }
 
 export interface DiscoveryQuery {

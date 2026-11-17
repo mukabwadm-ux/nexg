@@ -11,7 +11,13 @@ import {
   type Booking,
 } from '@/components/partner/merchant-featured';
 
-import { PromotionManager, type PromotableItem, type PromotionRow } from './promotion-manager';
+import type { StoreSubject } from './creative-preview';
+import {
+  PromotionManager,
+  type PromotableItem,
+  type PromotionMedia,
+  type PromotionRow,
+} from './promotion-manager';
 import {
   PromotionsFrame,
   PromotionStatus,
@@ -52,6 +58,9 @@ export function LivePromotionsWorkspace({
   requestNotice,
   promotions = [],
   items = [],
+  merchantId,
+  store,
+  media,
 }: {
   businessName: string;
   bookings: Booking[] | null;
@@ -59,6 +68,11 @@ export function LivePromotionsWorkspace({
   items?: PromotableItem[];
   request: ComponentProps<typeof Featured> | null;
   requestNotice?: string;
+  /** For uploading a promotion's own picture or video into the merchant's folder. */
+  merchantId?: string;
+  /** The store as Discovery shows it, for the promotion banner preview. */
+  store?: StoreSubject;
+  media?: Record<string, PromotionMedia>;
 }) {
   const [tab, setTab] = useState<PromotionTab>('Campaigns');
   const [selectedId, setSelectedId] = useState('');
@@ -88,7 +102,13 @@ export function LivePromotionsWorkspace({
       />
       {tab === 'Campaigns' && (
         <div className="mb-4">
-          <PromotionManager promotions={promotions} items={items} />
+          <PromotionManager
+            promotions={promotions}
+            items={items}
+            merchantId={merchantId}
+            store={store}
+            media={media}
+          />
         </div>
       )}
       <div

@@ -15,7 +15,7 @@ import type { DiscoveryProvider } from '../src/providers/DiscoveryProvider';
 // Isolated Supabase controls (plan step E2). These rows stand in for PostgREST replies and are never served as catalog data.
 const KEY = 'sb_publishable_control-key-7f3a91';
 const LOCAL = 'http://127.0.0.1:54321';
-const id = (prefix: 'c1' | 'f1' | 'f2', value: number) => `${prefix}000000-0000-4000-8000-${String(value).padStart(12, '0')}`;
+const id = (prefix: 'c1' | 'f1' | 'f2' | 'a1' | 'a2', value: number) => `${prefix}000000-0000-4000-8000-${String(value).padStart(12, '0')}`;
 const REAL = '7d3f0b6e-1c2a-4f5e-9a8b-0c1d2e3f4a5b';
 const REAL_ITEM = '7d3f0b6e-1c2a-4f5e-9a8b-0c1d2e3f9999';
 const mapRows = (subcategoryMap as unknown as { subcategories: BridgeMapRow[] }).subcategories;
@@ -134,9 +134,9 @@ function ordering(order: string | null) {
     return 0;
   };
 }
-interface Stub { merchants?: Row[]; items?: Row[]; maxRows?: number; exposeCount?: boolean; status?: number; failView?: string; fail?: () => Promise<Response> }
+interface Stub { merchants?: Row[]; items?: Row[]; promotions?: Row[]; maxRows?: number; exposeCount?: boolean; status?: number; failView?: string; fail?: () => Promise<Response> }
 function postgrest(stub: Stub = {}) {
-  const tables: Record<string, Row[]> = { merchant_public: stub.merchants ?? merchants, catalogue_public: stub.items ?? items, catalogue_section: sections };
+  const tables: Record<string, Row[]> = { merchant_public: stub.merchants ?? merchants, catalogue_public: stub.items ?? items, catalogue_section: sections, promotion_banner_v: stub.promotions ?? [] };
   const calls: { url: URL; init: RequestInit }[] = [];
   const fetch: SupabaseFetch = async (href, init) => {
     const url = new URL(href);
@@ -479,6 +479,30 @@ test("storefronts carry the merchant's own sections only when it has two or more
   assert.deepEqual(list.merchants[0]!.items.map((entry) => [entry.name, entry.section]), [['Mara day trip', undefined], ['Amboseli in two days', undefined], ['Nairobi National Park', undefined]], 'lists keep catalogue order');
   const failing = setup({ failView: 'catalogue_section' });
   assert.deepEqual((await failing.provider.getMerchant(id('c1', 3))).items.map((entry) => entry.section), [undefined, undefined, undefined], 'a failed section read still opens the storefront');
+});
+
+test("a store with a running promotion carries its banner, served by the website's media route; a failed read opens the store without it", async () => {
+  const running = { merchant_id: id('c1', 1), promotion_id: id('a1', 1), creative_id: id('a2', 1), name: 'Weekend special', kind: 'percent', value: 15,
+    item_name: null, starts_at: '2026-11-08T00:00:00Z', ends_at: '2026-11-16T20:59:00Z', media_kind: 'video' };
+  const older = { ...running, promotion_id: id('a1', 2), creative_id: id('a2', 2), name: 'Last week', starts_at: '2026-11-01T00:00:00Z' };
+  const image = { ...running, merchant_id: id('c1', 3), promotion_id: id('a1', 3), creative_id: id('a2', 3), kind: 'amount', value: 2000,
+    item_name: 'Mara day trip', ends_at: null, media_kind: 'image' };
+  const { provider, calls } = setup({ promotions: [older, running, image] });
+  const jua = plain(await provider.getMerchant(id('c1', 1)));
+  assert.deepEqual(jua.promotion, { name: 'Weekend special', benefit: '15% off', scope: 'On everything', endsAt: '2026-11-16T20:59:00Z',
+    media: { kind: 'video', src: `/api/promo-media/${id('a2', 1)}/media`, poster: `/api/promo-media/${id('a2', 1)}/poster` } }, 'the newest running promotion');
+  const read = reads(calls, 'promotion_banner_v')[0]!.url.searchParams;
+  assert.deepEqual([read.get('merchant_id'), read.get('limit')], [`eq.${id('c1', 1)}`, '1']);
+  assert.deepEqual(plain(await provider.getMerchant(id('c1', 3))).promotion,
+    { name: 'Weekend special', benefit: 'KES 2,000 off', scope: 'On Mara day trip', media: { kind: 'image', src: `/api/promo-media/${id('a2', 3)}/media` } });
+  assert.equal((await provider.getMerchant(id('c1', 2))).promotion, undefined, 'no running promotion, no banner');
+  const failing = setup({ promotions: [running], failView: 'promotion_banner_v' });
+  assert.equal((await failing.provider.getMerchant(id('c1', 1))).promotion, undefined, 'a failed banner read still opens the store');
+  const odd = setup({ promotions: [{ ...running, media_kind: 'gif' }] });
+  assert.equal((await odd.provider.getMerchant(id('c1', 1))).promotion, undefined, 'a row it cannot read is left out');
+  const lists = setup({ promotions: [running] });
+  await lists.provider.getMerchants({ limit: 48 });
+  assert.equal(reads(lists.calls, 'promotion_banner_v').length, 0, 'lists never read banners');
 });
 
 test('recommended puts featured merchants first, and a merchant that closed early today is closed', async () => {

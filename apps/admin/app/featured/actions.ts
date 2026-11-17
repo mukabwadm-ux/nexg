@@ -80,6 +80,45 @@ export async function unfeatureMerchant(merchantId: string, reason: string): Pro
   return { ok: true, message: (data as { message?: string } | null)?.message };
 }
 
+/**
+ * Approve a merchant's own homepage card or promotion picture, or send it back
+ * with a reason (which the merchant is sent word for word). The RPCs refuse
+ * anything not waiting for review and anyone outside the featured module.
+ */
+export async function reviewCreative(input: {
+  source: 'featured' | 'promotion';
+  id: string;
+  approve: boolean;
+  reason: string;
+}): Promise<PlaceOutcome> {
+  const client = createClient();
+  const { error } =
+    input.source === 'featured'
+      ? await client.rpc('rpc_featured_creative_review', {
+          p_creative_id: input.id,
+          p_approve: input.approve,
+          ...(input.reason.trim() ? { p_reason: input.reason.trim() } : {}),
+        })
+      : await client.rpc('rpc_promotion_creative_review', {
+          p_creative_id: input.id,
+          p_approve: input.approve,
+          ...(input.reason.trim() ? { p_reason: input.reason.trim() } : {}),
+        });
+
+  const bad = fail(error);
+  if (bad) return bad;
+
+  revalidatePath('/featured');
+  return {
+    ok: true,
+    message: input.approve
+      ? input.source === 'featured'
+        ? 'Approved. It shows on the homepage whenever their slot is live.'
+        : 'Approved. It shows on their store while the promotion runs.'
+      : 'Sent back. The merchant has your reason in their messages.',
+  };
+}
+
 /** Send the merchant the featured-slot pitch, with the real prices. */
 export async function sendFeaturedPitch(merchantId: string, note: string): Promise<PlaceOutcome> {
   const { data, error } = await createClient().rpc('rpc_featured_send_pitch', {

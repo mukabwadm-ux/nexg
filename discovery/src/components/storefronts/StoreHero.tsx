@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { Merchant } from '../../providers/DiscoveryProvider';
 import { ImageWithFallback } from '../ImageWithFallback';
 import { MerchantLogo } from '../MerchantCard';
+import { PromotionBanner } from './PromotionBanner';
 
 /**
  * The header every storefront shares: a full-width cover, a back pill, and the merchant's identity. Wider screens
@@ -24,7 +25,7 @@ export function StoreHero({ merchant, cover, eyebrow, facts, onBack, backLabel =
   children?: ReactNode;
 }) {
   const shown = (facts ?? []).filter(Boolean);
-  return <header className="store-hero">
+  return <><header className="store-hero">
     <ImageWithFallback src={cover || merchant.heroImage} alt="" width={1800} height={600} className="store-hero__image" fetchPriority="high" referrerPolicy="no-referrer" />
     <div className="store-hero__shade" aria-hidden="true" />
     <button type="button" className="store-hero__back" onClick={onBack}><ArrowLeft size={17} strokeWidth={1.75} aria-hidden="true" />{backLabel}</button>
@@ -40,5 +41,8 @@ export function StoreHero({ merchant, cover, eyebrow, facts, onBack, backLabel =
       </div>
       {children && <div className="store-hero__actions">{children}</div>}
     </div>
-  </header>;
+  </header>
+  {/* Every storefront draws this hero, so a running promotion's banner shows on every kind of store. */}
+  {merchant.promotion && <PromotionBanner promotion={merchant.promotion} />}
+  </>;
 }

@@ -3,6 +3,8 @@
 import { revalidatePath } from 'next/cache';
 
 import { merchantActionClient, requireMerchantActionObject } from '@/lib/merchant-action-access';
+import { mediaPayload, type PromoMediaRef } from '@/lib/promo-media';
+import { checkMerchantMedia } from '@/lib/promo-media-server';
 
 /**
  * What a merchant can do from their own dashboard.
@@ -165,8 +167,18 @@ export async function requestFeatured(input: {
   note: string;
   /** The product a Best sellers slot promotes. */
   itemId?: string;
+  /** A homepage slot's card: the merchant's own media and line, for review. */
+  card?: { media: PromoMediaRef | null; blurb: string } | null;
 }): Promise<Outcome> {
-  const { client } = await merchantActionClient({ merchantId: input.merchantId });
+  const { client, merchantId } = await merchantActionClient({ merchantId: input.merchantId });
+  const card =
+    input.card && (input.card.media || input.card.blurb.trim())
+      ? { media: mediaPayload(input.card.media), blurb: input.card.blurb.trim() || null }
+      : null;
+  if (card) {
+    const refused = await checkMerchantMedia(client, merchantId, input.card?.media ?? null);
+    if (refused) return { ok: false, message: refused };
+  }
   const { data, error } = await client.rpc('rpc_merchant_request_featured', {
     p_merchant_id: input.merchantId,
     p_placement_id: input.placementId,
@@ -174,6 +186,7 @@ export async function requestFeatured(input: {
     p_weeks: input.weeks,
     p_note: input.note || undefined,
     ...(input.itemId ? { p_item_id: input.itemId } : {}),
+    ...(card ? { p_creative: card } : {}),
   } as never);
   return unwrap(data, error, ['/merchant', '/merchant/featured', '/merchant/promotions']);
 }
@@ -828,6 +841,8 @@ export interface PromotionInput {
   itemId?: string | null;
   startsAt?: string | null;
   endsAt?: string | null;
+  /** A new picture or video for the promotion's banner, for review. Null keeps what it has. */
+  media?: PromoMediaRef | null;
 }
 
 const PROMOTION_PATHS = ['/merchant/promotions', '/merchant/menu', '/merchant/offerings'];
@@ -835,6 +850,8 @@ const PROMOTION_PATHS = ['/merchant/promotions', '/merchant/menu', '/merchant/of
 /** Create or change a promotion. The database checks ownership, values and dates. */
 export async function savePromotion(input: PromotionInput): Promise<Outcome> {
   const { client, merchantId } = await merchantActionClient();
+  const refused = await checkMerchantMedia(client, merchantId, input.media ?? null);
+  if (refused) return { ok: false, message: refused };
   const { data, error } = await client.rpc(
     'rpc_merchant_promotion_save' as never,
     {
@@ -846,6 +863,7 @@ export async function savePromotion(input: PromotionInput): Promise<Outcome> {
       p_item_id: input.itemId || null,
       p_starts_at: input.startsAt || null,
       p_ends_at: input.endsAt || null,
+      ...(input.media ? { p_media: mediaPayload(input.media) } : {}),
     } as never,
   );
   return unwrap(data, error as { message: string } | null, PROMOTION_PATHS);

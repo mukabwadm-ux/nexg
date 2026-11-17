@@ -17,7 +17,7 @@ import subcategoryMap from '../../demo-seed/subcategory-map.json';
 import { withPlatformCatalogueRows } from '../../discovery-engine/src/adapters/supabase/platformCatalogueRows';
 import { CatalogBridge, areaFromAddress, type BridgeMapRow, type DemoMedia, type ItemRow, type MerchantRow } from './catalogBridge';
 import { findCategory, findSubcategory } from '../data/taxonomy';
-import type { CollectionResult, DiscoveryProvider, DiscoveryQuery, Merchant, MerchantResult, OfferingResult, SearchSuggestions } from './DiscoveryProvider';
+import type { CollectionResult, DiscoveryProvider, DiscoveryQuery, Merchant, MerchantResult, OfferingResult, SearchSuggestions, StorePromotion } from './DiscoveryProvider';
 import { collectionDefinitions } from '../data/discoveryConfiguration';
 import { rankByMatch } from '../data/searchSuggestions';
 import { pageOfferings, toMerchant } from './platformMerchantProvider';
@@ -29,6 +29,10 @@ const MERCHANT_COLUMNS = 'id,trading_name,category_key,subcategory,branch_addres
 /** Recommended, as on the platform: featured merchants first, then by name. Supabase has no ratings. */
 const MERCHANT_ORDER = 'featured.desc.nullslast,trading_name.asc,id.asc';
 const ITEM_COLUMNS = 'id,merchant_id,section_id,name,description,price_kes,sort';
+/** A store's promotion banner (promotion_banner_v). */
+const PROMOTION_COLUMNS = 'promotion_id,creative_id,name,kind,value,item_name,ends_at,media_kind';
+/** The website's route that serves a banner's picture or video (apps/web/app/api/promo-media). */
+const PROMO_MEDIA_ROUTE = '/api/promo-media';
 /** Items per merchant: the catalog bridge's list and detail limits. */
 const LIST_ITEMS = 30;
 const DETAIL_ITEMS = 200;
@@ -120,6 +124,29 @@ function merchantRow(value: unknown): SupabaseMerchantRow {
     branch_address: text(row.branch_address), branch_latitude: finite(row.branch_latitude), branch_longitude: finite(row.branch_longitude),
     accepting_orders: flag(row.accepting_orders), busy_mode_until: text(row.busy_mode_until), closed_today: flag(row.closed_today),
     opens_today: text(row.opens_today), closes_today: text(row.closes_today), featured: flag(row.featured), closed_early_at: text(row.closed_early_at),
+  };
+}
+/**
+ * A promotion_banner_v row as the store's banner. The picture or video sits in a private bucket, so its address is
+ * the website's own route (apps/web/app/api/promo-media), which signs a short-lived link while the promotion runs.
+ */
+function promotionRow(value: unknown): StorePromotion {
+  const row = fields(value);
+  const creative = uuid(row.creative_id);
+  const kind = row.media_kind === 'image' || row.media_kind === 'video' ? row.media_kind : undefined;
+  const amount = finite(row.value);
+  const name = required(row.name).trim();
+  if (!kind || amount === null || amount <= 0 || (row.kind !== 'percent' && row.kind !== 'amount')) throw unavailable();
+  const endsAt = text(row.ends_at);
+  const item = text(row.item_name)?.trim();
+  return {
+    name,
+    benefit: row.kind === 'percent' ? `${amount}% off` : `KES ${amount.toLocaleString('en-KE')} off`,
+    scope: item ? `On ${item}` : 'On everything',
+    ...(endsAt && Number.isFinite(Date.parse(endsAt)) ? { endsAt } : {}),
+    media: kind === 'video'
+      ? { kind, src: `${PROMO_MEDIA_ROUTE}/${creative}/media`, poster: `${PROMO_MEDIA_ROUTE}/${creative}/poster` }
+      : { kind, src: `${PROMO_MEDIA_ROUTE}/${creative}/media` },
   };
 }
 const nairobiDate = (time: number) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Nairobi' }).format(time);
@@ -363,7 +390,24 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     if (row.id !== merchantId || rows.length > 1) throw unavailable();
     const [merchant] = await this.#hydrate([row], DETAIL_ITEMS, undefined, signal, true);
     if (!merchant) throw unavailable();
-    return merchant;
+    const promotion = await this.#promotion(merchantId, signal);
+    return promotion ? { ...merchant, promotion } : merchant;
+  }
+
+  /**
+   * The store's banner: its newest running promotion with a picture or video NexG approved (promotion_banner_v,
+   * migration 20270101120100). Presentation only, like section names: a failed read opens the store without it.
+   */
+  async #promotion(merchantId: string, signal?: AbortSignal): Promise<StorePromotion | undefined> {
+    try {
+      const { rows } = await this.#read('promotion_banner_v', {
+        select: PROMOTION_COLUMNS, merchant_id: `eq.${merchantId}`, order: 'starts_at.desc,promotion_id.asc', limit: '1',
+      }, false, signal);
+      return rows.length ? promotionRow(rows[0]) : undefined;
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      return undefined;
+    }
   }
 
   getAreas(signal?: AbortSignal): Promise<string[]> {
@@ -624,7 +668,7 @@ export class SupabaseDiscoveryProvider implements DiscoveryProvider {
     return this.#media ??= source().catch(() => { this.#media = undefined; return NO_MEDIA; });
   }
 
-  async #read(view: 'merchant_public' | 'catalogue_public' | 'catalogue_section', params: Record<string, string>, count: boolean, signal?: AbortSignal): Promise<{ rows: unknown[]; total?: number }> {
+  async #read(view: 'merchant_public' | 'catalogue_public' | 'catalogue_section' | 'promotion_banner_v', params: Record<string, string>, count: boolean, signal?: AbortSignal): Promise<{ rows: unknown[]; total?: number }> {
     if (signal?.aborted) throw signal.reason;
     const url = new URL(view, this.#rest);
     url.search = new URLSearchParams(params).toString();

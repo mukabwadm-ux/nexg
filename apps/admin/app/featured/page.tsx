@@ -22,6 +22,8 @@ import {
   type RateCardRow,
   type RuleRow,
 } from '@/components/featured/tabs';
+import { reviewCreative } from '@/app/featured/actions';
+import { CreativesTab, type CreativeRow } from '@/components/featured/creatives';
 import { type OpenSlot } from '@/components/featured/place-merchant';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
@@ -32,6 +34,7 @@ export const dynamic = 'force-dynamic';
 const TABS = [
   { key: 'inventory', label: 'Inventory' },
   { key: 'requests', label: 'Requests & waitlist' },
+  { key: 'creatives', label: 'Cards & pictures' },
   { key: 'schedule', label: 'Schedule' },
   { key: 'performance', label: 'Performance & billing' },
   { key: 'rules', label: 'Rules' },
@@ -64,7 +67,9 @@ export default async function FeaturedPage({
   const supabase = createClient();
 
   const tab = TABS.some((t) => t.key === searchParams?.tab) ? searchParams!.tab! : 'inventory';
-  const filter = searchParams?.filter ?? (tab === 'requests' ? 'action' : 'all');
+  const filter =
+    searchParams?.filter ??
+    (tab === 'requests' ? 'action' : tab === 'creatives' ? 'waiting' : 'all');
   const selected = searchParams?.selected ?? null;
   const week = searchParams?.week ?? mondayOf(new Date());
 
@@ -142,6 +147,7 @@ export default async function FeaturedPage({
                 selected={selected}
               />
             )}
+            {tab === 'creatives' && (await loadCreatives(supabase, city, filter))}
             {tab === 'schedule' && (await loadSchedule(supabase, city))}
             {tab === 'performance' && (await loadPerformance(supabase, city, badges))}
             {tab === 'rules' && (await loadRules(supabase))}
@@ -218,6 +224,54 @@ async function loadInventory(
       selected={selected}
       cityName={city.name}
       requests={requests.filter((r) => r.city_id === city.id)}
+    />
+  );
+}
+
+/**
+ * Merchants' own homepage cards and promotion pictures (migration
+ * 20270101120100), newest first, with each file signed for an hour so it can
+ * be watched here before it is approved. Signing runs as the signed-in staff
+ * member: the bucket lets the featured module read every file it reviews.
+ */
+type QueueRow = Omit<CreativeRow, 'src' | 'poster'> & {
+  media_path: string | null;
+  poster_path: string | null;
+};
+
+async function loadCreatives(supabase: Supabase, city: City, filter: string) {
+  const { data } = await supabase
+    .from('console_creative_queue_v')
+    .select('*')
+    .eq('city_id', city.id)
+    .order('submitted_at', { ascending: false })
+    .limit(120);
+
+  const rows = (data ?? []) as unknown as QueueRow[];
+  const paths = [
+    ...new Set(
+      rows.flatMap((row) => [row.media_path, row.poster_path]).filter((p): p is string => !!p),
+    ),
+  ];
+  const { data: signed } = paths.length
+    ? await supabase.storage.from('promo-media').createSignedUrls(paths, 60 * 60)
+    : { data: [] };
+  const links = new Map(
+    (signed ?? []).flatMap((link) =>
+      link.path && link.signedUrl && !link.error ? [[link.path, link.signedUrl] as const] : [],
+    ),
+  );
+
+  return (
+    <CreativesTab
+      rows={rows.map(({ media_path, poster_path, ...row }) => ({
+        ...row,
+        src: media_path ? (links.get(media_path) ?? null) : null,
+        poster: poster_path ? (links.get(poster_path) ?? null) : null,
+      }))}
+      filter={filter}
+      city={city.slug}
+      onReview={reviewCreative}
     />
   );
 }

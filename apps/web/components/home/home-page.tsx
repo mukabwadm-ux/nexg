@@ -3,7 +3,11 @@ import Link from 'next/link';
 
 import { AppPreview, StoreBadges } from '@/components/home/app-preview';
 import { BestSellers } from '@/components/home/best-sellers';
-import { FeaturedMerchants } from '@/components/home/featured-merchants';
+import {
+  FeaturedMerchants,
+  type CardMedia,
+  type FeaturedMerchant,
+} from '@/components/home/featured-merchants';
 import { Hero } from '@/components/home/hero';
 import { JoinParticles } from '@/components/home/join-particles';
 import { Reveal } from '@/components/reveal';
@@ -14,6 +18,7 @@ import { StoresNearYou } from '@/components/home/stores-near-you';
 import { SiteFooter } from '@/components/site-footer';
 import { BEST_SELLERS, bestSellerFromCatalogue, type BestSeller } from '@/lib/best-sellers';
 import { categoryTiles } from '@/lib/categories';
+import { signMedia } from '@/lib/promo-media-server';
 import { translator, type Locale, type Translate } from '@/lib/i18n/dictionaries';
 import type { NearbyStore } from '@/lib/stores-near';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -36,7 +41,7 @@ const getHomeData = unstable_cache(
       supabase
         .from('featured_live_v')
         .select(
-          'booking_id, merchant_id, trading_name, merchant_category, city_slug, branch_name, cover_photo_path, blurb, badge, position, accepting_orders, closed_today, prep_minutes',
+          'booking_id, merchant_id, trading_name, merchant_category, city_slug, branch_name, cover_photo_path, blurb, badge, position, accepting_orders, closed_today, prep_minutes, media_kind, media_path, poster_path',
         )
         .eq('kind', 'homepage')
         .order('position')
@@ -78,11 +83,41 @@ const getHomeData = unstable_cache(
         : [],
     );
 
-    return { cities: cityResult.data, stores, featured: featuredResult.data };
+    /* A merchant's own image or video sits in a private bucket; a visitor may
+       sign it only while its card is on the homepage. Signed for two hours,
+       well past this cache's five minutes. A file that cannot be signed
+       leaves the card on the merchant's cover photo. */
+    const featuredRows = featuredResult.data ?? [];
+    const signed = await signMedia(
+      supabase,
+      featuredRows.flatMap((row) => [row.media_path, row.poster_path]),
+      2 * 60 * 60,
+    );
+    const featured: FeaturedMerchant[] = featuredRows.map(
+      ({ media_kind, media_path, poster_path, ...row }) => ({
+        ...row,
+        media: cardMedia(media_kind, media_path, poster_path, signed),
+      }),
+    );
+
+    return { cities: cityResult.data, stores, featured };
   },
   ['homepage-public-data'],
   { revalidate: 300 },
 );
+
+function cardMedia(
+  kind: string | null,
+  path: string | null,
+  poster: string | null,
+  signed: Record<string, string>,
+): CardMedia | null {
+  const src = path ? signed[path] : undefined;
+  if (!src) return null;
+  if (kind === 'image') return { kind: 'image', src };
+  if (kind === 'video') return { kind: 'video', src, poster: poster ? signed[poster] : null };
+  return null;
+}
 
 /* Taps per category tile over the last 30 days. Refreshed every five minutes;
    if it cannot be read, the tiles keep their usual order. */

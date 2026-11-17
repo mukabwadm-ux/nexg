@@ -1,0 +1,517 @@
+/*
+ * The merchant's preview of their own image or video, as guests will see it.
+ *
+ * The homepage card is the real component (components/home/featured-merchants).
+ * The store banner is drawn by Discovery, a separate app, so it is mirrored
+ * here value for value from discovery/src/components/storefronts/store.css
+ * (.store-promo and .store-hero): keep the two in step. Discovery sizes some
+ * text with vw, which inside a scaled frame would read the merchant's own
+ * screen, so those values are worked out for each frame's width instead.
+ */
+
+@font-face {
+  font-family: 'Quicksand';
+  src: url('/fonts/quicksand/Quicksand-Variable.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+.dialog {
+  /* 100%, not 100vw: vw counts a classic scrollbar and pushes the dialog off-centre. */
+  width: min(1180px, calc(100% - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: #f6f3ec;
+  color: #171b24;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.35);
+  font-family: var(--font-manrope), Arial, sans-serif;
+  overflow: hidden;
+}
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.dialog::backdrop {
+  background: rgb(12 14 18 / 0.62);
+}
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid #e3e1dc;
+  background: #fff;
+}
+.head h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+.head p {
+  margin: 4px 0 0;
+  color: #586071;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #cdd0d7;
+  border-radius: 999px;
+  background: #fff;
+  color: #171b24;
+  cursor: pointer;
+}
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 18px 22px;
+}
+.frames {
+  display: grid;
+  grid-template-columns: minmax(0, 330px) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+.frameLabel {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 8px;
+  color: #586071;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.frameLabel span {
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.phone {
+  overflow: hidden;
+  border: 8px solid #171b24;
+  border-radius: 30px;
+  background: #171b24;
+}
+.browser {
+  overflow: hidden;
+  border: 1px solid #cdd0d7;
+  border-radius: 10px;
+  background: #171b24;
+}
+.browserBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #e8e5de;
+}
+.browserBar i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #c9c4ba;
+}
+.browserBar b {
+  flex: 1;
+  margin-left: 10px;
+  overflow: hidden;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #fff;
+  color: #586071;
+  font-size: 11px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.notes {
+  display: grid;
+  gap: 6px;
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 0 0 1px #e3e1dc;
+  color: #34394a;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.notes p {
+  margin: 0;
+}
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px;
+  border-top: 1px solid #e3e1dc;
+  background: #fff;
+}
+.foot .status {
+  flex: 1 1 260px;
+  margin: 0;
+  color: #34394a;
+  font-size: 13px;
+  font-weight: 600;
+}
+.foot .error {
+  color: #a3261b;
+}
+.progress {
+  display: block;
+  width: 100%;
+  height: 6px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e3e1dc;
+}
+.progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #98701a;
+  transition: width 120ms linear;
+}
+.button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid #cdd0d7;
+  border-radius: 6px;
+  background: #fff;
+  color: #171b24;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.primary {
+  border-color: #171b24;
+  background: #171b24;
+  color: #fff;
+}
+.dialog :focus-visible {
+  outline: 2px solid #98701a;
+  outline-offset: 3px;
+}
+
+@media (max-width: 860px) {
+  .frames {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .phone {
+    max-width: 330px;
+  }
+}
+@media (max-width: 560px) {
+  .dialog {
+    width: 100%;
+    max-height: 100dvh;
+    height: 100dvh;
+    border-radius: 0;
+  }
+  .head,
+  .body,
+  .foot {
+    padding-inline: 16px;
+  }
+  .foot .button {
+    flex: 1 1 auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress span {
+    transition: none;
+  }
+}
+
+/* ─────────────── the store page in Discovery (mirrors store.css) ─────────────── */
+
+.store {
+  --gold: #e5b65f;
+  --muted: #b4b7b5;
+  --line: rgba(255, 255, 255, 0.12);
+  min-height: 100%;
+  padding: 0 var(--gutter) 28px;
+  background: #111315;
+  color: #f3eee2;
+  font-family: Quicksand, Arial, sans-serif;
+  font-weight: 500;
+  font-synthesis: none;
+}
+.storeDesktop {
+  --gutter: 30px;
+  padding-top: 24px;
+}
+.storePhone {
+  --gutter: 16px;
+  padding-top: 20px;
+}
+.store p,
+.store h1,
+.store h2 {
+  margin: 0;
+}
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  margin: -24px calc(-1 * var(--gutter)) 0;
+  overflow: hidden;
+  background: #0d1417;
+}
+.storeDesktop .hero {
+  /* clamp(250px, 22vw, 340px) at 1280px wide. */
+  height: 281.6px;
+}
+.heroImage {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 45%;
+  background: radial-gradient(120% 140% at 85% 0%, rgba(229, 182, 95, 0.16), transparent 55%),
+    linear-gradient(135deg, #1b2a2f, #0d1417 70%);
+}
+.heroShade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    0deg,
+    rgba(6, 10, 12, 0.95) 0%,
+    rgba(6, 10, 12, 0.7) 30%,
+    rgba(6, 10, 12, 0.1) 70%,
+    rgba(6, 10, 12, 0.35) 100%
+  );
+}
+.heroBack {
+  position: absolute;
+  top: 20px;
+  left: var(--gutter);
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgba(8, 13, 15, 0.68);
+  color: #f3eee2;
+  font-size: 13px;
+  font-weight: 700;
+}
+.heroIdentity {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  width: 100%;
+  padding: 0 var(--gutter) 32px;
+}
+.heroLogo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #2c2517, #16130c);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.14),
+    0 12px 32px rgba(0, 0, 0, 0.45);
+  color: #f2c56d;
+  font-size: 30px;
+  font-weight: 700;
+}
+.heroText {
+  min-width: 0;
+  flex: 1;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+}
+.heroEyebrow {
+  margin: 0 0 8px;
+  color: #f2c56d;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.heroName {
+  font-size: 43.52px; /* clamp(30px, 3.4vw, 48px) at 1280px */
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+/* Phones: the cover alone, then the logo on its lower edge and the name under it. */
+.storePhone .hero {
+  display: block;
+  height: auto;
+  margin-top: -20px;
+  overflow: visible;
+  background: none;
+}
+.storePhone .heroImage {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  display: block;
+  height: 202.8px; /* clamp(190px, 52vw, 220px) at 390px */
+}
+.storePhone .heroShade {
+  inset: 0 0 auto;
+  height: 202.8px;
+  background: linear-gradient(180deg, rgba(6, 10, 12, 0.5), rgba(6, 10, 12, 0) 44%);
+}
+.storePhone .heroBack {
+  top: 12px;
+}
+.storePhone .heroIdentity {
+  position: relative;
+  z-index: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: -36px;
+  padding: 0 var(--gutter);
+  text-align: center;
+}
+.storePhone .heroLogo {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 3px #111315,
+    0 8px 20px rgba(0, 0, 0, 0.4);
+  font-size: 26px;
+}
+.storePhone .heroText {
+  text-shadow: none;
+}
+.storePhone .heroEyebrow {
+  display: none;
+}
+.storePhone .heroName {
+  font-size: 24.18px; /* clamp(22px, 6.2vw, 26px) at 390px */
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* The banner, value for value. */
+.promo {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  margin: 24px 0 0;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #121a1d;
+  box-shadow: 0 0 0 1px rgba(229, 182, 95, 0.28);
+}
+.promoMedia {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #0d1417;
+}
+.promoMedia img,
+.promoMedia video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.promoText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 24px 28px;
+}
+.promoEyebrow {
+  color: #f2c56d;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.promoBenefit {
+  color: #f3eee2;
+  font-size: 38.4px; /* clamp(28px, 3vw, 40px) at 1280px */
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+.store .promoName {
+  margin: 2px 0 0;
+  color: #f3eee2;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.promoDetail {
+  color: #c9cdc6;
+  font-size: 14px;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+.storePhone .promo {
+  grid-template-columns: 1fr;
+  margin-top: 16px;
+  border-radius: 18px;
+}
+.storePhone .promoText {
+  gap: 4px;
+  padding: 16px 18px 18px;
+}
+.storePhone .promoBenefit {
+  font-size: 28px;
+}
+.store.storePhone .promoName {
+  font-size: 16px;
+}
+.storePhone .promoDetail {
+  font-size: 13px;
+}
+.shelf {
+  display: grid;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 28px;
+}
+.shelf span {
+  height: 120px;
+  border-radius: 16px;
+  background: #151d21;
+  box-shadow: 0 0 0 1px var(--line);
+}
+.storeDesktop .shelf {
+  --columns: 4;
+}
+.storePhone .shelf {
+  --columns: 2;
+}
