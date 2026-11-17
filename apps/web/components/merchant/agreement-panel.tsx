@@ -224,7 +224,7 @@ export function AgreementPanel({
               {current
                 ? null
                 : details
-                  ? ' NexG signs your agreement, filled in with the details below, when your application is approved.'
+                  ? ' NexG signs it with the details below when your business is approved; if it already is, NexG’s team signs it once you save them.'
                   : null}
             </p>
           ) : (

@@ -7316,6 +7316,7 @@ export type Database = {
           prep_time_required: boolean;
           questions: NonNullable<Json>;
           requires_ops_mapping: boolean;
+          retired_subcategories: NonNullable<Json>;
           sort: number;
           subcategories: NonNullable<Json>;
           updated_at: string;
@@ -7340,6 +7341,7 @@ export type Database = {
           prep_time_required?: boolean;
           questions?: NonNullable<Json>;
           requires_ops_mapping?: boolean;
+          retired_subcategories?: NonNullable<Json>;
           sort?: number;
           subcategories?: NonNullable<Json>;
           updated_at?: string;
@@ -7363,6 +7365,7 @@ export type Database = {
           prep_time_required?: boolean;
           questions?: NonNullable<Json>;
           requires_ops_mapping?: boolean;
+          retired_subcategories?: NonNullable<Json>;
           sort?: number;
           subcategories?: NonNullable<Json>;
           updated_at?: string;
