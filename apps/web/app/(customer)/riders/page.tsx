@@ -64,7 +64,7 @@ const WHY = [
 const STEPS = [
   {
     title: 'Apply online',
-    body: 'Your name, phone, city and vehicle. Two minutes, no paperwork yet.',
+    body: 'Your name, phone, email and number plate. Two minutes, no paperwork yet.',
   },
   {
     title: 'Upload your documents',
