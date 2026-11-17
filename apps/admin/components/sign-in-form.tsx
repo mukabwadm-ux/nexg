@@ -68,7 +68,7 @@ export function SignInForm({
           Use your NexG work account. Your role decides what you can see once you are in.
         </p>
 
-        <form onSubmit={onSubmit} className="mt-6">
+        <form method="post" onSubmit={onSubmit} className="mt-6">
           <input type="hidden" name="next" value={next} />
 
           <Input

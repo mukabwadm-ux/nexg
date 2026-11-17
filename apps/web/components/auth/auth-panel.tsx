@@ -1,23 +1,20 @@
 'use client';
 
-import {
-  Button,
-  CAPTCHA_FIELD,
-  Card,
-  Input,
-  PhoneInput,
-  useEarlyCaptcha,
-  useToast,
-} from '@nexg/ui';
+import { Button, CAPTCHA_FIELD, Card, Input, useEarlyCaptcha, useToast } from '@nexg/ui';
 import { ArrowRight } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { createAccount, signIn } from '@/app/(customer)/sign-in/actions';
+import { type AuthResult, createAccount, signIn } from '@/app/(customer)/sign-in/actions';
 import { goTo } from '@/components/auth/password-recovery';
 import { PORTALS, type Portal } from '@/lib/auth-portals';
 import { DATA_PROTECTION_POLICY_URL, NEW_TAB } from '@/lib/legal-documents';
+
+/* Only the Create account tab asks for a phone number, so its field (and
+   libphonenumber with it) loads when that tab shows, not with sign-in. */
+const PhoneInput = dynamic(() => import('./phone-field'));
 
 const COPY: Record<Portal, { title: string; lead: string }> = {
   customer: {
@@ -97,7 +94,14 @@ export function AuthPanel({
     const token = await captcha.take();
     if (token) formData.set(CAPTCHA_FIELD, token);
 
-    const result = tab === 'signin' ? await signIn(formData) : await createAccount(formData);
+    /*
+     * A successful sign-in redirects from the server, with the portal in the
+     * same response (see signIn). Next resolves the call with nothing then,
+     * so the button stays busy until the portal is on screen.
+     */
+    const result: AuthResult | undefined =
+      tab === 'signin' ? await signIn(formData) : await createAccount(formData);
+    if (!result) return;
     setPending(false);
 
     if (!result.ok) {
@@ -228,6 +232,7 @@ export function AuthPanel({
           {tab === 'signin' && (
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
               <Link
+                prefetch={false}
                 href={forgotHref}
                 className="text-ink tap-area inline-block text-sm font-bold underline underline-offset-4"
               >
@@ -235,6 +240,7 @@ export function AuthPanel({
               </Link>
               {portal === 'merchant' && emailOtpEnabled ? (
                 <Link
+                  prefetch={false}
                   href="/merchants/sign-in/email"
                   className="text-ink tap-area inline-block text-sm font-bold underline underline-offset-4"
                 >
@@ -268,6 +274,7 @@ export function AuthPanel({
               <span className="text-muted text-xs font-semibold leading-[1.7]">
                 I agree to the{' '}
                 <Link
+                  prefetch={false}
                   href="/legal/terms"
                   className="text-ink font-bold underline underline-offset-2"
                 >
@@ -275,6 +282,7 @@ export function AuthPanel({
                 </Link>{' '}
                 and{' '}
                 <Link
+                  prefetch={false}
                   href="/legal/privacy"
                   className="text-ink font-bold underline underline-offset-2"
                 >
@@ -311,6 +319,7 @@ export function AuthPanel({
             <>
               New to NexG?{' '}
               <Link
+                prefetch={false}
                 href={next ? `/sign-up?next=${encodeURIComponent(next)}` : '/sign-up'}
                 className="text-ink font-bold underline underline-offset-4"
               >
@@ -331,7 +340,11 @@ export function AuthPanel({
           ) : (
             <>
               Not registered yet?{' '}
-              <Link href={info.start} className="text-ink font-bold underline underline-offset-4">
+              <Link
+                prefetch={false}
+                href={info.start}
+                className="text-ink font-bold underline underline-offset-4"
+              >
                 {portal === 'host' ? 'List your property' : `Apply as a ${portal}`}
               </Link>
             </>
@@ -354,7 +367,9 @@ export function AuthPanel({
                 asChild
                 className="border-gold/50 text-gold hover:bg-gold/10"
               >
-                <Link href={PORTALS[partner].signIn}>{PORTALS[partner].label} sign in</Link>
+                <Link prefetch={false} href={PORTALS[partner].signIn}>
+                  {PORTALS[partner].label} sign in
+                </Link>
               </Button>
             ))}
           </div>
@@ -362,7 +377,11 @@ export function AuthPanel({
       ) : (
         <p className="text-muted-light mt-4 text-center text-xs font-semibold">
           Ordering or booking a stay?{' '}
-          <Link href="/sign-in" className="text-ink font-bold underline underline-offset-4">
+          <Link
+            prefetch={false}
+            href="/sign-in"
+            className="text-ink font-bold underline underline-offset-4"
+          >
             Customer sign in
           </Link>
         </p>

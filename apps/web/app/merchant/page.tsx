@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { HomeLive } from '@/components/merchant/home-live';
-import { ConnectedApplication } from '@/components/onboarding/connected-application';
+import { LazyConnectedApplication as ConnectedApplication } from '@/components/onboarding/connected-application-lazy';
 import { loadMerchantHomeSource } from '@/lib/merchant-home-source';
 import { MERCHANT_PAYOUTS_HREF } from '@/lib/merchant-payouts';
 import { HomeSetup } from '@/components/merchant/home-setup';

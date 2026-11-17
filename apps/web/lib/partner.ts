@@ -45,10 +45,17 @@ export async function partnerHome(): Promise<PartnerHome> {
  */
 const signedIn = perRequest(async (): Promise<{ user: User | null; home: PartnerHome }> => {
   const client = createClient();
-  const auth = await client.auth.getUser();
+  /*
+   * Together, not one after the other: fn_partner_home reads the user from
+   * the session token itself, and its answer is used only once getUser has
+   * confirmed that user with Supabase.
+   */
+  const [auth, { data, error }] = await Promise.all([
+    client.auth.getUser(),
+    client.rpc('fn_partner_home'),
+  ]);
   if (auth.error || !auth.data.user)
     return { user: null, home: { kind: 'anonymous', home: '/sign-in' } };
-  const { data, error } = await client.rpc('fn_partner_home');
   if (error) throw new Error('Your account could not be loaded. Please retry.');
   return {
     user: auth.data.user,

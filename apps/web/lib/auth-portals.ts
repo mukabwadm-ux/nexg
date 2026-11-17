@@ -55,6 +55,14 @@ export function safeNext(value: unknown): string | undefined {
   return value;
 }
 
+/**
+ * The host workspace is served as its own HTML by a route handler, not by the
+ * app router, so reaching it is always a full page load.
+ */
+export function isHostWorkspacePath(path: string): boolean {
+  return path === '/host' || path.startsWith('/host?') || path.startsWith('/host/');
+}
+
 /** True when `path` is this portal's home or somewhere inside it. */
 export function withinPortal(portal: Portal, path: string): boolean {
   const home = PORTALS[portal].home;

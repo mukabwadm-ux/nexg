@@ -1,10 +1,12 @@
 'use server';
 
+import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application';
 import {
   PORTALS,
+  isHostWorkspacePath,
   isPortal,
   landingFor,
   portalForKind,
@@ -105,6 +107,16 @@ export async function signIn(formData: FormData): Promise<AuthResult> {
   const portal = portalOf(formData.get('portal'));
   const home = await partnerHome(supabase);
   const redirectTo = landingFor(portal, home, safeNext(formData.get('next')));
+  /*
+   * Straight there. A redirect from the action has Next render the
+   * destination into this same response, so the portal arrives in one round
+   * trip from the browser instead of two (this answer, then the browser
+   * asking for the page), which is a second or more on a slow connection.
+   * The caller then gets nothing back. The host workspace is served as its
+   * own HTML rather than by the app router, so it stays a full page load
+   * from the browser.
+   */
+  if (!isHostWorkspacePath(redirectTo)) redirect(redirectTo);
   const partner = portalForKind(home?.kind);
   return {
     ok: true,

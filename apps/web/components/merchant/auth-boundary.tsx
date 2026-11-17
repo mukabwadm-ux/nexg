@@ -113,9 +113,19 @@ export function MerchantAuthBoundary({
           },
         );
     };
+    /*
+     * Coming back to the tab always re-checks access (the watcher refreshes
+     * the page itself when access changed). Re-rendering the whole page for
+     * fresh data happens at most every 30 seconds: one return to the tab
+     * fires both focus and visibilitychange, and each used to rebuild the
+     * page on the server.
+     */
+    let lastRefresh = Date.now();
     const refresh = () => {
       if (active && document.visibilityState === 'visible') {
         void watcher?.check();
+        if (Date.now() - lastRefresh < 30_000) return;
+        lastRefresh = Date.now();
         router.refresh();
       }
     };

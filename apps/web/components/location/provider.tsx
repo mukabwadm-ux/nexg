@@ -115,6 +115,10 @@ export function SiteLocationProvider({
         isAuthPage(pathname) ||
         pathname === '/host' ||
         pathname.startsWith('/host/') ||
+        /* The rider portal sits in this layout but has no delivery spot to
+           place, so it skips the saved-places call on every page. */
+        pathname === '/rider' ||
+        pathname.startsWith('/rider/') ||
         isBookingPage(pathname) ||
         isMerchantRegistrationPath(pathname) ||
         pathname === '/merchant-live-preview' ||

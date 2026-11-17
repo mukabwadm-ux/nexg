@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { AuthPanel } from '@/components/auth/auth-panel';
 import { AuthShell } from '@/components/auth/auth-shell';
-import { SocialSignIn } from '@/components/auth/social-sign-in';
+import { LazySocialSignIn as SocialSignIn } from '@/components/auth/social-sign-in-lazy';
 import { safeNext, type Portal } from '@/lib/auth-portals';
 
 export type SignInSearchParams = {

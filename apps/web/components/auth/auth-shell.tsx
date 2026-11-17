@@ -76,13 +76,18 @@ const STORY: Record<
  * The frame every sign-in and sign-up page shares: a dark story panel on
  * wide screens (hidden on phones, where it would push the form off the first
  * screen) and the form on the right.
+ *
+ * Its links do not prefetch (prefetch={false}, here and in AuthPanel): a
+ * sign-in screen is for signing in, and prefetching every link on it spent
+ * a slow connection's bandwidth, and a server render per link, on pages
+ * hardly anyone opens from here, while the captcha and the sign-in waited.
  */
 export function AuthShell({ portal, children }: { portal: Portal; children: React.ReactNode }) {
   const story = STORY[portal];
   return (
     <div className="grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
       <div className="bg-ink relative hidden flex-col justify-between overflow-hidden p-10 text-white lg:flex">
-        <Link href={story.back[0]} className="flex items-center gap-3">
+        <Link prefetch={false} href={story.back[0]} className="flex items-center gap-3">
           <Logo className="h-24 w-auto" onDark />
         </Link>
 
@@ -109,10 +114,18 @@ export function AuthShell({ portal, children }: { portal: Portal; children: Reac
         <div className="flex flex-wrap items-center justify-between gap-4 text-xs font-semibold text-white/35">
           <span>© {new Date().getFullYear()} NexG Concierge</span>
           <span className="flex gap-4">
-            <Link href="/legal/terms" className="transition-colors hover:text-white/70">
+            <Link
+              prefetch={false}
+              href="/legal/terms"
+              className="transition-colors hover:text-white/70"
+            >
               Terms
             </Link>
-            <Link href="/legal/privacy" className="transition-colors hover:text-white/70">
+            <Link
+              prefetch={false}
+              href="/legal/privacy"
+              className="transition-colors hover:text-white/70"
+            >
               Privacy
             </Link>
             <a
@@ -122,7 +135,7 @@ export function AuthShell({ portal, children }: { portal: Portal; children: Reac
             >
               Data protection
             </a>
-            <Link href="/help" className="transition-colors hover:text-white/70">
+            <Link prefetch={false} href="/help" className="transition-colors hover:text-white/70">
               Help
             </Link>
           </span>
@@ -131,10 +144,16 @@ export function AuthShell({ portal, children }: { portal: Portal; children: Reac
 
       <div className="flex flex-col px-4 py-6 sm:px-8 lg:py-12">
         <div className="flex items-center justify-between gap-4">
-          <Link href={story.back[0]} aria-label="NexG home" className="lg:invisible">
+          <Link
+            prefetch={false}
+            href={story.back[0]}
+            aria-label="NexG home"
+            className="lg:invisible"
+          >
             <Logo className="h-12 w-auto" />
           </Link>
           <Link
+            prefetch={false}
             href={story.back[0]}
             className="text-muted hover:text-ink tap-area text-sm font-bold transition-colors"
           >

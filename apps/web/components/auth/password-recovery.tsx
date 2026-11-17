@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { requestPasswordRecovery, updateRecoveredPassword } from '@/app/(customer)/sign-in/actions';
-import { PORTALS, type Portal } from '@/lib/auth-portals';
+import { isHostWorkspacePath, PORTALS, type Portal } from '@/lib/auth-portals';
 
 /**
  * Where to go once signed in. A full page load for the host workspace,
@@ -18,11 +18,7 @@ import { PORTALS, type Portal } from '@/lib/auth-portals';
  * and the extra refresh rendered the destination a second time.
  */
 export function goTo(router: ReturnType<typeof useRouter>, destination: string) {
-  if (
-    destination === '/host' ||
-    destination.startsWith('/host?') ||
-    destination.startsWith('/host/')
-  ) {
+  if (isHostWorkspacePath(destination)) {
     window.location.assign(destination);
     return;
   }
@@ -75,7 +71,7 @@ export function ForgotPasswordForm({
           If an account uses that email, a password recovery link is on its way. Check your inbox.
         </p>
       ) : (
-        <form onSubmit={submit} className="mt-6">
+        <form method="post" onSubmit={submit} className="mt-6">
           <Input
             id="recovery-email"
             name="email"
@@ -139,7 +135,7 @@ export function ResetPasswordForm({ redirectTo = '/' }: { redirectTo?: string })
       <p className="text-muted mt-2 text-sm font-semibold leading-relaxed">
         Use at least 6 characters. You’ll be able to sign in with it right away.
       </p>
-      <form onSubmit={submit} className="mt-6 space-y-4">
+      <form method="post" onSubmit={submit} className="mt-6 space-y-4">
         <Input
           id="new-password"
           name="password"
