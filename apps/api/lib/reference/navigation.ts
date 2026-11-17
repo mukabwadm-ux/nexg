@@ -97,6 +97,13 @@ export const GUIDE_SECTIONS: NavSection[] = [
     label: 'Integrate',
     links: [
       {
+        href: '/docs/events',
+        label: 'Order events',
+        title: 'Order events: NexG calls you',
+        description:
+          'Signed events NexG posts to your server when a booking is created or its status changes: adding an endpoint, verifying, answering and retries.',
+      },
+      {
         href: '/docs/webhooks',
         label: 'Webhooks',
         title: 'Webhooks: calling back to NexG',

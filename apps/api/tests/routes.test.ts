@@ -242,6 +242,64 @@ describe('GET /v1/catalog/merchants', () => {
 });
 
 describe('GET /v1/catalog/merchants/{id}', () => {
+  const BRANCH = {
+    id: '0f1e2d3c-4b5a-4968-8776-655443322110',
+    name: 'Westlands',
+    address: 'Woodvale Grove, Westlands, Nairobi',
+    latitude: -1.2648,
+    longitude: 36.8027,
+    is_primary: true,
+    place_type: 'physical',
+    contact: null,
+    paused: false,
+    opens_today: '08:00:00',
+    closes_today: '22:00:00',
+    closed_today: false,
+  };
+
+  it('lists every open branch, primary first, from the public branch view', async () => {
+    const queries: Record<string, ReturnType<typeof fakeQuery>> = {
+      merchant_public: fakeQuery({ data: MERCHANT, error: null }),
+      merchant_branch_public: fakeQuery({
+        data: [
+          BRANCH,
+          { ...BRANCH, id: '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5e', is_primary: false },
+        ],
+        error: null,
+      }),
+      catalogue_public: fakeQuery({ data: [], error: null }),
+    };
+    from.mockImplementation((table: string) => queries[table]!.builder);
+
+    const res = await getMerchant(get(`/v1/catalog/merchants/${MERCHANT.id}`), {
+      params: { id: MERCHANT.id },
+    });
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.data.branches.map((b: { is_primary: boolean }) => b.is_primary)).toEqual([
+      true,
+      false,
+    ]);
+    const branchCalls = queries.merchant_branch_public!.calls;
+    expect(called(branchCalls, 'eq')).toEqual([['merchant_id', MERCHANT.id]]);
+    expect(called(branchCalls, 'order')[0]).toEqual(['is_primary', { ascending: false }]);
+  });
+
+  it('answers a branch failure with 500', async () => {
+    from.mockImplementation((table: string) =>
+      table === 'merchant_public'
+        ? fakeQuery({ data: MERCHANT, error: null }).builder
+        : fakeQuery({ data: null, error: { message: 'timeout' } }).builder,
+    );
+
+    const res = await getMerchant(get(`/v1/catalog/merchants/${MERCHANT.id}`), {
+      params: { id: MERCHANT.id },
+    });
+
+    expect(res.status).toBe(500);
+  });
+
   it('answers an unknown merchant with 404', async () => {
     const { builder } = fakeQuery({ data: null, error: null });
     from.mockReturnValue(builder);

@@ -168,9 +168,9 @@ export default function WebhooksPage() {
       <H2 id="verifying">Verifying</H2>
       <P>
         NexG signs the events it sends in the same way: a bank adapter fetching the latest state
-        of a collection verifies the answer with this code, and so will you, when NexG starts
-        sending events to partners. Verify the raw body before parsing it, and compare in constant
-        time.
+        of a collection verifies the answer with this code, and so do{' '}
+        <A href="/docs/events">order events</A>, which NexG posts to merchants with its own header.
+        Verify the raw body before parsing it, and compare in constant time.
       </P>
       <CodeTabs className="mt-6" samples={VERIFY} title="Verifying a signature" />
 
@@ -255,12 +255,6 @@ export default function WebhooksPage() {
           Today only banks send events to NexG. Connections for POS, ERP, booking and inventory
           systems already have a place for a per-connection webhook secret; the endpoints that
           accept their events will be listed in the reference when they ship.
-        </p>
-      </Callout>
-      <Callout tone="soon" title="Events NexG sends you">
-        <p>
-          NexG does not push order changes to merchants yet. Until it does, poll{' '}
-          <A href="/docs/reference/list-orders">GET /v1/orders</A>; once a minute costs 3 tokens.
         </p>
       </Callout>
     </DocPage>

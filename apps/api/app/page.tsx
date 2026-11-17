@@ -44,15 +44,16 @@ function explorerExamples(): ExplorerExample[] {
 const AUDIENCES = [
   {
     name: 'Merchants',
-    today: 'Read your orders into your own system, and show your NexG catalogue on your website.',
-    soon: 'Book transfers and couriers for guests by API; order events pushed to you.',
+    today:
+      'Read your orders into your own system, get order events pushed to you, and show your NexG catalogue on your website.',
+    soon: 'Change and cancel bookings by API, and every kind of booking in one list.',
     href: '/docs/merchants',
   },
   {
     name: 'Partners and developers',
     today:
       'Build on live merchants and catalogues, delivery zones, experiences and bookable services, and try bookings with test keys.',
-    soon: 'Order events pushed to you, and OAuth for third-party apps.',
+    soon: 'Availability for every kind of booking, and OAuth for third-party apps.',
     href: '/docs/quickstart',
   },
   {

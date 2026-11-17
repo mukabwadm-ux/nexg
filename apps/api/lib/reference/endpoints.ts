@@ -1,4 +1,5 @@
 import {
+  BRANCH_FIELDS,
   BOOKING_RECEIPT_FIELDS,
   BOOKING_REQUEST_FIELDS,
   CATALOGUE_ITEM_FIELDS,
@@ -221,9 +222,10 @@ export const ENDPOINTS: EndpointDoc[] = [
     status: 'live',
     group: 'Catalogue',
     title: 'Get a merchant and its catalogue',
-    summary: 'One live merchant with every item it sells, in catalogue order.',
+    summary: 'One live merchant, every open branch, and every item it sells, in catalogue order.',
     description: [
-      'Returns one live merchant and its catalogue. Items come in the merchant’s own order (by sort, then name), the same order its storefront on nexgapp.com uses.',
+      'Returns one live merchant, its open branches and its catalogue. Items come in the merchant’s own order (by sort, then name), the same order its storefront on nexgapp.com uses.',
+      'branches lists every open branch, the primary one first, with today’s hours. The merchant’s own branch_ fields describe the primary branch only.',
       'Age-restricted items are listed only when the merchant holds a verified licence for them, and their age_restricted flag is true so you can label them.',
     ],
     auth: { kind: 'optional_key', scope: 'public_read' },
@@ -246,6 +248,36 @@ export const ENDPOINTS: EndpointDoc[] = [
       ok: true,
       data: {
         merchant: SOKONI,
+        branches: [
+          {
+            id: '0f1e2d3c-4b5a-4968-8776-655443322110',
+            name: 'Westlands',
+            address: 'Woodvale Grove, Westlands, Nairobi',
+            latitude: -1.2648,
+            longitude: 36.8027,
+            is_primary: true,
+            place_type: 'physical',
+            contact: '+254700000201',
+            paused: false,
+            opens_today: '08:00:00',
+            closes_today: '22:00:00',
+            closed_today: false,
+          },
+          {
+            id: '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5e',
+            name: 'Kilimani',
+            address: 'Argwings Kodhek Road, Kilimani, Nairobi',
+            latitude: -1.2921,
+            longitude: 36.7836,
+            is_primary: false,
+            place_type: 'physical',
+            contact: null,
+            paused: false,
+            opens_today: '10:00:00',
+            closes_today: '21:00:00',
+            closed_today: false,
+          },
+        ],
         catalogue: [
           {
             id: '5d8e1f2a-3b4c-4d5e-8f6a-7b8c9d0e1f2a',
@@ -277,6 +309,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     },
     responseResources: [
       { schema: 'PublicMerchant', title: 'Merchant', at: 'data.merchant', fields: MERCHANT_FIELDS },
+      { schema: 'PublicBranch', title: 'Branch', at: 'data.branches[]', fields: BRANCH_FIELDS },
       {
         schema: 'CatalogueItem',
         title: 'Catalogue item',
@@ -291,7 +324,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 500,
         code: 'internal_error',
-        when: 'NexG could not read the merchant or its catalogue.',
+        when: 'NexG could not read the merchant, its branches or its catalogue.',
       },
       UNEXPECTED_ERROR,
     ],
@@ -539,7 +572,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     description: [
       'Returns orders placed with the merchant your key is bound to, newest first: guest orders from nexgapp.com and service bookings made through the API. With a test key it returns your test bookings instead, never real orders.',
       'You never send a merchant id. The key decides the merchant, so a key can never read another merchant’s orders. The stage is the one the merchant console shows, read from the order rather than worked out again.',
-      'Poll this endpoint to keep your system in step with NexG. Each call costs 3 tokens; at the default 60 tokens a minute, polling once a minute leaves plenty of room for catalogue reads.',
+      'To keep your system in step with NexG, add an order events endpoint and NexG posts each new booking and status change to you. Poll this endpoint as a backstop: each call costs 3 tokens; at the default 60 tokens a minute, polling once a minute leaves plenty of room for catalogue reads.',
     ],
     auth: { kind: 'key', scope: 'merchant_read', merchantBound: true },
     rateCost: 3,
@@ -557,6 +590,7 @@ export const ENDPOINTS: EndpointDoc[] = [
             reference: 'NX-261110-0003',
             service: '',
             quantity: 3,
+            status: 'confirmed',
             stage: 'preparing',
             payment_method: 'mpesa_stk',
             payment_status: 'paid',
@@ -630,6 +664,7 @@ export const ENDPOINTS: EndpointDoc[] = [
           reference: 'NX-261110-0003',
           service: '',
           quantity: 3,
+          status: 'completed',
           stage: 'delivered',
           payment_method: 'mpesa_stk',
           payment_status: 'paid',

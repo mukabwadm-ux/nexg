@@ -4,8 +4,10 @@ import { redirect } from 'next/navigation';
 
 import { createClient } from '@/lib/session';
 import { listDeveloperMerchants } from '@/lib/merchants';
+import { listWebhookEndpoints, rpcCaller } from '@/lib/webhooks';
 
 import { DeveloperConsole } from './developer-console';
+import { Webhooks } from './webhooks';
 
 /**
  * The developer console: issue an API key.
@@ -18,7 +20,7 @@ import { DeveloperConsole } from './developer-console';
  */
 export const metadata: Metadata = {
   title: 'Developer console',
-  description: 'Issue an API key for the NexG API.',
+  description: 'Issue an API key for the NexG API, and receive booking events.',
 };
 
 export const dynamic = 'force-dynamic';
@@ -35,6 +37,7 @@ export default async function DevelopersPage() {
   }
 
   const merchants = await listDeveloperMerchants(supabase);
+  const webhooks = await listWebhookEndpoints(rpcCaller(supabase));
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
@@ -47,6 +50,10 @@ export default async function DevelopersPage() {
       </header>
 
       <DeveloperConsole merchants={merchants} email={user.email ?? null} />
+
+      <div className="mt-8">
+        <Webhooks merchants={merchants} initial={webhooks} />
+      </div>
 
       <p className="text-ink/50 mt-8 text-xs">
         Not ready to wire an integration yet?{' '}

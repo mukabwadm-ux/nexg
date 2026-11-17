@@ -12,11 +12,14 @@ import {
   ERROR_CODES,
   ListRequest,
   PageEnvelope,
+  PublicBranch,
   PublicEvent,
   PublicMerchant,
   PublicZone,
   ServiceBooking,
+  WebhookEvent,
 } from '@nexg/contracts/api';
+import { EVENT_EXAMPLE } from '../lib/reference/events';
 
 import { tokenize } from '../lib/highlight';
 import { jsonError, parseQuery } from '../lib/http';
@@ -74,6 +77,7 @@ const SCHEMAS = {
   PublicEvent,
   ApiService,
   ApiOrder,
+  PublicBranch,
   ServiceBooking,
   BookingReceipt,
 } as const;
@@ -175,7 +179,13 @@ describe('the documented shapes match @nexg/contracts/api', () => {
     const detail = z
       .object({
         ok: z.literal(true),
-        data: z.object({ merchant: PublicMerchant, catalogue: z.array(CatalogueItem) }).strict(),
+        data: z
+          .object({
+            merchant: PublicMerchant,
+            branches: z.array(PublicBranch),
+            catalogue: z.array(CatalogueItem),
+          })
+          .strict(),
         meta: z.object({ api_version: z.literal('v1') }).strict(),
       })
       .strict();
@@ -193,6 +203,10 @@ describe('the documented shapes match @nexg/contracts/api', () => {
       })
       .strict();
     expect(() => receipt.parse(booking.responseExample)).not.toThrow();
+  });
+
+  it('the order events example is a valid event', () => {
+    expect(() => WebhookEvent.parse(EVENT_EXAMPLE)).not.toThrow();
   });
 
   it('the one-order example is a valid order', () => {

@@ -297,6 +297,45 @@ export const SERVICE_FIELDS: FieldDoc[] = [
   },
 ];
 
+export const BRANCH_FIELDS: FieldDoc[] = [
+  { name: 'id', type: 'uuid', description: 'NexG’s id for the branch.' },
+  { name: 'name', type: 'string | null', description: 'What the merchant calls the branch.' },
+  { name: 'address', type: 'string | null', description: 'Its street address.' },
+  { name: 'latitude', type: 'number | null', description: 'Where it is, for a map.' },
+  { name: 'longitude', type: 'number | null', description: 'Where it is, for a map.' },
+  {
+    name: 'is_primary',
+    type: 'boolean',
+    description: 'The branch the merchant’s own branch_ fields describe.',
+  },
+  {
+    name: 'place_type',
+    type: 'string',
+    description: 'physical for a place guests visit; other values for service that comes to them.',
+  },
+  {
+    name: 'contact',
+    type: 'string | null',
+    description: 'A public phone number or email for the branch, when the merchant gives one.',
+  },
+  { name: 'paused', type: 'boolean', description: 'Not taking orders or bookings for now.' },
+  {
+    name: 'opens_today',
+    type: 'string | null',
+    description: 'Today’s opening time in Nairobi, HH:MM:SS.',
+  },
+  {
+    name: 'closes_today',
+    type: 'string | null',
+    description: 'Today’s closing time in Nairobi, HH:MM:SS.',
+  },
+  {
+    name: 'closed_today',
+    type: 'boolean | null',
+    description: 'True when it does not open today.',
+  },
+];
+
 export const ORDER_FIELDS: FieldDoc[] = [
   { name: 'order_id', type: 'uuid', description: 'NexG’s id for the order. Store it.' },
   {
@@ -315,10 +354,16 @@ export const ORDER_FIELDS: FieldDoc[] = [
     description: 'Units on the order: passengers for a transfer, items for a basket.',
   },
   {
+    name: 'status',
+    type: 'string',
+    description:
+      'The same five words for every kind of booking: requested, confirmed, in_progress, completed or cancelled. Use it to decide what to do; use stage for detail.',
+  },
+  {
     name: 'stage',
     type: 'string',
     description:
-      'Where the order is: placed, confirmed, preparing, ready, picked_up, arriving, delivered, cancelled, disputed or refunded. The same stage the merchant console shows.',
+      'Where the order is in its own workflow: placed, confirmed, preparing, ready, picked_up, arriving, delivered, cancelled, disputed or refunded. The same stage the merchant console shows.',
   },
   {
     name: 'payment_method',

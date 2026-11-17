@@ -10,8 +10,8 @@ const AUDIENCES = [
   {
     name: 'Merchants',
     today:
-      'Read your own orders into your back office with a key bound to your merchant, and show your NexG listing and catalogue on your own website.',
-    soon: 'Book transfers and couriers for your guests through the API, and receive order events instead of polling.',
+      'Read your own orders into your back office with a key bound to your merchant, get order events instead of polling, and show your NexG listing and catalogue on your own website.',
+    soon: 'Change and cancel bookings through the API, and every kind of booking in one list.',
     href: '/docs/merchants',
     link: 'Merchant integration guide',
   },
@@ -19,7 +19,7 @@ const AUDIENCES = [
     name: 'Partners and developers',
     today:
       'Build on NexG’s public data: live merchants and catalogues, delivery zones, upcoming experiences and bookable services. Public reads work without a key, and test keys try bookings in a sandbox.',
-    soon: 'Order events sent to you instead of polling, and OAuth sign-in for third-party apps.',
+    soon: 'Availability for every kind of booking, and OAuth sign-in for third-party apps.',
     href: '/docs/quickstart',
     link: 'Quickstart',
   },
@@ -177,7 +177,6 @@ export default function IntroductionPage() {
       </P>
       <List>
         <li>Changing an order through the API: any <C>PATCH</C> endpoint.</li>
-        <li>Events NexG sends to you, such as an order changing stage. Poll your orders for now.</li>
         <li>Two-way sync with a POS, ERP, booking or inventory system.</li>
         <li>OAuth sign-in for third-party apps. Use API keys.</li>
       </List>

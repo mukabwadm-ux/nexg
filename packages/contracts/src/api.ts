@@ -166,6 +166,37 @@ export const PublicMerchant = z
 export type PublicMerchant = z.infer<typeof PublicMerchant>;
 
 /**
+ * One open branch of a listed merchant.
+ *
+ * Every branch, not only the primary one that `PublicMerchant` describes.
+ * Nothing a rider or the merchant's team uses internally: no rider phone,
+ * no pickup instructions, no reason a branch is paused.
+ */
+export const PublicBranch = z
+  .object({
+    id: Uuid,
+    name: z.string().nullable(),
+    address: z.string().nullable(),
+    latitude: z.number().nullable(),
+    longitude: z.number().nullable(),
+    /** The branch the merchant's own fields describe. */
+    is_primary: z.boolean(),
+    /** `physical` for a place guests visit; other values for mobile or online service. */
+    place_type: z.string(),
+    /** A public phone number or email for the branch, when the merchant gives one. */
+    contact: z.string().nullable(),
+    /** Not taking orders or bookings for now. */
+    paused: z.boolean(),
+    /** Today's hours in Nairobi time, HH:MM:SS. */
+    opens_today: z.string().nullable(),
+    closes_today: z.string().nullable(),
+    closed_today: z.boolean().nullable(),
+  })
+  .strict();
+
+export type PublicBranch = z.infer<typeof PublicBranch>;
+
+/**
  * One item on a merchant's menu.
  *
  * `price_kes` is whole shillings, which is an integer. A float
@@ -420,12 +451,28 @@ export type ApiService = z.infer<typeof ApiService>;
  * the merchant does not need a separate "read your orders" concept
  * to be told the stage of an order it placed.
  */
+/**
+ * A booking's status: the same five words for every kind of booking. The
+ * stage beside it says where the booking is in its own workflow.
+ */
+export const BookingStatus = z.enum([
+  'requested',
+  'confirmed',
+  'in_progress',
+  'completed',
+  'cancelled',
+]);
+export type BookingStatus = z.infer<typeof BookingStatus>;
+
 export const ApiOrder = z
   .object({
     order_id: Uuid,
     reference: z.string(),
     service: z.string(),
     quantity: z.number().int().positive(),
+    /** requested, confirmed, in_progress, completed or cancelled. */
+    status: BookingStatus,
+    /** Where the booking is in its own workflow, for example `picked_up`. */
     stage: z.string(),
     payment_method: z.string(),
     payment_status: z.string(),
@@ -439,3 +486,37 @@ export const ApiOrder = z
   .strict();
 
 export type ApiOrder = z.infer<typeof ApiOrder>;
+
+/**
+ * An event NexG posts to a merchant's webhook endpoint.
+ *
+ * The body is signed: `NexG-Signature: t=<unix seconds>,v1=<hex HMAC-SHA256
+ * of "<t>.<raw body>">`, keyed with the endpoint's signing secret. The same
+ * event id is sent on every retry.
+ */
+export const WebhookEventType = z.enum(['booking.created', 'booking.status_changed', 'ping']);
+export type WebhookEventType = z.infer<typeof WebhookEventType>;
+
+export const WebhookEvent = z
+  .object({
+    id: Uuid,
+    type: WebhookEventType,
+    api_version: z.literal('v1'),
+    environment: z.enum(['live', 'test']),
+    created_at: z.string(),
+    data: z
+      .object({
+        /** The booking as `GET /v1/orders/{id}` returns it, at this event. */
+        booking: ApiOrder.optional(),
+        /** booking.status_changed only. */
+        previous_status: BookingStatus.optional(),
+        previous_stage: z.string().optional(),
+        /** ping only. */
+        endpoint_id: Uuid.optional(),
+        message: z.string().optional(),
+      })
+      .strict(),
+  })
+  .strict();
+
+export type WebhookEvent = z.infer<typeof WebhookEvent>;

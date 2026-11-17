@@ -10,6 +10,34 @@ import type { ChangelogEntry } from './types';
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-11-17',
+    kind: 'added',
+    title: 'Order events',
+    body: [
+      'NexG now posts an event to your server when one of your bookings is created or its status changes, so you no longer have to poll. Add an https endpoint, live or test, in the developer console, under Webhooks.',
+      'Each event is signed with the endpoint’s secret, the same way banks sign the events they send NexG, and is retried for about two days until your server answers 2xx. The console lists each endpoint’s recent deliveries and sends a test event on request.',
+    ],
+    endpoints: [],
+  },
+  {
+    date: '2026-11-17',
+    kind: 'changed',
+    title: 'A status for every booking',
+    body: [
+      'Orders now carry status beside stage: requested, confirmed, in_progress, completed or cancelled, the same five words for every kind of booking. stage keeps the detail, such as picked_up. A booking completed and later disputed or refunded stays completed.',
+    ],
+    endpoints: ['list-orders', 'get-order'],
+  },
+  {
+    date: '2026-11-17',
+    kind: 'changed',
+    title: 'Every branch of a merchant',
+    body: [
+      'GET /v1/catalog/merchants/{id} now lists every open branch in data.branches, the primary one first, with its address, position, contact and today’s hours. The merchant’s own branch_ fields still describe the primary branch.',
+    ],
+    endpoints: ['get-merchant'],
+  },
+  {
     date: '2026-11-14',
     kind: 'fixed',
     title: 'A venue booking is charged once',

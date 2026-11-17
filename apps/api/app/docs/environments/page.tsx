@@ -120,6 +120,13 @@ export default function EnvironmentsPage() {
             'A bucket of its own, shared by your test keys.',
             'Your live bucket, shared by your live keys.',
           ],
+          [
+            <A key="e" href="/docs/events">
+              Order events
+            </A>,
+            'Sent to your test endpoints.',
+            'Sent to your live endpoints.',
+          ],
         ]}
       />
       <P>

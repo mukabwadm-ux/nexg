@@ -12,7 +12,7 @@ import { createPublicClient } from '@/lib/supabase';
 import { jsonError, withErrorEnvelope } from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
 import { readHeaders } from '@/lib/cache';
-import { PublicMerchant, CatalogueItem, Uuid } from '@nexg/contracts/api';
+import { PublicBranch, PublicMerchant, CatalogueItem, Uuid } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -63,6 +63,22 @@ export const GET = withErrorEnvelope(
       return jsonError('not_found', 'Merchant not found');
     }
 
+    // Every open branch, primary first. The merchant's own fields describe
+    // the primary branch only.
+    const { data: branches, error: branchesError } = await supabase
+      .from('merchant_branch_public')
+      .select(
+        'id, name, address, latitude, longitude, is_primary, place_type, contact, paused, opens_today, closes_today, closed_today',
+      )
+      .eq('merchant_id', id)
+      .order('is_primary', { ascending: false })
+      .order('sort', { ascending: true })
+      .order('name', { ascending: true });
+
+    if (branchesError) {
+      return jsonError('internal_error', 'Failed to fetch branches', { detail: branchesError });
+    }
+
     // Fetch catalogue items
     const { data: catalogue, error: catalogueError } = await supabase
       .from('catalogue_public')
@@ -81,6 +97,7 @@ export const GET = withErrorEnvelope(
       ok: true,
       data: {
         merchant: PublicMerchant.parse(merchant),
+        branches: (branches ?? []).map((branch) => PublicBranch.parse(branch)),
         catalogue: (catalogue ?? []).map((item) => CatalogueItem.parse(item)),
       },
       meta: {
