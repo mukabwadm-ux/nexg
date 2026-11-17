@@ -3,44 +3,26 @@
 import { captchaSiteKey } from '@nexg/ui';
 import * as React from 'react';
 
+import {
+  type CheckState,
+  loadTurnstile,
+  RENDER_FAILED,
+  SCRIPT_BLOCKED,
+  SCRIPT_TIMEOUT,
+  type TurnstileWidgetApi,
+  UNSUPPORTED,
+} from './turnstile';
+
 /*
  * Cloudflare Turnstile, shown in the form.
  *
  * The rest of NexG runs the check invisibly in a corner of the page. On the
  * developer console that left people stuck: when Cloudflare wanted a click,
  * the box in the corner went unnoticed and the sign-in was refused. Here the
- * check sits above the Sign in button, so it can be seen and ticked, and if
- * Cloudflare refuses to run on the page its own error shows in the box.
+ * check sits above the Sign in button, so it can be seen and ticked, and
+ * every turn it takes (asking for a click, passed, failed with a code) is
+ * reported to the form, which says it in words.
  */
-
-type TurnstileWidgetApi = {
-  render: (container: HTMLElement, options: Record<string, unknown>) => string;
-  reset: (widgetId: string) => void;
-  remove: (widgetId: string) => void;
-};
-
-const SCRIPT_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-
-function loadTurnstile(): Promise<TurnstileWidgetApi> {
-  const existing = (window as unknown as { turnstile?: TurnstileWidgetApi }).turnstile;
-  if (existing) return Promise.resolve(existing);
-  return new Promise((resolve, reject) => {
-    let script = document.querySelector<HTMLScriptElement>(`script[src="${SCRIPT_SRC}"]`);
-    if (!script) {
-      script = document.createElement('script');
-      script.src = SCRIPT_SRC;
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-    }
-    script.addEventListener('load', () => {
-      const api = (window as unknown as { turnstile?: TurnstileWidgetApi }).turnstile;
-      if (api) resolve(api);
-      else reject(new Error('Turnstile did not load.'));
-    });
-    script.addEventListener('error', () => reject(new Error('Turnstile could not be loaded.')));
-  });
-}
 
 export interface TurnstileHandle {
   /** A token is good for one sign-in; ask for a new one after each attempt. */
@@ -48,24 +30,26 @@ export interface TurnstileHandle {
 }
 
 export function TurnstileBox({
-  onToken,
-  onError,
+  onChange,
   handle,
 }: {
-  onToken: (token: string | null) => void;
-  onError: (code: string) => void;
+  onChange: (check: CheckState) => void;
   handle: React.MutableRefObject<TurnstileHandle | null>;
 }) {
   const container = React.useRef<HTMLDivElement>(null);
   const siteKey = captchaSiteKey();
-  const callbacks = React.useRef({ onToken, onError });
-  callbacks.current = { onToken, onError };
+  const report = React.useRef(onChange);
+  report.current = onChange;
 
   React.useEffect(() => {
     if (!siteKey || !container.current) return;
-    let widgetId: string | null = null;
     let api: TurnstileWidgetApi | null = null;
+    let widgetId: string | null = null;
     let cancelled = false;
+    const tell = (check: CheckState) => {
+      if (!cancelled) report.current(check);
+    };
+
     loadTurnstile()
       .then((loaded) => {
         if (cancelled || !container.current) return;
@@ -74,22 +58,29 @@ export function TurnstileBox({
           sitekey: siteKey,
           size: 'flexible',
           appearance: 'always',
-          callback: (token: string) => callbacks.current.onToken(token),
-          'expired-callback': () => callbacks.current.onToken(null),
+          callback: (token: string) => tell({ state: 'passed', token }),
+          'expired-callback': () => tell({ state: 'checking' }),
+          'before-interactive-callback': () => tell({ state: 'needs-click' }),
+          'after-interactive-callback': () => tell({ state: 'checking' }),
+          'unsupported-callback': () => tell({ state: 'failed', code: UNSUPPORTED }),
           'error-callback': (code: string | number) => {
-            callbacks.current.onToken(null);
-            callbacks.current.onError(String(code));
+            tell({ state: 'failed', code: String(code || 'unknown') });
             return true;
           },
         });
         handle.current = {
           reset: () => {
-            callbacks.current.onToken(null);
             if (api && widgetId) api.reset(widgetId);
           },
         };
       })
-      .catch(() => callbacks.current.onError('script-not-loaded'));
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : '';
+        const code =
+          message === SCRIPT_BLOCKED || message === SCRIPT_TIMEOUT ? message : RENDER_FAILED;
+        tell({ state: 'failed', code });
+      });
+
     return () => {
       cancelled = true;
       handle.current = null;
