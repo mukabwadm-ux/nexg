@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import type { Coverage, Place } from '@nexg/location';
 
 import { createPublicClient } from '@/lib/supabase/public';
+import { createClient } from '@/lib/supabase/server';
 
 /* Result types Google gives for a spot a rider can walk up to, best first. */
 const PRECISE = ['street_address', 'premise', 'subpremise', 'establishment', 'point_of_interest'];
@@ -53,8 +54,19 @@ const geocodeCell = unstable_cache(
  * Everything here is a thin call onto a database function,
  * because coverage, zones and saved places are decided in one
  * place and these actions must not become a second opinion. The
- * The connection-city fallback runs after the initial render because
+ * connection-city fallback runs after the initial render because
  * its headers and coverage lookup are not needed to show the page.
+ *
+ * Two clients, chosen by whether the answer depends on who is
+ * asking. Coverage and street names are the same for everyone, so
+ * they use the public client. Saved places, the account's last
+ * place and the consent record belong to a guest, so they use the
+ * visitor's own session: through the public client the database
+ * cannot tell who is asking, and from October to November 2026 it
+ * refused every saved-place call, so no signed-in guest's place
+ * ever reached their account. These run only as server actions
+ * after the page has rendered, so reading cookies here never makes
+ * a page dynamic.
  */
 
 export interface ResolvedPlace {
@@ -64,8 +76,25 @@ export interface ResolvedPlace {
   [key: string]: unknown;
 }
 
+/**
+ * The visitor's own session when they have a real account, else null.
+ *
+ * Saved places are only for real accounts, as ordering is. A signed-out
+ * visitor or an anonymous session gets null, and the browser keeps their
+ * places as before, without a refused database call on every page.
+ */
+async function signedInClient() {
+  const supabase = createClient();
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user || data.user.is_anonymous) return null;
+  return supabase;
+}
+
 export async function resolveLocation(context: Record<string, unknown>) {
-  const supabase = createPublicClient();
+  /* Session client: step 3 of the ladder is the signed-in guest's
+     last place, which the public client can never see. Signed-out
+     visitors are allowed this call and get the same answer as before. */
+  const supabase = createClient();
   const { data, error } = await supabase.rpc('rpc_resolve_location', {
     p_context: context as never,
   });
@@ -105,13 +134,21 @@ export async function streetFor(
 }
 
 export async function confirmPlace(payload: Record<string, unknown>) {
-  const supabase = createPublicClient();
+  /*
+   * "Just this once" sends save: false. rpc_place_confirm stores
+   * every pin it is given, so a one-off pin is not sent: it stays
+   * in this browser like any other, and the account keeps only the
+   * places somebody chose to save as Home or Work.
+   */
+  if (payload['save'] === false) {
+    return { ok: true, stored: false, reason: 'Used for this visit only.' };
+  }
+  const supabase = await signedInClient();
+  if (!supabase) return { ok: true, stored: false, reason: 'Kept on this device only.' };
   const { data, error } = await supabase.rpc('rpc_place_confirm', { p_payload: payload as never });
   if (error) {
     /*
-     * A signed-out visitor is refused this RPC, which is correct
-     * — their places live in their own browser. It is not an
-     * error worth surfacing, so it comes back as "not stored"
+     * Not an error worth surfacing: it comes back as "not stored"
      * and the client carries on with the place it already has.
      */
     return { ok: true, stored: false, reason: 'Kept on this device only.' };
@@ -120,14 +157,16 @@ export async function confirmPlace(payload: Record<string, unknown>) {
 }
 
 export async function listPlaces() {
-  const supabase = createPublicClient();
+  const supabase = await signedInClient();
+  if (!supabase) return [];
   const { data, error } = await supabase.rpc('rpc_place_list');
   if (error) return [];
   return (data ?? []) as Record<string, unknown>[];
 }
 
 export async function deletePlace(id: string) {
-  const supabase = createPublicClient();
+  const supabase = await signedInClient();
+  if (!supabase) return { ok: false, message: 'Sign in to manage your places.' };
   const { data, error } = await supabase.rpc('rpc_place_delete', { p_id: id });
   if (error) return { ok: false, message: error.message };
   return data as { ok: boolean; message?: string };
@@ -140,7 +179,9 @@ export async function noteLocationEvent(
   accuracyBand?: string,
   step?: string,
 ) {
-  const supabase = createPublicClient();
+  /* Session client, so a signed-in guest's consent is recorded
+     against them, as the database function is written to do. */
+  const supabase = createClient();
   await supabase.rpc('rpc_location_event', {
     p_session: sessionId,
     p_surface: surface,
