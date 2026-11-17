@@ -62267,7 +62267,7 @@ export type Database = {
         | 'movers_relocation'
         | 'premium_services';
       merchant_control_source: 'merchant' | 'staff' | 'system';
-      merchant_user_role: 'owner' | 'manager';
+      merchant_user_role: 'owner' | 'manager' | 'cashier';
       mood: 'wild' | 'taste' | 'night' | 'slow' | 'stay' | 'events';
       msg_channel:
         | 'web'
@@ -64072,7 +64072,7 @@ export const Constants = {
         'premium_services',
       ],
       merchant_control_source: ['merchant', 'staff', 'system'],
-      merchant_user_role: ['owner', 'manager'],
+      merchant_user_role: ['owner', 'manager', 'cashier'],
       mood: ['wild', 'taste', 'night', 'slow', 'stay', 'events'],
       msg_channel: [
         'web',

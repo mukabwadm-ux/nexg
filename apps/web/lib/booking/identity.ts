@@ -45,7 +45,12 @@ export async function merchantBookingIdentity(): Promise<BookingIdentity | null>
     .eq('user_id', auth.user.id)
     .eq('merchant_id', partner.id)
     .maybeSingle();
-  if (membershipError || !membership || !['owner', 'manager'].includes(membership.role))
+  // Owners and managers only: a cashier works the live queue, not bookings.
+  if (
+    membershipError ||
+    !membership ||
+    (membership.role !== 'owner' && membership.role !== 'manager')
+  )
     return null;
   const merchantQuery =
     access.state === 'legacy'
