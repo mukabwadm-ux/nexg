@@ -36,6 +36,7 @@ const row: Database['public']['Tables']['category_config']['Row'] = {
     },
   ],
   requires_ops_mapping: false,
+  retired_subcategories: [],
   sort: 1,
   subcategories: [
     {
