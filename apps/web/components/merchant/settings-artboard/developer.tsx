@@ -3,6 +3,7 @@
 import { Plus, RefreshCw } from 'lucide-react';
 import * as React from 'react';
 
+import { LiveDeveloperAccess } from './developer-live';
 import { kenyaTime, type Credential, type Webhook } from './model';
 import { useSettings } from './store';
 import { Action, Badge, Card, Empty, Field, Modal, Note, TextLink } from './ui';
@@ -26,16 +27,9 @@ export function DeveloperScreen() {
       label,
     );
   }
-  if (!identity.sample)
-    return (
-      <Card title="API & webhooks" description="Manage scoped access for supported systems.">
-        <Empty title="Developer access is not available for this workspace">
-          API credentials and webhook management require an approved developer-access service. No
-          keys, scopes or event subscriptions are created here.
-        </Empty>
-        <TextLink href="/merchant/support">Request developer access</TextLink>
-      </Card>
-    );
+  // A real workspace manages keys and webhooks in the developer console on
+  // api.nexgapp.com; this tab links there and shows what is connected.
+  if (!identity.sample) return <LiveDeveloperAccess merchantId={identity.merchantId} />;
   return (
     <>
       <div className={s.stack}>

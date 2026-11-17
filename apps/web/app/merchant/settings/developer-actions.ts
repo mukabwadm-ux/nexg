@@ -1,0 +1,137 @@
+'use server';
+
+import { z } from 'zod';
+
+import { createClient } from '@/lib/supabase/server';
+
+/**
+ * What Settings › API & webhooks shows a real workspace: the business's API
+ * keys and webhook endpoints, read-only. Keys and endpoints are created in
+ * the developer console on api.nexgapp.com, where a key is shown once.
+ *
+ * Row-level security decides what comes back: members of the merchant read
+ * its key records (never the key, and the hash is not selected); webhook
+ * endpoints come from rpc_api_webhook_endpoints, which answers for the
+ * merchants the person owns.
+ */
+
+export interface DeveloperKey {
+  id: string;
+  prefix: string;
+  environment: 'live' | 'test';
+  scopes: string[];
+  state: 'active' | 'expired' | 'revoked';
+  createdAt: string;
+  lastUsedAt: string | null;
+}
+
+export interface DeveloperEndpoint {
+  id: string;
+  url: string;
+  environment: 'live' | 'test';
+  enabled: boolean;
+  lastDeliveryAt: string | null;
+  lastDeliveryOk: boolean | null;
+  lastStatusCode: number | null;
+}
+
+export type DeveloperAccess =
+  | {
+      ok: true;
+      isOwner: boolean;
+      keys: DeveloperKey[];
+      /** Null when the endpoints could not be read; the keys still show. */
+      endpoints: DeveloperEndpoint[] | null;
+    }
+  | { ok: false; message: string };
+
+const KeyRow = z.object({
+  id: z.string(),
+  key_prefix: z.string(),
+  environment: z.string().nullable().optional(),
+  scopes: z.array(z.string()).nullable(),
+  state: z.string(),
+  created_at: z.string(),
+  last_used_at: z.string().nullable(),
+  expires_at: z.string().nullable(),
+});
+
+const EndpointRow = z.object({
+  id: z.string(),
+  merchant_id: z.string(),
+  url: z.string(),
+  environment: z.enum(['live', 'test']),
+  enabled: z.boolean(),
+  last_delivery_at: z.string().nullable(),
+  last_delivery_ok: z.boolean().nullable(),
+  last_status_code: z.number().nullable(),
+});
+
+export async function loadDeveloperAccess(merchantId: string): Promise<DeveloperAccess> {
+  if (!z.string().uuid().safeParse(merchantId).success) {
+    return { ok: false, message: 'Developer access could not be loaded.' };
+  }
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, message: 'Sign in again to see developer access.' };
+
+  const [membership, keys, endpoints] = await Promise.all([
+    supabase
+      .from('merchant_user')
+      .select('role')
+      .eq('merchant_id', merchantId)
+      .eq('user_id', user.id)
+      .maybeSingle(),
+    supabase
+      .from('api_key')
+      .select('id, key_prefix, environment, scopes, state, created_at, last_used_at, expires_at')
+      .eq('merchant_id', merchantId)
+      .order('created_at', { ascending: false })
+      .limit(50),
+    supabase.rpc('rpc_api_webhook_endpoints'),
+  ]);
+
+  if (keys.error) return { ok: false, message: 'Developer access could not be loaded.' };
+  const keyRows = z.array(KeyRow).safeParse(keys.data ?? []);
+  if (!keyRows.success) return { ok: false, message: 'Developer access could not be loaded.' };
+
+  const now = Date.now();
+  const endpointRows = endpoints.error
+    ? null
+    : z.array(EndpointRow).safeParse(endpoints.data ?? []);
+
+  return {
+    ok: true,
+    isOwner: (membership.data as { role?: string } | null)?.role === 'owner',
+    keys: keyRows.data.map((k) => ({
+      id: k.id,
+      prefix: k.key_prefix,
+      environment: k.environment === 'test' ? 'test' : 'live',
+      scopes: k.scopes ?? [],
+      state:
+        k.state !== 'active'
+          ? 'revoked'
+          : k.expires_at && Date.parse(k.expires_at) <= now
+            ? 'expired'
+            : 'active',
+      createdAt: k.created_at,
+      lastUsedAt: k.last_used_at,
+    })),
+    endpoints:
+      endpointRows && endpointRows.success
+        ? endpointRows.data
+            .filter((e) => e.merchant_id === merchantId)
+            .map((e) => ({
+              id: e.id,
+              url: e.url,
+              environment: e.environment,
+              enabled: e.enabled,
+              lastDeliveryAt: e.last_delivery_at,
+              lastDeliveryOk: e.last_delivery_ok,
+              lastStatusCode: e.last_status_code,
+            }))
+        : null,
+  };
+}
