@@ -146,7 +146,52 @@ test(
         assert.equal(hold.paymentStatus, 'unpaid');
         return { quote, intent, hold };
       }
+      async function search(propertyId?: string) {
+        const params = new URLSearchParams({
+          checkIn: f.input.checkIn,
+          checkOut: f.input.checkOut,
+          adults: String(f.input.adults),
+          children: String(f.input.children),
+          ...(propertyId ? { propertyId } : {}),
+        });
+        const collections = [
+          'reservations',
+          'booking-operations',
+          'booking-audit',
+          'booking-outbox',
+        ];
+        const before = await Promise.all(
+          collections.map(async (collection) => (await f.docs(collection)).length),
+        );
+        const response = await fetch(base + '/search?' + params, { headers: headers() });
+        assert.equal(response.status, 200, await response.clone().text());
+        const value = await response.json();
+        assert.equal(value.businessId, f.owner.businessId);
+        assert.equal(value.authority, 'nexg-booking-engine');
+        assert.equal(value.scope, 'business');
+        assert.equal(value.complete, true);
+        assert.equal(value.checkedUnits, 1);
+        assert.equal(value.request.propertyId, propertyId ?? null);
+        assert.deepEqual(
+          await Promise.all(
+            collections.map(async (collection) => (await f.docs(collection)).length),
+          ),
+          before,
+          'search must not create reservation, audit, request or outbox records',
+        );
+        return value;
+      }
       assert.equal((await availability()).available, true);
+      assert.deepEqual(
+        (await search()).items.map((row: { unitId: string }) => row.unitId),
+        [f.input.unitId],
+      );
+      assert.deepEqual(
+        (await search(f.input.propertyId)).items.map(
+          (row: { totalMinor: number }) => row.totalMinor,
+        ),
+        [20000],
+      );
       const { quote, intent, hold } = await createHold();
       assert.equal(
         (await fetch(base + '/holds/' + hold.id + '/activity', { headers: headers() })).status,
@@ -154,6 +199,10 @@ test(
         'an unpaid hold must not appear as confirmed Activity',
       );
       assert.equal((await availability()).available, false);
+      assert.deepEqual((await search()).items, [], 'a held room must not appear in dated search');
+      const heldList = await fetch(base + '/activity', { headers: headers() });
+      assert.equal(heldList.status, 200);
+      assert.deepEqual((await heldList.json()).items, [], 'holds are not confirmed Activity');
       assert.equal(
         (await availability({ ...f.input, checkIn: '2030-01-04', checkOut: '2030-01-06' }))
           .available,
@@ -280,6 +329,17 @@ test(
       assert.equal(activity.currency, 'KES');
       assert.equal(JSON.stringify(activity).includes(f.customer.email), false);
       assert.equal(JSON.stringify(activity).includes(binding.providerReference), false);
+      const activityList = await fetch(base + '/activity', { headers: headers() });
+      assert.equal(activityList.status, 200);
+      const list = await activityList.json();
+      assert.equal(list.businessId, f.owner.businessId);
+      assert.equal(list.complete, true);
+      assert.deepEqual(list.items, [activity]);
+      const foreignList = await fetch(base + '/activity', {
+        headers: headers(undefined, randomUUID()),
+      });
+      assert.equal(foreignList.status, 200);
+      assert.deepEqual((await foreignList.json()).items, [], 'another guest cannot read this stay');
       assert.equal(
         (
           await fetch(base + '/holds/' + hold.id + '/activity', {

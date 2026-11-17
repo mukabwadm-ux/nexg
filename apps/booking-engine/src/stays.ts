@@ -69,6 +69,9 @@ export interface StayHoldInput {
   requestId: string;
   expectedTotalMinor: number;
 }
+export type StaySearchInput = Omit<StayQuoteInput, 'unitId' | 'propertyId'> & {
+  propertyId: string | null;
+};
 export interface StayQuote extends StayQuoteInput {
   quoteId: string;
   offeringId: string;
@@ -265,6 +268,116 @@ export async function readStayAvailability(
     ...pricing,
     currency: 'KES' as const,
     observedAt: new Date(c.now()).toISOString(),
+  };
+}
+
+/** Tenant inventory only. This is not a cross-merchant search or a booking. */
+export async function readStaySearch(
+  engine: BookingEngine,
+  i: Identity,
+  input: StaySearchInput,
+  transaction: { request: any; coherentSnapshot: true },
+) {
+  assertStayPilotEnvironment();
+  actor(i);
+  if (transaction?.coherentSnapshot !== true || transaction.request?.transactionID == null)
+    fail('stay_snapshot_required', 'A coherent transaction snapshot is required.', 503);
+  if (
+    !exact(input, ['propertyId', 'checkIn', 'checkOut', 'adults', 'children']) ||
+    (input.propertyId !== null &&
+      (typeof input.propertyId !== 'string' || !uuid.test(input.propertyId))) ||
+    typeof input.checkIn !== 'string' ||
+    typeof input.checkOut !== 'string' ||
+    !Number.isSafeInteger(input.adults) ||
+    input.adults < 1 ||
+    !Number.isSafeInteger(input.children) ||
+    input.children < 0 ||
+    input.adults + input.children > 40
+  )
+    fail('invalid_stay_intent', 'Choose exact dates and guest counts.', 422);
+  const nights = times(
+    { ...input, propertyId: '', unitId: '' },
+    {
+      minNights: 1,
+      maxNights: 90,
+      checkInTime: '15:00',
+      checkOutTime: '11:00',
+    },
+  ).nights;
+  const c = engine.managementContext();
+  const req = c.request(i, transaction.request.transactionID);
+  const mapped = (await c.all('services', i, req))
+    .filter((service) => service.nexg?.stayInventory != null)
+    .map((service) => service.nexg.stayInventory);
+  if (!mapped.length || mapped.length > 200)
+    fail('stay_search_scope_unavailable', 'Complete native room scope is unavailable.', 503);
+  const scopes = new Set<string>(),
+    units = new Set<string>(),
+    resources = new Set<string>();
+  for (const binding of mapped) {
+    if (
+      ![binding.propertyId, binding.unitId, binding.resourceId].every(
+        (id) => typeof id === 'string' && uuid.test(id),
+      ) ||
+      units.has(binding.unitId.toLowerCase()) ||
+      resources.has(binding.resourceId.toLowerCase())
+    )
+      fail('stay_search_scope_unavailable', 'Complete native room scope is unavailable.', 503);
+    units.add(binding.unitId.toLowerCase());
+    resources.add(binding.resourceId.toLowerCase());
+    scopes.add(binding.propertyId);
+  }
+  if (input.propertyId !== null && !scopes.has(input.propertyId))
+    fail('stay_search_scope_unavailable', 'Complete native room scope is unavailable.', 503);
+  const scoped = mapped.filter(
+    (binding) => input.propertyId === null || binding.propertyId === input.propertyId,
+  );
+  const reservations = await c.all('reservations', i, req);
+  const now = c.now();
+  const items: Array<{
+    propertyId: string;
+    unitId: string;
+    offeringId: string;
+    nights: number;
+    nightlyMinor: number;
+    totalMinor: number;
+    currency: 'KES';
+  }> = [];
+  for (const binding of scoped) {
+    const exactRoom = { ...input, propertyId: binding.propertyId, unitId: binding.unitId };
+    const { service, inventory, resource } = await source(
+      engine,
+      i,
+      binding.propertyId,
+      binding.unitId,
+      req,
+    );
+    if (nights < inventory.minNights || nights > inventory.maxNights) continue;
+    const window = times(exactRoom, inventory);
+    if (
+      !admission(c, service, inventory, resource, exactRoom, window) ||
+      !available(reservations, resource, window.start, window.end, now)
+    )
+      continue;
+    items.push({
+      propertyId: binding.propertyId,
+      unitId: binding.unitId,
+      offeringId: service.publicId,
+      nights,
+      ...price(service, window.start, window.end),
+      currency: 'KES',
+    });
+  }
+  return {
+    contractVersion: 1 as const,
+    authority: 'nexg-booking-engine' as const,
+    scope: 'business' as const,
+    businessId: i.businessId,
+    complete: true as const,
+    request: input,
+    observedAt: new Date(now).toISOString(),
+    checkedUnits: scoped.length,
+    items,
   };
 }
 

@@ -114,7 +114,7 @@ const unavailable = () =>
 const invalid = () =>
   issue(422, 'INVALID_REQUEST', 'Check the stay dates, guests or reviewed quote.');
 
-async function readJson(message: Request | Response) {
+async function readJson(message: Request | Response, maximumBytes = 4096) {
   const reader = message.body?.getReader();
   if (!reader) throw new Error('Missing body');
   const decoder = new TextDecoder('utf-8', { fatal: true });
@@ -125,7 +125,7 @@ async function readJson(message: Request | Response) {
       const chunk = await reader.read();
       if (chunk.done) break;
       total += chunk.value.byteLength;
-      if (total > 4096) {
+      if (total > maximumBytes) {
         await reader.cancel();
         throw new Error('Body too large');
       }
@@ -182,6 +182,9 @@ export async function nativeVpsStayCheckout(
     return issue(503, 'STAY_ENGINE_DISABLED', 'Native Stays engine pilot is disabled.');
   const merchant = uuid.safeParse(params.merchantId);
   const [section, operation, action] = params.path;
+  const search = request.method === 'GET' && section === 'search' && params.path.length === 1;
+  const activityList =
+    request.method === 'GET' && section === 'activity' && params.path.length === 1;
   const availability =
     request.method === 'GET' && section === 'availability' && params.path.length === 1;
   const quote = request.method === 'POST' && section === 'quote' && params.path.length === 1;
@@ -200,7 +203,7 @@ export async function nativeVpsStayCheckout(
   const operationId = uuid.safeParse(operation);
   if (
     !merchant.success ||
-    !(quote || hold || status || payment || availability || activity) ||
+    !(quote || hold || status || payment || availability || activity || activityList || search) ||
     ((status || payment || activity) && !operationId.success)
   )
     return missing();
@@ -209,7 +212,7 @@ export async function nativeVpsStayCheckout(
     .map((v) => v.trim().toLowerCase())
     .filter((v) => MERCHANT_BOOKING_ID.test(v));
   if (!allowed.includes(merchant.data)) return missing();
-  if (activity && new URL(request.url).search) return invalid();
+  if ((activity || activityList) && new URL(request.url).search) return invalid();
   const secret = process.env.BOOKING_BRIDGE_SECRET;
   const configured = process.env.BOOKING_ENGINE_URL;
   if (!secret || secret.length < 32 || !configured) return unavailable();
@@ -239,6 +242,45 @@ export async function nativeVpsStayCheckout(
   // Never start the legacy Supabase payment RPC for a VPS-owned hold.
   if (payment) return issue(503, 'PAYMENT_UNAVAILABLE', 'Payment is not connected for this stay.');
   const key = uuid.safeParse(request.headers.get('idempotency-key'));
+  let searched:
+    | {
+        checkIn: string;
+        checkOut: string;
+        adults: number;
+        children: number;
+        propertyId: string | null;
+      }
+    | undefined;
+  if (search) {
+    const query = new URL(request.url).searchParams;
+    const required = ['checkIn', 'checkOut', 'adults', 'children'];
+    if (
+      [...query.keys()].some((key) => ![...required, 'propertyId'].includes(key)) ||
+      required.some((key) => query.getAll(key).length !== 1) ||
+      query.getAll('propertyId').length > 1 ||
+      !/^[1-9]\d?$/.test(query.get('adults') ?? '') ||
+      !/^(0|[1-9]\d?)$/.test(query.get('children') ?? '')
+    )
+      return invalid();
+    const parsed = z
+      .object({
+        checkIn: date,
+        checkOut: date,
+        adults: z.number().int().min(1).max(20),
+        children: z.number().int().min(0).max(20),
+        propertyId: uuid.nullable(),
+      })
+      .safeParse({
+        checkIn: query.get('checkIn'),
+        checkOut: query.get('checkOut'),
+        adults: Number(query.get('adults')),
+        children: Number(query.get('children')),
+        propertyId: query.has('propertyId') ? query.get('propertyId') : null,
+      });
+    if (!parsed.success || civilNights(parsed.data.checkIn, parsed.data.checkOut) === null)
+      return invalid();
+    searched = parsed.data;
+  }
   let availableFor: z.infer<typeof quoteInput> | undefined;
   if (availability) {
     const query = new URL(request.url).searchParams;
@@ -294,21 +336,34 @@ export async function nativeVpsStayCheckout(
     userId: actor.userId,
     staysCustomer: { purpose: 'nexg.stays.customer.v1', verified: true, customer: actor.contact },
   };
-  const path = availability
-    ? 'availability'
-    : quote
-      ? 'quote'
-      : hold
-        ? 'holds'
-        : 'holds/' + (operationId.success ? operationId.data : '') + (activity ? '/activity' : '');
+  const path = search
+    ? 'search'
+    : activityList
+      ? 'activity'
+      : availability
+        ? 'availability'
+        : quote
+          ? 'quote'
+          : hold
+            ? 'holds'
+            : 'holds/' +
+              (operationId.success ? operationId.data : '') +
+              (activity ? '/activity' : '');
   try {
     const target = new URL('/v1/stays/' + merchant.data + '/' + path, base);
+    if (searched) {
+      target.search = new URLSearchParams(
+        Object.entries(searched)
+          .filter(([, value]) => value !== null)
+          .map(([key, value]) => [key, String(value)]),
+      ).toString();
+    }
     if (availableFor)
       target.search = new URLSearchParams(
         availabilityKeys.map((k) => [k, String(availableFor![k])]),
       ).toString();
     const upstream = await fetch(target, {
-      method: status || availability || activity ? 'GET' : 'POST',
+      method: status || availability || activity || activityList || search ? 'GET' : 'POST',
       headers: {
         ...bookingHeaders(identity, secret),
         accept: 'application/json',
@@ -322,7 +377,83 @@ export async function nativeVpsStayCheckout(
       signal: AbortSignal.timeout(15000),
     });
     if (!upstream.ok) return upstreamFailure(upstream);
-    const raw = await readJson(upstream);
+    const raw = await readJson(upstream, activityList || search ? 1024 * 1024 : 4096);
+    if (searched) {
+      const view = z
+        .object({
+          contractVersion: z.literal(1),
+          authority: z.literal('nexg-booking-engine'),
+          scope: z.literal('business'),
+          businessId: uuid,
+          complete: z.literal(true),
+          request: z.object({
+            checkIn: date,
+            checkOut: date,
+            adults: z.number().int(),
+            children: z.number().int(),
+            propertyId: uuid.nullable(),
+          }),
+          observedAt: instant,
+          checkedUnits: z.number().int().min(0).max(200),
+          items: z
+            .array(
+              z.object({
+                propertyId: uuid,
+                unitId: uuid,
+                offeringId: uuid,
+                nights: z.number().int().min(1).max(90),
+                nightlyMinor: minor,
+                totalMinor: minor,
+                currency: z.literal('KES'),
+              }),
+            )
+            .max(200),
+        })
+        .safeParse(raw);
+      if (
+        !view.success ||
+        view.data.businessId !== merchant.data ||
+        Object.entries(searched).some(
+          ([key, value]) => view.data.request[key as keyof typeof searched] !== value,
+        ) ||
+        view.data.items.length > view.data.checkedUnits ||
+        new Set(view.data.items.map((item) => item.unitId)).size !== view.data.items.length ||
+        view.data.items.some(
+          (item) =>
+            (searched!.propertyId !== null && item.propertyId !== searched!.propertyId) ||
+            item.nights !== civilNights(searched!.checkIn, searched!.checkOut) ||
+            item.nightlyMinor * item.nights !== item.totalMinor,
+        )
+      )
+        return unavailable();
+      const age = Date.now() - Date.parse(view.data.observedAt);
+      if (!Number.isFinite(age) || age < -5000 || age > 60000) return unavailable();
+      return Response.json(view.data, { headers });
+    }
+    if (activityList) {
+      const view = z
+        .object({
+          source: z.literal('nexg-booking-engine'),
+          scope: z.literal('tenant'),
+          businessId: uuid,
+          complete: z.literal(true),
+          items: z.array(activityView).max(1000),
+        })
+        .safeParse(raw);
+      if (
+        !view.success ||
+        view.data.businessId !== merchant.data ||
+        new Set(view.data.items.map((item) => item.bookingId)).size !== view.data.items.length ||
+        view.data.items.some(
+          (item) =>
+            item.bookingReference !== item.bookingId ||
+            item.id !== 'stay:' + item.bookingId ||
+            item.nights !== civilNights(item.checkIn, item.checkOut),
+        )
+      )
+        return unavailable();
+      return Response.json(view.data, { headers });
+    }
     if (activity && operationId.success) {
       const view = activityView.safeParse(raw);
       if (

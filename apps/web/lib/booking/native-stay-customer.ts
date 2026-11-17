@@ -50,7 +50,13 @@ export async function resolveVerifiedStayCustomer(request: Request): Promise<Sta
         (v): v is string => typeof v === 'string' && v.trim().length > 0 && v.trim().length <= 200,
       )
       ?.trim();
-    if (!name || /[\u0000-\u001f\u007f]/.test(name))
+    if (
+      !name ||
+      Array.from(name).some((character) => {
+        const code = character.charCodeAt(0);
+        return code < 32 || code === 127;
+      })
+    )
       return { ok: false, reason: 'profile_required' };
     const email = user.email;
     if (

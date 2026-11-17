@@ -225,6 +225,163 @@ describe('native VPS Stays bridge', () => {
     expect((await call(availability(), 'availability')).status).toBe(503);
     expect((await call(availability(), 'availability')).status).toBe(503);
   });
+  it('returns only complete fresh engine Search with exact scope and reviewed night totals', async () => {
+    const input = {
+      checkIn: quote.checkIn,
+      checkOut: quote.checkOut,
+      adults: 2,
+      children: 0,
+      propertyId: quote.propertyId,
+    };
+    const query = new URLSearchParams(
+      Object.entries(input).map(([key, value]) => [key, String(value)]),
+    );
+    const searchRequest = (suffix = '') =>
+      new Request('https://nexg.example.test/search?' + query + suffix);
+    const item = {
+      propertyId: quote.propertyId,
+      unitId: quote.unitId,
+      offeringId: u(7),
+      nights: 2,
+      nightlyMinor: 12000,
+      totalMinor: 24000,
+      currency: 'KES',
+    };
+    const envelope = {
+      contractVersion: 1,
+      authority: 'nexg-booking-engine',
+      scope: 'business',
+      businessId: merchantId,
+      complete: true,
+      request: input,
+      observedAt: new Date().toISOString(),
+      checkedUnits: 1,
+      items: [item],
+    };
+    fetcher.mockResolvedValueOnce(
+      Response.json({ ...envelope, items: [{ ...item, internalId: 3 }] }),
+    );
+    const response = await call(searchRequest(), 'search');
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(envelope);
+    expect(fetcher.mock.calls[0]![0].pathname).toBe('/v1/stays/' + merchantId + '/search');
+    expect(Object.fromEntries(fetcher.mock.calls[0]![0].searchParams)).toEqual(
+      Object.fromEntries(query),
+    );
+    expect(fetcher.mock.calls[0]![1].method).toBe('GET');
+    expect(fetcher.mock.calls[0]![1].body).toBeUndefined();
+    for (const bad of [
+      { ...envelope, complete: false },
+      { ...envelope, businessId: u(99) },
+      { ...envelope, request: { ...input, adults: 3 } },
+      { ...envelope, checkedUnits: 0 },
+      { ...envelope, checkedUnits: 201 },
+      { ...envelope, checkedUnits: 2, items: [item, item] },
+      { ...envelope, items: [{ ...item, propertyId: u(99) }] },
+      { ...envelope, items: [{ ...item, totalMinor: 1 }] },
+      { ...envelope, observedAt: new Date(Date.now() - 61000).toISOString() },
+    ]) {
+      fetcher.mockResolvedValueOnce(Response.json(bad));
+      expect((await call(searchRequest(), 'search')).status).toBe(503);
+    }
+    const count = fetcher.mock.calls.length;
+    expect((await call(searchRequest('&adults=3'), 'search')).status).toBe(422);
+    expect((await call(searchRequest('&userId=' + u(99)), 'search')).status).toBe(422);
+    expect(fetcher).toHaveBeenCalledTimes(count);
+    fetcher.mockResolvedValueOnce(
+      Response.json({
+        ...envelope,
+        request: { ...input, propertyId: null },
+        checkedUnits: 0,
+        items: [],
+      }),
+    );
+    query.delete('propertyId');
+    expect(await (await call(searchRequest(), 'search')).json()).toMatchObject({
+      complete: true,
+      checkedUnits: 0,
+      items: [],
+    });
+  });
+  it('reads only the complete signed tenant Activity list and strips private fields', async () => {
+    const record = {
+      ...quote,
+      kind: 'stay',
+      id: 'stay:' + bookingId,
+      source: 'nexg-booking-engine',
+      bookingId,
+      bookingReference: bookingId,
+      quoteId,
+      offeringId: u(7),
+      status: 'confirmed',
+      paymentStatus: 'paid',
+      startTime: expiresAt,
+      endTime: expiresAt,
+      timeZone: 'Africa/Nairobi',
+      nights: 2,
+      totalMinor: 24000,
+      currency: 'KES',
+    };
+    const envelope = {
+      source: 'nexg-booking-engine',
+      scope: 'tenant',
+      businessId: merchantId,
+      complete: true,
+      items: [record],
+    };
+    fetcher.mockResolvedValueOnce(
+      Response.json({ ...envelope, items: [{ ...record, guest: contact }] }),
+    );
+    const response = await call(request(), 'activity');
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(envelope);
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
+    const [url, opts] = fetcher.mock.calls[0]!;
+    expect(url.pathname).toBe('/v1/stays/' + merchantId + '/activity');
+    expect(opts.method).toBe('GET');
+    expect(opts.body).toBeUndefined();
+    const signed = new Headers(opts.headers).get('x-nexg-booking-context')!;
+    expect(JSON.parse(Buffer.from(signed, 'base64url').toString())).toMatchObject({
+      businessId: merchantId,
+      userId: actorId,
+      role: 'customer',
+    });
+    for (const bad of [
+      { ...envelope, businessId: u(99) },
+      { ...envelope, complete: false },
+      { ...envelope, items: [record, record] },
+      { ...envelope, items: [{ ...record, paymentStatus: 'unpaid' }] },
+      { ...envelope, items: [{ ...record, id: 'stay:' + u(99) }] },
+      { ...envelope, items: Array(1001).fill(record) },
+    ]) {
+      fetcher.mockResolvedValueOnce(Response.json(bad));
+      expect((await call(request(), 'activity')).status).toBe(503);
+    }
+    fetcher.mockResolvedValueOnce(Response.json({ ...envelope, items: [] }));
+    expect(await (await call(request(), 'activity')).json()).toEqual({ ...envelope, items: [] });
+    fetcher.mockResolvedValueOnce(Response.json({ ...envelope, padding: 'x'.repeat(1024 * 1024) }));
+    expect((await call(request(), 'activity')).status).toBe(503);
+  });
+  it('refuses Activity list query overrides, unsigned requests, production and outages without fallback', async () => {
+    expect(
+      (await call(new Request('https://nexg.example.test/activity?userId=' + u(99)), 'activity'))
+        .status,
+    ).toBe(422);
+    expect((await call(request(), 'activity', 'extra')).status).toBe(404);
+    expect((await call(request({}), 'activity')).status).toBe(404);
+    expect(fetcher).not.toHaveBeenCalled();
+    auth.mockResolvedValueOnce({ ok: false, reason: 'sign_in' });
+    expect((await call(request(), 'activity')).status).toBe(401);
+    expect(fetcher).not.toHaveBeenCalled();
+    fetcher.mockRejectedValueOnce(new Error('engine offline'));
+    expect((await call(request(), 'activity')).status).toBe(503);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    vi.stubEnv('NODE_ENV', 'production');
+    expect(await (await call(request(), 'activity')).json()).toMatchObject({
+      code: 'STAY_ENGINE_DISABLED',
+    });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
   it('reads one confirmed Activity by booking ID and rejects mismatched or unpaid data', async () => {
     const record = {
       ...quote,

@@ -2,6 +2,7 @@ import type { BookingEngine } from './engine.js';
 import { quoteStay, createStayHold, readStayHold, readStayAvailability } from './stays.js';
 import { BookingError, type Customer, type Identity } from './types.js';
 import { readStayActivity } from './stay-activity.js';
+import { readStayActivityList } from './stay-activity-list.js';
 
 const uuid = /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
 export function authenticatedStayCustomer(identity: Identity): Customer {
@@ -67,8 +68,46 @@ function idempotencyKey(key?: string) {
 /** Internal dependency seam for boundary tests, never configurable from HTTP. */
 export function createStayTransport(
   commands = { quoteStay, createStayHold, readStayHold, readStayAvailability, readStayActivity },
+  activityListReader = readStayActivityList,
 ) {
   return {
+    async activityList(engine: BookingEngine, identity: Identity) {
+      authenticatedStayCustomer(identity);
+      const db = engine.payload.db;
+      if (db.name !== 'postgres' || (db as any).transactionOptions === false)
+        throw new BookingError(
+          503,
+          'Coherent Stay Activity storage is unavailable.',
+          'stay_snapshot_unavailable',
+        );
+      const postgres = db as unknown as {
+        beginTransaction(options: {
+          isolationLevel: 'repeatable read';
+          accessMode: 'read only';
+        }): Promise<string | number | null>;
+      };
+      const tx = await postgres.beginTransaction({
+        isolationLevel: 'repeatable read',
+        accessMode: 'read only',
+      });
+      if (tx == null)
+        throw new BookingError(
+          503,
+          'Coherent Stay Activity storage is unavailable.',
+          'stay_snapshot_unavailable',
+        );
+      try {
+        const view = await activityListReader(engine, identity, {
+          request: engine.managementContext().request(identity, tx),
+          coherentSnapshot: true,
+        });
+        await db.commitTransaction(tx);
+        return view;
+      } catch (error) {
+        await db.rollbackTransaction(tx);
+        throw error;
+      }
+    },
     async activity(engine: BookingEngine, identity: Identity, bookingId: string) {
       authenticatedStayCustomer(identity);
       if (!uuid.test(bookingId))
