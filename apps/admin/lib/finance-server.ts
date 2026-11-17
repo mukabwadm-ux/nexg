@@ -16,10 +16,10 @@ export async function movementSummary(
   from: string,
   to: string,
 ): Promise<{ rows: MovementSum[]; error: string | null }> {
-  const { data, error } = await supabase.rpc(
-    'rpc_finance_transaction_summary' as never,
-    { p_from: from, p_to: to } as never,
-  );
+  const { data, error } = await supabase.rpc('rpc_finance_transaction_summary', {
+    p_from: from,
+    p_to: to,
+  });
   return {
     rows: ((data as unknown as MovementSum[] | null) ?? []).map((r) => ({
       ...r,
@@ -37,10 +37,12 @@ export async function movementList(
   kind: string | null,
   limit = 2000,
 ): Promise<{ rows: Movement[]; truncated: boolean; error: string | null }> {
-  const { data, error } = await supabase.rpc(
-    'rpc_finance_transactions' as never,
-    { p_from: from, p_to: to, p_kind: kind, p_limit: limit } as never,
-  );
+  const { data, error } = await supabase.rpc('rpc_finance_transactions', {
+    p_from: from,
+    p_to: to,
+    p_kind: kind ?? undefined,
+    p_limit: limit,
+  });
   const rows = ((data as unknown as Movement[] | null) ?? []).map((r) => ({
     ...r,
     amount_cents: Number(r.amount_cents),
@@ -68,10 +70,7 @@ export async function invoiceList(
   from: string,
   to: string,
 ): Promise<{ rows: InvoiceItem[]; error: string | null }> {
-  const { data, error } = await supabase.rpc(
-    'rpc_finance_invoices' as never,
-    { p_from: from, p_to: to } as never,
-  );
+  const { data, error } = await supabase.rpc('rpc_finance_invoices', { p_from: from, p_to: to });
   return {
     rows: ((data as unknown as InvoiceItem[] | null) ?? []).map((r) => ({
       ...r,

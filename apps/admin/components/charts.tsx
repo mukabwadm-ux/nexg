@@ -238,16 +238,25 @@ export function ShareDonut({
 
       <ul className="space-y-2">
         {data.map((s, i) => (
-          <li key={s.key} className="flex items-center gap-2.5 text-[0.8125rem]">
+          <li key={s.key} className="flex items-start gap-2.5 text-[0.8125rem]">
             <span
               aria-hidden="true"
-              className="h-2.5 w-2.5 shrink-0 rounded-full"
+              className="mt-[0.3rem] h-2.5 w-2.5 shrink-0 rounded-full"
               style={{ background: s.color ?? PALETTE[i % PALETTE.length] }}
             />
-            <span className="min-w-0 flex-1 truncate font-semibold">{s.label}</span>
-            <span className="text-muted-light tabular-nums">
-              {unit === 'count' ? s.value.toLocaleString('en-KE') : ''}
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold leading-snug">{s.label}</span>
+              {unit === 'kes' && (
+                <span className="text-muted-light block text-xs tabular-nums">
+                  KES {s.value.toLocaleString('en-KE')}
+                </span>
+              )}
             </span>
+            {unit === 'count' && (
+              <span className="text-muted-light tabular-nums">
+                {s.value.toLocaleString('en-KE')}
+              </span>
+            )}
             <span className="w-12 text-right font-extrabold tabular-nums">
               {total > 0 ? `${((s.value / total) * 100).toFixed(1)}%` : '—'}
             </span>

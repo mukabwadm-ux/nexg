@@ -153,14 +153,21 @@ const STAT_TONES: Record<Tone, { ring: string; icon: string; card: string }> = {
 export function StatGrid({
   children,
   className,
+  dense = false,
 }: {
   children: React.ReactNode;
   className?: string;
+  /**
+   * Five or more cards of money: the icon sits above the figure until the
+   * screen is wide enough for "KES 24,860,000" beside it.
+   */
+  dense?: boolean;
 }) {
   return (
     <ul
+      data-dense={dense ? '' : undefined}
       className={cn(
-        'grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-[repeat(auto-fit,minmax(9.5rem,1fr))]',
+        'group/stats grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-[repeat(auto-fit,minmax(9.5rem,1fr))]',
         className,
       )}
     >
@@ -263,6 +270,8 @@ export function Stat({
   );
   const cls = cn(
     'flex min-w-0 flex-1 flex-col items-start gap-2.5 rounded-2xl border bg-gradient-to-br p-3.5 sm:flex-row sm:items-center sm:gap-3 sm:p-4',
+    'sm:group-data-[dense]/stats:flex-col sm:group-data-[dense]/stats:items-start sm:group-data-[dense]/stats:gap-2.5',
+    'min-[1760px]:group-data-[dense]/stats:flex-row min-[1760px]:group-data-[dense]/stats:items-center min-[1760px]:group-data-[dense]/stats:gap-3',
     'shadow-[0_1px_2px_rgba(20,20,20,0.04),0_10px_26px_-22px_rgba(20,20,20,0.35)]',
     t.card,
     href &&

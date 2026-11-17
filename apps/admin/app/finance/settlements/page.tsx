@@ -108,6 +108,8 @@ export default async function SettlementsPage({
   const pq = periodQuery(period);
   const before = previousPeriod(period.from, period.to);
   const today = todayInNairobi();
+  /* A period that ends today also lists the runs built but not yet paid. */
+  const upTo = period.to === today ? plusDays(today, 31) : period.to;
   const supabase = createClient();
 
   const [runsRes, owedRes, calendarRes] = await Promise.all([
@@ -117,7 +119,7 @@ export default async function SettlementsPage({
         'id, reference, state, pay_date, period_start, period_end, sent_at, reconciled_at, built_at',
       )
       .gte('pay_date', before.from)
-      .lte('pay_date', period.to)
+      .lte('pay_date', upTo)
       .order('pay_date', { ascending: false })
       .limit(200),
     supabase
@@ -230,7 +232,7 @@ export default async function SettlementsPage({
 
   /* One batch per run and payee type, as the designs list them. */
   const batches: BatchRow[] = [];
-  for (const run of allRuns.filter((r) => r.pay_date >= period.from && r.pay_date <= period.to)) {
+  for (const run of allRuns.filter((r) => r.pay_date >= period.from && r.pay_date <= upTo)) {
     const runLines = lines.filter((l) => l.run_id === run.id);
     const seen = new Set(runLines.map((l) => payeeGroup(l.party_type)));
     for (const g of (Object.keys(PAYEE_GROUPS) as PayeeGroup[]).filter((x) => seen.has(x))) {
@@ -276,7 +278,6 @@ export default async function SettlementsPage({
       ...extra,
       ...(pq ? { from: period.from, to: period.to } : {}),
     });
-  const runHref = (runId: string) => href('batches', { run: runId });
 
   /* The run opened from a batch: its checks, signatures and every line. */
   let runDetail: React.ReactNode = null;
@@ -391,7 +392,7 @@ export default async function SettlementsPage({
 
         {tab === 'overview' && (
           <>
-            <StatGrid>
+            <StatGrid dense>
               <Stat
                 icon={Coins}
                 value={kes(total)}
@@ -538,7 +539,7 @@ export default async function SettlementsPage({
             </div>
 
             <Sheet>
-              <BatchesTable rows={batches} runHref={runHref} compact />
+              <BatchesTable rows={batches} batchesHref={href('batches')} compact />
             </Sheet>
           </>
         )}
@@ -549,7 +550,7 @@ export default async function SettlementsPage({
               rows={groupLines('merchant')}
               title="Merchant settlements"
               noun="merchant"
-              runHref={runHref}
+              batchesHref={href('batches')}
             />
           </Sheet>
         )}
@@ -559,7 +560,7 @@ export default async function SettlementsPage({
               rows={groupLines('host')}
               title="Host payouts"
               noun="host"
-              runHref={runHref}
+              batchesHref={href('batches')}
             />
           </Sheet>
         )}
@@ -569,7 +570,7 @@ export default async function SettlementsPage({
               rows={groupLines('rider')}
               title="Rider payouts"
               noun="rider"
-              runHref={runHref}
+              batchesHref={href('batches')}
             />
           </Sheet>
         )}
@@ -577,7 +578,7 @@ export default async function SettlementsPage({
           <>
             {runDetail}
             <Sheet>
-              <BatchesTable rows={batches} runHref={runHref} />
+              <BatchesTable rows={batches} batchesHref={href('batches')} />
             </Sheet>
           </>
         )}
@@ -585,4 +586,11 @@ export default async function SettlementsPage({
       </main>
     </ConsoleShell>
   );
+}
+
+/** The ISO day `n` days after `day`. */
+function plusDays(day: string, n: number): string {
+  const d = new Date(`${day}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
 }

@@ -190,7 +190,7 @@ export default async function InvoicesPage({
 
         {tab === 'overview' && (
           <>
-            <StatGrid>
+            <StatGrid dense>
               <Stat
                 icon={Wallet}
                 value={kes(total)}

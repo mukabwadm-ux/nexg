@@ -289,7 +289,7 @@ export default async function FinanceReportsPage({
 
     body = (
       <>
-        <StatGrid>
+        <StatGrid dense>
           <Stat
             icon={Coins}
             value={kes(value)}

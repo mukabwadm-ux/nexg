@@ -118,19 +118,14 @@ export function MovementsTable({
 
   const columns: ColumnDef<Movement, unknown>[] = [
     {
-      id: 'reference',
-      accessorFn: (r) => r.reference,
-      header: 'Reference',
-      cell: ({ row: { original: r } }) => (
-        <span className="whitespace-nowrap font-semibold tabular-nums">{r.reference}</span>
-      ),
-    },
-    {
       id: 'when',
       accessorFn: (r) => r.happened_at,
-      header: 'Date & time',
+      header: 'Reference · date & time',
       cell: ({ row: { original: r } }) => (
-        <span className="whitespace-nowrap tabular-nums">{dateTime(r.happened_at)}</span>
+        <span className="block whitespace-nowrap tabular-nums">
+          <span className="block font-semibold">{r.reference}</span>
+          <span className="text-muted-light block text-xs">{dateTime(r.happened_at)}</span>
+        </span>
       ),
     },
     ...(showType
@@ -147,20 +142,17 @@ export function MovementsTable({
       : []),
     {
       id: 'description',
-      accessorFn: (r) => r.description,
-      header: 'Description',
+      accessorFn: (r) => `${r.description} ${r.party ?? ''}`,
+      header: 'Description · party',
       cell: ({ row: { original: r } }) => (
-        <span className="block max-w-[15rem] truncate" title={r.description}>
-          {r.description}
+        <span className="block max-w-[15rem]">
+          <span className="block truncate" title={r.description}>
+            {r.description}
+          </span>
+          <span className="text-muted-light block truncate text-xs font-semibold">
+            {r.party ?? '—'}
+          </span>
         </span>
-      ),
-    },
-    {
-      id: 'party',
-      accessorFn: (r) => r.party ?? '',
-      header: 'Party',
-      cell: ({ row: { original: r } }) => (
-        <span className="block max-w-[11rem] truncate font-semibold">{r.party ?? '—'}</span>
       ),
     },
     {

@@ -18,6 +18,11 @@ import { Pill } from '@/components/portal/kit';
 import { LINE_STATES, PAYEE_GROUPS, RAILS, RUN_STATES, type PayeeGroup } from '@/lib/finance';
 import { dateTime, day, kes, shillings } from '@/lib/portal';
 
+/** The batches view with one run open. */
+function withRun(batchesHref: string, runId: string): string {
+  return `${batchesHref}${batchesHref.includes('?') ? '&' : '?'}run=${encodeURIComponent(runId)}`;
+}
+
 /* ───────────────────────────────────────────────────── building a run */
 
 export function BuildRunButton({ batchesHref }: { batchesHref: string }) {
@@ -93,16 +98,17 @@ function batchStatus(b: BatchRow): {
 
 export function BatchesTable({
   rows,
-  runHref,
+  batchesHref,
   title = 'Settlement batches',
   compact = false,
 }: {
   rows: BatchRow[];
-  /** Where a batch opens: the run, with its checks and lines. */
-  runHref: (runId: string) => string;
+  /** The batches view; a batch opens there with its run's checks and lines. */
+  batchesHref: string;
   title?: string;
   compact?: boolean;
 }) {
+  const runHref = (runId: string) => withRun(batchesHref, runId);
   const [q, setQ] = React.useState('');
   const [group, setGroup] = React.useState('all');
   const [status, setStatus] = React.useState('all');
@@ -124,10 +130,15 @@ export function BatchesTable({
   const columns: ColumnDef<BatchRow, unknown>[] = [
     {
       id: 'reference',
-      accessorFn: (b) => b.reference,
-      header: 'Batch reference',
+      accessorFn: (b) => b.processedAt ?? b.payDate,
+      header: 'Batch · weekly',
       cell: ({ row: { original: b } }) => (
-        <span className="whitespace-nowrap font-semibold tabular-nums">{b.reference}</span>
+        <span className="block whitespace-nowrap tabular-nums">
+          <span className="block font-semibold">{b.reference}</span>
+          <span className="text-muted-light block text-xs">
+            {b.processedAt ? `Sent ${dateTime(b.processedAt)}` : `Pays ${day(b.payDate)}`}
+          </span>
+        </span>
       ),
     },
     {
@@ -158,12 +169,13 @@ export function BatchesTable({
         <span className="whitespace-nowrap tabular-nums">
           {b.recipients.toLocaleString('en-KE')}{' '}
           {b.group === 'merchant'
-            ? 'merchants'
+            ? 'merchant'
             : b.group === 'host'
-              ? 'hosts'
+              ? 'host'
               : b.group === 'rider'
-                ? 'riders'
-                : 'payees'}
+                ? 'rider'
+                : 'payee'}
+          {b.recipients === 1 ? '' : 's'}
         </span>
       ),
     },
@@ -182,12 +194,6 @@ export function BatchesTable({
       cell: ({ row: { original: b } }) => <RailList rails={b.rails} />,
     },
     {
-      id: 'schedule',
-      accessorFn: () => 'Weekly',
-      header: 'Schedule',
-      cell: () => <span className="text-muted">Weekly</span>,
-    },
-    {
       id: 'status',
       accessorFn: (b) => statusOf(b),
       header: 'Status',
@@ -199,20 +205,6 @@ export function BatchesTable({
           </Pill>
         );
       },
-    },
-    {
-      id: 'processed',
-      accessorFn: (b) => b.processedAt ?? b.payDate,
-      header: 'Date processed',
-      cell: ({ row: { original: b } }) => (
-        <span className="whitespace-nowrap tabular-nums">
-          {b.processedAt ? (
-            dateTime(b.processedAt)
-          ) : (
-            <span className="text-muted-light">Pays {day(b.payDate)}</span>
-          )}
-        </span>
-      ),
     },
     {
       id: 'actions',
@@ -335,7 +327,8 @@ export function BatchesTable({
                         {PAYEE_GROUPS[b.group].batch}
                       </span>
                       <span className="text-muted-light block truncate text-xs">
-                        {b.reference} · {b.recipients.toLocaleString('en-KE')} recipients
+                        {b.reference} · {b.recipients.toLocaleString('en-KE')} recipient
+                        {b.recipients === 1 ? '' : 's'}
                       </span>
                       <span className="mt-1 flex flex-wrap items-center gap-2">
                         <span className="whitespace-nowrap text-sm font-extrabold tabular-nums">
@@ -385,14 +378,16 @@ export function LinesTable({
   rows,
   title,
   noun,
-  runHref,
+  batchesHref,
 }: {
   rows: SettlementLine[];
   title: string;
   /** "merchant", "host", "rider". */
   noun: string;
-  runHref: (runId: string) => string;
+  /** The batches view, where a line's run opens. */
+  batchesHref: string;
 }) {
+  const runHref = (runId: string) => withRun(batchesHref, runId);
   const [q, setQ] = React.useState('');
   const [state, setState] = React.useState('all');
   const term = q.trim().toLowerCase().replace(/,/g, '');

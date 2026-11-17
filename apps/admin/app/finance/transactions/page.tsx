@@ -145,7 +145,7 @@ export default async function TransactionsPage({
           </p>
         )}
 
-        <StatGrid>
+        <StatGrid dense>
           <Stat
             icon={Coins}
             value={kes(t.total)}

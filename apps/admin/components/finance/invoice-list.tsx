@@ -72,9 +72,12 @@ export function InvoicesTable({
     {
       id: 'number',
       accessorFn: (r) => r.number,
-      header: 'Invoice no.',
+      header: 'Invoice no. · period',
       cell: ({ row: { original: r } }) => (
-        <span className="whitespace-nowrap font-semibold tabular-nums">{r.number}</span>
+        <span className="block whitespace-nowrap tabular-nums">
+          <span className="block font-semibold">{r.number}</span>
+          <span className="text-muted-light block text-xs">{r.period}</span>
+        </span>
       ),
     },
     {
@@ -104,25 +107,16 @@ export function InvoicesTable({
       ),
     },
     {
-      id: 'period',
-      accessorFn: (r) => r.period,
-      header: 'Period',
-      cell: ({ row: { original: r } }) => <span className="whitespace-nowrap">{r.period}</span>,
-    },
-    {
       id: 'issued',
       accessorFn: (r) => r.issued_at,
-      header: 'Issue date',
+      header: 'Issued · due',
       cell: ({ row: { original: r } }) => (
-        <span className="whitespace-nowrap tabular-nums">{day(r.issued_at)}</span>
-      ),
-    },
-    {
-      id: 'due',
-      accessorFn: (r) => r.due_at ?? '',
-      header: 'Due date',
-      cell: ({ row: { original: r } }) => (
-        <span className="whitespace-nowrap tabular-nums">{r.due_at ? day(r.due_at) : '—'}</span>
+        <span className="block whitespace-nowrap tabular-nums">
+          <span className="block">{day(r.issued_at)}</span>
+          <span className="text-muted-light block text-xs">
+            {r.due_at ? `Due ${day(r.due_at)}` : 'No due date'}
+          </span>
+        </span>
       ),
     },
     {
@@ -344,10 +338,13 @@ export function TaxDocsTable({
   const columns: ColumnDef<TaxDoc, unknown>[] = [
     {
       id: 'number',
-      accessorFn: (r) => r.number,
-      header: 'Number',
+      accessorFn: (r) => r.issued_at,
+      header: 'Number · issued',
       cell: ({ row: { original: r } }) => (
-        <span className="whitespace-nowrap font-semibold tabular-nums">{r.number}</span>
+        <span className="block whitespace-nowrap tabular-nums">
+          <span className="block font-semibold">{r.number}</span>
+          <span className="text-muted-light block text-xs">{day(r.issued_at)}</span>
+        </span>
       ),
     },
     {
@@ -355,7 +352,7 @@ export function TaxDocsTable({
       accessorFn: (r) => r.party_name ?? '',
       header: 'Billed to',
       cell: ({ row: { original: r } }) => (
-        <span className="block max-w-[14rem]">
+        <span className="block max-w-[11rem]">
           <span className="block truncate font-semibold">{r.party_name ?? '—'}</span>
           {r.party_pin && (
             <span className="text-muted-light block text-xs tabular-nums">PIN {r.party_pin}</span>
@@ -368,14 +365,6 @@ export function TaxDocsTable({
       accessorFn: (r) => r.purpose,
       header: 'For',
       cell: ({ row: { original: r } }) => <Pill tone="gold">{humanize(r.purpose)}</Pill>,
-    },
-    {
-      id: 'issued',
-      accessorFn: (r) => r.issued_at,
-      header: 'Issued',
-      cell: ({ row: { original: r } }) => (
-        <span className="whitespace-nowrap tabular-nums">{day(r.issued_at)}</span>
-      ),
     },
     {
       id: 'net',

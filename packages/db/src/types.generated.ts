@@ -13226,6 +13226,154 @@ export type Database = {
         };
         Relationships: [];
       };
+      fin_office_budget: {
+        Row: {
+          amount_cents: number;
+          category: string;
+          month: string;
+          set_by: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_cents: number;
+          category: string;
+          month: string;
+          set_by?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          amount_cents?: number;
+          category?: string;
+          month?: string;
+          set_by?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'fin_office_budget_set_by_fkey';
+            columns: ['set_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      fin_office_expense: {
+        Row: {
+          amount_cents: number;
+          category: string;
+          created_at: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          description: string;
+          id: string;
+          location_id: string | null;
+          notes: string | null;
+          number: string;
+          paid_by: string | null;
+          paid_on: string | null;
+          payee: string;
+          payment_method: string | null;
+          payment_reference: string | null;
+          receipt_path: string | null;
+          spent_on: string;
+          status: string;
+          submitted_at: string;
+          submitted_by: string | null;
+          updated_at: string;
+          vendor_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_cents: number;
+          category: string;
+          created_at?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          description: string;
+          id?: string;
+          location_id?: string | null;
+          notes?: string | null;
+          number?: string;
+          paid_by?: string | null;
+          paid_on?: string | null;
+          payee: string;
+          payment_method?: string | null;
+          payment_reference?: string | null;
+          receipt_path?: string | null;
+          spent_on: string;
+          status?: string;
+          submitted_at?: string;
+          submitted_by?: string | null;
+          updated_at?: string;
+          vendor_id?: string | null;
+        };
+        Update: {
+          amount_cents?: number;
+          category?: string;
+          created_at?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          description?: string;
+          id?: string;
+          location_id?: string | null;
+          notes?: string | null;
+          number?: string;
+          paid_by?: string | null;
+          paid_on?: string | null;
+          payee?: string;
+          payment_method?: string | null;
+          payment_reference?: string | null;
+          receipt_path?: string | null;
+          spent_on?: string;
+          status?: string;
+          submitted_at?: string;
+          submitted_by?: string | null;
+          updated_at?: string;
+          vendor_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'fin_office_expense_decided_by_fkey';
+            columns: ['decided_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_office_expense_location_id_fkey';
+            columns: ['location_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_location';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_office_expense_paid_by_fkey';
+            columns: ['paid_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_office_expense_submitted_by_fkey';
+            columns: ['submitted_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_office_expense_vendor_id_fkey';
+            columns: ['vendor_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_vendor';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       fin_party_owed: {
         Row: {
           as_of_entry_id: number;
@@ -52386,6 +52534,28 @@ export type Database = {
         }[];
       };
       fn_fin_rebuild: { Args: Record<PropertyKey, never>; Returns: Json };
+      fn_finance_movements: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          amount_cents: number;
+          category: string;
+          channel: string;
+          description: string;
+          direction: string;
+          happened_at: string;
+          href: string;
+          id: string;
+          kind: string;
+          note: string;
+          party: string;
+          provider_ref: string;
+          reference: string;
+          source: string;
+          state: string;
+          status: string;
+        }[];
+      };
+      fn_finance_period_check: { Args: { p_from: string; p_to: string }; Returns: undefined };
       fn_fit_budget: { Args: { p_plan_id: string }; Returns: undefined };
       fn_folio_caller_may_charge: { Args: { p_hotel_id: string }; Returns: boolean };
       fn_folio_escalation_sweep: { Args: Record<PropertyKey, never>; Returns: number };
@@ -55754,6 +55924,12 @@ export type Database = {
       rpc_featured_send_pitch: { Args: { p_merchant_id: string; p_note?: string }; Returns: Json };
       rpc_fin_export: { Args: { p_from: string; p_kind: string; p_to: string }; Returns: Json };
       rpc_fin_verify: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_finance_invoices: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_finance_transaction_summary: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_finance_transactions: {
+        Args: { p_from: string; p_kind?: string; p_limit?: number; p_to: string };
+        Returns: Json;
+      };
       rpc_folio_desk_action: {
         Args: { p_action: string; p_folio_ref?: string; p_note?: string; p_posting_id: string };
         Returns: {
@@ -58335,6 +58511,34 @@ export type Database = {
         Returns: undefined;
       };
       rpc_notifications_read: { Args: { p_id?: string }; Returns: Json };
+      rpc_office_budget_set: {
+        Args: { p_amount_cents: number; p_category: string; p_month: string };
+        Returns: undefined;
+      };
+      rpc_office_expense_cancel: { Args: { p_id: string; p_reason: string }; Returns: undefined };
+      rpc_office_expense_decide: {
+        Args: { p_approve: boolean; p_id: string; p_note?: string };
+        Returns: undefined;
+      };
+      rpc_office_expense_pay: {
+        Args: { p_id: string; p_method: string; p_paid_on?: string; p_reference?: string };
+        Returns: undefined;
+      };
+      rpc_office_expense_save: {
+        Args: {
+          p_amount_cents: number;
+          p_category: string;
+          p_description: string;
+          p_id?: string;
+          p_location_id?: string;
+          p_notes?: string;
+          p_payee: string;
+          p_receipt_path?: string;
+          p_spent_on: string;
+          p_vendor_id?: string;
+        };
+        Returns: string;
+      };
       rpc_order_add_note: {
         Args: { p_body: string; p_order_id: string; p_visible_to?: string };
         Returns: Json;

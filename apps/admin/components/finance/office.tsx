@@ -211,11 +211,13 @@ export function ExpensesTable({
         opensOverlay: true,
         onSelect: () => setPanel({ kind: 'pay', row: r }),
       },
-    r.receipt_path && {
-      label: 'Open receipt',
-      icon: <Paperclip />,
-      onSelect: () => openReceipt(r.receipt_path!),
-    },
+    r.receipt_path
+      ? {
+          label: 'Open receipt',
+          icon: <Paperclip />,
+          onSelect: () => openReceipt(r.receipt_path!),
+        }
+      : null,
     canWrite &&
       !['paid', 'cancelled'].includes(r.status) && {
         label: 'Cancel expense',
@@ -229,26 +231,18 @@ export function ExpensesTable({
 
   const columns: ColumnDef<ExpenseRow, unknown>[] = [
     {
-      id: 'date',
-      accessorFn: (r) => r.spent_on,
-      header: 'Date',
-      cell: ({ row: { original: r } }) => (
-        <span className="whitespace-nowrap tabular-nums">{day(r.spent_on)}</span>
-      ),
-    },
-    {
       id: 'description',
-      accessorFn: (r) => r.description,
-      header: 'Description',
+      accessorFn: (r) => r.spent_on,
+      header: 'Date · description',
       cell: ({ row: { original: r } }) => (
         <span className="flex min-w-0 items-center gap-2.5">
           <span className="bg-gold-soft text-gold-text flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
             <CategoryGlyph category={r.category} />
           </span>
-          <span className="min-w-0">
-            <span className="block max-w-[16rem] truncate font-semibold">{r.description}</span>
-            <span className="text-muted-light block truncate text-xs">
-              {r.number} · {r.payee}
+          <span className="min-w-0 max-w-[13rem]">
+            <span className="block truncate font-semibold">{r.description}</span>
+            <span className="text-muted-light block truncate text-xs tabular-nums">
+              {day(r.spent_on)} · {r.number} · {r.payee}
             </span>
           </span>
         </span>
@@ -278,7 +272,7 @@ export function ExpensesTable({
             {EXPENSE_STATUS[r.status]?.label ?? r.status}
           </Pill>
           {r.status === 'paid' && r.payment_method && (
-            <span className="text-muted-light text-xs">
+            <span className="text-muted-light block max-w-[9rem] truncate text-xs">
               {PAYMENT_METHODS[r.payment_method]}
               {r.payment_reference ? ` · ${r.payment_reference}` : ''}
             </span>

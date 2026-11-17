@@ -146,7 +146,8 @@ select lives_ok(
   'and it is marked paid with the bank reference');
 
 select is(
-  (select status || ' ' || payment_method || ' ' || payment_reference || ' ' || (paid_on = current_date)::text
+  (select status || ' ' || payment_method || ' ' || payment_reference || ' '
+          || (paid_on = (now() at time zone 'Africa/Nairobi')::date)::text
      from public.fin_office_expense where id = (select v::uuid from t where k = 'rent')),
   'paid bank_transfer FT96RENT true',
   'The expense records how, when and with which reference it was paid');

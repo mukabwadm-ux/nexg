@@ -153,7 +153,8 @@ export function Settlement({
             </div>
             <p className="text-muted mt-1 text-[0.8125rem] font-semibold">
               {shortDate(run.period_start)} to {shortDate(run.period_end)}
-              {run.city ? ` · ${run.city}` : ' · all cities'} · {run.line_count} lines
+              {run.city ? ` · ${run.city}` : ' · all cities'} · {run.line_count}{' '}
+              {Number(run.line_count) === 1 ? 'line' : 'lines'}
               {run.pay_date ? ` · pays ${shortDate(run.pay_date)}` : ''}
             </p>
           </div>

@@ -181,15 +181,21 @@ export default async function ReconciliationPage({
   let unreconciled = 0;
   let payments = 0;
   const trendMap = new Map<string, { reconciled: number; unreconciled: number }>();
+  /*
+   * Per day, the larger of the two records is what has to be reconciled,
+   * the part both agree on is reconciled, and the difference is not. The
+   * two shares add up to the whole, whichever side is short.
+   */
   for (const [d, v] of byDay) {
-    const gap = v.provider - v.ledger;
-    toReconcile += v.provider;
+    const matched = Math.min(v.provider, v.ledger);
+    const gap = Math.abs(v.provider - v.ledger);
+    toReconcile += Math.max(v.provider, v.ledger);
+    reconciled += matched;
+    unreconciled += gap;
     payments += v.payments;
-    if (gap === 0) reconciled += v.provider;
-    else unreconciled += Math.abs(gap);
     trendMap.set(d, {
-      reconciled: Math.round((gap === 0 ? v.provider : Math.min(v.provider, v.ledger)) / 100),
-      unreconciled: Math.round(Math.abs(gap) / 100),
+      reconciled: Math.round(matched / 100),
+      unreconciled: Math.round(gap / 100),
     });
   }
   const varianceDays = [...byDay.values()].filter((v) => v.provider !== v.ledger).length;
@@ -317,12 +323,12 @@ export default async function ReconciliationPage({
 
         {tab === 'overview' && (
           <>
-            <StatGrid>
+            <StatGrid dense>
               <Stat
                 icon={Wallet}
                 value={kes(toReconcile)}
                 label="Total to reconcile"
-                note="Paid payments in the period"
+                note="Payments or ledger cash, whichever is larger each day"
               />
               <Stat
                 icon={CheckCircle2}
