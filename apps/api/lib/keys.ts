@@ -48,7 +48,9 @@ export async function listConsoleKeys(
   const ids = merchantIds.filter((id) => UUID.test(id));
   const { data, error } = await supabase
     .from('api_key')
-    .select('id, merchant_id, key_prefix, environment, scopes, state, created_at, last_used_at, expires_at')
+    .select(
+      'id, merchant_id, key_prefix, environment, scopes, state, created_at, last_used_at, expires_at',
+    )
     .or(ids.length ? `merchant_id.in.(${ids.join(',')}),${own}` : own)
     .order('created_at', { ascending: false })
     .limit(100);
