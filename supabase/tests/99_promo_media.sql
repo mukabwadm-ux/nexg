@@ -5,7 +5,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(43);
+select plan(44);
 
 -- ═══════════════════════════════════════════ people, shops, slots
 
@@ -16,13 +16,19 @@ values
   ('00000000-0000-0000-0000-000000000000','c9700000-0000-4000-8000-000000000002',
    'authenticated','authenticated','other97@example.test',now(),false,now(),now()),
   ('00000000-0000-0000-0000-000000000000','c9700000-0000-4000-8000-000000000003',
-   'authenticated','authenticated','growth97@nexgapp.com',now(),false,now(),now());
+   'authenticated','authenticated','growth97@nexgapp.com',now(),false,now(),now()),
+  ('00000000-0000-0000-0000-000000000000','c9700000-0000-4000-8000-000000000004',
+   'authenticated','authenticated','viewer97@nexgapp.com',now(),false,now(),now());
 
 insert into public.staff_user (id, user_id, email, display_name)
 values ('c9790000-0000-4000-8000-00000000000a','c9700000-0000-4000-8000-000000000003',
-        'growth97@nexgapp.com','Growth 97');
+        'growth97@nexgapp.com','Growth 97'),
+       ('c9790000-0000-4000-8000-00000000000b','c9700000-0000-4000-8000-000000000004',
+        'viewer97@nexgapp.com','Viewer 97');
 insert into public.role_grant (staff_user_id, role_id, granted_by)
 values ('c9790000-0000-4000-8000-00000000000a', (select id from public.role where key = 'growth'),
+        'c9790000-0000-4000-8000-00000000000a'),
+       ('c9790000-0000-4000-8000-00000000000b', (select id from public.role where key = 'read_only'),
         'c9790000-0000-4000-8000-00000000000a');
 
 insert into public.merchant (id, legal_name, trading_name, category, contact_name,
@@ -228,6 +234,14 @@ select is(
 -- ═══════════════════════════════════════════ review
 
 set local role authenticated;
+select set_config('request.jwt.claims',
+  '{"sub":"c9700000-0000-4000-8000-000000000004","role":"authenticated"}', true);
+select throws_ok(
+  $$select public.rpc_featured_creative_review(
+      (select id from public.featured_creative
+        where merchant_id = 'c9710000-0000-4000-8000-00000000000a' and status = 'pending_review'), true)$$,
+  '42501', null, 'A view-only role can watch the queue but not approve.');
+
 select set_config('request.jwt.claims',
   '{"sub":"c9700000-0000-4000-8000-000000000003","role":"authenticated"}', true);
 

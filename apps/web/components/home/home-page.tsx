@@ -38,21 +38,11 @@ const getHomeData = unstable_cache(
         )
         .order('listed_at', { ascending: false })
         .limit(300),
-      supabase
-        .from('featured_live_v')
-        .select(
-          'booking_id, merchant_id, trading_name, merchant_category, city_slug, branch_name, cover_photo_path, blurb, badge, position, accepting_orders, closed_today, prep_minutes, media_kind, media_path, poster_path',
-        )
-        .eq('kind', 'homepage')
-        .order('position')
-        .limit(4),
+      loadFeatured(supabase),
     ]);
 
     if (cityResult.error) {
       throw new Error(`Could not load homepage cities: ${cityResult.error.message}`);
-    }
-    if (featuredResult.error) {
-      throw new Error(`Could not load homepage features: ${featuredResult.error.message}`);
     }
     /* A failed store read leaves the section out rather than the page. */
     if (storeResult.error) {
@@ -83,28 +73,61 @@ const getHomeData = unstable_cache(
         : [],
     );
 
-    /* A merchant's own image or video sits in a private bucket; a visitor may
-       sign it only while its card is on the homepage. Signed for two hours,
-       well past this cache's five minutes. A file that cannot be signed
-       leaves the card on the merchant's cover photo. */
-    const featuredRows = featuredResult.data ?? [];
-    const signed = await signMedia(
-      supabase,
-      featuredRows.flatMap((row) => [row.media_path, row.poster_path]),
-      2 * 60 * 60,
-    );
-    const featured: FeaturedMerchant[] = featuredRows.map(
-      ({ media_kind, media_path, poster_path, ...row }) => ({
-        ...row,
-        media: cardMedia(media_kind, media_path, poster_path, signed),
-      }),
-    );
-
-    return { cities: cityResult.data, stores, featured };
+    return { cities: cityResult.data, stores, featured: featuredResult };
   },
   ['homepage-public-data'],
   { revalidate: 300 },
 );
+
+/**
+ * The homepage's featured cards, with each card's own image or video.
+ *
+ * The media sits in a private bucket; a visitor may sign it only while its
+ * card is on the homepage. Signed for two hours, well past the five-minute
+ * cache. A file that cannot be signed leaves the card on the cover photo.
+ *
+ * The site deploys before migration 20270101120100 is applied by hand, and
+ * until then the view has no media columns: the cards are read without them
+ * and show the cover photo, as before, rather than the page failing.
+ */
+async function loadFeatured(
+  supabase: ReturnType<typeof createPublicClient>,
+): Promise<FeaturedMerchant[]> {
+  const withMedia = await supabase
+    .from('featured_live_v')
+    .select(
+      'booking_id, merchant_id, trading_name, merchant_category, city_slug, branch_name, cover_photo_path, blurb, badge, position, accepting_orders, closed_today, prep_minutes, media_kind, media_path, poster_path',
+    )
+    .eq('kind', 'homepage')
+    .order('position')
+    .limit(4);
+
+  if (!withMedia.error) {
+    const rows = withMedia.data ?? [];
+    const signed = await signMedia(
+      supabase,
+      rows.flatMap((row) => [row.media_path, row.poster_path]),
+      2 * 60 * 60,
+    );
+    return rows.map(({ media_kind, media_path, poster_path, ...row }) => ({
+      ...row,
+      media: cardMedia(media_kind, media_path, poster_path, signed),
+    }));
+  }
+
+  const plain = await supabase
+    .from('featured_live_v')
+    .select(
+      'booking_id, merchant_id, trading_name, merchant_category, city_slug, branch_name, cover_photo_path, blurb, badge, position, accepting_orders, closed_today, prep_minutes',
+    )
+    .eq('kind', 'homepage')
+    .order('position')
+    .limit(4);
+  if (plain.error) {
+    throw new Error(`Could not load homepage features: ${plain.error.message}`);
+  }
+  return (plain.data ?? []).map((row) => ({ ...row, media: null }));
+}
 
 function cardMedia(
   kind: string | null,

@@ -65,6 +65,32 @@ $$;
 
 grant execute on function authz.promo_media_merchant(text) to anon, authenticated, service_role;
 
+/* Approving or sending back a merchant's image or video: full access to the
+   featured module (Growth, Finance, super admins). The view-only roles can
+   watch the queue but not decide it. */
+create or replace function authz.can_review_featured()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select authz.is_super_admin() or exists (
+    select 1
+    from public.role_grant rg
+    join public.role r on r.id = rg.role_id
+    join public.staff_user su on su.id = rg.staff_user_id
+    join public.role_module_access a on a.role_key = r.key
+    where su.user_id = (select auth.uid())
+      and su.status = 'active'
+      and rg.revoked_at is null
+      and (rg.expires_at is null or rg.expires_at > now())
+      and a.module_key = 'featured'
+      and a.level = 'full')
+$$;
+
+grant execute on function authz.can_review_featured() to authenticated, service_role;
+
 -- ═══════════════════════════════════════════ the featured card's media
 
 alter table public.featured_creative
@@ -437,7 +463,7 @@ declare
   v_open public.featured_creative;
   v_row public.featured_creative;
   v_version integer;
-  v_old text[] := '{}';
+  v_old text[] := array[]::text[];
   m public.merchant;
 begin
   if p_booking.placement_kind <> 'homepage' then
@@ -523,7 +549,7 @@ declare
   v_media jsonb;
   v_open public.merchant_promotion_creative;
   v_row public.merchant_promotion_creative;
-  v_old text[] := '{}';
+  v_old text[] := array[]::text[];
 begin
   v_media := public.fn_promo_media_checked(p_promotion.merchant_id, p_media);
   if v_media is null then
@@ -1047,9 +1073,11 @@ grant execute on function public.rpc_merchant_promotion_save(
 -- ═══════════════════════════════════════════ staff review
 
 /*
- * As 20260101008700, but only a card waiting for review can be decided (an
- * approved or archived card cannot be approved again by mistake), and the
- * merchant is told in their messages either way, with the reason.
+ * As 20260101008700, but only full access to the featured module may decide
+ * (authz.can_review_featured: the view-only roles used to pass), only a card
+ * waiting for review can be decided (an approved or archived card cannot be
+ * approved again by mistake), and the merchant is told in their messages
+ * either way, with the reason.
  */
 create or replace function public.rpc_featured_creative_review(
   p_creative_id uuid,
@@ -1065,8 +1093,9 @@ declare
   v_creative public.featured_creative;
   v_booking public.featured_booking;
 begin
-  if not authz.reaches_module('featured') then
-    raise exception 'Not yours to review.' using errcode = 'insufficient_privilege';
+  if not authz.can_review_featured() then
+    raise exception 'Reviewing cards and pictures needs full access to Featured slots.'
+      using errcode = 'insufficient_privilege';
   end if;
   if not p_approve and coalesce(trim(coalesce(p_reason, '')), '') = '' then
     raise exception 'The merchant has to be told what to change. Write a reason.'
@@ -1141,8 +1170,9 @@ declare
   v_promotion public.merchant_promotion;
   m public.merchant;
 begin
-  if not authz.reaches_module('featured') then
-    raise exception 'Not yours to review.' using errcode = 'insufficient_privilege';
+  if not authz.can_review_featured() then
+    raise exception 'Reviewing cards and pictures needs full access to Featured slots.'
+      using errcode = 'insufficient_privilege';
   end if;
   if not p_approve and coalesce(trim(coalesce(p_reason, '')), '') = '' then
     raise exception 'The merchant has to be told what to change. Write a reason.'

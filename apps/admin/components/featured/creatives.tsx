@@ -114,7 +114,15 @@ function Media({ row }: { row: CreativeRow }) {
   );
 }
 
-function CreativeCard({ row, onReview }: { row: CreativeRow; onReview: Review }) {
+function CreativeCard({
+  row,
+  canReview,
+  onReview,
+}: {
+  row: CreativeRow;
+  canReview: boolean;
+  onReview: Review;
+}) {
   const router = useRouter();
   const { toast } = useToast();
   const [pending, setPending] = React.useState(false);
@@ -189,7 +197,12 @@ function CreativeCard({ row, onReview }: { row: CreativeRow; onReview: Review })
         )}
       </dl>
 
-      {row.status === 'pending_review' && (
+      {row.status === 'pending_review' && !canReview && (
+        <p className="text-muted-light mt-auto text-[0.75rem] font-semibold">
+          Approving needs full access to Featured slots.
+        </p>
+      )}
+      {row.status === 'pending_review' && canReview && (
         <div className="mt-auto space-y-2">
           {sendingBack ? (
             <>
@@ -245,11 +258,13 @@ export function CreativesTab({
   rows,
   filter,
   city,
+  canReview,
   onReview,
 }: {
   rows: CreativeRow[];
   filter: string;
   city: string | null;
+  canReview: boolean;
   onReview: Review;
 }) {
   const waiting = rows.filter((row) => row.status === 'pending_review');
@@ -296,7 +311,12 @@ export function CreativesTab({
       ) : (
         <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {shown.map((row) => (
-            <CreativeCard key={`${row.source}-${row.id}`} row={row} onReview={onReview} />
+            <CreativeCard
+              key={`${row.source}-${row.id}`}
+              row={row}
+              canReview={canReview}
+              onReview={onReview}
+            />
           ))}
         </div>
       )}

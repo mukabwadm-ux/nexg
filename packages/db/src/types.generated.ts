@@ -11865,8 +11865,13 @@ export type Database = {
           created_at: string;
           headline: string | null;
           id: string;
+          media_bytes: number | null;
+          media_kind: string | null;
+          media_mime: string | null;
+          media_path: string | null;
           merchant_id: string;
           pinned_item_id: string | null;
+          poster_path: string | null;
           rejection_reason: string | null;
           reviewed_at: string | null;
           reviewed_by: string | null;
@@ -11882,8 +11887,13 @@ export type Database = {
           created_at?: string;
           headline?: string | null;
           id?: string;
+          media_bytes?: number | null;
+          media_kind?: string | null;
+          media_mime?: string | null;
+          media_path?: string | null;
           merchant_id: string;
           pinned_item_id?: string | null;
+          poster_path?: string | null;
           rejection_reason?: string | null;
           reviewed_at?: string | null;
           reviewed_by?: string | null;
@@ -11898,8 +11908,13 @@ export type Database = {
           created_at?: string;
           headline?: string | null;
           id?: string;
+          media_bytes?: number | null;
+          media_kind?: string | null;
+          media_mime?: string | null;
+          media_path?: string | null;
           merchant_id?: string;
           pinned_item_id?: string | null;
+          poster_path?: string | null;
           rejection_reason?: string | null;
           reviewed_at?: string | null;
           reviewed_by?: string | null;
@@ -21945,6 +21960,181 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      merchant_promotion_creative: {
+        Row: {
+          created_at: string;
+          id: string;
+          media_bytes: number;
+          media_kind: string;
+          media_mime: string;
+          media_path: string;
+          merchant_id: string;
+          poster_path: string | null;
+          promotion_id: string;
+          rejection_reason: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: Database['public']['Enums']['creative_status'];
+          submitted_by: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          media_bytes: number;
+          media_kind: string;
+          media_mime: string;
+          media_path: string;
+          merchant_id: string;
+          poster_path?: string | null;
+          promotion_id: string;
+          rejection_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: Database['public']['Enums']['creative_status'];
+          submitted_by?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          media_bytes?: number;
+          media_kind?: string;
+          media_mime?: string;
+          media_path?: string;
+          merchant_id?: string;
+          poster_path?: string | null;
+          promotion_id?: string;
+          rejection_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: Database['public']['Enums']['creative_status'];
+          submitted_by?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_promotion_id_fkey';
+            columns: ['promotion_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_promotion';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_promotion_id_fkey';
+            columns: ['promotion_id'];
+            isOneToOne: false;
+            referencedRelation: 'promotion_banner_v';
+            referencedColumns: ['promotion_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_reviewed_by_fkey';
+            columns: ['reviewed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -38645,6 +38835,38 @@ export type Database = {
         ComputedFields: never;
         Relationships: [];
       };
+      console_creative_queue_v: {
+        Row: {
+          blurb: string | null;
+          booking_id: string | null;
+          booking_status: string | null;
+          city_id: string | null;
+          cover_photo_path: string | null;
+          id: string | null;
+          media_bytes: number | null;
+          media_kind: string | null;
+          media_mime: string | null;
+          media_path: string | null;
+          merchant_id: string | null;
+          placement_kind: string | null;
+          poster_path: string | null;
+          promotion_ends_at: string | null;
+          promotion_id: string | null;
+          promotion_item: string | null;
+          promotion_kind: string | null;
+          promotion_name: string | null;
+          promotion_value: number | null;
+          rejection_reason: string | null;
+          reviewed_at: string | null;
+          source: string | null;
+          status: string | null;
+          submitted_at: string | null;
+          trading_name: string | null;
+          wanted_start: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
       console_data_request_v: {
         Row: {
           blocking_reasons: Json | null;
@@ -42874,6 +43096,8 @@ export type Database = {
           cover_photo_path: string | null;
           has_creative: boolean | null;
           kind: Database['public']['Enums']['placement_kind'] | null;
+          media_kind: string | null;
+          media_path: string | null;
           merchant_category: Database['public']['Enums']['merchant_category'] | null;
           merchant_id: string | null;
           opens_today: string | null;
@@ -42881,6 +43105,7 @@ export type Database = {
           pinned_item_name: string | null;
           pinned_item_price: number | null;
           position: number | null;
+          poster_path: string | null;
           prep_minutes: number | null;
           trading_name: string | null;
           valid_to: string | null;
@@ -49144,6 +49369,145 @@ export type Database = {
           },
         ];
       };
+      promotion_banner_v: {
+        Row: {
+          catalogue_item_id: string | null;
+          creative_id: string | null;
+          ends_at: string | null;
+          item_name: string | null;
+          kind: string | null;
+          media_kind: string | null;
+          media_path: string | null;
+          merchant_id: string | null;
+          name: string | null;
+          poster_path: string | null;
+          promotion_id: string | null;
+          starts_at: string | null;
+          value: number | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
       property_attribution_v: {
         Row: {
           average_basket: number | null;
@@ -53050,6 +53414,18 @@ export type Database = {
       fn_encrypt_secret: { Args: { p_plain: string }; Returns: string };
       fn_event_anchor_effects: { Args: { p_plan_id: string }; Returns: undefined };
       fn_expire_documents: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_featured_blurb: { Args: { p_blurb: string }; Returns: string };
+      fn_featured_card_put: {
+        Args: {
+          p_blurb: string;
+          p_booking: Omit<
+            Database['public']['Tables']['featured_booking']['Row'],
+            Database['public']['Tables']['featured_booking']['ComputedFields']
+          >;
+          p_media: Json;
+        };
+        Returns: Json;
+      };
       fn_featured_eligibility: {
         Args: {
           p_category?: Database['public']['Enums']['merchant_category'];
@@ -53606,6 +53982,23 @@ export type Database = {
           p_city_id: string;
           p_merchant_id?: string;
           p_subtotal_cents: number;
+        };
+        Returns: Json;
+      };
+      fn_promo_media_checked: { Args: { p_media: Json; p_merchant_id: string }; Returns: Json };
+      fn_promo_media_in_use: { Args: { p_path: string }; Returns: boolean };
+      fn_promo_media_object: {
+        Args: { p_merchant_id: string; p_path: string; p_role: string };
+        Returns: Json;
+      };
+      fn_promo_media_shown: { Args: { p_path: string }; Returns: boolean };
+      fn_promotion_media_put: {
+        Args: {
+          p_media: Json;
+          p_promotion: Omit<
+            Database['public']['Tables']['merchant_promotion']['Row'],
+            Database['public']['Tables']['merchant_promotion']['ComputedFields']
+          >;
         };
         Returns: Json;
       };
@@ -56132,8 +56525,13 @@ export type Database = {
           created_at: string;
           headline: string | null;
           id: string;
+          media_bytes: number | null;
+          media_kind: string | null;
+          media_mime: string | null;
+          media_path: string | null;
           merchant_id: string;
           pinned_item_id: string | null;
+          poster_path: string | null;
           rejection_reason: string | null;
           reviewed_at: string | null;
           reviewed_by: string | null;
@@ -56157,8 +56555,13 @@ export type Database = {
           created_at: string;
           headline: string | null;
           id: string;
+          media_bytes: number | null;
+          media_kind: string | null;
+          media_mime: string | null;
+          media_path: string | null;
           merchant_id: string;
           pinned_item_id: string | null;
+          poster_path: string | null;
           rejection_reason: string | null;
           reviewed_at: string | null;
           reviewed_by: string | null;
@@ -57873,6 +58276,11 @@ export type Database = {
         Args: { p_confirmation_name: string; p_merchant_id: string; p_reason: string };
         Returns: Json;
       };
+      rpc_merchant_featured_card_save: {
+        Args: { p_blurb?: string; p_booking_id: string; p_media?: Json };
+        Returns: Json;
+      };
+      rpc_merchant_featured_card_withdraw: { Args: { p_booking_id: string }; Returns: Json };
       rpc_merchant_go_live: {
         Args: { p_merchant_id: string; p_reason?: string };
         Returns: {
@@ -58109,11 +58517,17 @@ export type Database = {
         };
       };
       rpc_merchant_payout_name_check: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_promotion_media_save: {
+        Args: { p_media: Json; p_promotion_id: string };
+        Returns: Json;
+      };
+      rpc_merchant_promotion_media_withdraw: { Args: { p_promotion_id: string }; Returns: Json };
       rpc_merchant_promotion_save: {
         Args: {
           p_ends_at: string;
           p_item_id: string;
           p_kind: string;
+          p_media?: Json;
           p_merchant_id: string;
           p_name: string;
           p_promotion_id: string;
@@ -58132,6 +58546,7 @@ export type Database = {
       };
       rpc_merchant_request_featured: {
         Args: {
+          p_creative?: Json;
           p_item_id?: string;
           p_merchant_id: string;
           p_note?: string;
@@ -59469,6 +59884,10 @@ export type Database = {
           promotion_id: string;
           promotion_name: string;
         }[];
+      };
+      rpc_promotion_creative_review: {
+        Args: { p_approve: boolean; p_creative_id: string; p_reason?: string };
+        Returns: Json;
       };
       rpc_property_delete: {
         Args: { p_confirm_name: string; p_property_id: string };

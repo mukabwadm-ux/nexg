@@ -63,7 +63,9 @@ export default async function FeaturedPage({
   };
 }) {
   const staff = await requireStaff();
-  requireModule(staff, 'featured');
+  const access = requireModule(staff, 'featured');
+  /* Approving needs full access (authz.can_review_featured); view-only roles watch. */
+  const canReview = staff.isSuperAdmin || access.level === 'full';
   const supabase = createClient();
 
   const tab = TABS.some((t) => t.key === searchParams?.tab) ? searchParams!.tab! : 'inventory';
@@ -147,7 +149,7 @@ export default async function FeaturedPage({
                 selected={selected}
               />
             )}
-            {tab === 'creatives' && (await loadCreatives(supabase, city, filter))}
+            {tab === 'creatives' && (await loadCreatives(supabase, city, filter, canReview))}
             {tab === 'schedule' && (await loadSchedule(supabase, city))}
             {tab === 'performance' && (await loadPerformance(supabase, city, badges))}
             {tab === 'rules' && (await loadRules(supabase))}
@@ -239,7 +241,7 @@ type QueueRow = Omit<CreativeRow, 'src' | 'poster'> & {
   poster_path: string | null;
 };
 
-async function loadCreatives(supabase: Supabase, city: City, filter: string) {
+async function loadCreatives(supabase: Supabase, city: City, filter: string, canReview: boolean) {
   const { data } = await supabase
     .from('console_creative_queue_v')
     .select('*')
@@ -271,6 +273,7 @@ async function loadCreatives(supabase: Supabase, city: City, filter: string) {
       }))}
       filter={filter}
       city={city.slug}
+      canReview={canReview}
       onReview={reviewCreative}
     />
   );
