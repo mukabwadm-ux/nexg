@@ -45,6 +45,10 @@ export default function MerchantIntegrationPage() {
         <li>Show your NexG listing and catalogue on your own website.</li>
         <li>Use NexG&apos;s delivery zones, published experiences and bookable services.</li>
         <li>
+          Check whether NexG can deliver a trip, with its usual time and fee, before you offer it:{' '}
+          <A href="/docs/reference/check-delivery">POST /v1/delivery/check</A>.
+        </li>
+        <li>
           Book NexG services for your guests, such as an airport transfer, charged to your account:{' '}
           <A href="/docs/reference/create-order">POST /v1/orders</A>. Try it first with a{' '}
           <A href="/docs/environments#test-keys">test key</A>, which books in a sandbox.

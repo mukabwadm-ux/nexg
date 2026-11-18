@@ -209,6 +209,111 @@ export const ZONE_FIELDS: FieldDoc[] = [
   },
 ];
 
+/** The body of POST /v1/delivery/check: the same fields a ride or courier booking takes. */
+export const DELIVERY_CHECK_REQUEST_FIELDS: FieldDoc[] = [
+  { name: 'pickup_lat', type: 'number', description: 'Where the rider collects: latitude.' },
+  { name: 'pickup_lng', type: 'number', description: 'Where the rider collects: longitude.' },
+  { name: 'dropoff_lat', type: 'number', description: 'Where the rider delivers: latitude.' },
+  { name: 'dropoff_lng', type: 'number', description: 'Where the rider delivers: longitude.' },
+];
+
+export const DELIVERY_CHECK_FIELDS: FieldDoc[] = [
+  {
+    name: 'deliverable',
+    type: 'boolean',
+    description: 'Whether NexG can deliver this trip now.',
+  },
+  {
+    name: 'reason',
+    type: "'pickup_not_served' | 'dropoff_not_served' | 'too_far' | 'dropoff_paused'",
+    nullable: true,
+    description:
+      'Why not, when deliverable is false; null when it is true. A lasting reason comes before a pause: a trip that is too far says too_far even while its drop-off zone is paused.',
+  },
+  {
+    name: 'message',
+    type: 'string',
+    nullable: true,
+    description: 'The reason in a sentence a person can read. Null when the trip is deliverable.',
+  },
+  {
+    name: 'city_slug',
+    type: 'string',
+    nullable: true,
+    description:
+      'The city the pickup is in, which prices the trip. Null when NexG does not collect there.',
+  },
+  { name: 'city_name', type: 'string', nullable: true, description: 'The same city’s name.' },
+  { name: 'pickup', type: 'object', description: 'The pickup end. See Pickup.' },
+  { name: 'dropoff', type: 'object', description: 'The drop-off end. See Drop-off.' },
+  {
+    name: 'distance_km',
+    type: 'number',
+    description: 'Pickup to drop-off in a straight line, in kilometres to one decimal place.',
+  },
+  {
+    name: 'max_distance_km',
+    type: 'integer',
+    nullable: true,
+    description:
+      'The longest straight-line trip NexG delivers in that city. Null when NexG does not collect at the pickup.',
+  },
+  {
+    name: 'eta_min',
+    type: 'integer',
+    nullable: true,
+    description:
+      'Shortest typical delivery time into the drop-off zone, in minutes. Null when the trip is not deliverable, or the drop-off is in no zone.',
+  },
+  {
+    name: 'eta_max',
+    type: 'integer',
+    nullable: true,
+    description: 'Longest typical delivery time into the drop-off zone, in minutes. Null as above.',
+  },
+  {
+    name: 'delivery_fee_cents',
+    type: 'integer',
+    nullable: true,
+    description:
+      'The delivery fee from NexG’s rate card, in cents: a base fee covering the first kilometre, plus a per-kilometre rate for each further kilometre begun. Null when the trip is not deliverable.',
+  },
+  { name: 'currency', type: "'KES'", description: 'Always KES.' },
+];
+
+export const DELIVERY_PICKUP_FIELDS: FieldDoc[] = [
+  {
+    name: 'served',
+    type: 'boolean',
+    description:
+      'Whether NexG collects there: inside a live zone, or within the delivery radius of a city NexG serves.',
+  },
+  {
+    name: 'zone_id',
+    type: 'uuid',
+    nullable: true,
+    description:
+      'The live zone the point is in, as GET /v1/zones lists it. Null outside every zone.',
+  },
+  { name: 'zone_name', type: 'string', nullable: true, description: 'That zone’s name.' },
+];
+
+export const DELIVERY_DROPOFF_FIELDS: FieldDoc[] = [
+  {
+    name: 'served',
+    type: 'boolean',
+    description:
+      'Whether NexG delivers there: inside a live zone, or within the delivery radius of a city NexG serves. A paused zone is still served.',
+  },
+  ...DELIVERY_PICKUP_FIELDS.slice(1),
+  {
+    name: 'paused',
+    type: 'boolean',
+    description:
+      'true while deliveries into the drop-off zone are paused. The message gives the reason staff gave.',
+  },
+];
+
 export const EVENT_FIELDS: FieldDoc[] = [
   { name: 'id', type: 'uuid', description: 'The event’s id.' },
   { name: 'city_id', type: 'uuid', description: 'The city it takes place in.' },

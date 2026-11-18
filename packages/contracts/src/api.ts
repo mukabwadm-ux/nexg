@@ -298,6 +298,75 @@ export const PublicEvent = z
 
 export type PublicEvent = z.infer<typeof PublicEvent>;
 
+/**
+ * "Can you deliver here?": the body of POST /v1/delivery/check. The same
+ * four fields a ride or courier booking takes, so a caller can check a trip
+ * and then book it with the same values.
+ */
+export const DeliveryCheckRequest = z
+  .object({
+    pickup_lat: z.number().min(-90).max(90),
+    pickup_lng: z.number().min(-180).max(180),
+    dropoff_lat: z.number().min(-90).max(90),
+    dropoff_lng: z.number().min(-180).max(180),
+  })
+  .strict();
+
+export type DeliveryCheckRequest = z.infer<typeof DeliveryCheckRequest>;
+
+/** Why a trip cannot be delivered. A lasting reason is reported before a pause. */
+export const DeliveryRefusal = z.enum([
+  'pickup_not_served',
+  'dropoff_not_served',
+  'too_far',
+  'dropoff_paused',
+]);
+
+export type DeliveryRefusal = z.infer<typeof DeliveryRefusal>;
+
+/**
+ * One end of a checked trip. `served` says whether NexG works there at all;
+ * the zone is named only when it is a live one.
+ */
+export const DeliveryPickup = z
+  .object({ served: z.boolean(), zone_id: Uuid.nullable(), zone_name: z.string().nullable() })
+  .strict();
+
+export type DeliveryPickup = z.infer<typeof DeliveryPickup>;
+
+/** The drop-off end. A paused zone is served but paused: NexG delivers there, not this minute. */
+export const DeliveryDropoff = DeliveryPickup.extend({ paused: z.boolean() }).strict();
+
+export type DeliveryDropoff = z.infer<typeof DeliveryDropoff>;
+
+/**
+ * The answer to POST /v1/delivery/check, at `data`.
+ *
+ * The ETA and the fee are given only when the trip is deliverable. The fee
+ * is the rate card's (a base for the first kilometre, a rate for each
+ * further commenced one) and is not binding: an order is priced when it is
+ * placed.
+ */
+export const DeliveryCheck = z
+  .object({
+    deliverable: z.boolean(),
+    reason: DeliveryRefusal.nullable(),
+    message: z.string().nullable(),
+    city_slug: z.string().nullable(),
+    city_name: z.string().nullable(),
+    pickup: DeliveryPickup,
+    dropoff: DeliveryDropoff,
+    distance_km: z.number().nonnegative(),
+    max_distance_km: z.number().int().nullable(),
+    eta_min: z.number().int().nullable(),
+    eta_max: z.number().int().nullable(),
+    delivery_fee_cents: Money.nullable(),
+    currency: z.literal('KES'),
+  })
+  .strict();
+
+export type DeliveryCheck = z.infer<typeof DeliveryCheck>;
+
 /* ════════════════════════════════════════════════════════════════════════════ the requests */
 
 /**

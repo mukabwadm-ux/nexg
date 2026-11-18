@@ -12,6 +12,16 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-18',
     kind: 'added',
+    title: 'Can NexG deliver here?',
+    body: [
+      'POST /v1/delivery/check takes a pickup and a drop-off and answers whether NexG can deliver the trip now, and why not when it cannot: a pickup or drop-off outside the areas NexG serves, a trip longer than NexG goes, or deliveries into the drop-off zone paused.',
+      'When it can, the answer gives the city, the zone at each end, the straight-line distance, the drop-off zone’s usual delivery time and the delivery fee from NexG’s rate card. It needs no key, like the zone list.',
+    ],
+    endpoints: ['check-delivery'],
+  },
+  {
+    date: '2026-11-18',
+    kind: 'added',
     title: 'OpenAPI spec and Postman collection',
     body: [
       'https://api.nexgapp.com/openapi.json describes every endpoint in OpenAPI 3.1, for code generators and API clients. https://api.nexgapp.com/postman.json is a Postman collection of the same: import it and set apiKey to a test key.',

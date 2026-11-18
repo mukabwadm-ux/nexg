@@ -52,7 +52,7 @@ const AUDIENCES = [
   {
     name: 'Partners and developers',
     today:
-      'Build on live merchants and catalogues, delivery zones, experiences and bookable services, and try bookings with test keys.',
+      'Build on live merchants and catalogues, delivery zones and delivery checks, experiences and bookable services, and try bookings with test keys.',
     soon: 'Availability for every kind of booking, and OAuth for third-party apps.',
     href: '/docs/quickstart',
   },

@@ -18,7 +18,7 @@ const AUDIENCES = [
   {
     name: 'Partners and developers',
     today:
-      'Build on NexG’s public data: live merchants and catalogues, delivery zones, upcoming experiences and bookable services. Public reads work without a key, and test keys try bookings in a sandbox.',
+      'Build on NexG’s public data: live merchants and catalogues, delivery zones, delivery checks with an ETA and a fee, upcoming experiences and bookable services. Public reads work without a key, and test keys try bookings in a sandbox.',
     soon: 'Availability for every kind of booking, and OAuth sign-in for third-party apps.',
     href: '/docs/quickstart',
     link: 'Quickstart',
@@ -92,6 +92,11 @@ export default function IntroductionPage() {
         <li>
           <Strong>Read</Strong> NexG&apos;s public data: merchants, catalogues, zones, upcoming
           experiences and bookable services. No key is needed to start.
+        </li>
+        <li>
+          <Strong>Check a delivery</Strong> before you offer it: whether NexG delivers between two
+          points, how long it usually takes and the fee, with{' '}
+          <A href="/docs/reference/check-delivery">POST /v1/delivery/check</A>.
         </li>
         <li>
           <Strong>Read your own orders</Strong> with a key bound to your merchant, newest first,

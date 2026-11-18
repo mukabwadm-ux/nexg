@@ -56527,6 +56527,15 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_delivery_check: {
+        Args: {
+          p_dropoff_lat: number;
+          p_dropoff_lng: number;
+          p_pickup_lat: number;
+          p_pickup_lng: number;
+        };
+        Returns: Json;
+      };
       rpc_delivery_rate: {
         Args: { p_city_slug: string };
         Returns: {
