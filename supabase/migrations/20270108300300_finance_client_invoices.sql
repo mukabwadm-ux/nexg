@@ -400,7 +400,7 @@ create policy finance_invoices_read on storage.objects
 insert into audit.action_registry
   (action, module, default_severity, needs_review, two_person, money, pii_fields, description)
 values
-  ('finance.client_saved', 'finance', 'info', false, false, false, '{email,cc_emails,phone}',
+  ('finance.client_saved', 'finance', 'info', false, false, false, '{}',
    'A client Finance invoices was added or its details changed'),
   ('finance.client_invoice_saved', 'finance', 'info', false, false, true, '{}',
    'A client invoice draft was saved'),
@@ -412,7 +412,7 @@ values
    'An issued client invoice was voided: its posting reversed and a credit note issued'),
   ('finance.client_invoice_pdf_recorded', 'finance', 'info', false, false, false, '{}',
    'The PDF of a client invoice was stored'),
-  ('finance.client_invoice_sent', 'finance', 'info', false, false, false, '{sent_to}',
+  ('finance.client_invoice_sent', 'finance', 'info', false, false, false, '{}',
    'A client invoice was emailed to the client')
 on conflict (action) do nothing;
 
@@ -687,8 +687,23 @@ begin
     p_actor_id => v_staff,
     p_target_type => 'fin_client', p_target_id => v_new.id,
     p_target_label => coalesce(v_new.trading_name, v_new.legal_name),
-    p_before => case when v_old.id is null then null else to_jsonb(v_old) end,
-    p_after => to_jsonb(v_new));
+    /* Contact details never enter the audit trail in clear: the log keeps
+       masked forms, so the action needs no pii_fields (test 16 treats any
+       pii_fields as a reveal that must be queued for review). */
+    p_before => case when v_old.id is null then null
+                     else to_jsonb(v_old) - 'email' - 'cc_emails' - 'phone'
+                          || jsonb_build_object(
+                               'email', regexp_replace(v_old.email, '^(.).*(@.*)$', '\1•••\2'),
+                               'cc_count', coalesce(cardinality(v_old.cc_emails), 0),
+                               'phone', case when v_old.phone is null then null
+                                             else '•••' || right(v_old.phone, 3) end)
+                end,
+    p_after => to_jsonb(v_new) - 'email' - 'cc_emails' - 'phone'
+               || jsonb_build_object(
+                    'email', regexp_replace(v_new.email, '^(.).*(@.*)$', '\1•••\2'),
+                    'cc_count', coalesce(cardinality(v_new.cc_emails), 0),
+                    'phone', case when v_new.phone is null then null
+                                  else '•••' || right(v_new.phone, 3) end));
 
   return v_new.id;
 end;
@@ -1414,7 +1429,9 @@ begin
     p_actor_id => v_staff,
     p_target_type => 'fin_invoice', p_target_id => p_id,
     p_target_label => v_old.number,
-    p_after => jsonb_build_object('sent_to', v_to));
+    p_after => jsonb_build_object(
+      'recipients', cardinality(string_to_array(v_to, ',')),
+      'sent_to', regexp_replace(v_to, '(^|,\s*)([^@,\s])[^@,]*@', '\1\2•••@', 'g')));
 end;
 $$;
 
