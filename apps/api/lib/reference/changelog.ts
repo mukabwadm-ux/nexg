@@ -10,6 +10,15 @@ import type { ChangelogEntry } from './types';
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-11-23',
+    kind: 'added',
+    title: 'TypeScript client library',
+    body: [
+      'npm install @nexg-org/api-client: a typed method for every endpoint, retries after a 429 or a server error where sending again is safe, an idempotency key on every booking, pagination, and verifyWebhook for the order events NexG posts to you. No dependencies; Node 20 or later, Deno, Bun and edge runtimes.',
+    ],
+    endpoints: [],
+  },
+  {
     date: '2026-11-18',
     kind: 'added',
     title: 'Update many catalogue items at once',
