@@ -98,6 +98,18 @@ export default function IntroductionPage() {
           with the same stage the merchant console shows.
         </li>
         <li>
+          <Strong>Book services</Strong> such as airport transfers and couriers, and{' '}
+          <Strong>hear about every booking</Strong> as it changes, through signed order events.
+        </li>
+        <li>
+          <Strong>Keep your catalogue in step</Strong>: update prices and what is sold out from your
+          own till or ERP.
+        </li>
+        <li>
+          <Strong>Try all of it in the sandbox</Strong> with a test key, without touching real
+          orders or prices.
+        </li>
+        <li>
           <Strong>Call back to NexG</Strong> with signed events. Banks do this today for payments
           at checkout.
         </li>
@@ -167,6 +179,11 @@ export default function IntroductionPage() {
           <A href="/docs/rate-limits">Rate limits</A> before you go live, then build against the{' '}
           <A href="/docs/reference">API reference</A>.
         </li>
+        <li>
+          Prefer tools? Download the <A href="/openapi.json">OpenAPI spec</A> for code generators
+          and API clients, or the <A href="/postman.json">Postman collection</A> and set its{' '}
+          <C>apiKey</C> variable to a test key.
+        </li>
       </List>
 
       <H2 id="not-yet">Not available yet</H2>
@@ -176,7 +193,7 @@ export default function IntroductionPage() {
         says they are live.
       </P>
       <List>
-        <li>Changing an order through the API: any <C>PATCH</C> endpoint.</li>
+        <li>Changing or cancelling a booking through the API.</li>
         <li>Two-way sync with a POS, ERP, booking or inventory system.</li>
         <li>OAuth sign-in for third-party apps. Use API keys.</li>
       </List>
