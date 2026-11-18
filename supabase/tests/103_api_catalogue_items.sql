@@ -106,7 +106,7 @@ select is(
      l.after ->> 'key_prefix')
    from audit.audit_event l
    where l.action = 'api.catalogue_item_updated' and l.target_id = 'ce000000-0000-4000-8000-000000000001'),
-  'system|api|500|550|catliv01',
+  'system|settings|500|550|catliv01',
   'the change is audited with the key that made it');
 
 select is(
