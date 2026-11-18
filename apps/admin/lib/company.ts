@@ -245,3 +245,42 @@ export function suggestedOrder(quantityOnHand: number, reorderLevel: number): nu
   const target = reorderLevel * 2;
   return Math.max(0, Math.ceil(target - quantityOnHand));
 }
+
+/* ───────────────────────────────────────────────────────────── folders */
+
+/** What the folder helpers need of a folder. */
+export interface FolderNode {
+  id: string;
+  name: string;
+  /** The top-level folder this one sits in; null for a top-level folder. */
+  parent_id: string | null;
+  sort: number;
+}
+
+/** Top-level folders in their order, each followed by its sub-folders. */
+export function folderTree<T extends FolderNode>(folders: T[]): { folder: T; subs: T[] }[] {
+  const order = (a: T, b: T) => a.sort - b.sort || a.name.localeCompare(b.name);
+  return folders
+    .filter((f) => !f.parent_id)
+    .sort(order)
+    .map((folder) => ({
+      folder,
+      subs: folders.filter((f) => f.parent_id === folder.id).sort(order),
+    }));
+}
+
+/** "Corporate and Legal › Company registration". */
+export function folderPath(folders: FolderNode[], id: string | null | undefined): string | null {
+  const f = folders.find((x) => x.id === id);
+  if (!f) return null;
+  const parent = f.parent_id ? folders.find((x) => x.id === f.parent_id) : null;
+  return parent ? `${parent.name} › ${f.name}` : f.name;
+}
+
+/** Every folder for a picker: each top-level folder, then its sub-folders under it. */
+export function folderOptions(folders: FolderNode[]): { value: string; label: string }[] {
+  return folderTree(folders).flatMap(({ folder, subs }) => [
+    { value: folder.id, label: folder.name },
+    ...subs.map((s) => ({ value: s.id, label: `${folder.name} › ${s.name}` })),
+  ]);
+}

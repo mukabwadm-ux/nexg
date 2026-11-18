@@ -7,6 +7,9 @@ import {
   daysUntil,
   fileBadge,
   fileKind,
+  folderOptions,
+  folderPath,
+  folderTree,
   hrefWith,
   initials,
   kes,
@@ -162,5 +165,39 @@ describe('inventory', () => {
         ['Helmet', 'Size "L", black'],
       ]),
     ).toBe('Name,Note\r\nHelmet,"Size ""L"", black"');
+  });
+});
+
+describe('folders', () => {
+  const folders = [
+    { id: 'hr', name: 'Human Resource', parent_id: null, sort: 20 },
+    { id: 'legal', name: 'Corporate and Legal', parent_id: null, sort: 10 },
+    { id: 'gov', name: 'Corporate governance', parent_id: 'legal', sort: 40 },
+    { id: 'reg', name: 'Company registration', parent_id: 'legal', sort: 10 },
+    { id: 'old', name: 'Archive', parent_id: null, sort: 1000 },
+  ];
+
+  it('orders top-level folders and their sub-folders by sort', () => {
+    expect(folderTree(folders).map((t) => [t.folder.id, t.subs.map((s) => s.id)])).toEqual([
+      ['legal', ['reg', 'gov']],
+      ['hr', []],
+      ['old', []],
+    ]);
+  });
+
+  it('names a folder by its path', () => {
+    expect(folderPath(folders, 'reg')).toBe('Corporate and Legal › Company registration');
+    expect(folderPath(folders, 'hr')).toBe('Human Resource');
+    expect(folderPath(folders, null)).toBeNull();
+  });
+
+  it('lists every folder for a picker, sub-folders under their folder', () => {
+    expect(folderOptions(folders).map((o) => o.label)).toEqual([
+      'Corporate and Legal',
+      'Corporate and Legal › Company registration',
+      'Corporate and Legal › Corporate governance',
+      'Human Resource',
+      'Archive',
+    ]);
   });
 });

@@ -1,4 +1,5 @@
 import { formatRange, Progress } from '@nexg/ui';
+import Link from 'next/link';
 import {
   Clock,
   Database,
@@ -27,6 +28,7 @@ import { ConsoleShell } from '@/components/console-shell';
 import {
   bytes,
   companyAccess,
+  folderPath,
   hrefWith,
   periodBounds,
   periodFrom,
@@ -112,10 +114,8 @@ export default async function CompanyFilesPage({
 
   const [summaryRes, foldersRes, filesRes, starsRes, sharesRes, peopleRes] = await Promise.all([
     supabase.rpc('rpc_company_files_summary', { p_from: period.from, p_to: period.to }),
-    supabase
-      .from('company_folder_v')
-      .select('id, name, color, file_count, bytes, last_change')
-      .order('name'),
+    /* Every column, so the page also reads the view before sub-folders existed. */
+    supabase.from('company_folder_v').select('*').order('name'),
     files,
     supabase.from('company_file_star').select('file_id'),
     supabase.from('company_file_share').select('file_id, staff_id').limit(5000),
@@ -123,11 +123,27 @@ export default async function CompanyFilesPage({
   ]);
 
   const summary = (summaryRes.data as Summary | null) ?? null;
-  const folders = ((foldersRes.data ?? []) as FolderRow[]).map((f) => ({
-    ...f,
-    file_count: Number(f.file_count ?? 0),
-    bytes: Number(f.bytes ?? 0),
-  }));
+  const folders = ((foldersRes.data ?? []) as Partial<FolderRow>[]).map(
+    (f): FolderRow => ({
+      id: f.id!,
+      name: f.name ?? '',
+      color: f.color ?? 'gold',
+      last_change: f.last_change ?? null,
+      file_count: Number(f.file_count ?? 0),
+      bytes: Number(f.bytes ?? 0),
+      parent_id: f.parent_id ?? null,
+      sort: Number(f.sort ?? 1000),
+      sub_count: Number(f.sub_count ?? 0),
+      all_file_count: Number(f.all_file_count ?? f.file_count ?? 0),
+      all_bytes: Number(f.all_bytes ?? f.bytes ?? 0),
+    }),
+  );
+  const topFolders = folders.filter((f) => !f.parent_id);
+  const openFolder =
+    tab === 'all' ? (folders.find((f) => f.id === searchParams?.folder) ?? null) : null;
+  const openParent = openFolder?.parent_id
+    ? (folders.find((f) => f.id === openFolder.parent_id) ?? null)
+    : null;
   const rows = (filesRes.data ?? []) as unknown as FileRow[];
   const failed = summaryRes.error || foldersRes.error || filesRes.error;
   const used = summary ? Number(summary.bytes) : null;
@@ -219,8 +235,13 @@ export default async function CompanyFilesPage({
               />
               <Stat
                 icon={Folder}
-                value={summary ? summary.folders.toLocaleString('en-KE') : null}
+                value={topFolders.length.toLocaleString('en-KE')}
                 label="Folders"
+                note={
+                  folders.length > topFolders.length
+                    ? `${(folders.length - topFolders.length).toLocaleString('en-KE')} folders inside them`
+                    : undefined
+                }
               />
               <Stat
                 icon={Users}
@@ -284,15 +305,71 @@ export default async function CompanyFilesPage({
           </>
         )}
 
+        {tab === 'all' && !openFolder && (
+          <Sheet>
+            <QuickFolders folders={folders} canWrite={canWrite} period={pq} title="Folders" />
+          </Sheet>
+        )}
+
         {tab !== 'overview' && (
           <Sheet>
+            {tab === 'all' && openFolder && (
+              <div className="mb-5 space-y-5">
+                <nav aria-label="Folder" className="text-sm font-semibold">
+                  <ol className="flex flex-wrap items-center gap-1.5">
+                    <li>
+                      <Link
+                        href={base('all')}
+                        className="text-muted hover:text-ink underline-offset-4 hover:underline"
+                      >
+                        All files
+                      </Link>
+                    </li>
+                    {openParent && (
+                      <>
+                        <li aria-hidden="true" className="text-muted-light">
+                          ›
+                        </li>
+                        <li>
+                          <Link
+                            href={hrefWith('/company/files', {
+                              tab: 'all',
+                              folder: openParent.id,
+                              ...(pq ? { from: period.from, to: period.to } : {}),
+                            })}
+                            className="text-muted hover:text-ink underline-offset-4 hover:underline"
+                          >
+                            {openParent.name}
+                          </Link>
+                        </li>
+                      </>
+                    )}
+                    <li aria-hidden="true" className="text-muted-light">
+                      ›
+                    </li>
+                    <li aria-current="page" className="text-ink font-extrabold">
+                      {openFolder.name}
+                    </li>
+                  </ol>
+                </nav>
+                {!openFolder.parent_id && (
+                  <QuickFolders
+                    folders={folders}
+                    canWrite={canWrite}
+                    period={pq}
+                    parent={openFolder}
+                    title={`In ${openFolder.name}`}
+                  />
+                )}
+              </div>
+            )}
             {tab === 'all' &&
               board(
-                searchParams?.folder
-                  ? (folders.find((f) => f.id === searchParams.folder)?.name ?? 'All files')
-                  : 'All files',
+                openFolder ? (folderPath(folders, openFolder.id) ?? 'All files') : 'All files',
                 undefined,
-                ['No files yet', 'Upload the first file with Upload files above.'],
+                openFolder
+                  ? ['No files here yet', 'Upload into this folder with Upload files above.']
+                  : ['No files yet', 'Upload the first file with Upload files above.'],
               )}
             {tab === 'mine' &&
               board('My files', undefined, [

@@ -63,6 +63,9 @@ import {
   FILE_KINDS,
   fileBadge,
   fileKind,
+  folderOptions,
+  folderPath,
+  folderTree,
   hrefWith,
   initials,
   storageKey,
@@ -94,6 +97,13 @@ export interface FolderRow {
   file_count: number;
   bytes: number;
   last_change: string | null;
+  /** The top-level folder this one sits in; null for a top-level folder. */
+  parent_id: string | null;
+  sort: number;
+  sub_count: number;
+  /** Files in the folder and its sub-folders. */
+  all_file_count: number;
+  all_bytes: number;
 }
 
 export interface PersonRow {
@@ -250,12 +260,22 @@ export function FilesBoard({
   };
 
   const term = q.trim().toLowerCase();
+  const parentOf = React.useMemo(
+    () => new Map(folders.map((f) => [f.id, f.parent_id ?? null])),
+    [folders],
+  );
+  /* A top-level folder shows its sub-folders' files too. */
+  const inFolder = (f: FileRow) =>
+    folder === 'all' ||
+    (folder === 'none'
+      ? !f.folder_id
+      : f.folder_id === folder || (f.folder_id != null && parentOf.get(f.folder_id) === folder));
   const rows = files.filter(
     (f) =>
       (kind === 'all' || fileKind(f.mime_type, f.name) === kind) &&
-      (folder === 'all' || (folder === 'none' ? !f.folder_id : f.folder_id === folder)) &&
+      inFolder(f) &&
       (!term ||
-        `${f.name} ${f.folder?.name ?? ''} ${f.owner?.display_name ?? ''} ${f.description ?? ''}`
+        `${f.name} ${folderPath(folders, f.folder_id) ?? ''} ${f.owner?.display_name ?? ''} ${f.description ?? ''}`
           .toLowerCase()
           .includes(term)),
   );
@@ -363,7 +383,7 @@ export function FilesBoard({
     },
     {
       id: 'folder',
-      accessorFn: (f) => f.folder?.name ?? '',
+      accessorFn: (f) => folderPath(folders, f.folder_id) ?? f.folder?.name ?? '',
       header: 'Folder',
       cell: ({ row: { original: f } }) =>
         f.folder ? (
@@ -372,7 +392,9 @@ export function FilesBoard({
               className={cn('h-4 w-4 shrink-0 fill-current', FOLDER_COLORS[f.folder.color])}
               aria-hidden="true"
             />
-            <span className="truncate">{f.folder.name}</span>
+            <span className="truncate" title={folderPath(folders, f.folder_id) ?? f.folder.name}>
+              {folderPath(folders, f.folder_id) ?? f.folder.name}
+            </span>
           </span>
         ) : (
           <span className="text-muted-light">No folder</span>
@@ -471,7 +493,7 @@ export function FilesBoard({
             className="flex-1 sm:flex-none"
             options={[
               { value: 'all', label: 'All folders' },
-              ...folders.map((f) => ({ value: f.id, label: f.name })),
+              ...folderOptions(folders),
               { value: 'none', label: 'No folder' },
             ]}
           />
@@ -604,7 +626,8 @@ export function FilesBoard({
                 >
                   <span className="block truncate text-sm font-bold">{f.name}</span>
                   <span className="text-muted-light block truncate text-xs">
-                    {f.folder?.name ?? 'No folder'} · {bytes(f.size_bytes)} ·{' '}
+                    {folderPath(folders, f.folder_id) ?? f.folder?.name ?? 'No folder'} ·{' '}
+                    {bytes(f.size_bytes)} ·{' '}
                     {dateTime(mode === 'trash' ? f.deleted_at : f.updated_at)}
                   </span>
                 </button>
@@ -686,7 +709,7 @@ function EditFilePanel({
         value={folderId}
         onChange={(e) => setFolderId(e.target.value)}
         placeholder="No folder"
-        options={folders.map((f) => ({ value: f.id, label: f.name }))}
+        options={folderOptions(folders)}
       />
       <VisibilityChoice value={visibility} onChange={setVisibility} disabled={!isOwner} />
       <TextArea
@@ -1027,7 +1050,7 @@ export function UploadFiles({
           value={folderId}
           onChange={(e) => setFolderId(e.target.value)}
           placeholder="No folder"
-          options={folders.map((f) => ({ value: f.id, label: f.name }))}
+          options={folderOptions(folders)}
         />
         <VisibilityChoice value={visibility} onChange={setVisibility} />
       </FormPanel>
@@ -1043,20 +1066,37 @@ export function QuickFolders({
   folders,
   canWrite,
   period,
+  parent = null,
+  title = 'Quick folders',
 }: {
   folders: FolderRow[];
   canWrite: boolean;
   period: string;
+  /** Shows this folder's sub-folders and adds new folders inside it; null shows the top level. */
+  parent?: FolderRow | null;
+  title?: string;
 }) {
   const [editing, setEditing] = React.useState<FolderRow | 'new' | null>(null);
   const [confirm, setConfirm] = React.useState<FolderRow | null>(null);
   const { run } = useRunner();
   const router = useRouter();
+  const shown = parent
+    ? (folderTree(folders).find((t) => t.folder.id === parent.id)?.subs ?? [])
+    : folderTree(folders).map((t) => t.folder);
+  const openHref = (f: FolderRow) =>
+    hrefWith('/company/files', { tab: 'all', folder: f.id }) + (period ? `&${period}` : '');
 
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-[1.125rem] font-extrabold tracking-[-0.01em]">Quick folders</h2>
+        <h2 className="text-[1.125rem] font-extrabold tracking-[-0.01em]">
+          {title}
+          {shown.length > 0 && (
+            <span className="text-muted-light ml-2 text-xs font-semibold tabular-nums">
+              {shown.length.toLocaleString('en-KE')}
+            </span>
+          )}
+        </h2>
         {canWrite && (
           <Button
             variant="outline"
@@ -1064,24 +1104,30 @@ export function QuickFolders({
             leadingIcon={<FolderPlus className="h-4 w-4" />}
             onClick={() => setEditing('new')}
           >
-            Add folder
+            {parent ? 'Add folder here' : 'Add folder'}
           </Button>
         )}
       </div>
-      {folders.length === 0 ? (
+      {shown.length === 0 ? (
         <EmptyState
           className="mt-4"
           size="sm"
           icon={<Folder className="h-5 w-5" />}
-          title="No folders yet"
-          description="Folders keep contracts, policies and finance papers apart. Add the first one, then upload into it."
+          title={parent ? 'No folders inside this one' : 'No folders yet'}
+          description={
+            parent
+              ? 'Add folders here to sort its papers, or upload straight into it.'
+              : 'Folders keep contracts, policies and finance papers apart. Add the first one, then upload into it.'
+          }
           {...(canWrite
             ? { action: { label: 'Add folder', onClick: () => setEditing('new') } }
             : {})}
         />
       ) : (
-        <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))]">
-          {folders.map((f) => {
+        <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-[repeat(auto-fill,minmax(10.5rem,1fr))]">
+          {shown.map((f) => {
+            const files = parent ? f.file_count : f.all_file_count;
+            const size = parent ? f.bytes : f.all_bytes;
             const menu = (
               <ActionMenu
                 label={`Actions for ${f.name}`}
@@ -1089,11 +1135,7 @@ export function QuickFolders({
                   {
                     label: 'Open',
                     icon: <FolderInput />,
-                    onSelect: () =>
-                      router.push(
-                        hrefWith('/company/files', { tab: 'all', folder: f.id }) +
-                          (period ? `&${period}` : ''),
-                      ),
+                    onSelect: () => router.push(openHref(f)),
                   },
                   canWrite && {
                     label: 'Rename',
@@ -1134,9 +1176,11 @@ export function QuickFolders({
                         anchor={menu}
                         title={`Delete “${f.name}”?`}
                         body={
-                          f.file_count > 0
-                            ? 'Move or delete its files first; a folder with files in it stays.'
-                            : 'The folder is empty, so nothing else changes.'
+                          f.sub_count > 0
+                            ? 'Delete the folders inside it first; a folder that holds folders stays.'
+                            : f.file_count > 0
+                              ? 'Move or delete its files first; a folder with files in it stays.'
+                              : 'The folder is empty, so nothing else changes.'
                         }
                         confirmLabel="Delete folder"
                         onConfirm={async () => run(() => deleteFolder(f.id))}
@@ -1147,16 +1191,19 @@ export function QuickFolders({
                   </div>
                 </div>
                 <a
-                  href={
-                    hrefWith('/company/files', { tab: 'all', folder: f.id }) +
-                    (period ? `&${period}` : '')
-                  }
+                  href={openHref(f)}
                   className="focus-visible:ring-gold mt-3 block rounded after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:ring-2"
                 >
-                  <span className="block truncate text-sm font-extrabold">{f.name}</span>
-                  <span className="text-muted-light block text-xs tabular-nums">
-                    {f.file_count.toLocaleString('en-KE')} {f.file_count === 1 ? 'file' : 'files'}
-                    {f.file_count > 0 && ` · ${bytes(f.bytes)}`}
+                  <span className="block text-sm font-extrabold leading-snug">{f.name}</span>
+                  <span className="text-muted-light mt-0.5 block text-xs tabular-nums">
+                    {!parent && f.sub_count > 0 && (
+                      <>
+                        {f.sub_count.toLocaleString('en-KE')}{' '}
+                        {f.sub_count === 1 ? 'folder' : 'folders'} ·{' '}
+                      </>
+                    )}
+                    {files.toLocaleString('en-KE')} {files === 1 ? 'file' : 'files'}
+                    {files > 0 && ` · ${bytes(size)}`}
                   </span>
                 </a>
               </li>
@@ -1166,24 +1213,46 @@ export function QuickFolders({
       )}
 
       {editing && (
-        <FolderPanel folder={editing === 'new' ? null : editing} onClose={() => setEditing(null)} />
+        <FolderPanel
+          folder={editing === 'new' ? null : editing}
+          parent={editing === 'new' ? parent : null}
+          onClose={() => setEditing(null)}
+        />
       )}
     </div>
   );
 }
 
-function FolderPanel({ folder, onClose }: { folder: FolderRow | null; onClose: () => void }) {
+function FolderPanel({
+  folder,
+  parent = null,
+  onClose,
+}: {
+  folder: FolderRow | null;
+  /** Where a new folder goes; null for the top level. */
+  parent?: FolderRow | null;
+  onClose: () => void;
+}) {
   const [name, setName] = React.useState(folder?.name ?? '');
-  const [color, setColor] = React.useState(folder?.color ?? 'gold');
+  const [color, setColor] = React.useState(folder?.color ?? parent?.color ?? 'gold');
   const { run, busy } = useRunner();
   return (
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title={folder ? 'Rename folder' : 'Add folder'}
+      title={folder ? 'Rename folder' : parent ? `Add a folder in ${parent.name}` : 'Add folder'}
       submitLabel={folder ? 'Save' : 'Add folder'}
       busy={busy}
-      onSubmit={() => run(() => saveFolder({ id: folder?.id, name, color }))}
+      onSubmit={() =>
+        run(() =>
+          saveFolder({
+            id: folder?.id,
+            name,
+            color,
+            parentId: folder ? null : (parent?.id ?? null),
+          }),
+        )
+      }
     >
       <TextField
         label="Name"
@@ -1191,7 +1260,7 @@ function FolderPanel({ folder, onClose }: { folder: FolderRow | null; onClose: (
         value={name}
         onChange={(e) => setName(e.target.value)}
         maxLength={60}
-        placeholder="Contracts"
+        placeholder={parent ? 'Company registration' : 'Corporate and Legal'}
       />
       <fieldset>
         <legend className="mb-2 text-sm font-bold">Colour</legend>

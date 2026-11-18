@@ -149,16 +149,8 @@ begin
     values (v_pr, 'Standing desk, electric', 3, 3000000, 1);
   end if;
 
-  insert into public.company_folder (name, color, created_by) values
-    ('Contracts', 'gold', v_admin),
-    ('Policies', 'gold', v_admin),
-    ('Finance', 'green', v_admin),
-    ('Operations', 'gold', v_admin),
-    ('Compliance', 'blue', v_admin),
-    ('Marketing', 'purple', v_admin),
-    ('HR & People', 'gold', v_admin),
-    ('Legal', 'ink', v_admin)
-  on conflict do nothing;
+  /* Company files' folders come from 20270106010100_company_folder_tree:
+     the twelve folders NexG files by, with their sub-folders. */
 end;
 $$;
 

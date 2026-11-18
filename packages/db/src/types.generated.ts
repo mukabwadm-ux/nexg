@@ -7980,6 +7980,8 @@ export type Database = {
           created_by: string | null;
           id: string;
           name: string;
+          parent_id: string | null;
+          sort: number;
           updated_at: string;
         };
         ComputedFields: never;
@@ -7989,6 +7991,8 @@ export type Database = {
           created_by?: string | null;
           id?: string;
           name: string;
+          parent_id?: string | null;
+          sort?: number;
           updated_at?: string;
         };
         Update: {
@@ -7997,6 +8001,8 @@ export type Database = {
           created_by?: string | null;
           id?: string;
           name?: string;
+          parent_id?: string | null;
+          sort?: number;
           updated_at?: string;
         };
         Relationships: [
@@ -8005,6 +8011,20 @@ export type Database = {
             columns: ['created_by'];
             isOneToOne: false;
             referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_folder_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_folder';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_folder_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_folder_v';
             referencedColumns: ['id'];
           },
         ];
@@ -39075,6 +39095,9 @@ export type Database = {
       };
       company_folder_v: {
         Row: {
+          all_bytes: number | null;
+          all_file_count: number | null;
+          all_last_change: string | null;
           bytes: number | null;
           color: string | null;
           created_at: string | null;
@@ -39083,6 +39106,9 @@ export type Database = {
           id: string | null;
           last_change: string | null;
           name: string | null;
+          parent_id: string | null;
+          sort: number | null;
+          sub_count: number | null;
           updated_at: string | null;
         };
         ComputedFields: never;
@@ -39092,6 +39118,20 @@ export type Database = {
             columns: ['created_by'];
             isOneToOne: false;
             referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_folder_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_folder';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'company_folder_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: false;
+            referencedRelation: 'company_folder_v';
             referencedColumns: ['id'];
           },
         ];
@@ -56022,7 +56062,7 @@ export type Database = {
       rpc_company_files_summary: { Args: { p_from?: string; p_to?: string }; Returns: Json };
       rpc_company_folder_delete: { Args: { p_id: string }; Returns: undefined };
       rpc_company_folder_save: {
-        Args: { p_color?: string; p_id?: string; p_name: string };
+        Args: { p_color?: string; p_id?: string; p_name: string; p_parent_id?: string };
         Returns: string;
       };
       rpc_company_inventory_summary: { Args: { p_from?: string }; Returns: Json };
