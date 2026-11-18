@@ -89,14 +89,14 @@ const SEVERITY_DEFAULT: Badge = { label: 'Attention', tone: 'bg-bg text-muted' }
 const CAL_DEFAULT: Badge = { label: 'Upcoming', tone: 'bg-bg text-muted' };
 
 const SEVERITY: Record<string, Badge> = {
-  blocking: { label: 'Stops payouts', tone: 'bg-danger text-white' },
+  blocking: { label: 'Stops Payouts', tone: 'bg-danger text-white' },
   urgent: { label: 'Urgent', tone: 'bg-warn/15 text-warn' },
   attention: { label: 'Attention', tone: 'bg-bg text-muted' },
 };
 
 const CAL_STATE: Record<string, Badge> = {
   done: { label: 'Done', tone: 'bg-success/15 text-success' },
-  in_progress: { label: 'In progress', tone: 'bg-warn/15 text-warn' },
+  in_progress: { label: 'In Progress', tone: 'bg-warn/15 text-warn' },
   overdue: { label: 'Overdue', tone: 'bg-danger text-white' },
   upcoming: { label: 'Upcoming', tone: 'bg-bg text-muted' },
 };
@@ -155,7 +155,7 @@ export function Overview({
       .map((r) => ({ key: r.key, label: r.label, value: Math.round(r.cents / 100) }));
     const rest = sorted.slice(5).reduce((sum, r) => sum + r.cents, 0);
     return rest > 0
-      ? [...top, { key: 'rest', label: 'Everything else', value: Math.round(rest / 100) }]
+      ? [...top, { key: 'rest', label: 'Everything Else', value: Math.round(rest / 100) }]
       : top;
   };
   const revenueTotal = revenue.reduce((a, r) => a + Number(r.amount_cents), 0);
@@ -188,7 +188,7 @@ export function Overview({
       {/* ─────────────────────────────────── what needs a person */}
       <section>
         <SectionTitle note="Each of these is still true tomorrow if nobody acts on it.">
-          Needs a person
+          Needs a Person
         </SectionTitle>
 
         {decisions.length === 0 ? (
@@ -249,7 +249,7 @@ export function Overview({
           note="Month to date, against the same days of the month before."
           right={<Verify from={from} to={to} />}
         >
-          This month
+          This Month
         </SectionTitle>
 
         {!totals ? (
@@ -294,7 +294,7 @@ export function Overview({
 
       {/* ──────────────────────────────── the month at a glance */}
       <div className="grid gap-5 lg:grid-cols-3">
-        <Panel title="Revenue by line" aside="This month">
+        <Panel title="Revenue by Line" aside="This month">
           {donut(
             revenueSlices,
             revenueTotal,
@@ -302,10 +302,10 @@ export function Overview({
             'No revenue has been recognised this month.',
           )}
         </Panel>
-        <Panel title="Money in" aside="This month">
+        <Panel title="Money In" aside="This month">
           {donut(inSlices, inTotal, 'In', 'Nothing has come in this month.')}
         </Panel>
-        <Panel title="Money out" aside="This month">
+        <Panel title="Money Out" aside="This month">
           {donut(
             outSlices,
             outTotal,
@@ -319,7 +319,7 @@ export function Overview({
       <div className="grid gap-6 lg:grid-cols-2">
         <section>
           <SectionTitle note="Both columns from the same entries, so they cannot drift apart.">
-            Where money moved
+            Where Money Moved
           </SectionTitle>
           <div className="border-border bg-surface overflow-hidden rounded-xl border">
             {flow.length === 0 ? (
@@ -375,7 +375,7 @@ export function Overview({
 
         <section>
           <SectionTitle note="Against the same number of days immediately before.">
-            Revenue by line
+            Revenue by Line
           </SectionTitle>
           <div className="border-border bg-surface overflow-hidden rounded-xl border">
             {revenue.length === 0 ? (
@@ -385,7 +385,7 @@ export function Overview({
                 <thead className="border-border bg-bg border-b">
                   <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                     <th className="px-4 py-2">Line</th>
-                    <th className="px-4 py-2 text-right">This month</th>
+                    <th className="px-4 py-2 text-right">This Month</th>
                     <th className="px-4 py-2 text-right">Change</th>
                   </tr>
                 </thead>
@@ -434,7 +434,7 @@ export function Overview({
       <div className="grid gap-6 lg:grid-cols-2">
         <section>
           <SectionTitle note="Unattributed is money whose city we could not resolve — a wiring fault, not a city.">
-            By city
+            By City
           </SectionTitle>
           <div className="border-border bg-surface overflow-hidden rounded-xl border">
             {cities.length === 0 ? (
@@ -476,7 +476,7 @@ export function Overview({
 
         <section>
           <SectionTitle note="Standing balance per partner, excluding anything a run has already claimed.">
-            Owed to partners
+            Owed to Partners
           </SectionTitle>
           <div className="border-border bg-surface overflow-hidden rounded-xl border">
             {owed.length === 0 ? (
@@ -523,7 +523,7 @@ export function Overview({
 
       <section>
         <SectionTitle note="Read from real runs and real filing dates, not a list anybody has to remember to update.">
-          What falls due
+          What Falls Due
         </SectionTitle>
         <div className="border-border bg-surface overflow-hidden rounded-xl border">
           {calendar.length === 0 ? (

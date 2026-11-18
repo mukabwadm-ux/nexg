@@ -1,7 +1,18 @@
 'use client';
 
 import * as React from 'react';
-import { Area, AreaChart, CartesianGrid, Cell, Label, Pie, PieChart, XAxis, YAxis } from 'recharts';
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Cell,
+  Label,
+  LabelList,
+  Pie,
+  PieChart,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 import {
   ChartContainer,
@@ -78,22 +89,23 @@ export function TrendArea({
   const config: ChartConfig = Object.fromEntries(
     series.map((s, i) => [s.key, { label: s.label, color: s.color ?? PALETTE[i] }]),
   );
+  /* The designs mark each point and pin the latest figure above it. */
+  const lead = series[0]?.key;
+  let pinned = -1;
+  if (lead) {
+    for (let i = data.length - 1; i >= 0; i--) {
+      if (Number(data[i]![lead]) > 0) {
+        pinned = i;
+        break;
+      }
+    }
+  }
+  const dots = data.length <= 45;
 
   return (
     <div>
-      <ul className="mb-3 flex flex-wrap gap-x-5 gap-y-1 text-xs font-semibold" aria-hidden="true">
-        {series.map((s, i) => (
-          <li key={s.key} className="text-muted flex items-center gap-2">
-            <span
-              className="h-2.5 w-2.5 rounded-full"
-              style={{ background: s.color ?? PALETTE[i] }}
-            />
-            {s.label}
-          </li>
-        ))}
-      </ul>
       <ChartContainer config={config} className="aspect-auto w-full" style={{ height }}>
-        <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+        <AreaChart data={data} margin={{ top: 34, right: 24, bottom: 0, left: 0 }}>
           <defs>
             {series.map((s) => (
               <linearGradient key={s.key} id={`fill-${id}-${s.key}`} x1="0" y1="0" x2="0" y2="1">
@@ -133,17 +145,83 @@ export function TrendArea({
             <Area
               key={s.key}
               dataKey={s.key}
-              type="monotone"
+              type="linear"
               stroke={`var(--color-${s.key})`}
               strokeWidth={i === 0 ? 2.5 : 2}
               fill={(s.fill ?? i === 0) ? `url(#fill-${id}-${s.key})` : 'transparent'}
-              dot={false}
+              dot={
+                dots
+                  ? { r: 3.5, fill: `var(--color-${s.key})`, stroke: '#fff', strokeWidth: 1.5 }
+                  : false
+              }
               activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }}
-            />
+            >
+              {i === 0 && pinned >= 0 && (
+                <LabelList
+                  dataKey={s.key}
+                  content={(props) => (
+                    <PinnedFigure
+                      {...(props as PinProps)}
+                      pinned={pinned}
+                      edge={pinned >= data.length * 0.85}
+                      text={formatter(unit)(Number(data[pinned]![s.key]))}
+                    />
+                  )}
+                />
+              )}
+            </Area>
           ))}
         </AreaChart>
       </ChartContainer>
+      <ul
+        className="mt-2 flex flex-wrap justify-center gap-x-6 gap-y-1 text-[0.8125rem] font-semibold"
+        aria-hidden="true"
+      >
+        {series.map((s, i) => (
+          <li key={s.key} className="text-ink/80 flex items-center gap-2">
+            <span className="h-3 w-3 rounded-full" style={{ background: s.color ?? PALETTE[i] }} />
+            {s.label}
+          </li>
+        ))}
+      </ul>
     </div>
+  );
+}
+
+interface PinProps {
+  x?: number | string;
+  y?: number | string;
+  index?: number;
+}
+
+/** The latest figure in a dark pill above its point, as the designs draw it. */
+function PinnedFigure({
+  x,
+  y,
+  index,
+  pinned,
+  text,
+  edge,
+}: PinProps & { pinned: number; text: string; edge: boolean }) {
+  if (index !== pinned || x == null || y == null) return null;
+  const cx = Number(x);
+  const cy = Number(y);
+  const width = text.length * 6.6 + 18;
+  /* Near the right edge the pill ends at the point instead of straddling it. */
+  const left = edge ? cx - width + 12 : cx - width / 2;
+  return (
+    <g pointerEvents="none">
+      <rect x={left} y={cy - 32} width={width} height={22} rx={7} fill="#141414" />
+      <text
+        x={left + width / 2}
+        y={cy - 17}
+        textAnchor="middle"
+        className="fill-white text-[0.6875rem] font-extrabold"
+      >
+        {text}
+      </text>
+      <circle cx={cx} cy={cy} r={5.5} fill="#141414" stroke="#fff" strokeWidth={2} />
+    </g>
   );
 }
 
@@ -236,29 +314,23 @@ export function ShareDonut({
         </PieChart>
       </ChartContainer>
 
-      <ul className="space-y-2">
+      {/* One line per slice, as drawn: the name, its share, then the amount. */}
+      <ul className="space-y-2.5">
         {data.map((s, i) => (
-          <li key={s.key} className="flex items-start gap-2.5 text-[0.8125rem]">
+          <li key={s.key} className="flex items-center gap-2.5 text-[0.875rem]">
             <span
               aria-hidden="true"
-              className="mt-[0.3rem] h-2.5 w-2.5 shrink-0 rounded-full"
+              className="h-3 w-3 shrink-0 rounded-full"
               style={{ background: s.color ?? PALETTE[i % PALETTE.length] }}
             />
-            <span className="min-w-0 flex-1">
-              <span className="block font-semibold leading-snug">{s.label}</span>
-              {unit === 'kes' && (
-                <span className="text-muted-light block text-xs tabular-nums">
-                  KES {s.value.toLocaleString('en-KE')}
-                </span>
-              )}
-            </span>
-            {unit === 'count' && (
-              <span className="text-muted-light tabular-nums">
-                {s.value.toLocaleString('en-KE')}
-              </span>
-            )}
-            <span className="w-12 text-right font-extrabold tabular-nums">
+            <span className="min-w-0 flex-1 font-semibold leading-snug">{s.label}</span>
+            <span className="w-12 shrink-0 text-right font-semibold tabular-nums">
               {total > 0 ? `${((s.value / total) * 100).toFixed(1)}%` : '—'}
+            </span>
+            <span className="shrink-0 whitespace-nowrap text-right font-semibold tabular-nums">
+              {unit === 'kes'
+                ? `KES ${s.value.toLocaleString('en-KE')}`
+                : s.value.toLocaleString('en-KE')}
             </span>
           </li>
         ))}

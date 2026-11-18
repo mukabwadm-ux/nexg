@@ -9,8 +9,10 @@ import {
   ChevronDown,
   ChevronsLeft,
   ChevronsRight,
+  CircleHelp,
   FolderOpen,
   Headphones,
+  Keyboard,
   Home,
   Landmark,
   LogOut,
@@ -20,6 +22,7 @@ import {
   Settings,
   ShoppingBag,
   Store,
+  Timer,
   TrendingUp,
   UserRound,
   Users,
@@ -32,6 +35,7 @@ import * as React from 'react';
 import { Logo } from '@/components/logo';
 import { StaffBell } from '@/components/staff-bell';
 import { activeHref, type NavGroup, type NavIcon } from '@/lib/console-nav';
+import { STAFF_IDLE_TIMEOUT_MS } from '@/lib/idle';
 
 /**
  * The console frame from the admin portal designs: a black sidebar with the
@@ -481,6 +485,7 @@ function TopBar({
 
       <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
         <StaffBell />
+        <HelpMenu role={staff.role} />
         <span aria-hidden="true" className="hidden h-8 w-px bg-white/15 sm:block" />
         <ProfileMenu staff={staff} signOut={signOut} />
       </div>
@@ -615,6 +620,84 @@ function PageSearch({ nav }: { nav: Group[] }) {
             ))
           )}
         </ul>
+      )}
+    </div>
+  );
+}
+
+/**
+ * The designs' question mark beside the bell: what the console expects of
+ * you — the search shortcut, the idle sign-out, and the role you are
+ * signed in with — rather than a link to a help centre that does not exist.
+ */
+function HelpMenu({ role }: { role: string }) {
+  const [open, setOpen] = React.useState(false);
+  const [mac, setMac] = React.useState(false);
+  const wrap = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => setMac(/Mac|iPhone|iPad/.test(navigator.platform)), []);
+  React.useEffect(() => {
+    if (!open) return;
+    const onDown = (event: MouseEvent) => {
+      if (!wrap.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => event.key === 'Escape' && setOpen(false);
+    window.addEventListener('mousedown', onDown);
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('mousedown', onDown);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const minutes = Math.round(STAFF_IDLE_TIMEOUT_MS / 60_000);
+  return (
+    <div ref={wrap} className="relative">
+      <button
+        type="button"
+        aria-label="Help"
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        onClick={() => setOpen((v) => !v)}
+        className="flex h-10 w-10 items-center justify-center rounded-full text-white/85 transition-colors hover:bg-white/10"
+      >
+        <CircleHelp className="h-6 w-6" strokeWidth={1.8} />
+      </button>
+      {open && (
+        <div
+          role="dialog"
+          aria-label="Help"
+          className="text-ink absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border border-black/10 bg-white shadow-[0_18px_40px_-12px_rgba(0,0,0,0.45)]"
+        >
+          <p className="border-border border-b px-4 py-3 text-sm font-extrabold">Help</p>
+          <ul className="space-y-3 px-4 py-3 text-[0.8125rem]">
+            <li className="flex gap-2.5">
+              <Keyboard aria-hidden="true" className="text-gold-text mt-0.5 h-4 w-4 shrink-0" />
+              <span>
+                <span className="block font-bold">Find a page</span>
+                Press{' '}
+                <kbd className="border-border rounded border px-1 font-sans text-xs font-bold">
+                  {mac ? '⌘' : 'Ctrl'} K
+                </kbd>{' '}
+                to search the console&rsquo;s pages and views.
+              </span>
+            </li>
+            <li className="flex gap-2.5">
+              <Timer aria-hidden="true" className="text-gold-text mt-0.5 h-4 w-4 shrink-0" />
+              <span>
+                <span className="block font-bold">Signing out</span>
+                The console signs you out after {minutes} minutes without activity.
+              </span>
+            </li>
+            <li className="flex gap-2.5">
+              <UserRound aria-hidden="true" className="text-gold-text mt-0.5 h-4 w-4 shrink-0" />
+              <span>
+                <span className="block font-bold">Your access</span>
+                {role}. A super admin changes roles on Staff &amp; roles.
+              </span>
+            </li>
+          </ul>
+        </div>
       )}
     </div>
   );

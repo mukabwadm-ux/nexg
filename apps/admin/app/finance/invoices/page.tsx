@@ -9,6 +9,7 @@ import {
   Files,
   LayoutGrid,
   ReceiptText,
+  Send,
   Wallet,
   type LucideIcon,
 } from 'lucide-react';
@@ -26,7 +27,7 @@ import { RangeControl } from '@/components/portal/client-kit';
 import { PageHeader, PanelHead, Sheet, Stat, StatGrid, ViewTabs } from '@/components/portal/kit';
 import { INVOICE_BUCKETS, invoiceBucket, share, type InvoiceBucket } from '@/lib/finance';
 import { invoiceList } from '@/lib/finance-server';
-import { lastMonths, previousPeriod } from '@/lib/office-finance';
+import { lastMonths, previousPeriod, vsLabel } from '@/lib/office-finance';
 import {
   change,
   hrefWith,
@@ -47,13 +48,13 @@ type Tab = 'overview' | 'all' | 'drafts' | 'outstanding' | 'paid' | 'overdue' | 
 
 const TABS: { key: Tab; label: string; icon: LucideIcon }[] = [
   { key: 'overview', label: 'Overview', icon: LayoutGrid },
-  { key: 'all', label: 'All invoices', icon: Files },
+  { key: 'all', label: 'All Invoices', icon: Files },
   { key: 'drafts', label: 'Drafts', icon: FilePen },
-  { key: 'outstanding', label: 'Outstanding', icon: Clock3 },
+  { key: 'outstanding', label: 'Sent', icon: Send },
   { key: 'paid', label: 'Paid', icon: CheckCircle2 },
   { key: 'overdue', label: 'Overdue', icon: AlertTriangle },
-  { key: 'tax', label: 'Tax invoices', icon: ReceiptText },
-  { key: 'credit', label: 'Credit notes', icon: FileMinus },
+  { key: 'tax', label: 'Tax Invoices', icon: ReceiptText },
+  { key: 'credit', label: 'Credit Notes', icon: FileMinus },
 ];
 
 /**
@@ -194,15 +195,16 @@ export default async function InvoicesPage({
               <Stat
                 icon={Wallet}
                 value={kes(total)}
-                label="Total invoiced"
+                label="Total Invoiced"
                 delta={delta == null ? null : { value: delta }}
+                deltaNote={vsLabel(before)}
                 note={delta == null ? 'Issued in this period' : undefined}
               />
               <Stat
                 icon={CheckCircle2}
                 tone="green"
                 value={kes(by('paid'))}
-                label="Paid invoices"
+                label="Paid Invoices"
                 note={pct(by('paid'))}
                 noteTone="good"
                 href={href('paid')}
@@ -228,7 +230,7 @@ export default async function InvoicesPage({
               <Stat
                 icon={Files}
                 value={issued.length.toLocaleString('en-KE')}
-                label="Total invoices"
+                label="Total Invoices"
                 note={
                   inPeriod.length > issued.length
                     ? `${inPeriod.length - issued.length} drafts besides`
@@ -240,7 +242,7 @@ export default async function InvoicesPage({
 
             <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
               <Sheet>
-                <PanelHead title="Invoice value trend" aside="last six months" />
+                <PanelHead title="Invoice Value Trend" aside="last six months" />
                 <div className="mt-4">
                   {trend.some((t) => t.invoiced > 0) ? (
                     <TrendArea
@@ -259,7 +261,7 @@ export default async function InvoicesPage({
                 </div>
               </Sheet>
               <Sheet>
-                <PanelHead title="Invoices by status" aside={formatRange(period)} />
+                <PanelHead title="Invoices by Status" aside={formatRange(period)} />
                 <div className="mt-4">
                   {slices.length ? (
                     <ShareDonut unit="kes" centre={kesShort(total)} caption="Total" data={slices} />
@@ -299,7 +301,7 @@ export default async function InvoicesPage({
           <Sheet>
             <TaxDocsTable
               rows={((taxRes.data ?? []) as unknown as TaxDoc[]).map(numeric)}
-              title="Tax invoices"
+              title="Tax Invoices"
               noun="tax invoice"
             />
           </Sheet>
@@ -308,7 +310,7 @@ export default async function InvoicesPage({
           <Sheet>
             <TaxDocsTable
               rows={((taxRes.data ?? []) as unknown as TaxDoc[]).map(numeric)}
-              title="Credit notes"
+              title="Credit Notes"
               noun="credit note"
             />
           </Sheet>

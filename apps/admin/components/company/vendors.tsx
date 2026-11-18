@@ -147,7 +147,7 @@ export function VendorsTable({
     },
     canWrite &&
       v.status !== 'active' && {
-        label: 'Make active',
+        label: 'Make Active',
         icon: <Play />,
         separated: true,
         opensOverlay: true,
@@ -155,7 +155,7 @@ export function VendorsTable({
       },
     canWrite &&
       v.status === 'active' && {
-        label: 'Put on hold',
+        label: 'Put on Hold',
         icon: <Pause />,
         separated: true,
         opensOverlay: true,
@@ -312,7 +312,7 @@ export function VendorsTable({
             value={category}
             onChange={setCategory}
             options={[
-              { value: 'all', label: 'Everything they supply' },
+              { value: 'all', label: 'Everything They Supply' },
               ...Object.entries(VENDOR_CATEGORIES).map(([k, v]) => ({ value: k, label: v })),
             ]}
           />
@@ -325,12 +325,12 @@ export function VendorsTable({
           description={
             filtered
               ? 'Try another name or category.'
-              : 'Add the businesses NexG buys from with Add vendor: who to call, what they supply and on what terms.'
+              : 'Add the businesses NexG buys from with Add Vendor: who to call, what they supply and on what terms.'
           }
           {...(filtered
             ? {
                 action: {
-                  label: 'Clear filters',
+                  label: 'Clear Filters',
                   onClick: () => {
                     setQ('');
                     setCategory('all');
@@ -456,15 +456,15 @@ function VendorDetail({
         <dl className="divide-border border-border divide-y rounded-2xl border text-sm">
           {(
             [
-              ['Contact person', v.contact_name ?? '—'],
+              ['Contact Person', v.contact_name ?? '—'],
               ['Address', [v.address, v.city?.name].filter(Boolean).join(', ') || '—'],
               ['KRA PIN', v.tax_pin ?? '—'],
-              ['Payment terms', PAYMENT_TERMS[v.payment_terms] ?? v.payment_terms],
+              ['Payment Terms', PAYMENT_TERMS[v.payment_terms] ?? v.payment_terms],
               [
-                'Ordered so far',
+                'Ordered So Far',
                 `${kes(live.reduce((s, o) => s + o.total_cents, 0))} over ${live.length} ${live.length === 1 ? 'order' : 'orders'}`,
               ],
-              ['On NexG’s list since', day(v.created_at)],
+              ['On NexG’s List Since', day(v.created_at)],
             ] as const
           ).map(([k, val]) => (
             <div key={k} className="flex justify-between gap-4 px-4 py-3">
@@ -475,7 +475,7 @@ function VendorDetail({
         </dl>
         {v.notes && <p className="bg-bg rounded-xl px-4 py-3 text-sm">{v.notes}</p>}
         <div>
-          <h3 className="mb-2 text-sm font-extrabold">Purchase orders</h3>
+          <h3 className="mb-2 text-sm font-extrabold">Purchase Orders</h3>
           {orders.length === 0 ? (
             <p className="text-muted-light text-sm">No orders with this vendor yet.</p>
           ) : (
@@ -514,7 +514,7 @@ export function AddVendor({ cities }: { cities: Option[] }) {
         leadingIcon={<Plus className="h-4 w-4" />}
         onClick={() => setOpen(true)}
       >
-        Add vendor
+        Add Vendor
       </Button>
       {open && <VendorPanel vendor={null} cities={cities} onClose={() => setOpen(false)} />}
     </>
@@ -551,9 +551,9 @@ function VendorPanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title={vendor ? 'Edit vendor' : 'Add vendor'}
+      title={vendor ? 'Edit Vendor' : 'Add Vendor'}
       subtitle={vendor?.name ?? 'A business NexG buys from'}
-      submitLabel={vendor ? 'Save vendor' : 'Add vendor'}
+      submitLabel={vendor ? 'Save Vendor' : 'Add Vendor'}
       busy={busy}
       width="lg"
       onSubmit={() =>
@@ -570,7 +570,7 @@ function VendorPanel({
       }
     >
       <TextField
-        label="Business name"
+        label="Business Name"
         required
         value={f.name}
         onChange={(e) => set('name', e.target.value)}
@@ -578,7 +578,7 @@ function VendorPanel({
         placeholder="Tech Hub Kenya Ltd"
       />
       <fieldset>
-        <legend className="mb-2 text-sm font-bold">What they supply</legend>
+        <legend className="mb-2 text-sm font-bold">What They Supply</legend>
         <div className="flex flex-wrap gap-2">
           {Object.entries(VENDOR_CATEGORIES).map(([k, label]) => {
             const on = f.categories.includes(k);
@@ -612,7 +612,7 @@ function VendorPanel({
       </fieldset>
       <FieldRow>
         <TextField
-          label="Contact person"
+          label="Contact Person"
           value={f.contactName}
           onChange={(e) => set('contactName', e.target.value)}
           maxLength={120}
@@ -666,7 +666,7 @@ function VendorPanel({
           placeholder="P051234567X"
         />
         <SelectField
-          label="Payment terms"
+          label="Payment Terms"
           value={f.paymentTerms}
           onChange={(e) => set('paymentTerms', e.target.value)}
           options={Object.entries(PAYMENT_TERMS).map(([k, v]) => ({ value: k, label: v }))}
@@ -703,17 +703,17 @@ function StatusPanel({
   const { run, busy } = useRunner();
   const copy = {
     active: {
-      title: 'Make active',
-      button: 'Make active',
+      title: 'Make Active',
+      button: 'Make Active',
       hint: 'Colleagues can order from them again.',
     },
     on_hold: {
-      title: 'Put on hold',
-      button: 'Put on hold',
+      title: 'Put on Hold',
+      button: 'Put on Hold',
       hint: 'No new purchase orders until they are made active again. Open orders carry on.',
     },
     archived: {
-      title: 'Archive vendor',
+      title: 'Archive Vendor',
       button: 'Archive',
       hint: 'They leave the lists. Their orders stay in the history.',
     },

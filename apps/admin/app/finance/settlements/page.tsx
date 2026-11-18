@@ -33,7 +33,7 @@ import { RangeControl } from '@/components/portal/client-kit';
 import { PageHeader, PanelHead, Sheet, Stat, StatGrid, ViewTabs } from '@/components/portal/kit';
 import { lineBucket, PAYEE_GROUPS, payeeGroup, share, type PayeeGroup } from '@/lib/finance';
 import { movementList } from '@/lib/finance-server';
-import { previousPeriod } from '@/lib/office-finance';
+import { previousPeriod, vsLabel } from '@/lib/office-finance';
 import {
   change,
   day,
@@ -47,18 +47,18 @@ import {
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = { title: 'Settlements & payouts' };
+export const metadata: Metadata = { title: 'Settlements & Payouts' };
 export const dynamic = 'force-dynamic';
 
 type Tab = 'overview' | 'merchants' | 'hosts' | 'riders' | 'batches' | 'history';
 
 const TABS: { key: Tab; label: string; icon: LucideIcon }[] = [
   { key: 'overview', label: 'Overview', icon: LayoutGrid },
-  { key: 'merchants', label: 'Merchant settlements', icon: Store },
-  { key: 'hosts', label: 'Host payouts', icon: Home },
-  { key: 'riders', label: 'Rider payouts', icon: Bike },
-  { key: 'batches', label: 'Settlement batches', icon: Layers },
-  { key: 'history', label: 'Payout history', icon: History },
+  { key: 'merchants', label: 'Merchant Settlements', icon: Store },
+  { key: 'hosts', label: 'Host Payouts', icon: Home },
+  { key: 'riders', label: 'Rider Payouts', icon: Bike },
+  { key: 'batches', label: 'Settlement Batches', icon: Layers },
+  { key: 'history', label: 'Payout History', icon: History },
 ];
 
 interface RunListRow {
@@ -298,7 +298,7 @@ export default async function SettlementsPage({
             href={href('batches')}
             className="text-muted hover:text-ink text-sm font-bold underline underline-offset-4"
           >
-            All batches
+            All Batches
           </Link>
         </PanelHead>
         <div className="mt-4">
@@ -332,7 +332,7 @@ export default async function SettlementsPage({
         <MovementsTable
           rows={rows}
           truncated={lists.some((l) => l.truncated)}
-          title="Payout history"
+          title="Payout History"
           filename={`nexg-payouts-${period.from}-to-${period.to}.csv`}
           emptyTitle="No payouts in this period"
           emptyText="Settlement payouts to merchants, hosts and riders, and M-Pesa payouts to customers, appear here once a run is built."
@@ -359,7 +359,7 @@ export default async function SettlementsPage({
     <ConsoleShell staff={staff}>
       <PageHeader
         icon={Coins}
-        title="Settlements & payouts"
+        title="Settlements & Payouts"
         subtitle="Merchant, host and rider settlements, payout runs, and what is still owed."
         actions={
           <>
@@ -396,8 +396,9 @@ export default async function SettlementsPage({
               <Stat
                 icon={Coins}
                 value={kes(total)}
-                label="Total payouts"
+                label="Total Payouts"
                 delta={delta == null ? null : { value: delta }}
+                deltaNote={vsLabel(before)}
                 note={delta == null ? `${now.length.toLocaleString('en-KE')} payouts` : undefined}
               />
               <Stat
@@ -410,21 +411,21 @@ export default async function SettlementsPage({
               <Stat
                 icon={Home}
                 value={kes(byGroup('host'))}
-                label="Hosts (stays)"
+                label="Hosts (Stays)"
                 note={pctOf(byGroup('host'))}
                 href={href('hosts')}
               />
               <Stat
                 icon={Bike}
                 value={kes(byGroup('rider'))}
-                label="Riders (delivery)"
+                label="Riders (Delivery)"
                 note={pctOf(byGroup('rider'))}
                 href={href('riders')}
               />
               <Stat
                 icon={Users}
                 value={owed.length || owedTotal ? kes(owedTotal) : null}
-                label="Owed, not yet in a run"
+                label="Owed, Not Yet in a Run"
                 note={
                   owedByGroup.length
                     ? `${owedByGroup.reduce((s, x) => s + x.n, 0).toLocaleString('en-KE')} payees waiting`
@@ -436,7 +437,7 @@ export default async function SettlementsPage({
 
             <div className="grid gap-5 xl:grid-cols-3">
               <Sheet>
-                <PanelHead title="Settlement breakdown" aside={formatRange(period)} />
+                <PanelHead title="Settlement Breakdown" aside={formatRange(period)} />
                 <div className="mt-4">
                   {total > 0 ? (
                     <ShareDonut
@@ -462,7 +463,7 @@ export default async function SettlementsPage({
               </Sheet>
 
               <Sheet>
-                <PanelHead title="Payout status" aside={formatRange(period)} />
+                <PanelHead title="Payout Status" aside={formatRange(period)} />
                 <ul className="mt-4 space-y-2.5">
                   {(
                     [
@@ -492,7 +493,7 @@ export default async function SettlementsPage({
               </Sheet>
 
               <Sheet>
-                <PanelHead title="Upcoming settlements" />
+                <PanelHead title="Upcoming Settlements" />
                 {calendar.length === 0 && owedByGroup.length === 0 ? (
                   <p className="text-muted-light py-10 text-center text-sm">
                     Nothing is owed and no settlement is scheduled.
@@ -548,7 +549,7 @@ export default async function SettlementsPage({
           <Sheet>
             <LinesTable
               rows={groupLines('merchant')}
-              title="Merchant settlements"
+              title="Merchant Settlements"
               noun="merchant"
               batchesHref={href('batches')}
             />
@@ -558,7 +559,7 @@ export default async function SettlementsPage({
           <Sheet>
             <LinesTable
               rows={groupLines('host')}
-              title="Host payouts"
+              title="Host Payouts"
               noun="host"
               batchesHref={href('batches')}
             />
@@ -568,7 +569,7 @@ export default async function SettlementsPage({
           <Sheet>
             <LinesTable
               rows={groupLines('rider')}
-              title="Rider payouts"
+              title="Rider Payouts"
               noun="rider"
               batchesHref={href('batches')}
             />

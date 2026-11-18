@@ -67,7 +67,7 @@ export const CONSOLE_NAV: NavGroup[] = [
       { label: 'Service Requests', href: '/operations?tab=services', module: 'orders' },
       { label: 'Incidents & Disputes', href: '/operations?tab=incidents', module: 'orders' },
       /* Not in the Operations design, kept so the concierge desk stays one click away. */
-      { label: 'Experience days', href: '/experiences', module: 'experiences', home: true },
+      { label: 'Experience Days', href: '/experiences', module: 'experiences', home: true },
     ],
   },
   {
@@ -75,7 +75,7 @@ export const CONSOLE_NAV: NavGroup[] = [
     label: 'Merchants',
     icon: 'merchants',
     items: [
-      { label: 'All merchants', href: '/merchants?tab=directory', module: 'merchants', home: true },
+      { label: 'All Merchants', href: '/merchants?tab=directory', module: 'merchants', home: true },
       { label: 'Onboarding', href: '/merchants/applications', module: 'merchants' },
       { label: 'Verification', href: '/merchants/verification', module: 'merchants', home: true },
       { label: 'Catalogues', href: '/merchants/catalogues', module: 'merchants', home: true },
@@ -86,7 +86,7 @@ export const CONSOLE_NAV: NavGroup[] = [
         module: 'merchants',
         home: true,
       },
-      { label: 'Hours & capacity', href: '/merchants?tab=hours', module: 'merchants' },
+      { label: 'Hours & Capacity', href: '/merchants?tab=hours', module: 'merchants' },
       { label: 'Categories', href: '/categories', module: 'categories', home: true },
     ],
   },
@@ -129,10 +129,10 @@ export const CONSOLE_NAV: NavGroup[] = [
     label: 'Finance',
     icon: 'finance',
     items: [
-      { label: 'Office finance', href: '/finance/office', module: 'finance', home: true },
+      { label: 'Office Finance', href: '/finance/office', module: 'finance', home: true },
       { label: 'Transactions', href: '/finance/transactions', module: 'finance', home: true },
       {
-        label: 'Settlements & payouts',
+        label: 'Settlements & Payouts',
         href: '/finance/settlements',
         module: 'finance',
         home: true,
@@ -140,7 +140,7 @@ export const CONSOLE_NAV: NavGroup[] = [
       { label: 'Reconciliations', href: '/finance/reconciliation', module: 'finance', home: true },
       { label: 'Invoices', href: '/finance/invoices', module: 'finance', home: true },
       { label: 'Reports', href: '/finance/reports', module: 'finance', home: true },
-      { label: 'Fraud checks', href: '/finance/fraud', module: 'finance', home: true },
+      { label: 'Fraud Checks', href: '/finance/fraud', module: 'finance', home: true },
     ],
   },
   {
@@ -184,12 +184,12 @@ export const CONSOLE_NAV: NavGroup[] = [
     label: 'Company',
     icon: 'company',
     items: [
-      { label: 'Company files', href: '/company/files', module: 'company', home: true },
-      { label: 'Company inventory', href: '/company/inventory', module: 'company', home: true },
-      { label: 'Assets & equipment', href: '/company/assets', module: 'company', home: true },
+      { label: 'Company Files', href: '/company/files', module: 'company', home: true },
+      { label: 'Company Inventory', href: '/company/inventory', module: 'company', home: true },
+      { label: 'Assets & Equipment', href: '/company/assets', module: 'company', home: true },
       { label: 'Procurement', href: '/company/procurement', module: 'company', home: true },
-      { label: 'Vendors & suppliers', href: '/company/vendors', module: 'company', home: true },
-      { label: 'Warehouses & stores', href: '/company/warehouses', module: 'company', home: true },
+      { label: 'Vendors & Suppliers', href: '/company/vendors', module: 'company', home: true },
+      { label: 'Warehouses & Stores', href: '/company/warehouses', module: 'company', home: true },
     ],
   },
   {

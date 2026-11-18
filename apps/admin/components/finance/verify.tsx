@@ -67,7 +67,7 @@ export function Verify({ from, to }: { from: string; to: string }) {
         disabled={state === 'running'}
         className="border-border-strong bg-surface text-ink hover:border-ink rounded-full border px-3 py-1.5 text-[0.6875rem] font-extrabold transition-colors disabled:opacity-50"
       >
-        {state === 'running' ? 'Re-summing the ledger…' : 'Verify against the ledger'}
+        {state === 'running' ? 'Re-Summing the Ledger…' : 'Verify Against the Ledger'}
       </button>
 
       {error ? (

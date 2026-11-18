@@ -101,10 +101,10 @@ describe('trends', () => {
 describe('words', () => {
   it('names each kind of row', () => {
     expect(typeOf({ source: 'payout', kind: 'merchant', category: 'host' }).label).toBe(
-      'Host payout',
+      'Host Payout',
     );
     expect(typeOf({ source: 'payment', kind: 'rider', category: 'rider_float' }).label).toBe(
-      'Rider float',
+      'Rider Float',
     );
     expect(typeOf({ source: 'b2c', kind: 'refund', category: 'return_excess' }).label).toBe(
       'Refund',
@@ -112,7 +112,8 @@ describe('words', () => {
   });
 
   it('turns keys into words', () => {
-    expect(humanize('restaurants_food')).toBe('Restaurants food');
+    expect(humanize('restaurants_food')).toBe('Restaurants Food');
+    expect(humanize('cost_of_sales')).toBe('Cost of Sales');
     expect(humanize(null)).toBe('—');
   });
 });

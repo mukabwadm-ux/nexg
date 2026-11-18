@@ -25,7 +25,7 @@ import {
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = { title: 'Warehouses & stores' };
+export const metadata: Metadata = { title: 'Warehouses & Stores' };
 export const dynamic = 'force-dynamic';
 
 type Tab = 'overview' | 'closed';
@@ -113,7 +113,7 @@ export default async function WarehousesPage({
     <ConsoleShell staff={staff}>
       <PageHeader
         icon={Warehouse}
-        title="Warehouses & stores"
+        title="Warehouses & Stores"
         subtitle="Every office, warehouse, store and rider hub where NexG keeps stock and equipment, and what each one holds."
         actions={
           <>
@@ -136,7 +136,7 @@ export default async function WarehousesPage({
             },
             {
               key: 'stock',
-              label: 'Stock by location',
+              label: 'Stock by Location',
               icon: Layers,
               href: `/company/inventory?tab=items`,
             },
@@ -165,34 +165,34 @@ export default async function WarehousesPage({
               <Stat
                 icon={Warehouse}
                 value={open.length.toLocaleString('en-KE')}
-                label="Open locations"
+                label="Open Locations"
                 note={closed.length ? `${closed.length} closed` : undefined}
               />
               <Stat
                 icon={Wallet}
                 value={kes(value)}
-                label="Stock value"
+                label="Stock Value"
                 note="At today's unit costs"
               />
               <Stat
                 icon={Layers}
                 tone="blue"
                 value={stock.length.toLocaleString('en-KE')}
-                label="Stock lines"
+                label="Stock Lines"
                 href="/company/inventory?tab=items"
               />
               <Stat
                 icon={CircleAlert}
                 tone="red"
                 value={attention.toLocaleString('en-KE')}
-                label="Need reordering"
+                label="Need Reordering"
                 href="/company/inventory?tab=reorder"
               />
               <Stat
                 icon={Laptop}
                 tone="purple"
                 value={held.toLocaleString('en-KE')}
-                label="Equipment held"
+                label="Equipment Held"
                 href="/company/assets"
               />
             </StatGrid>
@@ -205,20 +205,20 @@ export default async function WarehousesPage({
                 people={people}
                 cities={cities}
                 canWrite={canWrite}
-                title="Open locations"
+                title="Open Locations"
               />
             </Sheet>
 
             <div className="grid gap-5 lg:grid-cols-2">
               <Sheet>
-                <PanelHead title="Stock value by location" />
+                <PanelHead title="Stock Value by Location" />
                 <div className="mt-4">
                   {byLocation.length ? (
                     <ShareDonut
                       data={byLocation}
                       unit="kes"
                       centre={kesShort(value)}
-                      caption="Stock value"
+                      caption="Stock Value"
                     />
                   ) : (
                     <p className="text-muted-light py-10 text-center text-sm">
@@ -228,7 +228,7 @@ export default async function WarehousesPage({
                 </div>
               </Sheet>
               <Sheet>
-                <PanelHead title="Stock movements" aside="this period" />
+                <PanelHead title="Stock Movements" aside="this period" />
                 <div className="mt-4">
                   <ActivityFeed
                     rows={(activityRes.data ?? []) as ActivityRow[]}
@@ -247,7 +247,7 @@ export default async function WarehousesPage({
               people={people}
               cities={cities}
               canWrite={canWrite}
-              title="Closed locations"
+              title="Closed Locations"
             />
           </Sheet>
         )}

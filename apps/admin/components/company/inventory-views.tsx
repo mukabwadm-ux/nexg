@@ -12,21 +12,21 @@ import { PanelHead, Pill, Sheet } from '@/components/portal/kit';
 import { dateTime, kes, kesShort, quantity, STOCK_STATUS, type Tone } from '@/lib/company';
 
 const KIND: Record<string, { label: string; tone: Tone }> = {
-  'stock:in': { label: 'Stock in', tone: 'green' },
-  'stock:out': { label: 'Stock out', tone: 'red' },
+  'stock:in': { label: 'Stock In', tone: 'green' },
+  'stock:out': { label: 'Stock Out', tone: 'red' },
   'stock:transfer': { label: 'Transfer', tone: 'gold' },
   'stock:adjust': { label: 'Count', tone: 'blue' },
-  'asset:maintenance_scheduled': { label: 'Service booked', tone: 'amber' },
+  'asset:maintenance_scheduled': { label: 'Service Booked', tone: 'amber' },
   'asset:maintenance_started': { label: 'Maintenance', tone: 'amber' },
-  'asset:maintenance_done': { label: 'Maintenance done', tone: 'green' },
-  'asset:assigned': { label: 'Handed over', tone: 'blue' },
-  'asset:returned': { label: 'Handed back', tone: 'green' },
+  'asset:maintenance_done': { label: 'Maintenance Done', tone: 'green' },
+  'asset:assigned': { label: 'Handed Over', tone: 'blue' },
+  'asset:returned': { label: 'Handed Back', tone: 'green' },
   'asset:moved': { label: 'Moved', tone: 'gold' },
   'asset:registered': { label: 'Registered', tone: 'purple' },
   'asset:updated': { label: 'Changed', tone: 'grey' },
   'asset:retired': { label: 'Retired', tone: 'grey' },
   'asset:lost': { label: 'Lost', tone: 'red' },
-  'asset:restored': { label: 'Back in use', tone: 'green' },
+  'asset:restored': { label: 'Back in Use', tone: 'green' },
 };
 
 /** Every stock movement and equipment event in the period. */
@@ -120,7 +120,7 @@ export function MovementsTable({ rows, period }: { rows: ActivityRow[]; period: 
 
   return (
     <div className="flex flex-col gap-4">
-      <PanelHead title="Stock movements" aside={period}>
+      <PanelHead title="Stock Movements" aside={period}>
         <SearchBox
           value={q}
           onChange={setQ}
@@ -134,12 +134,12 @@ export function MovementsTable({ rows, period }: { rows: ActivityRow[]; period: 
           onChange={setKind}
           options={[
             { value: 'all', label: 'Everything' },
-            { value: 'stock', label: 'Stock only' },
-            { value: 'stock:in', label: 'Stock in' },
-            { value: 'stock:out', label: 'Stock out' },
+            { value: 'stock', label: 'Stock Only' },
+            { value: 'stock:in', label: 'Stock In' },
+            { value: 'stock:out', label: 'Stock Out' },
             { value: 'stock:transfer', label: 'Transfers' },
             { value: 'stock:adjust', label: 'Counts' },
-            { value: 'asset', label: 'Equipment only' },
+            { value: 'asset', label: 'Equipment Only' },
           ]}
         />
         <ExportButton
@@ -209,18 +209,18 @@ export function InventoryReports({
   const rest = byCategory.slice(6).reduce((s, c) => s + c.value, 0);
   const slices = [
     ...top.map((c) => ({ key: c.key, label: c.label, value: Math.round(c.value / 100) })),
-    ...(rest > 0 ? [{ key: 'rest', label: 'Everything else', value: Math.round(rest / 100) }] : []),
+    ...(rest > 0 ? [{ key: 'rest', label: 'Everything Else', value: Math.round(rest / 100) }] : []),
   ];
 
   return (
     <div className="grid gap-5 lg:grid-cols-2">
       <Sheet>
         <PanelHead
-          title="Stock value by category"
+          title="Stock Value by Category"
           aside={`${stockValue} on hand · ${assetValue} in equipment`}
         >
           <ExportButton
-            label="Export stock"
+            label="Export Stock"
             filename="company-stock.csv"
             rows={() => [
               [
@@ -250,7 +250,7 @@ export function InventoryReports({
         </PanelHead>
         <div className="mt-5">
           {total > 0 ? (
-            <ShareDonut data={slices} centre={kesShort(total)} caption="Stock value" unit="kes" />
+            <ShareDonut data={slices} centre={kesShort(total)} caption="Stock Value" unit="kes" />
           ) : (
             <p className="text-muted-light py-8 text-center text-sm">
               No stock with a value yet. Items need a unit cost to count here.
@@ -259,7 +259,7 @@ export function InventoryReports({
         </div>
       </Sheet>
       <Sheet>
-        <PanelHead title="Stock value by location" />
+        <PanelHead title="Stock Value by Location" />
         {byLocation.length === 0 ? (
           <p className="text-muted-light py-8 text-center text-sm">No stock recorded yet.</p>
         ) : (

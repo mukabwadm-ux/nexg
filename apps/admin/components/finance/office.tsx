@@ -198,14 +198,14 @@ export function ExpensesTable({
       onSelect: () => setPanel({ kind: 'approve', row: r }),
     },
     mayDecide(r) && {
-      label: 'Turn down',
+      label: 'Turn Down',
       icon: <XCircle />,
       opensOverlay: true,
       onSelect: () => setPanel({ kind: 'reject', row: r }),
     },
     canWrite &&
       r.status === 'approved' && {
-        label: 'Mark paid',
+        label: 'Mark Paid',
         icon: <Wallet />,
         separated: true,
         opensOverlay: true,
@@ -213,14 +213,14 @@ export function ExpensesTable({
       },
     r.receipt_path
       ? {
-          label: 'Open receipt',
+          label: 'Open Receipt',
           icon: <Paperclip />,
           onSelect: () => openReceipt(r.receipt_path!),
         }
       : null,
     canWrite &&
       !['paid', 'cancelled'].includes(r.status) && {
-        label: 'Cancel expense',
+        label: 'Cancel Expense',
         icon: <Ban />,
         tone: 'danger' as const,
         separated: true,
@@ -233,7 +233,7 @@ export function ExpensesTable({
     {
       id: 'description',
       accessorFn: (r) => r.spent_on,
-      header: 'Date · description',
+      header: 'Date · Description',
       cell: ({ row: { original: r } }) => (
         <span className="flex min-w-0 items-center gap-2.5">
           <span className="bg-gold-soft text-gold-text flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
@@ -283,7 +283,7 @@ export function ExpensesTable({
     {
       id: 'by',
       accessorFn: (r) => r.submitter?.display_name ?? '',
-      header: 'Recorded by',
+      header: 'Recorded By',
       cell: ({ row: { original: r } }) => (
         <Person name={r.submitter?.display_name ?? r.submitter?.email ?? null} />
       ),
@@ -333,7 +333,7 @@ export function ExpensesTable({
             onChange={setCategory}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All categories' },
+              { value: 'all', label: 'All Categories' },
               ...Object.entries(EXPENSE_CATEGORIES).map(([k, v]) => ({ value: k, label: v.label })),
             ]}
           />
@@ -344,7 +344,7 @@ export function ExpensesTable({
               onChange={setStatus}
               className="flex-1 sm:flex-none"
               options={[
-                { value: 'all', label: 'All statuses' },
+                { value: 'all', label: 'All Statuses' },
                 ...Object.entries(EXPENSE_STATUS).map(([k, v]) => ({ value: k, label: v.label })),
               ]}
             />
@@ -367,12 +367,12 @@ export function ExpensesTable({
               ? 'Try another search, category or status.'
               : approvals
                 ? 'Expenses recorded by a colleague wait here for you to approve or turn down.'
-                : 'Record rent, utilities, salaries and other office spending with Add expense. A second person approves each one before it is paid.'
+                : 'Record rent, utilities, salaries and other office spending with Add Expense. A second person approves each one before it is paid.'
           }
           {...(filtered
             ? {
                 action: {
-                  label: 'Clear filters',
+                  label: 'Clear Filters',
                   onClick: () => {
                     setQ('');
                     setCategory('all');
@@ -461,7 +461,7 @@ export function AddExpense({ vendors, locations }: { vendors: Choice[]; location
         leadingIcon={<Plus className="h-4 w-4" />}
         onClick={() => setOpen(true)}
       >
-        Add expense
+        Add Expense
       </Button>
       {open && (
         <ExpensePanel expense={null} vendors={vendors} locations={locations} onClose={close} />
@@ -537,9 +537,9 @@ function ExpensePanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title={expense ? `Edit ${expense.number}` : 'Add expense'}
+      title={expense ? `Edit ${expense.number}` : 'Add Expense'}
       subtitle="A colleague with full Finance access approves it before it is paid."
-      submitLabel={expense ? 'Save and send for approval' : 'Record for approval'}
+      submitLabel={expense ? 'Save and Send for Approval' : 'Record for Approval'}
       busy={busy || uploading}
       width="lg"
       onSubmit={async () => {
@@ -570,7 +570,7 @@ function ExpensePanel({
         </p>
       )}
       <TextField
-        label="What it was for"
+        label="What It Was For"
         required
         value={f.description}
         onChange={(e) => set('description', e.target.value)}
@@ -599,7 +599,7 @@ function ExpensePanel({
       </FieldRow>
       <FieldRow>
         <TextField
-          label="Spent on"
+          label="Spent On"
           required
           type="date"
           max={todayInNairobi()}
@@ -607,7 +607,7 @@ function ExpensePanel({
           onChange={(e) => set('spentOn', e.target.value)}
         />
         <TextField
-          label="Paid to"
+          label="Paid To"
           required
           value={f.payee}
           onChange={(e) => set('payee', e.target.value)}
@@ -617,7 +617,7 @@ function ExpensePanel({
       </FieldRow>
       <FieldRow>
         <SelectField
-          label="Supplier on file"
+          label="Supplier on File"
           value={f.vendorId}
           onChange={(e) => set('vendorId', e.target.value)}
           placeholder="Not a listed vendor"
@@ -640,7 +640,7 @@ function ExpensePanel({
           leadingIcon={<Paperclip className="h-4 w-4" />}
           onClick={() => input.current?.click()}
         >
-          {receiptName || expense?.receipt_path ? 'Replace receipt' : 'Attach receipt'}
+          {receiptName || expense?.receipt_path ? 'Replace Receipt' : 'Attach Receipt'}
         </Button>
         <span className="text-muted-light text-xs">
           {receiptName ??
@@ -689,9 +689,9 @@ function DecidePanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title={approve ? `Approve ${kes(e.amount_cents)}` : 'Turn down expense'}
+      title={approve ? `Approve ${kes(e.amount_cents)}` : 'Turn Down Expense'}
       subtitle={`${e.number} · ${e.description}`}
-      submitLabel={approve ? 'Approve' : 'Turn down'}
+      submitLabel={approve ? 'Approve' : 'Turn Down'}
       danger={!approve}
       busy={busy}
       onSubmit={() => run(() => decideExpense(e.id, approve, note))}
@@ -705,10 +705,10 @@ function DecidePanel({
       <dl className="divide-border border-border divide-y rounded-2xl border text-sm">
         {(
           [
-            ['Paid to', e.payee],
+            ['Paid To', e.payee],
             ['Category', EXPENSE_CATEGORIES[e.category]?.label ?? e.category],
-            ['Spent on', day(e.spent_on)],
-            ['Recorded by', e.submitter?.display_name ?? e.submitter?.email ?? '—'],
+            ['Spent On', day(e.spent_on)],
+            ['Recorded By', e.submitter?.display_name ?? e.submitter?.email ?? '—'],
           ] as const
         ).map(([k, v]) => (
           <div key={k} className="flex justify-between gap-4 px-4 py-2.5">
@@ -725,13 +725,13 @@ function DecidePanel({
           leadingIcon={<FileText className="h-4 w-4" />}
           onClick={() => openReceipt(e.receipt_path!)}
         >
-          Open the receipt
+          Open the Receipt
         </Button>
       ) : (
         <p className="text-muted-light text-xs">No receipt attached.</p>
       )}
       <TextArea
-        label={approve ? 'Note' : 'Why it is turned down'}
+        label={approve ? 'Note' : 'Why It Is Turned Down'}
         required={!approve}
         value={note}
         onChange={(ev) => setNote(ev.target.value)}
@@ -751,9 +751,9 @@ function PayPanel({ expense: e, onClose }: { expense: ExpenseRow; onClose: () =>
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title="Mark paid"
+      title="Mark Paid"
       subtitle={`${e.number} · ${kes(e.amount_cents)} to ${e.payee}`}
-      submitLabel="Mark paid"
+      submitLabel="Mark Paid"
       busy={busy}
       onSubmit={() => run(() => payExpense({ id: e.id, method, reference, paidOn }))}
     >
@@ -762,13 +762,13 @@ function PayPanel({ expense: e, onClose }: { expense: ExpenseRow; onClose: () =>
       </p>
       <FieldRow>
         <SelectField
-          label="Paid by"
+          label="Paid By"
           value={method}
           onChange={(ev) => setMethod(ev.target.value)}
           options={Object.entries(PAYMENT_METHODS).map(([k, v]) => ({ value: k, label: v }))}
         />
         <TextField
-          label="Paid on"
+          label="Paid On"
           type="date"
           max={todayInNairobi()}
           value={paidOn}
@@ -778,9 +778,9 @@ function PayPanel({ expense: e, onClose }: { expense: ExpenseRow; onClose: () =>
       <TextField
         label={
           method === 'mpesa'
-            ? 'M-Pesa code'
+            ? 'M-PESA Code'
             : method === 'bank_transfer'
-              ? 'Bank reference'
+              ? 'Bank Reference'
               : 'Reference'
         }
         required={method === 'mpesa' || method === 'bank_transfer'}
@@ -800,9 +800,9 @@ function CancelPanel({ expense: e, onClose }: { expense: ExpenseRow; onClose: ()
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title="Cancel expense"
+      title="Cancel Expense"
       subtitle={`${e.number} · ${e.description}`}
-      submitLabel="Cancel expense"
+      submitLabel="Cancel Expense"
       danger
       busy={busy}
       onSubmit={() => run(() => cancelExpense(e.id, reason))}

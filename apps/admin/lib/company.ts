@@ -120,14 +120,14 @@ export function storageKey(userId: string, name: string, random: string): string
 /* ─────────────────────────────────────────────────────────────── statuses */
 
 export const STOCK_STATUS: Record<string, { label: string; tone: Tone }> = {
-  in_stock: { label: 'In stock', tone: 'green' },
-  low_stock: { label: 'Low stock', tone: 'amber' },
-  out_of_stock: { label: 'Out of stock', tone: 'red' },
+  in_stock: { label: 'In Stock', tone: 'green' },
+  low_stock: { label: 'Low Stock', tone: 'amber' },
+  out_of_stock: { label: 'Out of Stock', tone: 'red' },
 };
 
 export const ASSET_STATUS: Record<string, { label: string; tone: Tone }> = {
   available: { label: 'Available', tone: 'green' },
-  in_use: { label: 'In use', tone: 'blue' },
+  in_use: { label: 'In Use', tone: 'blue' },
   maintenance: { label: 'Maintenance', tone: 'amber' },
   retired: { label: 'Retired', tone: 'grey' },
   lost: { label: 'Lost', tone: 'red' },
@@ -143,9 +143,9 @@ export const ASSET_CONDITION: Record<string, { label: string; tone: Tone }> = {
 
 export const REQUEST_STATUS: Record<string, { label: string; tone: Tone }> = {
   draft: { label: 'Draft', tone: 'grey' },
-  submitted: { label: 'Awaiting approval', tone: 'amber' },
+  submitted: { label: 'Awaiting Approval', tone: 'amber' },
   approved: { label: 'Approved', tone: 'blue' },
-  rejected: { label: 'Turned down', tone: 'red' },
+  rejected: { label: 'Turned Down', tone: 'red' },
   ordered: { label: 'Ordered', tone: 'purple' },
   received: { label: 'Received', tone: 'green' },
   cancelled: { label: 'Cancelled', tone: 'grey' },
@@ -153,14 +153,14 @@ export const REQUEST_STATUS: Record<string, { label: string; tone: Tone }> = {
 
 export const ORDER_STATUS: Record<string, { label: string; tone: Tone }> = {
   issued: { label: 'Issued', tone: 'purple' },
-  partially_received: { label: 'Part received', tone: 'amber' },
+  partially_received: { label: 'Part Received', tone: 'amber' },
   received: { label: 'Received', tone: 'green' },
   cancelled: { label: 'Cancelled', tone: 'grey' },
 };
 
 export const VENDOR_STATUS: Record<string, { label: string; tone: Tone }> = {
   active: { label: 'Active', tone: 'green' },
-  on_hold: { label: 'On hold', tone: 'amber' },
+  on_hold: { label: 'On Hold', tone: 'amber' },
   archived: { label: 'Archived', tone: 'grey' },
 };
 
@@ -177,41 +177,41 @@ export const DEPARTMENTS: Record<string, string> = {
   technology: 'Technology',
   marketing: 'Marketing',
   people: 'People',
-  support: 'Customer support',
+  support: 'Customer Support',
   riders: 'Riders',
   office: 'Office',
   other: 'Other',
 };
 
 export const VENDOR_CATEGORIES: Record<string, string> = {
-  it_electronics: 'IT & electronics',
+  it_electronics: 'IT & Electronics',
   furniture: 'Furniture',
-  office_supplies: 'Office supplies',
-  rider_gear: 'Rider gear',
-  fuel_energy: 'Fuel & energy',
+  office_supplies: 'Office Supplies',
+  rider_gear: 'Rider Gear',
+  fuel_energy: 'Fuel & Energy',
   printing: 'Printing',
   cleaning: 'Cleaning',
   maintenance: 'Maintenance',
-  professional_services: 'Professional services',
+  professional_services: 'Professional Services',
   logistics: 'Logistics',
-  food_beverage: 'Food & beverage',
+  food_beverage: 'Food & Beverage',
   other: 'Other',
 };
 
 export const PAYMENT_TERMS: Record<string, string> = {
-  prepaid: 'Paid in advance',
-  on_delivery: 'On delivery',
-  net_7: '7 days',
-  net_15: '15 days',
-  net_30: '30 days',
-  net_60: '60 days',
+  prepaid: 'Paid in Advance',
+  on_delivery: 'On Delivery',
+  net_7: '7 Days',
+  net_15: '15 Days',
+  net_30: '30 Days',
+  net_60: '60 Days',
 };
 
 export const LOCATION_KINDS: Record<string, string> = {
   office: 'Office',
   warehouse: 'Warehouse',
   store: 'Store',
-  hub: 'Rider hub',
+  hub: 'Rider Hub',
   other: 'Other',
 };
 

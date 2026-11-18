@@ -38,14 +38,14 @@ import {
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = { title: 'Company files' };
+export const metadata: Metadata = { title: 'Company Files' };
 export const dynamic = 'force-dynamic';
 
 const TABS = [
   { key: 'overview', label: 'Overview', icon: LayoutGrid },
-  { key: 'all', label: 'All files', icon: FileText },
-  { key: 'mine', label: 'My files', icon: UserRound },
-  { key: 'shared', label: 'Shared with me', icon: Users },
+  { key: 'all', label: 'All Files', icon: FileText },
+  { key: 'mine', label: 'My Files', icon: UserRound },
+  { key: 'shared', label: 'Shared with Me', icon: Users },
   { key: 'recent', label: 'Recent', icon: Clock },
   { key: 'starred', label: 'Starred', icon: Star },
   { key: 'trash', label: 'Trash', icon: Trash2 },
@@ -187,7 +187,7 @@ export default async function CompanyFilesPage({
     <ConsoleShell staff={staff}>
       <PageHeader
         icon={FolderOpen}
-        title="Company files"
+        title="Company Files"
         subtitle="Central repository for company documents, policies, contracts and operational files."
         actions={
           <>
@@ -229,7 +229,7 @@ export default async function CompanyFilesPage({
               <Stat
                 icon={FileText}
                 value={summary ? summary.files.toLocaleString('en-KE') : null}
-                label="Total files"
+                label="Total Files"
                 note={summary ? `+${summary.added.toLocaleString('en-KE')} this period` : undefined}
                 href={base('all')}
               />
@@ -246,20 +246,20 @@ export default async function CompanyFilesPage({
               <Stat
                 icon={Users}
                 value={summary ? summary.shared.toLocaleString('en-KE') : null}
-                label="Shared files"
+                label="Shared Files"
                 href={base('shared')}
               />
               <Stat
                 icon={Star}
                 value={summary ? summary.starred.toLocaleString('en-KE') : null}
-                label="Starred by you"
+                label="Starred by You"
                 href={base('starred')}
               />
               <Stat
                 wide
                 icon={Database}
                 value={used == null ? null : bytes(used)}
-                label="Used by Company files"
+                label="Used by Company Files"
                 note={
                   project == null
                     ? undefined
@@ -291,12 +291,12 @@ export default async function CompanyFilesPage({
 
             <Sheet>
               {board(
-                'Recent files',
+                'Recent Files',
                 `changed ${formatRange(period)}`,
                 [
                   'Nothing changed in this period',
                   summary && summary.files > 0
-                    ? 'Pick a longer period above, or open All files.'
+                    ? 'Pick a longer period above, or open All Files.'
                     : 'Upload contracts, policies and other company papers to keep them in one place.',
                 ],
                 true,
@@ -322,7 +322,7 @@ export default async function CompanyFilesPage({
                         href={base('all')}
                         className="text-muted hover:text-ink underline-offset-4 hover:underline"
                       >
-                        All files
+                        All Files
                       </Link>
                     </li>
                     {openParent && (
@@ -365,19 +365,19 @@ export default async function CompanyFilesPage({
             )}
             {tab === 'all' &&
               board(
-                openFolder ? (folderPath(folders, openFolder.id) ?? 'All files') : 'All files',
+                openFolder ? (folderPath(folders, openFolder.id) ?? 'All Files') : 'All Files',
                 undefined,
                 openFolder
-                  ? ['No files here yet', 'Upload into this folder with Upload files above.']
-                  : ['No files yet', 'Upload the first file with Upload files above.'],
+                  ? ['No files here yet', 'Upload into this folder with Upload Files above.']
+                  : ['No files yet', 'Upload the first file with Upload Files above.'],
               )}
             {tab === 'mine' &&
-              board('My files', undefined, [
+              board('My Files', undefined, [
                 'You have not uploaded anything',
                 'Files you upload are listed here.',
               ])}
             {tab === 'shared' &&
-              board('Shared with me', undefined, [
+              board('Shared with Me', undefined, [
                 'Nothing shared with you yet',
                 'When a colleague shares a file with you it shows up here.',
               ])}

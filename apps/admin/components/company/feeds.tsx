@@ -36,21 +36,21 @@ export interface ActivityRow {
 }
 
 const LOOK: Record<string, { label: string; icon: LucideIcon; tone: string }> = {
-  'stock:in': { label: 'Stock in', icon: ArrowDown, tone: 'bg-success-bg text-success' },
-  'stock:out': { label: 'Stock out', icon: ArrowUp, tone: 'bg-danger-bg text-danger' },
+  'stock:in': { label: 'Stock In', icon: ArrowDown, tone: 'bg-success-bg text-success' },
+  'stock:out': { label: 'Stock Out', icon: ArrowUp, tone: 'bg-danger-bg text-danger' },
   'stock:transfer': {
     label: 'Transfer',
     icon: ArrowLeftRight,
     tone: 'bg-[#FFF1C7] text-[#B07C00]',
   },
-  'stock:adjust': { label: 'Stock count', icon: ClipboardCheck, tone: 'bg-info-bg text-info' },
+  'stock:adjust': { label: 'Stock Count', icon: ClipboardCheck, tone: 'bg-info-bg text-info' },
   'asset:registered': { label: 'Registered', icon: Tag, tone: 'bg-[#FFF1C7] text-[#B07C00]' },
-  'asset:updated': { label: 'Details changed', icon: Tag, tone: 'bg-[#F1EFEA] text-muted' },
-  'asset:assigned': { label: 'Handed over', icon: Hand, tone: 'bg-info-bg text-info' },
-  'asset:returned': { label: 'Handed back', icon: Undo2, tone: 'bg-success-bg text-success' },
+  'asset:updated': { label: 'Details Changed', icon: Tag, tone: 'bg-[#F1EFEA] text-muted' },
+  'asset:assigned': { label: 'Handed Over', icon: Hand, tone: 'bg-info-bg text-info' },
+  'asset:returned': { label: 'Handed Back', icon: Undo2, tone: 'bg-success-bg text-success' },
   'asset:moved': { label: 'Moved', icon: ArrowLeftRight, tone: 'bg-[#FFF1C7] text-[#B07C00]' },
   'asset:maintenance_scheduled': {
-    label: 'Service scheduled',
+    label: 'Service Scheduled',
     icon: Wrench,
     tone: 'bg-[#FFF1C7] text-[#B07C00]',
   },
@@ -60,13 +60,13 @@ const LOOK: Record<string, { label: string; icon: LucideIcon; tone: string }> = 
     tone: 'bg-[#FDF0E4] text-[#C2570C]',
   },
   'asset:maintenance_done': {
-    label: 'Maintenance done',
+    label: 'Maintenance Done',
     icon: PackageCheck,
     tone: 'bg-success-bg text-success',
   },
   'asset:retired': { label: 'Retired', icon: XCircle, tone: 'bg-[#F1EFEA] text-muted' },
-  'asset:lost': { label: 'Reported lost', icon: XCircle, tone: 'bg-danger-bg text-danger' },
-  'asset:restored': { label: 'Back in use', icon: RotateCcw, tone: 'bg-success-bg text-success' },
+  'asset:lost': { label: 'Reported Lost', icon: XCircle, tone: 'bg-danger-bg text-danger' },
+  'asset:restored': { label: 'Back in Use', icon: RotateCcw, tone: 'bg-success-bg text-success' },
 };
 
 /** What happened, in one line, the way the Recent stock movements list writes it. */

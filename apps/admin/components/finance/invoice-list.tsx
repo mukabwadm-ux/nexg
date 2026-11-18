@@ -39,7 +39,7 @@ const PARTY_ICON = { host: Home, hotel: Hotel, merchant: Store } as const;
 export function InvoicesTable({
   rows,
   today,
-  title = 'Invoice list',
+  title = 'Invoice List',
   emptyTitle = 'No invoices in this period',
 }: {
   rows: InvoiceListRow[];
@@ -72,7 +72,7 @@ export function InvoicesTable({
     {
       id: 'number',
       accessorFn: (r) => r.number,
-      header: 'Invoice no. · period',
+      header: 'Invoice No. · Period',
       cell: ({ row: { original: r } }) => (
         <span className="block whitespace-nowrap tabular-nums">
           <span className="block font-semibold">{r.number}</span>
@@ -109,7 +109,7 @@ export function InvoicesTable({
     {
       id: 'issued',
       accessorFn: (r) => r.issued_at,
-      header: 'Issued · due',
+      header: 'Issued · Due',
       cell: ({ row: { original: r } }) => (
         <span className="block whitespace-nowrap tabular-nums">
           <span className="block">{day(r.issued_at)}</span>
@@ -179,7 +179,7 @@ export function InvoicesTable({
             onChange={setType}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All types' },
+              { value: 'all', label: 'All Types' },
               ...types.map((t) => ({ value: t, label: INVOICE_TYPES[t]?.label ?? t })),
             ]}
           />
@@ -189,7 +189,7 @@ export function InvoicesTable({
             onChange={setStatus}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All statuses' },
+              { value: 'all', label: 'All Statuses' },
               ...(Object.keys(INVOICE_BUCKETS) as InvoiceBucket[])
                 .filter((b) => buckets.includes(b))
                 .map((b) => ({ value: b, label: INVOICE_BUCKETS[b].label })),
@@ -241,7 +241,7 @@ export function InvoicesTable({
           {...(filtered
             ? {
                 action: {
-                  label: 'Clear filters',
+                  label: 'Clear Filters',
                   onClick: () => {
                     setQ('');
                     setType('all');
@@ -305,11 +305,11 @@ export interface TaxDoc {
 }
 
 const KRA: Record<string, { label: string; tone: React.ComponentProps<typeof Pill>['tone'] }> = {
-  pending: { label: 'Not sent to KRA', tone: 'amber' },
+  pending: { label: 'Not Sent to KRA', tone: 'amber' },
   submitted: { label: 'Submitted', tone: 'blue' },
   accepted: { label: 'Accepted by KRA', tone: 'green' },
   rejected: { label: 'Rejected by KRA', tone: 'red' },
-  not_required: { label: 'Not required', tone: 'grey' },
+  not_required: { label: 'Not Required', tone: 'grey' },
 };
 
 export function TaxDocsTable({
@@ -339,7 +339,7 @@ export function TaxDocsTable({
     {
       id: 'number',
       accessorFn: (r) => r.issued_at,
-      header: 'Number · issued',
+      header: 'Number · Issued',
       cell: ({ row: { original: r } }) => (
         <span className="block whitespace-nowrap tabular-nums">
           <span className="block font-semibold">{r.number}</span>
@@ -350,7 +350,7 @@ export function TaxDocsTable({
     {
       id: 'party',
       accessorFn: (r) => r.party_name ?? '',
-      header: 'Billed to',
+      header: 'Billed To',
       cell: ({ row: { original: r } }) => (
         <span className="block max-w-[11rem]">
           <span className="block truncate font-semibold">{r.party_name ?? '—'}</span>
@@ -428,7 +428,7 @@ export function TaxDocsTable({
             onChange={setKra}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'Any KRA status' },
+              { value: 'all', label: 'Any KRA Status' },
               ...Object.entries(KRA)
                 .filter(([k]) => rows.some((r) => r.kra_status === k))
                 .map(([k, v]) => ({ value: k, label: v.label })),

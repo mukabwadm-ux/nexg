@@ -43,6 +43,7 @@ import {
   spendBetween,
   SPEND,
   utilisation,
+  vsLabel,
 } from '@/lib/office-finance';
 import {
   change,
@@ -56,7 +57,7 @@ import {
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = { title: 'Office finance' };
+export const metadata: Metadata = { title: 'Office Finance' };
 export const dynamic = 'force-dynamic';
 
 type Tab = 'expenses' | 'approvals' | 'budgets' | 'reports';
@@ -174,7 +175,7 @@ export default async function OfficeFinancePage({
     <ConsoleShell staff={staff}>
       <PageHeader
         icon={FolderOpen}
-        title="Office finance"
+        title="Office Finance"
         subtitle="Manage and track all office expenses, budgets, and approvals."
         actions={
           <>
@@ -193,7 +194,7 @@ export default async function OfficeFinancePage({
               ? [
                   {
                     key: 'add',
-                    label: 'Add expense',
+                    label: 'Add Expense',
                     icon: Plus,
                     href: href('expenses', { new: '1' }),
                   },
@@ -226,18 +227,19 @@ export default async function OfficeFinancePage({
               <Stat
                 icon={Wallet}
                 value={kes(spent)}
-                label="Total office expenses"
+                label="Total Office Expenses"
                 delta={
                   change(spent, spentBefore) == null
                     ? null
                     : { value: change(spent, spentBefore)!, upIsBad: true }
                 }
+                deltaNote={vsLabel(before)}
                 note={spentBefore === 0 ? 'Approved and paid this period' : undefined}
               />
               <Stat
                 icon={PiggyBank}
                 value={budget ? kes(budget) : null}
-                label={periodMonths.length > 1 ? 'Budget for these months' : 'Budget this month'}
+                label={periodMonths.length > 1 ? 'Budget for These Months' : 'Budget This Month'}
                 note={budget ? undefined : 'No budget set'}
                 href={href('budgets')}
               />
@@ -245,7 +247,7 @@ export default async function OfficeFinancePage({
                 icon={BarChart3}
                 visual={<Ring value={used} label="Budget used" />}
                 value={used == null ? null : `${Math.round(used)}%`}
-                label="Budget used"
+                label="Budget Used"
                 tone={used != null && used > 100 ? 'red' : 'gold'}
                 note={
                   used == null
@@ -259,7 +261,7 @@ export default async function OfficeFinancePage({
               <Stat
                 icon={Receipt}
                 value={transactions.toLocaleString('en-KE')}
-                label="Expense transactions"
+                label="Expense Transactions"
                 note={waiting.length ? `${waiting.length} waiting for approval` : undefined}
                 href={waiting.length ? href('approvals') : undefined}
               />
@@ -267,7 +269,7 @@ export default async function OfficeFinancePage({
 
             <div className="grid gap-5 xl:grid-cols-2">
               <Sheet>
-                <PanelHead title="Expenses by category" aside={formatRange(period)} />
+                <PanelHead title="Expenses by Category" aside={formatRange(period)} />
                 <div className="mt-4">
                   {categories.length ? (
                     <ShareDonut
@@ -289,7 +291,7 @@ export default async function OfficeFinancePage({
                 </div>
               </Sheet>
               <Sheet>
-                <PanelHead title="Monthly office expenses" aside="last six months" />
+                <PanelHead title="Monthly Office Expenses" aside="last six months" />
                 <div className="mt-4">
                   {trend.some((t) => t.spend > 0) ? (
                     <TrendArea
@@ -321,12 +323,12 @@ export default async function OfficeFinancePage({
                   canWrite={canWrite}
                   vendors={vendors}
                   locations={locations}
-                  title="Recent office expenses"
+                  title="Recent Office Expenses"
                   compact
                 />
               </Sheet>
               <Sheet>
-                <PanelHead title="Top expense categories" aside={formatRange(period)} />
+                <PanelHead title="Top Expense Categories" aside={formatRange(period)} />
                 {categories.length === 0 ? (
                   <p className="text-muted-light py-8 text-center text-sm">Nothing to rank yet.</p>
                 ) : (
@@ -372,7 +374,7 @@ export default async function OfficeFinancePage({
               vendors={vendors}
               locations={locations}
               title={
-                canWrite ? 'Waiting for approval' : 'Waiting for approval (full Finance decides)'
+                canWrite ? 'Waiting for Approval' : 'Waiting for Approval (full Finance decides)'
               }
               approvals
             />

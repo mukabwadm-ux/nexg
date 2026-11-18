@@ -152,7 +152,7 @@ export function LocationsBoard({
                       label={`Actions for ${l.name}`}
                       actions={[
                         {
-                          label: 'Stock and equipment',
+                          label: 'Stock and Equipment',
                           icon: <Eye />,
                           opensOverlay: true,
                           onSelect: () => setPanel({ kind: 'view', row: l }),
@@ -166,7 +166,7 @@ export function LocationsBoard({
                         canWrite &&
                           (l.active
                             ? {
-                                label: 'Close location',
+                                label: 'Close Location',
                                 icon: <PowerOff />,
                                 tone: 'danger' as const,
                                 separated: true,
@@ -174,7 +174,7 @@ export function LocationsBoard({
                                 onSelect: () => setPanel({ kind: 'close', row: l }),
                               }
                             : {
-                                label: 'Reopen location',
+                                label: 'Reopen Location',
                                 icon: <Power />,
                                 separated: true,
                                 opensOverlay: true,
@@ -188,7 +188,7 @@ export function LocationsBoard({
                 <p data-figure className="mt-4 text-[1.375rem] font-extrabold tracking-[-0.02em]">
                   {kes(s.value)}
                 </p>
-                <p className="text-muted-light text-xs font-semibold">stock value</p>
+                <p className="text-muted-light text-xs font-semibold">Stock Value</p>
                 <div className="bg-border/70 mt-2 h-1.5 overflow-hidden rounded-full">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-[#F0B90B] to-[#FDD128]"
@@ -199,8 +199,8 @@ export function LocationsBoard({
                 <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
                   {(
                     [
-                      ['Stock lines', s.lines.length, false],
-                      ['Need reorder', s.low, s.low > 0],
+                      ['Stock Lines', s.lines.length, false],
+                      ['Need Reorder', s.low, s.low > 0],
                       ['Equipment', s.assets.length, false],
                     ] as const
                   ).map(([k, v, alert]) => (
@@ -301,7 +301,7 @@ function LocationDetail({
           </div>
         )}
         <div>
-          <h3 className="mb-2 text-sm font-extrabold">Stock here</h3>
+          <h3 className="mb-2 text-sm font-extrabold">Stock Here</h3>
           {stock.length === 0 ? (
             <p className="text-muted-light text-sm">No stock kept here.</p>
           ) : (
@@ -328,7 +328,7 @@ function LocationDetail({
           )}
         </div>
         <div>
-          <h3 className="mb-2 text-sm font-extrabold">Equipment here</h3>
+          <h3 className="mb-2 text-sm font-extrabold">Equipment Here</h3>
           {assets.length === 0 ? (
             <p className="text-muted-light text-sm">No equipment based here.</p>
           ) : (
@@ -366,7 +366,7 @@ export function AddLocation({ people, cities }: { people: Option[]; cities: Opti
         leadingIcon={<Plus className="h-4 w-4" />}
         onClick={() => setOpen(true)}
       >
-        Add location
+        Add Location
       </Button>
       {open && (
         <LocationPanel
@@ -406,9 +406,9 @@ function LocationPanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title={location ? 'Edit location' : 'Add location'}
+      title={location ? 'Edit Location' : 'Add Location'}
       subtitle={location?.name ?? 'Where NexG keeps stock and equipment'}
-      submitLabel={location ? 'Save location' : 'Add location'}
+      submitLabel={location ? 'Save Location' : 'Add Location'}
       busy={busy}
       onSubmit={() =>
         run(() =>
@@ -493,9 +493,9 @@ function ActivePanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title={active ? 'Reopen location' : 'Close location'}
+      title={active ? 'Reopen Location' : 'Close Location'}
       subtitle={location.name}
-      submitLabel={active ? 'Reopen' : 'Close location'}
+      submitLabel={active ? 'Reopen' : 'Close Location'}
       danger={!active}
       busy={busy}
       onSubmit={() => run(() => setLocationActive(location.id, active, reason))}

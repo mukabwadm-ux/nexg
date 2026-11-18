@@ -84,12 +84,12 @@ export function Invoices({ rows }: { rows: InvoiceRow[] }) {
           tone={overdue.length > 0 ? 'warn' : 'plain'}
         />
         <Tile
-          label="Invoiced in all"
+          label="Invoiced in All"
           value={kesMoney(rows.reduce((a, r) => a + Number(r.total_cents), 0))}
           note={`${rows.length} raised`}
         />
         <Tile
-          label="No due date"
+          label="No Due Date"
           value={String(noDueDate.length)}
           note="Cannot go overdue, so nobody chases them"
           tone={noDueDate.length > 0 ? 'warn' : 'plain'}
@@ -106,7 +106,7 @@ export function Invoices({ rows }: { rows: InvoiceRow[] }) {
 
       <section>
         <SectionTitle note="Oldest overdue first. That is the order the work gets done in.">
-          Every invoice
+          Every Invoice
         </SectionTitle>
 
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">

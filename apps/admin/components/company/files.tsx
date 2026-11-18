@@ -293,7 +293,7 @@ export function FilesBoard({
             onSelect: () => run(() => trashFile(f.id, false)),
           },
           mayPurge(f) && {
-            label: 'Delete for good',
+            label: 'Delete for Good',
             icon: <Trash2 />,
             tone: 'danger' as const,
             separated: true,
@@ -303,12 +303,12 @@ export function FilesBoard({
         ]
       : [
           {
-            label: stars.has(f.id) ? 'Remove star' : 'Star',
+            label: stars.has(f.id) ? 'Remove Star' : 'Star',
             icon: stars.has(f.id) ? <StarOff /> : <Star />,
             onSelect: () => run(() => starFile(f.id, !stars.has(f.id))),
           },
           mayChange(f) && {
-            label: 'Rename or move',
+            label: 'Rename or Move',
             icon: <Pencil />,
             opensOverlay: true,
             onSelect: () => setEditing(f),
@@ -320,7 +320,7 @@ export function FilesBoard({
             onSelect: () => setSharing(f),
           },
           mayChange(f) && {
-            label: 'Move to trash',
+            label: 'Move to Trash',
             icon: <Trash2 />,
             tone: 'danger' as const,
             separated: true,
@@ -337,7 +337,7 @@ export function FilesBoard({
         anchor={menu}
         title={`Delete “${f.name}” for good?`}
         body="It is removed from Company files and from storage. This cannot be undone."
-        confirmLabel="Delete for good"
+        confirmLabel="Delete for Good"
         onConfirm={async () => run(() => purgeFile(f.id))}
       />
     ) : (
@@ -349,7 +349,7 @@ export function FilesBoard({
     {
       id: 'name',
       accessorFn: (f) => f.name,
-      header: 'File name',
+      header: 'File Name',
       cell: ({ row: { original: f } }) => (
         <span className="flex min-w-0 items-center gap-3">
           <FileGlyph row={f} />
@@ -482,7 +482,7 @@ export function FilesBoard({
             onChange={setKind}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All file types' },
+              { value: 'all', label: 'All File Types' },
               ...FILE_KINDS.map((k) => ({ value: k.key, label: k.label })),
             ]}
           />
@@ -492,9 +492,9 @@ export function FilesBoard({
             onChange={setFolder}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All folders' },
+              { value: 'all', label: 'All Folders' },
               ...folderOptions(folders),
-              { value: 'none', label: 'No folder' },
+              { value: 'none', label: 'No Folder' },
             ]}
           />
           <div
@@ -536,7 +536,7 @@ export function FilesBoard({
                 setSelected([]);
               }}
             >
-              Move {bulkTrash.length} to trash
+              Move {bulkTrash.length} to Trash
             </Button>
           )}
           {bulkTrash.length < selected.length && (
@@ -555,7 +555,7 @@ export function FilesBoard({
           {...(filtered
             ? {
                 action: {
-                  label: 'Clear filters',
+                  label: 'Clear Filters',
                   onClick: () => {
                     setQ('');
                     setKind('all');
@@ -687,7 +687,7 @@ function EditFilePanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title="Rename or move"
+      title="Rename or Move"
       subtitle={file.name}
       submitLabel="Save"
       busy={busy}
@@ -748,7 +748,7 @@ function VisibilityChoice({
   ];
   return (
     <fieldset disabled={disabled} className="space-y-2">
-      <legend className="mb-1.5 text-sm font-bold">Who sees it</legend>
+      <legend className="mb-1.5 text-sm font-bold">Who Sees It</legend>
       {options.map((o) => (
         <label
           key={o.key}
@@ -807,14 +807,14 @@ function SharePanel({
       onOpenChange={(o) => !o && onClose()}
       title="Share"
       subtitle={file.name}
-      submitLabel="Save sharing"
+      submitLabel="Save Sharing"
       busy={busy}
       onSubmit={() => run(() => shareFile(file.id, [...chosen]))}
     >
       <p className="text-muted text-sm">
         {file.visibility === 'private'
           ? 'Only the people ticked here, and you, can open this private file.'
-          : 'Everyone in Company can open this file already. Sharing puts it under their “Shared with me”.'}
+          : 'Everyone in Company can open this file already. Sharing puts it under their “Shared with Me”.'}
       </p>
       <SearchBox
         value={q}
@@ -953,14 +953,14 @@ export function UploadFiles({
         leadingIcon={<UploadCloud className="h-4 w-4" />}
         onClick={() => setOpen(true)}
       >
-        Upload files
+        Upload Files
       </Button>
       <FormPanel
         open={open}
         onOpenChange={(o) => {
           if (!busy) setOpen(o);
         }}
-        title="Upload files"
+        title="Upload Files"
         subtitle="PDF, Office documents, images, CSV, text or ZIP · up to 50 MB each"
         submitLabel={busy ? 'Uploading…' : 'Upload'}
         busy={busy}
@@ -988,7 +988,7 @@ export function UploadFiles({
           <p className="text-sm font-bold">Drop files here</p>
           <p className="text-muted-light text-xs">or</p>
           <Button variant="outline" size="sm" onClick={() => input.current?.click()}>
-            Choose files
+            Choose Files
           </Button>
           <input
             ref={input}
@@ -1067,7 +1067,7 @@ export function QuickFolders({
   canWrite,
   period,
   parent = null,
-  title = 'Quick folders',
+  title = 'Quick Folders',
 }: {
   folders: FolderRow[];
   canWrite: boolean;
@@ -1104,7 +1104,7 @@ export function QuickFolders({
             leadingIcon={<FolderPlus className="h-4 w-4" />}
             onClick={() => setEditing('new')}
           >
-            {parent ? 'Add folder here' : 'Add folder'}
+            {parent ? 'Add Folder Here' : 'Add Folder'}
           </Button>
         )}
       </div>
@@ -1120,7 +1120,7 @@ export function QuickFolders({
               : 'Folders keep contracts, policies and finance papers apart. Add the first one, then upload into it.'
           }
           {...(canWrite
-            ? { action: { label: 'Add folder', onClick: () => setEditing('new') } }
+            ? { action: { label: 'Add Folder', onClick: () => setEditing('new') } }
             : {})}
         />
       ) : (
@@ -1182,7 +1182,7 @@ export function QuickFolders({
                               ? 'Move or delete its files first; a folder with files in it stays.'
                               : 'The folder is empty, so nothing else changes.'
                         }
-                        confirmLabel="Delete folder"
+                        confirmLabel="Delete Folder"
                         onConfirm={async () => run(() => deleteFolder(f.id))}
                       />
                     ) : (
@@ -1240,8 +1240,8 @@ function FolderPanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title={folder ? 'Rename folder' : parent ? `Add a folder in ${parent.name}` : 'Add folder'}
-      submitLabel={folder ? 'Save' : 'Add folder'}
+      title={folder ? 'Rename Folder' : parent ? `Add a Folder in ${parent.name}` : 'Add Folder'}
+      submitLabel={folder ? 'Save' : 'Add Folder'}
       busy={busy}
       onSubmit={() =>
         run(() =>
