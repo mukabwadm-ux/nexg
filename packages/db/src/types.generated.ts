@@ -57978,7 +57978,32 @@ export type Database = {
         };
       };
       rpc_featured_send_pitch: { Args: { p_merchant_id: string; p_note?: string }; Returns: Json };
+      rpc_fin_client_save: { Args: { p_client?: Json; p_id?: string }; Returns: string };
+      rpc_fin_clients: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_fin_export: { Args: { p_from: string; p_kind: string; p_to: string }; Returns: Json };
+      rpc_fin_invoice_detail: { Args: { p_id: string }; Returns: Json };
+      rpc_fin_invoice_issue: { Args: { p_id: string }; Returns: Json };
+      rpc_fin_invoice_mark_sent: { Args: { p_id: string; p_to: string }; Returns: undefined };
+      rpc_fin_invoice_pdf_record: {
+        Args: { p_id: string; p_path: string; p_sha256: string };
+        Returns: undefined;
+      };
+      rpc_fin_invoice_record_payment: {
+        Args: {
+          p_amount_cents: number;
+          p_id: string;
+          p_method: string;
+          p_paid_on?: string;
+          p_reference: string;
+        };
+        Returns: Json;
+      };
+      rpc_fin_invoice_save: {
+        Args: { p_client_ref?: string; p_id?: string; p_invoice?: Json };
+        Returns: string;
+      };
+      rpc_fin_invoice_void: { Args: { p_id: string; p_reason: string }; Returns: Json };
+      rpc_fin_letterhead: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_fin_statement_close: { Args: { p_import_id: string }; Returns: undefined };
       rpc_fin_statement_detail: { Args: { p_import_id: string }; Returns: Json };
       rpc_fin_statement_find: { Args: { p_match_id: string; p_query?: string }; Returns: Json };

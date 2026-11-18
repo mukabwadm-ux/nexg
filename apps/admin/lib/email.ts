@@ -21,13 +21,21 @@ export interface SendOutcome {
 const FALLBACK_FROM = process.env.EMAIL_FROM ?? 'NexG Support <info@nexgapp.com>';
 const FALLBACK_REPLY_TO = process.env.EMAIL_REPLY_TO ?? 'info@nexgapp.com';
 
+/* Finance's sender when Settings > Email routing ("finance") cannot be read. */
+const FINANCE_FROM = 'NexG Finance <finance@nexgapp.com>';
+const FINANCE_REPLY_TO = 'finance@nexgapp.com';
+
 /**
  * The sender for ticket emails comes from Settings > Email routing ("support"),
- * so it can be changed without a deploy. If the lookup fails the environment
- * values above are used, because a missing setting must not stop a reply.
+ * so it can be changed without a deploy. If the lookup fails the fallback
+ * values are used, because a missing setting must not stop a reply.
  */
 async function senderFor(
   routeKey: string,
+  fallback: { from: string; replyTo: string } = {
+    from: FALLBACK_FROM,
+    replyTo: FALLBACK_REPLY_TO,
+  },
 ): Promise<{ from: string; replyTo: string; enabled: boolean }> {
   try {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -53,16 +61,16 @@ async function senderFor(
         if (r?.from) {
           return {
             from: r.from,
-            replyTo: r.reply_to ?? FALLBACK_REPLY_TO,
+            replyTo: r.reply_to ?? fallback.replyTo,
             enabled: r.enabled !== false,
           };
         }
       }
     }
   } catch {
-    /* fall through to the environment values */
+    /* fall through to the fallback values */
   }
-  return { from: FALLBACK_FROM, replyTo: FALLBACK_REPLY_TO, enabled: true };
+  return { ...fallback, enabled: true };
 }
 
 async function deliver(to: string, subject: string, text: string): Promise<SendOutcome> {
@@ -99,6 +107,87 @@ async function deliver(to: string, subject: string, text: string): Promise<SendO
       }),
       // A slow provider must not hold a guest's form open.
       signal: AbortSignal.timeout(10_000),
+    });
+
+    if (!response.ok) {
+      const detail = await response.text();
+      return { status: 'failed', error: `${response.status}: ${detail.slice(0, 300)}` };
+    }
+
+    const body = (await response.json()) as { id?: string };
+    return { status: 'sent', ...(body.id ? { providerMessageId: body.id } : {}) };
+  } catch (cause) {
+    return { status: 'failed', error: cause instanceof Error ? cause.message : String(cause) };
+  }
+}
+
+export interface EmailAttachment {
+  filename: string;
+  /** The file's bytes, or the same already in base64. */
+  content: Uint8Array | string;
+}
+
+/**
+ * An email from Finance, with attachments: a client invoice and its PDF.
+ * Sent from Settings > Email routing ("finance"), normally
+ * NexG Finance <finance@nexgapp.com>. Like every send here it is `skipped`,
+ * not failed, when there is no RESEND_API_KEY, so the console can say email
+ * is not set up and offer the download instead.
+ */
+export async function sendFinanceEmail({
+  to,
+  cc = [],
+  subject,
+  text,
+  attachments = [],
+}: {
+  to: string[];
+  cc?: string[];
+  subject: string;
+  text: string;
+  attachments?: EmailAttachment[];
+}): Promise<SendOutcome> {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) {
+    return { status: 'skipped', error: 'No RESEND_API_KEY configured — nothing was sent.' };
+  }
+
+  const sender = await senderFor('finance', { from: FINANCE_FROM, replyTo: FINANCE_REPLY_TO });
+  if (!sender.enabled) {
+    return {
+      status: 'skipped',
+      error: 'Finance emails are switched off in Settings > Email routing.',
+    };
+  }
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: sender.from,
+        to,
+        ...(cc.length ? { cc } : {}),
+        reply_to: sender.replyTo,
+        subject,
+        text,
+        ...(attachments.length
+          ? {
+              attachments: attachments.map((a) => ({
+                filename: a.filename,
+                content:
+                  typeof a.content === 'string'
+                    ? a.content
+                    : Buffer.from(a.content).toString('base64'),
+              })),
+            }
+          : {}),
+      }),
+      // An attachment takes longer than a plain reply; still never forever.
+      signal: AbortSignal.timeout(20_000),
     });
 
     if (!response.ok) {

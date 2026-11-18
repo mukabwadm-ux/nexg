@@ -298,6 +298,7 @@ export const INVOICE_TYPES: Record<string, { label: string; tone: Tone }> = {
   host: { label: 'Host Invoice', tone: 'purple' },
   hotel: { label: 'Hotel Statement', tone: 'blue' },
   merchant: { label: 'Merchant Statement', tone: 'gold' },
+  client: { label: 'Client Invoice', tone: 'ink' },
 };
 
 /**
