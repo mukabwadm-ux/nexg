@@ -399,6 +399,30 @@ importers:
         specifier: 2.1.8
         version: 2.1.8(@types/node@20.17.10)(jsdom@25.0.1)
 
+  packages/api-client:
+    devDependencies:
+      '@nexg/config':
+        specifier: workspace:*
+        version: link:../config
+      '@nexg/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      eslint:
+        specifier: 8.57.1
+        version: 8.57.1
+      rimraf:
+        specifier: 6.0.1
+        version: 6.0.1
+      typescript:
+        specifier: 5.7.2
+        version: 5.7.2
+      vitest:
+        specifier: 2.1.8
+        version: 2.1.8(@types/node@22.19.9)(jsdom@25.0.1)
+      zod:
+        specifier: 3.24.1
+        version: 3.24.1
+
   packages/booking-config:
     dependencies:
       ajv:
