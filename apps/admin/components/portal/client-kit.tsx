@@ -70,13 +70,26 @@ export function useRunner() {
 /* ─────────────────────────────────────────────────────────── the period */
 
 /** The header's period picker; it writes ?from=&to= and keeps the open view. */
-export function RangeControl({ from, to }: { from: string; to: string }) {
+export function RangeControl({
+  from,
+  to,
+  showPreset = false,
+  tone = 'dark',
+}: {
+  from: string;
+  to: string;
+  /** "Last 30 days (Nov 1 – Nov 30, 2026)" when the range is a preset. */
+  showPreset?: boolean;
+  /** Light when it sits on a white card rather than the black header. */
+  tone?: 'dark' | 'light';
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
   return (
     <DateRangePicker
-      tone="dark"
+      tone={tone}
+      showPreset={showPreset}
       value={{ from, to }}
       onChange={(r) => {
         const next = new URLSearchParams(params.toString());

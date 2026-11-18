@@ -278,6 +278,8 @@ export interface DateRangePickerProps {
   align?: 'start' | 'center' | 'end';
   /** Accessible name for the trigger, e.g. "Period". */
   label?: string;
+  /** Name the preset the range matches before the dates: "Last 30 days (Nov 1 – Nov 30, 2026)". */
+  showPreset?: boolean;
   className?: string;
 }
 
@@ -296,6 +298,7 @@ export function DateRangePicker({
   tone = 'light',
   align = 'end',
   label = 'Period',
+  showPreset = false,
   className,
 }: DateRangePickerProps) {
   const today = max ?? todayInNairobi();
@@ -319,6 +322,13 @@ export function DateRangePicker({
     const r = p.range(today);
     return draft.from === r.from && (draft.to ?? draft.from) === r.to;
   });
+
+  const valuePreset = showPreset
+    ? presets.find((p) => {
+        const r = p.range(today);
+        return value.from === r.from && value.to === r.to;
+      })
+    : undefined;
 
   const apply = () => {
     if (!draft.from) return;
@@ -345,7 +355,16 @@ export function DateRangePicker({
             className={cn('h-4 w-4 shrink-0', tone === 'dark' ? 'text-white/80' : 'text-muted')}
             aria-hidden="true"
           />
-          <span className="whitespace-nowrap tabular-nums">{formatRange(value)}</span>
+          {valuePreset ? (
+            <span className="whitespace-nowrap tabular-nums">
+              <span className="font-bold">{valuePreset.label}</span>{' '}
+              <span className={tone === 'dark' ? 'text-white/75' : 'text-muted'}>
+                ({formatRange(value)})
+              </span>
+            </span>
+          ) : (
+            <span className="whitespace-nowrap tabular-nums">{formatRange(value)}</span>
+          )}
           <ChevronDown
             className={cn(
               'h-4 w-4 shrink-0 transition-transform group-data-[state=open]:rotate-180',

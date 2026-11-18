@@ -41,6 +41,21 @@ export function periodFrom(
   return { from, to: to > today ? today : to };
 }
 
+/**
+ * Like periodFrom, but opening on the last 30 days (today included), as the
+ * Operations and Merchant Performance designs do.
+ */
+export function periodLast30(
+  params: { from?: string; to?: string } | undefined,
+  today = todayInNairobi(),
+): Period {
+  const from = params?.from;
+  const to = params?.to;
+  if (validDay(from) && validDay(to) && from <= to) return periodFrom(params, today);
+  const start = new Date(Date.parse(`${today}T12:00:00Z`) - 29 * 86_400_000);
+  return { from: start.toISOString().slice(0, 10), to: today };
+}
+
 /** The same period's query string, to carry it across tabs and links. */
 export function periodQuery(period: Period, today = todayInNairobi()): string {
   const fallback = periodFrom(undefined, today);

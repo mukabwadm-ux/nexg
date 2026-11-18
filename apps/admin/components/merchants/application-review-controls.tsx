@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { createClient } from '@/lib/supabase/client';
 
-type Decision = 'approved' | 'changes_requested' | 'rejected';
+export type Decision = 'approved' | 'changes_requested' | 'rejected';
 type Attempt = {
   merchantId: string;
   expectedRevision: number;
@@ -27,14 +27,17 @@ export function ApplicationReviewControls({
   merchantId,
   revision,
   canReview,
+  initialDecision = 'approved',
 }: {
   actorId: string;
   merchantId: string;
   revision: number;
   canReview: boolean;
+  /** The decision the form opens on, when a button chose it already. */
+  initialDecision?: Decision;
 }) {
   const router = useRouter();
-  const [decision, setDecision] = useState<Decision>('approved');
+  const [decision, setDecision] = useState<Decision>(initialDecision);
   const [reason, setReason] = useState('');
   const [phase, setPhase] = useState<Phase>('ready');
   const [message, setMessage] = useState('');

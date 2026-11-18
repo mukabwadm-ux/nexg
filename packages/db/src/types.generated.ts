@@ -54252,6 +54252,29 @@ export type Database = {
         Args: { depth?: number; s: Json; v: Json };
         Returns: boolean;
       };
+      fn_merchant_catalogue_rows: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          area: string;
+          available: number;
+          category_key: string;
+          category_label: string;
+          explore_visible: boolean;
+          items: number;
+          merchant_id: string;
+          merchant_status: string;
+          name: string;
+          needs_fix: number;
+          open_flags: number;
+          open_photo_tasks: number;
+          pending_edits: number;
+          photo_path: string;
+          sections: number;
+          state: string;
+          updated_at: string;
+        }[];
+      };
+      fn_merchant_category_label: { Args: { p_key: string }; Returns: string };
       fn_merchant_draft_for_write: {
         Args: { p_merchant_id: string };
         Returns: {
@@ -54435,6 +54458,32 @@ export type Database = {
         Args: { p_data: Json; p_merchant_id: string };
         Returns: Json;
       };
+      fn_merchant_verification_rows: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          area: string;
+          category_key: string;
+          category_label: string;
+          created_at: string;
+          docs_expired: number;
+          docs_rejected: number;
+          email: string;
+          kra_pin: string;
+          legal_name: string;
+          managed: boolean;
+          merchant_id: string;
+          name: string;
+          phone: string;
+          photo_path: string;
+          review_state: string;
+          revision: number;
+          state: string;
+          status: string;
+          status_reason: string;
+          submitted_at: string;
+          submitted_revision: number;
+        }[];
+      };
       fn_mood_chips: {
         Args: { p_city_id: string };
         Returns: {
@@ -54549,6 +54598,34 @@ export type Database = {
         };
         Returns: string;
       };
+      fn_ops_kinds: { Args: { p_tab: string }; Returns: string[] };
+      fn_ops_rows: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          all_day: boolean;
+          amount_cents: number;
+          area: string;
+          area_id: string;
+          bucket: string;
+          city_id: string;
+          customer: string;
+          done_at: string;
+          ends_at: string;
+          eta_at: string;
+          href: string;
+          id: string;
+          kind: string;
+          lat: number;
+          lng: number;
+          party: string;
+          ref: string;
+          starts_at: string;
+          status: string;
+          status_label: string;
+          tone: string;
+        }[];
+      };
+      fn_ops_short_name: { Args: { p_name: string }; Returns: string };
       fn_order_lateness: { Args: { p_delivered: string; p_promised: string }; Returns: number };
       fn_order_money_scope: { Args: { p_order_id: string }; Returns: string };
       fn_order_needs_action: { Args: { p_order_id: string }; Returns: string[] };
@@ -55851,6 +55928,18 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_catalogue_item_add_staff: {
+        Args: {
+          p_available?: boolean;
+          p_description?: string;
+          p_merchant_id: string;
+          p_name: string;
+          p_price_kes?: number;
+          p_section_id?: string;
+          p_section_name?: string;
+        };
+        Returns: string;
       };
       rpc_catalogue_item_update_api: {
         Args: { p_api_key: string; p_changes: Json; p_item_id: string };
@@ -58857,6 +58946,18 @@ export type Database = {
         };
         Returns: string;
       };
+      rpc_merchant_catalogue_detail: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_catalogue_list: {
+        Args: {
+          p_keys?: string[];
+          p_limit?: number;
+          p_offset?: number;
+          p_q?: string;
+          p_status?: string;
+        };
+        Returns: Json;
+      };
+      rpc_merchant_catalogue_overview: { Args: { p_keys?: string[] }; Returns: Json };
       rpc_merchant_close_store: { Args: { p_branch_id: string; p_reason: string }; Returns: Json };
       rpc_merchant_console_counts: { Args: { p_city_id?: string }; Returns: Json };
       rpc_merchant_control: {
@@ -59219,6 +59320,23 @@ export type Database = {
         };
       };
       rpc_merchant_payout_name_check: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_payouts: {
+        Args: {
+          p_from: string;
+          p_keys?: string[];
+          p_limit?: number;
+          p_offset?: number;
+          p_q?: string;
+          p_rail?: string;
+          p_status?: string;
+          p_to: string;
+        };
+        Returns: Json;
+      };
+      rpc_merchant_performance: {
+        Args: { p_from: string; p_keys?: string[]; p_to: string };
+        Returns: Json;
+      };
       rpc_merchant_promotion_media_save: {
         Args: { p_media: Json; p_promotion_id: string };
         Returns: Json;
@@ -60092,6 +60210,18 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_merchant_verification_detail: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_verification_list: {
+        Args: {
+          p_category?: string;
+          p_limit?: number;
+          p_offset?: number;
+          p_q?: string;
+          p_tab?: string;
+        };
+        Returns: Json;
+      };
+      rpc_merchant_verification_overview: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_merchant_verify_phone_code: {
         Args: { p_code: string; p_merchant_id: string };
         Returns: Json;
@@ -60291,6 +60421,34 @@ export type Database = {
           p_receipt_path?: string;
           p_spent_on: string;
           p_vendor_id?: string;
+        };
+        Returns: string;
+      };
+      rpc_operations_list: {
+        Args: {
+          p_area?: string;
+          p_bucket?: string;
+          p_from: string;
+          p_kind?: string;
+          p_limit?: number;
+          p_offset?: number;
+          p_q?: string;
+          p_status?: string;
+          p_tab?: string;
+          p_to: string;
+        };
+        Returns: Json;
+      };
+      rpc_operations_overview: {
+        Args: { p_from: string; p_tab?: string; p_to: string };
+        Returns: Json;
+      };
+      rpc_ops_incident_raise: {
+        Args: {
+          p_description: string;
+          p_kind: string;
+          p_order_reference?: string;
+          p_severity: string;
         };
         Returns: string;
       };
