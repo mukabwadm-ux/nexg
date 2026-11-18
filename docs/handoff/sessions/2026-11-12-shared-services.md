@@ -1,4 +1,4 @@
-# Shared services handoff, 12 November 2026
+# Shared services handoff, 12 November 2026 (updated 18 November)
 
 > **Rider sign-in belongs to another developer.** Do not design or change it, and check with them before any rider work.
 
@@ -21,7 +21,7 @@ Each NexG surface built its own basket, checkout, payments, bookings, sign-in an
 
 There are three phases:
 
-1. **Fix the holes.** Done in #146 (below).
+1. **Fix the holes.** Done in #146, merged and live since 16 Nov 2026 (below).
 2. **Get the owner's decisions D1 to D15.** D1 to D6 come first. Build nothing in phase 3 before the answers.
 3. **Build each shared piece once.** Point every app at it, then retire the copies.
 
@@ -64,20 +64,31 @@ Also in the PR:
 - pages wider than the screen at 360 and 390 px (the ask, experience, hosts and stays pages);
 - `e2e/web/home.spec.ts`, which still expects the old headline.
 
-**Release:**
+**Released on 16 Nov 2026.** #146 went into `main` together with #149 as `8dea675`. All nine migrations were applied to production the same day: #149's `20261220000200` and `0300`, then `20261223000100` to `0700`. Each was checked against its file's fingerprint.
 
-1. Merge. Vercel deploys the website, admin and API.
-2. The same day, the owner runs the database push from an up-to-date copy of `main`.
+Checked again on 18 Nov:
 
-Either order is safe, but don't leave a long gap between them.
-
-On 16 Nov, production had every migration up to `main`'s `20261222090000` except #149's `20261220000200` and `0300`. Nine are left to apply: those two, then `20261223000100` to `0700`. The two sort before `20261222090000`, which is already applied, so `supabase db push` refuses them without `--include-all`. The script passes flags through: dry-run with `bash scripts/push-to-production.sh --dry-run --include-all` and check that it lists exactly those nine. Production had no pending bookings and no dispatch jobs on 16 Nov, so the release job's first run and the new start rule would change no existing rows.
+- All 19 functions the two PRs define still run exactly their version, and the wiring check has 0 findings.
+- Order placement, booking and stay holds refuse signed-out callers.
+- The release job runs every 5 minutes without failures.
+- No orders, bookings, stay holds, dispatch jobs or privacy requests have come in since, so the first real ones will be the real-world test of these rules.
 
 **Owner decisions behind it (12 Nov):**
 
 - **Phone already on file:** refused, and support links it. SMS-code linking can replace this later, with D6.
 - **Shop hours:** closed hours and closing early block orders. Busy mode is unchanged.
 - **Accounts:** an account is needed to order, book or hold a stay.
+
+## Fixed since #146 (17 Nov 2026)
+
+These turned up while checking the shared services. All four are on `main` and in production.
+
+| Problem | Fix |
+| --- | --- |
+| Saved delivery places never reached a signed-in customer's account. The website's location actions used the signed-out client, so `rpc_place_list`, `rpc_place_confirm` and `rpc_place_delete` were refused for everyone. | The actions use the visitor's session and skip the call when nobody is signed in. "Just this once" pins stay off the account (`f53c884`). Saving still needs a manual test with a real account. |
+| The nightly document-expiry job failed every night. Pausing a live merchant that was taking orders broke `merchant_not_live_takes_no_orders`, and the job's single transaction then expired nothing. | `fn_partner_recompute_status` turns orders and the concierge pick off when it pauses a merchant, and `fn_expire_documents` expires each document in its own subtransaction (`20270101000200`). The first successful run was on 17 Nov. |
+| `rpc_merchant_membership_update` failed on every call, because it wrote text into the `merchant_user_role` enum. | The role is validated and cast, only an owner can change the team, and a blank role no longer trips the last-owner check. `cashier` is now a role (`20270101000300` and `0400`). |
+| The 21-category master list dropped the Adult age check on four specialties and stranded merchants on retired subcategories. | `20270102120100` and `20270102120200`. |
 
 ## Decisions waiting for the owner
 
@@ -93,28 +104,40 @@ On 16 Nov, production had every migration up to `main`'s `20261222090000` except
 These are also needed before launch:
 
 - **D7:** move the Stays app onto Supabase stays and retire its local host service.
-- **D8:** notification channels and phone push.
-- **D9:** who owns the category list (Discovery has its own).
+- **D8:** notification channels and phone push. Approved on 15 Nov, and #151 implements it.
+- **D9:** who owns the category list. The 21-category master list now lives in `packages/contracts/src/data/category-master.json` and the database. Discovery follows it through its own copied files, which can drift.
 - **D10:** one request path that reaches merchants.
 - **D11:** one inbox and one review path.
 - **D12:** one storage layout.
-- **D13:** where each service runs. The website, admin and API already deploy on Vercel; only the connector worker is open.
+- **D13:** where each service runs. The website, admin and API already deploy on Vercel. Still open:
+  - the connector worker;
+  - the booking engine. Its VPS deploy kit (#78) brings its own web server on ports 80 and 443, and those ports are already in use on the target server.
 - **D14:** packaging for `@nexg/maps`.
 - **D15:** one settlement system for merchants, riders and hosts.
 
 ## Queue
 
-**Open backend PRs:**
+**Open backend PRs.** On 18 Nov, `main`'s newest migration was `20270105020300`. Number after `main`'s newest, and check again right before pushing.
 
-- **#132, customer account controls.** It needs two changes:
-  - Renumber its migrations after `20261223000700`.
+- **#132, customer account controls.** It is needed for the Consumer store release, and needs three changes:
+  - Renumber it: `20261205000100` and test `61` are taken on `main`.
+  - Drop its saved-places part, which re-creates #149's live `customer_saved` table, policies and `rpc_saved_add`.
   - Add `host_user`, `hotel_user` and `rider` links to the `business_account` blocker in `fn_customer_deletion_blockers`.
+- **#148, native stay checkout.**
+  - Renumber it: `20261220000100` and `0200` are taken by the maps migrations.
+  - Its stay holds go through `rpc_stay_hold`, so the account rule applies.
+  - Its app-side M-Pesa prompt is a second way to start payments, so settle it together with D2.
+- **#150, rider courier sharing, and #151, native push (D8).** No clashes. Renumber them after `main`'s newest to keep the apply order; tests 78 and 79 are still free.
+- **#152, rental discovery facts.** `20261116000000` sorts before `main`'s newest, so renumber it.
+- **#59, merchant application hardening.** It reuses `20261111000000` and carries an older `tg_merchant_application_write_guard`. Rebase it onto `main`'s current guard (`20261218000100`), then review it.
 
-  It is needed for the Consumer store release.
-- **#59, merchant application hardening.** Renumber it (it reuses `20261111000000`), then review it.
-- **#89.** Replaced by #145; close it.
+**Smaller open items:**
 
-**Requests from the app teams.** None is started. The owner sets the order; the suggested order is #146, #132, R1, then R3, R8 and R9.
+- **Team permissions.** Removing members (`rpc_merchant_membership_remove`) and sending invites (`rpc_merchant_invite_member`) need only membership, not ownership. That is the owner's call.
+- **Old branch.** `claude/shared-services-42601f` still has #146's old migration numbers and can be deleted.
+- **Duplicate test numbers** on `main`: 35 (2 files), 70 (2 files) and 99 (4 files).
+
+**Requests from the app teams.** None is started. The owner sets the order; the suggested order is #132, R1, then R3, R8 and R9.
 
 - **R1:** public privacy-policy and support pages, which the app stores require.
 - **R2:** the Discovery engine at a public https origin. This is hosting (D13).
@@ -175,7 +198,8 @@ What a build needs:
 - **Types:** CI regenerates `packages/db/src/types.generated.ts` with Supabase CLI 2.121.0 (`pnpm db:types`) and Prettier 3.4.2, and fails on any difference.
 - **Production:**
   - A merge to `main` deploys the website, admin and API immediately.
-  - Database migrations reach production only when the owner runs `scripts/push-to-production.sh` from an up-to-date `main`, with a dry run first.
+  - Database migrations reach production only when the owner applies them, after a go-ahead. That is either `scripts/push-to-production.sh` from an up-to-date `main` (dry run first), or by hand with each file's fingerprint checked.
+  - Production can apply migrations out of version order. When a file sorts before one already applied, `supabase db push` needs `--include-all`, and no later migration may redefine the same objects.
   - Never connect to or migrate the hosted database yourself.
   - For each change, tell the owner whether the merge or the database push goes first.
 - **SQL gotchas:**
@@ -183,11 +207,11 @@ What a build needs:
   - `data_request_kind` is `access`, `erasure`, `rectification` or `restriction`.
   - `fn_booking_open_at` treats a shop with no hours on file as closed.
   - A pgTAP test that switches roles needs `grant usage` on its `pg_temp` schema (see tests 19 and 70).
-- **Commits and PRs:** only when the owner asks.
+- **Commits:** `main` takes direct pushes with no required checks, so run typecheck, lint and the affected tests first. Commit and push only when the owner asks.
 
 ## Next steps
 
-1. The owner merges #146 and runs the database push the same day.
-2. Ask the owner D1 to D6, then D7 to D15.
-3. Finish #132.
+1. Ask the owner D1 to D6, then D7 to D15.
+2. Rework #132 first, for the Consumer store release, then the other open backend PRs.
+3. With the owner: try saving a delivery place while signed in, and watch the first real orders, bookings and stay holds under #146's rules.
 4. Work through the queue in the owner's order.
