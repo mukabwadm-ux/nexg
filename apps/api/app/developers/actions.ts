@@ -20,14 +20,16 @@ import type { Database } from '@nexg/db';
  * A key is live or test. A test key starts `nexg_test_`, books in the
  * sandbox (never a real order) and has a rate-limit bucket of its own.
  * Booking (`merchant_write`) is offered on test keys only: who may book
- * for real, on account, is NexG's decision, not a checkbox.
+ * for real, on account, is NexG's decision, not a checkbox. Updating the
+ * catalogue (`catalogue_write`) is the merchant's own business, so an owner
+ * may put it on a live key.
  */
 
 const RequestSchema = z.object({
   scopes: z
-    .array(z.enum(['public_read', 'merchant_read', 'merchant_write']))
+    .array(z.enum(['public_read', 'merchant_read', 'merchant_write', 'catalogue_write']))
     .min(1)
-    .max(3),
+    .max(4),
   merchant_id: z.string().uuid().nullable(),
   rate_limit: z.number().int().min(10).max(600).default(60),
   environment: z.enum(['live', 'test']).default('live'),
@@ -136,7 +138,10 @@ export async function issueApiKey(formData: FormData): Promise<IssueResult> {
    * The database constraint refuses it too, but refusing it here means
    * the developer is told why rather than being handed a database error.
    */
-  if (!merchant_id && scopes.some((s) => s === 'merchant_read' || s === 'merchant_write')) {
+  if (
+    !merchant_id &&
+    scopes.some((s) => s === 'merchant_read' || s === 'merchant_write' || s === 'catalogue_write')
+  ) {
     return {
       ok: false,
       message: 'Choose the merchant this key is for.',

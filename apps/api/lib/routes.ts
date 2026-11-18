@@ -16,6 +16,8 @@ export interface V1Route {
 }
 
 export const V1_ROUTES: readonly V1Route[] = [
+  { path: '/v1/catalog/items', methods: ['GET'] },
+  { path: '/v1/catalog/items/{id}', methods: ['PATCH'] },
   { path: '/v1/catalog/merchants', methods: ['GET'] },
   { path: '/v1/catalog/merchants/{id}', methods: ['GET'] },
   { path: '/v1/experiences', methods: ['GET'] },

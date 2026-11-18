@@ -12,6 +12,32 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-17',
     kind: 'added',
+    title: 'Updating your catalogue',
+    body: [
+      'PATCH /v1/catalog/items/{id} changes an item’s price or availability, so your own till or ERP can keep NexG in step. A live change applies to the next order; a test key answers with the result and saves nothing.',
+      'GET /v1/catalog/items lists every item of your merchant, sold-out ones included, with the ids to update.',
+      'Both use catalogue_write, a new scope that an owner can put on a live key in the developer console. It cannot book services or read orders.',
+    ],
+    endpoints: ['list-catalogue-items', 'update-catalogue-item'],
+  },
+  {
+    date: '2026-11-17',
+    kind: 'fixed',
+    title: 'Every request checks its key and spends its tokens',
+    body: [
+      'On the public read endpoints, NexG could reuse a key check and a token spend for up to five minutes, the time it keeps their data. Repeated requests with a key then spent no tokens, and a revoked key kept working until that time ran out. Now the key is checked and the tokens are spent on every request, and a revoked key is refused at once everywhere.',
+    ],
+    endpoints: [
+      'list-merchants',
+      'get-merchant',
+      'list-zones',
+      'list-experiences',
+      'list-services',
+    ],
+  },
+  {
+    date: '2026-11-17',
+    kind: 'added',
     title: 'Test bookings that move',
     body: [
       'A test booking no longer stays requested. Move it to confirmed, in_progress, completed or cancelled with POST /v1/test/orders/{id}/status and a test key, and each move sends booking.status_changed to your test endpoints, so you can build for status changes before you go live.',

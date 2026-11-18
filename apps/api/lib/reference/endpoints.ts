@@ -332,6 +332,232 @@ export const ENDPOINTS: EndpointDoc[] = [
     source: 'apps/api/app/v1/catalog/merchants/[id]/route.ts',
   },
   {
+    slug: 'list-catalogue-items',
+    method: 'GET',
+    host: 'api',
+    path: '/v1/catalog/items',
+    status: 'live',
+    group: 'Catalogue',
+    title: 'List your catalogue items',
+    summary:
+      'Every item your merchant sells, sold-out ones included. The key decides the merchant.',
+    description: [
+      'Returns every catalogue item of the merchant your key is bound to, in menu order: by section, then each item’s sort, then name. Unlike Get a merchant and its catalogue, it includes items that are sold out (available false), so your system can find them again to put them back on sale.',
+      'Each item is the same object the public catalogue returns, so one parser reads both. Use the ids with Update a catalogue item. The whole catalogue comes back in one answer, without paging.',
+    ],
+    auth: { kind: 'key', scope: 'catalogue_write', merchantBound: true },
+    rateCost: 1,
+    cache: 'no-store',
+    paginated: false,
+    params: [
+      {
+        name: 'X-Api-Key',
+        in: 'header',
+        type: 'string',
+        required: true,
+        description:
+          'A key bound to your merchant, with catalogue_write or merchant_read. Or send it as Authorization: Bearer <key>.',
+      },
+    ],
+    example: {},
+    responseStatus: '200 OK',
+    responseExample: {
+      ok: true,
+      data: {
+        items: [
+          {
+            id: '5d8e1f2a-3b4c-4d5e-8f6a-7b8c9d0e1f2a',
+            merchant_id: MERCHANT_ID,
+            section_id: '2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d',
+            name: 'Nyama choma platter',
+            description: 'Half kilo of goat ribs, kachumbari, ugali',
+            price_kes: 1450,
+            available: true,
+            age_restricted: false,
+            highlighted: true,
+            sort: 0,
+          },
+          {
+            id: '6e9f2a3b-4c5d-4e6f-9a7b-8c9d0e1f2a3b',
+            merchant_id: MERCHANT_ID,
+            section_id: '2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d',
+            name: 'Grilled tilapia',
+            description: 'Whole fish, lemon and chilli, sukuma wiki',
+            price_kes: 1200,
+            available: false,
+            age_restricted: false,
+            highlighted: true,
+            sort: 1,
+          },
+        ],
+      },
+      meta: { api_version: 'v1' },
+    },
+    responseResources: [
+      {
+        schema: 'CatalogueItem',
+        title: 'Catalogue item',
+        at: 'data.items[]',
+        fields: CATALOGUE_ITEM_FIELDS,
+      },
+    ],
+    errors: [
+      ...credentialErrors('catalogue_write or merchant_read', false),
+      {
+        status: 403,
+        code: 'not_found',
+        when: 'The key is not bound to a merchant.',
+      },
+      { status: 500, code: 'internal_error', when: 'NexG could not read the catalogue.' },
+      UNEXPECTED_ERROR,
+    ],
+    notes: [
+      'A key with catalogue_write spends one token; a key with only merchant_read spends three, as an order read does.',
+      'An item the merchant has not priced yet has price_kes null.',
+      'Merchant keys work only while the merchant may operate: not while it is paused, suspended or delisted, and not while its application is waiting for approval.',
+    ],
+    since: '2026-11-17',
+    source: 'apps/api/app/v1/catalog/items/route.ts',
+  },
+  {
+    slug: 'update-catalogue-item',
+    method: 'PATCH',
+    host: 'api',
+    path: '/v1/catalog/items/{id}',
+    status: 'live',
+    group: 'Catalogue',
+    title: 'Update a catalogue item',
+    summary: 'Change an item’s price or availability, from your till or ERP.',
+    description: [
+      'Changes one of your merchant’s catalogue items: its price (price_kes), whether it is on sale (available), or both in one call. Send only what changes. This is how your own till or ERP keeps NexG in step.',
+      'With a live key the change is saved at once and applies to the next order, because checkout always reads the current price. NexG keeps a record of each change and the key that made it. The public catalogue may show the old values for a few minutes, because its answers are cached.',
+      'With a test key nothing is saved: the answer shows the item as the change would leave it, with applied false, so you can build without touching real prices.',
+    ],
+    auth: { kind: 'key', scope: 'catalogue_write', merchantBound: true },
+    rateCost: 1,
+    cache: 'no-store',
+    paginated: false,
+    params: [
+      {
+        name: 'id',
+        in: 'path',
+        type: 'uuid',
+        required: true,
+        description: 'The item’s id, from List your catalogue items.',
+      },
+      {
+        name: 'X-Api-Key',
+        in: 'header',
+        type: 'string',
+        required: true,
+        description:
+          'A key bound to your merchant, with catalogue_write. A test key (nexg_test_…) changes nothing.',
+      },
+      {
+        name: 'Content-Type',
+        in: 'header',
+        type: 'string',
+        required: true,
+        description: 'application/json',
+      },
+    ],
+    example: {
+      path: { id: '6e9f2a3b-4c5d-4e6f-9a7b-8c9d0e1f2a3b' },
+      body: { price_kes: 1250, available: false },
+    },
+    requestResources: [
+      {
+        title: 'Change',
+        at: 'body',
+        fields: [
+          {
+            name: 'price_kes',
+            type: 'integer',
+            description: 'The new price, in whole shillings from 1 to 1,000,000. Optional.',
+          },
+          {
+            name: 'available',
+            type: 'boolean',
+            description:
+              'false while the item is sold out, true when it is back on sale. Optional.',
+          },
+        ],
+      },
+    ],
+    responseStatus: '200 OK',
+    responseExample: {
+      ok: true,
+      data: {
+        item: {
+          id: '6e9f2a3b-4c5d-4e6f-9a7b-8c9d0e1f2a3b',
+          merchant_id: MERCHANT_ID,
+          section_id: '2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d',
+          name: 'Grilled tilapia',
+          description: 'Whole fish, lemon and chilli, sukuma wiki',
+          price_kes: 1250,
+          available: false,
+          age_restricted: false,
+          highlighted: true,
+          sort: 1,
+        },
+        applied: true,
+      },
+      meta: { api_version: 'v1' },
+    },
+    responseResources: [
+      {
+        schema: 'CatalogueItem',
+        title: 'Catalogue item',
+        at: 'data.item',
+        fields: CATALOGUE_ITEM_FIELDS,
+      },
+      {
+        title: 'Saved',
+        at: 'data',
+        fields: [
+          {
+            name: 'applied',
+            type: 'boolean',
+            description:
+              'true when the change was saved, with a live key. false with a test key, which saves nothing.',
+          },
+        ],
+      },
+    ],
+    errors: [
+      ...credentialErrors('catalogue_write', false),
+      {
+        status: 400,
+        code: 'invalid_request',
+        when: 'The id is not a UUID, or the body is not JSON with price_kes, available or both. error.fields names the field.',
+      },
+      {
+        status: 400,
+        code: 'invalid_request',
+        when: 'A price that is not whole shillings from 1 to 1,000,000, an available that is not true or false, or any other field. The message says which.',
+      },
+      {
+        status: 403,
+        code: 'not_found',
+        when: 'The key is not bound to a merchant.',
+      },
+      {
+        status: 404,
+        code: 'not_found',
+        when: 'Your merchant has no item with that id.',
+      },
+      { status: 500, code: 'internal_error', when: 'NexG could not update the item.' },
+      UNEXPECTED_ERROR,
+    ],
+    notes: [
+      'catalogue_write is a scope of its own: an owner can put it on a live key in the developer console. It cannot book services or read orders.',
+      'Names, descriptions, photos, sections and new items are changed in the merchant console or by CSV import, not through the API yet.',
+      'Merchant keys work only while the merchant may operate: not while it is paused, suspended or delisted, and not while its application is waiting for approval.',
+    ],
+    since: '2026-11-17',
+    source: 'apps/api/app/v1/catalog/items/[id]/route.ts',
+  },
+  {
     slug: 'list-zones',
     method: 'GET',
     host: 'api',

@@ -1043,6 +1043,16 @@ function ApiDocs({ origins }: { origins: ApiOrigins }) {
     ['GET', '/v1/experiences', 'Upcoming events. Public.'],
     ['GET', '/v1/services', 'Service types. Public.'],
     ['GET', '/v1/orders', 'Orders of the merchant the key belongs to. Needs merchant_read.'],
+    [
+      'GET',
+      '/v1/catalog/items',
+      'Every item of the key’s merchant, sold out too. merchant_read or catalogue_write.',
+    ],
+    [
+      'PATCH',
+      '/v1/catalog/items/{id}',
+      'Change an item’s price or availability. Needs catalogue_write.',
+    ],
   ];
   const urls: [string, string, string][] = [
     [
@@ -1085,9 +1095,10 @@ function ApiDocs({ origins }: { origins: ApiOrigins }) {
         <code className={code}>Authorization: Bearer &lt;key&gt;</code>). Keys are stored only as a
         hash and shown once. Scopes: <code className={code}>public_read</code> (default),{' '}
         <code className={code}>merchant_read</code> (a merchant&apos;s own orders),{' '}
-        <code className={code}>merchant_write</code>, <code className={code}>internal_read</code>,{' '}
-        <code className={code}>internal_write</code>. A merchant key only ever sees its own
-        merchant.
+        <code className={code}>merchant_write</code> (booking services),{' '}
+        <code className={code}>catalogue_write</code> (prices and availability),{' '}
+        <code className={code}>internal_read</code>, <code className={code}>internal_write</code>. A
+        merchant key only ever sees its own merchant.
       </p>
 
       <h4 className={h}>What it can access</h4>

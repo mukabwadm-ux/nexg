@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@nexg/db';
 
 import type { ApiEnvironment } from './auth';
+import { noStoreFetch } from './no-store';
 
 /**
  * Which database functions a key's orders go through.
@@ -31,7 +32,7 @@ export function orderWriter() {
   return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } },
+    { auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: noStoreFetch } },
   ) as unknown as { rpc: (name: PlaceFunction, args: Record<string, unknown>) => RpcResult };
 }
 
@@ -50,7 +51,7 @@ export function sandboxMover() {
   return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } },
+    { auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: noStoreFetch } },
   ) as unknown as {
     rpc: (name: typeof SANDBOX_MOVE_FUNCTION, args: Record<string, unknown>) => RpcResult;
   };
@@ -69,6 +70,6 @@ export function orderReader() {
   return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } },
+    { auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: noStoreFetch } },
   ) as unknown as { rpc: (name: ReadFunction, args: Record<string, unknown>) => RpcResult };
 }

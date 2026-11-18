@@ -23,6 +23,7 @@ const SCOPE_WORDS: Record<string, string> = {
   public_read: 'Public catalogue',
   merchant_read: 'Your orders',
   merchant_write: 'Book services',
+  catalogue_write: 'Update catalogue',
   internal_read: 'NexG internal',
   internal_write: 'NexG internal',
 };

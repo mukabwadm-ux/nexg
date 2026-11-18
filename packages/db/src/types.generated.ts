@@ -53726,6 +53726,7 @@ export type Database = {
       fn_anonymise_guest: { Args: { p_guest_id: string }; Returns: undefined };
       fn_answer_matches: { Args: { p_answers: Json; p_condition: Json }; Returns: boolean };
       fn_api_booking_status: { Args: { p_stage: string }; Returns: string };
+      fn_api_catalogue_item: { Args: { p_item: Json }; Returns: Json };
       fn_api_key_issue: {
         Args: {
           p_created_by?: string;
@@ -55773,6 +55774,11 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_catalogue_item_update_api: {
+        Args: { p_api_key: string; p_changes: Json; p_item_id: string };
+        Returns: Json;
+      };
+      rpc_catalogue_items_api: { Args: { p_api_key: string }; Returns: Json };
       rpc_category_config_save: { Args: { p_category: string; p_config: Json }; Returns: Json };
       rpc_category_tile_click: { Args: { p_tile: string }; Returns: undefined };
       rpc_category_tile_popularity: {
@@ -63093,6 +63099,7 @@ export type Database = {
         | 'public_read'
         | 'merchant_read'
         | 'merchant_write'
+        | 'catalogue_write'
         | 'internal_read'
         | 'internal_write';
       api_credential_state: 'active' | 'revoked' | 'expired';
@@ -64888,6 +64895,7 @@ export const Constants = {
         'public_read',
         'merchant_read',
         'merchant_write',
+        'catalogue_write',
         'internal_read',
         'internal_write',
       ],

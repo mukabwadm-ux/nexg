@@ -89,6 +89,30 @@ describe('issuing keys from the developer console', () => {
     expect(rpc).not.toHaveBeenCalled();
   });
 
+  it('issues a live key that updates the catalogue, which is the merchant’s own business', async () => {
+    const result = await issueApiKey(
+      form({
+        environment: 'live',
+        scopes: ['public_read', 'catalogue_write'],
+        merchant_id: MERCHANT,
+      }),
+    );
+    expect(result).toMatchObject({ ok: true, key: { environment: 'live' } });
+    expect(rpc).toHaveBeenCalledWith(
+      'fn_api_key_issue',
+      expect.objectContaining({
+        p_merchant_id: MERCHANT,
+        p_scopes: ['public_read', 'catalogue_write'],
+      }),
+    );
+  });
+
+  it('asks for a merchant before issuing a catalogue key', async () => {
+    const result = await issueApiKey(form({ scopes: ['catalogue_write'], merchant_id: '' }));
+    expect(result).toMatchObject({ ok: false, message: 'Choose the merchant this key is for.' });
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
   it('refuses a kind of key that does not exist', async () => {
     const result = await issueApiKey(form({ environment: 'staging', scopes: 'public_read' }));
     expect(result.ok).toBe(false);

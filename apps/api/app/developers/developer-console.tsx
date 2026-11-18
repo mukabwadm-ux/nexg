@@ -50,6 +50,17 @@ function scopeOptions(environment: Environment) {
           },
         ]
       : []),
+    environment === 'test'
+      ? {
+          id: 'catalogue_write',
+          label: 'Try catalogue updates',
+          hint: 'PATCH /v1/catalog/items/{id} answers with the result but changes nothing.',
+        }
+      : {
+          id: 'catalogue_write',
+          label: 'Update your catalogue',
+          hint: 'Prices and what is sold out, from your till or ERP (PATCH /v1/catalog/items/{id}). Live for the next order.',
+        },
   ];
 }
 
@@ -63,6 +74,10 @@ function firstCall(rawKey: string, scopes: string[]) {
   -d '{"service": "airport_transfer", "quantity": 2,
        "pickup_label": "JKIA Terminal 1A", "pickup_lat": -1.3192, "pickup_lng": 36.9278,
        "dropoff_label": "Westlands, Nairobi", "dropoff_lat": -1.2648, "dropoff_lng": 36.8027}'`;
+  }
+  if (scopes.includes('catalogue_write')) {
+    return `curl -H "X-Api-Key: ${rawKey}" \\
+  https://api.nexgapp.com/v1/catalog/items`;
   }
   return `curl -H "X-Api-Key: ${rawKey}" \\
   https://api.nexgapp.com/v1/catalog/merchants`;
@@ -100,7 +115,9 @@ export function DeveloperConsole({
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const wantsMerchantScope = scopes.some((s) => s === 'merchant_read' || s === 'merchant_write');
+  const wantsMerchantScope = scopes.some(
+    (s) => s === 'merchant_read' || s === 'merchant_write' || s === 'catalogue_write',
+  );
 
   function toggleScope(scope: string) {
     setScopes((current) =>
@@ -351,9 +368,10 @@ export function DeveloperConsole({
                 className="w-32 rounded border px-3 py-2 text-sm"
               />
               <p className="text-ink/60 text-xs">
-                Keys share one bucket per merchant or developer. Public reads cost one token, order
-                reads three and bookings five. Adding a key does not add a separate quota. Test keys
-                have a bucket of their own, so testing never uses up your live quota.
+                Keys share one bucket per merchant or developer. Public reads and catalogue updates
+                cost one token, order reads three and bookings five. Adding a key does not add a
+                separate quota. Test keys have a bucket of their own, so testing never uses up your
+                live quota.
               </p>
             </div>
 

@@ -29,7 +29,7 @@ export const HOSTS: Record<Host, string> = {
   web: 'https://nexgapp.com',
 };
 
-export type ApiScope = 'public_read' | 'merchant_read' | 'merchant_write';
+export type ApiScope = 'public_read' | 'merchant_read' | 'merchant_write' | 'catalogue_write';
 
 export type EndpointGroup =
   | 'Catalogue'

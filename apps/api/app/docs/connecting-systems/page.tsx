@@ -20,6 +20,11 @@ const ITEM = `{
   "highlighted": true
 }`;
 
+const PRICE_CHANGE = `curl -X PATCH https://api.nexgapp.com/v1/catalog/items/6e9f2a3b-4c5d-4e6f-9a7b-8c9d0e1f2a3b \\
+  -H "X-Api-Key: $NEXG_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"price_kes": 1250, "available": false}'`;
+
 const SYNC = `// Every minute: read new and changed orders, newest first, until one you
 // already have at the same stage. Keyed by NexG's order_id.
 const res = await fetch('https://api.nexgapp.com/v1/orders', {
@@ -106,9 +111,11 @@ export default function ConnectingSystemsPage() {
           [
             'Your system tells NexG',
             <span key="h">
-              Posts signed events to NexG. See <A href="/docs/webhooks">Webhooks</A>.
+              Updates your catalogue&apos;s prices and availability with{' '}
+              <A href="/docs/reference/update-catalogue-item">PATCH /v1/catalog/items/{'{id}'}</A>,
+              or posts signed events to NexG. See <A href="/docs/webhooks">Webhooks</A>.
             </span>,
-            'Banks, in sandbox. Other systems coming soon.',
+            'Catalogue updates live. Bank events in sandbox.',
           ],
           [
             'NexG calls your system',
@@ -124,21 +131,31 @@ export default function ConnectingSystemsPage() {
         rows={[
           [
             'Catalogue and prices',
-            'Merchant console, or a CSV export from your system',
+            <span key="i">
+              Merchant console, a CSV export from your system, or{' '}
+              <C>PATCH /v1/catalog/items/{'{id}'}</C> for prices
+            </span>,
             <C key="o">GET /v1/catalog/merchants/{'{id}'}</C>,
-            'Sync from your system',
+            'New items and photos by API',
           ],
           [
             'Availability',
-            'The available column, in the console or CSV',
+            <span key="i">
+              The available column, in the console or CSV, or available in{' '}
+              <C>PATCH /v1/catalog/items/{'{id}'}</C>
+            </span>,
             'available on each item',
             'Stock levels from your inventory',
           ],
           [
             'Orders and their stage',
-            'Guests order on nexgapp.com',
-            <C key="o">GET /v1/orders</C>,
-            'Bookings by API; order events pushed to you',
+            <span key="i">
+              Guests order on nexgapp.com; merchants book services with <C>POST /v1/orders</C>
+            </span>,
+            <span key="o">
+              <C>GET /v1/orders</C>, and order events pushed to you
+            </span>,
+            'Changing and cancelling bookings by API',
           ],
           [
             'Payments',
@@ -166,6 +183,24 @@ export default function ConnectingSystemsPage() {
         <C>handling_notes</C> and <C>storage_guidance</C>. Download it from the same page. Photos
         are uploaded in the console, not in the file. Prices are whole shillings.
       </P>
+
+      <H3 id="prices">Prices and availability, as they change</H3>
+      <P>
+        Issue a live key with <C>catalogue_write</C> for your merchant in the{' '}
+        <A href="/developers">developer console</A>. Read your items once with{' '}
+        <A href="/docs/reference/list-catalogue-items">GET /v1/catalog/items</A> and keep each
+        item&apos;s <C>id</C> next to your own product code. Then, whenever a price changes or
+        something sells out in your system, send only that change with{' '}
+        <A href="/docs/reference/update-catalogue-item">PATCH /v1/catalog/items/{'{id}'}</A>. It
+        applies to the next order. Try it first with a test key, which answers with the result
+        and saves nothing.
+      </P>
+      <CodeBlock
+        className="mt-6"
+        code={PRICE_CHANGE}
+        language="curl"
+        title="Sold out, at a new price"
+      />
 
       <H3 id="orders">Your orders, from NexG to your system</H3>
       <P>

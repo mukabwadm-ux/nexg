@@ -2,16 +2,20 @@ import { isIP } from 'node:net';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@nexg/db';
 
+import { noStoreFetch } from './no-store';
+
 export const API_SCOPES = {
   public_read: 'public_read',
   merchant_read: 'merchant_read',
   merchant_write: 'merchant_write',
+  catalogue_write: 'catalogue_write',
   internal_read: 'internal_read',
   internal_write: 'internal_write',
 } as const;
 
 export type ApiScope = (typeof API_SCOPES)[keyof typeof API_SCOPES];
-export type ApiOperation = 'public_read' | 'merchant_read' | 'merchant_write';
+/** What a request spends tokens on: 1 for public_read and catalogue_write, 3 and 5 for the others. */
+export type ApiOperation = 'public_read' | 'merchant_read' | 'merchant_write' | 'catalogue_write';
 
 /**
  * live: real data, and a booking is a real order. test: a sandbox key
@@ -57,6 +61,8 @@ function apiClient(privileged = false) {
   }
   return createClient<Database>(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
+    // Never a cached key check or token spend: see lib/no-store.ts.
+    global: { fetch: noStoreFetch },
   }) as unknown as {
     rpc: (
       name: string,

@@ -37,6 +37,11 @@ export default function RateLimitsPage() {
           ['Public reads: merchants, zones, experiences, services', <C key="s">public_read</C>, '1'],
           ['Reading your orders', <C key="s">merchant_read</C>, '3'],
           ['Booking a service', <C key="s">merchant_write</C>, '5'],
+          [
+            'Updating a catalogue item, or listing your catalogue items',
+            <C key="s">catalogue_write</C>,
+            '1',
+          ],
         ]}
       />
 

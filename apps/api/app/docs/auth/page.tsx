@@ -99,6 +99,11 @@ export default function AuthPage() {
             'On a test key, the merchant’s owner, from the console. On a live key, ask NexG.',
           ],
           [
+            <C key="s">catalogue_write</C>,
+            'Update that merchant’s catalogue prices and availability (PATCH /v1/catalog/items/{id}) and list its items. A test key changes nothing.',
+            'The merchant’s owner, from the console, on a live or test key.',
+          ],
+          [
             <span key="s">
               <C>internal_read</C>, <C>internal_write</C>
             </span>,
