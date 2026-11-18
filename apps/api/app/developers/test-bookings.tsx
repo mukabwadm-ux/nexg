@@ -6,9 +6,15 @@ import Link from 'next/link';
 import { useEffect, useState, useTransition } from 'react';
 
 import type { DeveloperMerchant } from '@/lib/merchants';
-import { consoleMoves, MOVE_LABELS, type TestBooking, type TestBookingList } from '@/lib/sandbox';
+import { consoleActions, type TestBooking, type TestBookingList } from '@/lib/sandbox';
 
-import { makeTestBooking, moveTestBooking, type TestBookingResult } from './sandbox-actions';
+import {
+  assignTestRider,
+  makeTestBooking,
+  moveTestBooking,
+  moveTestBookingStage,
+  type TestBookingResult,
+} from './sandbox-actions';
 
 export interface BookableService {
   code: string;
@@ -90,10 +96,12 @@ export function TestBookings({
       </CardHeader>
       <CardContent className="space-y-6">
         <p className="text-ink/70 text-sm">
-          Make a test booking, then move it through its statuses. NexG sends{' '}
-          <span className="font-mono text-xs">booking.created</span>, then{' '}
-          <span className="font-mono text-xs">booking.status_changed</span> at every move, to your
-          test webhook endpoints. Nothing is dispatched or charged.{' '}
+          Make a test booking, then move it on. NexG sends{' '}
+          <span className="font-mono text-xs">booking.created</span>, an event at every move (
+          <span className="font-mono text-xs">booking.status_changed</span> or{' '}
+          <span className="font-mono text-xs">booking.stage_changed</span>), and{' '}
+          <span className="font-mono text-xs">booking.rider_assigned</span> when a ride or courier
+          gets a test rider, to your test webhook endpoints. Nothing is dispatched or charged.{' '}
           <Link href="/docs/environments#moving-test-bookings" className="underline">
             How test bookings work
           </Link>
@@ -160,7 +168,7 @@ export function TestBookings({
             {bookings.length > 0 && (
               <ul className="space-y-3">
                 {bookings.map((b) => {
-                  const moves = consoleMoves(b.next);
+                  const actions = consoleActions(b);
                   return (
                     <li key={b.id} className="border-border rounded-lg border p-3">
                       <div className="flex flex-wrap items-center gap-2 text-sm font-medium">
@@ -168,6 +176,12 @@ export function TestBookings({
                         <span className="rounded-full border px-2 py-0.5 text-xs font-semibold">
                           {(b.status ?? b.stage).replace(/_/g, ' ')}
                         </span>
+                        {b.stage !== b.status && (
+                          <span className="text-ink/60 text-xs">{b.stage.replace(/_/g, ' ')}</span>
+                        )}
+                        {b.riderAssignedAt && (
+                          <span className="text-ink/60 text-xs">· test rider assigned</span>
+                        )}
                       </div>
                       <p className="text-ink/60 mt-1 text-xs">
                         {[
@@ -177,16 +191,24 @@ export function TestBookings({
                           when(b.createdAt),
                         ].join(' · ')}
                       </p>
-                      {moves.length > 0 && (
+                      {actions.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-2">
-                          {moves.map((status) => (
+                          {actions.map((action) => (
                             <Button
-                              key={status}
+                              key={action.label}
                               type="button"
                               disabled={pending}
-                              onClick={() => run(() => moveTestBooking(b.id, status))}
+                              onClick={() =>
+                                run(() =>
+                                  action.kind === 'rider'
+                                    ? assignTestRider(b.id)
+                                    : action.kind === 'stage'
+                                      ? moveTestBookingStage(b.id, action.value)
+                                      : moveTestBooking(b.id, action.value),
+                                )
+                              }
                             >
-                              {MOVE_LABELS[status]}
+                              {action.label}
                             </Button>
                           ))}
                         </div>

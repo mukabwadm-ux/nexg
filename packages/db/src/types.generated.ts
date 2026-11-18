@@ -4061,6 +4061,7 @@ export type Database = {
           price_source: string;
           quantity: number;
           reference: string;
+          rider_assigned_at: string | null;
           scheduled_for: string | null;
           service: string;
           stage: string;
@@ -4081,6 +4082,7 @@ export type Database = {
           price_source: string;
           quantity: number;
           reference: string;
+          rider_assigned_at?: string | null;
           scheduled_for?: string | null;
           service: string;
           stage?: string;
@@ -4100,6 +4102,7 @@ export type Database = {
           price_source?: string;
           quantity?: number;
           reference?: string;
+          rider_assigned_at?: string | null;
           scheduled_for?: string | null;
           service?: string;
           stage?: string;
@@ -53763,12 +53766,44 @@ export type Database = {
           retry_after: number;
         }[];
       };
+      fn_api_sandbox_key: {
+        Args: { p_api_key: string };
+        Returns: {
+          created_at: string;
+          created_by: string | null;
+          created_by_user: string | null;
+          environment: string;
+          expires_at: string | null;
+          id: string;
+          key_hash: string;
+          key_prefix: string;
+          last_used_at: string | null;
+          merchant_id: string | null;
+          rate_limit: number;
+          revoke_reason: string | null;
+          revoked_at: string | null;
+          revoked_by: string | null;
+          scopes: Database['public']['Enums']['api_credential_scope'][];
+          state: Database['public']['Enums']['api_credential_state'];
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'api_key';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       fn_api_test_order_move: {
         Args: { p_id: string; p_merchant_id: string; p_status: string };
         Returns: Json;
       };
       fn_api_test_order_next: { Args: { p_stage: string }; Returns: string[] };
       fn_api_test_order_object: { Args: { p_id: string }; Returns: Json };
+      fn_api_test_order_rider: { Args: { p_id: string; p_merchant_id: string }; Returns: Json };
+      fn_api_test_order_stage: {
+        Args: { p_id: string; p_merchant_id: string; p_stage: string };
+        Returns: Json;
+      };
       fn_api_webhook_can_manage: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_api_webhook_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_api_webhook_enqueue: {
@@ -55019,10 +55054,12 @@ export type Database = {
       rpc_api_key_revoke: { Args: { p_key_id: string; p_reason?: string }; Returns: boolean };
       rpc_api_overview: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_api_test_order_move: { Args: { p_order_id: string; p_status: string }; Returns: Json };
+      rpc_api_test_order_rider: { Args: { p_order_id: string }; Returns: Json };
       rpc_api_test_order_sample: {
         Args: { p_merchant_id: string; p_service: string };
         Returns: Json;
       };
+      rpc_api_test_order_stage: { Args: { p_order_id: string; p_stage: string }; Returns: Json };
       rpc_api_test_orders: { Args: { p_limit?: number }; Returns: Json };
       rpc_api_webhook_deliveries: {
         Args: { p_endpoint_id: string; p_limit?: number };
@@ -60262,6 +60299,11 @@ export type Database = {
           p_reason_code: string;
           p_reason_text?: string;
         };
+        Returns: Json;
+      };
+      rpc_order_rider_api_test: { Args: { p_api_key: string; p_order_id: string }; Returns: Json };
+      rpc_order_stage_api_test: {
+        Args: { p_api_key: string; p_order_id: string; p_stage: string };
         Returns: Json;
       };
       rpc_order_status_api_test: {
