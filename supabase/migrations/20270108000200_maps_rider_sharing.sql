@@ -314,9 +314,9 @@ grant execute on function public.rpc_my_rider_map_assignments(),
 to authenticated;
 
 insert into public.wiring_audit_exempt (function_name, reason, recorded_in) values
-  ('rpc_rider_map_share_start', 'Rider opts into a single short-lived order sharing lease.', '20261220000400_maps_rider_sharing'),
-  ('rpc_rider_map_share_publish', 'One ephemeral fix only. A separate per-sample audit would retain location metadata.', '20261220000400_maps_rider_sharing'),
-  ('rpc_rider_map_share_stop', 'Rider revokes the ephemeral sharing lease without retaining a tracking history.', '20261220000400_maps_rider_sharing');
+  ('rpc_rider_map_share_start', 'Rider opts into a single short-lived order sharing lease.', '20270108000200_maps_rider_sharing'),
+  ('rpc_rider_map_share_publish', 'One ephemeral fix only. A separate per-sample audit would retain location metadata.', '20270108000200_maps_rider_sharing'),
+  ('rpc_rider_map_share_stop', 'Rider revokes the ephemeral sharing lease without retaining a tracking history.', '20270108000200_maps_rider_sharing');
 
 -- Clear discarded private coordinates even when a device disappears before stop.
 select cron.schedule('maps-rider-sharing-expire', '* * * * *', $prune$
