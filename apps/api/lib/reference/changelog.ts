@@ -12,6 +12,16 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-18',
     kind: 'added',
+    title: 'OpenAPI spec and Postman collection',
+    body: [
+      'https://api.nexgapp.com/openapi.json describes every endpoint in OpenAPI 3.1, for code generators and API clients. https://api.nexgapp.com/postman.json is a Postman collection of the same: import it and set apiKey to a test key.',
+      'Both are built from the same source as this reference, so they always match it.',
+    ],
+    endpoints: [],
+  },
+  {
+    date: '2026-11-18',
+    kind: 'added',
     title: 'Rider milestones in order events',
     body: [
       'booking.stage_changed: a booking’s stage changed inside the same status, such as picked_up to arriving, or preparing to ready. Every stage change now sends exactly one event: booking.status_changed when the status changes, booking.stage_changed when it does not.',
