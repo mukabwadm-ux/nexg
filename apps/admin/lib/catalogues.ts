@@ -85,7 +85,14 @@ export interface CatalogueDetail {
   sections: { id: string; name: string; items: number; available: number }[];
   items: CatalogueItem[];
   modifier_groups: { name: string; required: boolean; options: number }[];
-  pending_edits: { id: string; kind: string; item: string | null; created_at: string }[];
+  pending_edits: {
+    id: string;
+    kind: string;
+    item: string | null;
+    /** The price asked for, for a price change; null otherwise or when the payload has none. */
+    price_kes: number | null;
+    created_at: string;
+  }[];
   price_flags: {
     id: string;
     item: string | null;
@@ -207,6 +214,7 @@ export function parseCatalogueDetail(data: unknown): CatalogueDetail | null {
         id: str(e.id) ?? '',
         kind: str(e.kind) ?? 'change',
         item: str(e.item),
+        price_kes: num(obj(e.payload).price_kes),
         created_at: str(e.created_at) ?? '',
       };
     }),
