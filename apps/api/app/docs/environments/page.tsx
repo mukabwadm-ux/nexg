@@ -154,27 +154,30 @@ export default function EnvironmentsPage() {
 
       <H2 id="moving-test-bookings">Moving a test booking</H2>
       <P>
-        A real booking changes status as the merchant and NexG work on it. Nobody works on a test
-        booking, so you move it yourself. Each move sends <C>booking.status_changed</C> to your
-        test endpoints: the same event a live booking sends, so you can build for it before you go
-        live.
+        A real booking changes as the merchant, NexG and the rider work on it. Nobody works on a
+        test booking, so you move it yourself, and each move sends the event a live booking would:{' '}
+        <C>booking.status_changed</C>, or <C>booking.stage_changed</C> for a move inside one status
+        such as picked_up to arriving. A test ride or courier can also be given a test rider, which
+        sends <C>booking.rider_assigned</C>.
       </P>
       <List>
         <li>
           <Strong>With the API:</Strong>{' '}
           <A href="/docs/reference/move-test-order">POST /v1/test/orders/{'{id}'}/status</A>, with
-          a test key that has <C>merchant_write</C> and the status to move to.
+          a test key that has <C>merchant_write</C> and the status or the stage to move to. Assign
+          a test rider with{' '}
+          <A href="/docs/reference/assign-test-rider">POST /v1/test/orders/{'{id}'}/rider</A>.
         </li>
         <li>
           <Strong>Without code:</Strong> in the <A href="/developers">developer console</A>, under{' '}
-          <Strong>Test bookings</Strong>, make a sample booking and press Confirm, Start, Complete
-          or Cancel.
+          <Strong>Test bookings</Strong>, make a sample booking and press Confirm, Start, Arriving,
+          Complete or Cancel, and Assign rider for a ride or courier.
         </li>
       </List>
       <P>
-        A booking only moves forward: requested, confirmed, in_progress, completed. You may skip
-        ahead, and you may cancel it at any point before it is completed. Completed and cancelled
-        are final. A live key cannot move anything.
+        A booking only moves forward: placed, confirmed, preparing, ready, picked_up, arriving,
+        delivered. You may skip ahead, and you may cancel it at any point before it is completed.
+        Completed and cancelled are final. A live key cannot move anything.
       </P>
       <CodeBlock
         className="mt-6"

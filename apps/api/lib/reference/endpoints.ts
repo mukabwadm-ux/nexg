@@ -1066,10 +1066,12 @@ export const ENDPOINTS: EndpointDoc[] = [
     status: 'live',
     group: 'Orders',
     title: 'Move a test booking',
-    summary: 'Sandbox only: move a test booking to a later status, to try status-change events.',
+    summary:
+      'Sandbox only: move a test booking to a later status or stage, to try status and stage events.',
     description: [
-      'A real booking changes status as the merchant and NexG work on it. A test booking has nobody working on it, so this endpoint moves it for you: book with a test key, move the booking to confirmed, in_progress, completed or cancelled, and watch booking.status_changed arrive at your test endpoint.',
-      'A booking only moves forward: requested, confirmed, in_progress, completed. You may skip steps, and you may cancel it at any point before it is completed. Completed and cancelled are final. Each status gets the first stage a real order uses for it: confirmed, picked_up, delivered or cancelled.',
+      'A real booking changes as the merchant, NexG and the rider work on it. A test booking has nobody working on it, so this endpoint moves it for you: book with a test key, move the booking on, and watch the events arrive at your test endpoint.',
+      'Send a status (confirmed, in_progress, completed or cancelled) or a stage (confirmed, preparing, ready, picked_up, arriving, delivered or cancelled). A status gets the first stage a real order uses for it. A move that changes the status sends booking.status_changed; one inside a status, such as picked_up to arriving, sends booking.stage_changed.',
+      'A booking only moves forward. You may skip steps, and you may cancel it at any point before it is completed. Completed and cancelled are final.',
       'Test keys only. A live key is refused with 403: real bookings move only as the work happens. The developer console does the same with buttons, under Test bookings.',
     ],
     auth: { kind: 'key', scope: 'merchant_write', merchantBound: true },
@@ -1105,14 +1107,20 @@ export const ENDPOINTS: EndpointDoc[] = [
     },
     requestResources: [
       {
-        title: 'Status change',
+        title: 'Move',
         at: 'body',
         fields: [
           {
             name: 'status',
             type: "'confirmed' | 'in_progress' | 'completed' | 'cancelled'",
             description:
-              'Where to move the booking: a status later than the one it has, or cancelled.',
+              'Where to move the booking: a status later than the one it has, or cancelled. Send this or stage.',
+          },
+          {
+            name: 'stage',
+            type: "'confirmed' | 'preparing' | 'ready' | 'picked_up' | 'arriving' | 'delivered' | 'cancelled'",
+            description:
+              'Where to move the booking: a stage later than the one it has, or cancelled. Send this or status.',
           },
         ],
       },
@@ -1152,6 +1160,12 @@ export const ENDPOINTS: EndpointDoc[] = [
             type: 'string',
             description: 'The status the booking had before this move.',
           },
+          {
+            name: 'previous_stage',
+            type: 'string',
+            description:
+              'The stage the booking had before this move. Sent when you moved it by stage.',
+          },
         ],
       },
     ],
@@ -1160,12 +1174,12 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 400,
         code: 'invalid_request',
-        when: 'The id is not a UUID, or the body is not JSON with a status of confirmed, in_progress, completed or cancelled.',
+        when: 'The id is not a UUID, or the body is not JSON with one of status or stage, set to a value listed above.',
       },
       {
         status: 400,
         code: 'invalid_request',
-        when: 'The booking cannot move there: it already has that status, the status comes before its own, or it is completed or cancelled. The message says which.',
+        when: 'The booking cannot move there: it is already there, it is past it, or it is completed or cancelled. The message says which.',
       },
       {
         status: 403,
@@ -1181,11 +1195,112 @@ export const ENDPOINTS: EndpointDoc[] = [
       UNEXPECTED_ERROR,
     ],
     notes: [
-      'Each move sends booking.status_changed to your enabled test endpoints, with the booking as GET /v1/orders/{id} returns it, previous_status and previous_stage. Cancelling sends it too.',
+      'Each move sends one event to your enabled test endpoints, with the booking as GET /v1/orders/{id} returns it: booking.status_changed with previous_status and previous_stage, or booking.stage_changed with previous_stage. Cancelling sends booking.status_changed.',
+      'Give a test ride or courier a test rider with Assign a test rider, to try booking.rider_assigned.',
       'Test bookings made in the developer console move the same way, and appear in List your orders for your test keys.',
     ],
     since: '2026-11-17',
     source: 'apps/api/app/v1/test/orders/[id]/status/route.ts',
+  },
+  {
+    slug: 'assign-test-rider',
+    method: 'POST',
+    host: 'api',
+    path: '/v1/test/orders/{id}/rider',
+    status: 'live',
+    group: 'Orders',
+    title: 'Assign a test rider',
+    summary: 'Sandbox only: give a test ride or courier a rider, to try booking.rider_assigned.',
+    description: [
+      'A real ride or courier gets a rider when one accepts its delivery job, and NexG sends booking.rider_assigned. A test booking has no riders, so this endpoint assigns a test rider and sends the same event to your test endpoint. Call it again to try a new rider taking over.',
+      'Rides and couriers only, and not once the booking is completed or cancelled. There is no body. Test keys only: a live key is refused with 403.',
+    ],
+    auth: { kind: 'key', scope: 'merchant_write', merchantBound: true },
+    rateCost: 5,
+    cache: 'no-store',
+    paginated: false,
+    params: [
+      {
+        name: 'id',
+        in: 'path',
+        type: 'uuid',
+        required: true,
+        description: 'The order_id of a test ride or courier.',
+      },
+      {
+        name: 'X-Api-Key',
+        in: 'header',
+        type: 'string',
+        required: true,
+        description: 'A test key (nexg_test_…) bound to your merchant, with merchant_write.',
+      },
+    ],
+    example: { path: { id: '7c6b5a49-3827-4615-a4b3-c2d1e0f9a8b7' } },
+    responseStatus: '200 OK',
+    responseExample: {
+      ok: true,
+      data: {
+        order: {
+          order_id: '7c6b5a49-3827-4615-a4b3-c2d1e0f9a8b7',
+          reference: 'TEST-261117-A1B2C3',
+          service: 'airport_transfer',
+          quantity: 2,
+          status: 'confirmed',
+          stage: 'confirmed',
+          payment_method: 'on_account',
+          payment_status: 'pending',
+          currency: 'KES',
+          total_cents: 200000,
+          scheduled_for: '2026-11-18T03:30:00+00:00',
+          pickup_label: 'JKIA Terminal 1A',
+          dropoff_label: 'Woodvale Grove, Westlands, Nairobi',
+          created_at: '2026-11-17T09:12:44.512+00:00',
+        },
+        assigned_at: '2026-11-17T09:20:03.118+00:00',
+      },
+      meta: { api_version: 'v1' },
+    },
+    responseResources: [
+      { schema: 'ApiOrder', title: 'Order', at: 'data.order', fields: ORDER_FIELDS },
+      {
+        title: 'The rider',
+        at: 'data',
+        fields: [
+          {
+            name: 'assigned_at',
+            type: 'string',
+            description:
+              'When the test rider was assigned. booking.rider_assigned carries the same.',
+          },
+        ],
+      },
+    ],
+    errors: [
+      ...credentialErrors('merchant_write', false),
+      { status: 400, code: 'invalid_request', when: 'The id is not a UUID.' },
+      {
+        status: 400,
+        code: 'invalid_request',
+        when: 'The booking is not a ride or a courier, or it is completed or cancelled. The message says which.',
+      },
+      {
+        status: 403,
+        code: 'not_found',
+        when: 'The key is a live key, or it is not bound to a merchant.',
+      },
+      {
+        status: 404,
+        code: 'not_found',
+        when: 'Your merchant has no test booking with that id.',
+      },
+      { status: 500, code: 'internal_error', when: 'NexG could not assign the test rider.' },
+      UNEXPECTED_ERROR,
+    ],
+    notes: [
+      'booking.rider_assigned carries the booking and assigned_at, and nothing about the rider yet.',
+    ],
+    since: '2026-11-18',
+    source: 'apps/api/app/v1/test/orders/[id]/rider/route.ts',
   },
   {
     slug: 'bank-webhook',

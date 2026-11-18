@@ -494,7 +494,13 @@ export type ApiOrder = z.infer<typeof ApiOrder>;
  * of "<t>.<raw body>">`, keyed with the endpoint's signing secret. The same
  * event id is sent on every retry.
  */
-export const WebhookEventType = z.enum(['booking.created', 'booking.status_changed', 'ping']);
+export const WebhookEventType = z.enum([
+  'booking.created',
+  'booking.status_changed',
+  'booking.stage_changed',
+  'booking.rider_assigned',
+  'ping',
+]);
 export type WebhookEventType = z.infer<typeof WebhookEventType>;
 
 export const WebhookEvent = z
@@ -510,7 +516,10 @@ export const WebhookEvent = z
         booking: ApiOrder.optional(),
         /** booking.status_changed only. */
         previous_status: BookingStatus.optional(),
+        /** booking.status_changed and booking.stage_changed. */
         previous_stage: z.string().optional(),
+        /** booking.rider_assigned only: when the rider took the job. */
+        assigned_at: z.string().optional(),
         /** ping only. */
         endpoint_id: Uuid.optional(),
         message: z.string().optional(),

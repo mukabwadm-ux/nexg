@@ -10,6 +10,36 @@ import type { ChangelogEntry } from './types';
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-11-18',
+    kind: 'added',
+    title: 'OpenAPI spec and Postman collection',
+    body: [
+      'https://api.nexgapp.com/openapi.json describes every endpoint in OpenAPI 3.1, for code generators and API clients. https://api.nexgapp.com/postman.json is a Postman collection of the same: import it and set apiKey to a test key.',
+      'Both are built from the same source as this reference, so they always match it.',
+    ],
+    endpoints: [],
+  },
+  {
+    date: '2026-11-18',
+    kind: 'added',
+    title: 'Rider milestones in order events',
+    body: [
+      'booking.stage_changed: a booking’s stage changed inside the same status, such as picked_up to arriving, or preparing to ready. Every stage change now sends exactly one event: booking.status_changed when the status changes, booking.stage_changed when it does not.',
+      'booking.rider_assigned: a rider took the booking’s delivery job, and again when another rider takes over. It carries the booking and assigned_at; details about the rider will follow.',
+      'In the sandbox, POST /v1/test/orders/{id}/rider gives a test ride or courier a test rider. The console’s Test bookings card has the same button.',
+    ],
+    endpoints: ['assign-test-rider'],
+  },
+  {
+    date: '2026-11-18',
+    kind: 'changed',
+    title: 'Test bookings move by stage too',
+    body: [
+      'POST /v1/test/orders/{id}/status takes a stage (confirmed, preparing, ready, picked_up, arriving, delivered or cancelled) as well as a status, so you can try booking.stage_changed. The answer then also gives previous_stage.',
+    ],
+    endpoints: ['move-test-order'],
+  },
+  {
     date: '2026-11-17',
     kind: 'added',
     title: 'Updating your catalogue',

@@ -179,11 +179,11 @@ update public.api_test_order set stage = 'preparing'
  where id = (select (v ->> 'order_id')::uuid from t where k = 'd');
 
 select is(
-  (select count(*) from public.api_webhook_event ev
-   where ev.type = 'booking.status_changed'
+  (select string_agg(ev.type, ',' order by ev.created_at) from public.api_webhook_event ev
+   where ev.type <> 'booking.created'
      and ev.booking_id = (select (v ->> 'order_id')::uuid from t where k = 'd')),
-  1::bigint,
-  'a stage change inside the same status sends nothing');
+  'booking.status_changed,booking.stage_changed',
+  'a stage change inside the same status sends booking.stage_changed (20270105030100), not a status change');
 
 -- ═══════════════════════════════════════════════════════════════ the developer console
 
