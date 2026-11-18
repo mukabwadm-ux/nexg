@@ -58008,7 +58008,10 @@ export type Database = {
         };
         Returns: Json;
       };
-      rpc_fin_statement_void: { Args: { p_import_id: string; p_reason: string }; Returns: undefined };
+      rpc_fin_statement_void: {
+        Args: { p_import_id: string; p_reason: string };
+        Returns: undefined;
+      };
       rpc_fin_verify: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_finance_invoices: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_finance_report_customers: { Args: { p_from: string; p_to: string }; Returns: Json };

@@ -26,6 +26,13 @@ import {
   type ReconRow,
   type WebhookRow,
 } from '@/components/finance/reconciliation';
+import {
+  NewReconciliation,
+  StatementDetail,
+  StatementImports,
+  type StatementDetailData,
+  type StatementImportRow,
+} from '@/components/finance/statement-import';
 import { RangeControl } from '@/components/portal/client-kit';
 import {
   PageHeader,
@@ -93,13 +100,18 @@ interface Invariant {
 export default async function ReconciliationPage({
   searchParams,
 }: {
-  searchParams?: { tab?: string; from?: string; to?: string };
+  searchParams?: { tab?: string; from?: string; to?: string; import?: string };
 }) {
   const staff = await requireStaff();
-  requireModule(staff, 'finance');
+  const finance = requireModule(staff, 'finance');
+  const canWrite = staff.isSuperAdmin || finance.level === 'full';
   const period = periodFrom(searchParams);
   const pq = periodQuery(period);
   const supabase = createClient();
+  /* Statement imports: started with the reads below; an error there stays in its own tab. */
+  const statementsQuery = Promise.resolve(
+    supabase.rpc('rpc_fin_statement_imports', { p_from: period.from, p_to: period.to }),
+  );
 
   const [reconRes, clearingRes, webhookRes, invariantRes, mismatchRes, runsRes, summary] =
     await Promise.all([
@@ -133,6 +145,15 @@ export default async function ReconciliationPage({
         .order('pay_date', { ascending: false }),
       movementSummary(supabase, period.from, period.to),
     ]);
+
+  const statementsRes = await statementsQuery;
+  const statements = (statementsRes.data ?? []) as unknown as StatementImportRow[];
+  const statementsOpen = statements
+    .filter((s) => s.status === 'open')
+    .reduce((n, s) => n + Number(s.open_count), 0);
+  const importId = /^[0-9a-f-]{36}$/i.test(searchParams?.import ?? '')
+    ? searchParams!.import!
+    : null;
 
   const recon = ((reconRes.data ?? []) as unknown as ReconRow[]).map((r) => ({
     ...r,
@@ -234,11 +255,20 @@ export default async function ReconciliationPage({
   );
 
   /* Payouts not yet confirmed: lines sent or failed, M-Pesa payouts in doubt. */
-  const tab: Tab = (
-    ['overview', 'settlement', 'payouts', 'provider', 'discrepancies'] as const
-  ).includes(searchParams?.tab as Tab)
-    ? (searchParams!.tab as Tab)
-    : 'overview';
+  /* Imported statements live on the Bank/M-PESA tab, as the design groups them;
+     the old ?tab=statements links land there. */
+  const tab: Tab =
+    searchParams?.tab === 'statements'
+      ? 'provider'
+      : (['overview', 'settlement', 'payouts', 'provider', 'discrepancies'] as const).includes(
+            searchParams?.tab as Tab,
+          )
+        ? (searchParams!.tab as Tab)
+        : 'overview';
+  const detailRes =
+    tab === 'provider' && importId
+      ? await supabase.rpc('rpc_fin_statement_detail', { p_import_id: importId })
+      : null;
   let payoutRows: Awaited<ReturnType<typeof movementList>>['rows'] = [];
   let payoutsTruncated = false;
   let uncertain = 0;
@@ -279,7 +309,12 @@ export default async function ReconciliationPage({
       alert: mismatches.length || null,
     },
     { key: 'payouts', label: 'Payout Reconciliation', icon: Send, alert: uncertain || null },
-    { key: 'provider', label: 'Bank/M-PESA Reconciliation', icon: Landmark },
+    {
+      key: 'provider',
+      label: 'Bank/M-PESA Reconciliation',
+      icon: Landmark,
+      alert: statementsOpen || null,
+    },
     {
       key: 'discrepancies',
       label: 'Discrepancies',
@@ -300,7 +335,12 @@ export default async function ReconciliationPage({
         icon={Scale}
         title="Reconciliations"
         subtitle="Match payments, settlements, payouts and M-Pesa records against the ledger."
-        actions={<RangeControl from={period.from} to={period.to} />}
+        actions={
+          <>
+            <RangeControl from={period.from} to={period.to} />
+            {canWrite && <NewReconciliation from={period.from} to={period.to} />}
+          </>
+        }
       />
 
       <main className="space-y-5 px-3 py-5 sm:px-6 sm:py-6">
@@ -540,15 +580,41 @@ export default async function ReconciliationPage({
           </Sheet>
         )}
 
-        {tab === 'provider' && (
-          <Sheet>
-            <Reconciliation
-              clearing={(clearingRes.data as ClearingRow[] | null) ?? []}
-              recon={recon}
-              webhooks={webhooks}
-            />
-          </Sheet>
-        )}
+        {tab === 'provider' &&
+          (detailRes ? (
+            detailRes.error || !detailRes.data ? (
+              <p
+                role="alert"
+                className="bg-danger-bg text-danger rounded-xl px-4 py-3 text-sm font-semibold"
+              >
+                This statement import could not be loaded:{' '}
+                {detailRes.error?.message ?? 'it does not exist.'}
+              </p>
+            ) : (
+              <StatementDetail
+                data={detailRes.data as unknown as StatementDetailData}
+                canWrite={canWrite}
+                listHref={href('provider')}
+              />
+            )
+          ) : (
+            <>
+              <Sheet>
+                <StatementImports
+                  rows={statements}
+                  error={statementsRes.error?.message ?? null}
+                  listHref={href('provider')}
+                />
+              </Sheet>
+              <Sheet>
+                <Reconciliation
+                  clearing={(clearingRes.data as ClearingRow[] | null) ?? []}
+                  recon={recon}
+                  webhooks={webhooks}
+                />
+              </Sheet>
+            </>
+          ))}
 
         {tab === 'discrepancies' && (
           <Sheet>
