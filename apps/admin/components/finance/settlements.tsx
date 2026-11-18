@@ -37,7 +37,7 @@ export function BuildRunButton({ batchesHref }: { batchesHref: string }) {
       }
       tone="black"
       title="Build last week's payout run?"
-      body="Gathers what merchants, hosts and riders are owed for Monday to Sunday just finished. Nothing is approved or sent: the run then needs its checks and two signatures. Building again before approval rebuilds it."
+      body="Gathers what merchants, hosts, riders and experience partners are owed for Monday to Sunday just finished. Nothing is approved or sent: the run then needs its checks and two signatures. Building again before approval rebuilds it."
       confirmLabel="Build Run"
       onConfirm={async () => {
         const r = await buildPayoutRun();
@@ -174,7 +174,7 @@ export function BatchesTable({
               ? 'host'
               : b.group === 'rider'
                 ? 'rider'
-                : 'payee'}
+                : 'partner'}
           {b.recipients === 1 ? '' : 's'}
         </span>
       ),
@@ -382,7 +382,7 @@ export function LinesTable({
 }: {
   rows: SettlementLine[];
   title: string;
-  /** "merchant", "host", "rider". */
+  /** "merchant", "host", "rider", "partner". */
   noun: string;
   /** The batches view, where a line's run opens. */
   batchesHref: string;

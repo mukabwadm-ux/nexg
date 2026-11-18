@@ -6,12 +6,12 @@ import {
   CheckCircle2,
   Clock3,
   Coins,
+  Handshake,
   History,
   Home,
   LayoutGrid,
   Layers,
   Store,
-  Users,
   XCircle,
   type LucideIcon,
 } from 'lucide-react';
@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { ShareDonut } from '@/components/charts';
 import { ConsoleShell } from '@/components/console-shell';
 import { MovementsTable } from '@/components/finance/movements';
+import { PartnerPayoutDetails } from '@/components/finance/partner-payouts';
 import { Settlement, type LineRow, type RunRow } from '@/components/finance/settlement';
 import {
   BatchesTable,
@@ -34,6 +35,7 @@ import { PageHeader, PanelHead, Sheet, Stat, StatGrid, ViewTabs } from '@/compon
 import { lineBucket, PAYEE_GROUPS, payeeGroup, share, type PayeeGroup } from '@/lib/finance';
 import { movementList } from '@/lib/finance-server';
 import { previousPeriod, vsLabel } from '@/lib/office-finance';
+import { partnerPayouts } from '@/lib/partner-payouts';
 import {
   change,
   day,
@@ -50,13 +52,14 @@ import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = { title: 'Settlements & Payouts' };
 export const dynamic = 'force-dynamic';
 
-type Tab = 'overview' | 'merchants' | 'hosts' | 'riders' | 'batches' | 'history';
+type Tab = 'overview' | 'merchants' | 'hosts' | 'riders' | 'partners' | 'batches' | 'history';
 
 const TABS: { key: Tab; label: string; icon: LucideIcon }[] = [
   { key: 'overview', label: 'Overview', icon: LayoutGrid },
   { key: 'merchants', label: 'Merchant Settlements', icon: Store },
   { key: 'hosts', label: 'Host Payouts', icon: Home },
   { key: 'riders', label: 'Rider Payouts', icon: Bike },
+  { key: 'partners', label: 'Partner Payouts', icon: Handshake },
   { key: 'batches', label: 'Settlement Batches', icon: Layers },
   { key: 'history', label: 'Payout History', icon: History },
 ];
@@ -85,10 +88,11 @@ const LINE_COLUMNS =
 
 /**
  * Finance → Settlements & payouts: what the weekly runs pay merchants,
- * hosts and riders, where each payout stands, and what is owed but not
- * yet in a run. Runs come from fin_settlement_run and its lines; a run in
- * the period is one whose pay date falls in it. Draft and cancelled runs
- * pay nothing and are left out of the totals.
+ * hosts, riders and experience partners, where each payout stands, and
+ * what is owed but not yet in a run. Runs come from fin_settlement_run and
+ * its lines; a run in the period is one whose pay date falls in it. Draft
+ * and cancelled runs pay nothing and are left out of the totals. Partner
+ * Payouts also lists where each partner is paid, for Finance to verify.
  */
 export default async function SettlementsPage({
   searchParams,
@@ -96,9 +100,11 @@ export default async function SettlementsPage({
   searchParams?: { tab?: string; from?: string; to?: string; run?: string };
 }) {
   const staff = await requireStaff();
-  requireModule(staff, 'finance');
+  const finance = requireModule(staff, 'finance');
   const canBuild =
     staff.isSuperAdmin || staff.roles.includes('finance') || staff.roles.includes('finance_lead');
+  /* Verifying partner payout details is full Finance's; the database checks again. */
+  const canVerify = staff.isSuperAdmin || finance.level === 'full';
   const tab: Tab = TABS.some((t) => t.key === searchParams?.tab)
     ? (searchParams!.tab as Tab)
     : searchParams?.run
@@ -222,6 +228,7 @@ export default async function SettlementsPage({
       };
     })
     .filter((x) => x.cents > 0);
+  const owedPayees = owedByGroup.reduce((s, x) => s + x.n, 0);
   const calendar = (calendarRes.data ?? []) as unknown as {
     id: string;
     due_on: string;
@@ -335,9 +342,30 @@ export default async function SettlementsPage({
           title="Payout History"
           filename={`nexg-payouts-${period.from}-to-${period.to}.csv`}
           emptyTitle="No payouts in this period"
-          emptyText="Settlement payouts to merchants, hosts and riders, and M-Pesa payouts to customers, appear here once a run is built."
+          emptyText="Settlement payouts to merchants, hosts, riders and partners, and M-Pesa payouts to customers, appear here once a run is built."
         />
       </Sheet>
+    );
+  }
+
+  /* Partner Payouts: where each partner is paid, and whether Finance has checked it. */
+  let partnerDetails: React.ReactNode = null;
+  if (tab === 'partners') {
+    const { data, error } = await supabase.rpc('rpc_experience_partner_payouts');
+    partnerDetails = error ? (
+      <p
+        role="alert"
+        className="bg-danger-bg text-danger rounded-xl px-4 py-3 text-sm font-semibold"
+      >
+        Partner payout details could not be loaded: {error.message}
+      </p>
+    ) : (
+      <PartnerPayoutDetails
+        rows={partnerPayouts(data)}
+        canVerify={canVerify}
+        myStaffId={staff.staffId}
+        isSuperAdmin={staff.isSuperAdmin}
+      />
     );
   }
 
@@ -360,7 +388,7 @@ export default async function SettlementsPage({
       <PageHeader
         icon={Coins}
         title="Settlements & Payouts"
-        subtitle="Merchant, host and rider settlements, payout runs, and what is still owed."
+        subtitle="Merchant, host, rider and partner settlements, payout runs, and what is still owed."
         actions={
           <>
             <RangeControl from={period.from} to={period.to} />
@@ -423,15 +451,11 @@ export default async function SettlementsPage({
                 href={href('riders')}
               />
               <Stat
-                icon={Users}
-                value={owed.length || owedTotal ? kes(owedTotal) : null}
-                label="Owed, Not Yet in a Run"
-                note={
-                  owedByGroup.length
-                    ? `${owedByGroup.reduce((s, x) => s + x.n, 0).toLocaleString('en-KE')} payees waiting`
-                    : 'Nothing waiting'
-                }
-                noteTone="muted"
+                icon={Handshake}
+                value={kes(byGroup('other'))}
+                label="Partners & Others"
+                note={pctOf(byGroup('other'))}
+                href={href('partners')}
               />
             </StatGrid>
 
@@ -493,7 +517,14 @@ export default async function SettlementsPage({
               </Sheet>
 
               <Sheet>
-                <PanelHead title="Upcoming Settlements" />
+                <PanelHead
+                  title="Upcoming Settlements"
+                  aside={
+                    owedTotal > 0
+                      ? `${kes(owedTotal)} owed, not yet in a run · ${owedPayees.toLocaleString('en-KE')} payee${owedPayees === 1 ? '' : 's'}`
+                      : undefined
+                  }
+                />
                 {calendar.length === 0 && owedByGroup.length === 0 ? (
                   <p className="text-muted-light py-10 text-center text-sm">
                     Nothing is owed and no settlement is scheduled.
@@ -574,6 +605,19 @@ export default async function SettlementsPage({
               batchesHref={href('batches')}
             />
           </Sheet>
+        )}
+        {tab === 'partners' && (
+          <>
+            <Sheet>
+              <LinesTable
+                rows={groupLines('other')}
+                title="Partner Payouts"
+                noun="partner"
+                batchesHref={href('batches')}
+              />
+            </Sheet>
+            <Sheet>{partnerDetails}</Sheet>
+          </>
         )}
         {tab === 'batches' && (
           <>

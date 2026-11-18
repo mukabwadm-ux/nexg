@@ -4,6 +4,8 @@ import {
   daysBetween,
   humanize,
   invoiceBucket,
+  PAYEE_GROUPS,
+  payeeGroup,
   series,
   share,
   statusTotals,
@@ -109,6 +111,14 @@ describe('words', () => {
     expect(typeOf({ source: 'b2c', kind: 'refund', category: 'return_excess' }).label).toBe(
       'Refund',
     );
+    expect(
+      typeOf({ source: 'payout', kind: 'merchant', category: 'experience_partner' }).label,
+    ).toBe('Partner Payout');
+  });
+
+  it('puts experience partners with Partners & Others', () => {
+    expect(payeeGroup('experience_partner')).toBe('other');
+    expect(PAYEE_GROUPS[payeeGroup('experience_partner')].label).toBe('Partners & Others');
   });
 
   it('turns keys into words', () => {

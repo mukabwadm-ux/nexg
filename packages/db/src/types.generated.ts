@@ -11454,6 +11454,65 @@ export type Database = {
           },
         ];
       };
+      experience_partner_payout: {
+        Row: {
+          account: NonNullable<Json>;
+          declared_at: string;
+          declared_by: string | null;
+          partner_id: string;
+          rail: string;
+          verified_at: string | null;
+          verified_by: string | null;
+          verified_version: number | null;
+          version: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          account: NonNullable<Json>;
+          declared_at?: string;
+          declared_by?: string | null;
+          partner_id: string;
+          rail: string;
+          verified_at?: string | null;
+          verified_by?: string | null;
+          verified_version?: number | null;
+          version?: number;
+        };
+        Update: {
+          account?: NonNullable<Json>;
+          declared_at?: string;
+          declared_by?: string | null;
+          partner_id?: string;
+          rail?: string;
+          verified_at?: string | null;
+          verified_by?: string | null;
+          verified_version?: number | null;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'experience_partner_payout_declared_by_fkey';
+            columns: ['declared_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_payout_partner_id_fkey';
+            columns: ['partner_id'];
+            isOneToOne: true;
+            referencedRelation: 'experience_partner';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_payout_verified_by_fkey';
+            columns: ['verified_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       feature_flag: {
         Row: {
           disabled_at: string | null;
@@ -13325,6 +13384,274 @@ export type Database = {
         };
         Relationships: [];
       };
+      fin_client: {
+        Row: {
+          active: boolean;
+          address: string | null;
+          cc_emails: string[];
+          created_at: string;
+          created_by: string | null;
+          email: string | null;
+          experience_partner_id: string | null;
+          host_id: string | null;
+          hotel_id: string | null;
+          id: string;
+          kind: string;
+          kra_pin: string | null;
+          legal_name: string;
+          merchant_id: string | null;
+          payment_terms_days: number;
+          phone: string | null;
+          trading_name: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          active?: boolean;
+          address?: string | null;
+          cc_emails?: string[];
+          created_at?: string;
+          created_by?: string | null;
+          email?: string | null;
+          experience_partner_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: string;
+          kind?: string;
+          kra_pin?: string | null;
+          legal_name: string;
+          merchant_id?: string | null;
+          payment_terms_days?: number;
+          phone?: string | null;
+          trading_name?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          address?: string | null;
+          cc_emails?: string[];
+          created_at?: string;
+          created_by?: string | null;
+          email?: string | null;
+          experience_partner_id?: string | null;
+          host_id?: string | null;
+          hotel_id?: string | null;
+          id?: string;
+          kind?: string;
+          kra_pin?: string | null;
+          legal_name?: string;
+          merchant_id?: string | null;
+          payment_terms_days?: number;
+          phone?: string | null;
+          trading_name?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'fin_client_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_client_experience_partner_id_fkey';
+            columns: ['experience_partner_id'];
+            isOneToOne: false;
+            referencedRelation: 'experience_partner';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_client_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_client_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_client_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_hotel_context_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_hotel_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_client_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_client_hotel_id_fkey';
+            columns: ['hotel_id'];
+            isOneToOne: false;
+            referencedRelation: 'hotel_admin_v';
+            referencedColumns: ['hotel_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
       fin_decision: {
         Row: {
           amount_cents: number | null;
@@ -13478,6 +13805,258 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'fin_invariant_v';
             referencedColumns: ['key'];
+          },
+        ];
+      };
+      fin_invoice: {
+        Row: {
+          bill_to: Json | null;
+          client_id: string;
+          client_ref: string;
+          created_at: string;
+          created_by: string | null;
+          credit_note_id: string | null;
+          currency: string;
+          due_date: string;
+          gross_cents: number;
+          id: string;
+          issue_date: string;
+          issue_txn_id: string | null;
+          issued_at: string | null;
+          issued_by: string | null;
+          net_cents: number;
+          notes: string | null;
+          number: string | null;
+          paid_at: string | null;
+          pdf_path: string | null;
+          pdf_sha256: string | null;
+          sent_at: string | null;
+          sent_to: string | null;
+          status: string;
+          tax_invoice_id: string | null;
+          updated_at: string;
+          vat_cents: number;
+          void_reason: string | null;
+          void_txn_id: string | null;
+          voided_at: string | null;
+          voided_by: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          bill_to?: Json | null;
+          client_id: string;
+          client_ref: string;
+          created_at?: string;
+          created_by?: string | null;
+          credit_note_id?: string | null;
+          currency?: string;
+          due_date: string;
+          gross_cents?: number;
+          id?: string;
+          issue_date: string;
+          issue_txn_id?: string | null;
+          issued_at?: string | null;
+          issued_by?: string | null;
+          net_cents?: number;
+          notes?: string | null;
+          number?: string | null;
+          paid_at?: string | null;
+          pdf_path?: string | null;
+          pdf_sha256?: string | null;
+          sent_at?: string | null;
+          sent_to?: string | null;
+          status?: string;
+          tax_invoice_id?: string | null;
+          updated_at?: string;
+          vat_cents?: number;
+          void_reason?: string | null;
+          void_txn_id?: string | null;
+          voided_at?: string | null;
+          voided_by?: string | null;
+        };
+        Update: {
+          bill_to?: Json | null;
+          client_id?: string;
+          client_ref?: string;
+          created_at?: string;
+          created_by?: string | null;
+          credit_note_id?: string | null;
+          currency?: string;
+          due_date?: string;
+          gross_cents?: number;
+          id?: string;
+          issue_date?: string;
+          issue_txn_id?: string | null;
+          issued_at?: string | null;
+          issued_by?: string | null;
+          net_cents?: number;
+          notes?: string | null;
+          number?: string | null;
+          paid_at?: string | null;
+          pdf_path?: string | null;
+          pdf_sha256?: string | null;
+          sent_at?: string | null;
+          sent_to?: string | null;
+          status?: string;
+          tax_invoice_id?: string | null;
+          updated_at?: string;
+          vat_cents?: number;
+          void_reason?: string | null;
+          void_txn_id?: string | null;
+          voided_at?: string | null;
+          voided_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'fin_invoice_client_id_fkey';
+            columns: ['client_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_client';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_invoice_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_invoice_credit_note_id_fkey';
+            columns: ['credit_note_id'];
+            isOneToOne: true;
+            referencedRelation: 'tax_invoice';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_invoice_issued_by_fkey';
+            columns: ['issued_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_invoice_tax_invoice_id_fkey';
+            columns: ['tax_invoice_id'];
+            isOneToOne: true;
+            referencedRelation: 'tax_invoice';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_invoice_voided_by_fkey';
+            columns: ['voided_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      fin_invoice_line: {
+        Row: {
+          description: string;
+          gross_cents: number;
+          id: string;
+          invoice_id: string;
+          net_cents: number;
+          quantity: number;
+          revenue_account: string;
+          sort: number;
+          unit_price_cents: number;
+          vat_cents: number;
+          vat_pct: number;
+          vat_rate: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          description: string;
+          gross_cents: number;
+          id?: string;
+          invoice_id: string;
+          net_cents: number;
+          quantity: number;
+          revenue_account: string;
+          sort: number;
+          unit_price_cents: number;
+          vat_cents: number;
+          vat_pct: number;
+          vat_rate: string;
+        };
+        Update: {
+          description?: string;
+          gross_cents?: number;
+          id?: string;
+          invoice_id?: string;
+          net_cents?: number;
+          quantity?: number;
+          revenue_account?: string;
+          sort?: number;
+          unit_price_cents?: number;
+          vat_cents?: number;
+          vat_pct?: number;
+          vat_rate?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'fin_invoice_line_invoice_id_fkey';
+            columns: ['invoice_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_invoice';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      fin_invoice_payment: {
+        Row: {
+          amount_cents: number;
+          cash_account: string;
+          id: string;
+          invoice_id: string;
+          method: string;
+          paid_on: string;
+          recorded_at: string;
+          recorded_by: string | null;
+          reference: string;
+          txn_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_cents: number;
+          cash_account: string;
+          id?: string;
+          invoice_id: string;
+          method: string;
+          paid_on: string;
+          recorded_at?: string;
+          recorded_by?: string | null;
+          reference: string;
+          txn_id?: string | null;
+        };
+        Update: {
+          amount_cents?: number;
+          cash_account?: string;
+          id?: string;
+          invoice_id?: string;
+          method?: string;
+          paid_on?: string;
+          recorded_at?: string;
+          recorded_by?: string | null;
+          reference?: string;
+          txn_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'fin_invoice_payment_invoice_id_fkey';
+            columns: ['invoice_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_invoice';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_invoice_payment_recorded_by_fkey';
+            columns: ['recorded_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -13798,7 +14377,15 @@ export type Database = {
           oldest_unsettled: string | null;
           owed_cents: number;
           party_id: string;
-          party_type: 'merchant' | 'rider' | 'host' | 'hotel' | 'guest' | 'provider' | 'nexg';
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
         };
         ComputedFields: never;
         Insert: {
@@ -13809,7 +14396,15 @@ export type Database = {
           oldest_unsettled?: string | null;
           owed_cents: number;
           party_id: string;
-          party_type: 'merchant' | 'rider' | 'host' | 'hotel' | 'guest' | 'provider' | 'nexg';
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
         };
         Update: {
           as_of_entry_id?: number;
@@ -13819,7 +14414,15 @@ export type Database = {
           oldest_unsettled?: string | null;
           owed_cents?: number;
           party_id?: string;
-          party_type?: 'merchant' | 'rider' | 'host' | 'hotel' | 'guest' | 'provider' | 'nexg';
+          party_type?:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
         };
         Relationships: [];
       };
@@ -13961,7 +14564,15 @@ export type Database = {
           paid_at: string | null;
           party_id: string;
           party_label: string;
-          party_type: 'merchant' | 'rider' | 'host' | 'hotel' | 'guest' | 'provider' | 'nexg';
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
           provider_ref: string | null;
           rail: Database['public']['Enums']['settlement_rail'];
           retry_count: number;
@@ -13987,7 +14598,15 @@ export type Database = {
           paid_at?: string | null;
           party_id: string;
           party_label: string;
-          party_type: 'merchant' | 'rider' | 'host' | 'hotel' | 'guest' | 'provider' | 'nexg';
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
           provider_ref?: string | null;
           rail: Database['public']['Enums']['settlement_rail'];
           retry_count?: number;
@@ -14012,7 +14631,15 @@ export type Database = {
           paid_at?: string | null;
           party_id?: string;
           party_label?: string;
-          party_type?: 'merchant' | 'rider' | 'host' | 'hotel' | 'guest' | 'provider' | 'nexg';
+          party_type?:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
           provider_ref?: string | null;
           rail?: Database['public']['Enums']['settlement_rail'];
           retry_count?: number;
@@ -14329,7 +14956,7 @@ export type Database = {
           linked_receipt: string | null;
           other_party: string | null;
           phone_tail: string | null;
-          raw: Json;
+          raw: NonNullable<Json>;
           reason_type: string | null;
           receipt: string | null;
           status_text: string | null;
@@ -14350,7 +14977,7 @@ export type Database = {
           linked_receipt?: string | null;
           other_party?: string | null;
           phone_tail?: string | null;
-          raw?: Json;
+          raw?: NonNullable<Json>;
           reason_type?: string | null;
           receipt?: string | null;
           status_text?: string | null;
@@ -14370,7 +14997,7 @@ export type Database = {
           linked_receipt?: string | null;
           other_party?: string | null;
           phone_tail?: string | null;
-          raw?: Json;
+          raw?: NonNullable<Json>;
           reason_type?: string | null;
           receipt?: string | null;
           status_text?: string | null;
@@ -44586,6 +45213,7 @@ export type Database = {
             | 'guest'
             | 'provider'
             | 'nexg'
+            | 'experience_partner'
             | null;
           pay_date: string | null;
           provider_ref: string | null;
@@ -54230,6 +54858,10 @@ export type Database = {
       fn_email_route_for: { Args: { p_template: string }; Returns: string };
       fn_encrypt_secret: { Args: { p_plain: string }; Returns: string };
       fn_event_anchor_effects: { Args: { p_plan_id: string }; Returns: undefined };
+      fn_experience_partner_payout_masked: {
+        Args: { p_account: Json; p_rail: string };
+        Returns: string;
+      };
       fn_expire_documents: { Args: Record<PropertyKey, never>; Returns: number };
       fn_featured_blurb: { Args: { p_blurb: string }; Returns: string };
       fn_featured_card_put: {
@@ -55207,7 +55839,15 @@ export type Database = {
           entry_ids: number[];
           gross_cents: number;
           party_id: string;
-          party_type: 'merchant' | 'rider' | 'host' | 'hotel' | 'guest' | 'provider' | 'nexg';
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
         }[];
       };
       fn_settlement_recompute: { Args: { p_run_id: string }; Returns: undefined };
@@ -57352,6 +57992,15 @@ export type Database = {
           user_id: string;
         }[];
       };
+      rpc_experience_partner_payout_declare: {
+        Args: { p_partner_id: string; p_payout: Json };
+        Returns: Json;
+      };
+      rpc_experience_partner_payout_verify: {
+        Args: { p_partner_id: string; p_version: number };
+        Returns: Json;
+      };
+      rpc_experience_partner_payouts: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_experience_queue: {
         Args: { p_city_id?: string };
         Returns: {
@@ -59131,7 +59780,7 @@ export type Database = {
       };
       rpc_maps_route_budget: { Args: { p_context_id: string }; Returns: Json };
       rpc_mark_paid: {
-        Args: { p_plan_id: string; p_reference: string };
+        Args: { p_method?: string; p_plan_id: string; p_reference: string };
         Returns: {
           answers: NonNullable<Json>;
           approved_at: string | null;

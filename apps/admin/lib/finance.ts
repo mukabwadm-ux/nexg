@@ -88,6 +88,7 @@ export function typeOf(m: Pick<Movement, 'source' | 'kind' | 'category'>): {
     if (m.category === 'rider') return { label: 'Rider Payout', tone: 'amber' };
     if (m.category === 'host') return { label: 'Host Payout', tone: 'blue' };
     if (m.category === 'hotel') return { label: 'Hotel Payout', tone: 'blue' };
+    if (m.category === 'experience_partner') return { label: 'Partner Payout', tone: 'green' };
     return { label: 'Merchant Payout', tone: 'grey' };
   }
   if (m.source === 'payment') {
@@ -262,13 +263,14 @@ export const PAYEE_GROUPS: Record<PayeeGroup, { label: string; batch: string; co
   merchant: { label: 'Merchants', batch: 'Merchant Settlement', color: '#F5B800' },
   host: { label: 'Hosts & Hotels (Stays)', batch: 'Host Payout (Stays)', color: '#141414' },
   rider: { label: 'Riders (Delivery)', batch: 'Rider Payout', color: '#F9DC7A' },
-  other: { label: 'Partners & Others', batch: 'Other Payout', color: '#C9C4B8' },
+  other: { label: 'Partners & Others', batch: 'Partner Payout', color: '#C9C4B8' },
 };
 
 export function payeeGroup(partyType: string): PayeeGroup {
   if (partyType === 'merchant') return 'merchant';
   if (partyType === 'host' || partyType === 'hotel') return 'host';
   if (partyType === 'rider') return 'rider';
+  /* experience_partner (the venues and operators behind concierge plans) and anyone else. */
   return 'other';
 }
 
