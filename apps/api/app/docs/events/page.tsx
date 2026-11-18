@@ -76,6 +76,20 @@ export default function EventsPage() {
             </span>,
           ],
           [
+            <C key="t">booking.stage_changed</C>,
+            'A booking’s stage changes inside the same status: preparing to ready, or a ride or courier going from picked_up to arriving.',
+            <span key="d">
+              <C>booking</C>, <C>previous_stage</C>
+            </span>,
+          ],
+          [
+            <C key="t">booking.rider_assigned</C>,
+            'A rider takes the booking’s delivery job, and again when another rider takes over. Nothing about the rider is sent yet.',
+            <span key="d">
+              <C>booking</C>, <C>assigned_at</C>
+            </span>,
+          ],
+          [
             <C key="t">ping</C>,
             'You press Send test event in the console.',
             <span key="d">
@@ -126,8 +140,9 @@ export default function EventsPage() {
         ]}
       />
       <P>
-        An event is sent when the status changes. A stage change inside one status, such as
-        preparing to ready, sends nothing; read the booking when you need its stage.
+        Every stage change sends exactly one event: <C>booking.status_changed</C> when the status
+        changes too, <C>booking.stage_changed</C> when it does not. If you only act on statuses,
+        you can ignore <C>booking.stage_changed</C>.
       </P>
 
       <H2 id="verifying">Verifying</H2>
@@ -197,10 +212,11 @@ export default function EventsPage() {
           <C>booking.created</C> to your test endpoints, never to live ones.
         </li>
         <li>
-          Then <A href="/docs/environments#moving-test-bookings">move the test booking</A> to
-          confirmed, in_progress, completed or cancelled. Each move sends{' '}
-          <C>booking.status_changed</C>. The console&apos;s <Strong>Test bookings</Strong> card
-          does both without code.
+          Then <A href="/docs/environments#moving-test-bookings">move the test booking</A> by
+          status or by stage, and give a test ride or courier a test rider. Each move sends{' '}
+          <C>booking.status_changed</C> or <C>booking.stage_changed</C>, and a rider{' '}
+          <C>booking.rider_assigned</C>. The console&apos;s <Strong>Test bookings</Strong> card
+          does all of it without code.
         </li>
         <li>Never use a live endpoint&apos;s secret in a test, or the other way round.</li>
       </List>

@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 
-import { listTestBookings, TEST_STATUSES, type TestBooking } from '@/lib/sandbox';
+import { listTestBookings, TEST_STAGES, TEST_STATUSES, type TestBooking } from '@/lib/sandbox';
 import { createClient } from '@/lib/session';
 import { rpcCaller } from '@/lib/webhooks';
 
@@ -17,6 +17,7 @@ import { rpcCaller } from '@/lib/webhooks';
 const Id = z.string().uuid();
 const ServiceCode = z.string().regex(/^[a-z][a-z0-9_]*$/);
 const Status = z.enum(TEST_STATUSES);
+const Stage = z.enum(TEST_STAGES);
 
 export type TestBookingResult =
   | { ok: true; bookings: TestBooking[]; message: string }
@@ -72,5 +73,46 @@ export async function moveTestBooking(orderId: string, status: string): Promise<
     moved.success
       ? `${moved.data.order.reference} moved from ${moved.data.previous_status} to ${moved.data.order.status}. NexG sends booking.status_changed to your test endpoints.`
       : 'Moved. NexG sends booking.status_changed to your test endpoints.',
+  );
+}
+
+export async function moveTestBookingStage(
+  orderId: string,
+  stage: string,
+): Promise<TestBookingResult> {
+  if (!Id.safeParse(orderId).success) return { ok: false, message: 'No such test booking.' };
+  const to = Stage.safeParse(stage);
+  if (!to.success) return { ok: false, message: 'Choose a stage.' };
+
+  const { data, error } = await rpcCaller(createClient()).rpc('rpc_api_test_order_stage', {
+    p_order_id: orderId,
+    p_stage: to.data,
+  });
+  if (error) return { ok: false, message: error.message };
+
+  const moved = z
+    .object({
+      order: z.object({ reference: z.string(), stage: z.string() }),
+      previous_stage: z.string(),
+    })
+    .safeParse(data);
+  return refreshed(
+    moved.success
+      ? `${moved.data.order.reference} moved from ${moved.data.previous_stage} to ${moved.data.order.stage}. NexG sends the event to your test endpoints.`
+      : 'Moved. NexG sends the event to your test endpoints.',
+  );
+}
+
+export async function assignTestRider(orderId: string): Promise<TestBookingResult> {
+  if (!Id.safeParse(orderId).success) return { ok: false, message: 'No such test booking.' };
+
+  const { data, error } = await rpcCaller(createClient()).rpc('rpc_api_test_order_rider', {
+    p_order_id: orderId,
+  });
+  if (error) return { ok: false, message: error.message };
+
+  const assigned = z.object({ order: z.object({ reference: z.string() }) }).safeParse(data);
+  return refreshed(
+    `${assigned.success ? assigned.data.order.reference : 'The booking'} has a test rider. NexG sends booking.rider_assigned to your test endpoints.`,
   );
 }

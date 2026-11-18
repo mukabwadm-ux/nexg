@@ -8,7 +8,12 @@ const { rpc, createServerClient } = vi.hoisted(() => {
 vi.mock('@supabase/ssr', () => ({ createServerClient }));
 vi.mock('next/headers', () => ({ cookies: () => ({ getAll: () => [], set: () => undefined }) }));
 
-import { makeTestBooking, moveTestBooking } from '../app/developers/sandbox-actions';
+import {
+  assignTestRider,
+  makeTestBooking,
+  moveTestBooking,
+  moveTestBookingStage,
+} from '../app/developers/sandbox-actions';
 import { listTestBookings } from '../lib/sandbox';
 
 const MERCHANT = '22222222-2222-4222-8222-222222222222';
@@ -40,6 +45,18 @@ beforeEach(() => {
   rpc.mockImplementation(async (name: string) => {
     if (name === 'rpc_api_test_orders') return { data: [ROW], error: null };
     if (name === 'rpc_api_test_order_sample') return { data: ROW, error: null };
+    if (name === 'rpc_api_test_order_stage') {
+      return {
+        data: {
+          order: { ...ROW, status: 'in_progress', stage: 'arriving' },
+          previous_stage: 'picked_up',
+        },
+        error: null,
+      };
+    }
+    if (name === 'rpc_api_test_order_rider') {
+      return { data: { order: ROW, assigned_at: '2026-11-18T09:20:03.118+00:00' }, error: null };
+    }
     if (name === 'rpc_api_test_order_move') {
       return {
         data: {
@@ -130,6 +147,37 @@ describe('test bookings in the developer console', () => {
     expect((await makeTestBooking(MERCHANT, 'Airport Transfer!')).ok).toBe(false);
     expect((await moveTestBooking('not-a-booking', 'confirmed')).ok).toBe(false);
     expect((await moveTestBooking(BOOKING, 'requested')).ok).toBe(false);
+    expect(names()).toEqual([]);
+  });
+
+  it('moves a booking by stage, and says from which stage to which', async () => {
+    const result = await moveTestBookingStage(BOOKING, 'arriving');
+
+    expect(rpc).toHaveBeenCalledWith('rpc_api_test_order_stage', {
+      p_order_id: BOOKING,
+      p_stage: 'arriving',
+    });
+    expect(result).toMatchObject({
+      ok: true,
+      message:
+        'TEST-261117-A1B2C3 moved from picked_up to arriving. NexG sends the event to your test endpoints.',
+    });
+  });
+
+  it('gives a ride or courier a test rider', async () => {
+    const result = await assignTestRider(BOOKING);
+
+    expect(rpc).toHaveBeenCalledWith('rpc_api_test_order_rider', { p_order_id: BOOKING });
+    expect(result).toMatchObject({
+      ok: true,
+      message:
+        'TEST-261117-A1B2C3 has a test rider. NexG sends booking.rider_assigned to your test endpoints.',
+    });
+  });
+
+  it('asks the database nothing for a stage it does not know', async () => {
+    expect((await moveTestBookingStage(BOOKING, 'flying')).ok).toBe(false);
+    expect((await assignTestRider('not-a-booking')).ok).toBe(false);
     expect(names()).toEqual([]);
   });
 });

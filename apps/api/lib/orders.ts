@@ -38,6 +38,15 @@ export function orderWriter() {
 
 /** Moves a test booking to a later status. There is no live twin. */
 export const SANDBOX_MOVE_FUNCTION = 'rpc_order_status_api_test';
+/** Moves a test booking to a later stage. */
+export const SANDBOX_STAGE_FUNCTION = 'rpc_order_stage_api_test';
+/** Gives a test ride or courier a test rider. */
+export const SANDBOX_RIDER_FUNCTION = 'rpc_order_rider_api_test';
+
+type SandboxFunction =
+  | typeof SANDBOX_MOVE_FUNCTION
+  | typeof SANDBOX_STAGE_FUNCTION
+  | typeof SANDBOX_RIDER_FUNCTION;
 
 /**
  * The client that moves a test booking, for POST /v1/test/orders/{id}/status.
@@ -53,7 +62,7 @@ export function sandboxMover() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: noStoreFetch } },
   ) as unknown as {
-    rpc: (name: typeof SANDBOX_MOVE_FUNCTION, args: Record<string, unknown>) => RpcResult;
+    rpc: (name: SandboxFunction, args: Record<string, unknown>) => RpcResult;
   };
 }
 
