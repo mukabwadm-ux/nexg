@@ -1,3 +1,4 @@
+import { cookies } from './cookies';
 import { dataProcessing } from './data-processing';
 import { refunds } from './refunds';
 import { riderAgreement } from './rider-agreement';
@@ -7,10 +8,10 @@ import type { LegalDocument } from './types';
 /**
  * The documents the legal pages tab between.
  *
- * The terms, the refunds policy, the rider agreement and the data processing
- * agreement have text. The rest are listed with their taglines
+ * The terms, the refunds and cookie policies, the rider agreement and the data
+ * processing agreement have text. The rest are listed with their taglines
  * because a visitor needs to know they are coming and roughly what each one
- * covers, but they carry no sections: writing plausible privacy or cookie
+ * covers, but they carry no sections: writing plausible privacy or merchant
  * wording would be inventing commitments NexG has not made, and under the
  * Kenyan Data Protection Act a privacy notice in particular is a statement of
  * obligations rather than marketing copy.
@@ -44,13 +45,7 @@ export const LEGAL_DOCUMENTS: LegalDocument[] = [
     'What we collect and why',
     'What personal data NexG collects, why we collect it, how long we keep it and what you can ask us to do with it.',
   ),
-  undrafted(
-    'cookies',
-    'cookies',
-    'Cookie Policy',
-    'Cookies and similar tech',
-    'The cookies this site sets, what each one is for, and how to refuse them.',
-  ),
+  cookies,
   refunds,
   undrafted(
     'merchant-terms',
