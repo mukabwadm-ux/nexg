@@ -1,8 +1,9 @@
 {
   "name": "@nexg/api-client",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "description": "A typed TypeScript client for the NexG API (api.nexgapp.com), with order-event signature checking",
+  "license": "MIT",
   "keywords": [
     "nexg",
     "api",
@@ -24,7 +25,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "publishConfig": {
     "access": "public",

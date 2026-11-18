@@ -2,7 +2,11 @@
 
 A typed TypeScript client for the NexG API (`https://api.nexgapp.com`), and the check for the order events NexG posts to your endpoints. No runtime dependencies: it needs `fetch` and Web Crypto, so it runs on Node 20 or later, Deno, Bun and edge runtimes.
 
-It is not on npm yet. Inside this repository, depend on it as `"@nexg/api-client": "workspace:*"`.
+```bash
+npm install @nexg/api-client
+```
+
+Inside this repository, depend on it as `"@nexg/api-client": "workspace:*"`. MIT licensed.
 
 ## Calls
 
@@ -108,10 +112,9 @@ The key needs `merchant_read`, `merchant_write` and `catalogue_write`. Only a te
 
 Inside this repository the package is used as TypeScript source. Packed for npm, it builds itself first (`prepack` runs `tsc -p tsconfig.build.json` into `dist/`), and `publishConfig` points `main`, `types` and `exports` at `dist/`: ES modules and declarations, with no dependencies. `pnpm --filter @nexg/api-client pack` shows exactly what would be published.
 
-Before the first publish:
+To publish:
 
-1. Give it a licence: `license` in package.json and a LICENSE file, and set `private` to `false`.
-2. Create the `nexg` organisation on npmjs.com. If that name is taken, rename the package to the organisation you get.
-3. From a clean checkout of `main` (the repository's `.npmrc` sets `publish-branch=main`), run `npm login`, then `pnpm --filter @nexg/api-client publish --access public`.
+1. The first time, create the `nexg` organisation on npmjs.com. If that name is taken, rename the package to the organisation you get.
+2. From a clean checkout of `main` (the repository's `.npmrc` sets `publish-branch=main`), run `npm login`, then `pnpm --filter @nexg/api-client publish --access public`.
 
 After a schema change in `@nexg/contracts`: run `generate`, raise the version, and publish again.
