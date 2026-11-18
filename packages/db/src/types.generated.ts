@@ -55857,6 +55857,7 @@ export type Database = {
         Returns: Json;
       };
       rpc_catalogue_items_api: { Args: { p_api_key: string }; Returns: Json };
+      rpc_catalogue_items_update_api: { Args: { p_api_key: string; p_items: Json }; Returns: Json };
       rpc_category_config_save: { Args: { p_category: string; p_config: Json }; Returns: Json };
       rpc_category_tile_click: { Args: { p_tile: string }; Returns: undefined };
       rpc_category_tile_popularity: {

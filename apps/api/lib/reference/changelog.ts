@@ -12,6 +12,16 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-18',
     kind: 'added',
+    title: 'Update many catalogue items at once',
+    body: [
+      'PATCH /v1/catalog/items changes the price or availability of up to 100 of your items in one call, so a till or ERP can keep a whole price list in step without one call per item. Each change follows the rules of PATCH /v1/catalog/items/{id}.',
+      'It is all or nothing: if any item is refused, nothing in the call is saved, and ids your merchant does not have come back together, each named by its place in the list. One call costs one token. A test key answers with the result and saves nothing.',
+    ],
+    endpoints: ['update-catalogue-items'],
+  },
+  {
+    date: '2026-11-18',
+    kind: 'added',
     title: 'Can NexG deliver here?',
     body: [
       'POST /v1/delivery/check takes a pickup and a drop-off and answers whether NexG can deliver the trip now, and why not when it cannot: a pickup or drop-off outside the areas NexG serves, a trip longer than NexG goes, or deliveries into the drop-off zone paused.',

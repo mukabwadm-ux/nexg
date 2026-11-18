@@ -25,6 +25,14 @@ const PRICE_CHANGE = `curl -X PATCH https://api.nexgapp.com/v1/catalog/items/6e9
   -H "Content-Type: application/json" \\
   -d '{"price_kes": 1250, "available": false}'`;
 
+const BULK_CHANGE = `curl -X PATCH https://api.nexgapp.com/v1/catalog/items \\
+  -H "X-Api-Key: $NEXG_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"items": [
+        {"id": "6e9f2a3b-4c5d-4e6f-9a7b-8c9d0e1f2a3b", "price_kes": 1250},
+        {"id": "7f0a3b4c-5d6e-4f70-8b9c-0d1e2f3a4b5c", "available": false}
+      ]}'`;
+
 const SYNC = `// Every minute: read new and changed orders, newest first, until one you
 // already have at the same stage. Keyed by NexG's order_id.
 const res = await fetch('https://api.nexgapp.com/v1/orders', {
@@ -50,12 +58,16 @@ function ItemIllustration() {
       role="img"
       className="border-border bg-bg flex h-full flex-col justify-center rounded-xl border p-4 sm:p-6"
     >
-      <div className="border-border bg-surface rounded-xl border p-4 shadow-card">
+      <div className="border-border bg-surface shadow-card rounded-xl border p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-micro text-gold-text font-bold uppercase">Popular</p>
-            <p className="text-ink mt-1 text-base font-extrabold leading-snug">Nyama choma platter</p>
-            <p className="text-muted mt-1 text-sm leading-5">Half kilo of goat ribs, kachumbari, ugali</p>
+            <p className="text-ink mt-1 text-base font-extrabold leading-snug">
+              Nyama choma platter
+            </p>
+            <p className="text-muted mt-1 text-sm leading-5">
+              Half kilo of goat ribs, kachumbari, ugali
+            </p>
           </div>
           <span className="bg-gold-soft text-gold-text border-gold/40 shrink-0 rounded-full border px-2 py-0.5 text-[0.6875rem] font-bold">
             Highlight
@@ -113,7 +125,9 @@ export default function ConnectingSystemsPage() {
             <span key="h">
               Updates your catalogue&apos;s prices and availability with{' '}
               <A href="/docs/reference/update-catalogue-item">PATCH /v1/catalog/items/{'{id}'}</A>,
-              or posts signed events to NexG. See <A href="/docs/webhooks">Webhooks</A>.
+              or up to 100 items at once with{' '}
+              <A href="/docs/reference/update-catalogue-items">PATCH /v1/catalog/items</A>, or posts
+              signed events to NexG. See <A href="/docs/webhooks">Webhooks</A>.
             </span>,
             'Catalogue updates live. Bank events in sandbox.',
           ],
@@ -133,7 +147,8 @@ export default function ConnectingSystemsPage() {
             'Catalogue and prices',
             <span key="i">
               Merchant console, a CSV export from your system, or{' '}
-              <C>PATCH /v1/catalog/items/{'{id}'}</C> for prices
+              <C>PATCH /v1/catalog/items/{'{id}'}</C> (one item) and <C>PATCH /v1/catalog/items</C>{' '}
+              (up to 100) for prices
             </span>,
             <C key="o">GET /v1/catalog/merchants/{'{id}'}</C>,
             'New items and photos by API',
@@ -171,12 +186,17 @@ export default function ConnectingSystemsPage() {
       <H3 id="catalogue">Your catalogue, from your system to NexG</H3>
       <P>
         Export your products from your POS or ERP as CSV and import the file in the NexG merchant
-        console (<Strong>Menu</Strong>, then import). The import shows a preview with any
-        problems row by row before anything is written. A row with an <C>id</C> updates that item;
-        a row without one updates the item with exactly that name, or adds a new one, so
-        re-importing the same file never duplicates products.
+        console (<Strong>Menu</Strong>, then import). The import shows a preview with any problems
+        row by row before anything is written. A row with an <C>id</C> updates that item; a row
+        without one updates the item with exactly that name, or adds a new one, so re-importing the
+        same file never duplicates products.
       </P>
-      <CodeBlock className="mt-6" code={CSV} language="text" title="catalogue.csv (first columns)" />
+      <CodeBlock
+        className="mt-6"
+        code={CSV}
+        language="text"
+        title="catalogue.csv (first columns)"
+      />
       <P>
         The full template adds <C>portion_size</C>, <C>ingredients</C>, <C>allergens</C>,{' '}
         <C>dietary_labels</C>, <C>prep_time_minutes</C>, <C>availability_notes</C>,{' '}
@@ -192,8 +212,8 @@ export default function ConnectingSystemsPage() {
         item&apos;s <C>id</C> next to your own product code. Then, whenever a price changes or
         something sells out in your system, send only that change with{' '}
         <A href="/docs/reference/update-catalogue-item">PATCH /v1/catalog/items/{'{id}'}</A>. It
-        applies to the next order. Try it first with a test key, which answers with the result
-        and saves nothing.
+        applies to the next order. Try it first with a test key, which answers with the result and
+        saves nothing.
       </P>
       <CodeBlock
         className="mt-6"
@@ -201,12 +221,25 @@ export default function ConnectingSystemsPage() {
         language="curl"
         title="Sold out, at a new price"
       />
+      <P>
+        To send many changes at once, such as a price list after a supplier&apos;s increase, use{' '}
+        <A href="/docs/reference/update-catalogue-items">PATCH /v1/catalog/items</A> with up to 100
+        items per call. It saves all of them or none: ids your merchant does not have come back
+        together, each named by its place in the list. One call costs one token, however many items
+        it carries.
+      </P>
+      <CodeBlock
+        className="mt-6"
+        code={BULK_CHANGE}
+        language="curl"
+        title="Two changes in one call"
+      />
 
       <H3 id="orders">Your orders, from NexG to your system</H3>
       <P>
-        Issue a key with <C>merchant_read</C> for your merchant, then poll your orders once a
-        minute and upsert them by <C>order_id</C>. Map NexG&apos;s stage to your own statuses
-        once, in one place.
+        Issue a key with <C>merchant_read</C> for your merchant, then poll your orders once a minute
+        and upsert them by <C>order_id</C>. Map NexG&apos;s stage to your own statuses once, in one
+        place.
       </P>
       <CodeBlock className="mt-6" code={SYNC} language="javascript" title="Order sync" />
       <Table
@@ -230,8 +263,8 @@ export default function ConnectingSystemsPage() {
 
       <H3 id="your-site">Your NexG listing, on your own website</H3>
       <P>
-        Read your merchant and catalogue as NexG publishes them, and show them in your own
-        design. Link back to your storefront at{' '}
+        Read your merchant and catalogue as NexG publishes them, and show them in your own design.
+        Link back to your storefront at{' '}
         <C>https://nexgapp.com/discover?merchant={'{merchant id}'}</C> so guests can order.
       </P>
       <CodeTabs className="mt-6" samples={merchantSamples} title="Request" />
@@ -266,9 +299,9 @@ export default function ConnectingSystemsPage() {
       <H2 id="two-way-sync">Two-way sync</H2>
       <Callout tone="soon" title="Designed, not live">
         <p>
-          The rules below are written into NexG&apos;s integration code, but no POS, ERP, booking
-          or inventory provider is connected through them yet. The first providers will be
-          announced in the <A href="/docs/changelog">changelog</A>.
+          The rules below are written into NexG&apos;s integration code, but no POS, ERP, booking or
+          inventory provider is connected through them yet. The first providers will be announced in
+          the <A href="/docs/changelog">changelog</A>.
         </p>
       </Callout>
       <P>Every connection moves through the same steps, and cannot skip one:</P>
@@ -282,8 +315,8 @@ export default function ConnectingSystemsPage() {
           operation the connection will use must pass.
         </li>
         <li>
-          <Strong>Mapped</Strong>: every field is mapped between your records and NexG&apos;s,
-          and the mapping is versioned.
+          <Strong>Mapped</Strong>: every field is mapped between your records and NexG&apos;s, and
+          the mapping is versioned.
         </li>
         <li>
           <Strong>Previewed</Strong>: the changes the mapping would make are shown before any are
@@ -300,7 +333,9 @@ export default function ConnectingSystemsPage() {
           Each kind of data has one owner: NexG, your system, shared under written rules, or read
           only from yours. Your system can never write what NexG owns.
         </li>
-        <li>Each event is applied once, by its id, and changes NexG made itself are not applied back.</li>
+        <li>
+          Each event is applied once, by its id, and changes NexG made itself are not applied back.
+        </li>
         <li>
           Events apply in your system&apos;s order, or are reconciled when order cannot be trusted.
         </li>

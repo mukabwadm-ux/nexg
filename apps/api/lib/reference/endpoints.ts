@@ -562,6 +562,166 @@ export const ENDPOINTS: EndpointDoc[] = [
     source: 'apps/api/app/v1/catalog/items/[id]/route.ts',
   },
   {
+    slug: 'update-catalogue-items',
+    method: 'PATCH',
+    host: 'api',
+    path: '/v1/catalog/items',
+    status: 'live',
+    group: 'Catalogue',
+    title: 'Update many catalogue items',
+    summary: 'Change the price or availability of up to 100 items in one call.',
+    description: [
+      'Changes up to 100 of your merchant’s catalogue items in one call: each one’s price (price_kes), whether it is on sale (available), or both. Name each item by its id and send only what changes. This is how a till or ERP keeps a whole price list in step without one call per item.',
+      'It is all or nothing. If any item is refused (an id your merchant does not have, an item listed twice, or a change that breaks the rules), nothing in the call is saved. Ids your merchant does not have come back together, each named by its place in the list, so you can drop them and send the rest again.',
+      'Each change follows the same rules as Update a catalogue item. With a live key the changes are saved at once and apply to the next order, and NexG keeps a record of each one and the key that made it. With a test key nothing is saved: the answer shows the items as the changes would leave them, with applied false.',
+    ],
+    auth: { kind: 'key', scope: 'catalogue_write', merchantBound: true },
+    rateCost: 1,
+    cache: 'no-store',
+    paginated: false,
+    params: [
+      {
+        name: 'X-Api-Key',
+        in: 'header',
+        type: 'string',
+        required: true,
+        description:
+          'A key bound to your merchant, with catalogue_write. A test key (nexg_test_…) changes nothing.',
+      },
+      {
+        name: 'Content-Type',
+        in: 'header',
+        type: 'string',
+        required: true,
+        description: 'application/json',
+      },
+    ],
+    example: {
+      body: {
+        items: [
+          { id: '6e9f2a3b-4c5d-4e6f-9a7b-8c9d0e1f2a3b', price_kes: 1250 },
+          { id: '7f0a3b4c-5d6e-4f70-8b9c-0d1e2f3a4b5c', available: false },
+        ],
+      },
+    },
+    requestResources: [
+      {
+        title: 'Changes',
+        at: 'body',
+        fields: [
+          {
+            name: 'items',
+            type: 'array',
+            description: 'From 1 to 100 changes, each item once. See Change.',
+          },
+        ],
+      },
+      {
+        title: 'Change',
+        at: 'body.items[]',
+        fields: [
+          {
+            name: 'id',
+            type: 'uuid',
+            description: 'The item’s id, from List your catalogue items.',
+          },
+          {
+            name: 'price_kes',
+            type: 'integer',
+            description: 'The new price, in whole shillings from 1 to 1,000,000. Optional.',
+          },
+          {
+            name: 'available',
+            type: 'boolean',
+            description:
+              'false while the item is sold out, true when it is back on sale. Optional, but send price_kes, available or both.',
+          },
+        ],
+      },
+    ],
+    responseStatus: '200 OK',
+    responseExample: {
+      ok: true,
+      data: {
+        items: [
+          {
+            id: '6e9f2a3b-4c5d-4e6f-9a7b-8c9d0e1f2a3b',
+            merchant_id: MERCHANT_ID,
+            section_id: '2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d',
+            name: 'Grilled tilapia',
+            description: 'Whole fish, lemon and chilli, sukuma wiki',
+            price_kes: 1250,
+            available: true,
+            age_restricted: false,
+            highlighted: true,
+            sort: 1,
+          },
+          {
+            id: '7f0a3b4c-5d6e-4f70-8b9c-0d1e2f3a4b5c',
+            merchant_id: MERCHANT_ID,
+            section_id: '2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d',
+            name: 'Nyama choma platter',
+            description: 'Goat ribs, kachumbari, ugali',
+            price_kes: 1800,
+            available: false,
+            age_restricted: false,
+            highlighted: false,
+            sort: 2,
+          },
+        ],
+        applied: true,
+      },
+      meta: { api_version: 'v1' },
+    },
+    responseResources: [
+      {
+        schema: 'CatalogueItem',
+        title: 'Catalogue item',
+        at: 'data.items[]',
+        fields: CATALOGUE_ITEM_FIELDS,
+      },
+      {
+        title: 'Saved',
+        at: 'data',
+        fields: [
+          {
+            name: 'applied',
+            type: 'boolean',
+            description:
+              'true when the changes were saved, with a live key. false with a test key, which saves nothing.',
+          },
+        ],
+      },
+    ],
+    errors: [
+      ...credentialErrors('catalogue_write', false),
+      {
+        status: 400,
+        code: 'invalid_request',
+        when: 'The body is not JSON with items, the list is empty or longer than 100, an item is listed twice, or an item has no id, no change, a price that is not whole shillings from 1 to 1,000,000, an available that is not true or false, or another field. error.fields names each one, as items.3.price_kes.',
+      },
+      {
+        status: 403,
+        code: 'not_found',
+        when: 'The key is not bound to a merchant.',
+      },
+      {
+        status: 404,
+        code: 'not_found',
+        when: 'Your merchant has no item with one or more of the ids. error.fields names each, as items.3.id. Nothing was changed.',
+      },
+      { status: 500, code: 'internal_error', when: 'NexG could not update the items.' },
+      UNEXPECTED_ERROR,
+    ],
+    notes: [
+      'One call costs one token, however many items it carries.',
+      'The answer lists the items in the order you sent them, each with the public catalogue’s fields, as Update a catalogue item answers one.',
+      'Sending a value an item already has changes nothing and records nothing, so you can send a whole price list each time.',
+    ],
+    since: '2026-11-18',
+    source: 'apps/api/app/v1/catalog/items/route.ts',
+  },
+  {
     slug: 'list-zones',
     method: 'GET',
     host: 'api',
