@@ -217,7 +217,7 @@ export function BulkImportButton({
 export function PublishChanges({
   edits,
 }: {
-  edits: { id: string; kind: string; item: string | null; created: string }[];
+  edits: { id: string; kind: string; item: string | null; price: number | null; created: string }[];
 }) {
   const [open, setOpen] = React.useState(false);
   const [reason, setReason] = React.useState<Record<string, string>>({});
@@ -250,6 +250,18 @@ export function PublishChanges({
                 {e.kind.replace(/_/g, ' ')}
                 {e.item ? ` · ${e.item}` : ''}
               </p>
+              {e.kind === 'price_change' ? (
+                <p className="text-ink mt-0.5 text-sm font-semibold">
+                  {e.price != null
+                    ? `New price: KES ${e.price.toLocaleString('en-KE')}. Publishing sets it.`
+                    : 'No price in whole shillings was sent, so it can only be turned down.'}
+                </p>
+              ) : (
+                <p className="text-ink mt-0.5 text-sm font-semibold">
+                  Publishing records the decision only. Make the change on the merchant&apos;s
+                  record.
+                </p>
+              )}
               <p className="text-muted text-xs font-semibold">Asked {e.created}</p>
               <textarea
                 className="border-border bg-surface mt-2 w-full rounded-lg border p-2.5 text-sm"

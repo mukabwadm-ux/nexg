@@ -870,6 +870,7 @@ async function CataloguePaneView({
             id: e.id,
             kind: e.kind,
             item: e.item,
+            price: e.price_kes,
             created: e.created_at ? updated.format(new Date(e.created_at)) : '',
           }))}
         />
