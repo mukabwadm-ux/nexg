@@ -42,7 +42,7 @@ const DESTINATION_SERVICES: {
     words: ['airport', 'pickup', 'pick up', 'transfer', 'taxi', 'ride', 'flight'],
     title: 'Airport pickup',
     subtitle: 'Arranged by a concierge',
-    href: () => '/ask?need=Airport%20Transfer',
+    href: () => '/ask?category=airport_transfers',
   },
   {
     words: ['hotel', 'stay', 'airbnb', 'apartment', 'room', 'accommodation', 'lodging'],

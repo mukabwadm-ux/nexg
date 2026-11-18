@@ -17,7 +17,7 @@ export const POPULAR_CATEGORIES = [
   { key: 'home.pc.laundry', image: 'laundry', category: 'laundry_cleaning' },
   { key: 'home.pc.gifts', image: 'gifts', category: 'flowers_gifts' },
   /* Arranged by a concierge rather than sold by a merchant. */
-  { key: 'home.pc.airport', image: 'airport', href: '/ask?need=Airport%20Transfer' },
+  { key: 'home.pc.airport', image: 'airport', href: '/ask?category=airport_transfers' },
 ] as const;
 
 /** Tile ids the click counter accepts: the tile's image name, which is unique. */

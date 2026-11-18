@@ -2,6 +2,8 @@
 
 import { z } from 'zod';
 
+import { ASK_CATEGORIES } from '@/lib/ask-categories';
+import { ASK_NOTES_MAX, ASK_PHONE_PATTERN, askTicketBody } from '@/lib/ask-request';
 import { createClient } from '@/lib/supabase/server';
 import { CAPTCHA_FAILED_MESSAGE, verifyTurnstile } from '@/lib/turnstile';
 
@@ -13,7 +15,8 @@ export interface ActionResult {
 }
 
 /**
- * The homepage "Start your order" card.
+ * The request form on /ask ("Ask a concierge"). It began as the
+ * homepage's "Start your order" card.
  *
  * It raises a **ticket**. It used to write a row to
  * `waitlist_signup` with source = 'homepage_request', which is
@@ -29,7 +32,12 @@ export interface ActionResult {
  */
 const leadSchema = z.object({
   staying_at: z.string().trim().min(3, 'Tell us where you are staying.').max(300),
-  need: z.string().trim().min(1, 'Choose what you need.').max(100),
+  /* One of NexG's categories, from the form's dropdown, so whoever
+     calls back already knows what it is about. */
+  category: z
+    .string()
+    .trim()
+    .refine((id) => ASK_CATEGORIES.some((option) => option.id === id), 'Choose what you need.'),
   when: z.enum(['asap', 'later']),
   when_detail: z.string().trim().max(200).optional(),
 
@@ -39,9 +47,10 @@ const leadSchema = z.object({
     .trim()
     .min(7, 'We need a number to reach you on.')
     .max(20)
-    .regex(/^[+0-9][0-9 ()-]{6,}$/, 'That does not look like a phone number.'),
+    .regex(ASK_PHONE_PATTERN, 'That does not look like a phone number.'),
   full_name: z.string().trim().max(120).optional(),
-  notes: z.string().trim().max(600).optional(),
+  /* "Tell us more": the request in their own words. */
+  notes: z.string().trim().max(ASK_NOTES_MAX).optional(),
 
   /*
    * The pin, present only when the guest picked a place rather
@@ -61,7 +70,7 @@ export async function submitLead(_prev: ActionResult | null, formData: FormData)
     return { ok: false, message: CAPTCHA_FAILED_MESSAGE };
   const parsed = leadSchema.safeParse({
     staying_at: formData.get('staying_at'),
-    need: formData.get('need'),
+    category: formData.get('category') ?? '',
     when: formData.get('when'),
     when_detail: formData.get('when_detail') ?? undefined,
     phone: formData.get('phone'),
@@ -82,6 +91,7 @@ export async function submitLead(_prev: ActionResult | null, formData: FormData)
 
   const d = parsed.data;
   const supabase = createClient();
+  const category = ASK_CATEGORIES.find((option) => option.id === d.category)!;
 
   /*
    * The body is what a desk agent reads first, so it is written
@@ -89,27 +99,29 @@ export async function submitLead(_prev: ActionResult | null, formData: FormData)
    * structured copy goes in `details`, where the console can
    * show each answer under its own label.
    */
-  const body = [
-    `${d.need} — ${d.when === 'asap' ? 'as soon as possible' : d.when_detail || 'at a time to arrange'}.`,
-    `Staying at: ${d.staying_at}.`,
-    d.notes ? `They added: ${d.notes}` : null,
-  ]
-    .filter(Boolean)
-    .join('\n');
+  const body = askTicketBody({
+    categoryName: category.name,
+    when: d.when,
+    whenDetail: d.when_detail,
+    stayingAt: d.staying_at,
+    notes: d.notes,
+  });
 
   const { data, error } = await supabase.rpc('rpc_support_ticket_create', {
     p_body: body,
     p_from_role: 'guest',
-    /* The hero form is always somebody asking for something to
-       be arranged, whatever they picked from the chips. */
+    /* Always somebody asking for something to be arranged,
+       whichever category they picked. */
     p_topic: 'concierge_request' as never,
     p_phone: d.phone,
     ...(d.full_name ? { p_full_name: d.full_name } : {}),
     p_source_form: 'homepage_order',
     p_details: {
-      need: d.need,
+      /* The category's id rather than its name: the console shows
+         the current name, so a renamed category still reads right. */
+      category: d.category,
       when: d.when,
-      when_detail: d.when_detail ?? null,
+      when_detail: d.when_detail || null,
       staying_at: d.staying_at,
       /* The pin, when they picked a place rather than typing
          one. A concierge reading an address still has to work
@@ -119,7 +131,7 @@ export async function submitLead(_prev: ActionResult | null, formData: FormData)
       lng: d.staying_lng ?? null,
       zone: d.staying_zone ?? null,
       location_source: d.staying_source ?? null,
-      notes: d.notes ?? null,
+      notes: d.notes || null,
     } as never,
   });
 

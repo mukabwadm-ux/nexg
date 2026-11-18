@@ -1,12 +1,13 @@
 'use client';
 
 import { useLocation, type Place } from '@nexg/location';
-import { Input } from '@nexg/ui';
-import { Check, Crosshair, MapPin, Search } from 'lucide-react';
+import { Check, Crosshair, Search } from 'lucide-react';
 import * as React from 'react';
 
 /**
- * "Where are you staying?" on the homepage hero.
+ * "Where are you staying?" on the Ask a concierge form (/ask), drawn as
+ * that form's fields are: the merchant form's floating-label field
+ * (`mo-field`, merchant-onboarding.css). It began on the homepage hero.
  *
  * The field the whole order hangs on, and it used to be a plain
  * text box — so a visitor whose location the site had already
@@ -36,7 +37,15 @@ interface Candidate {
   lng: number;
 }
 
-export function StayingAtField() {
+export function StayingAtField({
+  error,
+  onValueChange,
+}: {
+  /** Why the form refused what is here, shown under the field. */
+  error?: string | undefined;
+  /** Told every time the text changes, whether typed, chosen or filled in. */
+  onValueChange?: (value: string) => void;
+}) {
   const { place, step, ready, consent, openSheet, setPlace, actions } = useLocation();
 
   const [value, setValue] = React.useState('');
@@ -46,6 +55,12 @@ export function StayingAtField() {
   const [open, setOpen] = React.useState(false);
   const [picked, setPicked] = React.useState<Place | null>(null);
   const wrap = React.useRef<HTMLDivElement>(null);
+
+  /* The form folds this field away behind a summary, so it needs the text
+     too, including what the resolved location filled in on its own. */
+  React.useEffect(() => {
+    onValueChange?.(value);
+  }, [value, onValueChange]);
 
   /*
    * Fill from the resolved place — but never over something the
@@ -134,34 +149,90 @@ export function StayingAtField() {
   const guessed = step === 'ip_city' || place?.source === 'ip_city';
 
   return (
-    <div ref={wrap} className="relative">
-      <Input
-        id="staying_at"
-        name="staying_at"
-        label="Where are you staying?"
-        placeholder="Airbnb, apartment or address"
-        leadingIcon={<MapPin className="h-4 w-4" />}
-        className="h-[46px] rounded-xl [&:not([aria-invalid=true])]:border-[#DDD6C6]"
-        /*
-         * Deliberately not `loading={searching}`. The shared
-         * Input renders its spinner by way of
-         * `disabled={disabled || loading}`, which is right for a
-         * field being validated and wrong for one being typed
-         * into: it greys out and stops accepting keystrokes
-         * halfway through the word somebody is searching for.
-         * The dropdown says "Looking…" instead.
-         */
-        required
-        autoComplete="off"
-        value={value}
-        onChange={(e) => {
-          setValue(e.target.value);
-          setTouched(true);
-          setPicked(null);
-          setOpen(true);
-        }}
-        onFocus={() => setOpen(true)}
-      />
+    <div ref={wrap} className="min-w-0">
+      {/* The field and its results, which open right under the box. */}
+      <div className="relative">
+        <div className={`mo-field ${error ? 'has-error' : ''}`}>
+          <label htmlFor="staying_at">
+            Where are you staying?
+            <span className="mo-required"> *</span>
+          </label>
+          {/*
+           * Never disabled while searching: a field that greys out
+           * halfway through the word somebody is typing stops taking
+           * keystrokes. The dropdown says "Looking…" instead.
+           */}
+          <input
+            id="staying_at"
+            name="staying_at"
+            type="text"
+            placeholder="Airbnb, apartment or address"
+            required
+            aria-required
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? 'staying_at-error' : 'staying_at-note'}
+            autoComplete="off"
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value);
+              setTouched(true);
+              setPicked(null);
+              setOpen(true);
+            }}
+            onFocus={() => setOpen(true)}
+          />
+          {error ? (
+            <span id="staying_at-error" className="mo-error" role="alert">
+              {error}
+            </span>
+          ) : null}
+        </div>
+
+        {showResults ? (
+          <div className="border-border bg-surface absolute left-0 right-0 top-[calc(100%+0.375rem)] z-40 overflow-hidden rounded-xl border shadow-xl">
+            {searching ? (
+              <p className="text-muted-light px-4 py-3 text-[0.8125rem] font-semibold">Looking…</p>
+            ) : results.length === 0 ? (
+              <div className="px-4 py-3">
+                <p className="text-muted-light text-[0.8125rem] font-semibold">
+                  Nothing matched that. You can still send it as typed — a concierge will confirm
+                  the spot with you.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => openSheet('hero-no-match')}
+                  className="mt-1.5 text-[0.75rem] font-extrabold text-[#86650D] hover:underline"
+                >
+                  Or drop a pin on a map
+                </button>
+              </div>
+            ) : (
+              results.map((r, i) => (
+                <button
+                  /* Two places can share a pin (shops in one mall), so the
+                     position in the list keeps every key unique. */
+                  key={`${i}:${r.lat},${r.lng}`}
+                  type="button"
+                  onClick={() => void choose(r)}
+                  className="border-border hover:bg-gold-soft flex w-full items-center gap-3 border-b px-4 py-2.5 text-left transition-colors last:border-0"
+                >
+                  <Search className="text-muted-light h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                  <span className="min-w-0">
+                    <span className="block truncate text-[0.8125rem] font-extrabold">
+                      {r.label}
+                    </span>
+                    {r.address_line ? (
+                      <span className="text-muted-light block truncate text-[0.75rem] font-semibold">
+                        {r.address_line}
+                      </span>
+                    ) : null}
+                  </span>
+                </button>
+              ))
+            )}
+          </div>
+        ) : null}
+      </div>
 
       {/*
        * The pin travels with the lead. Without it a concierge
@@ -183,7 +254,8 @@ export function StayingAtField() {
           sits exactly here and half a sentence under a list is
           worse than no sentence. */}
       <div
-        className={`mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 ${
+        id="staying_at-note"
+        className={`mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 ${
           showResults ? 'invisible' : ''
         }`}
       >
@@ -194,7 +266,7 @@ export function StayingAtField() {
               From your delivery location
             </span>
             {picked?.zone ? (
-              <span className="text-muted-light text-[0.75rem] font-semibold">
+              <span className="text-[0.75rem] font-semibold text-[color:var(--mo-muted)]">
                 {picked.zone}
                 {picked.eta_min && picked.eta_max
                   ? ` · ${picked.eta_min}–${picked.eta_max} min typical`
@@ -223,7 +295,7 @@ export function StayingAtField() {
                 the generic hint, when the useful sentence is the
                 one saying their city was guessed. */}
             {place && (guessed || place.coverage !== 'covered') ? (
-              <span className="text-muted-light text-[0.75rem] font-semibold">
+              <span className="text-[0.75rem] font-semibold text-[color:var(--mo-muted)]">
                 {place.coverage === 'unlaunched'
                   ? `We are not live in ${place.city ?? 'that city'} yet — tell us where anyway and we will be in touch.`
                   : guessed
@@ -231,7 +303,7 @@ export function StayingAtField() {
                     : 'That spot is outside the areas we deliver to. Type another, or tell us anyway.'}
               </span>
             ) : (
-              <span className="text-muted-light text-[0.75rem] font-semibold">
+              <span className="text-[0.75rem] font-semibold text-[color:var(--mo-muted)]">
                 Type an Airbnb, estate or building — or use your location.
               </span>
             )}
@@ -257,50 +329,6 @@ export function StayingAtField() {
           </>
         )}
       </div>
-
-      {/* Results, inline. */}
-      {showResults ? (
-        <div className="border-border bg-surface absolute left-0 right-0 top-[calc(100%-0.25rem)] z-40 overflow-hidden rounded-xl border shadow-xl">
-          {searching ? (
-            <p className="text-muted-light px-4 py-3 text-[0.8125rem] font-semibold">Looking…</p>
-          ) : results.length === 0 ? (
-            <div className="px-4 py-3">
-              <p className="text-muted-light text-[0.8125rem] font-semibold">
-                Nothing matched that. You can still send it as typed — a concierge will confirm the
-                spot with you.
-              </p>
-              <button
-                type="button"
-                onClick={() => openSheet('hero-no-match')}
-                className="mt-1.5 text-[0.75rem] font-extrabold text-[#86650D] hover:underline"
-              >
-                Or drop a pin on a map
-              </button>
-            </div>
-          ) : (
-            results.map((r, i) => (
-              <button
-                /* Two places can share a pin (shops in one mall), so the
-                   position in the list keeps every key unique. */
-                key={`${i}:${r.lat},${r.lng}`}
-                type="button"
-                onClick={() => void choose(r)}
-                className="border-border hover:bg-bg flex w-full items-center gap-3 border-b px-4 py-2.5 text-left transition-colors last:border-0"
-              >
-                <Search className="text-muted-light h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                <span className="min-w-0">
-                  <span className="block truncate text-[0.8125rem] font-extrabold">{r.label}</span>
-                  {r.address_line ? (
-                    <span className="text-muted-light block truncate text-[0.75rem] font-semibold">
-                      {r.address_line}
-                    </span>
-                  ) : null}
-                </span>
-              </button>
-            ))
-          )}
-        </div>
-      ) : null}
     </div>
   );
 }

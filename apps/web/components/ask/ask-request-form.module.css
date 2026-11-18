@@ -1,0 +1,128 @@
+/*
+ * The Ask form wears the merchant and rider forms' styles
+ * (merchant-onboarding.css inside MerchantRegistrationFormFrame). These are
+ * only what it has and they do not: a three-part progress bar, a text box, a
+ * two-way choice that fits a phone, a larger send button and the sent card.
+ */
+
+.ask {
+  /* The card stays cream in the dark theme, so the native controls inside it
+     (the dropdown's list, the text box's scrollbar) stay light with it. */
+  color-scheme: light;
+}
+
+.ask :global(.mo-registration-progress-bar) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* The text box, drawn like the inputs and the dropdown beside it. 16px text
+   keeps phones from zooming in when it takes focus. */
+.ask :global(.mo-section-body .mo-field textarea) {
+  min-height: 116px;
+  padding: 14px 15px;
+  border-width: 1.5px;
+  border-radius: 10px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Both answers side by side at any width, each taking half: a long one wraps
+   onto two lines rather than pushing the card wider than a phone. */
+.ask :global(.mo-segment) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  justify-self: stretch;
+}
+
+.ask :global(.mo-segment label) {
+  justify-content: center;
+  padding: 8px 12px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.send {
+  min-height: 52px;
+  padding-inline: 28px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.reassurance {
+  max-width: 34ch;
+}
+
+/* On a phone the note sits over the full-width button: centred across it,
+   not squeezed against its right edge. */
+@media (max-width: 560px) {
+  .ask .reassurance {
+    max-width: none;
+    text-align: center;
+  }
+}
+
+/* The sent card: what they asked for, read back, and the reference. */
+.sentLede {
+  color: var(--mo-muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.sentList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1.5px solid var(--mo-border);
+  border-radius: 12px;
+  background: var(--mo-soft);
+}
+
+.sentList div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sentList dt {
+  flex: 0 0 auto;
+  color: var(--mo-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sentList dd {
+  min-width: 0;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.reference {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.02em;
+}
+
+.sentActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.sentActions > * {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+@media (max-width: 560px) {
+  .sentActions > * {
+    flex: 1 1 100%;
+  }
+}

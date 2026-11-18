@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
+import { FormSection } from '@/components/onboarding/form-section';
 import { MerchantRegistrationFormFrame } from '@/components/onboarding/merchant-registration-page';
 import { looksKenyan } from '@/components/rider-onboarding/types';
 import {
@@ -312,6 +313,7 @@ export function RiderRegistrationForm({ cityId }: { cityId: string | null }) {
     );
 
   const sectionProps = (index: number) => ({
+    scope: 'rider',
     section: sections[index]!,
     number: index + 1,
     open: open === sections[index]!.id,
@@ -361,7 +363,7 @@ export function RiderRegistrationForm({ cityId }: { cityId: string | null }) {
               </div>
             </div>
 
-            <Section {...sectionProps(0)}>
+            <FormSection {...sectionProps(0)}>
               <div className="mo-section-pair">
                 <Field
                   id="rider-first-name"
@@ -386,9 +388,9 @@ export function RiderRegistrationForm({ cityId }: { cityId: string | null }) {
                   }}
                 />
               </div>
-            </Section>
+            </FormSection>
 
-            <Section {...sectionProps(1)}>
+            <FormSection {...sectionProps(1)}>
               <Field
                 id="rider-phone"
                 label="M-Pesa mobile number"
@@ -499,9 +501,9 @@ export function RiderRegistrationForm({ cityId }: { cityId: string | null }) {
                   </p>
                 ) : null}
               </div>
-            </Section>
+            </FormSection>
 
-            <Section {...sectionProps(2)}>
+            <FormSection {...sectionProps(2)}>
               <p className="mo-help">NexG riders deliver on motorbikes, in Nairobi.</p>
               <Field
                 id="rider-plate"
@@ -516,9 +518,9 @@ export function RiderRegistrationForm({ cityId }: { cityId: string | null }) {
                   clearError('plate');
                 }}
               />
-            </Section>
+            </FormSection>
 
-            <Section {...sectionProps(3)} onContinue={undefined}>
+            <FormSection {...sectionProps(3)} onContinue={undefined}>
               <div className="mo-registration-terms">
                 <div className="mo-check">
                   <input
@@ -544,7 +546,7 @@ export function RiderRegistrationForm({ cityId }: { cityId: string | null }) {
                 </div>
                 {errors.terms && <span className="mo-error">{errors.terms}</span>}
               </div>
-            </Section>
+            </FormSection>
           </section>
 
           <div className="mo-actions">
@@ -572,97 +574,6 @@ export function RiderRegistrationForm({ cityId }: { cityId: string | null }) {
 }
 
 /* ------------------------------------------------------------ the pieces */
-
-/** One numbered card of the form, the same markup as the merchant form's sections. */
-function Section({
-  section,
-  number,
-  open,
-  onOpen,
-  onContinue,
-  children,
-}: {
-  section: {
-    id: SectionId;
-    title: string;
-    done: boolean;
-    attention: boolean;
-    started: boolean;
-    summary: string;
-  };
-  number: number;
-  open: boolean;
-  onOpen: () => void;
-  onContinue: (() => void) | undefined;
-  children: React.ReactNode;
-}) {
-  const bodyId = `mo-section-rider-${section.id}`;
-  const state = section.done
-    ? 'done'
-    : section.attention
-      ? 'attention'
-      : open || section.started
-        ? 'progress'
-        : 'todo';
-  const badge = {
-    done: 'Complete',
-    attention: 'Needs attention',
-    progress: 'In progress',
-    todo: 'To do',
-  }[state];
-  return (
-    <section
-      className={`mo-section is-${state} ${open ? 'is-open' : ''}`}
-      aria-labelledby={`${bodyId}-title`}
-    >
-      <div className="mo-section-head">
-        <span className="mo-section-marker" aria-hidden="true">
-          {section.done ? (
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3.2"
-            >
-              <path d="M5 12.5 10 17 19 7" />
-            </svg>
-          ) : (
-            number
-          )}
-        </span>
-        <div className="mo-section-title">
-          <h2 id={`${bodyId}-title`}>{section.title}</h2>
-          {!open && section.summary && <p>{section.summary}</p>}
-        </div>
-        {open || !section.done ? <span className="mo-section-badge">{badge}</span> : null}
-        {!open && (
-          <button
-            type="button"
-            className="mo-section-edit"
-            aria-expanded="false"
-            aria-controls={bodyId}
-            onClick={onOpen}
-          >
-            {section.done ? 'Edit' : 'Open'}
-            <span className="mo-sr-only"> {section.title}</span>
-          </button>
-        )}
-      </div>
-      <div id={bodyId} className="mo-section-body" hidden={!open}>
-        {children}
-        {onContinue && (
-          <div className="mo-section-actions">
-            <button type="button" className="mo-button mo-section-continue" onClick={onContinue}>
-              Continue
-            </button>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
 
 /** A text field, the same markup as the merchant form's, so its floating label works. */
 function Field({

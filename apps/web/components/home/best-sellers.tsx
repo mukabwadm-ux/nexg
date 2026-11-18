@@ -35,7 +35,7 @@ export function BestSellers({
 
   const hrefFor = (item: BestSeller) => {
     if (item.href) return item.href;
-    if (item.category === 'airport') return '/ask?need=Airport%20Transfer';
+    if (item.category === 'airport') return '/ask?category=airport_transfers';
     return discoverCategoryHref(item.category);
   };
 

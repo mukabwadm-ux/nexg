@@ -20,6 +20,7 @@ import { ConsoleShell } from '@/components/console-shell';
 import { TicketThread, type ThreadMessage } from '@/components/ticket-thread';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
+import { ticketCategory } from '@/lib/ticket-category';
 
 export const metadata: Metadata = { title: 'Support & tickets' };
 export const dynamic = 'force-dynamic';
@@ -43,7 +44,7 @@ const DETAIL_LABEL: Record<string, string> = {
   when_detail: 'Time they gave',
   staying_at: 'Staying at',
   zone: 'Zone',
-  notes: 'They added',
+  notes: 'In their words',
   from_role: 'Filling in as',
   topic: 'Topic they chose',
   kind: 'They are a',
@@ -82,6 +83,12 @@ const TOPIC_LABEL: Record<string, string> = {
   partner_merchant: 'Merchant',
   hotel_partnership: 'Hotel',
   something_else: 'Something else',
+};
+
+/* Which form raised it, where the key is not already English. The
+   Ask a concierge form kept the key it had on the homepage. */
+const SOURCE_FORM_LABEL: Record<string, string> = {
+  homepage_order: 'Ask a concierge',
 };
 
 const STATUS_TONE: Record<string, 'neutral' | 'warning' | 'success' | 'danger'> = {
@@ -126,6 +133,7 @@ export default async function SupportAndTicketsPage({
   const inQueue = all.filter((t) => (queue.statuses as readonly string[]).includes(t.status));
 
   const selected = all.find((t) => t.id === searchParams?.ticket) ?? inQueue[0] ?? all[0] ?? null;
+  const selectedCategory = selected ? ticketCategory(selected.details) : null;
 
   const { data: notices } = selected
     ? await supabase
@@ -340,6 +348,8 @@ export default async function SupportAndTicketsPage({
               ) : (
                 inQueue.map((ticket) => {
                   const active = ticket.id === selected?.id;
+                  /* What they need, so a callback starts from it. */
+                  const category = ticketCategory(ticket.details);
                   return (
                     <li key={ticket.id}>
                       <Link
@@ -367,6 +377,11 @@ export default async function SupportAndTicketsPage({
                           {ticket.from_role} · {TOPIC_LABEL[ticket.topic] ?? ticket.topic} ·{' '}
                           {ticket.reference}
                         </span>
+                        {category ? (
+                          <span className="bg-gold/25 text-ink mt-2 inline-block max-w-full truncate rounded-full px-2.5 py-0.5 text-[0.6875rem] font-extrabold">
+                            {category}
+                          </span>
+                        ) : null}
                         <span className="text-muted mt-2 line-clamp-2 block text-xs font-semibold leading-snug">
                           {ticket.body}
                         </span>
@@ -388,6 +403,11 @@ export default async function SupportAndTicketsPage({
                         <StatusBadge tone={STATUS_TONE[selected.status] ?? 'neutral'}>
                           {selected.status}
                         </StatusBadge>
+                        {selectedCategory ? (
+                          <span className="bg-gold/25 text-ink rounded-full px-2.5 py-0.5 text-xs font-extrabold tracking-normal">
+                            {selectedCategory}
+                          </span>
+                        ) : null}
                       </p>
                       <p className="text-muted-light mt-0.5 text-xs font-semibold">
                         {selected.reference} · {TOPIC_LABEL[selected.topic] ?? selected.topic}
@@ -445,7 +465,18 @@ export default async function SupportAndTicketsPage({
                       </h2>
                       {selected.source_form ? (
                         <p className="text-muted-light mt-0.5 text-xs font-semibold">
-                          from the {selected.source_form.replace(/_/g, ' ')} form
+                          from the{' '}
+                          {SOURCE_FORM_LABEL[selected.source_form] ??
+                            selected.source_form.replace(/_/g, ' ')}{' '}
+                          form
+                        </p>
+                      ) : null}
+                      {/* The category first, by its current name: it is
+                          what a callback starts from. */}
+                      {selectedCategory ? (
+                        <p className="border-gold/50 bg-gold/15 mt-3 flex items-baseline justify-between gap-3 rounded-xl border px-3 py-2.5 text-sm">
+                          <span className="text-muted-light shrink-0 font-semibold">Category</span>
+                          <span className="text-right font-extrabold">{selectedCategory}</span>
                         </p>
                       ) : null}
                       <dl className="mt-3 space-y-2 text-sm">
@@ -461,7 +492,10 @@ export default async function SupportAndTicketsPage({
                               k !== 'location_source' &&
                               /* The host record has a link under it; a bare
                                  uuid on its own line is just noise. */
-                              k !== 'host_id'
+                              k !== 'host_id' &&
+                              /* Shown above, by name. */
+                              k !== 'category' &&
+                              k !== 'need'
                             );
                           })
                           .map(([key, value]) => (
