@@ -100,8 +100,10 @@ select throws_ok($$select public.rpc_my_order_map('c0730000-0000-4000-8000-00000
   '42501', 'Sign in with your account to view an order map.', 'A bearer subject is required.');
 select set_config('request.jwt.claims',
   '{"sub":"c0730000-0000-4000-8000-000000000003","role":"authenticated","is_anonymous":false}', true);
-select throws_ok($$select public.rpc_my_order_map('c0730000-0000-4000-8000-00000000005a')$$,
-  '42501', 'Sign in with your account to view an order map.', 'An anonymous Auth user cannot read an owned order.');
+-- Since 20270108000300_order_stages a guest (temporary session) reads the map of
+-- an order it owns (tests/107_order_stages.sql).
+select is(public.rpc_my_order_map('c0730000-0000-4000-8000-00000000005a') -> 'record' ->> 'id',
+  'c0730000-0000-4000-8000-00000000005a', 'A temporary session reads the map of the order it owns.');
 select set_config('request.jwt.claims',
   '{"sub":"c0730000-0000-4000-8000-000000000002","role":"authenticated"}', true);
 select throws_ok($$select public.rpc_my_order_map('c0730000-0000-4000-8000-000000000051')$$,

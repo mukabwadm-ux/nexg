@@ -1,7 +1,11 @@
 'use client';
 
 import { useMemo } from 'react';
-import { advanceMerchantBooking, loadMerchantWork } from '@/app/merchant/work/actions';
+import {
+  advanceMerchantBooking,
+  advanceMerchantOrder,
+  loadMerchantWork,
+} from '@/app/merchant/work/actions';
 import { bookingRequest, isBookingNotInitialized } from '../booking/api';
 import { kenyaDateLabel, kenyaTime, STATUS_LABELS } from '../booking/format';
 import type { BookingWorkspaceData } from '../booking/types';
@@ -73,8 +77,13 @@ export function LiveWorkWorkspace({
         return result.records;
       },
       async advance(record, actionId) {
-        if (record.workflowId !== 'WF_BOOKING') throw new Error('No action is available.');
-        const result = await advanceMerchantBooking(record.id, actionId);
+        const result =
+          record.workflowId === 'WF_ORDER'
+            ? await advanceMerchantOrder(record.id, actionId)
+            : record.workflowId === 'WF_BOOKING'
+              ? await advanceMerchantBooking(record.id, actionId)
+              : null;
+        if (!result) throw new Error('No action is available.');
         if (!result.ok) throw new Error(result.message);
         return result.record;
       },

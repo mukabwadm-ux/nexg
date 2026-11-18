@@ -60311,6 +60311,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_merchant_order_step: { Args: { p_order_id: string; p_step: string }; Returns: Json };
       rpc_merchant_payout_name_check: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_payouts: {
         Args: {
@@ -62619,6 +62620,10 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_rider_order_step: {
+        Args: { p_handed_to?: string; p_order_id: string; p_step: string };
+        Returns: Json;
       };
       rpc_rider_payout_name_check: { Args: { p_rider_id: string }; Returns: Json };
       rpc_rider_reference_log: {
