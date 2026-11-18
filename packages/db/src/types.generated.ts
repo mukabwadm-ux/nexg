@@ -14219,6 +14219,261 @@ export type Database = {
           },
         ];
       };
+      fin_statement_import: {
+        Row: {
+          account_label: string;
+          closed_at: string | null;
+          closed_by: string | null;
+          closing_balance_cents: number | null;
+          created_at: string;
+          created_by: string | null;
+          file_name: string;
+          file_path: string;
+          file_sha256: string;
+          format: string;
+          id: string;
+          line_count: number;
+          matched_at: string | null;
+          note: string | null;
+          number: string;
+          opening_balance_cents: number | null;
+          paid_in_cents: number;
+          period_from: string;
+          period_to: string;
+          size_bytes: number;
+          source: string;
+          status: string;
+          withdrawn_cents: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          account_label: string;
+          closed_at?: string | null;
+          closed_by?: string | null;
+          closing_balance_cents?: number | null;
+          created_at?: string;
+          created_by?: string | null;
+          file_name: string;
+          file_path: string;
+          file_sha256: string;
+          format: string;
+          id?: string;
+          line_count?: number;
+          matched_at?: string | null;
+          note?: string | null;
+          number?: string;
+          opening_balance_cents?: number | null;
+          paid_in_cents?: number;
+          period_from: string;
+          period_to: string;
+          size_bytes: number;
+          source: string;
+          status?: string;
+          withdrawn_cents?: number;
+        };
+        Update: {
+          account_label?: string;
+          closed_at?: string | null;
+          closed_by?: string | null;
+          closing_balance_cents?: number | null;
+          created_at?: string;
+          created_by?: string | null;
+          file_name?: string;
+          file_path?: string;
+          file_sha256?: string;
+          format?: string;
+          id?: string;
+          line_count?: number;
+          matched_at?: string | null;
+          note?: string | null;
+          number?: string;
+          opening_balance_cents?: number | null;
+          paid_in_cents?: number;
+          period_from?: string;
+          period_to?: string;
+          size_bytes?: number;
+          source?: string;
+          status?: string;
+          withdrawn_cents?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'fin_statement_import_closed_by_fkey';
+            columns: ['closed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_statement_import_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      fin_statement_line: {
+        Row: {
+          account_ref: string | null;
+          amount_cents: number;
+          balance_cents: number | null;
+          completed_at: string;
+          details: string | null;
+          direction: string;
+          id: string;
+          import_id: string;
+          initiated_at: string | null;
+          kind: string;
+          line_no: number;
+          linked_receipt: string | null;
+          other_party: string | null;
+          phone_tail: string | null;
+          raw: Json;
+          reason_type: string | null;
+          receipt: string | null;
+          status_text: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          account_ref?: string | null;
+          amount_cents: number;
+          balance_cents?: number | null;
+          completed_at: string;
+          details?: string | null;
+          direction: string;
+          id?: string;
+          import_id: string;
+          initiated_at?: string | null;
+          kind: string;
+          line_no: number;
+          linked_receipt?: string | null;
+          other_party?: string | null;
+          phone_tail?: string | null;
+          raw?: Json;
+          reason_type?: string | null;
+          receipt?: string | null;
+          status_text?: string | null;
+        };
+        Update: {
+          account_ref?: string | null;
+          amount_cents?: number;
+          balance_cents?: number | null;
+          completed_at?: string;
+          details?: string | null;
+          direction?: string;
+          id?: string;
+          import_id?: string;
+          initiated_at?: string | null;
+          kind?: string;
+          line_no?: number;
+          linked_receipt?: string | null;
+          other_party?: string | null;
+          phone_tail?: string | null;
+          raw?: Json;
+          reason_type?: string | null;
+          receipt?: string | null;
+          status_text?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'fin_statement_line_import_id_fkey';
+            columns: ['import_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_statement_import';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      fin_statement_match: {
+        Row: {
+          created_at: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          difference_cents: number | null;
+          expected_ledger: boolean | null;
+          id: string;
+          import_id: string;
+          ledger_found: boolean | null;
+          line_id: string | null;
+          note: string | null;
+          record_amount_cents: number | null;
+          record_at: string | null;
+          record_id: string | null;
+          record_label: string | null;
+          record_reference: string | null;
+          record_state: string | null;
+          record_type: string | null;
+          result: string;
+          rule: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          difference_cents?: number | null;
+          expected_ledger?: boolean | null;
+          id?: string;
+          import_id: string;
+          ledger_found?: boolean | null;
+          line_id?: string | null;
+          note?: string | null;
+          record_amount_cents?: number | null;
+          record_at?: string | null;
+          record_id?: string | null;
+          record_label?: string | null;
+          record_reference?: string | null;
+          record_state?: string | null;
+          record_type?: string | null;
+          result: string;
+          rule?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          difference_cents?: number | null;
+          expected_ledger?: boolean | null;
+          id?: string;
+          import_id?: string;
+          ledger_found?: boolean | null;
+          line_id?: string | null;
+          note?: string | null;
+          record_amount_cents?: number | null;
+          record_at?: string | null;
+          record_id?: string | null;
+          record_label?: string | null;
+          record_reference?: string | null;
+          record_state?: string | null;
+          record_type?: string | null;
+          result?: string;
+          rule?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'fin_statement_match_decided_by_fkey';
+            columns: ['decided_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_statement_match_import_id_fkey';
+            columns: ['import_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_statement_import';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fin_statement_match_line_id_fkey';
+            columns: ['line_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_statement_line';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       fin_transition: {
         Row: {
           entity: string;
@@ -54058,7 +54313,35 @@ export type Database = {
           source_hash: string;
         }[];
       };
+      fn_fin_mask_phones: { Args: { p_text: string }; Returns: string };
       fn_fin_rebuild: { Args: Record<PropertyKey, never>; Returns: Json };
+      fn_fin_statement_match: { Args: { p_import_id: string }; Returns: Json };
+      fn_fin_statement_records: {
+        Args: { p_hi: string; p_lo: string; p_receipts?: string[]; p_source: string };
+        Returns: {
+          account_ref: string;
+          amount_cents: number;
+          at: string;
+          closed_at: string;
+          direction: string;
+          expected_ledger: boolean;
+          grp: string;
+          has_receipt: boolean;
+          label: string;
+          ledger_found: boolean;
+          listable: boolean;
+          opened_at: string;
+          pay_ref: string;
+          phone3: string;
+          priority: number;
+          receipt: string;
+          record_id: string;
+          record_type: string;
+          reference: string;
+          state: string;
+          state_ok: boolean;
+        }[];
+      };
       fn_finance_movements: {
         Args: { p_from: string; p_to: string };
         Returns: {
@@ -57696,8 +57979,40 @@ export type Database = {
       };
       rpc_featured_send_pitch: { Args: { p_merchant_id: string; p_note?: string }; Returns: Json };
       rpc_fin_export: { Args: { p_from: string; p_kind: string; p_to: string }; Returns: Json };
+      rpc_fin_statement_close: { Args: { p_import_id: string }; Returns: undefined };
+      rpc_fin_statement_detail: { Args: { p_import_id: string }; Returns: Json };
+      rpc_fin_statement_find: { Args: { p_match_id: string; p_query?: string }; Returns: Json };
+      rpc_fin_statement_import: {
+        Args: {
+          p_account_label: string;
+          p_file_name: string;
+          p_file_path: string;
+          p_file_sha256: string;
+          p_format: string;
+          p_lines: Json;
+          p_period_from: string;
+          p_period_to: string;
+          p_size_bytes: number;
+          p_source: string;
+        };
+        Returns: Json;
+      };
+      rpc_fin_statement_imports: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_fin_statement_resolve: {
+        Args: {
+          p_action: string;
+          p_match_id: string;
+          p_note?: string;
+          p_record_id?: string;
+          p_record_type?: string;
+        };
+        Returns: Json;
+      };
+      rpc_fin_statement_void: { Args: { p_import_id: string; p_reason: string }; Returns: undefined };
       rpc_fin_verify: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_finance_invoices: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_finance_report_customers: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_finance_report_riders: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_finance_transaction_summary: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_finance_transactions: {
         Args: { p_from: string; p_kind?: string; p_limit?: number; p_to: string };
