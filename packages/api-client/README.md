@@ -43,7 +43,7 @@ const { booking } = await nexg.orders.create(
 for await (const order of nexg.orders.listAll()) console.log(order.reference, order.status);
 ```
 
-Every method returns the `data` of the answer, typed as the [reference](https://api.nexgapp.com/docs/reference) documents it. The types come from `@nexg/contracts`, the schemas the API itself uses, so they cannot drift from it.
+Every method returns the `data` of the answer, typed as the [reference](https://api.nexgapp.com/docs/reference) documents it. The types in `src/types.ts` are generated from `@nexg/contracts`, the schemas the API itself uses, as plain TypeScript, so the package needs neither the contracts nor zod. `src/types.test.ts` fails the type check when they no longer match; `pnpm --filter @nexg/api-client generate` writes them again.
 
 | Group         | Methods                                                       |
 | ------------- | ------------------------------------------------------------- |
@@ -104,6 +104,14 @@ NEXG_SANDBOX_BASE_URL=https://api.nexgapp.com NEXG_SANDBOX_KEY=nexg_test_… pnp
 
 The key needs `merchant_read`, `merchant_write` and `catalogue_write`. Only a test key is accepted: it books in the sandbox and saves no catalogue change.
 
-## Publishing later
+## Publishing
 
-To put it on npm, the package needs a build that emits JavaScript and bundles the `@nexg/contracts` types into its declarations (the source imports them as types only), a name under an npm organisation NexG controls, and a docs page on api.nexgapp.com.
+Inside this repository the package is used as TypeScript source. Packed for npm, it builds itself first (`prepack` runs `tsc -p tsconfig.build.json` into `dist/`), and `publishConfig` points `main`, `types` and `exports` at `dist/`: ES modules and declarations, with no dependencies. `pnpm --filter @nexg/api-client pack` shows exactly what would be published.
+
+Before the first publish:
+
+1. Give it a licence: `license` in package.json and a LICENSE file, and set `private` to `false`.
+2. Create the `nexg` organisation on npmjs.com. If that name is taken, rename the package to the organisation you get.
+3. From a clean checkout of `main` (the repository's `.npmrc` sets `publish-branch=main`), run `npm login`, then `pnpm --filter @nexg/api-client publish --access public`.
+
+After a schema change in `@nexg/contracts`: run `generate`, raise the version, and publish again.

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { NexgWebhookError } from './errors';
-import { verifyWebhook } from './webhooks';
+import { NexgWebhookError } from './errors.js';
+import { verifyWebhook } from './webhooks.js';
 
 /*
  * The signature below was made by Postgres, the way the webhook dispatcher

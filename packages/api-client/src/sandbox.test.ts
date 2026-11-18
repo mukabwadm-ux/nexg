@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { NexgClient } from './client';
-import { NexgApiError } from './errors';
+import { NexgClient } from './client.js';
+import { NexgApiError } from './errors.js';
 
 /*
  * The client against a real NexG API, with a test key. Skipped unless both

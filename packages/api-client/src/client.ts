@@ -1,7 +1,9 @@
+import { NexgApiError, NexgConnectionError } from './errors.js';
 import type {
   ApiOrder,
   ApiService,
   BookingReceipt,
+  BookingRequest,
   BookingStatus,
   CatalogueItem,
   DeliveryCheck,
@@ -10,11 +12,7 @@ import type {
   PublicEvent,
   PublicMerchant,
   PublicZone,
-  ServiceBooking,
-} from '@nexg/contracts/api';
-import type { z } from 'zod';
-
-import { NexgApiError, NexgConnectionError } from './errors';
+} from './types.js';
 
 /**
  * A client for the NexG API (https://api.nexgapp.com).
@@ -78,9 +76,6 @@ export interface ExperienceListParams extends PageParams {
   city?: string;
   q?: string;
 }
-
-/** A booking as you send it: quantity and payment_method have defaults. */
-export type BookingRequest = z.input<typeof ServiceBooking>;
 
 /** A change to one item: a price, availability, or both. */
 export interface CatalogueChange {

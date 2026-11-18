@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { NexgClient } from './client';
-import { NexgApiError, NexgConnectionError } from './errors';
+import { NexgClient } from './client.js';
+import { NexgApiError, NexgConnectionError } from './errors.js';
 
 /*
  * The client against a fake fetch: what it sends, what it returns, and when

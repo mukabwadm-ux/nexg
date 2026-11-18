@@ -9,7 +9,6 @@
 export {
   DEFAULT_BASE_URL,
   NexgClient,
-  type BookingRequest,
   type CatalogueChange,
   type CatalogueItemChange,
   type ExperienceListParams,
@@ -19,20 +18,28 @@ export {
   type PageParams,
   type TestStage,
   type TestStatus,
-} from './client';
-export { NexgApiError, NexgConnectionError, NexgWebhookError, type WebhookFailure } from './errors';
-export { verifyWebhook, type VerifyWebhookOptions } from './webhooks';
+} from './client.js';
+export {
+  NexgApiError,
+  NexgConnectionError,
+  NexgWebhookError,
+  type WebhookFailure,
+} from './errors.js';
+export { verifyWebhook, type VerifyWebhookOptions } from './webhooks.js';
 export type {
   ApiOrder,
   ApiService,
   BookingReceipt,
+  BookingRequest,
   BookingStatus,
   CatalogueItem,
   DeliveryCheck,
   DeliveryCheckRequest,
+  DeliveryRefusal,
   PublicBranch,
   PublicEvent,
   PublicMerchant,
   PublicZone,
   WebhookEvent,
-} from '@nexg/contracts/api';
+  WebhookEventType,
+} from './types.js';

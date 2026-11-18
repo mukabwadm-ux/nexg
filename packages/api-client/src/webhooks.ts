@@ -1,6 +1,5 @@
-import type { WebhookEvent } from '@nexg/contracts/api';
-
-import { NexgWebhookError } from './errors';
+import { NexgWebhookError } from './errors.js';
+import type { WebhookEvent } from './types.js';
 
 /**
  * Checking an order event NexG posted to your endpoint.
