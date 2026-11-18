@@ -23,8 +23,12 @@ export interface LegalSection {
 export interface LegalDocument {
   /** URL slug, e.g. "terms". Also the tab order key. */
   slug: string;
-  /** Matches public.legal_document_key so an acceptance can be recorded. */
-  key: 'terms' | 'privacy' | 'cookies' | 'refunds' | 'merchant_terms' | 'rider_agreement';
+  /**
+   * Matches public.legal_document_key so an acceptance can be recorded. Null
+   * for a document that is signed per counterparty rather than accepted on
+   * the site (the data processing agreement).
+   */
+  key: 'terms' | 'privacy' | 'cookies' | 'refunds' | 'merchant_terms' | 'rider_agreement' | null;
   title: string;
   /** One line under the tab. */
   tagline: string;

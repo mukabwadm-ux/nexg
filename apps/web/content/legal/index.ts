@@ -1,12 +1,16 @@
+import { dataProcessing } from './data-processing';
+import { refunds } from './refunds';
+import { riderAgreement } from './rider-agreement';
 import { terms } from './terms';
 import type { LegalDocument } from './types';
 
 /**
- * The six documents the artboard tabs between.
+ * The documents the legal pages tab between.
  *
- * Only the terms are drafted. The other five are listed with their taglines
+ * The terms, the refunds policy, the rider agreement and the data processing
+ * agreement have text. The rest are listed with their taglines
  * because a visitor needs to know they are coming and roughly what each one
- * covers, but they carry no sections: writing plausible privacy or refund
+ * covers, but they carry no sections: writing plausible privacy or cookie
  * wording would be inventing commitments NexG has not made, and under the
  * Kenyan Data Protection Act a privacy notice in particular is a statement of
  * obligations rather than marketing copy.
@@ -47,13 +51,7 @@ export const LEGAL_DOCUMENTS: LegalDocument[] = [
     'Cookies and similar tech',
     'The cookies this site sets, what each one is for, and how to refuse them.',
   ),
-  undrafted(
-    'refunds',
-    'refunds',
-    'Refunds & Cancellations',
-    'When you get your money back',
-    'When an order can be cancelled, what a cancellation costs, and how a refund is returned to you.',
-  ),
+  refunds,
   undrafted(
     'merchant-terms',
     'merchant_terms',
@@ -61,13 +59,8 @@ export const LEGAL_DOCUMENTS: LegalDocument[] = [
     'For businesses selling on NexG',
     'The agreement between NexG and a business listed on the platform: commission, settlement, obligations and how either side ends it.',
   ),
-  undrafted(
-    'rider-agreement',
-    'rider_agreement',
-    'Rider Agreement',
-    'For delivery partners',
-    'The agreement between NexG and a rider: how work is offered, how you are paid, what equipment and cover you need.',
-  ),
+  riderAgreement,
+  dataProcessing,
 ];
 
 export function findDocument(slug: string): LegalDocument | undefined {
