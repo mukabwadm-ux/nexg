@@ -8,6 +8,8 @@ import { createClient } from '@/lib/supabase/server';
 export interface SignInResult {
   ok: boolean;
   message: string;
+  /** The security check refused the attempt, not the password. Worth one retry. */
+  captcha?: boolean;
 }
 
 /**
@@ -48,6 +50,19 @@ export async function signIn(
     password,
     options: { captchaToken: typeof captcha === 'string' && captcha ? captcha : undefined },
   });
+
+  /*
+   * Supabase refuses a sign-in whose Turnstile token is missing or spent with
+   * captcha_failed. That says nothing about the password, so it is not
+   * logged as a bad one or reported as one.
+   */
+  if (error?.code === 'captcha_failed') {
+    return {
+      ok: false,
+      captcha: true,
+      message: 'The security check did not finish. Press Sign in again.',
+    };
+  }
 
   await record(supabase, email, error ? 'bad_password' : 'success');
 
