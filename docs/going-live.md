@@ -147,6 +147,8 @@ Most functions guard themselves and raise. The ones that did not were the mainte
 
 A function that genuinely needs an anonymous caller — a QR scan, a careers applicant with a one-time token, a payment provider's callback — grants it explicitly. If you add one, grant it on purpose so a reviewer sees the line. `supabase/tests/21_money_and_live.sql` asserts both halves: that no `cron_*` is reachable, and that a logged-out visitor can still read a menu and scan a sticker.
 
+The default still grants to `authenticated`, and `revoke … from public, anon` leaves that grant in place. A helper that does not check its caller, because the functions that call it do, must also be revoked from `authenticated`, or any signed-in customer can call it at `/rest/v1/rpc`. `20270106020100_close_internal_helpers` did this for seven of them, including `fn_settlement_owed` (every partner's unpaid balance) and `fn_staff_for_module` (staff email addresses). `supabase/tests/99_internal_helpers_closed.sql` checks them.
+
 ## What is still missing after all of this
 
 - **A notifications worker.** Everything queues in `notification_log` and nothing sends. Every screen says "queued", never "sent". This is the biggest remaining gap: delay notices, document reminders, featured pitches and tracking SMS all sit there.

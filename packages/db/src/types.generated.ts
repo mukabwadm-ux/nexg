@@ -53757,6 +53757,7 @@ export type Database = {
       cron_qr_scan_partitions: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_scan_rollup: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_retention: { Args: Record<PropertyKey, never>; Returns: number };
+      cron_trim_run_log: { Args: { p_keep?: string }; Returns: number };
       distance_to_nearest_zone: {
         Args: { p_lat: number; p_lng: number };
         Returns: {
