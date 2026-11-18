@@ -167,11 +167,20 @@ export async function markPaid(
   method: 'mpesa' | 'bank',
 ): Promise<Outcome> {
   const supabase = createClient();
-  const { error } = await supabase.rpc('rpc_mark_paid', {
+  let { error } = await supabase.rpc('rpc_mark_paid', {
     p_plan_id: planId,
     p_reference: reference,
     p_method: method,
   });
+  /* Until 20270108300600 is in the database the function takes no method
+     (PostgREST answers PGRST202): record the payment the old way rather than
+     refuse it. Nothing reaches the ledger in that version either way. */
+  if (error?.code === 'PGRST202') {
+    ({ error } = await supabase.rpc('rpc_mark_paid', {
+      p_plan_id: planId,
+      p_reference: reference,
+    }));
+  }
   const bad = fail(error);
   if (bad) return bad;
   revalidatePath(`/experiences/plans/${planId}`);
