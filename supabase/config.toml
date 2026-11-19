@@ -452,3 +452,7 @@ enabled = true
 # Let the handler return the versioned authentication failure for this function.
 [functions.maps-routes]
 verify_jwt = false
+
+# The handler checks its own x-native-push-secret header; the scheduler sends no JWT.
+[functions.native-push-dispatch]
+verify_jwt = false
