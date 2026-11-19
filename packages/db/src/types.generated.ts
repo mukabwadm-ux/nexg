@@ -60311,6 +60311,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_merchant_order_step: { Args: { p_order_id: string; p_step: string }; Returns: Json };
       rpc_merchant_payout_name_check: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_payouts: {
         Args: {
@@ -61335,7 +61336,10 @@ export type Database = {
       };
       rpc_msg_take: { Args: { p_conversation: string }; Returns: Json };
       rpc_my_bookings: { Args: Record<PropertyKey, never>; Returns: Json };
-      rpc_my_order_map: { Args: { p_order_id: string }; Returns: Json };
+      rpc_my_order_map:
+        | { Args: { p_order_id: string }; Returns: Json }
+        | { Args: { p_contract_version: string; p_order_id: string }; Returns: Json };
+      rpc_my_rider_map_assignments: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_saved_places: {
         Args: {
           p_cursor?: Json;
@@ -62581,6 +62585,21 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_rider_map_share_publish: {
+        Args: {
+          p_latitude: number;
+          p_longitude: number;
+          p_observed_at: string;
+          p_sequence: number;
+          p_share_id: string;
+        };
+        Returns: Json;
+      };
+      rpc_rider_map_share_start: {
+        Args: { p_assigned_at: string; p_assignment_id: string; p_order_id: string };
+        Returns: Json;
+      };
+      rpc_rider_map_share_stop: { Args: { p_share_id: string }; Returns: Json };
       rpc_rider_message_send: {
         Args: { p_body: string; p_channel: string; p_rider_id: string; p_subject?: string };
         Returns: {
@@ -62601,6 +62620,10 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_rider_order_step: {
+        Args: { p_handed_to?: string; p_order_id: string; p_step: string };
+        Returns: Json;
       };
       rpc_rider_payout_name_check: { Args: { p_rider_id: string }; Returns: Json };
       rpc_rider_reference_log: {

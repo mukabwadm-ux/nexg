@@ -26,6 +26,7 @@ type OrderRow = {
   promised_ready_at: string | null;
   rider: string | null;
   what_now: string | null;
+  stage: string | null;
   needs_your_ack: boolean | null;
 };
 type Failure = { ok: false; message: string };
@@ -53,6 +54,22 @@ const orderStatuses: Record<string, { label: string; stage: number }> = {
   done: { label: 'Delivered', stage: 3 },
   closed: { label: 'Closed', stage: 3 },
 };
+const orderColumns =
+  'id, reference, guest, item_count, store, placed_at, promised_ready_at, rider, what_now, stage, needs_your_ack';
+/* The shop's two steps (rpc_merchant_order_step). Accepting is automatic and
+   an order paid online waits for payment, so there is no button before then. */
+function orderNextAction(order: OrderRow): WorkRecord['nextAction'] {
+  if (
+    order.what_now !== 'to_cook' &&
+    order.what_now !== 'cooking' &&
+    order.what_now !== 'you_are_late'
+  )
+    return undefined;
+  if (order.stage === 'placed' || order.stage === 'confirmed')
+    return { id: 'start', label: 'Start preparing' };
+  if (order.stage === 'preparing') return { id: 'ready', label: 'Mark ready for the rider' };
+  return undefined;
+}
 const bookingStatuses: Record<string, string> = {
   pending: 'Pending confirmation',
   confirmed: 'Confirmed',
@@ -90,6 +107,7 @@ function orderRecord(order: OrderRow & { id: string }): WorkRecord {
     confirmation: status.label,
     sourceLabel: 'Orders',
     history: order.placed_at ? [`Placed ${formatDate(order.placed_at)}`] : [],
+    nextAction: orderNextAction(order),
   };
 }
 
@@ -140,9 +158,7 @@ export async function loadMerchantWork(
   if (workflow === 'WF_ORDER') {
     const { data, error } = await client
       .from('merchant_orders_v')
-      .select(
-        'id, reference, guest, item_count, store, placed_at, promised_ready_at, rider, what_now, needs_your_ack',
-      )
+      .select(orderColumns)
       .eq('merchant_id', merchantId)
       .order('placed_at', { ascending: false })
       .limit(200);
@@ -221,4 +237,41 @@ export async function advanceMerchantBooking(
   revalidatePath('/merchant/work');
   revalidatePath('/merchant/bookings');
   return { ok: true, record: bookingRecord(updated, resource?.name) };
+}
+
+export async function advanceMerchantOrder(
+  id: string,
+  action: string,
+): Promise<{ ok: true; record: WorkRecord } | Failure> {
+  const { client, merchantId } = await merchantActionClient();
+  if (typeof id !== 'string' || !uuid.test(id))
+    return { ok: false, message: 'Choose a valid order.' };
+  const load = () =>
+    client
+      .from('merchant_orders_v')
+      .select(orderColumns)
+      .eq('merchant_id', merchantId)
+      .eq('id', id)
+      .maybeSingle<OrderRow>();
+  const { data, error } = await load();
+  if (error || !data?.id) return { ok: false, message: 'This order could not be loaded.' };
+  if (orderNextAction(data)?.id !== action)
+    return { ok: false, message: 'This order changed. Reload it before trying again.' };
+  const { error: stepError } = await client.rpc('rpc_merchant_order_step', {
+    p_order_id: id,
+    p_step: action,
+  });
+  if (stepError)
+    return {
+      ok: false,
+      message:
+        stepError.hint === 'awaiting_payment'
+          ? 'Wait for the customer’s payment before starting this order.'
+          : 'Could not update the order. Reload it before trying again.',
+    };
+  const { data: updated } = await load();
+  revalidatePath('/merchant/work');
+  revalidatePath('/merchant/orders');
+  const row = updated?.id ? updated : data;
+  return { ok: true, record: orderRecord({ ...row, id: row.id ?? id }) };
 }
