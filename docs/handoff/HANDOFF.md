@@ -1,5 +1,7 @@
 # Current handoff index
 
+- [NexG API, 17 November 2026](sessions/2026-11-17-nexg-api.md). What `api.nexgapp.com` serves today: catalogue and order reads, booking a service, the sandbox (test keys and test bookings that move through their statuses), order events and key revoking. Also where each piece lives, how to run and test it, the decisions the owner still owes, and phases 2 to 5.
+
 - [Shared services, 12 November 2026](sessions/2026-11-12-shared-services.md). One shared Supabase backend for every NexG app: the phase 1 fixes in #146, the owner decisions D1 to D15 still open, the backend queue, and how to change the shared backend safely. The owner sends the private notes directly.
 
 - [Unified merchant platform, 2 November 2026](sessions/2026-11-02-unified-merchant-platform.md). The Derrick NEXG checkout is the primary source for the combined platform and merchant workspace; the separate merchant folder is a retained local backup.
