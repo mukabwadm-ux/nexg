@@ -61340,6 +61340,7 @@ export type Database = {
         | { Args: { p_order_id: string }; Returns: Json }
         | { Args: { p_contract_version: string; p_order_id: string }; Returns: Json };
       rpc_my_rider_map_assignments: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_my_rider_offers: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_saved_places: {
         Args: {
           p_cursor?: Json;
@@ -62564,6 +62565,10 @@ export type Database = {
       };
       rpc_rider_kit_status: { Args: { p_rider_id: string }; Returns: Json };
       rpc_rider_live_location: { Args: { p_reason?: string; p_rider_id: string }; Returns: Json };
+      rpc_rider_location_ping: {
+        Args: { p_latitude: number; p_longitude: number; p_observed_at?: string };
+        Returns: Json;
+      };
       rpc_rider_log_call: {
         Args: { p_note: string; p_rider_id: string };
         Returns: {
