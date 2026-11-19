@@ -1,5 +1,7 @@
 # Current handoff index
 
+- [Phone push, 19 November 2026](sessions/2026-11-19-native-push.md). Phone notifications, iPhone Live Activities and Android progress updates for Consumer, Stays and Rider, replacing #151: the app contract, the payloads and how to turn the sender on.
+
 - [Shared services, 12 November 2026](sessions/2026-11-12-shared-services.md). One shared Supabase backend for every NexG app: the phase 1 fixes in #146, the owner decisions D1 to D15 still open, the backend queue, and how to change the shared backend safely. The owner sends the private notes directly.
 
 - [Unified merchant platform, 2 November 2026](sessions/2026-11-02-unified-merchant-platform.md). The Derrick NEXG checkout is the primary source for the combined platform and merchant workspace; the separate merchant folder is a retained local backup.
