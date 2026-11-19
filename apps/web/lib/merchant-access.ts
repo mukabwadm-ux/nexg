@@ -33,7 +33,12 @@ export class MerchantAccessError extends Error {
 function readFailed(result: { error: unknown; status?: number }): boolean {
   const code = String((result.error as { code?: unknown } | null)?.code ?? '');
   // Refused or signed out: an answer about access, not a failed read.
-  if (code === '42501' || code.startsWith('PGRST3') || result.status === 401 || result.status === 403)
+  if (
+    code === '42501' ||
+    code.startsWith('PGRST3') ||
+    result.status === 401 ||
+    result.status === 403
+  )
     return false;
   return !result.status || result.status >= 500 || code === '57014' || code.startsWith('08');
 }

@@ -38,9 +38,9 @@ export default async function JoinBusinessPage() {
     <main className="mx-auto max-w-xl px-4 py-12 sm:py-16">
       <h1 className="font-display text-2xl font-bold">No team invitation for this account</h1>
       <p className="text-muted mt-3 leading-relaxed">
-        You are signed in as <strong className="text-ink">{user.email}</strong>, and no business
-        has an open invitation for that address. Ask the owner to invite this exact address from
-        their Team page, or sign in with the address the invitation was sent to.
+        You are signed in as <strong className="text-ink">{user.email}</strong>, and no business has
+        an open invitation for that address. Ask the owner to invite this exact address from their
+        Team page, or sign in with the address the invitation was sent to.
       </p>
       <p className="mt-6">
         <Link href="/" className="text-gold-text font-bold underline">

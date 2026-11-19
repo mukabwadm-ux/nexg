@@ -1,8 +1,9 @@
 name: CI
 
 on:
+  # Every pull request, including ones stacked on another branch: those used to
+  # get no checks at all until they were re-pointed at main.
   pull_request:
-    branches: [main, nexg-app]
   push:
     branches: [main, nexg-app]
   workflow_dispatch:
@@ -23,6 +24,42 @@ env:
   DISCOVERY_ALLOW_LOCAL_SUPABASE: '1'
 
 jobs:
+  # About a minute, so the two most common mistakes show up before the 10-minute jobs finish.
+  quick-checks:
+    name: Quick checks (migration ids, formatting)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # On a pull request, new migrations must sort after the base branch's latest
+      # and nothing already on the base may be edited or removed.
+      - name: Migration ids are unique and in order
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: node scripts/check-migration-ids.mjs ${BASE_REF:+origin/$BASE_REF}
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Formatting
+        run: |
+          if ! pnpm format:check; then
+            echo "::error::Some files are not formatted. Run 'pnpm format' (or 'pnpm exec prettier --write <file>') and commit the result."
+            exit 1
+          fi
+
   maps-services:
     name: Map service contracts
     runs-on: ubuntu-latest
@@ -53,8 +90,16 @@ jobs:
 
       # Proves the schema rebuilds from an empty database, which is the M2
       # definition of done — not just that it applies to whatever is lying around.
+      # One retry: image pulls hit the registry's rate limit and the runner's
+      # ports are sometimes still held, which fails the job before any test runs.
       - name: Start Supabase
-        run: supabase start
+        run: |
+          supabase start || {
+            echo "::warning::supabase start failed; retrying once in 20s"
+            supabase stop --no-backup || true
+            sleep 20
+            supabase start
+          }
 
       - name: Reset from zero
         run: supabase db reset --local
@@ -84,7 +129,7 @@ jobs:
         run: |
           pnpm db:types
           if ! git diff --exit-code -- packages/db/src/types.generated.ts; then
-            echo "::error::packages/db/src/types.generated.ts is stale. Run 'pnpm db:types' and commit the result."
+            echo "::error::packages/db/src/types.generated.ts is stale: a migration changed the schema but the types file was not regenerated. Run 'pnpm db:reset && pnpm db:types' and commit the result, or (no Docker) download the 'types-generated' artifact from this run's Summary page and commit it as packages/db/src/types.generated.ts."
             exit 1
           fi
 
@@ -173,8 +218,16 @@ jobs:
         with:
           version: 2.121.0
 
+      # One retry: image pulls hit the registry's rate limit and the runner's
+      # ports are sometimes still held, which fails the job before any test runs.
       - name: Start Supabase
-        run: supabase start
+        run: |
+          supabase start || {
+            echo "::warning::supabase start failed; retrying once in 20s"
+            supabase stop --no-backup || true
+            sleep 20
+            supabase start
+          }
 
       - name: Point the apps at local Supabase
         run: |
@@ -267,8 +320,16 @@ jobs:
         with:
           version: 2.121.0
 
+      # One retry: image pulls hit the registry's rate limit and the runner's
+      # ports are sometimes still held, which fails the job before any test runs.
       - name: Start Supabase
-        run: supabase start
+        run: |
+          supabase start || {
+            echo "::warning::supabase start failed; retrying once in 20s"
+            supabase stop --no-backup || true
+            sleep 20
+            supabase start
+          }
 
       # NEXT_PUBLIC_* values are inlined at build time, so these must be
       # set before `pnpm build`, not just before the servers start.
