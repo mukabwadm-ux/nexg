@@ -155,11 +155,12 @@ select '0e710000-0000-4000-8000-0000000000c1', 'airport_transfers', a.id, a.vers
        '0e710000-0000-4000-8000-0000000000a1'
 from public.fn_merchant_agreement_for_category('airport_transfers') a
 where a.id is not null;
-select throws_ok(
-  $$ update public.merchant_application set submitted_revision = 1, submitted_at = now(), review_state = 'pending'
-     where merchant_id = '0e710000-0000-4000-8000-0000000000c1' $$,
-  '23514', 'Complete your onboarding details before submitting: Business registration number.',
-  'an application cannot be submitted with a required detail missing');
+-- Since 20270124000100 (approve first) a missing detail no longer blocks
+-- submitting; it keeps the merchant from going live instead.
+select ok(
+  public.fn_merchant_go_live_missing('0e710000-0000-4000-8000-0000000000c1')
+    @> '[{"key": "agreement_details"}]'::jsonb,
+  'without the registration number, going live still waits for the agreement details');
 
 insert into public.merchant_agreement_party (merchant_id, legal_name, registration_number, kra_pin, address,
   signatory_name, signatory_title, representative_name, representative_title, principal_name)

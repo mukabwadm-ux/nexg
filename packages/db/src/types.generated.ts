@@ -1443,6 +1443,7 @@ export type Database = {
         Returns: string;
       };
       cron_chain_check: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_merchant_setup_reminders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_run_alerts: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_actor_name: {
         Args: {
@@ -1466,6 +1467,7 @@ export type Database = {
       fn_diff: { Args: { p_after: Json; p_before: Json }; Returns: Json };
       fn_mask_email: { Args: { p_email: string }; Returns: string };
       fn_mask_payload: { Args: { p_fields: string[]; p_payload: Json }; Returns: Json };
+      fn_merchant_go_live_missing: { Args: { p_merchant_id: string }; Returns: Json };
       fn_require: { Args: { p_level: string }; Returns: string };
       fn_sentence: {
         Args: {
@@ -1539,6 +1541,7 @@ export type Database = {
         Returns: Json;
       };
       rpc_legal_hold_release: { Args: { p_id: string; p_reason: string }; Returns: Json };
+      rpc_merchant_setup_todo: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_pack_create: {
         Args: {
           p_filter: Json;
@@ -24893,6 +24896,127 @@ export type Database = {
           },
           {
             foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      merchant_setup_reminder: {
+        Row: {
+          merchant_id: string;
+          recipients: number;
+          sent_at: string;
+          step: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          merchant_id: string;
+          recipients?: number;
+          sent_at?: string;
+          step: number;
+        };
+        Update: {
+          merchant_id?: string;
+          recipients?: number;
+          sent_at?: string;
+          step?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
