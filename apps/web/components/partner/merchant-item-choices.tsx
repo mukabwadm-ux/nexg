@@ -7,12 +7,23 @@ import type { Outcome } from '@/app/merchant/actions';
 import {
   saveOptionGroup,
   setItemOptionGroups,
+  setItemBooking,
   setItemUnit,
   type ItemUnitInput,
   type OptionGroupInput,
 } from '@/app/merchant/menu/choices-actions';
 
+import { bookingRequest } from '@/components/merchant/booking/api';
+import { ITEM_KIND_LABEL, ITEM_KINDS, type ItemKind } from '@/lib/catalogue-kinds';
+
 import { Panel } from './bits';
+
+/** The shop's booking offerings, from the booking engine, to link items to. */
+interface OfferingChoice {
+  id: string;
+  name: string;
+  active?: boolean;
+}
 
 export interface OptionGroupRow {
   id: string;
@@ -32,6 +43,8 @@ export interface ChoiceItemRow {
   unit_min?: number | null;
   unit_max?: number | null;
   price_is_estimate?: boolean | null;
+  kind?: string | null;
+  booking_offering_id?: string | null;
   group_ids: string[];
 }
 
@@ -82,6 +95,22 @@ export function ItemChoices({
   const [busy, setBusy] = React.useState<string | null>(null);
   const [said, setSaid] = React.useState<Outcome | null>(null);
   const [editing, setEditing] = React.useState<OptionGroupInput | null>(null);
+  // null while loading; 'none' when the shop has no booking setup to link to.
+  const [offerings, setOfferings] = React.useState<OfferingChoice[] | 'none' | null>(null);
+
+  React.useEffect(() => {
+    let live = true;
+    bookingRequest<{ offerings?: OfferingChoice[] }>('/workspace')
+      .then((w) => {
+        if (live) setOfferings(w.offerings?.length ? w.offerings : 'none');
+      })
+      .catch(() => {
+        if (live) setOfferings('none');
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
 
   const run = async (key: string, action: () => Promise<Outcome>) => {
     setBusy(key);
@@ -96,7 +125,7 @@ export function ItemChoices({
   return (
     <Panel
       title="Choices, add-ons and units"
-      note="Sizes, extras and per-kg pricing, shown in the app and priced at checkout"
+      note="Sizes, extras, per-kg pricing, and items customers book instead of buy"
     >
       {said && (
         <p
@@ -161,7 +190,14 @@ export function ItemChoices({
       <h3 className="mb-2 mt-5 text-[0.8125rem] font-extrabold">Items</h3>
       <ul className="divide-border divide-y">
         {items.map((i) => (
-          <ItemRow key={i.id} item={i} groups={groups} busy={busy} run={run} />
+          <ItemRow
+            key={i.id}
+            item={i}
+            groups={groups}
+            offerings={offerings}
+            busy={busy}
+            run={run}
+          />
         ))}
       </ul>
     </Panel>
@@ -279,11 +315,13 @@ function GroupEditor({
 function ItemRow({
   item,
   groups,
+  offerings,
   busy,
   run,
 }: {
   item: ChoiceItemRow;
   groups: OptionGroupRow[];
+  offerings: OfferingChoice[] | 'none' | null;
   busy: string | null;
   run: (key: string, action: () => Promise<Outcome>) => Promise<Outcome>;
 }) {
@@ -296,6 +334,10 @@ function ItemRow({
     unitMax: item.unit_max == null ? null : Number(item.unit_max),
     priceIsEstimate: Boolean(item.price_is_estimate),
   });
+  const [kind, setKind] = React.useState<ItemKind>(
+    (ITEM_KINDS as readonly string[]).includes(item.kind ?? '') ? (item.kind as ItemKind) : 'buy',
+  );
+  const [offering, setOffering] = React.useState<string>(item.booking_offering_id ?? '');
   const measured = unit.soldBy === 'weight' || unit.soldBy === 'volume';
   const num = (v: string) => (v.trim() === '' ? null : Number(v));
 
@@ -309,9 +351,64 @@ function ItemRow({
               ? `KES ${item.price_kes} per ${unit.unitLabel ?? 'unit'}`
               : `KES ${item.price_kes}`}
             {item.group_ids.length > 0 && ` · ${item.group_ids.length} choice group(s)`}
+            {item.kind &&
+              item.kind !== 'buy' &&
+              ` · booked (${ITEM_KIND_LABEL[item.kind as ItemKind] ?? item.kind})`}
           </span>
         </summary>
         <div className="mt-2 space-y-3 pl-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              aria-label={`How customers get ${item.name}`}
+              className={input}
+              value={kind}
+              onChange={(e) => setKind(e.target.value as ItemKind)}
+            >
+              {ITEM_KINDS.map((k) => (
+                <option key={k} value={k}>
+                  {ITEM_KIND_LABEL[k]}
+                </option>
+              ))}
+            </select>
+            {kind !== 'buy' &&
+              (offerings === null ? (
+                <span className="text-muted text-[0.75rem] font-semibold">Loading bookings…</span>
+              ) : offerings === 'none' ? (
+                <span className="text-muted text-[0.75rem] font-semibold">
+                  Set up what customers can book on the Calendar page first.
+                </span>
+              ) : (
+                <select
+                  aria-label={`Which booking ${item.name} opens`}
+                  className={input}
+                  value={offering}
+                  onChange={(e) => setOffering(e.target.value)}
+                >
+                  <option value="">Choose a booking…</option>
+                  {offerings.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.name}
+                      {o.active === false ? ' (paused)' : ''}
+                    </option>
+                  ))}
+                </select>
+              ))}
+            <button
+              type="button"
+              className={button}
+              disabled={
+                busy === `k${item.id}` ||
+                (kind !== 'buy' && (!Array.isArray(offerings) || !offering))
+              }
+              onClick={() =>
+                void run(`k${item.id}`, () =>
+                  setItemBooking(item.id, kind, kind === 'buy' ? null : offering),
+                )
+              }
+            >
+              {busy === `k${item.id}` ? '…' : 'Save'}
+            </button>
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             <select
               aria-label={`How ${item.name} is sold`}

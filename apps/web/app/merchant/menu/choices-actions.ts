@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import type { Outcome } from '@/app/merchant/actions';
+import { ITEM_KINDS, type ItemKind } from '@/lib/catalogue-kinds';
 import { merchantActionClient } from '@/lib/merchant-action-access';
 
 /**
@@ -129,5 +130,42 @@ export async function setItemUnit(itemId: string, unit: ItemUnitInput): Promise<
     message: measured
       ? `Saved. The price is per ${label}; customers buy in steps of ${step} ${label}.`
       : 'Saved.',
+  };
+}
+
+/**
+ * How customers get an item: bought through checkout, or booked through one of
+ * the shop's booking offerings (the app then books it with the booking engine).
+ */
+export async function setItemBooking(
+  itemId: string,
+  kind: ItemKind,
+  offeringId: string | null,
+): Promise<Outcome> {
+  const { client, merchantId } = await merchantActionClient({ access: 'setup' });
+  if (!uuid.test(itemId)) return { ok: false, message: 'Choose a valid item.' };
+  if (!(ITEM_KINDS as readonly string[]).includes(kind))
+    return { ok: false, message: 'Choose how customers get this item.' };
+  const offering = offeringId?.trim() || null;
+  if (kind !== 'buy' && !offering)
+    return { ok: false, message: 'Choose which booking this item opens.' };
+  if (offering && !/^[A-Za-z0-9_-]{1,128}$/.test(offering))
+    return { ok: false, message: 'Choose a booking from your list.' };
+  const { data, error } = await client
+    .from('catalogue_item')
+    .update({ kind, booking_offering_id: kind === 'buy' ? null : offering })
+    .eq('id', itemId)
+    .eq('merchant_id', merchantId)
+    .select('id')
+    .maybeSingle();
+  if (error) return { ok: false, message: error.message };
+  if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
+  refresh();
+  return {
+    ok: true,
+    message:
+      kind === 'buy'
+        ? 'Saved. Customers add this item to the basket.'
+        : 'Saved. Customers book this item instead of adding it to the basket.',
   };
 }
