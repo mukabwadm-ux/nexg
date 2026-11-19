@@ -54,6 +54,30 @@ describe('live merchant Home', () => {
     const html = home(available, { ...merchant, accepting_orders: false });
     expect(html).toContain('Accepting orders');
     expect(html).toContain('Off');
+    expect(html).toContain('Guests cannot order until you start taking orders.');
+  });
+
+  it('puts the start / pause button on the Accepting orders tile when it is given', () => {
+    // Approval leaves a new business live with orders off; this button is how
+    // its owner starts. The page gives it only to an owner or manager.
+    const html = renderToStaticMarkup(
+      <HomeLive
+        m={{ ...merchant, accepting_orders: false }}
+        personName="Sam"
+        branches={[]}
+        attention={[]}
+        orders={[]}
+        money={null}
+        bars={[]}
+        unavailable={available}
+        ordersSwitch={<button type="button">Start taking orders</button>}
+      />,
+    );
+    expect(html).toContain('Start taking orders');
+    expect(html.indexOf('Accepting orders')).toBeLessThan(html.indexOf('Start taking orders'));
+    expect(home(available, { ...merchant, accepting_orders: false })).not.toContain(
+      'Start taking orders',
+    );
   });
 });
 

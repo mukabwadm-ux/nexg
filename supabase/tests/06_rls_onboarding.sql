@@ -108,16 +108,15 @@ select is(
 
 select is(
   (select count(*)::int from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-000000000001')),
-  3,
-  'a restaurant that serves alcohol owes three documents'
+  7,
+  'a restaurant that serves alcohol owes seven documents (three common, permit, food handler, liquor, menu)'
 );
 
-select ok(
-  not exists (
-    select 1 from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-000000000001')
-    where kind in ('owner_id', 'kra_pin')
-  ),
-  'no merchant is asked for an owner ID or a KRA PIN certificate'
+select is(
+  (select count(*)::int from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-000000000001')
+   where kind in ('owner_id', 'kra_pin', 'business_registration_cert')),
+  3,
+  'every merchant owes the owner ID, KRA PIN and registration certificates (onboarding template)'
 );
 
 select ok(
@@ -133,7 +132,7 @@ where id = 'cccccccc-0000-0000-0000-000000000001';
 
 select is(
   (select count(*)::int from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-000000000001')),
-  2,
+  6,
   'saying no to alcohol drops the liquor licence again'
 );
 
@@ -145,8 +144,8 @@ where id = 'cccccccc-0000-0000-0000-000000000001';
 
 select is(
   (select count(*)::int from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-000000000001')),
-  3,
-  'the canonical restaurant category keeps its category and answer-based document rules'
+  7,
+  'the canonical restaurant category keeps its category and answer-based document rules (plus the menu)'
 );
 
 update public.merchant set category = 'restaurant'

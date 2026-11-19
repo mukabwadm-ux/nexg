@@ -13,6 +13,7 @@ import {
   ApplicationReviewUnavailable,
 } from '@/components/merchants/application-review-view';
 import { MerchantDocumentsSection } from '@/components/merchants/documents-section';
+import { MerchantOnboardingAnswers } from '@/components/merchants/onboarding-answers';
 import { MerchantTabs } from '@/components/merchants/shell';
 import { loadMerchantDocuments } from '@/lib/merchant-documents';
 import {
@@ -63,8 +64,18 @@ export default async function ManagedMerchantApplicationPage({
     : { data: null };
   const merchantName = merchant?.trading_name || merchant?.legal_name || '';
   /* The documents the applicant uploaded, beside the application they
-     belong to: a reviewer should not have to approve first to read them. */
-  const documents = await loadMerchantDocuments(createClient(), params.id);
+     belong to: a reviewer should not have to approve first to read them.
+     And whether a main location is saved, the other thing Approve checks
+     (approvalBlocker), so a reviewer is not surprised by the refusal. */
+  const [documents, primary] = await Promise.all([
+    loadMerchantDocuments(createClient(), params.id),
+    createClient()
+      .from('merchant_branch')
+      .select('merchant_id', { count: 'exact', head: true })
+      .eq('merchant_id', params.id)
+      .eq('is_primary', true),
+  ]);
+  const hasLocation = !primary.error && (primary.count ?? 0) > 0;
   return (
     <ApplicationReviewActor key={source.actorId} actorId={source.actorId}>
       <ConsoleShell staff={staff} current="/merchants">
@@ -105,7 +116,22 @@ export default async function ManagedMerchantApplicationPage({
               {documents.onFile} of {documents.review.length} on file
             </span>
           </a>
+          <span className="border-border ml-4 mt-4 inline-flex min-h-11 items-center gap-2 rounded-lg border px-4 text-sm font-bold">
+            Location
+            <span
+              className={`rounded-full px-2 py-0.5 text-[0.6875rem] font-extrabold ${
+                hasLocation ? 'bg-success-bg text-success' : 'bg-warning-bg text-warning'
+              }`}
+            >
+              {primary.error
+                ? 'Could not be checked'
+                : hasLocation
+                  ? 'Main location saved'
+                  : 'Not saved yet: approval waits for it'}
+            </span>
+          </span>
           <ApplicationAgreement merchantId={params.id} />
+          <MerchantOnboardingAnswers merchantId={params.id} />
           <MerchantAgreementSigned merchantId={params.id} />
           <ApplicationReviewDetail {...source} />
           <div className="mt-10 max-w-4xl">

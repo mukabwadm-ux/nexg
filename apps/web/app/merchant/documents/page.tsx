@@ -11,6 +11,8 @@ import {
 } from '@/components/merchant/agreement-panel';
 import type { AgreementDetailsRecord } from '@/components/merchant/agreement-details';
 import { PageHead } from '@/components/merchant/frame';
+import { OnboardingDetailsPanel } from '@/components/merchant/onboarding-details-panel';
+import { parseOnboardingDetails } from '@nexg/contracts/merchant-onboarding-details';
 import { requireMerchant, setupPageOrWorkspace } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -31,6 +33,7 @@ export default async function MerchantDocuments() {
     { data: agreement },
     { data: details },
     { data: signed },
+    { data: onboarding, error: onboardingError },
   ] = await Promise.all([
     supabase.rpc('fn_merchant_required_docs', { p_merchant_id: me.id }),
     supabase
@@ -49,6 +52,8 @@ export default async function MerchantDocuments() {
     // Null until 20270103000100 runs: the panel then works as before.
     supabase.rpc('rpc_merchant_agreement_details_read', { p_merchant_id: me.id }),
     supabase.rpc('rpc_merchant_agreement_signed_list', { p_merchant_id: me.id }),
+    // Null until 20270110410100 runs: the panel then stays hidden.
+    supabase.rpc('rpc_merchant_onboarding_read', { p_merchant_id: me.id }),
   ]);
 
   return (
@@ -63,6 +68,11 @@ export default async function MerchantDocuments() {
         status={agreement as unknown as AgreementStatus | null}
         details={(details as unknown as AgreementDetailsRecord | null) ?? null}
         signed={(signed as unknown as SignedAgreementCopy[] | null) ?? null}
+      />
+
+      <OnboardingDetailsPanel
+        merchantId={me.id}
+        details={onboardingError || !onboarding ? null : parseOnboardingDetails(onboarding)}
       />
 
       {error ? (

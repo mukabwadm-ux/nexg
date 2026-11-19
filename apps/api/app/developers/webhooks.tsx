@@ -3,6 +3,7 @@
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@nexg/ui';
 import { FlaskConical, Webhook } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
 import type { DeveloperMerchant } from '@/lib/merchants';
@@ -48,6 +49,10 @@ export function Webhooks({
   initial: { ok: true; endpoints: WebhookEndpoint[] } | { ok: false; message: string };
 }) {
   const owned = merchants.filter((m) => m.role === 'owner');
+  /* The Test bookings box below reads the endpoints from the server render,
+     so it said "No test endpoint is switched on" until a reload. Refreshing
+     after a change keeps this card's own state, the one-time secret included. */
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [endpoints, setEndpoints] = useState<WebhookEndpoint[]>(
     initial.ok ? initial.endpoints : [],
@@ -84,7 +89,10 @@ export function Webhooks({
         setError(result.message ?? 'That did not work.');
         return;
       }
-      if (result.endpoints) setEndpoints(result.endpoints);
+      if (result.endpoints) {
+        setEndpoints(result.endpoints);
+        router.refresh();
+      }
       if (result.message) setNotice(result.message);
     });
   }
@@ -100,6 +108,7 @@ export function Webhooks({
       }
       setEndpoints(result.endpoints);
       setSecret({ value: result.secret, url: String(formData.get('url') ?? '') });
+      router.refresh();
     });
   }
 
