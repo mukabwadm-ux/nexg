@@ -166,4 +166,4 @@ revoke execute on function public.rpc_order_place_web(jsonb) from public, anon;
 grant execute on function public.rpc_order_place_web(jsonb) to authenticated;
 
 comment on function authz.is_anonymous_session() is
-  'A temporary (anonymous) sign-in rather than an account. Bookings and stay holds refuse it; delivery orders accept it (20270108000100).';
+  'A temporary (anonymous) sign-in rather than an account. Bookings and stay holds refuse it; delivery orders accept it (20270109000100).';

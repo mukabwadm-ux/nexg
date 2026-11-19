@@ -1,4 +1,4 @@
--- Bookings and stay holds need an account (orders no longer do: 106), and an unconfirmed booking
+-- Bookings and stay holds need an account (orders no longer do: 108), and an unconfirmed booking
 -- lets its time go.
 
 begin;
@@ -48,8 +48,8 @@ set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"c0690000-0000-4000-8000-000000000020","role":"authenticated","is_anonymous":true}', true);
 
--- Delivery orders accept a temporary session since 20270108000100_guest_orders
--- (tests/106_guest_orders.sql); it gets past the account check to the phone check.
+-- Delivery orders accept a temporary session since 20270109000100_guest_orders
+-- (tests/108_guest_orders.sql); it gets past the account check to the phone check.
 select throws_ok($$select public.rpc_order_place_web('{}'::jsonb)$$,
   'A phone number the rider can reach you on.',
   'A temporary session is no longer refused an order for having no account.');

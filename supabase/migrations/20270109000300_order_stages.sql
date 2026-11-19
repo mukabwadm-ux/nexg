@@ -27,7 +27,7 @@
 --                                           rpc_order_mark does for staff.
 -- 4. A guest (temporary session) reads the map of their own order:
 --    rpc_my_order_map no longer needs a full account, only the session that
---    owns the order. The rider's live position (20270108000200, from PR #150)
+--    owns the order. The rider's live position (20270109000200, from PR #150)
 --    is shared with a guest customer as with an account.
 --
 -- Each step writes order.stage, its timestamp and an order_event row with the
@@ -36,7 +36,7 @@
 --
 -- Rollback: re-run dispatch.rpc_job_start from 20261223000600,
 -- rpc_my_order_map(uuid) from 20261220000200 and
--- dispatch.maps_rider_assignments from 20270108000200; then
+-- dispatch.maps_rider_assignments from 20270109000200; then
 --   drop function public.rpc_merchant_order_step(uuid, text),
 --     public.rpc_rider_order_step(uuid, text, text), dispatch.fn_job_start(uuid);
 
@@ -419,7 +419,7 @@ comment on function public.rpc_my_order_map(uuid) is
 revoke execute on function public.rpc_my_order_map(uuid) from public, anon, service_role;
 grant execute on function public.rpc_my_order_map(uuid) to authenticated;
 
--- maps_rider_assignments: 20270108000200, with a guest customer counted too,
+-- maps_rider_assignments: 20270109000200, with a guest customer counted too,
 -- so a rider can share their position with a guest's order.
 create or replace function dispatch.maps_rider_assignments(p_rider_id uuid)
 returns table (

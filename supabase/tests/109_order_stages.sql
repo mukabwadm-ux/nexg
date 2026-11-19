@@ -153,7 +153,7 @@ select throws_ok($$select public.rpc_rider_order_step('c1070000-0000-4000-8000-0
 select is(public.rpc_rider_order_step('c1070000-0000-4000-8000-0000000000f1', 'picked_up') ->> 'stage',
   'picked_up', 'The rider picks it up.');
 
--- The rider shares their position (20270108000200), now that it is picked up.
+-- The rider shares their position (20270109000200), now that it is picked up.
 select is((select (a ->> 'canShare')::boolean
              from jsonb_array_elements(public.rpc_my_rider_map_assignments() -> 'assignments') a
             where a ->> 'orderId' = 'c1070000-0000-4000-8000-0000000000f1'),
