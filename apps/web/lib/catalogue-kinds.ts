@@ -1,4 +1,4 @@
-/** How a customer gets a catalogue item (`catalogue_item_kind`, 20270109000400). */
+/** How a customer gets a catalogue item (`catalogue_item_kind`, 20270111000100). */
 export const ITEM_KINDS = [
   'buy',
   'ticket',

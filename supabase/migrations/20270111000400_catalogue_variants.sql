@@ -5,7 +5,7 @@
 -- Q_OFFERING_PRICE has mode 'variant', and specialty needs name "size",
 -- "colour" or "device-type" variants. Until now nothing stored one.
 --
--- Choice groups (modifier_group, 20270109000400) stay for things added to the
+-- Choice groups (modifier_group, 20270111000100) stay for things added to the
 -- same product: extras, sides, a message. A variant replaces the product:
 --
 -- 1. catalogue_attribute: up to three per item ("Size", "Colour"), each with
@@ -25,7 +25,7 @@
 --    variant grid in one go (Menu page).
 --
 -- Rollback: re-run fn_web_order_quote, rpc_order_place_web and
--- catalogue_public from 20270109000400; drop the trigger, the functions,
+-- catalogue_public from 20270111000100; drop the trigger, the functions,
 -- catalogue_variant_public, the three tables and the two order_item columns.
 
 insert into audit.action_registry (action, module, default_severity, money, description) values
@@ -399,7 +399,7 @@ comment on function public.rpc_merchant_item_variants_save(uuid, jsonb) is
 revoke execute on function public.rpc_merchant_item_variants_save(uuid, jsonb) from public, anon;
 grant execute on function public.rpc_merchant_item_variants_save(uuid, jsonb) to authenticated;
 
--- catalogue_public: 20270109000400, with has_variants appended.
+-- catalogue_public: 20270111000100, with has_variants appended.
 create or replace view public.catalogue_public
 with (security_invoker = false)
 as
@@ -448,7 +448,7 @@ where coalesce(i.available, true)
 
 grant select on public.catalogue_public to anon, authenticated;
 
--- fn_web_order_quote: 20270109000400, with each line's version.
+-- fn_web_order_quote: 20270111000100, with each line's version.
 create or replace function public.fn_web_order_quote(p_payload jsonb)
 returns jsonb
 language plpgsql
@@ -703,7 +703,7 @@ $$;
 revoke execute on function public.fn_web_order_quote(jsonb) from public, anon, authenticated;
 grant execute on function public.fn_web_order_quote(jsonb) to service_role;
 
--- rpc_order_place_web: 20270109000400, keeping the version and setting aside counted stock.
+-- rpc_order_place_web: 20270111000100, keeping the version and setting aside counted stock.
 create or replace function public.rpc_order_place_web(p_payload jsonb)
 returns jsonb
 language plpgsql
@@ -808,7 +808,7 @@ begin
     'KES', q -> 'pricing_version_ids', v_needs)
   returning id into v_order;
 
-  /* Each line, with its unit and the choices made on it (20270109000400). */
+  /* Each line, with its unit and the choices made on it (20270111000100). */
   for v_line in select l from jsonb_array_elements(q -> 'lines') l loop
     insert into public.order_item (
       order_id, catalogue_item_id, name, quantity, unit_price_cents, line_total_cents, note,
