@@ -60251,6 +60251,10 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_merchant_handover_code_enter: {
+        Args: { p_code: string; p_order_id: string };
+        Returns: Json;
+      };
       rpc_merchant_holiday_set: {
         Args: {
           p_closed: boolean;
@@ -61409,10 +61413,12 @@ export type Database = {
       rpc_my_order_map:
         | { Args: { p_order_id: string }; Returns: Json }
         | { Args: { p_contract_version: string; p_order_id: string }; Returns: Json };
+      rpc_my_order_collection_code: { Args: { p_order_id: string }; Returns: Json };
       rpc_my_order_handoff_code: { Args: { p_order_id: string }; Returns: Json };
       rpc_my_rider_jobs: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_rider_map_assignments: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_rider_offers: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_my_rider_pickup_code: { Args: { p_order_id: string }; Returns: Json };
       rpc_my_saved_places: {
         Args: {
           p_cursor?: Json;

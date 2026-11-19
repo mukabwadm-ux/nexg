@@ -70,6 +70,13 @@ function orderNextAction(order: OrderRow): WorkRecord['nextAction'] {
   if (order.stage === 'preparing') return { id: 'ready', label: 'Mark ready for the rider' };
   return undefined;
 }
+
+/* Ready: the rider (or, for a collection order, the customer) shows a code
+   and the shop types it in to hand the order over (rpc_merchant_handover_code_enter). */
+function orderHandoverAction(order: OrderRow): WorkRecord['nextAction'] {
+  if (order.stage !== 'ready') return undefined;
+  return { id: 'handover', label: 'Hand over: enter the code shown to you', needsCode: true };
+}
 const bookingStatuses: Record<string, string> = {
   pending: 'Pending confirmation',
   confirmed: 'Confirmed',
@@ -107,7 +114,7 @@ function orderRecord(order: OrderRow & { id: string }): WorkRecord {
     confirmation: status.label,
     sourceLabel: 'Orders',
     history: order.placed_at ? [`Placed ${formatDate(order.placed_at)}`] : [],
-    nextAction: orderNextAction(order),
+    nextAction: orderNextAction(order) ?? orderHandoverAction(order),
   };
 }
 
@@ -255,6 +262,27 @@ export async function advanceMerchantOrder(
       .maybeSingle<OrderRow>();
   const { data, error } = await load();
   if (error || !data?.id) return { ok: false, message: 'This order could not be loaded.' };
+  if (action.startsWith('handover:')) {
+    if (!orderHandoverAction(data))
+      return { ok: false, message: 'This order changed. Reload it before trying again.' };
+    const code = action.slice('handover:'.length).replace(/\D/g, '');
+    if (code.length !== 4) return { ok: false, message: 'Enter the 4-digit code.' };
+    const { data: entered, error: codeError } = await client.rpc(
+      'rpc_merchant_handover_code_enter',
+      { p_order_id: id, p_code: code },
+    );
+    const result = (entered ?? {}) as { ok?: boolean; message?: string };
+    if (codeError || result.ok === false)
+      return {
+        ok: false,
+        message: result.message ?? 'Could not hand the order over. Reload it before trying again.',
+      };
+    const { data: handed } = await load();
+    revalidatePath('/merchant/work');
+    revalidatePath('/merchant/orders');
+    const row = handed?.id ? handed : data;
+    return { ok: true, record: orderRecord({ ...row, id: row.id ?? id }) };
+  }
   if (orderNextAction(data)?.id !== action)
     return { ok: false, message: 'This order changed. Reload it before trying again.' };
   const { error: stepError } = await client.rpc('rpc_merchant_order_step', {
