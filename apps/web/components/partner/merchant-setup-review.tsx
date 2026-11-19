@@ -56,7 +56,7 @@ export function SetupReview({ lines }: { lines: SetupReviewLine[] }) {
                 const r = await dismissSetupReview(line.id);
                 setBusy(null);
                 if (r.ok) router.refresh();
-                else setError(r.message);
+                else setError(r.message ?? 'That line could not be cleared.');
               }}
             >
               {busy === line.id ? '…' : 'Done'}
