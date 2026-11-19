@@ -29,7 +29,7 @@ export const PORTALS: Record<Portal, PortalInfo> = {
   merchant: {
     signIn: '/merchants/sign-in',
     home: '/merchant',
-    start: '/merchants/apply',
+    start: '/merchants#register',
     label: 'Merchant',
   },
   rider: { signIn: '/riders/sign-in', home: '/rider', start: '/riders#apply', label: 'Rider' },

@@ -27,7 +27,18 @@ export default async function ApplyIndex({
     for (const [key, value] of Object.entries(searchParams ?? {})) {
       if (typeof value === 'string' && value) query.set(key, value);
     }
-    redirect(`/merchants/register${query.size ? `?${query.toString()}` : ''}`);
+    // Resuming or editing a saved registration keeps the standalone page.
+    if (query.has('merchantId') || query.has('operationId'))
+      redirect(`/merchants/register?${query.toString()}`);
+    // Someone who already has a merchant goes to their workspace.
+    const client = createClient();
+    const { data: auth } = await client.auth.getUser();
+    if (auth?.user && !auth.user.is_anonymous) {
+      const { data: home } = await client.rpc('fn_partner_home');
+      if ((home as { kind?: string } | null)?.kind === 'merchant') redirect('/merchant');
+    }
+    // Everyone else starts on the sign-up form on the Merchants page.
+    redirect('/merchants#register');
   }
   const supabase = createClient();
 
