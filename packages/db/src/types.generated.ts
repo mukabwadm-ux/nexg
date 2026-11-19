@@ -27061,6 +27061,7 @@ export type Database = {
           cash_handling_cents: number;
           channel: Database['public']['Enums']['order_channel'];
           city_id: string;
+          client_request_id: string | null;
           collected_by: string | null;
           commission_cents: number | null;
           commission_pct: number | null;
@@ -27123,6 +27124,7 @@ export type Database = {
           cash_handling_cents?: number;
           channel?: Database['public']['Enums']['order_channel'];
           city_id: string;
+          client_request_id?: string | null;
           collected_by?: string | null;
           commission_cents?: number | null;
           commission_pct?: number | null;
@@ -27184,6 +27186,7 @@ export type Database = {
           cash_handling_cents?: number;
           channel?: Database['public']['Enums']['order_channel'];
           city_id?: string;
+          client_request_id?: string | null;
           collected_by?: string | null;
           commission_cents?: number | null;
           commission_pct?: number | null;
