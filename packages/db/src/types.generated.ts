@@ -55343,6 +55343,7 @@ export type Database = {
         Args: { p_at?: string; p_merchant_id: string };
         Returns: boolean;
       };
+      fn_merchant_payout_declared: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_readiness: { Args: { p_merchant_id: string }; Returns: Json };
       fn_merchant_required_docs: {
         Args: { p_merchant_id: string };
@@ -60282,6 +60283,7 @@ export type Database = {
         };
       };
       rpc_merchant_invite_revoke: { Args: { p_invite_id: string }; Returns: Json };
+      rpc_merchant_invites_accept: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_merchant_membership_remove: {
         Args: { p_merchant_id: string; p_user_id: string };
         Returns: Json;

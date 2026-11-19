@@ -73,6 +73,66 @@ describe('open workspace authorization', () => {
     watcher.stop();
   });
 
+  it('keeps the page through failed reads and closes it only when they keep failing', async () => {
+    let content = 'typing';
+    let reply: () => Promise<{ data: unknown; error: unknown; status?: number }> = async () => {
+      throw new TypeError('Failed to fetch');
+    };
+    const watcher = watchMerchantWorkspaceAccess({
+      client: { rpc: () => reply() },
+      merchantId: 'merchant-1',
+      initial: approved,
+      visible: () => true,
+      onChange: () => {
+        content = 'changed';
+      },
+      onInvalid: () => {
+        content = 'closed';
+      },
+    });
+    // A dropped connection, then a database timeout: nothing is unmounted.
+    expect(await watcher.check()).toBe('retrying');
+    reply = async () => ({ data: null, error: { code: '57014', message: 'timeout' }, status: 500 });
+    expect(await watcher.check()).toBe('retrying');
+    expect(content).toBe('typing');
+    // A good read in between starts the count again.
+    reply = async () => ({ data: approved, error: null, status: 200 });
+    expect(await watcher.check()).toBe('unchanged');
+    reply = async () => ({ data: null, error: { code: '', message: 'fetch failed' }, status: 0 });
+    expect(await watcher.check()).toBe('retrying');
+    expect(await watcher.check()).toBe('retrying');
+    expect(content).toBe('typing');
+    // The third failure in a row closes the workspace, as before.
+    expect(await watcher.check()).toBe('unavailable');
+    expect(content).toBe('closed');
+    watcher.stop();
+  });
+
+  it('closes at once when the database refuses the read rather than failing to run it', async () => {
+    let content = 'private';
+    const watcher = watchMerchantWorkspaceAccess({
+      client: {
+        rpc: async () => ({
+          data: null,
+          error: { code: '42501', message: 'permission denied' },
+          status: 403,
+        }),
+      },
+      merchantId: 'merchant-1',
+      initial: approved,
+      visible: () => true,
+      onChange: () => {
+        content = 'changed';
+      },
+      onInvalid: () => {
+        content = 'hidden';
+      },
+    });
+    expect(await watcher.check()).toBe('unavailable');
+    expect(content).toBe('hidden');
+    watcher.stop();
+  });
+
   it('aborts a pending SDK read and discards its late authority response after cleanup', async () => {
     let resolve!: (value: { data: unknown; error: null }) => void;
     let signal: AbortSignal | undefined;

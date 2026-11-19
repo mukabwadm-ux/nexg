@@ -234,7 +234,7 @@ export function projectMerchantSavedHome(input: SavedHomeInput): MerchantSavedHo
       actionLabel: locations.total ? 'Review locations' : 'Add location',
       description: locations.total
         ? `${locations.total} location ${locations.total === 1 ? 'record' : 'records'} saved, ${locations.addressed} with an address and ${locations.pinned} with a pin. ${locations.closed} closed and ${locations.paused} paused. Visibility and service coverage are checked separately.`
-        : 'No location records are saved. A declared branch count does not create locations.',
+        : 'No location records are saved. NexG needs your main location before it can approve your business. A declared branch count does not create locations.',
     });
   replace(locationRow);
 

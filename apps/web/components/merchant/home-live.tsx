@@ -53,6 +53,7 @@ export function HomeLive({
   preview = false,
   previewDemo,
   previewState = 'live',
+  ordersSwitch,
 }: {
   m: MerchantHome;
   branches: BranchCard[];
@@ -65,6 +66,8 @@ export function HomeLive({
   preview?: boolean;
   previewDemo?: PreviewDemo;
   previewState?: 'live' | 'paused' | 'mixed' | 'unavailable';
+  /** The start / pause button, given only to a live business's owner or manager. */
+  ordersSwitch?: React.ReactNode;
 }) {
   const demo = preview ? previewDemo : undefined;
   const destination = (section: string) => {
@@ -201,8 +204,11 @@ export function HomeLive({
                   : previewState === 'mixed'
                     ? 'Check each location below.'
                     : `You’re accepting new ${demo.activityLabel.toLowerCase()}.`
-              : 'Location hours and availability may differ.'
+              : m.accepting_orders === false && m.status === 'live'
+                ? 'Guests cannot order until you start taking orders.'
+                : 'Location hours and availability may differ.'
           }
+          action={demo ? undefined : ordersSwitch}
           divider
         />
       </section>
@@ -511,12 +517,14 @@ function Status({
   label,
   value,
   note,
+  action,
   divider = false,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   note: string;
+  action?: React.ReactNode;
   divider?: boolean;
 }) {
   return (
@@ -536,6 +544,7 @@ function Status({
           </span>
         </div>
         <p className={`${subtle} mt-0.5`}>{note}</p>
+        {action}
       </div>
     </div>
   );
