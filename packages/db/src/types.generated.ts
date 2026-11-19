@@ -56922,6 +56922,7 @@ export type Database = {
       cron_finance_invariants: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_holiday_reminders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_merchant_deleted_retention: { Args: Record<PropertyKey, never>; Returns: number };
+      cron_native_push_dispatch: { Args: Record<PropertyKey, never>; Returns: boolean };
       cron_notify_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_payments_worker: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_push_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -57806,14 +57807,37 @@ export type Database = {
           isSetofReturn: false;
         };
       };
-      fn_native_stay_customer: {
-        Args: Record<PropertyKey, never>;
-        Returns: string;
+      fn_native_push_claim: {
+        Args: { p_limit?: number };
+        Returns: {
+          app: string;
+          binding: number;
+          deadline: string;
+          environment: string;
+          expires_at: string;
+          id: string;
+          installation_id: string;
+          lease: string;
+          locale: string;
+          occurred_at: string;
+          platform: string;
+          stage: string;
+          subject: string;
+          subject_id: string;
+          surface: string;
+          terminal: boolean;
+          token: string;
+          watch_id: string;
+        }[];
       };
-      fn_native_stay_checkout_view: {
-        Args: { p_checkout_id: string };
-        Returns: Json;
+      fn_native_push_finish: {
+        Args: { p_id: string; p_lease: string; p_result: string };
+        Returns: boolean;
       };
+      fn_native_push_reminders: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_native_push_retention: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_native_stay_customer: { Args: Record<PropertyKey, never>; Returns: string };
+      fn_native_stay_checkout_view: { Args: { p_checkout_id: string }; Returns: Json };
       fn_needs_action_reads_as: { Args: { p_reasons: string[] }; Returns: string };
       fn_notify_enqueue: {
         Args: {
@@ -63848,6 +63872,45 @@ export type Database = {
       };
       rpc_my_support_tickets: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_ticket_reply: { Args: { p_body: string; p_ticket_id: string }; Returns: Json };
+      rpc_native_push_register: {
+        Args: {
+          p_alerts: boolean;
+          p_app: string;
+          p_environment: string;
+          p_expected_revision: number;
+          p_installation: string;
+          p_locale: string;
+          p_platform: string;
+          p_proof: string;
+          p_rider_device?: string;
+          p_token: string;
+        };
+        Returns: Json;
+      };
+      rpc_native_push_revision: {
+        Args: { p_installation: string; p_proof: string };
+        Returns: number;
+      };
+      rpc_native_push_revoke: {
+        Args: { p_expected_revision: number; p_installation: string; p_proof: string };
+        Returns: boolean;
+      };
+      rpc_native_push_unwatch: {
+        Args: { p_binding: number; p_installation: string; p_proof: string; p_watch: string };
+        Returns: boolean;
+      };
+      rpc_native_push_watch: {
+        Args: {
+          p_activity_token?: string;
+          p_binding: number;
+          p_installation: string;
+          p_proof: string;
+          p_subject: string;
+          p_subject_id: string;
+          p_watch: string;
+        };
+        Returns: boolean;
+      };
       rpc_native_stay_quote: {
         Args: {
           p_adults: number;
@@ -63859,14 +63922,8 @@ export type Database = {
         };
         Returns: Json;
       };
-      rpc_native_stay_hold: {
-        Args: { p_first_name: string; p_quote_id: string };
-        Returns: Json;
-      };
-      rpc_native_stay_status: {
-        Args: { p_operation_id: string };
-        Returns: Json;
-      };
+      rpc_native_stay_hold: { Args: { p_first_name: string; p_quote_id: string }; Returns: Json };
+      rpc_native_stay_status: { Args: { p_operation_id: string }; Returns: Json };
       rpc_nearest_free: {
         Args: { p_job_id: string; p_limit?: number };
         Returns: {

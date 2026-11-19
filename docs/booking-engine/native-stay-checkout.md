@@ -1,6 +1,6 @@
 # Native stay checkout
 
-The NEXG Stay and Consumer Expo apps use customer routes on the shared web backend. The native screens own review, guest details, payment and confirmation. The backend uses the established Stay availability query, hold, payment and settlement records. Carried over from PR #148 in migration `20270117000200_native_stay_checkout.sql`.
+The NEXG Stay and Consumer Expo apps use customer routes on the shared web backend. The native screens own review, guest details, payment and confirmation. The backend uses the established Stay availability query, hold, payment and settlement records. Carried over from PR #148 in migration `20270121000200_native_stay_checkout.sql`.
 
 All routes below live under `/api/customer/checkout/stays`. They require the caller's shared Supabase access token in `Authorization: Bearer <token>`: an account, or a temporary guest session (the hold needs the guest's first name). State is private and never cached.
 
@@ -21,7 +21,7 @@ Hold replay returns the operation's original stay. Rate and unit availability ar
 
 ## Rollout order
 
-1. Apply migration `20270117000200_native_stay_checkout.sql`.
+1. Apply migration `20270121000200_native_stay_checkout.sql`.
 2. Deploy the web routes.
 3. Configure both mobile apps with the shared web origin.
 4. When Paystack is wired, add the payment step behind `POST /holds/{operationId}/payment` and list the method in `paymentMethods`.
