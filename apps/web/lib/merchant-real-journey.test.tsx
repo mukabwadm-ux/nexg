@@ -242,10 +242,14 @@ describe('persisted real merchant journey', () => {
       expect(setupHtml).toContain('2 location records saved, 2 with an address and 1 with a pin.');
       expect(setupHtml).toContain('3 opening windows saved across 2 weekdays.');
       expect(setupHtml).toContain('1 awaiting review, 1 verified, 0 rejected and 1 expired.');
-      // Before approval only Business profile and Documents (step 2) are open;
-      // the other saved steps stay visible but greyed out and locked.
+      // Before approval only Business profile, Documents (step 2) and the
+      // location approval needs are open; the other saved steps stay visible
+      // but greyed out and locked.
       expect(setupHtml).toContain('Your payout declaration is saved.');
       expect(setupHtml.indexOf('Documents and evidence')).toBeLessThan(
+        setupHtml.indexOf('Location and coverage'),
+      );
+      expect(setupHtml.indexOf('Location and coverage')).toBeLessThan(
         setupHtml.indexOf('Offerings'),
       );
       expect(setupHtml.match(/data-locked="true"/g)?.length).toBeGreaterThan(0);

@@ -102,10 +102,13 @@ values ('cccccccc-0000-0000-0000-00000000000f', 'Afya Pharmacy Ltd', 'Afya Pharm
         (select id from public.city where slug = 'nairobi'),
         '{"dispenses_rx": "yes"}'::jsonb);
 
+-- Since the owner's onboarding template (20270110410100) every merchant owes
+-- the owner ID copy, KRA PIN and business registration certificates again, and
+-- a pharmacy no longer owes the county permit.
 select is(
   (select count(*)::int from public.fn_merchant_required_docs('cccccccc-0000-0000-0000-00000000000f')),
-  3,
-  'a dispensing pharmacy needs the business permit plus both licences'
+  5,
+  'a dispensing pharmacy needs the three common documents plus both licences'
 );
 
 select ok(
