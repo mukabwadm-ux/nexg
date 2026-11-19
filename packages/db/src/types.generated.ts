@@ -56973,6 +56973,7 @@ export type Database = {
           offboard_reason: string | null;
           offboarded_at: string | null;
           offers_paused_reason: string | null;
+          offline_after_trip: boolean;
           onboarding_session_at: string | null;
           onboarding_slot_id: string | null;
           onboarding_step: number;
@@ -56981,6 +56982,7 @@ export type Database = {
           ownership: Database['public']['Enums']['vehicle_ownership'] | null;
           pay_on_delivery_eligible: boolean;
           payout_msisdn: string | null;
+          payout_msisdn_changed_at: string | null;
           payout_name_lookup: Json | null;
           phone: string;
           phone_code_attempts: number;
@@ -57215,6 +57217,7 @@ export type Database = {
           offboard_reason: string | null;
           offboarded_at: string | null;
           offers_paused_reason: string | null;
+          offline_after_trip: boolean;
           onboarding_session_at: string | null;
           onboarding_slot_id: string | null;
           onboarding_step: number;
@@ -57223,6 +57226,7 @@ export type Database = {
           ownership: Database['public']['Enums']['vehicle_ownership'] | null;
           pay_on_delivery_eligible: boolean;
           payout_msisdn: string | null;
+          payout_msisdn_changed_at: string | null;
           payout_name_lookup: Json | null;
           phone: string;
           phone_code_attempts: number;
@@ -63628,6 +63632,7 @@ export type Database = {
           offboard_reason: string | null;
           offboarded_at: string | null;
           offers_paused_reason: string | null;
+          offline_after_trip: boolean;
           onboarding_session_at: string | null;
           onboarding_slot_id: string | null;
           onboarding_step: number;
@@ -63636,6 +63641,7 @@ export type Database = {
           ownership: Database['public']['Enums']['vehicle_ownership'] | null;
           pay_on_delivery_eligible: boolean;
           payout_msisdn: string | null;
+          payout_msisdn_changed_at: string | null;
           payout_name_lookup: Json | null;
           phone: string;
           phone_code_attempts: number;
@@ -63714,6 +63720,7 @@ export type Database = {
           offboard_reason: string | null;
           offboarded_at: string | null;
           offers_paused_reason: string | null;
+          offline_after_trip: boolean;
           onboarding_session_at: string | null;
           onboarding_slot_id: string | null;
           onboarding_step: number;
@@ -63722,6 +63729,7 @@ export type Database = {
           ownership: Database['public']['Enums']['vehicle_ownership'] | null;
           pay_on_delivery_eligible: boolean;
           payout_msisdn: string | null;
+          payout_msisdn_changed_at: string | null;
           payout_name_lookup: Json | null;
           phone: string;
           phone_code_attempts: number;
@@ -64039,6 +64047,7 @@ export type Database = {
           offboard_reason: string | null;
           offboarded_at: string | null;
           offers_paused_reason: string | null;
+          offline_after_trip: boolean;
           onboarding_session_at: string | null;
           onboarding_slot_id: string | null;
           onboarding_step: number;
@@ -64047,6 +64056,7 @@ export type Database = {
           ownership: Database['public']['Enums']['vehicle_ownership'] | null;
           pay_on_delivery_eligible: boolean;
           payout_msisdn: string | null;
+          payout_msisdn_changed_at: string | null;
           payout_name_lookup: Json | null;
           phone: string;
           phone_code_attempts: number;
@@ -64142,6 +64152,7 @@ export type Database = {
           offboard_reason: string | null;
           offboarded_at: string | null;
           offers_paused_reason: string | null;
+          offline_after_trip: boolean;
           onboarding_session_at: string | null;
           onboarding_slot_id: string | null;
           onboarding_step: number;
@@ -64150,6 +64161,7 @@ export type Database = {
           ownership: Database['public']['Enums']['vehicle_ownership'] | null;
           pay_on_delivery_eligible: boolean;
           payout_msisdn: string | null;
+          payout_msisdn_changed_at: string | null;
           payout_name_lookup: Json | null;
           phone: string;
           phone_code_attempts: number;
@@ -64278,6 +64290,7 @@ export type Database = {
           offboard_reason: string | null;
           offboarded_at: string | null;
           offers_paused_reason: string | null;
+          offline_after_trip: boolean;
           onboarding_session_at: string | null;
           onboarding_slot_id: string | null;
           onboarding_step: number;
@@ -64286,6 +64299,7 @@ export type Database = {
           ownership: Database['public']['Enums']['vehicle_ownership'] | null;
           pay_on_delivery_eligible: boolean;
           payout_msisdn: string | null;
+          payout_msisdn_changed_at: string | null;
           payout_name_lookup: Json | null;
           phone: string;
           phone_code_attempts: number;
