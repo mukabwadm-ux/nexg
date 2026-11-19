@@ -161,9 +161,8 @@ export function AgreementDetailsFields({
         value={value.registration_number}
         onChange={set('registration_number')}
         disabled={disabled}
-        required={false}
         placeholder="PVT-AB12CD3"
-        hint="Not registered yet? Leave it empty: NexG signs your agreement once you add it."
+        hint="As on your certificate of registration or incorporation (CR12 or equivalent)."
       />
       <Text
         id={id('kra-pin')}

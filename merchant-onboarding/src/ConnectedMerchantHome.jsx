@@ -138,12 +138,20 @@ export default function ConnectedMerchantHome({
     const [documentsRow] = homeRows.splice(documentsAt, 1);
     homeRows.splice(homeRows.findIndex((row) => row.id === 'business') + 1, 0, documentsRow);
   }
-  // Until an admin approves the account, only the business profile and the
-  // documents can be worked on. Every other step is shown greyed out.
+  // The location comes next: approval takes the business live, which
+  // publishes its main location, so an admin cannot approve without one.
+  const locationAt = homeRows.findIndex((row) => row.id === 'location');
+  if (locationAt >= 0 && homeRows.some((row) => row.id === 'documents')) {
+    const [locationRow] = homeRows.splice(locationAt, 1);
+    homeRows.splice(homeRows.findIndex((row) => row.id === 'documents') + 1, 0, locationRow);
+  }
+  // Until an admin approves the account, only the business profile, the
+  // documents and the location can be worked on: they are what approval
+  // checks. Every other step is shown greyed out.
   const awaitingApproval = !previewMode && !savedHome.access.operations;
   const checklist = awaitingApproval
     ? homeRows.map((row) =>
-        row.id === 'business' || row.id === 'documents'
+        row.id === 'business' || row.id === 'documents' || row.id === 'location'
           ? row
           : {
               ...row,
@@ -217,7 +225,7 @@ export default function ConnectedMerchantHome({
               ? published
                 ? 'Your approved workspace is available and your business is published. Accepting work has separate requirements.'
                 : 'Your approved workspace is available. Your business remains unpublished until activation requirements are met.'
-              : 'Complete your business profile and documents below. The other steps unlock once an admin has verified your documents and approved your account.'}
+              : 'Complete your business profile, documents and location below. The other steps unlock once an admin has verified your documents and approved your account.'}
           </p>
           {!previewMode &&
             (reviewState === 'changes_requested' || needsResubmission) &&
