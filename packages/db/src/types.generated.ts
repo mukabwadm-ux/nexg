@@ -58024,10 +58024,7 @@ export type Database = {
         };
         Returns: string;
       };
-      fn_offering_setup_project: {
-        Args: { p_item_id: string };
-        Returns: undefined;
-      };
+      fn_offering_setup_project: { Args: { p_item_id: string }; Returns: undefined };
       fn_ops_kinds: { Args: { p_tab: string }; Returns: string[] };
       fn_ops_rows: {
         Args: { p_from: string; p_to: string };
@@ -58413,10 +58410,7 @@ export type Database = {
         };
         Returns: undefined;
       };
-      fn_setup_review_from_onboarding: {
-        Args: Record<PropertyKey, never>;
-        Returns: number;
-      };
+      fn_setup_review_from_onboarding: { Args: Record<PropertyKey, never>; Returns: number };
       fn_short_booking_code: { Args: Record<PropertyKey, never>; Returns: string };
       fn_slot_order: {
         Args: { p_slot: Database['public']['Enums']['block_slot'] };
@@ -63683,10 +63677,7 @@ export type Database = {
         Args: { p_merchant_id: string; p_rows: Json };
         Returns: Json;
       };
-      rpc_merchant_setup_review_dismiss: {
-        Args: { p_review_id: string };
-        Returns: Json;
-      };
+      rpc_merchant_setup_review_dismiss: { Args: { p_review_id: string }; Returns: Json };
       rpc_merchant_soft_delete: {
         Args: { p_confirmation_name: string; p_merchant_id: string; p_reason: string };
         Returns: Json;
