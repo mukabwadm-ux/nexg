@@ -9820,6 +9820,25 @@ export type Database = {
           },
         ];
       };
+      customer_notification_pref: {
+        Row: {
+          choices: NonNullable<Json>;
+          updated_at: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          choices?: NonNullable<Json>;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          choices?: NonNullable<Json>;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       customer_saved: {
         Row: {
           created_at: string;
@@ -36097,6 +36116,7 @@ export type Database = {
           status: Database['public']['Enums']['ticket_status'];
           topic: Database['public']['Enums']['ticket_topic'];
           updated_at: string;
+          user_id: string | null;
         };
         ComputedFields: never;
         Insert: {
@@ -36120,6 +36140,7 @@ export type Database = {
           status?: Database['public']['Enums']['ticket_status'];
           topic?: Database['public']['Enums']['ticket_topic'];
           updated_at?: string;
+          user_id?: string | null;
         };
         Update: {
           assigned_to?: string | null;
@@ -36142,6 +36163,7 @@ export type Database = {
           status?: Database['public']['Enums']['ticket_status'];
           topic?: Database['public']['Enums']['ticket_topic'];
           updated_at?: string;
+          user_id?: string | null;
         };
         Relationships: [
           {
@@ -58944,6 +58966,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_guest_ensure: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_guest_reveal_phone: { Args: { p_guest_id: string; p_reason: string }; Returns: Json };
       rpc_handover_plan: {
         Args: { p_plan_id: string; p_reason: string; p_to: string };
@@ -61459,6 +61482,11 @@ export type Database = {
       rpc_my_order_map:
         | { Args: { p_order_id: string }; Returns: Json }
         | { Args: { p_contract_version: string; p_order_id: string }; Returns: Json };
+      rpc_my_data_export_request: {
+        Args: Record<PropertyKey, never>;
+        Returns: Json;
+      };
+      rpc_my_data_requests: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_rider_map_assignments: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_saved_places: {
         Args: {
@@ -61486,6 +61514,19 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_my_support_ticket_create: {
+        Args: {
+          p_body: string;
+          p_details?: Json;
+          p_order_reference?: string;
+          p_topic?: Database['public']['Enums']['ticket_topic'];
+        };
+        Returns: Json;
+      };
+      rpc_my_support_tickets: {
+        Args: Record<PropertyKey, never>;
+        Returns: Json;
+      };
       rpc_nearest_free: {
         Args: { p_job_id: string; p_limit?: number };
         Returns: {
@@ -61510,6 +61551,10 @@ export type Database = {
           p_status: Database['public']['Enums']['notification_status'];
         };
         Returns: undefined;
+      };
+      rpc_notification_pref_set: {
+        Args: { p_category: string; p_channel: string; p_enabled: boolean };
+        Returns: Json;
       };
       rpc_notifications_read: { Args: { p_id?: string }; Returns: Json };
       rpc_office_budget_set: {
