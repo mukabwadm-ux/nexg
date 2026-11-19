@@ -11,7 +11,7 @@ import { merchantActionClient } from '@/lib/merchant-action-access';
  *
  * Groups are written through rpc_merchant_option_group_save and attached to
  * items through rpc_merchant_item_option_groups_set
- * (20270109000400_catalogue_selling); checkout prices them from the same rows.
+ * (20270111000100_catalogue_selling); checkout prices them from the same rows.
  */
 
 export interface OptionInput {
@@ -183,7 +183,7 @@ export interface VariantGridInput {
   }[];
 }
 
-/** Save an item's versions (rpc_merchant_item_variants_save, 20270109000700). */
+/** Save an item's versions (rpc_merchant_item_variants_save, 20270111000400). */
 export async function saveItemVariants(itemId: string, grid: VariantGridInput): Promise<Outcome> {
   const { client } = await merchantActionClient({ access: 'setup' });
   if (!uuid.test(itemId)) return { ok: false, message: 'Choose a valid item.' };
