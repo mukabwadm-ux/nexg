@@ -17685,6 +17685,121 @@ export type Database = {
           },
         ];
       };
+      host_payout: {
+        Row: {
+          account: NonNullable<Json>;
+          declared_at: string;
+          declared_by: string | null;
+          host_id: string;
+          rail: string;
+          verified_at: string | null;
+          verified_by: string | null;
+          verified_version: number | null;
+          version: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          account: NonNullable<Json>;
+          declared_at?: string;
+          declared_by?: string | null;
+          host_id: string;
+          rail: string;
+          verified_at?: string | null;
+          verified_by?: string | null;
+          verified_version?: number | null;
+          version?: number;
+        };
+        Update: {
+          account?: NonNullable<Json>;
+          declared_at?: string;
+          declared_by?: string | null;
+          host_id?: string;
+          rail?: string;
+          verified_at?: string | null;
+          verified_by?: string | null;
+          verified_version?: number | null;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_payout_declared_by_fkey';
+            columns: ['declared_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_payout_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_payout_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: true;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_payout_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: true;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_payout_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_payout_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_payout_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_payout_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_payout_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_payout_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_payout_verified_by_fkey';
+            columns: ['verified_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       host_priority_rule: {
         Row: {
           host_id: string;
@@ -61674,6 +61789,9 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_host_payout_declare: { Args: { p_host_id: string; p_payout: Json }; Returns: Json };
+      rpc_host_payout_verify: { Args: { p_host_id: string; p_version: number }; Returns: Json };
+      rpc_host_payouts: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_host_referral_link: { Args: { p_host_id: string }; Returns: Json };
       rpc_host_request_create: {
         Args: { p_host_id: string; p_payload: Json };

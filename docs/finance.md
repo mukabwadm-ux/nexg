@@ -127,7 +127,7 @@ The console **cannot move a run along**. The transitions exist and are guarded; 
 
 Cash is `cash.bank` for a bank collection and `cash.mpesa_paybill` otherwise.
 
-A stay's host share is not a `payable.*` balance, so the settlement run does not pay it. The run settles a host's payables as a credit note against their next invoice, which is not how a stay is paid, and hosts have no payout details in NexG yet. Finance sees the share on the owed list under the host's name, and the host sees it on their statement as a stay.
+A stay's host share is kept on `stay.host_share`, not a `payable.*` account. The weekly run pays it together with the host's referral rewards (`payable.host_credit`), on one line, to payout details in `host_payout`: hospitality staff declare them on the host's record in Hotels & Airbnb (`rpc_host_payout_declare`), and someone with full Finance other than the declarer verifies them on Settlements → Host Payouts (`rpc_host_payout_verify`). Without verified details the host's line is held (`held_kyc`), and a paused or offboarded host is held whatever their details (`held_suspended`). Unpaid host invoices are not netted off. Until a run claims it, Finance sees the share on the owed list under the host's name, and the host sees it on their statement as a stay.
 
 A posting never undoes a payment. The triggers log `ledger.posting_failed` (high) instead of raising, and every posting function is idempotent, so a failed one can be posted again from the SQL Editor.
 

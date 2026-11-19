@@ -137,3 +137,40 @@ export async function recordStayRefund(input: {
   revalidatePath('/hotels');
   return { success: true };
 }
+
+/**
+ * Declares where a host is paid their stay shares and referral rewards.
+ * Declaring again clears Finance's verification, and the weekly run holds
+ * the host's payouts until someone with full Finance, other than whoever
+ * declared them, verifies the details. Who may declare (hospitality staff)
+ * is checked by the RPC.
+ */
+export async function declareHostPayout(
+  hostId: string,
+  payout: Record<string, string>,
+): Promise<{ ok: boolean; message?: string }> {
+  const staff = await requireStaff();
+  requireModule(staff, 'hotels');
+  if (!uuid.test(hostId)) return { ok: false, message: 'The host ID is invalid.' };
+
+  const { data, error } = await createClient().rpc('rpc_host_payout_declare', {
+    p_host_id: hostId,
+    p_payout: payout,
+  });
+  if (error)
+    return {
+      ok: false,
+      message:
+        error.code === '22023' || error.code === '42501' || error.code === 'P0002'
+          ? error.message
+          : 'The payout details could not be saved. Try again.',
+    };
+  revalidatePath('/hotels');
+  revalidatePath('/finance/settlements');
+  return {
+    ok: true,
+    message:
+      (data as { message?: string } | null)?.message ??
+      'Saved. Finance verifies the details before a payout run pays the host.',
+  };
+}

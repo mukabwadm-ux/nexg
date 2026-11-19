@@ -53,6 +53,29 @@ export async function verifyPartnerPayout(
 }
 
 /**
+ * Verifies a host's payout details, by the version on the screen. The
+ * database decides who may (full Finance, not whoever declared them; a
+ * super admin may, logged for review) and logs it. The next run pays the
+ * host's stay shares and referral rewards to these details.
+ */
+export async function verifyHostPayout(
+  hostId: string,
+  version: number,
+): Promise<{ ok: boolean; message?: string }> {
+  const staff = await requireStaff();
+  requireModule(staff, 'finance');
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('rpc_host_payout_verify', {
+    p_host_id: hostId,
+    p_version: version,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/finance/settlements');
+  revalidatePath('/hotels');
+  return { ok: true, message: (data as { message?: string } | null)?.message ?? 'Verified' };
+}
+
+/**
  * A rider's early payout: approve, reject (with a reason the rider reads),
  * or record that it was paid with the M-Pesa reference. The database checks
  * full Finance and, on paid, takes the amount off the next weekly run.

@@ -38,6 +38,7 @@ import {
 } from '@/components/hotels/tabs';
 import { Card } from '@nexg/ui';
 
+import { hostPayouts } from '@/lib/host-payouts';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -101,7 +102,7 @@ export default async function HotelsPage({
       <main className="px-4 py-6 sm:px-8">
         <HotelTabs current={tab} />
 
-        {tab === 'hosts' && (await loadHosts(supabase, badges, filter, selected))}
+        {tab === 'hosts' && (await loadHosts(supabase, badges, filter, selected, worksHospitality))}
         {tab === 'listings' && (await loadListings(supabase, filter, selected))}
         {tab === 'refunds' &&
           (worksHospitality ? (
@@ -144,8 +145,9 @@ async function loadHosts(
   badges: Badges,
   filter: string,
   selected: string | null,
+  canDeclarePayout: boolean,
 ) {
-  const [{ data: hosts }, { data: units }] = await Promise.all([
+  const [{ data: hosts }, { data: units }, payouts] = await Promise.all([
     supabase.from('console_host_directory_v').select('*').order('created_at', { ascending: false }),
     /* Only the selected host's units: the panel is the only thing that
        renders them, and a hundred hosts is a lot of rows to fetch for
@@ -153,6 +155,8 @@ async function loadHosts(
     selected
       ? supabase.from('host_view_v').select('*').eq('host_id', selected)
       : Promise.resolve({ data: [] as unknown[] }),
+    /* Where the selected host is paid, masked; only the panel shows it. */
+    selected ? supabase.rpc('rpc_host_payouts') : Promise.resolve({ data: null, error: null }),
   ]);
 
   return (
@@ -162,6 +166,9 @@ async function loadHosts(
       badges={badges}
       filter={filter}
       selected={selected}
+      payout={hostPayouts(payouts.data).find((p) => p.host_id === selected) ?? null}
+      canDeclarePayout={canDeclarePayout}
+      payoutUnavailable={payouts.error != null}
     />
   );
 }
