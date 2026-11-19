@@ -731,7 +731,7 @@ begin
     'KES', q -> 'pricing_version_ids', v_needs)
   returning id into v_order;
 
-  /* Each line, with its unit and the choices made on it (20270109000400). */
+  /* Each line, with its unit and the choices made on it (20270111000100). */
   for v_line in select l from jsonb_array_elements(q -> 'lines') l loop
     insert into public.order_item (
       order_id, catalogue_item_id, name, quantity, unit_price_cents, line_total_cents, note,
