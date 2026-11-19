@@ -6551,6 +6551,7 @@ export type Database = {
           allergens: string[];
           availability_notes: string | null;
           available: boolean;
+          booking_offering_id: string | null;
           created_at: string;
           description: string | null;
           dietary_labels: string[];
@@ -6558,15 +6559,22 @@ export type Database = {
           highlighted: boolean;
           id: string;
           ingredients: string | null;
+          kind: Database['public']['Enums']['catalogue_item_kind'];
           merchant_id: string;
           name: string;
           photo_path: string | null;
           portion_size: string | null;
           prep_time_minutes: number | null;
+          price_is_estimate: boolean;
           price_kes: number | null;
           section_id: string;
+          sold_by: string;
           sort: number;
           storage_guidance: string | null;
+          unit_label: string | null;
+          unit_max: number | null;
+          unit_min: number | null;
+          unit_step: number;
           updated_at: string;
         };
         ComputedFields: never;
@@ -6575,6 +6583,7 @@ export type Database = {
           allergens?: string[];
           availability_notes?: string | null;
           available?: boolean;
+          booking_offering_id?: string | null;
           created_at?: string;
           description?: string | null;
           dietary_labels?: string[];
@@ -6582,15 +6591,22 @@ export type Database = {
           highlighted?: boolean;
           id?: string;
           ingredients?: string | null;
+          kind?: Database['public']['Enums']['catalogue_item_kind'];
           merchant_id: string;
           name: string;
           photo_path?: string | null;
           portion_size?: string | null;
           prep_time_minutes?: number | null;
+          price_is_estimate?: boolean;
           price_kes?: number | null;
           section_id: string;
+          sold_by?: string;
           sort?: number;
           storage_guidance?: string | null;
+          unit_label?: string | null;
+          unit_max?: number | null;
+          unit_min?: number | null;
+          unit_step?: number;
           updated_at?: string;
         };
         Update: {
@@ -6598,6 +6614,7 @@ export type Database = {
           allergens?: string[];
           availability_notes?: string | null;
           available?: boolean;
+          booking_offering_id?: string | null;
           created_at?: string;
           description?: string | null;
           dietary_labels?: string[];
@@ -6605,15 +6622,22 @@ export type Database = {
           highlighted?: boolean;
           id?: string;
           ingredients?: string | null;
+          kind?: Database['public']['Enums']['catalogue_item_kind'];
           merchant_id?: string;
           name?: string;
           photo_path?: string | null;
           portion_size?: string | null;
           prep_time_minutes?: number | null;
+          price_is_estimate?: boolean;
           price_kes?: number | null;
           section_id?: string;
+          sold_by?: string;
           sort?: number;
           storage_guidance?: string | null;
+          unit_label?: string | null;
+          unit_max?: number | null;
+          unit_min?: number | null;
+          unit_step?: number;
           updated_at?: string;
         };
         Relationships: [
@@ -27422,7 +27446,9 @@ export type Database = {
           order_id: string;
           quantity: number;
           removed_at: string | null;
+          unit_label: string | null;
           unit_price_cents: number;
+          unit_step: number | null;
         };
         ComputedFields: never;
         Insert: {
@@ -27435,7 +27461,9 @@ export type Database = {
           order_id: string;
           quantity: number;
           removed_at?: string | null;
+          unit_label?: string | null;
           unit_price_cents: number;
+          unit_step?: number | null;
         };
         Update: {
           catalogue_item_id?: string | null;
@@ -27447,7 +27475,9 @@ export type Database = {
           order_id?: string;
           quantity?: number;
           removed_at?: string | null;
+          unit_label?: string | null;
           unit_price_cents?: number;
+          unit_step?: number | null;
         };
         Relationships: [
           {
@@ -39764,18 +39794,65 @@ export type Database = {
           },
         ];
       };
+      catalogue_option_public: {
+        Row: {
+          group_id: string | null;
+          group_name: string | null;
+          item_id: string | null;
+          max_choices: number | null;
+          min_choices: number | null;
+          options: Json | null;
+          required: boolean | null;
+          sort: number | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_item_modifier_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_modifier_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_modifier_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+        ];
+      };
       catalogue_public: {
         Row: {
           age_restricted: boolean | null;
           available: boolean | null;
+          booking_offering_id: string | null;
           description: string | null;
+          gallery_paths: string[] | null;
+          has_options: boolean | null;
           highlighted: boolean | null;
           id: string | null;
+          kind: string | null;
           merchant_id: string | null;
           name: string | null;
+          photo_path: string | null;
+          price_is_estimate: boolean | null;
           price_kes: number | null;
           section_id: string | null;
+          sold_by: string | null;
           sort: number | null;
+          unit_label: string | null;
+          unit_max: number | null;
+          unit_min: number | null;
+          unit_step: number | null;
         };
         ComputedFields: never;
         Relationships: [
@@ -55073,6 +55150,7 @@ export type Database = {
         }[];
       };
       fn_ledger_backfill: { Args: { p_limit?: number }; Returns: Json };
+      fn_line_options: { Args: { p_item_id: string; p_options: Json }; Returns: Json };
       fn_listing_sync: { Args: { p_unit_id: string }; Returns: undefined };
       fn_load_available: { Args: { p_plan_id: string }; Returns: undefined };
       fn_mask_phone: { Args: { p_phone: string }; Returns: string };
@@ -60282,6 +60360,10 @@ export type Database = {
         };
       };
       rpc_merchant_invite_revoke: { Args: { p_invite_id: string }; Returns: Json };
+      rpc_merchant_item_option_groups_set: {
+        Args: { p_group_ids: string[]; p_item_id: string };
+        Returns: Json;
+      };
       rpc_merchant_membership_remove: {
         Args: { p_merchant_id: string; p_user_id: string };
         Returns: Json;
@@ -60310,6 +60392,10 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_merchant_option_group_save: {
+        Args: { p_group: Json; p_merchant_id: string };
+        Returns: Json;
       };
       rpc_merchant_order_step: { Args: { p_order_id: string; p_step: string }; Returns: Json };
       rpc_merchant_payout_name_check: { Args: { p_merchant_id: string }; Returns: Json };
@@ -64414,6 +64500,18 @@ export type Database = {
         | 'write_off'
         | 'manual_adjustment'
         | 'recovery_payment';
+      catalogue_item_kind:
+        | 'buy'
+        | 'ticket'
+        | 'seats'
+        | 'appointment'
+        | 'table'
+        | 'trip'
+        | 'transfer'
+        | 'rental'
+        | 'service'
+        | 'request'
+        | 'pass';
       city_status: 'live' | 'soft_launch' | 'waitlist' | 'paused';
       commission_tier_code: 'T1' | 'T2' | 'T3';
       connector_adapter_state: 'draft' | 'sandbox' | 'available' | 'disabled';
@@ -66213,6 +66311,19 @@ export const Constants = {
         'write_off',
         'manual_adjustment',
         'recovery_payment',
+      ],
+      catalogue_item_kind: [
+        'buy',
+        'ticket',
+        'seats',
+        'appointment',
+        'table',
+        'trip',
+        'transfer',
+        'rental',
+        'service',
+        'request',
+        'pass',
       ],
       city_status: ['live', 'soft_launch', 'waitlist', 'paused'],
       commission_tier_code: ['T1', 'T2', 'T3'],
