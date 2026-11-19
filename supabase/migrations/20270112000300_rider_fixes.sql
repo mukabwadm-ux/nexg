@@ -77,7 +77,7 @@ grant execute on function public.rpc_rider_messages_read(uuid[]) to authenticate
 
 insert into public.wiring_audit_exempt (function_name, reason, recorded_in) values
   ('rpc_rider_messages_read', 'Only sets read_at on the rider''s own messages; a read receipt, not an action.',
-   '20270110000300_rider_fixes')
+   '20270112000300_rider_fixes')
 on conflict do nothing;
 
 -- ═══════════════════════════════════════════════ 2. tickets come back
