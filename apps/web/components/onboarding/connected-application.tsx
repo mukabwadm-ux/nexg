@@ -630,9 +630,12 @@ export function ConnectedApplication({
     if (!quiet) {
       const problems = onboardingProblems(current.fields, onboardingAnswers);
       if (problems.length) {
+        /* Name what is missing: only the asterisks mark the fields themselves. */
         const message =
-          problems[0]!.message +
-          (problems.length > 1 ? ` (and ${problems.length - 1} more marked below)` : '');
+          problems
+            .slice(0, 3)
+            .map((p) => p.message)
+            .join('; ') + (problems.length > 3 ? ` (and ${problems.length - 3} more)` : '');
         setOnboardingError(message);
         throw new Error(`Your onboarding details: ${message}`);
       }
