@@ -25,6 +25,16 @@ import {
   withRepresentative,
   type AgreementDetailsRecord,
 } from '@/components/merchant/agreement-details';
+import {
+  OnboardingDetailsFields,
+  loadOnboardingDetails,
+} from '@/components/merchant/onboarding-details';
+import {
+  onboardingAnswersToSave,
+  onboardingProblems,
+  type OnboardingAnswers,
+  type OnboardingField,
+} from '@nexg/contracts/merchant-onboarding-details';
 import { createClient } from '@/lib/supabase/client';
 import { subscribeProtectedActor } from '@/lib/supabase/protected-actor';
 import type { MerchantSavedHomeSource } from '@/lib/merchant-home-source';
@@ -123,6 +133,39 @@ export function ConnectedApplication({
   );
   const [detailsSameAsSignatory, setDetailsSameAsSignatory] = useState(true);
   const [detailsError, setDetailsError] = useState<string | null>(null);
+  /*
+   * The owner's onboarding template for the chosen category (business type,
+   * county, owner ID number, licences and confirmations). Null until the
+   * database answers, and stays null where it does not have it yet.
+   */
+  const [onboardingFields, setOnboardingFields] = useState<{
+    category: string;
+    fields: OnboardingField[];
+  } | null>(null);
+  const [onboardingAnswers, setOnboardingAnswers] = useState<OnboardingAnswers>({});
+  const [onboardingError, setOnboardingError] = useState<string | null>(null);
+  const onboardingCategory = useRef<string | null>(null);
+  const onboardingLoaded = useRef(false);
+  const loadOnboarding = useCallback((categoryId: string) => {
+    if (!categoryId || onboardingCategory.current === categoryId) return;
+    onboardingCategory.current = categoryId;
+    void loadOnboardingDetails(
+      createClient(),
+      record.current?.merchant_id ?? null,
+      categoryId,
+    ).then((details) => {
+      if (onboardingCategory.current !== categoryId) return;
+      if (!details) {
+        setOnboardingFields(null);
+        return;
+      }
+      setOnboardingFields({ category: categoryId, fields: details.fields });
+      if (!onboardingLoaded.current) {
+        onboardingLoaded.current = true;
+        setOnboardingAnswers((local) => ({ ...details.answers, ...local }));
+      }
+    });
+  }, []);
   const closeSetupEditor = () => setSetupEditor(null);
   const refreshSetup = () => router.refresh();
   const openLegacySetup = useCallback(
@@ -576,6 +619,41 @@ export function ConnectedApplication({
     setDetailsError(null);
   }
 
+  /*
+   * Saves the onboarding template answers. Required to submit (the database
+   * refuses a submission without them); a draft (`quiet`) saves what is
+   * valid and skips the rest.
+   */
+  async function saveOnboardingDetails(merchantId: string, quiet = false) {
+    const current = onboardingFields;
+    if (!current) return;
+    if (!quiet) {
+      const problems = onboardingProblems(current.fields, onboardingAnswers);
+      if (problems.length) {
+        /* Name what is missing: only the asterisks mark the fields themselves. */
+        const message =
+          problems
+            .slice(0, 3)
+            .map((p) => p.message)
+            .join('; ') + (problems.length > 3 ? ` (and ${problems.length - 3} more)` : '');
+        setOnboardingError(message);
+        throw new Error(`Your onboarding details: ${message}`);
+      }
+    }
+    const { error } = await createClient().rpc('rpc_merchant_onboarding_save', {
+      p_merchant_id: merchantId,
+      p_answers: onboardingAnswersToSave(current.fields, onboardingAnswers, {
+        dropInvalid: quiet,
+      }),
+    });
+    if (error) {
+      if (quiet) return;
+      setOnboardingError(error.message);
+      throw new Error(error.message || 'Your onboarding details could not be saved. Please retry.');
+    }
+    setOnboardingError(null);
+  }
+
   async function submit(input: Record<string, unknown>) {
     if (emailOtpEnabled) {
       const email = String((input.business as { email?: unknown } | undefined)?.email ?? '')
@@ -606,7 +684,14 @@ export function ConnectedApplication({
         );
         return { applicationId: saved.merchant_id, status: saved.review.state, redirecting: true };
       }
+      if (onboardingFields && agreementDetails && !agreementDetails.registration_number.trim()) {
+        setDetailsError('Add your business registration number.');
+        throw new Error(
+          'Your details for the agreement: add your business registration number (as on your certificate of registration or incorporation).',
+        );
+      }
       await saveAgreementDetails(saved.merchant_id);
+      await saveOnboardingDetails(saved.merchant_id);
       await acceptAgreement(saved.merchant_id, String(input.categoryId ?? ''));
       const submitted = MerchantApplicationRecord.parse(
         await post({
@@ -735,34 +820,66 @@ export function ConnectedApplication({
           serialize(async () => {
             const saved = await save(input);
             await saveAgreementDetails(saved.merchant_id, true);
+            await saveOnboardingDetails(saved.merchant_id, true);
             return saved;
           })
         }
         onSubmit={submit}
         renderAgreement={(categoryId: string) => (
-          <AgreementConsent
-            categoryId={categoryId}
-            checked={agreementAcceptedFor === categoryId && Boolean(categoryId)}
-            error={agreementError}
-            onChange={(checked) => {
-              setAgreementAcceptedFor(checked ? categoryId : null);
-              setAgreementError(null);
-            }}
-            details={
-              agreementDetails
-                ? {
-                    value: agreementDetails,
-                    onChange: (value) => {
-                      setAgreementDetails(value);
-                      setDetailsError(null);
-                    },
-                    sameAsSignatory: detailsSameAsSignatory,
-                    onSameAsSignatoryChange: setDetailsSameAsSignatory,
-                    error: detailsError,
-                  }
-                : null
-            }
-          />
+          <>
+            <OnboardingCategory categoryId={categoryId} onCategory={loadOnboarding} />
+            {onboardingFields && categoryId && onboardingFields.category === categoryId ? (
+              <section
+                aria-labelledby="onboarding-details-title"
+                className="border-border mb-4 rounded-xl border p-4"
+              >
+                <h3 id="onboarding-details-title" className="text-ink text-base font-extrabold">
+                  Onboarding details
+                </h3>
+                <p className="text-muted mb-4 mt-1 text-xs font-semibold leading-[1.5]">
+                  What NexG needs to approve a business in your category. Fields marked * are
+                  required to submit; you upload the matching documents from Home after you apply.
+                </p>
+                <OnboardingDetailsFields
+                  idPrefix="application-onboarding"
+                  fields={onboardingFields.fields}
+                  answers={onboardingAnswers}
+                  onChange={(answers) => {
+                    setOnboardingAnswers(answers);
+                    setOnboardingError(null);
+                  }}
+                />
+                {onboardingError ? (
+                  <p role="alert" className="text-danger mt-3 text-sm font-bold">
+                    {onboardingError}
+                  </p>
+                ) : null}
+              </section>
+            ) : null}
+            <AgreementConsent
+              categoryId={categoryId}
+              checked={agreementAcceptedFor === categoryId && Boolean(categoryId)}
+              error={agreementError}
+              onChange={(checked) => {
+                setAgreementAcceptedFor(checked ? categoryId : null);
+                setAgreementError(null);
+              }}
+              details={
+                agreementDetails
+                  ? {
+                      value: agreementDetails,
+                      onChange: (value) => {
+                        setAgreementDetails(value);
+                        setDetailsError(null);
+                      },
+                      sameAsSignatory: detailsSameAsSignatory,
+                      onSameAsSignatoryChange: setDetailsSameAsSignatory,
+                      error: detailsError,
+                    }
+                  : null
+              }
+            />
+          </>
         )}
         canSubmit={!emailOtpEnabled || emailIsVerified}
         emailFieldDisabled={
@@ -869,4 +986,18 @@ export function ConnectedApplication({
       )}
     </>
   );
+}
+
+/* Tells the application which category the form is on, so it can load that category's template fields. */
+function OnboardingCategory({
+  categoryId,
+  onCategory,
+}: {
+  categoryId: string;
+  onCategory: (categoryId: string) => void;
+}) {
+  useEffect(() => {
+    onCategory(categoryId);
+  }, [categoryId, onCategory]);
+  return null;
 }

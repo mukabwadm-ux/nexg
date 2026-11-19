@@ -152,6 +152,16 @@ pnpm db:types     # regenerate packages/db/src/types.generated.ts
 Every one of these passes `--local`. None of them can touch a hosted project, whatever the CLI
 happens to be linked to — `db:reset` drops the whole database, and that guard is deliberate.
 
+**Before you push a migration** (CI checks each of these and fails otherwise):
+
+1. `git fetch origin`, and give the new file an id later than every id on `origin/main` and on
+   other open branches. Never reuse an id; never rename, edit or delete a migration that has merged.
+   `node scripts/check-migration-ids.mjs origin/main` checks your branch.
+2. `pnpm db:reset && pnpm db:types`, and commit `packages/db/src/types.generated.ts` in the same
+   commit as the migration. No Docker? Push, then take the `types-generated` artifact from the
+   failed CI run's Summary page and commit that file.
+3. `pnpm format:check` (or `pnpm format`) before pushing.
+
 **Reference data lives in migrations, not `seed.sql`.** Cities, roles, document requirements and
 setting keys ship with the schema because production needs them too. `seed.sql` holds only local
 development fixtures and never runs anywhere else.

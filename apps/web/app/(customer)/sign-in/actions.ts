@@ -14,6 +14,7 @@ import {
   type PartnerHome,
   type Portal,
 } from '@/lib/auth-portals';
+import { acceptMerchantInvites } from '@/lib/merchant-invites';
 import { clearedWelcomeMetadata, welcomeMetadata } from '@/lib/merchant-welcome';
 import { createClient } from '@/lib/supabase/server';
 
@@ -47,7 +48,13 @@ export interface AuthResult {
   rateLimited?: boolean;
 }
 
+/**
+ * Where a signed-in person lands. Any team invitation for their confirmed
+ * email is accepted first, so an invited manager signing in for the first
+ * time lands in the business that invited them.
+ */
 async function partnerHome(supabase: ReturnType<typeof createClient>): Promise<PartnerHome> {
+  await acceptMerchantInvites(supabase);
   const { data } = await supabase.rpc('fn_partner_home');
   return (data as PartnerHome) ?? null;
 }
@@ -533,6 +540,8 @@ export async function completeCustomerSignUp(
   });
   if (updateError)
     return { ok: false, message: 'We could not save your details. Please try again.' };
+  // A team invitation for this address is accepted as soon as it is confirmed.
+  await acceptMerchantInvites(supabase);
   if (!sendWelcome) return { ok: true, message: 'Your details are saved.' };
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nexgapp.com';
