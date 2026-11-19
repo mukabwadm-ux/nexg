@@ -1,3 +1,4 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { recordAppBooking } from './app-session';
@@ -25,7 +26,7 @@ describe('the shop checks a booking code', () => {
 describe('the saved app booking', () => {
   it('keeps the code, the name, the reference and what is left to pay', async () => {
     const upsert = vi.fn().mockResolvedValue({ error: null });
-    const client = { from: vi.fn(() => ({ upsert })) } as any;
+    const client = { from: vi.fn(() => ({ upsert })) } as unknown as SupabaseClient;
     await recordAppBooking(
       client,
       merchantId,
@@ -68,7 +69,7 @@ describe('the saved app booking', () => {
   it('clears the deadline and the amount once paid', async () => {
     const eq2 = vi.fn().mockResolvedValue({ error: null });
     const update = vi.fn(() => ({ eq: vi.fn(() => ({ eq: eq2 })) }));
-    const client = { from: vi.fn(() => ({ update })) } as any;
+    const client = { from: vi.fn(() => ({ update })) } as unknown as SupabaseClient;
     await recordAppBooking(
       client,
       merchantId,
@@ -95,7 +96,7 @@ describe('the saved app booking', () => {
   it('mirrors the code the engine shows: set once paid, cleared once used', async () => {
     const eq2 = vi.fn().mockResolvedValue({ error: null });
     const update = vi.fn(() => ({ eq: vi.fn(() => ({ eq: eq2 })) }));
-    const client = { from: vi.fn(() => ({ update })) } as any;
+    const client = { from: vi.fn(() => ({ update })) } as unknown as SupabaseClient;
     const read = (bookingCode: string | null) =>
       recordAppBooking(
         client,
@@ -106,14 +107,18 @@ describe('the saved app booking', () => {
         null,
       );
     await read('K7QM4X');
-    expect((update.mock.calls[0] as any[])[0].booking_code).toBe('K7QM4X');
+    expect(
+      (update.mock.calls[0] as unknown as [{ booking_code: string | null }])[0].booking_code,
+    ).toBe('K7QM4X');
     await read(null);
-    expect((update.mock.calls[1] as any[])[0].booking_code).toBeNull();
+    expect(
+      (update.mock.calls[1] as unknown as [{ booking_code: string | null }])[0].booking_code,
+    ).toBeNull();
   });
 
   it('ignores a booking code that is not one', async () => {
     const upsert = vi.fn().mockResolvedValue({ error: null });
-    const client = { from: vi.fn(() => ({ upsert })) } as any;
+    const client = { from: vi.fn(() => ({ upsert })) } as unknown as SupabaseClient;
     await recordAppBooking(
       client,
       merchantId,
