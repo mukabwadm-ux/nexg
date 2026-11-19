@@ -1,7 +1,7 @@
 -- A rider whose last position is old is skipped, and says why.
 --
 -- Its own file: a new enum value cannot be used in the transaction that adds
--- it, and 20270112000200 uses it.
+-- it, and 20270115000200 uses it.
 --
 -- Rollback: enum values cannot be dropped; the value is harmless unused.
 --   delete from settings.definition where key = 'dispatch.location_fresh_s';

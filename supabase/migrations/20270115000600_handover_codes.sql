@@ -5,7 +5,7 @@
 -- customer can click on the activity screen and a code will have appeared
 -- to share with the rider".
 --
--- 1. Delivery (rider to customer), from 20270112000400. The customer now sees
+-- 1. Delivery (rider to customer), from 20270115000400. The customer now sees
 --    the code only while it can be used: from picked_up, through arriving.
 --    Before or after, rpc_my_order_handoff_code returns code null. The rider
 --    enters it (rpc_rider_verify_handoff_code, or rpc_rider_order_step
@@ -28,7 +28,7 @@
 -- table has no grants), five wrong tries lock it, and a used code is spent.
 --
 -- Rollback: drop the functions, triggers and table added here; delete the
--- setting; re-run rpc_my_order_handoff_code from 20270112000400.
+-- setting; re-run rpc_my_order_handoff_code from 20270115000400.
 
 insert into audit.action_registry (action, module, default_severity, money, description) values
   ('order.shop_handed_to_rider', 'orders', 'info', false, 'A shop handed an order to the rider who showed its code'),
@@ -362,5 +362,5 @@ grant execute on function public.rpc_merchant_handover_code_enter(uuid, text) to
 
 insert into public.wiring_audit_exempt (function_name, reason, recorded_in) values
   ('rpc_my_order_collection_code', 'Shows the customer their own collection code, making it the first time; the handover it allows is audited.',
-   '20270112000600_handover_codes')
+   '20270115000600_handover_codes')
 on conflict do nothing;

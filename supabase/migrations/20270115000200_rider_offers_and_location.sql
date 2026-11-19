@@ -17,7 +17,7 @@
 --    no distance to rank by. rpc_rider_location_ping(lat, lng, observed_at)
 --    lets the Rider app send it while the rider is online or on a trip.
 --    A rider whose position is older than dispatch.location_fresh_s
---    (default 120 s, 20270112000100) is skipped as 'location_stale'.
+--    (default 120 s, 20270115000100) is skipped as 'location_stale'.
 --
 -- 3. A rider could not read their own offers (dispatch.offer is readable only
 --    through dispatch.job, which is live operations' and merchants'; the
@@ -483,7 +483,7 @@ grant execute on function public.rpc_rider_location_ping(double precision, doubl
 insert into public.wiring_audit_exempt (function_name, reason, recorded_in) values
   ('rpc_rider_location_ping',
    'Latest position only, every few seconds while working. A per-point audit row would keep a movement history.',
-   '20270112000200_rider_offers_and_location')
+   '20270115000200_rider_offers_and_location')
 on conflict do nothing;
 
 -- ═══════════════════════════════════════════════ 5. the rider sees their offers

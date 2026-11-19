@@ -40,7 +40,7 @@
 --
 -- Rollback: drop the functions, views, tables and bucket added here; drop
 -- dispatch.job.at_pickup_at; re-run rpc_rider_order_step(uuid, text, text)
--- from 20270109000300 and rpc_my_rider_offers from 20270112000200.
+-- from 20270109000300 and rpc_my_rider_offers from 20270115000200.
 
 insert into audit.action_registry (action, module, default_severity, money, description) values
   ('order.rider_at_pickup', 'orders', 'info', false, 'A rider arrived at the shop'),
@@ -153,7 +153,7 @@ grant execute on function public.rpc_my_order_handoff_code(uuid) to authenticate
 
 insert into public.wiring_audit_exempt (function_name, reason, recorded_in) values
   ('rpc_my_order_handoff_code', 'Shows the customer their own code; only notes when it was first shown.',
-   '20270112000400_rider_delivery')
+   '20270115000400_rider_delivery')
 on conflict do nothing;
 
 -- ═══════════════════════════════════════════════ 2. photo proof
@@ -562,7 +562,7 @@ grant execute on function public.rpc_rider_verify_handoff_code(uuid, text) to au
 
 insert into public.wiring_audit_exempt (function_name, reason, recorded_in) values
   ('rpc_rider_verify_handoff_code', 'Checks a code and counts tries; the delivery it allows is audited by rpc_rider_order_step.',
-   '20270112000400_rider_delivery')
+   '20270115000400_rider_delivery')
 on conflict do nothing;
 
 -- ═══════════════════════════════════════════════ 4. cash collected

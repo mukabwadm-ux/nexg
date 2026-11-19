@@ -175,7 +175,7 @@ select is(public.rpc_my_order_map('c1070000-0000-4000-8000-0000000000f1', '2') -
 select is((public.rpc_my_order_map('c1070000-0000-4000-8000-0000000000f1', '2') -> 'courier' ->> 'latitude')::numeric,
   -1.295, 'At the position the rider sent.');
 
--- The guest reads the code they give the rider (20270112000400).
+-- The guest reads the code they give the rider (20270115000400).
 select set_config('t.code',
   public.rpc_my_order_handoff_code('c1070000-0000-4000-8000-0000000000f1') ->> 'code', true);
 
