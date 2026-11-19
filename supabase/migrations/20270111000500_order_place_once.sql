@@ -10,7 +10,7 @@
 -- Also checked (gap B12): rpc_payment_authorised, once open to signed-out
 -- callers, was dropped by 20261223000100; nothing to change here.
 --
--- Rollback: re-run rpc_order_place_web from 20270109000700, then drop the index
+-- Rollback: re-run rpc_order_place_web from 20270111000400, then drop the index
 -- and the column.
 
 alter table public.order add column client_request_id uuid;
@@ -19,7 +19,7 @@ comment on column public.order.client_request_id is
 create unique index order_one_per_client_request
   on public.order (guest_id, client_request_id) where client_request_id is not null;
 
--- rpc_order_place_web: 20270109000700, returning the first order for a repeated request.
+-- rpc_order_place_web: 20270111000400, returning the first order for a repeated request.
 create or replace function public.rpc_order_place_web(p_payload jsonb)
 returns jsonb
 language plpgsql
@@ -143,7 +143,7 @@ begin
     'KES', q -> 'pricing_version_ids', v_needs, v_request::uuid)
   returning id into v_order;
 
-  /* Each line, with its unit and the choices made on it (20270109000400). */
+  /* Each line, with its unit and the choices made on it (20270111000100). */
   for v_line in select l from jsonb_array_elements(q -> 'lines') l loop
     insert into public.order_item (
       order_id, catalogue_item_id, name, quantity, unit_price_cents, line_total_cents, note,
