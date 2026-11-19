@@ -68,7 +68,9 @@ describe('the saved app booking', () => {
 
   it('clears the deadline and the amount once paid', async () => {
     const eq2 = vi.fn().mockResolvedValue({ error: null });
-    const update = vi.fn(() => ({ eq: vi.fn(() => ({ eq: eq2 })) }));
+    const update = vi.fn((_values: Record<string, unknown>) => ({
+      eq: vi.fn(() => ({ eq: eq2 })),
+    }));
     const client = { from: vi.fn(() => ({ update })) } as unknown as SupabaseClient;
     await recordAppBooking(
       client,
@@ -95,7 +97,9 @@ describe('the saved app booking', () => {
 
   it('mirrors the code the engine shows: set once paid, cleared once used', async () => {
     const eq2 = vi.fn().mockResolvedValue({ error: null });
-    const update = vi.fn(() => ({ eq: vi.fn(() => ({ eq: eq2 })) }));
+    const update = vi.fn((_values: Record<string, unknown>) => ({
+      eq: vi.fn(() => ({ eq: eq2 })),
+    }));
     const client = { from: vi.fn(() => ({ update })) } as unknown as SupabaseClient;
     const read = (bookingCode: string | null) =>
       recordAppBooking(
@@ -107,13 +111,9 @@ describe('the saved app booking', () => {
         null,
       );
     await read('K7QM4X');
-    expect(
-      (update.mock.calls[0] as unknown as [{ booking_code: string | null }])[0].booking_code,
-    ).toBe('K7QM4X');
+    expect(update.mock.calls[0]![0].booking_code).toBe('K7QM4X');
     await read(null);
-    expect(
-      (update.mock.calls[1] as unknown as [{ booking_code: string | null }])[0].booking_code,
-    ).toBeNull();
+    expect(update.mock.calls[1]![0].booking_code).toBeNull();
   });
 
   it('ignores a booking code that is not one', async () => {
