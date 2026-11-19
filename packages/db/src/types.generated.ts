@@ -55627,10 +55627,7 @@ export type Database = {
       };
       fn_ledger_backfill: { Args: { p_limit?: number }; Returns: Json };
       fn_line_options: { Args: { p_item_id: string; p_options: Json }; Returns: Json };
-      fn_line_variant: {
-        Args: { p_item_id: string; p_variant: string };
-        Returns: Json;
-      };
+      fn_line_variant: { Args: { p_item_id: string; p_variant: string }; Returns: Json };
       fn_listing_sync: { Args: { p_unit_id: string }; Returns: undefined };
       fn_load_available: { Args: { p_plan_id: string }; Returns: undefined };
       fn_mask_phone: { Args: { p_phone: string }; Returns: string };
