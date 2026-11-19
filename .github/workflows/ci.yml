@@ -72,6 +72,18 @@ jobs:
       - name: Injected route provider, authentication and quota boundaries
         run: node --test supabase/functions/maps-routes/handler.test.ts
 
+  native-push:
+    name: Phone push payloads and sender
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Lock-screen words, APNs and FCM payloads, retries and token retirement
+        run: node --test supabase/functions/native-push-dispatch/native-push.test.ts
+
   database:
     name: Migrations, RLS and audit chain
     runs-on: ubuntu-latest
