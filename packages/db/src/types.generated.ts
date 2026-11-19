@@ -55898,6 +55898,7 @@ export type Database = {
         Args: { p_at?: string; p_merchant_id: string };
         Returns: boolean;
       };
+      fn_merchant_payout_declared: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_readiness: { Args: { p_merchant_id: string }; Returns: Json };
       fn_merchant_required_docs: {
         Args: { p_merchant_id: string };
@@ -60838,6 +60839,7 @@ export type Database = {
         };
       };
       rpc_merchant_invite_revoke: { Args: { p_invite_id: string }; Returns: Json };
+      rpc_merchant_invites_accept: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_merchant_item_option_groups_set: {
         Args: { p_group_ids: string[]; p_item_id: string };
         Returns: Json;
@@ -60880,6 +60882,14 @@ export type Database = {
         Returns: Json;
       };
       rpc_merchant_order_step: { Args: { p_order_id: string; p_step: string }; Returns: Json };
+      rpc_merchant_onboarding_read: {
+        Args: { p_category?: string; p_merchant_id?: string };
+        Returns: Json;
+      };
+      rpc_merchant_onboarding_save: {
+        Args: { p_answers: Json; p_merchant_id: string };
+        Returns: Json;
+      };
       rpc_merchant_payout_name_check: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_payouts: {
         Args: {

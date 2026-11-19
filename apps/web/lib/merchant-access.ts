@@ -17,10 +17,25 @@ export class MerchantAccessError extends Error {
   constructor(
     message: string,
     public readonly status: 403 | 503,
+    /**
+     * The read itself failed (no connection, a timeout, a server error), so
+     * it says nothing about the person's access. A malformed or expired
+     * answer is not transient: it is an answer, and it ends access.
+     */
+    public readonly transient = false,
   ) {
     super(message);
     this.name = 'MerchantAccessError';
   }
+}
+
+/** A failed read that says nothing about access: the request or the database failed. */
+function readFailed(result: { error: unknown; status?: number }): boolean {
+  const code = String((result.error as { code?: unknown } | null)?.code ?? '');
+  // Refused or signed out: an answer about access, not a failed read.
+  if (code === '42501' || code.startsWith('PGRST3') || result.status === 401 || result.status === 403)
+    return false;
+  return !result.status || result.status >= 500 || code === '57014' || code.startsWith('08');
 }
 
 export interface MerchantAccessClient {
@@ -34,16 +49,22 @@ export async function loadMerchantWorkspaceAccess(
   client: unknown,
   merchantId: string,
 ): Promise<MerchantWorkspaceAccess> {
-  let result: { data: unknown; error: unknown };
+  let result: { data: unknown; error: unknown; status?: number };
   try {
     result = await (client as MerchantAccessClient).rpc('rpc_merchant_workspace_access', {
       p_merchant_id: merchantId,
     });
   } catch {
-    throw new MerchantAccessError('Your workspace permissions could not be checked.', 503);
+    throw new MerchantAccessError('Your workspace permissions could not be checked.', 503, true);
   }
   const { data, error } = result;
-  if (error || !data || typeof data !== 'object' || Array.isArray(data))
+  if (error)
+    throw new MerchantAccessError(
+      'Your workspace permissions could not be checked.',
+      503,
+      readFailed(result),
+    );
+  if (!data || typeof data !== 'object' || Array.isArray(data))
     throw new MerchantAccessError('Your workspace permissions could not be checked.', 503);
   const value = data as Partial<MerchantWorkspaceAccess>;
   if (

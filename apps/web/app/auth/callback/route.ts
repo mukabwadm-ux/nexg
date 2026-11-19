@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 
 import { landingFor, safeNext, type PartnerHome } from '@/lib/auth-portals';
 import { INVALID_LINK_PATH, safeAuthNext } from '@/lib/auth-next';
+import { acceptMerchantInvites } from '@/lib/merchant-invites';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -46,6 +47,9 @@ export async function GET(request: NextRequest) {
   if (error || !data.user) {
     return go(flow === 'oauth' ? '/sign-in?error=oauth' : INVALID_LINK_PATH);
   }
+
+  // A team invitation for this account's confirmed email joins it now.
+  await acceptMerchantInvites(supabase);
 
   if (flow !== 'oauth') return go(safeAuthNext(params.get('next')));
 
