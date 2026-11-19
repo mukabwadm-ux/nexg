@@ -10236,6 +10236,25 @@ export type Database = {
           },
         ];
       };
+      customer_notification_pref: {
+        Row: {
+          choices: NonNullable<Json>;
+          updated_at: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          choices?: NonNullable<Json>;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          choices?: NonNullable<Json>;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       customer_saved: {
         Row: {
           created_at: string;
@@ -23623,6 +23642,188 @@ export type Database = {
           },
         ];
       };
+      merchant_onboarding_answer: {
+        Row: {
+          answers: NonNullable<Json>;
+          merchant_id: string;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          answers?: NonNullable<Json>;
+          merchant_id: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          answers?: NonNullable<Json>;
+          merchant_id?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      merchant_onboarding_field: {
+        Row: {
+          categories: string[] | null;
+          columns: NonNullable<Json>;
+          future_date: boolean;
+          hint: string | null;
+          key: string;
+          label: string;
+          must_be_yes: boolean;
+          options: NonNullable<Json>;
+          pattern: string | null;
+          placeholder: string | null;
+          required: string;
+          required_when: Json | null;
+          requires_doc: string | null;
+          section: string;
+          sort: number;
+          source: string;
+          type: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          categories?: string[] | null;
+          columns?: NonNullable<Json>;
+          future_date?: boolean;
+          hint?: string | null;
+          key: string;
+          label: string;
+          must_be_yes?: boolean;
+          options?: NonNullable<Json>;
+          pattern?: string | null;
+          placeholder?: string | null;
+          required: string;
+          required_when?: Json | null;
+          requires_doc?: string | null;
+          section: string;
+          sort: number;
+          source: string;
+          type: string;
+        };
+        Update: {
+          categories?: string[] | null;
+          columns?: NonNullable<Json>;
+          future_date?: boolean;
+          hint?: string | null;
+          key?: string;
+          label?: string;
+          must_be_yes?: boolean;
+          options?: NonNullable<Json>;
+          pattern?: string | null;
+          placeholder?: string | null;
+          required?: string;
+          required_when?: Json | null;
+          requires_doc?: string | null;
+          section?: string;
+          sort?: number;
+          source?: string;
+          type?: string;
+        };
+        Relationships: [];
+      };
       merchant_penalty: {
         Row: {
           amount_kes: number;
@@ -36776,6 +36977,7 @@ export type Database = {
           status: Database['public']['Enums']['ticket_status'];
           topic: Database['public']['Enums']['ticket_topic'];
           updated_at: string;
+          user_id: string | null;
         };
         ComputedFields: never;
         Insert: {
@@ -36799,6 +37001,7 @@ export type Database = {
           status?: Database['public']['Enums']['ticket_status'];
           topic?: Database['public']['Enums']['ticket_topic'];
           updated_at?: string;
+          user_id?: string | null;
         };
         Update: {
           assigned_to?: string | null;
@@ -36821,6 +37024,7 @@ export type Database = {
           status?: Database['public']['Enums']['ticket_status'];
           topic?: Database['public']['Enums']['ticket_topic'];
           updated_at?: string;
+          user_id?: string | null;
         };
         Relationships: [
           {
@@ -56171,6 +56375,34 @@ export type Database = {
       fn_merchant_is_live: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_liquor_licensed: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_mine: { Args: { p_merchant_id: string }; Returns: string };
+      fn_merchant_onboarding_category: { Args: { p_merchant_id: string }; Returns: string };
+      fn_merchant_onboarding_date_error: {
+        Args: { p_future: boolean; p_value: Json };
+        Returns: string;
+      };
+      fn_merchant_onboarding_docs: {
+        Args: { p_category: string; p_merchant_id: string };
+        Returns: string[];
+      };
+      fn_merchant_onboarding_fields_json: { Args: { p_category: string }; Returns: Json };
+      fn_merchant_onboarding_missing: {
+        Args: { p_category?: string; p_merchant_id: string };
+        Returns: Json;
+      };
+      fn_merchant_onboarding_missing_for: {
+        Args: { p_answers: Json; p_category: string };
+        Returns: Json;
+      };
+      fn_merchant_onboarding_value_error: {
+        Args: {
+          p_field: Omit<
+            Database['public']['Tables']['merchant_onboarding_field']['Row'],
+            Database['public']['Tables']['merchant_onboarding_field']['ComputedFields']
+          >;
+          p_value: Json;
+        };
+        Returns: string;
+      };
       fn_merchant_open_for_orders: {
         Args: { p_at?: string; p_merchant_id: string };
         Returns: boolean;
@@ -59684,6 +59916,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_guest_ensure: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_guest_reveal_phone: { Args: { p_guest_id: string; p_reason: string }; Returns: Json };
       rpc_handover_plan: {
         Args: { p_plan_id: string; p_reason: string; p_to: string };
@@ -61165,11 +61398,6 @@ export type Database = {
           isSetofReturn: false;
         };
       };
-      rpc_merchant_option_group_save: {
-        Args: { p_group: Json; p_merchant_id: string };
-        Returns: Json;
-      };
-      rpc_merchant_order_step: { Args: { p_order_id: string; p_step: string }; Returns: Json };
       rpc_merchant_onboarding_read: {
         Args: { p_category?: string; p_merchant_id?: string };
         Returns: Json;
@@ -61178,6 +61406,11 @@ export type Database = {
         Args: { p_answers: Json; p_merchant_id: string };
         Returns: Json;
       };
+      rpc_merchant_option_group_save: {
+        Args: { p_group: Json; p_merchant_id: string };
+        Returns: Json;
+      };
+      rpc_merchant_order_step: { Args: { p_order_id: string; p_step: string }; Returns: Json };
       rpc_merchant_payout_name_check: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_payouts: {
         Args: {
@@ -62208,6 +62441,11 @@ export type Database = {
       rpc_my_order_map:
         | { Args: { p_order_id: string }; Returns: Json }
         | { Args: { p_contract_version: string; p_order_id: string }; Returns: Json };
+      rpc_my_data_export_request: {
+        Args: Record<PropertyKey, never>;
+        Returns: Json;
+      };
+      rpc_my_data_requests: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_engine_booking_code: {
         Args: { p_engine_booking_id: string; p_merchant_id: string };
         Returns: string;
@@ -62240,6 +62478,19 @@ export type Database = {
         Returns: Json;
       };
       rpc_my_stay_code: { Args: { p_stay_id: string }; Returns: string };
+      rpc_my_support_ticket_create: {
+        Args: {
+          p_body: string;
+          p_details?: Json;
+          p_order_reference?: string;
+          p_topic?: Database['public']['Enums']['ticket_topic'];
+        };
+        Returns: Json;
+      };
+      rpc_my_support_tickets: {
+        Args: Record<PropertyKey, never>;
+        Returns: Json;
+      };
       rpc_nearest_free: {
         Args: { p_job_id: string; p_limit?: number };
         Returns: {
@@ -62264,6 +62515,10 @@ export type Database = {
           p_status: Database['public']['Enums']['notification_status'];
         };
         Returns: undefined;
+      };
+      rpc_notification_pref_set: {
+        Args: { p_category: string; p_channel: string; p_enabled: boolean };
+        Returns: Json;
       };
       rpc_notifications_read: { Args: { p_id?: string }; Returns: Json };
       rpc_office_budget_set: {
