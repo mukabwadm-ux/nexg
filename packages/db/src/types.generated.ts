@@ -54915,6 +54915,7 @@ export type Database = {
         Returns: number;
       };
       fn_compute_rider_health: { Args: { p_as_of?: string }; Returns: number };
+      fn_customer_deletion_blockers: { Args: { p_user_id: string }; Returns: Json };
       fn_data_request_blockers: { Args: { p_request_id: string }; Returns: Json };
       fn_decrypt_secret: { Args: { p_cipher: string }; Returns: string };
       fn_delivery_band: {
@@ -61421,6 +61422,8 @@ export type Database = {
         Returns: Json;
       };
       rpc_msg_take: { Args: { p_conversation: string }; Returns: Json };
+      rpc_my_account_deletion: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_my_account_deletion_request: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_bookings: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_order_map:
         | { Args: { p_order_id: string }; Returns: Json }
