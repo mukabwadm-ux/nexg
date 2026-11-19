@@ -4974,6 +4974,7 @@ export type Database = {
           notes: string | null;
           paid_at: string | null;
           paid_cents: number | null;
+          paid_simulated: boolean;
           payment_due_by: string | null;
           payment_reference: string | null;
           quantity: number;
@@ -5003,6 +5004,7 @@ export type Database = {
           notes?: string | null;
           paid_at?: string | null;
           paid_cents?: number | null;
+          paid_simulated?: boolean;
           payment_due_by?: string | null;
           payment_reference?: string | null;
           quantity?: number;
@@ -5031,6 +5033,7 @@ export type Database = {
           notes?: string | null;
           paid_at?: string | null;
           paid_cents?: number | null;
+          paid_simulated?: boolean;
           payment_due_by?: string | null;
           payment_reference?: string | null;
           quantity?: number;
@@ -57083,6 +57086,7 @@ export type Database = {
           starts_at: string;
         }[];
       };
+      rpc_booking_pay_simulated: { Args: { p_booking_id: string }; Returns: Json };
       rpc_booking_set_status: {
         Args: { p_booking_id: string; p_status: Database['public']['Enums']['reservation_status'] };
         Returns: {

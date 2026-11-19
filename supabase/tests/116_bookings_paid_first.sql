@@ -4,7 +4,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(52);
+select plan(58);
 
 insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, is_anonymous, created_at, updated_at)
 values
@@ -248,6 +248,48 @@ select is(public.rpc_host_stay_check_in((select v from t where k = 'scode'), 'WA
   'in_stay', 'The code and name check the guest in.');
 select is(public.rpc_host_stay_check_in((select v from t where k = 'scode')) ->> 'reason',
   'used', 'The stay code then stops working.');
+reset role;
+
+-- ═════════════════════════════════════════ test payments (20270109001100)
+
+set local role authenticated;
+select set_config('request.jwt.claims',
+  '{"sub":"c1130000-0000-4000-8000-000000000004","role":"authenticated"}', true);
+insert into t select 'sim', (public.rpc_booking_create('c1130000-0000-4000-8000-0000000000b1',
+  (current_date + 6)::timestamptz + interval '10 hours', p_guest_name => 'Amina')).id::text;
+select throws_ok($$select public.rpc_booking_pay_simulated((select v::uuid from t where k = 'sim'))$$,
+  '42501', 'Test payments are switched off.', 'Test payments are off unless switched on.');
+reset role;
+
+insert into settings.version (key, scope_kind, scope_city_id, value, status, effective_from, reason)
+select 'payments.simulated_bookings', 'city', id, to_jsonb(true), 'active', now() - interval '1 minute', 'test 116'
+  from public.city where slug = 'nairobi';
+
+set local role authenticated;
+select set_config('request.jwt.claims',
+  '{"sub":"c1130000-0000-4000-8000-000000000005","role":"authenticated"}', true);
+select throws_ok($$select public.rpc_booking_pay_simulated((select v::uuid from t where k = 'sim'))$$,
+  '42501', 'That booking is not yours.', 'Nobody can test-pay someone else''s booking.');
+select set_config('request.jwt.claims',
+  '{"sub":"c1130000-0000-4000-8000-000000000004","role":"authenticated"}', true);
+select is(public.rpc_booking_pay_simulated((select v::uuid from t where k = 'sim')) ->> 'ok',
+  'true', 'Switched on, the customer confirms with a test payment.');
+select matches(public.rpc_my_booking_code((select v::uuid from t where k = 'sim')), '^[A-HJKMNP-Z2-9]{6}$',
+  'And gets their code.');
+reset role;
+select is((select status::text || ' ' || paid_simulated::text || ' ' || left(payment_reference, 4)
+             from public.booking where id = (select v::uuid from t where k = 'sim')),
+  'confirmed true SIM-', 'It is confirmed, but marked as a test payment.');
+insert into t select 'simcode', code from public.reservation_code where booking_id = (select v::uuid from t where k = 'sim');
+-- The business's lock-out from the wrong codes above has run out.
+update public.reservation_code_attempt set at = now() - interval '16 minutes'
+ where actor = 'c1130000-0000-4000-8000-000000000002';
+
+set local role authenticated;
+select set_config('request.jwt.claims',
+  '{"sub":"c1130000-0000-4000-8000-000000000002","role":"authenticated"}', true);
+select is(public.rpc_merchant_booking_by_code((select v from t where k = 'simcode')) -> 'booking' ->> 'test_payment',
+  'true', 'The business sees it was a test payment.');
 reset role;
 
 -- ═════════════════════════════════════════ app bookings and erasure

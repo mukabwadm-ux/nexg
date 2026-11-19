@@ -96,3 +96,22 @@ export function settleEngineBookingPayment(input: {
     `settle:${input.provider}:${input.reference}`.slice(0, 200),
   );
 }
+
+/**
+ * A test payment while no payment provider is connected (owner, 19 Nov 2026).
+ * The engine confirms the booking for exactly the amount due and records it
+ * as `simulated`: no money is collected. Refused unless the engine has
+ * BOOKING_SIMULATED_PAYMENTS=1; the website route also needs
+ * NEXG_SIMULATED_PAYMENTS=1.
+ */
+export function simulateEngineBookingPayment(merchantId: string, bookingId: string) {
+  if (!ID.test(merchantId) || !ID.test(bookingId))
+    return Promise.resolve<PlatformResult>({ ok: false, status: 422, code: 'invalid_input' });
+  const reference = `SIM-${randomUUID().replaceAll('-', '').slice(0, 12).toUpperCase()}`;
+  return platformCall(
+    merchantId,
+    `/v1/platform/bookings/${encodeURIComponent(bookingId)}/settle`,
+    { provider: 'simulated', reference },
+    `settle:simulated:${reference}`,
+  );
+}

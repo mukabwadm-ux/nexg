@@ -161,6 +161,14 @@ export class BookingEngine {
     public payload: Payload,
     private sqlite = true,
     private clock = () => Date.now(),
+    /**
+     * Test payments while no payment provider is connected (owner, 19 Nov
+     * 2026). Off unless BOOKING_SIMULATED_PAYMENTS=1. A test payment confirms
+     * the booking but is recorded as `simulated`: no money was collected.
+     */
+    private options: { simulatedPayments?: boolean } = {
+      simulatedPayments: process.env.BOOKING_SIMULATED_PAYMENTS === '1',
+    },
   ) {}
   managementContext() {
     return {
@@ -2888,7 +2896,7 @@ export class BookingEngine {
         if (
           n.requiresPayment &&
           ((n.paidMinor ?? 0) - (n.refundedMinor ?? 0) < (n.pricing?.dueNowMinor ?? 0) ||
-            !['merchant_recorded', 'provider_verified'].includes(n.paymentState))
+            !['merchant_recorded', 'provider_verified', 'simulated'].includes(n.paymentState))
         )
           throw new BookingError(
             409,
@@ -3178,6 +3186,8 @@ export class BookingEngine {
       used: false,
       pass,
       paid: n.paymentState !== 'awaiting_payment',
+      // A test payment while payments are not connected: no money collected.
+      testPayment: n.paymentState === 'simulated',
       arrivedAt: n.arrivedAt ?? null,
       visits: pass ? (n.visits ?? []) : undefined,
     };
@@ -3286,7 +3296,12 @@ export class BookingEngine {
         );
       const provider = text(input.provider, 'Payment provider', 40),
         reference = text(input.reference, 'Payment reference', 200),
-        amountMinor = integer(input.amountMinor, 'Paid amount', 1);
+        simulated = provider === 'simulated';
+      if (simulated && !this.options.simulatedPayments)
+        throw new BookingError(403, 'Test payments are switched off.', 'simulated_payments_off');
+      const due = (n.pricing?.totalDueMinor ?? n.priceMinor) - (n.paidMinor ?? 0);
+      // A test payment is always for exactly the amount due.
+      const amountMinor = simulated ? due : integer(input.amountMinor, 'Paid amount', 1);
       if (
         (n.paymentEvidence ?? []).some(
           (e: any) => e.provider === provider && e.reference === reference,
@@ -3299,7 +3314,6 @@ export class BookingEngine {
           'This booking is no longer held. Refund the payment.',
           'hold_expired',
         );
-      const due = (n.pricing?.totalDueMinor ?? n.priceMinor) - (n.paidMinor ?? 0);
       if (amountMinor !== due)
         throw new BookingError(
           422,
@@ -3316,7 +3330,7 @@ export class BookingEngine {
             ...n,
             status: 'confirmed',
             paidMinor: (n.paidMinor ?? 0) + amountMinor,
-            paymentState: 'provider_verified',
+            paymentState: simulated ? 'simulated' : 'provider_verified',
             paymentEvidence: [
               ...(n.paymentEvidence ?? []),
               {
@@ -3325,7 +3339,8 @@ export class BookingEngine {
                 provider,
                 reference,
                 recordedAt: at,
-                verification: 'provider_verified',
+                verification: simulated ? 'simulated' : 'provider_verified',
+                ...(simulated ? { note: 'Test payment: no money was collected.' } : {}),
               },
             ],
             expiresAt: null,
@@ -3336,7 +3351,9 @@ export class BookingEngine {
         identity,
         req,
       );
-      await this.audit(identity, req, 'booking.paid', id, { version: result.nexg?.version });
+      await this.audit(identity, req, simulated ? 'booking.paid_simulated' : 'booking.paid', id, {
+        version: result.nexg?.version,
+      });
       return this.bookingView(result);
     });
   }

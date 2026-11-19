@@ -362,6 +362,25 @@ test('customer bookings: reference and name only, prepaid, codes, check-in, eras
     },
   );
 
+  await t.test('test payments: off unless switched on, and always marked', async () => {
+    const r = await book(achieng, '2030-01-05T09:00:00+03:00', { customer: { name: 'Achieng' } });
+    const test = { provider: 'simulated', reference: 'SIM-1' };
+    await assert.rejects(
+      () => engine.settlePayment(platform, r.booking.id, test, key()),
+      (e: any) => e.code === 'simulated_payments_off',
+    );
+    const testing = new BookingEngine(payload, true, () => now, { simulatedPayments: true });
+    const paid = (await testing.settlePayment(platform, r.booking.id, test, key())) as any;
+    assert.equal(paid.status, 'confirmed');
+    assert.equal(paid.paymentState, 'simulated');
+    assert.equal(paid.paidMinor, 150000, 'for exactly the amount due');
+    assert.equal(paid.paymentEvidence.at(-1).verification, 'simulated');
+    const mine = (await engine.customerBooking(achieng, r.booking.id, r.customerToken)) as any;
+    assert.match(mine.bookingCode, /^[A-HJKMNP-Z2-9]{6}$/, 'the customer gets their code');
+    const looked = (await engine.bookingByCode(owner, mine.bookingCode)) as any;
+    assert.equal(looked.testPayment, true, 'the shop sees it was a test payment');
+  });
+
   await t.test('a free booking has nothing to pay and is confirmed', async () => {
     const r = (await engine.createBooking(
       achieng,

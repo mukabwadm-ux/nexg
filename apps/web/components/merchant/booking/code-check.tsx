@@ -17,6 +17,8 @@ export interface CodeBooking {
   quantity?: number;
   customer?: { name?: string };
   paid?: boolean;
+  /** Confirmed with a test payment while payments are not connected. */
+  testPayment?: boolean;
   arrivedAt: string | null;
   /** A non-pass code is used once; after that only this is shown. */
   used: boolean;
@@ -157,9 +159,11 @@ export function BookingCodeCheck({
                   ? found.status === 'held'
                     ? 'Not paid yet, so not confirmed.'
                     : `This booking is ${found.status}.`
-                  : found.paid
-                    ? 'Paid and confirmed.'
-                    : 'Confirmed.'}
+                  : found.testPayment
+                    ? 'Confirmed with a test payment: no money was collected.'
+                    : found.paid
+                      ? 'Paid and confirmed.'
+                      : 'Confirmed.'}
           </p>
           {!found.used && USABLE.has(found.status) ? (
             <div className="flex flex-wrap items-end gap-2">
