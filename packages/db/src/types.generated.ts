@@ -58263,6 +58263,10 @@ export type Database = {
         Args: { p_email?: boolean; p_id: string };
         Returns: undefined;
       };
+      fn_receipt_for_host_payout: {
+        Args: { p_email?: boolean; p_line_id: string };
+        Returns: undefined;
+      };
       fn_receipt_for_payment: {
         Args: { p_email?: boolean; p_payment_id: string };
         Returns: undefined;

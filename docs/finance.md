@@ -129,6 +129,8 @@ Cash is `cash.bank` for a bank collection and `cash.mpesa_paybill` otherwise.
 
 A stay's host share is kept on `stay.host_share`, not a `payable.*` account. The weekly run pays it together with the host's referral rewards (`payable.host_credit`), on one line, to payout details in `host_payout`: hospitality staff declare them on the host's record in Hotels & Airbnb (`rpc_host_payout_declare`), and someone with full Finance other than the declarer verifies them on Settlements → Host Payouts (`rpc_host_payout_verify`). Without verified details the host's line is held (`held_kyc`), and a paused or offboarded host is held whatever their details (`held_suspended`). Unpaid host invoices are not netted off. Until a run claims it, Finance sees the share on the owed list under the host's name, and the host sees it on their statement as a stay.
 
+What the host hears (`20270124000100_host_payout_notices`): when their run line is marked paid they get a payout receipt (stay earnings, referral rewards, the amount sent and the M-Pesa or bank reference), emailed, and the payout shows on their statement as a minus line. Nothing marks a run line paid yet, because the run's send step is not built, so this starts when it is. New payout details, and Finance verifying them, are emailed to the host, masked. A booking NexG cancels after confirming it is emailed to the host too. All of these go to `host.email`; a host without one gets none. `public.host_message` is not read by the host workspace, so nothing is sent there.
+
 A posting never undoes a payment. The triggers log `ledger.posting_failed` (high) instead of raising, and every posting function is idempotent, so a failed one can be posted again from the SQL Editor.
 
 ---
