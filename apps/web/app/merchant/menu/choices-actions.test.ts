@@ -18,7 +18,12 @@ vi.mock('@/lib/merchant-action-access', () => ({
   },
 }));
 
-import { saveOptionGroup, setItemOptionGroups, setItemUnit } from './choices-actions';
+import {
+  saveItemVariants,
+  saveOptionGroup,
+  setItemOptionGroups,
+  setItemUnit,
+} from './choices-actions';
 
 const item = '11111111-2222-4333-8444-555555555555';
 
@@ -100,6 +105,55 @@ describe('Menu choices and units', () => {
       unit_min: 0.5,
       unit_max: 3,
       price_is_estimate: true,
+    });
+  });
+
+  it('saves a size and colour grid, dropping empty values and cells for unknown pairs', async () => {
+    const r = await saveItemVariants(item, {
+      attributes: [
+        { name: ' Size ', values: ['40', ' 41', '', '40'] },
+        { name: 'Colour', values: ['Black'] },
+      ],
+      variants: [
+        { values: ['40', 'Black'], priceKes: 3000, available: true, stockCount: null },
+        { values: ['41', 'Black'], priceKes: 3100, available: false, stockCount: 2 },
+        { values: ['40'], priceKes: 1, available: true, stockCount: null },
+      ],
+    });
+    expect(r.ok).toBe(true);
+    expect(mock.rpc).toHaveBeenCalledWith('rpc_merchant_item_variants_save', {
+      p_item_id: item,
+      p_payload: {
+        attributes: [
+          { name: 'Size', values: ['40', '41'] },
+          { name: 'Colour', values: ['Black'] },
+        ],
+        variants: [
+          {
+            values: ['40', 'Black'],
+            price_kes: 3000,
+            available: true,
+            stock_count: null,
+            sku: null,
+          },
+          { values: ['41', 'Black'], price_kes: 3100, available: false, stock_count: 2, sku: null },
+        ],
+      },
+    });
+  });
+
+  it('refuses fractional prices and turns versions off with empty lists', async () => {
+    const bad = await saveItemVariants(item, {
+      attributes: [{ name: 'Size', values: ['S'] }],
+      variants: [{ values: ['S'], priceKes: 9.5, available: true, stockCount: null }],
+    });
+    expect(bad.ok).toBe(false);
+    expect(mock.rpc).not.toHaveBeenCalled();
+    const off = await saveItemVariants(item, { attributes: [], variants: [] });
+    expect(off.message).toBe('Versions turned off for this item.');
+    expect(mock.rpc).toHaveBeenCalledWith('rpc_merchant_item_variants_save', {
+      p_item_id: item,
+      p_payload: { attributes: [], variants: [] },
     });
   });
 });

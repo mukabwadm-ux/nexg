@@ -31,6 +31,8 @@ export default async function MerchantMenu() {
     { data: merchantData },
     { data: groupData },
     { data: linkData },
+    { data: attributeData },
+    { data: variantData },
   ] = await Promise.all([
     supabase
       .from('catalogue_item')
@@ -54,6 +56,14 @@ export default async function MerchantMenu() {
       .is('archived_at', null)
       .order('sort'),
     supabase.from('catalogue_item_modifier').select('item_id, group_id, sort').order('sort'),
+    supabase
+      .from('catalogue_attribute')
+      .select('id, item_id, name, sort, catalogue_attribute_value(id, name, sort)')
+      .order('sort'),
+    supabase
+      .from('catalogue_variant')
+      .select('id, item_id, value_ids, price_kes, available, stock_count, sku')
+      .is('archived_at', null),
   ]);
 
   const itemRows = (data as ItemRow[] | null) ?? [];
@@ -83,6 +93,7 @@ export default async function MerchantMenu() {
   const choiceItems: ChoiceItemRow[] = itemRows.map((item) => ({
     ...item,
     group_ids: (linkData ?? []).filter((l) => l.item_id === item.id).map((l) => l.group_id),
+    variants: itemVariants(item.id, attributeData ?? [], variantData ?? []),
   }));
   const on = items.filter((i) => i.available);
   const categoryId = merchantData?.category_key ?? merchantData?.category;
@@ -155,4 +166,46 @@ function isCatalogueExample(value: unknown): value is {
     typeof example.pricePlaceholder === 'string' &&
     typeof example.photoHint === 'string'
   );
+}
+
+interface AttributeRow {
+  id: string;
+  item_id: string;
+  name: string;
+  sort: number;
+  catalogue_attribute_value: { id: string; name: string; sort: number }[] | null;
+}
+interface VariantRow {
+  id: string;
+  item_id: string;
+  value_ids: string[];
+  price_kes: number;
+  available: boolean;
+  stock_count: number | null;
+  sku: string | null;
+}
+
+/** An item's saved versions in the shape the Menu grid edits: names, not ids. */
+function itemVariants(itemId: string, attributes: AttributeRow[], variants: VariantRow[]) {
+  const mine = attributes.filter((a) => a.item_id === itemId).sort((a, b) => a.sort - b.sort);
+  const names = new Map(
+    mine.flatMap((a) => (a.catalogue_attribute_value ?? []).map((v) => [v.id, v.name] as const)),
+  );
+  return {
+    attributes: mine.map((a) => ({
+      name: a.name,
+      values: [...(a.catalogue_attribute_value ?? [])]
+        .sort((x, y) => x.sort - y.sort)
+        .map((v) => v.name),
+    })),
+    variants: variants
+      .filter((v) => v.item_id === itemId)
+      .map((v) => ({
+        values: v.value_ids.map((id) => names.get(id) ?? ''),
+        priceKes: v.price_kes,
+        available: v.available,
+        stockCount: v.stock_count,
+        sku: v.sku,
+      })),
+  };
 }

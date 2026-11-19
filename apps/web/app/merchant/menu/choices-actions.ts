@@ -169,3 +169,62 @@ export async function setItemBooking(
         : 'Saved. Customers book this item instead of adding it to the basket.',
   };
 }
+
+export interface VariantGridInput {
+  /** Up to three things that vary, each with its values, for example Size: S, M, L. */
+  attributes: { name: string; values: string[] }[];
+  /** One entry per version sold: one value per attribute, in the same order. */
+  variants: {
+    values: string[];
+    priceKes: number;
+    available: boolean;
+    stockCount: number | null;
+    sku?: string | null;
+  }[];
+}
+
+/** Save an item's versions (rpc_merchant_item_variants_save, 20270109000700). */
+export async function saveItemVariants(itemId: string, grid: VariantGridInput): Promise<Outcome> {
+  const { client } = await merchantActionClient({ access: 'setup' });
+  if (!uuid.test(itemId)) return { ok: false, message: 'Choose a valid item.' };
+  const attributes = (grid.attributes ?? [])
+    .map((a) => ({
+      name: a.name?.trim() ?? '',
+      values: [...new Set((a.values ?? []).map((v) => v.trim()).filter(Boolean))],
+    }))
+    .filter((a) => a.name && a.values.length);
+  if (attributes.length > 3) return { ok: false, message: 'Use at most three things that vary.' };
+  const variants = attributes.length
+    ? (grid.variants ?? []).filter((v) => v.values.length === attributes.length)
+    : [];
+  if (
+    variants.some(
+      (v) =>
+        !Number.isInteger(v.priceKes) ||
+        v.priceKes < 0 ||
+        (v.stockCount != null && (!Number.isInteger(v.stockCount) || v.stockCount < 0)),
+    )
+  )
+    return { ok: false, message: 'Enter prices and counts as whole numbers, 0 or more.' };
+  const { error } = await client.rpc('rpc_merchant_item_variants_save', {
+    p_item_id: itemId,
+    p_payload: {
+      attributes,
+      variants: variants.map((v) => ({
+        values: v.values,
+        price_kes: v.priceKes,
+        available: v.available,
+        stock_count: v.stockCount,
+        sku: v.sku ?? null,
+      })),
+    },
+  });
+  if (error) return { ok: false, message: error.message };
+  refresh();
+  return {
+    ok: true,
+    message: attributes.length
+      ? `Saved ${variants.length} version${variants.length === 1 ? '' : 's'}. Customers choose one before adding it.`
+      : 'Versions turned off for this item.',
+  };
+}

@@ -6140,6 +6140,87 @@ export type Database = {
           },
         ];
       };
+      catalogue_attribute: {
+        Row: {
+          id: string;
+          item_id: string;
+          name: string;
+          sort: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          id?: string;
+          item_id: string;
+          name: string;
+          sort?: number;
+        };
+        Update: {
+          id?: string;
+          item_id?: string;
+          name?: string;
+          sort?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_attribute_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_attribute_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_attribute_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_attribute_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+        ];
+      };
+      catalogue_attribute_value: {
+        Row: {
+          attribute_id: string;
+          id: string;
+          name: string;
+          sort: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          attribute_id: string;
+          id?: string;
+          name: string;
+          sort?: number;
+        };
+        Update: {
+          attribute_id?: string;
+          id?: string;
+          name?: string;
+          sort?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_attribute_value_attribute_id_fkey';
+            columns: ['attribute_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_attribute';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       catalogue_branch_override: {
         Row: {
           available: boolean | null;
@@ -6227,6 +6308,13 @@ export type Database = {
             foreignKeyName: 'catalogue_branch_override_item_id_fkey';
             columns: ['item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_branch_override_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
             referencedRelation: 'featured_live_v';
             referencedColumns: ['pinned_item_id'];
           },
@@ -6287,6 +6375,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_edit_request_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
           },
           {
             foreignKeyName: 'catalogue_edit_request_catalogue_item_id_fkey';
@@ -6798,6 +6893,13 @@ export type Database = {
             foreignKeyName: 'catalogue_item_modifier_item_id_fkey';
             columns: ['item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_modifier_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
             referencedRelation: 'featured_live_v';
             referencedColumns: ['pinned_item_id'];
           },
@@ -6867,6 +6969,13 @@ export type Database = {
             foreignKeyName: 'catalogue_photo_item_id_fkey';
             columns: ['item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
             referencedRelation: 'featured_live_v';
             referencedColumns: ['pinned_item_id'];
           },
@@ -6922,6 +7031,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_task_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
           },
           {
             foreignKeyName: 'catalogue_photo_task_catalogue_item_id_fkey';
@@ -7085,6 +7201,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
           },
           {
             foreignKeyName: 'catalogue_price_flag_catalogue_item_id_fkey';
@@ -7327,6 +7450,78 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      catalogue_variant: {
+        Row: {
+          archived_at: string | null;
+          available: boolean;
+          created_at: string;
+          id: string;
+          item_id: string;
+          photo_path: string | null;
+          price_kes: number;
+          sku: string | null;
+          stock_count: number | null;
+          updated_at: string;
+          value_ids: string[];
+        };
+        ComputedFields: never;
+        Insert: {
+          archived_at?: string | null;
+          available?: boolean;
+          created_at?: string;
+          id?: string;
+          item_id: string;
+          photo_path?: string | null;
+          price_kes: number;
+          sku?: string | null;
+          stock_count?: number | null;
+          updated_at?: string;
+          value_ids: string[];
+        };
+        Update: {
+          archived_at?: string | null;
+          available?: boolean;
+          created_at?: string;
+          id?: string;
+          item_id?: string;
+          photo_path?: string | null;
+          price_kes?: number;
+          sku?: string | null;
+          stock_count?: number | null;
+          updated_at?: string;
+          value_ids?: string[];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_variant_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_variant_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_variant_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_variant_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
           },
         ];
       };
@@ -9889,6 +10084,13 @@ export type Database = {
             foreignKeyName: 'customer_engine_booking_catalogue_item_id_fkey';
             columns: ['catalogue_item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
             referencedRelation: 'featured_live_v';
             referencedColumns: ['pinned_item_id'];
           },
@@ -10032,6 +10234,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
           },
           {
             foreignKeyName: 'customer_saved_item_id_fkey';
@@ -12014,6 +12223,13 @@ export type Database = {
             foreignKeyName: 'featured_booking_item_id_fkey';
             columns: ['item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
             referencedRelation: 'featured_live_v';
             referencedColumns: ['pinned_item_id'];
           },
@@ -12364,6 +12580,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_pinned_item_id_fkey';
+            columns: ['pinned_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
           },
           {
             foreignKeyName: 'featured_creative_pinned_item_id_fkey';
@@ -23448,6 +23671,13 @@ export type Database = {
             foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
             columns: ['catalogue_item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
             referencedRelation: 'featured_live_v';
             referencedColumns: ['pinned_item_id'];
           },
@@ -23903,6 +24133,13 @@ export type Database = {
             isOneToOne: true;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: true;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
           },
           {
             foreignKeyName: 'merchant_setup_offering_detail_item_id_fkey';
@@ -27635,6 +27872,8 @@ export type Database = {
           unit_label: string | null;
           unit_price_cents: number;
           unit_step: number | null;
+          variant_id: string | null;
+          variant_label: string | null;
         };
         ComputedFields: never;
         Insert: {
@@ -27650,6 +27889,8 @@ export type Database = {
           unit_label?: string | null;
           unit_price_cents: number;
           unit_step?: number | null;
+          variant_id?: string | null;
+          variant_label?: string | null;
         };
         Update: {
           catalogue_item_id?: string | null;
@@ -27664,6 +27905,8 @@ export type Database = {
           unit_label?: string | null;
           unit_price_cents?: number;
           unit_step?: number | null;
+          variant_id?: string | null;
+          variant_label?: string | null;
         };
         Relationships: [
           {
@@ -27679,6 +27922,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'order_item_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
           },
           {
             foreignKeyName: 'order_item_catalogue_item_id_fkey';
@@ -27755,6 +28005,13 @@ export type Database = {
             columns: ['order_id'];
             isOneToOne: false;
             referencedRelation: 'rider_jobs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'order_item_variant_id_fkey';
+            columns: ['variant_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant';
             referencedColumns: ['id'];
           },
         ];
@@ -40018,6 +40275,13 @@ export type Database = {
             foreignKeyName: 'catalogue_item_modifier_item_id_fkey';
             columns: ['item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_modifier_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
             referencedRelation: 'featured_live_v';
             referencedColumns: ['pinned_item_id'];
           },
@@ -40031,6 +40295,7 @@ export type Database = {
           description: string | null;
           gallery_paths: string[] | null;
           has_options: boolean | null;
+          has_variants: boolean | null;
           highlighted: boolean | null;
           id: string | null;
           kind: string | null;
@@ -40155,6 +40420,16 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      catalogue_variant_public: {
+        Row: {
+          attributes: Json | null;
+          item_id: string | null;
+          price_from_cents: number | null;
+          variants: Json | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
       };
       checkout_hotel_context_v: {
         Row: {
@@ -51081,6 +51356,13 @@ export type Database = {
             foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
             columns: ['catalogue_item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
             referencedRelation: 'featured_live_v';
             referencedColumns: ['pinned_item_id'];
           },
@@ -55345,6 +55627,10 @@ export type Database = {
       };
       fn_ledger_backfill: { Args: { p_limit?: number }; Returns: Json };
       fn_line_options: { Args: { p_item_id: string; p_options: Json }; Returns: Json };
+      fn_line_variant: {
+        Args: { p_item_id: string; p_variant: string };
+        Returns: Json;
+      };
       fn_listing_sync: { Args: { p_unit_id: string }; Returns: undefined };
       fn_load_available: { Args: { p_plan_id: string }; Returns: undefined };
       fn_mask_phone: { Args: { p_phone: string }; Returns: string };
@@ -56178,6 +56464,7 @@ export type Database = {
       fn_unit_listing_ready: { Args: { p_unit_id: string }; Returns: boolean };
       fn_unit_readiness: { Args: { p_unit_id: string }; Returns: Json };
       fn_vacancy_hiring_team: { Args: { p_vacancy_id: string }; Returns: string[] };
+      fn_variant_label: { Args: { p_value_ids: string[] }; Returns: string };
       fn_wa_window: { Args: { p_conversation: string }; Returns: Json };
       fn_web_order_quote: { Args: { p_payload: Json }; Returns: Json };
       fn_wiring_check: {
@@ -60556,6 +60843,10 @@ export type Database = {
       rpc_merchant_invite_revoke: { Args: { p_invite_id: string }; Returns: Json };
       rpc_merchant_item_option_groups_set: {
         Args: { p_group_ids: string[]; p_item_id: string };
+        Returns: Json;
+      };
+      rpc_merchant_item_variants_save: {
+        Args: { p_item_id: string; p_payload: Json };
         Returns: Json;
       };
       rpc_merchant_membership_remove: {

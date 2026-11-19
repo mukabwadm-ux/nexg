@@ -17,6 +17,7 @@ import { bookingRequest } from '@/components/merchant/booking/api';
 import { ITEM_KIND_LABEL, ITEM_KINDS, type ItemKind } from '@/lib/catalogue-kinds';
 
 import { Panel } from './bits';
+import { VariantGrid, type ItemVariants } from './merchant-item-variants';
 
 /** The shop's booking offerings, from the booking engine, to link items to. */
 interface OfferingChoice {
@@ -46,6 +47,7 @@ export interface ChoiceItemRow {
   kind?: string | null;
   booking_offering_id?: string | null;
   group_ids: string[];
+  variants?: ItemVariants;
 }
 
 const input =
@@ -483,6 +485,16 @@ function ItemRow({
               {busy === `u${item.id}` ? '…' : 'Save unit'}
             </button>
           </div>
+          {kind === 'buy' && (item.kind ?? 'buy') === 'buy' && (
+            <VariantGrid
+              itemId={item.id}
+              itemName={item.name}
+              basePriceKes={item.price_kes}
+              saved={item.variants ?? { attributes: [], variants: [] }}
+              busy={busy === `v${item.id}`}
+              run={run}
+            />
+          )}
           {groups.length > 0 && (
             <div className="flex flex-wrap items-center gap-3">
               {groups.map((g) => (
