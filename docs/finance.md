@@ -113,6 +113,26 @@ The console **cannot move a run along**. The transitions exist and are guarded; 
 
 ---
 
+## Payments on the ledger
+
+| Payment | When | Posting |
+| --- | --- | --- |
+| Order | paid, or cash collected | the sale: what the merchant is owed, NexG's fees and commission net of VAT, the VAT, the rider's tip (`ledger.fn_post_sale`) |
+| Featured slot | paid | all of it to `revenue.featured` (`ledger.fn_post_featured_paid`) |
+| Stay | paid and confirmed | 85% to `stay.host_share:<host>`, NexG's 15% to `revenue.stay_commission` less its VAT, the VAT to `tax.vat_output` (`ledger.fn_post_stay_paid`) |
+| Stay | paid after its nights went to somebody else | owed back to the guest on `refunds_pending` |
+| Stay | cancelled by staff after it was paid | the host share, commission and VAT taken back into `refunds_pending` (`ledger.fn_post_stay_refund_due`) |
+| Stay | refund recorded | `refunds_pending` back out of the cash account it came in on (`ledger.fn_post_stay_refunded`) |
+| Rider float | — | nothing: no flow creates these payments yet, and a payment row cannot say which rider paid |
+
+Cash is `cash.bank` for a bank collection and `cash.mpesa_paybill` otherwise.
+
+A stay's host share is not a `payable.*` balance, so the settlement run does not pay it. The run settles a host's payables as a credit note against their next invoice, which is not how a stay is paid, and hosts have no payout details in NexG yet. Finance sees the share on the owed list under the host's name, and the host sees it on their statement as a stay.
+
+A posting never undoes a payment. The triggers log `ledger.posting_failed` (high) instead of raising, and every posting function is idempotent, so a failed one can be posted again from the SQL Editor.
+
+---
+
 ## Projections
 
 Six, rebuilt every two minutes by `cron_fin_rebuild`:
