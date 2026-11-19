@@ -10,7 +10,7 @@ import { merchantActionClient } from '@/lib/merchant-action-access';
  *
  * Groups are written through rpc_merchant_option_group_save and attached to
  * items through rpc_merchant_item_option_groups_set
- * (20270109000400_catalogue_selling); checkout prices them from the same rows.
+ * (20270111000100_catalogue_selling); checkout prices them from the same rows.
  */
 
 export interface OptionInput {
