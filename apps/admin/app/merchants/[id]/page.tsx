@@ -188,6 +188,15 @@ export default async function MerchantApplicationPage({
   ]);
 
   const { review, outstanding } = documents;
+  // What is still open before Take live (approve first, 20270124000100).
+  // Null until that migration is in the database.
+  const { data: todo } = await supabase.rpc('rpc_merchant_setup_todo', {
+    p_merchant_id: params.id,
+  });
+  const setupTodo =
+    ((todo as { items?: { label: string; who: string; count?: number }[] } | null)?.items ??
+      null) ||
+    null;
   const city = merchant.city as { name: string } | null;
   const primary = branches?.[0];
   const canManageLifecycle = staff.isSuperAdmin || staff.roles.includes('merchant_ops');
@@ -474,6 +483,7 @@ export default async function MerchantApplicationPage({
                 disabled={merchant.status === 'live'}
                 outstanding={outstanding.length}
                 currentStatus={merchant.status}
+                openItems={setupTodo}
                 onActivate={async (reason) => {
                   'use server';
                   return goLive(params.id, reason);

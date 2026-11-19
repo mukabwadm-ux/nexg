@@ -18,12 +18,15 @@ export function ActivatePanel({
   disabled,
   outstanding,
   currentStatus,
+  openItems,
   onActivate,
 }: {
   kind: 'rider' | 'merchant';
   disabled: boolean;
   outstanding: number;
   currentStatus: string;
+  /** What the merchant (or NexG) still has to do before going live (rpc_merchant_setup_todo). */
+  openItems?: { label: string; who: string; count?: number }[] | null;
   onActivate: (reason: string) => Promise<{ ok: boolean; message: string }>;
 }) {
   const { toast } = useToast();
@@ -72,6 +75,20 @@ export function ActivatePanel({
           ? 'Everything required is verified. This is the last step.'
           : `${outstanding} required ${outstanding === 1 ? 'document is' : 'documents are'} not verified yet. ${verb} will tell you exactly which.`}
       </p>
+      {openItems && openItems.length > 0 ? (
+        <div className="mt-3">
+          <p className="text-sm font-bold">Still open before going live</p>
+          <ul className="text-muted mt-1 list-disc pl-5 text-sm font-semibold leading-[1.7]">
+            {openItems.map((item) => (
+              <li key={item.label}>
+                {item.label}
+                {item.count ? ` (${item.count})` : ''}
+                {item.who === 'nexg' ? ' · NexG' : ' · merchant, in their dashboard'}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <div className="mt-4">
         <Input

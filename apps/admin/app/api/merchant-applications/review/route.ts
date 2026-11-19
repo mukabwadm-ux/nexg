@@ -1,7 +1,4 @@
-import {
-  approvalBlocker,
-  merchantApplicationReviewHandler,
-} from '@/lib/merchant-application-review-http';
+import { merchantApplicationReviewHandler } from '@/lib/merchant-application-review-http';
 import { issueSignedAgreement, issueSummary } from '@/lib/merchant-agreement-signing';
 import { createClient } from '@/lib/supabase/server';
 import type { ReviewRpcResult } from '@/lib/merchant-application-review-contracts';
@@ -31,31 +28,9 @@ export async function POST(request: Request) {
       };
       return await rpc.call(client, name, args).abortSignal(signal);
     },
-    approvalBlocker: async (merchantId, signal) => {
-      const [required, documents, primary] = await Promise.all([
-        client.rpc('fn_merchant_required_docs', { p_merchant_id: merchantId }).abortSignal(signal),
-        client
-          .from('document')
-          .select('requirement_id, status')
-          .eq('owner_type', 'merchant')
-          .eq('owner_id', merchantId)
-          .is('superseded_at', null)
-          .abortSignal(signal),
-        client
-          .from('merchant_branch')
-          .select('merchant_id', { count: 'exact', head: true })
-          .eq('merchant_id', merchantId)
-          .eq('is_primary', true)
-          .abortSignal(signal),
-      ]);
-      if (required.error || documents.error || primary.error)
-        throw new Error('Approval readiness could not be read.');
-      return approvalBlocker(
-        (required.data as { id: string; label?: string | null }[] | null) ?? [],
-        (documents.data as { requirement_id: string; status: string }[] | null) ?? [],
-        primary.count ?? 0,
-      );
-    },
+    // Approval no longer waits for documents or a location (approve first,
+    // 20270124000100): the merchant finishes those in its dashboard, and
+    // rpc_merchant_go_live refuses until they are done.
     goLive: async (merchantId, signal) => {
       const { error } = await client
         .rpc('rpc_merchant_go_live', {

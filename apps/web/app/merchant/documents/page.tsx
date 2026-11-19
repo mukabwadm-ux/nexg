@@ -63,31 +63,37 @@ export default async function MerchantDocuments() {
         lead="The documents NexG needs for your category, their review state and expiry. Documents you already verified are carried over and never re-requested unless they expire."
       />
 
-      <AgreementPanel
-        merchantId={me.id}
-        status={agreement as unknown as AgreementStatus | null}
-        details={(details as unknown as AgreementDetailsRecord | null) ?? null}
-        signed={(signed as unknown as SignedAgreementCopy[] | null) ?? null}
-      />
-
-      <OnboardingDetailsPanel
-        merchantId={me.id}
-        details={onboardingError || !onboarding ? null : parseOnboardingDetails(onboarding)}
-      />
-
-      {error ? (
-        <p className="bg-danger-bg text-danger rounded-lg px-3 py-2 text-[0.8125rem] font-bold">
-          We could not read what we need from you: {error.message}
-        </p>
-      ) : (
-        <Documents
-          ownerType="merchant"
-          ownerId={me.id}
-          requirements={(reqs as Requirement[] | null) ?? []}
-          onFile={(docs as OnFile[] | null) ?? []}
-          asked={(asked as Asked[] | null) ?? []}
+      <div id="onboarding-details" className="scroll-mt-20">
+        <OnboardingDetailsPanel
+          merchantId={me.id}
+          details={onboardingError || !onboarding ? null : parseOnboardingDetails(onboarding)}
         />
-      )}
+      </div>
+
+      <div id="agreement" className="scroll-mt-20">
+        <AgreementPanel
+          merchantId={me.id}
+          status={agreement as unknown as AgreementStatus | null}
+          details={(details as unknown as AgreementDetailsRecord | null) ?? null}
+          signed={(signed as unknown as SignedAgreementCopy[] | null) ?? null}
+        />
+      </div>
+
+      <div id="documents-list" className="scroll-mt-20">
+        {error ? (
+          <p className="bg-danger-bg text-danger rounded-lg px-3 py-2 text-[0.8125rem] font-bold">
+            We could not read what we need from you: {error.message}
+          </p>
+        ) : (
+          <Documents
+            ownerType="merchant"
+            ownerId={me.id}
+            requirements={(reqs as Requirement[] | null) ?? []}
+            onFile={(docs as OnFile[] | null) ?? []}
+            asked={(asked as Asked[] | null) ?? []}
+          />
+        )}
+      </div>
     </div>
   );
 }
