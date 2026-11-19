@@ -501,7 +501,12 @@ export async function inviteMember(input: {
     p_branches: input.branches.length > 0 ? input.branches : undefined,
     p_caps: input.caps as never,
   });
-  return unwrap(data, error, ALL, 'Invitation sent. They join when they sign in with it.');
+  return unwrap(
+    data,
+    error,
+    ALL,
+    'Invitation sent. They join when they sign in to NexG with that email address.',
+  );
 }
 
 export async function updateMember(input: {
