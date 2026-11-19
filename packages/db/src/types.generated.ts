@@ -57521,6 +57521,8 @@ export type Database = {
       rpc_booking_block: {
         Args: { p_ends_at: string; p_notes?: string; p_resource_id: string; p_starts_at: string };
         Returns: {
+          checked_in_at: string | null;
+          checked_in_by: string | null;
           created_at: string;
           ends_at: string;
           exclusive: boolean;
@@ -57532,6 +57534,11 @@ export type Database = {
           id: string;
           merchant_id: string;
           notes: string | null;
+          paid_at: string | null;
+          paid_cents: number | null;
+          paid_simulated: boolean;
+          payment_due_by: string | null;
+          payment_reference: string | null;
           quantity: number;
           reference: string;
           resource_id: string;
@@ -57568,6 +57575,8 @@ export type Database = {
           p_starts_at?: string;
         };
         Returns: {
+          checked_in_at: string | null;
+          checked_in_by: string | null;
           created_at: string;
           ends_at: string;
           exclusive: boolean;
@@ -57579,6 +57588,11 @@ export type Database = {
           id: string;
           merchant_id: string;
           notes: string | null;
+          paid_at: string | null;
+          paid_cents: number | null;
+          paid_simulated: boolean;
+          payment_due_by: string | null;
+          payment_reference: string | null;
           quantity: number;
           reference: string;
           resource_id: string;
@@ -57607,6 +57621,8 @@ export type Database = {
       rpc_booking_set_status: {
         Args: { p_booking_id: string; p_status: Database['public']['Enums']['reservation_status'] };
         Returns: {
+          checked_in_at: string | null;
+          checked_in_by: string | null;
           created_at: string;
           ends_at: string;
           exclusive: boolean;
@@ -57618,6 +57634,11 @@ export type Database = {
           id: string;
           merchant_id: string;
           notes: string | null;
+          paid_at: string | null;
+          paid_cents: number | null;
+          paid_simulated: boolean;
+          payment_due_by: string | null;
+          payment_reference: string | null;
           quantity: number;
           reference: string;
           resource_id: string;
@@ -62438,18 +62459,15 @@ export type Database = {
       rpc_my_account_deletion_request: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_booking_code: { Args: { p_booking_id: string }; Returns: string };
       rpc_my_bookings: { Args: Record<PropertyKey, never>; Returns: Json };
-      rpc_my_order_map:
-        | { Args: { p_order_id: string }; Returns: Json }
-        | { Args: { p_contract_version: string; p_order_id: string }; Returns: Json };
-      rpc_my_data_export_request: {
-        Args: Record<PropertyKey, never>;
-        Returns: Json;
-      };
+      rpc_my_data_export_request: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_data_requests: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_engine_booking_code: {
         Args: { p_engine_booking_id: string; p_merchant_id: string };
         Returns: string;
       };
+      rpc_my_order_map:
+        | { Args: { p_order_id: string }; Returns: Json }
+        | { Args: { p_contract_version: string; p_order_id: string }; Returns: Json };
       rpc_my_rider_map_assignments: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_saved_places: {
         Args: {
@@ -62487,10 +62505,7 @@ export type Database = {
         };
         Returns: Json;
       };
-      rpc_my_support_tickets: {
-        Args: Record<PropertyKey, never>;
-        Returns: Json;
-      };
+      rpc_my_support_tickets: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_nearest_free: {
         Args: { p_job_id: string; p_limit?: number };
         Returns: {
@@ -64458,6 +64473,8 @@ export type Database = {
         Returns: {
           check_in: string;
           check_out: string;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -64502,6 +64519,8 @@ export type Database = {
         Returns: {
           check_in: string;
           check_out: string;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -64547,6 +64566,8 @@ export type Database = {
         Returns: {
           check_in: string;
           check_out: string;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -64596,6 +64617,8 @@ export type Database = {
         Returns: {
           check_in: string;
           check_out: string;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -64640,6 +64663,8 @@ export type Database = {
         Returns: {
           check_in: string;
           check_out: string;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -64684,6 +64709,8 @@ export type Database = {
         Returns: {
           check_in: string;
           check_out: string;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -64834,6 +64861,8 @@ export type Database = {
         Returns: {
           check_in: string;
           check_out: string;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -64939,6 +64968,7 @@ export type Database = {
           status: Database['public']['Enums']['ticket_status'];
           topic: Database['public']['Enums']['ticket_topic'];
           updated_at: string;
+          user_id: string | null;
         };
         SetofOptions: {
           from: '*';
@@ -64974,6 +65004,7 @@ export type Database = {
           status: Database['public']['Enums']['ticket_status'];
           topic: Database['public']['Enums']['ticket_topic'];
           updated_at: string;
+          user_id: string | null;
         };
         SetofOptions: {
           from: '*';
