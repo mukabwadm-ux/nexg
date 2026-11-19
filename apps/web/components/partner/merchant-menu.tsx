@@ -36,6 +36,12 @@ export interface ItemRow {
   handling_notes?: string | null;
   storage_guidance?: string | null;
   prep_time_minutes?: number | null;
+  sold_by?: string | null;
+  unit_label?: string | null;
+  unit_step?: number | null;
+  unit_min?: number | null;
+  unit_max?: number | null;
+  price_is_estimate?: boolean | null;
 }
 
 export interface SectionRow {

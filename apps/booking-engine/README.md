@@ -23,13 +23,14 @@ The schema comes only from the reviewed migrations in `migrations/`:
 
 Runtime settings:
 
-| Variable                 | Value                                                                |
-| ------------------------ | -------------------------------------------------------------------- |
-| `BOOKING_DATABASE_URL`   | Dedicated PostgreSQL connection string                               |
-| `PAYLOAD_SECRET`         | Random, at least 32 characters, private to this service              |
-| `BOOKING_BRIDGE_SECRET`  | Random, at least 32 characters; the same value is set on the web app |
-| `PORT` or `BOOKING_PORT` | Listening port (the host usually sets `PORT`)                        |
-| `BOOKING_HOST`           | `0.0.0.0` in a container (the Dockerfile sets it)                    |
+| Variable                     | Value                                                                                                       |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `BOOKING_DATABASE_URL`       | Dedicated PostgreSQL connection string                                                                      |
+| `PAYLOAD_SECRET`             | Random, at least 32 characters, private to this service                                                     |
+| `BOOKING_BRIDGE_SECRET`      | Random, at least 32 characters; the same value is set on the web app                                        |
+| `PORT` or `BOOKING_PORT`     | Listening port (the host usually sets `PORT`)                                                               |
+| `BOOKING_HOST`               | `0.0.0.0` in a container (the Dockerfile sets it)                                                           |
+| `BOOKING_SIMULATED_PAYMENTS` | `1` allows test payments (no money collected) while no payment provider is connected; leave unset otherwise |
 
 The web app needs `BOOKING_ENGINE_URL` (this service's HTTPS address) and the same `BOOKING_BRIDGE_SECRET`. Build the image from the repository root with `docker build -f apps/booking-engine/Dockerfile .`. `GET /health` answers without a signature; every other route requires the signed bridge headers.
 

@@ -126,7 +126,42 @@ export function createBookingServer(engine: BookingEngine, secret: string) {
           );
         throw new BookingError(405, 'This action is not supported.', 'method_not_allowed');
       }
+      // NexG platform calls: payment confirmation and account erasure.
+      if (path.startsWith('/v1/platform/')) {
+        const settle = path.match(/^\/v1\/platform\/bookings\/([^/]+)\/settle$/);
+        if (settle && req.method === 'POST')
+          return respond(
+            res,
+            200,
+            await engine.settlePayment(
+              identity,
+              decodeURIComponent(settle[1]!),
+              await body(req),
+              key,
+            ),
+          );
+        if (path === '/v1/platform/customers/forget' && req.method === 'POST')
+          return respond(
+            res,
+            200,
+            await engine.forgetCustomer(identity, (await body(req)).ref, key),
+          );
+        throw new BookingError(404, 'This action was not found.', 'not_found');
+      }
       requireManager(identity);
+      const byCode = path.match(/^\/v1\/codes\/([^/]+)(\/arrive)?$/);
+      if (byCode && !byCode[2] && req.method === 'GET')
+        return respond(
+          res,
+          200,
+          await engine.bookingByCode(identity, decodeURIComponent(byCode[1]!)),
+        );
+      if (byCode && byCode[2] && req.method === 'POST')
+        return respond(
+          res,
+          200,
+          await engine.arriveByCode(identity, decodeURIComponent(byCode[1]!), await body(req), key),
+        );
       if (path === '/v1/quote' && req.method === 'POST')
         return respond(res, 200, await engine.quote(identity, await body(req)));
       if (path === '/v1/bootstrap' && req.method === 'POST')

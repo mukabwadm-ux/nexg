@@ -118,8 +118,8 @@ select set_config('request.jwt.claims', '{"sub":"c0560000-0000-4000-8000-0000000
 select is(
   (select status::text from public.rpc_booking_create(
      'c0560000-0000-4000-8000-000000000021', current_setting('t.d0_1000')::timestamptz, null, null, 1, 'Wanjiru', '+254700005699')),
-  'confirmed',
-  'a customer books an instant-confirm time and it is confirmed'
+  'pending',
+  'a customer books an instant-confirm time; it waits for payment (paid first since 20270116000400)'
 );
 select is(
   (select count(*)::int from public.rpc_booking_open_times('c0560000-0000-4000-8000-000000000021', current_setting('t.wed')::date)),
@@ -127,17 +127,17 @@ select is(
   'the booked hour and its turnaround buffer leave the times on offer'
 );
 select throws_ok(
-  format($$select public.rpc_booking_create('c0560000-0000-4000-8000-000000000021', %L)$$, current_setting('t.d0_1800')::timestamptz),
+  format($$select public.rpc_booking_create('c0560000-0000-4000-8000-000000000021', %L, null, null, 1, 'Wanjiru')$$, current_setting('t.d0_1800')::timestamptz),
   '22023', null,
   'a customer cannot book after closing'
 );
 select throws_ok(
-  format($$select public.rpc_booking_create('c0560000-0000-4000-8000-000000000021', %L)$$, current_setting('t.d0_1630')::timestamptz),
+  format($$select public.rpc_booking_create('c0560000-0000-4000-8000-000000000021', %L, null, null, 1, 'Wanjiru')$$, current_setting('t.d0_1630')::timestamptz),
   '22023', null,
   'nor run past closing time'
 );
 select throws_ok(
-  format($$select public.rpc_booking_create('c0560000-0000-4000-8000-000000000021', %L)$$, current_setting('t.d4_1000')::timestamptz),
+  format($$select public.rpc_booking_create('c0560000-0000-4000-8000-000000000021', %L, null, null, 1, 'Wanjiru')$$, current_setting('t.d4_1000')::timestamptz),
   '22023', null,
   'nor book on a closed day'
 );
