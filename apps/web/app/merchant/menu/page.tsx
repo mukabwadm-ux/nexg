@@ -1,4 +1,9 @@
 import { PageHead } from '@/components/merchant/frame';
+import {
+  ItemChoices,
+  type ChoiceItemRow,
+  type OptionGroupRow,
+} from '@/components/partner/merchant-item-choices';
 import { Menu, type ItemRow, type SectionRow } from '@/components/partner/merchant-menu';
 import { requireMerchant, setupPageOrWorkspace } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
@@ -20,11 +25,17 @@ export default async function MerchantMenu() {
   );
   const supabase = createClient();
 
-  const [{ data, error }, { data: sectionData }, { data: merchantData }] = await Promise.all([
+  const [
+    { data, error },
+    { data: sectionData },
+    { data: merchantData },
+    { data: groupData },
+    { data: linkData },
+  ] = await Promise.all([
     supabase
       .from('catalogue_item')
       .select(
-        'id, section_id, name, description, price_kes, available, age_restricted, sort, photo_path, portion_size, ingredients, allergens, dietary_labels, availability_notes, handling_notes, storage_guidance, prep_time_minutes',
+        'id, section_id, name, description, price_kes, available, age_restricted, sort, photo_path, portion_size, ingredients, allergens, dietary_labels, availability_notes, handling_notes, storage_guidance, prep_time_minutes, sold_by, unit_label, unit_step, unit_min, unit_max, price_is_estimate',
       )
       .eq('merchant_id', me.id)
       .order('sort'),
@@ -34,6 +45,15 @@ export default async function MerchantMenu() {
       .select('category, category_key, subcategory')
       .eq('id', me.id)
       .maybeSingle(),
+    supabase
+      .from('modifier_group')
+      .select(
+        'id, name, required, max_choices, sort, modifier_option(id, name, extra_cents, available, sort)',
+      )
+      .eq('merchant_id', me.id)
+      .is('archived_at', null)
+      .order('sort'),
+    supabase.from('catalogue_item_modifier').select('item_id, group_id, sort').order('sort'),
   ]);
 
   const itemRows = (data as ItemRow[] | null) ?? [];
@@ -51,6 +71,19 @@ export default async function MerchantMenu() {
     photo_url: item.photo_path ? (photoUrls.get(item.photo_path) ?? null) : null,
   }));
   const sections = (sectionData as SectionRow[] | null) ?? [];
+  const groups: OptionGroupRow[] = (groupData ?? []).map((g) => ({
+    id: g.id,
+    name: g.name,
+    required: g.required,
+    max_choices: g.max_choices,
+    options: [...(g.modifier_option ?? [])]
+      .sort((a, b) => a.sort - b.sort)
+      .map((o) => ({ id: o.id, name: o.name, extra_cents: o.extra_cents, available: o.available })),
+  }));
+  const choiceItems: ChoiceItemRow[] = itemRows.map((item) => ({
+    ...item,
+    group_ids: (linkData ?? []).filter((l) => l.item_id === item.id).map((l) => l.group_id),
+  }));
   const on = items.filter((i) => i.available);
   const categoryId = merchantData?.category_key ?? merchantData?.category;
   const { data: categoryConfig, error: categoryConfigError } = categoryId
@@ -103,6 +136,7 @@ export default async function MerchantMenu() {
         sections={sections}
         catalogueExample={catalogueExample}
       />
+      <ItemChoices groups={groups} items={choiceItems} />
     </div>
   );
 }
