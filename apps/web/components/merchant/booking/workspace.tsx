@@ -16,6 +16,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { bookingRequest, command } from './api';
+import { BookingCodeCheck } from './code-check';
 import { bookingCalendarSegments } from './calendar-data';
 import {
   addDays,
@@ -416,6 +417,7 @@ export function MerchantBookingWorkspace({
           </button>
         </div>
       </header>
+      <BookingCodeCheck base={apiBase} disabled={disabled} />
       {!online ? (
         <p role="status" className="bg-gold-soft text-gold-text rounded-lg p-3 text-sm">
           You are offline. Displayed bookings are the last loaded records. Reconnect to make
