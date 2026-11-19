@@ -11,9 +11,11 @@
 --   curated     slug starts with 'demo-'
 --   events      organiser_name = 'Demo organiser'
 --
--- Step 1 only reads. Step 2 deletes in one transaction and stops, deleting
--- nothing, if any customer plan, partner hold, ledger account or non-demo
--- curated day still uses a demo row. Then those need a decision first.
+-- Step 1 only reads. Step 2 deletes in one transaction. Unpaid customer
+-- plans that used a demo item keep their blocks (title and price are copied
+-- into each block) with the link cleared. It stops, deleting nothing, if a
+-- paid, running or finished plan, a partner hold, a ledger account or a
+-- non-demo curated day still uses a demo row.
 
 -- ------------------------------------------------------------- 1. preview
 
@@ -72,12 +74,19 @@ declare
   v_ledger integer;
   v_curated integer;
 begin
+  -- Blocks keep their own title and price (the snapshots), and the foreign
+  -- keys clear the link, so a plan that is not paid just loses the link to
+  -- the demo item (owner, 19 Nov 2026: 11 blocks). A paid, running or
+  -- finished plan involves money, so that still stops the delete.
   select count(*) into v_blocks from public.plan_block b
-   where b.component_id in (select id from demo_component)
-      or b.event_id in (select id from demo_event)
-      or b.assigned_driver_partner_id in (select id from demo_partner);
+    join public.plan p on p.id = b.plan_id
+   where (b.component_id in (select id from demo_component)
+          or b.event_id in (select id from demo_event)
+          or b.assigned_driver_partner_id in (select id from demo_partner))
+     and p.status::text in ('paid', 'in_progress', 'completed');
   select count(*) into v_plans from public.plan
-   where curated_day_id in (select id from demo_curated);
+   where curated_day_id in (select id from demo_curated)
+     and status::text in ('paid', 'in_progress', 'completed');
   select count(*) into v_holds from public.partner_hold
    where partner_id in (select id from demo_partner);
   select count(*) into v_ledger from ledger.account
@@ -86,7 +95,7 @@ begin
    where cb.component_id in (select id from demo_component)
      and cb.curated_day_id not in (select id from demo_curated);
   if v_blocks + v_plans + v_holds + v_ledger + v_curated > 0 then
-    raise exception 'Nothing deleted. Still in use: % plan blocks, % plans, % partner holds, % ledger accounts, % blocks in real curated days.',
+    raise exception 'Nothing deleted. Still in use: % blocks in paid plans, % paid plans from a demo day, % partner holds, % ledger accounts, % blocks in real curated days.',
       v_blocks, v_plans, v_holds, v_ledger, v_curated;
   end if;
 end
