@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { ShareDonut } from '@/components/charts';
 import { ConsoleShell } from '@/components/console-shell';
 import { EarlyPayouts, type EarlyPayoutRow } from '@/components/finance/early-payouts';
+import { HostPayoutDetails } from '@/components/finance/host-payouts';
 import { MovementsTable } from '@/components/finance/movements';
 import { PartnerPayoutDetails } from '@/components/finance/partner-payouts';
 import { Settlement, type LineRow, type RunRow } from '@/components/finance/settlement';
@@ -35,6 +36,7 @@ import { RangeControl } from '@/components/portal/client-kit';
 import { PageHeader, PanelHead, Sheet, Stat, StatGrid, ViewTabs } from '@/components/portal/kit';
 import { lineBucket, PAYEE_GROUPS, payeeGroup, share, type PayeeGroup } from '@/lib/finance';
 import { movementList } from '@/lib/finance-server';
+import { hostPayouts } from '@/lib/host-payouts';
 import { previousPeriod, vsLabel } from '@/lib/office-finance';
 import { partnerPayouts } from '@/lib/partner-payouts';
 import {
@@ -92,8 +94,9 @@ const LINE_COLUMNS =
  * hosts, riders and experience partners, where each payout stands, and
  * what is owed but not yet in a run. Runs come from fin_settlement_run and
  * its lines; a run in the period is one whose pay date falls in it. Draft
- * and cancelled runs pay nothing and are left out of the totals. Partner
- * Payouts also lists where each partner is paid, for Finance to verify.
+ * and cancelled runs pay nothing and are left out of the totals. Host and
+ * Partner Payouts also list where each host and partner is paid, for
+ * Finance to verify.
  */
 export default async function SettlementsPage({
   searchParams,
@@ -381,6 +384,27 @@ export default async function SettlementsPage({
     );
   }
 
+  /* Host Payouts: where each host is paid, and whether Finance has checked it. */
+  let hostDetails: React.ReactNode = null;
+  if (tab === 'hosts') {
+    const { data, error } = await supabase.rpc('rpc_host_payouts');
+    hostDetails = error ? (
+      <p
+        role="alert"
+        className="bg-danger-bg text-danger rounded-xl px-4 py-3 text-sm font-semibold"
+      >
+        Host payout details could not be loaded: {error.message}
+      </p>
+    ) : (
+      <HostPayoutDetails
+        rows={hostPayouts(data)}
+        canVerify={canVerify}
+        myStaffId={staff.staffId}
+        isSuperAdmin={staff.isSuperAdmin}
+      />
+    );
+  }
+
   const groupLines = (g: PayeeGroup) =>
     lines
       .filter((l) => inPeriod(l) && payeeGroup(l.party_type) === g)
@@ -601,14 +625,17 @@ export default async function SettlementsPage({
           </Sheet>
         )}
         {tab === 'hosts' && (
-          <Sheet>
-            <LinesTable
-              rows={groupLines('host')}
-              title="Host Payouts"
-              noun="host"
-              batchesHref={href('batches')}
-            />
-          </Sheet>
+          <>
+            <Sheet>
+              <LinesTable
+                rows={groupLines('host')}
+                title="Host Payouts"
+                noun="host"
+                batchesHref={href('batches')}
+              />
+            </Sheet>
+            <Sheet>{hostDetails}</Sheet>
+          </>
         )}
         {tab === 'riders' && (
           <Sheet>

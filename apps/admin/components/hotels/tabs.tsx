@@ -2,6 +2,9 @@ import { HostPrivacyShare } from './host-privacy-share';
 import { Card } from '@nexg/ui';
 import Link from 'next/link';
 
+import type { HostPayout } from '@/lib/host-payouts';
+
+import { HostPayoutPanel } from './host-payout';
 import {
   ageLabel,
   Avatar,
@@ -63,12 +66,20 @@ export function HostsTab({
   badges,
   filter,
   selected,
+  payout = null,
+  canDeclarePayout = false,
+  payoutUnavailable = false,
 }: {
   hosts: HostRow[];
   units: UnitRow[];
   badges: Badges;
   filter: string;
   selected: string | null;
+  /** The selected host's payout details, if any were declared. */
+  payout?: HostPayout | null;
+  /** Hospitality staff, who declare payout details; the database checks again. */
+  canDeclarePayout?: boolean;
+  payoutUnavailable?: boolean;
 }) {
   const visible = hosts.filter((h) => {
     switch (filter) {
@@ -199,7 +210,13 @@ export function HostsTab({
         </Card>
 
         {chosen ? (
-          <HostPanel host={chosen} units={units.filter((u) => u.host_id === chosen.id)} />
+          <HostPanel
+            host={chosen}
+            units={units.filter((u) => u.host_id === chosen.id)}
+            payout={payout?.host_id === chosen.id ? payout : null}
+            canDeclarePayout={canDeclarePayout}
+            payoutUnavailable={payoutUnavailable}
+          />
         ) : (
           <Card className="p-5">
             <p className="text-muted text-sm font-semibold">Pick a host to open their record.</p>
@@ -210,7 +227,19 @@ export function HostsTab({
   );
 }
 
-function HostPanel({ host, units }: { host: HostRow; units: UnitRow[] }) {
+function HostPanel({
+  host,
+  units,
+  payout,
+  canDeclarePayout,
+  payoutUnavailable,
+}: {
+  host: HostRow;
+  units: UnitRow[];
+  payout: HostPayout | null;
+  canDeclarePayout: boolean;
+  payoutUnavailable: boolean;
+}) {
   return (
     <div className="space-y-4">
       <Card className="p-5">
@@ -311,6 +340,14 @@ function HostPanel({ host, units }: { host: HostRow; units: UnitRow[] }) {
           Hosts pay nothing to list. The only thing billed is a welcome package they ordered.
         </p>
       </Card>
+
+      <HostPayoutPanel
+        hostId={host.id}
+        hostName={host.display_name ?? '[Host name]'}
+        payout={payout}
+        canDeclare={canDeclarePayout}
+        unavailable={payoutUnavailable}
+      />
 
       {(host.status === 'applied' || host.status === 'verifying') && (
         <Card className="border-gold border-2 p-5">
