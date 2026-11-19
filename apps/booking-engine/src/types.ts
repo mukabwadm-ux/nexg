@@ -26,7 +26,9 @@ export interface Identity {
   answers?: Record<string, unknown>;
 }
 export interface Customer {
+  /** For a customer booking: the name to reserve under. */
   name: string;
+  /** Kept only on bookings the shop enters itself. */
   email?: string;
   phone?: string;
 }
@@ -86,11 +88,16 @@ export interface OfferingInput {
   serviceArea?: { areas: string[] };
   travelMinutes?: number;
   additionalSetup?: Record<string, unknown>;
+  ticketTypes?: import('./public-details.js').TicketType[] | null;
+  rentalTerms?: import('./public-details.js').RentalTerms | null;
+  quoteRange?: import('./public-details.js').QuoteRange | null;
 }
 export interface BookingInput {
   specialist?: SpecialistBookingInput;
   occurrenceId?: string;
   offeringId: string;
+  /** Required when the offering lists ticket types. */
+  ticketTypeId?: string;
   resourceIds?: string[];
   startTime?: string;
   endTime?: string;

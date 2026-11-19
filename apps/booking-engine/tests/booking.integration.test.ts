@@ -248,7 +248,8 @@ test('booking GET reads preserve persisted business state', async (t) => {
         const activeSnapshot = await snapshot();
         assert.deepEqual((await request('/v1' + route)).value.slots, []);
         assert.deepEqual(await snapshot(), activeSnapshot);
-        now += 10 * 60000;
+        // A customer hold waits 15 minutes for payment (NEXG_PREPAID_V1).
+        now += 15 * 60000;
         expirySnapshot = await snapshot();
         for (const [prefix, identity] of [
           ['/v1', owner],
@@ -1520,13 +1521,28 @@ test('native booking lifecycle, concurrency, scope and durable storage', async (
             (error: any) => error.status === 403,
           );
 
-          let accepted = await engine.changeBooking(
-            merchant,
-            created.booking.id,
-            'confirm',
-            { expectedVersion: created.booking.version },
-            key(),
+          // A customer booking is confirmed by its payment, not by the merchant.
+          await assert.rejects(
+            () =>
+              engine.changeBooking(
+                merchant,
+                created.booking.id,
+                'confirm',
+                { expectedVersion: created.booking.version },
+                key(),
+              ),
+            (error: any) => error.code === 'payment_required',
           );
+          let accepted = (await engine.settlePayment(
+            { ...merchant, role: 'platform', userId: 'nexg-payments' },
+            created.booking.id,
+            {
+              provider: 'test',
+              reference: 'SNAPSHOT-1',
+              amountMinor: created.booking.pricing.totalDueMinor,
+            },
+            key(),
+          )) as any;
           assert.equal(accepted.status, 'confirmed');
           accepted = await engine.changeBooking(
             merchant,

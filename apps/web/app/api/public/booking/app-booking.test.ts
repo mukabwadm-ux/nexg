@@ -75,10 +75,60 @@ describe('booking from the app with its sign-in', () => {
       'POST',
       body,
       itemId,
+      `account_${userId}`,
     );
   });
 
-  it('lets a temporary session look but not book', async () => {
+  it('sends the engine only the name to reserve under, never an email or phone', async () => {
+    mock.session.mockResolvedValue({ kind: 'signed_in', userId, anonymous: false, client });
+    mock.forward.mockResolvedValue(Response.json({ booking: { id: 'bk1' } }, { status: 201 }));
+    await POST(
+      new Request(url('bookings'), {
+        method: 'POST',
+        headers: { ...bearer, 'content-type': 'application/json' },
+        body: JSON.stringify({
+          offeringId: 'off1',
+          startTime: '2030-01-02T09:00:00+03:00',
+          customer: { name: 'Wanjiru', email: 'w@example.test', phone: '+254700000000' },
+        }),
+      }),
+      { params: { businessId, path: ['bookings'] } },
+    );
+    const forwarded = mock.forward.mock.calls[0]![0] as Request;
+    expect(await forwarded.json()).toEqual({
+      offeringId: 'off1',
+      startTime: '2030-01-02T09:00:00+03:00',
+      customer: { name: 'Wanjiru' },
+    });
+  });
+
+  it('strips contact details on the website cookie path too', async () => {
+    mock.session.mockResolvedValue({ kind: 'none' });
+    mock.forward.mockResolvedValue(Response.json({ booking: { id: 'bk1' } }, { status: 201 }));
+    await POST(
+      new Request(url('bookings'), {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', origin: 'https://nexg.test' },
+        body: JSON.stringify({ offeringId: 'off1', customer: { name: 'A', email: 'a@b.test' } }),
+      }),
+      { params: { businessId, path: ['bookings'] } },
+    );
+    const forwarded = mock.forward.mock.calls[0]![0] as Request;
+    expect(await forwarded.json()).toEqual({ offeringId: 'off1', customer: { name: 'A' } });
+    expect(forwarded.headers.get('origin')).toBe('https://nexg.test');
+  });
+
+  it('refuses a booking body that is not JSON', async () => {
+    mock.session.mockResolvedValue({ kind: 'signed_in', userId, anonymous: false, client });
+    const response = await POST(
+      new Request(url('bookings'), { method: 'POST', headers: bearer, body: 'not json' }),
+      { params: { businessId, path: ['bookings'] } },
+    );
+    expect(response.status).toBe(400);
+    expect(mock.forward).not.toHaveBeenCalled();
+  });
+
+  it('lets a temporary (guest) session book, and saves it under the guest reference', async () => {
     mock.session.mockResolvedValue({ kind: 'signed_in', userId, anonymous: true, client });
     mock.forward.mockResolvedValue(Response.json({ offerings: [] }));
     const look = await GET(new Request(url('catalog'), { headers: bearer }), {
@@ -86,13 +136,27 @@ describe('booking from the app with its sign-in', () => {
     });
     expect(look.status).toBe(200);
     expect(mock.forward.mock.calls[0]![2].userId).toBe(`app_guest_${userId}`);
+    const body = { booking: { id: 'bk2', status: 'held' }, customerToken: 't'.repeat(43) };
+    mock.forward.mockResolvedValue(Response.json(body, { status: 201 }));
     const book = await POST(
-      new Request(url('bookings'), { method: 'POST', headers: bearer, body: '{}' }),
+      new Request(url('bookings'), {
+        method: 'POST',
+        headers: bearer,
+        body: JSON.stringify({ customer: { name: 'Guest' } }),
+      }),
       { params: { businessId, path: ['bookings'] } },
     );
-    expect(book.status).toBe(401);
-    expect(mock.forward).toHaveBeenCalledTimes(1);
-    expect(mock.record).not.toHaveBeenCalled();
+    expect(book.status).toBe(201);
+    expect(mock.forward.mock.calls[1]![2].userId).toBe(`app_guest_${userId}`);
+    expect(mock.record).toHaveBeenCalledWith(
+      client,
+      businessId,
+      ['bookings'],
+      'POST',
+      body,
+      null,
+      `app_guest_${userId}`,
+    );
   });
 
   it('opens a saved booking with its saved private token', async () => {

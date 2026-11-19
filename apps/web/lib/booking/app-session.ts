@@ -4,8 +4,10 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
  * The Consumer app books through the same public booking bridge as the
  * website, but it has no website cookie. It sends its Supabase session as
  * `Authorization: Bearer <access token>` instead. This file checks that token
- * with Supabase and keeps the app's bookings (engine id + private token) in
- * `customer_engine_booking`, so the customer sees them on any device.
+ * with Supabase and keeps the app's bookings (engine id + private token, the
+ * booking code, the name reserved under and what is left to pay) in
+ * `customer_engine_booking`, so the customer sees them on any device. Accounts
+ * and guest sessions both book; the engine holds a booking until it is paid.
  */
 
 export type AppBookingSession =
@@ -86,6 +88,12 @@ interface EngineBooking {
   startTime?: unknown;
   endTime?: unknown;
   priceMinor?: unknown;
+  bookingCode?: unknown;
+  customer?: { name?: unknown };
+  paymentState?: unknown;
+  paidMinor?: unknown;
+  expiresAt?: unknown;
+  pricing?: { totalDueMinor?: unknown };
 }
 
 const ID = /^[A-Za-z0-9_-]{1,128}$/;
@@ -96,13 +104,21 @@ const status = (v: unknown) => (typeof v === 'string' && /^[a-z_]{1,40}$/.test(v
 const cents = (v: unknown) =>
   typeof v === 'number' && Number.isSafeInteger(v) && v >= 0 ? v : null;
 
+const CODE = /^[A-HJKMNP-Z2-9]{6}$/;
+const code = (v: unknown) => (typeof v === 'string' && CODE.test(v) ? v : null);
+
 function summary(booking: EngineBooking) {
+  const due = cents(booking.pricing?.totalDueMinor) ?? cents(booking.priceMinor);
+  const paid = cents(booking.paidMinor) ?? 0;
   return {
     title: str(booking.offeringName, 200),
     status: status(booking.status),
     starts_at: time(booking.startTime),
     ends_at: time(booking.endTime),
     total_cents: cents(booking.priceMinor),
+    payment_state: status(booking.paymentState),
+    amount_due_cents: due === null ? null : Math.max(0, due - paid),
+    hold_expires_at: booking.status === 'held' ? time(booking.expiresAt) : null,
   };
 }
 
@@ -118,6 +134,7 @@ export async function recordAppBooking(
   method: string,
   body: unknown,
   catalogueItemId: string | null,
+  customerRef?: string,
 ) {
   try {
     if (!body || typeof body !== 'object') return;
@@ -134,6 +151,9 @@ export async function recordAppBooking(
           merchant_id: businessId,
           engine_booking_id: booking.id,
           customer_token: customerToken,
+          customer_ref: customerRef ?? null,
+          booking_code: code(booking.bookingCode),
+          reservation_name: str(booking.customer?.name, 80),
           catalogue_item_id: catalogueItemId,
           offering_id:
             typeof booking.offeringId === 'string' && ID.test(booking.offeringId)
@@ -150,9 +170,15 @@ export async function recordAppBooking(
     const raw = body as EngineBooking & { booking?: EngineBooking };
     const booking = raw.booking && typeof raw.booking === 'object' ? raw.booking : raw;
     if (booking.id !== parts[1]) return;
-    const changes = Object.fromEntries(
-      Object.entries(summary(booking)).filter(([, value]) => value !== null),
+    const fresh = summary(booking);
+    const changes: Record<string, unknown> = Object.fromEntries(
+      Object.entries(fresh).filter(([, value]) => value !== null),
     );
+    // A hold that ended (paid or expired) clears its deadline.
+    if (fresh.status && fresh.status !== 'held') changes.hold_expires_at = null;
+    // The code mirrors what the engine shows the customer: set once paid and
+    // confirmed, cleared once used (rpc_my_engine_booking_code reads it).
+    if ('bookingCode' in booking) changes.booking_code = code(booking.bookingCode);
     if (!Object.keys(changes).length) return;
     await client
       .from('customer_engine_booking')

@@ -4,7 +4,12 @@ import {
   recordAppBooking,
   savedCustomerToken,
 } from '@/lib/booking/app-session';
-import { bookingCustomerSession, forwardBookingRequest, problem } from '@/lib/booking/bridge';
+import {
+  MAX_BOOKING_BODY_BYTES,
+  bookingCustomerSession,
+  forwardBookingRequest,
+  problem,
+} from '@/lib/booking/bridge';
 import { publicMerchantBookingAccess } from '@/lib/booking/public-access';
 
 export const runtime = 'nodejs';
@@ -12,10 +17,42 @@ export const dynamic = 'force-dynamic';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/**
+ * A new booking carries only the name to reserve under to the engine: any
+ * email or phone the page or app sends stays here (Supabase holds the
+ * customer's contact details). Owner's decision, 19 Nov 2026.
+ */
+async function withoutContactDetails(request: Request): Promise<Request | Response> {
+  const text = await request.text();
+  if (text.length > MAX_BOOKING_BODY_BYTES)
+    return problem(413, 'The booking request is too large.', 'body_too_large');
+  let body: unknown;
+  try {
+    body = JSON.parse(text || '{}');
+  } catch {
+    return problem(400, 'The booking details are not valid JSON.', 'invalid_json');
+  }
+  if (!body || typeof body !== 'object' || Array.isArray(body))
+    return problem(400, 'Send the booking details as a JSON object.', 'invalid_json');
+  const { customer, ...rest } = body as { customer?: { name?: unknown } };
+  const name =
+    customer && typeof customer === 'object' && typeof customer.name === 'string'
+      ? customer.name
+      : undefined;
+  const headers = new Headers(request.headers);
+  headers.delete('content-length');
+  return new Request(request.url, {
+    method: request.method,
+    headers,
+    body: JSON.stringify({ ...rest, customer: { name } }),
+  });
+}
+
 async function route(
-  request: Request,
+  incoming: Request,
   context: { params: { businessId: string; path: string[] } },
 ) {
+  let request = incoming;
   const businessId = context.params.businessId;
   const parts = context.params.path;
   if (!/^[a-zA-Z0-9_-]{1,128}$/.test(businessId))
@@ -38,15 +75,20 @@ async function route(
       'connection_setup_required',
     );
 
+  const creating = request.method === 'POST' && parts.length === 1 && parts[0] === 'bookings';
+  if (creating) {
+    const cleaned = await withoutContactDetails(request);
+    if (cleaned instanceof Response) return cleaned;
+    request = cleaned;
+  }
+
   // The Consumer app: its Supabase session as a bearer token, never a cookie.
   const app = await appBookingSession(request);
   if (app.kind === 'invalid')
     return problem(401, 'Your sign-in has expired. Sign in again.', 'sign_in_required');
   if (app.kind === 'signed_in') {
-    const creating = request.method === 'POST' && parts.length === 1 && parts[0] === 'bookings';
-    // Same rule as bookings on the main database: a temporary session may look
-    // and price, but booking needs an account.
-    if (creating && app.anonymous) return problem(401, 'Sign in to book.', 'account_required');
+    // Accounts and guest (temporary) sessions both book (owner, 19 Nov 2026):
+    // the engine holds the booking until it is paid, then confirms it.
     const bookingId = parts[0] === 'bookings' && parts[1] ? parts[1] : null;
     const customerToken = bookingId
       ? await savedCustomerToken(app.client, businessId, bookingId)
@@ -58,7 +100,7 @@ async function route(
       'customer',
       { appSession: true, customerToken },
     );
-    if (response.ok && !app.anonymous && parts[0] === 'bookings') {
+    if (response.ok && parts[0] === 'bookings') {
       const item = new URL(request.url).searchParams.get('catalogueItemId');
       const body = await response
         .clone()
@@ -71,6 +113,7 @@ async function route(
         request.method,
         body,
         item && UUID.test(item) ? item : null,
+        appBookingUserId(app),
       );
     }
     return response;
