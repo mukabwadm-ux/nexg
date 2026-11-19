@@ -91,7 +91,7 @@ select throws_ok(
 
 select set_config('request.jwt.claims',
   '{"sub":"d4700000-0000-4000-8000-000000000003","role":"authenticated","is_anonymous":true}', true);
-/* Since 20270109000900 a temporary session may hold dates and pay (116), once
+/* Since 20270111000600 a temporary session may hold dates and pay (116), once
    it gives the name to book under. */
 select throws_ok(
   $$ select public.rpc_stay_hold('d4730000-0000-4000-8000-00000000000a',

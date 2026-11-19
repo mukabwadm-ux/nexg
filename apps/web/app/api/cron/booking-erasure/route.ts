@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  * Daily (vercel.json): finish erasing deleted accounts from the booking
  * engine. The database queues each business and customer reference when an
  * account is deleted and the app had not already had the engine forget them
- * (engine_booking_erasure, 20270109001000). This asks the engine to forget
+ * (engine_booking_erasure, 20270111000700). This asks the engine to forget
  * each one and marks it done; failures are retried on later runs, up to 20
  * times.
  *

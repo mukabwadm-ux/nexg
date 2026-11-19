@@ -1,6 +1,6 @@
 -- Guests book once they pay; nothing is confirmed unpaid; the customer shows
 -- a booking code and the business checks it; app bookings are forgotten by
--- the booking engine when the account goes (20270109000900, 20270109001000).
+-- the booking engine when the account goes (20270111000600, 20270111000700).
 
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -250,7 +250,7 @@ select is(public.rpc_host_stay_check_in((select v from t where k = 'scode')) ->>
   'used', 'The stay code then stops working.');
 reset role;
 
--- ═════════════════════════════════════════ test payments (20270109001100)
+-- ═════════════════════════════════════════ test payments (20270111000800)
 
 set local role authenticated;
 select set_config('request.jwt.claims',
