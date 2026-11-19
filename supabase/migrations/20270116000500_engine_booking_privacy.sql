@@ -31,7 +31,7 @@
 --     drop column payment_state, drop column amount_due_cents,
 --     drop column hold_expires_at, drop column forgotten_at;
 --   drop function public.rpc_my_engine_booking_code(uuid, text);
---   then re-run the update grant from 20270111000300.
+--   then re-run the update grant from 20270116000300.
 
 alter table public.customer_engine_booking
   add column if not exists customer_ref text,

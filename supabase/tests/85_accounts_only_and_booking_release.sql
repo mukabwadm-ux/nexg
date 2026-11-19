@@ -1,4 +1,4 @@
--- Bookings and stay holds once needed an account; since 20270111000600 a guest may book
+-- Bookings and stay holds once needed an account; since 20270116000400 a guest may book
 -- with a name and pays first (116). Orders no longer need one either (108). An unconfirmed
 -- booking lets its time go.
 

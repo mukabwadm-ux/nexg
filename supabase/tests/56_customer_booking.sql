@@ -119,7 +119,7 @@ select is(
   (select status::text from public.rpc_booking_create(
      'c0560000-0000-4000-8000-000000000021', current_setting('t.d0_1000')::timestamptz, null, null, 1, 'Wanjiru', '+254700005699')),
   'pending',
-  'a customer books an instant-confirm time; it waits for payment (paid first since 20270111000600)'
+  'a customer books an instant-confirm time; it waits for payment (paid first since 20270116000400)'
 );
 select is(
   (select count(*)::int from public.rpc_booking_open_times('c0560000-0000-4000-8000-000000000021', current_setting('t.wed')::date)),

@@ -146,7 +146,7 @@ revoke execute on function public.rpc_my_account_deletion() from public, anon;
 grant execute on function public.rpc_my_account_deletion() to authenticated;
 insert into public.wiring_audit_exempt (function_name, reason, recorded_in) values
   ('rpc_my_account_deletion', 'A customer reading whether their own account can be deleted; nothing changes',
-   '20270111000200_customer_account_deletion')
+   '20270116000200_customer_account_deletion')
 on conflict (function_name) do nothing;
 
 -- 4. Delete my account, now.

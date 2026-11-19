@@ -1,7 +1,7 @@
 -- Customer account controls carried forward from PR #132 (consumer/account-controls,
 -- by langs4u, design approved by the owner on 11 Nov 2026), with a new id.
 --
--- #132's account deletion part went into 20270111000200 (#159). Its saved-items
+-- #132's account deletion part went into 20270116000200 (#159). Its saved-items
 -- part (customer_saved, rpc_saved_add) is already on main in
 -- 20261220000300_saved_places, with a stricter "real account" policy, so it is
 -- not repeated here. What #132 added that main still lacks:
@@ -195,7 +195,7 @@ begin
      and (dr.guest_id = v_guest or dr.requester_email = v_email)
    order by dr.received_at desc limit 1;
   if v_request.id is null then
-    -- identity_method 'signed_in' comes from 20270111000200_customer_account_deletion.
+    -- identity_method 'signed_in' comes from 20270116000200_customer_account_deletion.
     insert into public.data_request (guest_id, requester_email, kind, status, channel, identity_verified_at, identity_method)
     values (v_guest, v_email, 'access', 'in_progress', 'app', now(), 'signed_in')
     returning * into v_request;

@@ -107,7 +107,7 @@ select is(
      'dddddddd-0000-0000-0000-000000000001', now() + interval '30 days', now() + interval '31 days',
      p_guest_name => 'Guest')),
   'pending',
-  'a guest booking waits for payment (20270111000600)'
+  'a guest booking waits for payment (20270116000400)'
 );
 
 select is(
