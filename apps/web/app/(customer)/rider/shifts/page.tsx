@@ -1,5 +1,6 @@
 import { Panel, Row, Tile } from '@/components/rider/bits';
 import { RiderBoard, RiderPageHead, riderContext } from '@/components/rider/frame';
+import { ShiftCommit, ShiftRelease } from '@/components/rider/rider-actions';
 
 export const metadata = { title: 'Shifts' };
 export const dynamic = 'force-dynamic';
@@ -57,6 +58,13 @@ export default async function RiderShifts() {
     .limit(60);
 
   const all = (data as ShiftRow[] | null) ?? [];
+
+  const { data: zoneRows } = await supabase
+    .from('zone')
+    .select('id, name')
+    .eq('active', true)
+    .order('name');
+  const zones = (zoneRows as { id: string; name: string }[] | null) ?? [];
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Nairobi' });
 
   const upcoming = all.filter((s) => s.date >= today).sort((a, b) => a.date.localeCompare(b.date));
@@ -100,6 +108,18 @@ export default async function RiderShifts() {
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-4">
+          <Panel title="Commit to a shift · today to two weeks ahead">
+            <div className="px-4 py-3">
+              {h.status === 'active' ? (
+                <ShiftCommit zones={zones} />
+              ) : (
+                <p className="text-muted text-[0.8125rem] font-semibold">
+                  Shifts open once your account is active.
+                </p>
+              )}
+            </div>
+          </Panel>
+
           <Panel title="Coming up">
             {upcoming.length === 0 ? (
               <p className="text-muted-light px-4 py-10 text-center text-[0.8125rem] font-semibold">
@@ -130,13 +150,14 @@ export default async function RiderShifts() {
                     >
                       {(STATUS[s.status] ?? STATUS.committed)!.label}
                     </span>
+                    {s.status === 'committed' && <ShiftRelease shiftId={s.id} />}
                   </div>
                 ))}
               </div>
             )}
             <p className="text-muted-light border-border border-t px-4 py-2.5 text-[0.6875rem] font-semibold leading-[1.6]">
-              Need to give one back? Tell rider ops before the window starts and it is released
-              rather than missed. Released shifts do not count against you; a quiet no-show does.
+              Need to give one back? Release it before the window starts and it is released rather
+              than missed. Released shifts do not count against you; a quiet no-show does.
             </p>
           </Panel>
 

@@ -51,3 +51,29 @@ export async function verifyPartnerPayout(
   revalidatePath('/experiences');
   return { ok: true, message: (data as { message?: string } | null)?.message ?? 'Verified' };
 }
+
+/**
+ * A rider's early payout: approve, reject (with a reason the rider reads),
+ * or record that it was paid with the M-Pesa reference. The database checks
+ * full Finance and, on paid, takes the amount off the next weekly run.
+ * Nothing here sends money.
+ */
+export async function decideEarlyPayout(
+  requestId: string,
+  decision: 'approve' | 'reject' | 'paid',
+  note: string,
+  providerRef: string,
+): Promise<{ ok: boolean; message?: string }> {
+  const staff = await requireStaff();
+  requireModule(staff, 'finance');
+  const { data, error } = await createClient().rpc('rpc_finance_rider_payout_decide', {
+    p_request_id: requestId,
+    p_decision: decision,
+    p_note: note || undefined,
+    p_provider_ref: providerRef || undefined,
+  });
+  if (error) return { ok: false, message: error.message.replace(/^.*?:\s*/, '') };
+  revalidatePath('/finance/settlements');
+  const r = (data ?? {}) as { status?: string };
+  return { ok: true, message: r.status ? `Marked ${r.status}.` : undefined };
+}

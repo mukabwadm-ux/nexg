@@ -1,5 +1,6 @@
 import { Panel, Row, Tile } from '@/components/rider/bits';
 import { RiderBoard, RiderPageHead, riderContext } from '@/components/rider/frame';
+import { NewTicket, TicketThread } from '@/components/rider/rider-actions';
 
 export const metadata = { title: 'Support' };
 export const dynamic = 'force-dynamic';
@@ -50,6 +51,24 @@ export default async function RiderSupport() {
     .limit(50);
 
   const all = (data as TicketRow[] | null) ?? [];
+
+  const { data: thread } = all.length
+    ? await supabase
+        .from('my_ticket_message_v')
+        .select('id, ticket_id, body, from_support, created_at')
+        .in(
+          'ticket_id',
+          all.map((t) => t.id),
+        )
+        .order('created_at', { ascending: true })
+    : { data: [] };
+  const messages = (thread ?? []) as {
+    id: string;
+    ticket_id: string;
+    body: string;
+    from_support: boolean;
+    created_at: string;
+  }[];
   const open = all.filter((t) => t.resolved_at === null);
   const answered = all.filter((t) => t.first_reply_at !== null);
 
@@ -153,15 +172,42 @@ export default async function RiderSupport() {
               so the desk remembers what you asked last week.
             </p>
           </Panel>
+
+          {all.length > 0 && (
+            <Panel title="Conversations">
+              <div className="divide-border divide-y">
+                {all.slice(0, 10).map((t) => (
+                  <details key={t.id} className="px-4 py-3" open={t.resolved_at === null}>
+                    <summary className="cursor-pointer text-[0.8125rem] font-extrabold">
+                      {t.reference} · {t.body.slice(0, 48)}
+                    </summary>
+                    <div className="mt-2">
+                      <TicketThread
+                        ticketId={t.id}
+                        closed={t.status === 'closed'}
+                        messages={messages.filter((m) => m.ticket_id === t.id)}
+                      />
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </Panel>
+          )}
         </div>
 
         <aside className="space-y-4">
+          <Panel title="Ask us">
+            <div className="px-4 py-3">
+              <NewTicket />
+            </div>
+          </Panel>
+
           <Panel title="What rider ops can do now">
             <Row label="Re-dispatch a stuck order" value="yes" />
             <Row label="Match a deposit by hand" value="yes" />
             <Row label="Change your areas" value="yes" />
             <Row label="Change a health score" value="no" tone="muted" />
-            <Row label="Pay early" value="no" tone="muted" />
+            <Row label="Pay early" value="ask on Earnings" />
           </Panel>
 
           <section className="bg-ink rounded-xl p-4 text-white">

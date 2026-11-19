@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
+import { Disposals, type DisposalRow } from '@/components/live/disposals';
 import { MapArea, type RiderPin } from '@/components/live/map-area';
 import type { Bounds, OrderPoint, ZoneShape } from '@/components/live/map';
 import { Chip, DASH, num } from '@/components/live/shared';
@@ -168,6 +169,36 @@ export default async function LivePage({
     if (n.error) problems.push(n.error.message);
   }
 
+  /* Orders a rider could not deliver, waiting on this city's live ops. */
+  const { data: disposalRows } = await supabase
+    .from('dispatch_disposal_queue_v')
+    .select(
+      'id, order_reference, rider_name, reason, requested_at, payment_method, dropoff_label, photo_path',
+    )
+    .eq('city_id', city.id)
+    .eq('status', 'pending')
+    .order('requested_at')
+    .limit(20);
+  const disposals: DisposalRow[] = await Promise.all(
+    (
+      (disposalRows ?? []) as {
+        id: string;
+        order_reference: string;
+        rider_name: string | null;
+        reason: string;
+        requested_at: string;
+        payment_method: string;
+        dropoff_label: string | null;
+        photo_path: string;
+      }[]
+    ).map(async (d) => {
+      const { data: signed } = await supabase.storage
+        .from('rider-proof')
+        .createSignedUrl(d.photo_path, 600);
+      return { ...d, photoUrl: signed?.signedUrl ?? null };
+    }),
+  );
+
   /* The same three the RPC checks, so the button is not offered to
      somebody the database will then refuse. */
   const canPause =
@@ -243,6 +274,7 @@ export default async function LivePage({
           </div>
 
           <div>
+            <Disposals rows={disposals} />
             {selected ? (
               <Workbench
                 order={selected}

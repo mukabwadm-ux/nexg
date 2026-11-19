@@ -44082,6 +44082,27 @@ export type Database = {
           },
         ];
       };
+      dispatch_disposal_queue_v: {
+        Row: {
+          city_id: string | null;
+          currency: string | null;
+          decided_at: string | null;
+          decision_note: string | null;
+          dropoff_label: string | null;
+          id: string | null;
+          order_id: string | null;
+          order_reference: string | null;
+          payment_method: string | null;
+          photo_path: string | null;
+          reason: string | null;
+          requested_at: string | null;
+          rider_id: string | null;
+          rider_name: string | null;
+          status: string | null;
+          total_cents: number | null;
+        };
+        Relationships: [];
+      };
       dispatch_merchant_v: {
         Row: {
           accepting_orders: boolean | null;
@@ -50662,6 +50683,17 @@ export type Database = {
           },
         ];
       };
+      my_ticket_message_v: {
+        Row: {
+          body: string | null;
+          created_at: string | null;
+          from_support: boolean | null;
+          id: string | null;
+          ticket_id: string | null;
+          ticket_reference: string | null;
+        };
+        Relationships: [];
+      };
       notification_outbox_v: {
         Row: {
           attempts: number | null;
@@ -52885,6 +52917,26 @@ export type Database = {
           },
         ];
       };
+      rider_payout_request_queue_v: {
+        Row: {
+          amount_kes: number | null;
+          city_id: string | null;
+          decided_at: string | null;
+          decision_note: string | null;
+          id: string | null;
+          paid_at: string | null;
+          payout_msisdn: string | null;
+          payout_msisdn_changed_at: string | null;
+          provider_ref: string | null;
+          reason: string | null;
+          requested_at: string | null;
+          rider_id: string | null;
+          rider_name: string | null;
+          rider_phone: string | null;
+          status: string | null;
+        };
+        Relationships: [];
+      };
       rider_public: {
         Row: {
           city_id: string | null;
@@ -55072,6 +55124,7 @@ export type Database = {
           promotion_name: string;
         }[];
       };
+      fn_kenyan_msisdn: { Args: { p_phone: string }; Returns: string };
       fn_ledger_backfill: { Args: { p_limit?: number }; Returns: Json };
       fn_listing_sync: { Args: { p_unit_id: string }; Returns: undefined };
       fn_load_available: { Args: { p_plan_id: string }; Returns: undefined };
@@ -55818,6 +55871,10 @@ export type Database = {
           isOneToOne: false;
           isSetofReturn: true;
         };
+      };
+      fn_rider_trip_pay: {
+        Args: { p_cancelled?: boolean; p_city_id: string; p_trip_km: number; p_wait_min?: number };
+        Returns: Json;
       };
       fn_run_invariants: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_serving_city: {
@@ -57630,6 +57687,10 @@ export type Database = {
           vehicle: string;
         }[];
       };
+      rpc_dispatch_disposal_decide: {
+        Args: { p_approve: boolean; p_disposal_id: string; p_note?: string };
+        Returns: Json;
+      };
       rpc_dispatch_force_stack: {
         Args: { p_job_id: string; p_reason: string; p_rider_id: string };
         Returns: Json;
@@ -58690,6 +58751,15 @@ export type Database = {
       rpc_finance_invoices: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_finance_report_customers: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_finance_report_riders: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_finance_rider_payout_decide: {
+        Args: {
+          p_decision: string;
+          p_note?: string;
+          p_provider_ref?: string;
+          p_request_id: string;
+        };
+        Returns: Json;
+      };
       rpc_finance_transaction_summary: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_finance_transactions: {
         Args: { p_from: string; p_kind?: string; p_limit?: number; p_to: string };
@@ -61339,6 +61409,8 @@ export type Database = {
       rpc_my_order_map:
         | { Args: { p_order_id: string }; Returns: Json }
         | { Args: { p_contract_version: string; p_order_id: string }; Returns: Json };
+      rpc_my_order_handoff_code: { Args: { p_order_id: string }; Returns: Json };
+      rpc_my_rider_jobs: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_rider_map_assignments: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_rider_offers: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_saved_places: {
@@ -61367,6 +61439,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_my_ticket_reply: { Args: { p_body: string; p_ticket_id: string }; Returns: Json };
       rpc_nearest_free: {
         Args: { p_job_id: string; p_limit?: number };
         Returns: {
@@ -62282,6 +62355,8 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_rider_agreement_accept: { Args: { p_version_id: string }; Returns: Json };
+      rpc_rider_agreement_current: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_rider_apply: {
         Args: {
           p_city_id: string;
@@ -62293,7 +62368,15 @@ export type Database = {
         };
         Returns: string;
       };
+      rpc_rider_cash_collected: {
+        Args: { p_amount_cents: number; p_order_id: string };
+        Returns: Json;
+      };
       rpc_rider_console_counts: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_rider_contact_attempt: {
+        Args: { p_channel: string; p_order_id: string; p_outcome?: string; p_who: string };
+        Returns: Json;
+      };
       rpc_rider_cooldown: {
         Args: { p_hours: number; p_reason: string; p_rider_id: string };
         Returns: {
@@ -62466,6 +62549,21 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_rider_device_register: {
+        Args: {
+          p_job_device?: boolean;
+          p_label?: string;
+          p_location_permission?: boolean;
+          p_notification_permission?: boolean;
+          p_platform: string;
+          p_push_token?: string;
+        };
+        Returns: Json;
+      };
+      rpc_rider_disposal_request: {
+        Args: { p_order_id: string; p_photo_path: string; p_reason: string };
+        Returns: Json;
+      };
       rpc_rider_go_online: { Args: { p_online: boolean; p_reason?: string }; Returns: Json };
       rpc_rider_issue_kit:
         | { Args: { p_rider_id: string }; Returns: string }
@@ -62626,11 +62724,30 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_rider_messages_read: { Args: { p_ids?: string[] }; Returns: Json };
       rpc_rider_order_step: {
-        Args: { p_handed_to?: string; p_order_id: string; p_step: string };
+        Args: {
+          p_code?: string;
+          p_details?: Json;
+          p_handed_to?: string;
+          p_order_id: string;
+          p_photo_path?: string;
+          p_step: string;
+        };
         Returns: Json;
       };
+      rpc_rider_payout_cancel: { Args: { p_request_id: string }; Returns: Json };
       rpc_rider_payout_name_check: { Args: { p_rider_id: string }; Returns: Json };
+      rpc_rider_payout_overview: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_rider_payout_request: {
+        Args: { p_amount_kes: number; p_reason?: string };
+        Returns: Json;
+      };
+      rpc_rider_phone_change_start: { Args: { p_kind: string; p_phone: string }; Returns: Json };
+      rpc_rider_phone_change_verify: {
+        Args: { p_challenge_id: string; p_code: string };
+        Returns: Json;
+      };
       rpc_rider_reference_log: {
         Args: {
           p_name: string;
@@ -63011,6 +63128,10 @@ export type Database = {
       };
       rpc_rider_update_profile: {
         Args: { p_areas?: string[]; p_max_km?: number; p_rider_id: string; p_shifts?: string[] };
+        Returns: Json;
+      };
+      rpc_rider_verify_handoff_code: {
+        Args: { p_code: string; p_order_id: string };
         Returns: Json;
       };
       rpc_rider_verify_phone_code: { Args: { p_code: string; p_rider_id: string }; Returns: Json };

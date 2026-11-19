@@ -20,6 +20,7 @@ import Link from 'next/link';
 
 import { ShareDonut } from '@/components/charts';
 import { ConsoleShell } from '@/components/console-shell';
+import { EarlyPayouts, type EarlyPayoutRow } from '@/components/finance/early-payouts';
 import { MovementsTable } from '@/components/finance/movements';
 import { PartnerPayoutDetails } from '@/components/finance/partner-payouts';
 import { Settlement, type LineRow, type RunRow } from '@/components/finance/settlement';
@@ -117,6 +118,17 @@ export default async function SettlementsPage({
   /* A period that ends today also lists the runs built but not yet paid. */
   const upTo = period.to === today ? plusDays(today, 31) : period.to;
   const supabase = createClient();
+
+  /* Riders' special early payout requests, answered here. */
+  const { data: earlyRows } = await supabase
+    .from('rider_payout_request_queue_v')
+    .select(
+      'id, rider_name, rider_phone, amount_kes, reason, payout_msisdn, status, requested_at, payout_msisdn_changed_at',
+    )
+    .in('status', ['pending', 'approved'])
+    .order('requested_at')
+    .limit(50);
+  const earlyPayouts = (earlyRows ?? []) as EarlyPayoutRow[];
 
   const [runsRes, owedRes, calendarRes] = await Promise.all([
     supabase
@@ -408,6 +420,8 @@ export default async function SettlementsPage({
             alert: x.key === 'batches' ? status.failed.n + status.held.n || null : null,
           }))}
         />
+
+        <EarlyPayouts rows={earlyPayouts} canDecide={canVerify} />
 
         {failed && (
           <p
