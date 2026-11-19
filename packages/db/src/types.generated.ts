@@ -6770,6 +6770,13 @@ export type Database = {
             foreignKeyName: 'catalogue_item_modifier_group_id_fkey';
             columns: ['group_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_option_public';
+            referencedColumns: ['group_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_modifier_group_id_fkey';
+            columns: ['group_id'];
+            isOneToOne: false;
             referencedRelation: 'modifier_group';
             referencedColumns: ['id'];
           },
@@ -24814,6 +24821,13 @@ export type Database = {
             foreignKeyName: 'modifier_option_group_id_fkey';
             columns: ['group_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_option_public';
+            referencedColumns: ['group_id'];
+          },
+          {
+            foreignKeyName: 'modifier_option_group_id_fkey';
+            columns: ['group_id'];
+            isOneToOne: false;
             referencedRelation: 'modifier_group';
             referencedColumns: ['id'];
           },
@@ -27606,6 +27620,13 @@ export type Database = {
           order_item_id?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: 'order_item_modifier_group_id_fkey';
+            columns: ['group_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_option_public';
+            referencedColumns: ['group_id'];
+          },
           {
             foreignKeyName: 'order_item_modifier_group_id_fkey';
             columns: ['group_id'];
