@@ -14,6 +14,11 @@ import {
 } from '@/lib/merchant-application-client';
 import { sendMerchantPasswordSetupLink } from '@/app/(customer)/sign-in/actions';
 import { createClient } from '@/lib/supabase/client';
+import {
+  forgetStartedAnonymous,
+  markStartedAnonymous,
+  shouldSendSetupLink,
+} from '@/lib/merchant-setup-email';
 import { subscribeProtectedActor } from '@/lib/supabase/protected-actor';
 import type { MerchantSavedHomeSource } from '@/lib/merchant-home-source';
 import { merchantSessionSignInHref } from '@/lib/merchant-journey-navigation';
@@ -127,6 +132,11 @@ export function ConnectedApplication({
   const lastActivity = useRef(0);
   const currentEmail = useRef('');
   const setupLinkSent = useRef(false);
+  // Verifying the email makes this anonymous visitor permanent before they
+  // submit, so remember that they started anonymous (see merchant-setup-email).
+  useEffect(() => {
+    if (anonymousSession) markStartedAnonymous(actorId);
+  }, [anonymousSession, actorId]);
   useEffect(() => {
     alive.current = true;
     abort.current = new AbortController();
@@ -422,7 +432,7 @@ export function ConnectedApplication({
     );
   }
   async function completeSubmission(email: string) {
-    if (anonymousSession && emailOtpEnabled) {
+    if (shouldSendSetupLink({ anonymousSession, emailOtpEnabled, actorId })) {
       if (!setupLinkSent.current) {
         const result = await sendMerchantPasswordSetupLink(await getCaptchaToken());
         if (!result.ok) throw new Error(result.message);
@@ -433,6 +443,7 @@ export function ConnectedApplication({
         throw new Error(
           'Your password setup link was sent, but we could not sign out. Please try again.',
         );
+      forgetStartedAnonymous();
       const params = new URLSearchParams({ next: '/merchant', setup: 'sent', email });
       router.push(`/merchants/sign-in?${params.toString()}`);
     } else {
