@@ -13,6 +13,7 @@ import {
   ApplicationReviewUnavailable,
 } from '@/components/merchants/application-review-view';
 import { MerchantDocumentsSection } from '@/components/merchants/documents-section';
+import { MerchantOnboardingAnswers } from '@/components/merchants/onboarding-answers';
 import { MerchantTabs } from '@/components/merchants/shell';
 import { loadMerchantDocuments } from '@/lib/merchant-documents';
 import {
@@ -130,6 +131,7 @@ export default async function ManagedMerchantApplicationPage({
             </span>
           </span>
           <ApplicationAgreement merchantId={params.id} />
+          <MerchantOnboardingAnswers merchantId={params.id} />
           <MerchantAgreementSigned merchantId={params.id} />
           <ApplicationReviewDetail {...source} />
           <div className="mt-10 max-w-4xl">

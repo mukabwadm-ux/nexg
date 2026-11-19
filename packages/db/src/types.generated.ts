@@ -60314,6 +60314,14 @@ export type Database = {
         };
       };
       rpc_merchant_order_step: { Args: { p_order_id: string; p_step: string }; Returns: Json };
+      rpc_merchant_onboarding_read: {
+        Args: { p_category?: string; p_merchant_id?: string };
+        Returns: Json;
+      };
+      rpc_merchant_onboarding_save: {
+        Args: { p_answers: Json; p_merchant_id: string };
+        Returns: Json;
+      };
       rpc_merchant_payout_name_check: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_payouts: {
         Args: {
