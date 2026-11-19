@@ -64,7 +64,7 @@ cross join (values
 ) as x (id, ref, booking, provider, channel)
 where m.id = (select v::uuid from t where k = 'merchant');
 
-update public.payment set state = 'paid', paid_at = now()
+update public.payment set state = 'paid', paid_at = now(), provider_ref = 'REF-' || reference
  where id in ('99f00000-0000-4000-8000-0000000000c1', '99f00000-0000-4000-8000-0000000000c2');
 
 select is(
@@ -109,7 +109,7 @@ select '99f00000-0000-4000-8000-0000000000c3', 'PAY-LEDGER-S1', 'stay',
        'guest_checkout'
 from public.unit u where u.id = (select v::uuid from t where k = 'unit');
 
-update public.payment set state = 'paid', paid_at = now()
+update public.payment set state = 'paid', paid_at = now(), provider_ref = 'MPESAS1'
  where id = '99f00000-0000-4000-8000-0000000000c3';
 
 /* KES 20,000: 85% to the host; 16% VAT inside NexG's KES 3,000 is 413.79. */
@@ -225,7 +225,7 @@ select '99f00000-0000-4000-8000-0000000000c4', 'PAY-LEDGER-S2', 'stay',
        'guest_checkout'
 from public.unit u where u.id = (select v::uuid from t where k = 'unit');
 
-update public.payment set state = 'paid', paid_at = now()
+update public.payment set state = 'paid', paid_at = now(), provider_ref = 'MPESAS2'
  where id = '99f00000-0000-4000-8000-0000000000c4';
 
 select is(
@@ -245,7 +245,7 @@ insert into public.payment (id, reference, intent, amount_cents, provider, chann
 values ('99f00000-0000-4000-8000-0000000000c5', 'PAY-LEDGER-R1', 'rider_float', 250000, 'mpesa',
         'mpesa', 'pending', 'rider_app');
 
-update public.payment set state = 'paid', paid_at = now()
+update public.payment set state = 'paid', paid_at = now(), provider_ref = 'MPESAR1'
  where id = '99f00000-0000-4000-8000-0000000000c5';
 
 select is(
@@ -276,7 +276,7 @@ select '99f00000-0000-4000-8000-0000000000c6', 'PAY-LEDGER-F3', 'featured_slot',
 from public.merchant m where m.id = (select v::uuid from t where k = 'merchant');
 
 select lives_ok(
-  $$update public.payment set state = 'paid', paid_at = now()
+  $$update public.payment set state = 'paid', paid_at = now(), provider_ref = 'MPESAF3'
      where id = '99f00000-0000-4000-8000-0000000000c6'$$,
   'A payment still settles when its posting fails');
 
