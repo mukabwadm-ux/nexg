@@ -23025,6 +23025,188 @@ export type Database = {
           },
         ];
       };
+      merchant_onboarding_answer: {
+        Row: {
+          answers: NonNullable<Json>;
+          merchant_id: string;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          answers?: NonNullable<Json>;
+          merchant_id: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          answers?: NonNullable<Json>;
+          merchant_id?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      merchant_onboarding_field: {
+        Row: {
+          categories: string[] | null;
+          columns: NonNullable<Json>;
+          future_date: boolean;
+          hint: string | null;
+          key: string;
+          label: string;
+          must_be_yes: boolean;
+          options: NonNullable<Json>;
+          pattern: string | null;
+          placeholder: string | null;
+          required: string;
+          required_when: Json | null;
+          requires_doc: string | null;
+          section: string;
+          sort: number;
+          source: string;
+          type: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          categories?: string[] | null;
+          columns?: NonNullable<Json>;
+          future_date?: boolean;
+          hint?: string | null;
+          key: string;
+          label: string;
+          must_be_yes?: boolean;
+          options?: NonNullable<Json>;
+          pattern?: string | null;
+          placeholder?: string | null;
+          required: string;
+          required_when?: Json | null;
+          requires_doc?: string | null;
+          section: string;
+          sort: number;
+          source: string;
+          type: string;
+        };
+        Update: {
+          categories?: string[] | null;
+          columns?: NonNullable<Json>;
+          future_date?: boolean;
+          hint?: string | null;
+          key?: string;
+          label?: string;
+          must_be_yes?: boolean;
+          options?: NonNullable<Json>;
+          pattern?: string | null;
+          placeholder?: string | null;
+          required?: string;
+          required_when?: Json | null;
+          requires_doc?: string | null;
+          section?: string;
+          sort?: number;
+          source?: string;
+          type?: string;
+        };
+        Relationships: [];
+      };
       merchant_penalty: {
         Row: {
           amount_kes: number;
@@ -55339,6 +55521,34 @@ export type Database = {
       fn_merchant_is_live: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_liquor_licensed: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_mine: { Args: { p_merchant_id: string }; Returns: string };
+      fn_merchant_onboarding_category: { Args: { p_merchant_id: string }; Returns: string };
+      fn_merchant_onboarding_date_error: {
+        Args: { p_future: boolean; p_value: Json };
+        Returns: string;
+      };
+      fn_merchant_onboarding_docs: {
+        Args: { p_category: string; p_merchant_id: string };
+        Returns: string[];
+      };
+      fn_merchant_onboarding_fields_json: { Args: { p_category: string }; Returns: Json };
+      fn_merchant_onboarding_missing: {
+        Args: { p_category?: string; p_merchant_id: string };
+        Returns: Json;
+      };
+      fn_merchant_onboarding_missing_for: {
+        Args: { p_answers: Json; p_category: string };
+        Returns: Json;
+      };
+      fn_merchant_onboarding_value_error: {
+        Args: {
+          p_field: Omit<
+            Database['public']['Tables']['merchant_onboarding_field']['Row'],
+            Database['public']['Tables']['merchant_onboarding_field']['ComputedFields']
+          >;
+          p_value: Json;
+        };
+        Returns: string;
+      };
       fn_merchant_open_for_orders: {
         Args: { p_at?: string; p_merchant_id: string };
         Returns: boolean;
@@ -60313,7 +60523,6 @@ export type Database = {
           isSetofReturn: false;
         };
       };
-      rpc_merchant_order_step: { Args: { p_order_id: string; p_step: string }; Returns: Json };
       rpc_merchant_onboarding_read: {
         Args: { p_category?: string; p_merchant_id?: string };
         Returns: Json;
@@ -60322,6 +60531,7 @@ export type Database = {
         Args: { p_answers: Json; p_merchant_id: string };
         Returns: Json;
       };
+      rpc_merchant_order_step: { Args: { p_order_id: string; p_step: string }; Returns: Json };
       rpc_merchant_payout_name_check: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_payouts: {
         Args: {
