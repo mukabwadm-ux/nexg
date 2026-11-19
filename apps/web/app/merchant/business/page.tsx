@@ -281,6 +281,7 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
       initialTab={searchParams?.tab}
       liveData={data}
       liveMemberTools={memberTools}
+      liveDocuments={evidence?.ok ? evidence : null}
       liveTools={{
         profile: record ? (
           <Link className={manage} href={`/merchants/register?merchantId=${record.merchant_id}`}>

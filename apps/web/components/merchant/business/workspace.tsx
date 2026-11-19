@@ -43,6 +43,7 @@ import {
   LocationsView,
   ProfileView,
   TeamView,
+  type LiveDocuments,
   type ViewProps,
 } from './views';
 import styles from './workspace.module.css';
@@ -77,6 +78,7 @@ export function BusinessWorkspace({
   liveData,
   liveTools,
   liveMemberTools,
+  liveDocuments,
 }: {
   initialProfileId?: string;
   initialTab?: Section;
@@ -85,6 +87,8 @@ export function BusinessWorkspace({
   liveData?: Business;
   liveTools?: Partial<Record<Section, ReactNode>>;
   liveMemberTools?: Record<string, ReactNode>;
+  /** The real requirements and files, so a document panel can upload. */
+  liveDocuments?: LiveDocuments | null;
 }) {
   const inheritedDemo = useMerchantOnboardingDemoContext();
   const live = Boolean(liveData);
@@ -434,6 +438,7 @@ export function BusinessWorkspace({
         readOnly: scopedReadOnly,
         live,
         liveMemberTools,
+        liveDocuments,
         edit,
         save,
         message,

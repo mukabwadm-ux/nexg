@@ -27,6 +27,12 @@ import {
 } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { ReviewReply } from '@/components/merchant/board-client';
+import {
+  Documents,
+  type Asked,
+  type OnFile,
+  type Requirement,
+} from '@/components/partner/documents';
 import { readDraft, writeDraft } from './source';
 import {
   activityIssues,
@@ -77,11 +83,21 @@ function ActivityIcon({ activity }: { activity: Pick<Activity, 'profileId' | 'mo
   return <Icon aria-hidden="true" />;
 }
 
+/** The real document requirements and files, for the owner of a live business. */
+export type LiveDocuments = {
+  ownerId: string;
+  requirements: Requirement[];
+  onFile: OnFile[];
+  asked: Asked[];
+};
+
 export type ViewProps = {
   data: Business;
   readOnly: boolean;
   live?: boolean;
   liveMemberTools?: Record<string, ReactNode>;
+  /** Present for whoever may upload documents; null otherwise. */
+  liveDocuments?: LiveDocuments | null;
   edit: (section: Section, id: string, value: unknown) => void;
   save: (next: Business, action: string, review?: boolean) => Promise<void>;
   message: (text: string) => void;
@@ -1221,103 +1237,139 @@ export function DocumentsView(p: ViewProps) {
         </section>
       </div>
       {d ? (
-        <Panel
-          title={d.name}
-          subtitle={d.scope}
-          onClose={() => setSelected(null)}
-          footer={
-            <>
-              <Button
-                onClick={() =>
-                  p.preview(
-                    'Previous document version',
-                    `${d.name}\nVersion ${d.version}: ${d.current}\n\nThis frontend stores file metadata only. Original document bytes require the future document source.`,
-                  )
-                }
-              >
-                <Eye />
-                View previous version
-              </Button>
-              <Button primary disabled={readOnly} onClick={replace}>
-                Replace document
-              </Button>
-            </>
-          }
-        >
-          <div className="bu-split-row">
-            <Status value={`Current v${d.version} ${d.current.toLowerCase()}`} pill />
-            {d.replacement !== 'None' && <Status value={d.replacement} pill />}
-          </div>
-          {d.reason && (
-            <div style={{ marginTop: 8 }}>
-              <Note warning>{d.reason}</Note>
+        p.live ? (
+          /* A live business uploads for real: the same uploader as Manage
+             documents, for this one requirement. The form below it is the
+             design preview's, which only ever changed this page's copy. */
+          <Panel title={d.name} subtitle={d.scope} onClose={() => setSelected(null)}>
+            <div className="bu-split-row">
+              <Status value={d.current} pill />
+              {d.replacement !== 'None' && <Status value={d.replacement} pill />}
             </div>
-          )}
-          <h3 style={{ marginTop: 10 }}>Versions</h3>
-          <div className="bu-version">
-            <div>
-              <strong>v{d.version} (current)</strong>
-              <p>Confirmed sample record</p>
+            {d.reason && (
+              <div style={{ marginTop: 8 }}>
+                <Note warning>{d.reason}</Note>
+              </div>
+            )}
+            <div style={{ marginTop: 12 }}>
+              {p.liveDocuments &&
+              p.liveDocuments.requirements.some((requirement) => requirement.id === d.id) ? (
+                <Documents
+                  ownerType="merchant"
+                  ownerId={p.liveDocuments.ownerId}
+                  requirements={p.liveDocuments.requirements.filter(
+                    (requirement) => requirement.id === d.id,
+                  )}
+                  onFile={p.liveDocuments.onFile.filter((file) => file.requirement_id === d.id)}
+                  asked={p.liveDocuments.asked.filter((ask) => ask.requirement_id === d.id)}
+                />
+              ) : (
+                <Note>The application owner uploads and replaces business documents.</Note>
+              )}
             </div>
-            <Status value={d.current} />
-          </div>
-          {d.replacement !== 'None' && !d.replacements?.length && (
+            <p className="bu-small bu-muted" style={{ marginTop: 10 }}>
+              Uploading a file does not verify it: NexG checks it first.
+            </p>
+          </Panel>
+        ) : (
+          <Panel
+            title={d.name}
+            subtitle={d.scope}
+            onClose={() => setSelected(null)}
+            footer={
+              <>
+                <Button
+                  onClick={() =>
+                    p.preview(
+                      'Previous document version',
+                      `${d.name}\nVersion ${d.version}: ${d.current}\n\nThis frontend stores file metadata only. Original document bytes require the future document source.`,
+                    )
+                  }
+                >
+                  <Eye />
+                  View previous version
+                </Button>
+                <Button primary disabled={readOnly} onClick={replace}>
+                  Replace document
+                </Button>
+              </>
+            }
+          >
+            <div className="bu-split-row">
+              <Status value={`Current v${d.version} ${d.current.toLowerCase()}`} pill />
+              {d.replacement !== 'None' && <Status value={d.replacement} pill />}
+            </div>
+            {d.reason && (
+              <div style={{ marginTop: 8 }}>
+                <Note warning>{d.reason}</Note>
+              </div>
+            )}
+            <h3 style={{ marginTop: 10 }}>Versions</h3>
             <div className="bu-version">
               <div>
-                <strong>v{d.version + 1} (replacement)</strong>
-                <p>Original evidence retained</p>
+                <strong>v{d.version} (current)</strong>
+                <p>Confirmed sample record</p>
               </div>
-              <Status value={d.replacement} />
+              <Status value={d.current} />
             </div>
-          )}
-          {d.replacements?.map((v) => (
-            <div className="bu-version" key={v.version}>
-              <div>
-                <strong>v{v.version} (replacement)</strong>
-                <p>{v.filename} · metadata saved locally</p>
-              </div>
-              <Status value={v.state} />
-            </div>
-          ))}
-          <div className="bu-fields bu-document-fields" style={{ marginTop: 10 }}>
-            <Field label="Upload replacement file">
-              <div className="bu-file">
-                <Upload size={24} />
+            {d.replacement !== 'None' && !d.replacements?.length && (
+              <div className="bu-version">
                 <div>
-                  <input
-                    aria-label="Replacement file"
-                    type="file"
-                    disabled={readOnly}
-                    accept="application/pdf,image/jpeg,image/png"
-                    onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                  />
-                  <p className="bu-small bu-muted">PDF, JPG or PNG (max 10 MB)</p>
-                  {file && <p className="bu-small">{file.name} · local selection only</p>}
+                  <strong>v{d.version + 1} (replacement)</strong>
+                  <p>Original evidence retained</p>
                 </div>
+                <Status value={d.replacement} />
               </div>
-            </Field>
-            <div className="bu-form-grid">
-              <Field label="Expiry date (optional)">
-                <input
-                  type="date"
-                  disabled={readOnly}
-                  value={expiry}
-                  onChange={(e) => setExpiry(e.target.value)}
-                />
+            )}
+            {d.replacements?.map((v) => (
+              <div className="bu-version" key={v.version}>
+                <div>
+                  <strong>v{v.version} (replacement)</strong>
+                  <p>{v.filename} · metadata saved locally</p>
+                </div>
+                <Status value={v.state} />
+              </div>
+            ))}
+            <div className="bu-fields bu-document-fields" style={{ marginTop: 10 }}>
+              <Field label="Upload replacement file">
+                <div className="bu-file">
+                  <Upload size={24} />
+                  <div>
+                    <input
+                      aria-label="Replacement file"
+                      type="file"
+                      disabled={readOnly}
+                      accept="application/pdf,image/jpeg,image/png"
+                      onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                    />
+                    <p className="bu-small bu-muted">PDF, JPG or PNG (max 10 MB)</p>
+                    {file && <p className="bu-small">{file.name} · local selection only</p>}
+                  </div>
+                </div>
               </Field>
-              <Field label="Note to reviewer (optional)">
-                <textarea
-                  maxLength={500}
-                  disabled={readOnly}
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                />
-              </Field>
+              <div className="bu-form-grid">
+                <Field label="Expiry date (optional)">
+                  <input
+                    type="date"
+                    disabled={readOnly}
+                    value={expiry}
+                    onChange={(e) => setExpiry(e.target.value)}
+                  />
+                </Field>
+                <Field label="Note to reviewer (optional)">
+                  <textarea
+                    maxLength={500}
+                    disabled={readOnly}
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                  />
+                </Field>
+              </div>
+              <Note>Uploading a file does not verify it.</Note>
+              <p className="bu-small bu-muted">Requirement owner: Business verification</p>
             </div>
-            <Note>Uploading a file does not verify it.</Note>
-            <p className="bu-small bu-muted">Requirement owner: Business verification</p>
-          </div>
-        </Panel>
+          </Panel>
+        )
       ) : (
         <Empty title="Select a document" />
       )}
