@@ -3,7 +3,8 @@ import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 export interface BookingIdentity {
   businessId: string;
   userId: string;
-  role: 'owner' | 'manager' | 'customer';
+  /** 'platform': NexG itself (payment confirmation, account erasure); see platform.ts. */
+  role: 'owner' | 'manager' | 'customer' | 'platform';
   branches?: string[] | null;
   businessName?: string;
   subcategoryId?: string;
@@ -102,6 +103,12 @@ export function allowedBookingPath(
         : ['bookings', 'quote'].includes(section ?? '');
   }
   if (section === 'bookings' && id && parts.length === 2 && method === 'GET') return true;
+  // The business checks the code a customer shows: look it up, then check in.
+  if (audience === 'merchant' && section === 'codes' && id) {
+    if (parts.length === 2) return method === 'GET';
+    if (parts.length === 3 && action === 'arrive') return method === 'POST';
+    return false;
+  }
   if (section === 'bookings' && id && action && parts.length === 3 && method === 'POST') {
     return audience === 'customer'
       ? ['cancel', 'reschedule', 'quote', 'workflow'].includes(action)

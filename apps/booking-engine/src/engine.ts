@@ -22,6 +22,24 @@ import {
 } from './specialist-runtime.js';
 import { requireManager } from './auth.js';
 import {
+  customerRecord,
+  forgottenFields,
+  newBookingCode,
+  normalizeBookingCode,
+  placeholderEmail,
+  requirePlatform,
+  sameReservationName,
+  CUSTOMER_REF,
+  PREPAID_HOLD_MINUTES,
+  PREPAID_POLICY,
+} from './customer-privacy.js';
+import {
+  chosenTicketType,
+  normalizePublicDetails,
+  pricedFor,
+  publicDetailsView,
+} from './public-details.js';
+import {
   BookingError,
   type BookingInput,
   type Identity,
@@ -120,6 +138,20 @@ function allowedInBranch(identity: Identity, doc: Doc) {
   return !identity.branches || identity.branches.includes(doc.nexg?.locationId ?? 'primary');
 }
 
+/** Wrong codes allowed per business before a short lock-out. */
+const CODE_ATTEMPTS = 10;
+const CODE_LOCK_MINUTES = 15;
+/** A pass (membership): its code is for repeat visits. */
+const isPass = (n: Doc) => n.model === 'ENTITLEMENT';
+const nairobiDay = (ms: number) => new Date(ms + 3 * 3600000).toISOString().slice(0, 10);
+/** The booking's code can be entered: paid (or nothing to pay) and confirmed or under way. */
+function codeUsable(n: Doc, state: string) {
+  return (
+    n.paymentState !== 'awaiting_payment' &&
+    ['confirmed', 'accepted', 'in_progress', 'active'].includes(state)
+  );
+}
+
 /** SQLite admits one writer; queue the entire command, then let Payload's real
  * transaction and resource-lock hooks enforce allocation. PostgreSQL relies on
  * those database locks and may process unrelated transactions concurrently. */
@@ -129,6 +161,14 @@ export class BookingEngine {
     public payload: Payload,
     private sqlite = true,
     private clock = () => Date.now(),
+    /**
+     * Test payments while no payment provider is connected (owner, 19 Nov
+     * 2026). Off unless BOOKING_SIMULATED_PAYMENTS=1. A test payment confirms
+     * the booking but is recorded as `simulated`: no money was collected.
+     */
+    private options: { simulatedPayments?: boolean } = {
+      simulatedPayments: process.env.BOOKING_SIMULATED_PAYMENTS === '1',
+    },
   ) {}
   managementContext() {
     return {
@@ -598,6 +638,7 @@ export class BookingEngine {
       resourceSelectionMode: string(n.resourceSelectionMode),
       transportIncluded: boolean(n.transportIncluded),
       withDriver: boolean(n.withDriver),
+      ...publicDetailsView(n),
       reservationFee:
         fee && typeof fee === 'object'
           ? {
@@ -614,11 +655,18 @@ export class BookingEngine {
         : undefined,
     };
   }
-  bookingView(d: Doc) {
+  /**
+   * A booking as the merchant or the customer sees it. The customer's opaque
+   * reference never leaves the engine. The booking code is the customer's to
+   * show: merchant lists omit it, so the shop checks it at the counter.
+   */
+  bookingView(d: Doc, audience: 'merchant' | 'customer' = 'merchant') {
     const n = d.nexg ?? {};
     const holdExpired = this.isExpiredHold(d);
     const {
       customerTokenHash: _,
+      bookingCode: _bookingCode,
+      createdBy: _createdBy,
       acceptedConfiguration: _acceptedConfiguration,
       specialistState: _specialistState,
       specialistAllocations: _specialistAllocations,
@@ -629,6 +677,18 @@ export class BookingEngine {
     } = n;
     return {
       ...safe,
+      customer: n.customer ? (({ ref: _ref, ...rest }) => rest)(n.customer) : undefined,
+      // The customer's code, only while it can be used: paid, confirmed and
+      // not yet used (a pass: while valid). Otherwise null.
+      ...(audience === 'customer' && n.bookingCode
+        ? {
+            bookingCode:
+              codeUsable(n, holdExpired ? 'expired' : (d.status ?? n.status)) &&
+              (!n.arrivedAt || isPass(n))
+                ? n.bookingCode
+                : null,
+          }
+        : {}),
       specialist: specialistBookingView(n),
       id: d.publicId,
       occupancyOverdue: n.custodyState === 'in_use' && Date.parse(n.endTime) <= this.clock(),
@@ -817,6 +877,7 @@ export class BookingEngine {
         'Indicative prices are for requests pending scope approval.',
         'invalid_price',
       );
+    const details = normalizePublicDetails(input.model, input as Doc);
     const locationId = location(identity, input.locationId);
     const normalizedSpecialist = specialistSetup(
       input.model,
@@ -850,6 +911,9 @@ export class BookingEngine {
       const id = publicId();
       const n = {
         ...input,
+        ticketTypes: details.ticketTypes,
+        rentalTerms: details.rentalTerms,
+        quoteRange: details.quoteRange,
         specialistSetup: normalizedSpecialist,
         capacity:
           normalizedSpecialist?.model === 'TOUR'
@@ -986,8 +1050,10 @@ export class BookingEngine {
     return this.price(service, start, end, quantity);
   }
   async quote(identity: Identity, input: Doc, publicOnly = false) {
-    const service = await this.own('services', input.offeringId, identity);
-    if (publicOnly) await this.assertPublished(identity, service);
+    const offered = await this.own('services', input.offeringId, identity);
+    if (publicOnly) await this.assertPublished(identity, offered);
+    const ticket = chosenTicketType(offered.nexg, input.ticketTypeId);
+    const service = pricedFor(offered, ticket);
     const b = await this.business(identity),
       captureOnly =
         this.sourceConfirmationRequired(b.configuration) || CAPTURE_ONLY.has(service.nexg.model);
@@ -1017,8 +1083,22 @@ export class BookingEngine {
       captureOnly,
     );
     const sourceRequired = this.sourceConfirmationRequired(b.configuration);
+    // A customer booking is paid in full before it is confirmed.
+    const prepaid =
+      publicOnly &&
+      !sourceRequired &&
+      !pricing.indicative &&
+      !captureOnly &&
+      !NON_BLOCKING.has(service.nexg.model) &&
+      !['request_quote', 'merchant_approval'].includes(service.nexg.intakeMode) &&
+      !this.externalOwnership(b.configuration, ['pricing', 'finance.payment']) &&
+      !this.externalReservations(b.configuration ?? {});
     return {
       ...pricing,
+      ...(prepaid && pricing.totalDueMinor > 0
+        ? { dueNowMinor: pricing.totalDueMinor, balanceMinor: 0, paymentPolicyId: PREPAID_POLICY }
+        : {}),
+      ticketTypeId: ticket?.id,
       binding: !sourceRequired && !pricing.indicative,
       sourceRequired,
       indicative: sourceRequired || pricing.indicative,
@@ -1864,6 +1944,19 @@ export class BookingEngine {
     const b = await this.assertPublished(identity);
     const occurrences = await this.all('booking-sessions', identity);
     const resources = await this.all('resources', identity);
+    // Places already taken on each published date (departures, sessions).
+    const taken = new Map<string, number>();
+    for (const r of await this.all('reservations', identity))
+      if (
+        r.nexg?.sessionId !== undefined &&
+        r.nexg?.recordRole !== 'session_allocation' &&
+        BLOCKING.has(r.status) &&
+        !this.isExpiredHold(r)
+      )
+        taken.set(
+          String(r.nexg.sessionId),
+          (taken.get(String(r.nexg.sessionId)) ?? 0) + (r.guestCount ?? 1),
+        );
     const offerings = (await this.all('services', identity))
       .filter((d) => d.active !== false && d.nexg?.bookingEnabled !== false)
       .map((d) => ({
@@ -1876,6 +1969,10 @@ export class BookingEngine {
             startTime: o.startTime,
             endTime: o.endTime,
             capacity: o.capacity,
+            remainingCapacity: Math.max(
+              0,
+              Math.min(o.capacity, d.nexg?.capacity ?? o.capacity) - (taken.get(String(o.id)) ?? 0),
+            ),
             published: true,
           })),
         eligibleResources:
@@ -1904,12 +2001,17 @@ export class BookingEngine {
         'Use a fresh secure operation UUID for public booking.',
         'invalid_public_operation_key',
       );
-    const customer = {
-      name: text(input.customer?.name, 'Customer name'),
-      email: input.customer?.email?.trim(),
-      phone: input.customer?.phone?.trim(),
-    };
-    if (!customer.email && !customer.phone)
+    // A customer booking keeps the bridge's opaque reference and the name to
+    // reserve under; any email or phone sent is not stored (Supabase holds
+    // them). A booking the shop enters keeps the contact the shop typed.
+    const customer: Doc = publicOnly
+      ? customerRecord(identity, input.customer?.name)
+      : {
+          name: text(input.customer?.name, 'Customer name'),
+          email: input.customer?.email?.trim(),
+          phone: input.customer?.phone?.trim(),
+        };
+    if (!publicOnly && !customer.email && !customer.phone)
       throw new BookingError(422, 'Add a customer email or phone number.', 'contact_required');
     if (customer.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email))
       throw new BookingError(422, 'Enter a valid email address.', 'invalid_email');
@@ -1925,6 +2027,13 @@ export class BookingEngine {
       await this.expiredInTransaction(identity, req);
       const service = await this.own('services', input.offeringId, identity, req);
       if (publicOnly) await this.assertPublished(identity, service, req);
+      const ticket = chosenTicketType(service.nexg, input.ticketTypeId);
+      if (ticket?.maxPerBooking && quantity > ticket.maxPerBooking)
+        throw new BookingError(
+          422,
+          `Book at most ${ticket.maxPerBooking} of this ticket type at once.`,
+          'too_many_tickets',
+        );
       if (service.active === false)
         throw new BookingError(409, 'This offering is inactive.', 'inactive_offering');
       if (input.hold && NON_BLOCKING.has(service.nexg.model))
@@ -1974,9 +2083,9 @@ export class BookingEngine {
       this.validateCapacity(service, resources, quantity, b.configuration);
       if (!requestOnly || input.hold) await this.assertReady(identity, service, resources, req);
       const externalPrice = this.externalOwnership(b.configuration, ['pricing', 'finance.payment']);
-      const pricing = {
+      const pricing: Doc = {
         ...this.requestPrice(
-          service,
+          pricedFor(service, ticket),
           start,
           end,
           quantity,
@@ -2002,9 +2111,30 @@ export class BookingEngine {
           'price_changed',
         );
       this.validateBookingDetails(service, input);
-      const paymentRequired = n.requiresPayment === true || pricing.dueNowMinor > 0;
+      // Every customer booking is paid in full before it is confirmed
+      // (owner, 19 Nov 2026). Free bookings have nothing to pay.
+      const prepaid =
+        publicOnly && !requestOnly && !pricing.indicative && pricing.totalDueMinor > 0;
+      if (prepaid) {
+        pricing.dueNowMinor = pricing.totalDueMinor;
+        pricing.balanceMinor = 0;
+      }
+      const paymentRequired = prepaid || n.requiresPayment === true || pricing.dueNowMinor > 0;
       const id = publicId(),
         token = customerToken;
+      let bookingCode: string | undefined;
+      if (publicOnly) {
+        const taken = new Set(
+          [
+            ...(await this.all('reservations', identity, req)),
+            ...(await this.all('booking-requests', identity, req)),
+          ]
+            .map((d) => d.nexg?.bookingCode)
+            .filter(Boolean),
+        );
+        do bookingCode = newBookingCode();
+        while (taken.has(bookingCode));
+      }
       const metadata = {
         specialistState: specialistPlan?.plan.acceptedTerms,
         specialistAllocations: specialistPlan ? [] : undefined,
@@ -2021,12 +2151,14 @@ export class BookingEngine {
         model: n.model,
         resourceIds: resources.map((r) => r.publicId),
         customer,
+        bookingCode,
+        ticketType: ticket ? { id: ticket.id, name: ticket.name } : undefined,
         trip: input.trip,
         customerLocation: input.customerLocation,
         allocations: input.allocations ?? [],
         pricing,
         pricingBasis: pricing.basis,
-        unitPriceMinor: n.priceMinor,
+        unitPriceMinor: ticket?.priceMinor ?? n.priceMinor,
         quantityScale: n.quantityScale ?? 0,
         capacityUnit: n.capacityUnit ?? 'place',
         notes: typeof input.notes === 'string' ? input.notes.slice(0, 2000) : '',
@@ -2052,16 +2184,18 @@ export class BookingEngine {
         customerTokenHash: token ? hash(token) : undefined,
         acceptedPricing: {
           pricingBasis: n.pricingBasis ?? 'per_booking',
-          priceMinor: n.priceMinor,
+          priceMinor: ticket?.priceMinor ?? n.priceMinor,
           durationUnitMinutes: n.durationUnitMinutes,
           minimumBillableUnits: n.minimumBillableUnits,
         },
         acceptedPolicies: {
-          paymentPolicyId: n.paymentPolicyId,
+          paymentPolicyId: prepaid ? PREPAID_POLICY : n.paymentPolicyId,
           changePolicyId: n.changePolicyId,
           version: n.policyVersion,
           terms: {
-            payment: 'No online prepayment; pay the merchant separately.',
+            payment: prepaid
+              ? `Pay the full amount through NexG within ${PREPAID_HOLD_MINUTES} minutes to confirm; until then the time is held for you.`
+              : 'No online prepayment; pay the merchant separately.',
             changes: 'Changes and cancellation before work starts, subject to availability.',
           },
         },
@@ -2086,7 +2220,7 @@ export class BookingEngine {
         doc = await this.allocate(identity, req, service, resources, input, metadata);
       }
       await this.audit(identity, req, 'booking.created', id, { status: metadata.status });
-      const booking = this.bookingView(doc);
+      const booking = this.bookingView(doc, publicOnly ? 'customer' : 'merchant');
       return booking;
     });
     return publicOnly ? { booking: result, customerToken } : result;
@@ -2258,8 +2392,12 @@ export class BookingEngine {
       return r.capacityMode === 'per-guest' ? metadata.quantity : 1;
     };
     const first = selected[0]!;
+    const holdMinutes =
+      metadata.acceptedPolicies?.paymentPolicyId === PREPAID_POLICY ? PREPAID_HOLD_MINUTES : 10;
     const expiresAt =
-      metadata.status === 'held' ? new Date(this.clock() + 10 * 60000).toISOString() : undefined;
+      metadata.status === 'held'
+        ? new Date(this.clock() + holdMinutes * 60000).toISOString()
+        : undefined;
     return this.create(
       'reservations',
       {
@@ -2269,7 +2407,11 @@ export class BookingEngine {
         startTime: metadata.startTime,
         endTime: metadata.endTime,
         status: metadata.status,
-        guest: metadata.customer,
+        // Reserve's guest columns get the reservation name; the opaque
+        // reference stays in nexg only.
+        guest: metadata.customer?.ref
+          ? { name: metadata.customer.name, email: placeholderEmail(metadata.publicId) }
+          : metadata.customer,
         guestCount: allocationUnits(first),
         items: selected
           .slice(1)
@@ -2294,7 +2436,7 @@ export class BookingEngine {
   async customerBooking(identity: Identity, id: string, token: string | undefined) {
     const { doc } = await this.locateBooking(identity, id, this.request(identity));
     this.assertCustomerToken(doc, token);
-    return this.bookingView(doc);
+    return this.bookingView(doc, 'customer');
   }
   private assertCustomerToken(doc: Doc, token: string | undefined) {
     const expected = doc.nexg?.customerTokenHash;
@@ -2754,7 +2896,7 @@ export class BookingEngine {
         if (
           n.requiresPayment &&
           ((n.paidMinor ?? 0) - (n.refundedMinor ?? 0) < (n.pricing?.dueNowMinor ?? 0) ||
-            n.paymentState !== 'merchant_recorded')
+            !['merchant_recorded', 'provider_verified', 'simulated'].includes(n.paymentState))
         )
           throw new BookingError(
             409,
@@ -2987,7 +3129,293 @@ export class BookingEngine {
       } else throw new BookingError(404, 'Unknown booking action.', 'not_found');
       await this.cleanupSessions(identity, req);
       await this.audit(identity, req, `booking.${action}`, id, { version: result.nexg?.version });
+      return this.bookingView(result, identity.role === 'customer' ? 'customer' : 'merchant');
+    });
+  }
+
+  /** Wrong codes or names per business, in the last 15 minutes (this process). */
+  private codeFailures = new Map<string, number[]>();
+  private assertCodeAttemptsLeft(identity: Identity) {
+    const since = this.clock() - CODE_LOCK_MINUTES * 60000;
+    const recent = (this.codeFailures.get(identity.businessId) ?? []).filter((t) => t > since);
+    this.codeFailures.set(identity.businessId, recent);
+    if (recent.length >= CODE_ATTEMPTS)
+      throw new BookingError(
+        429,
+        `Too many wrong codes. Try again in ${CODE_LOCK_MINUTES} minutes.`,
+        'too_many_code_attempts',
+      );
+  }
+  private codeFailed(identity: Identity) {
+    const list = this.codeFailures.get(identity.businessId) ?? [];
+    list.push(this.clock());
+    this.codeFailures.set(identity.businessId, list);
+    if (this.codeFailures.size > 10000) this.codeFailures.clear();
+  }
+  /** A customer booking found by the code the customer shows at the counter. */
+  private async findByCode(identity: Identity, code: unknown, req?: any) {
+    this.assertCodeAttemptsLeft(identity);
+    const normalized = normalizeBookingCode(code);
+    if (!normalized) {
+      this.codeFailed(identity);
+      throw new BookingError(422, 'Enter the 6-character booking code.', 'invalid_booking_code');
+    }
+    for (const collection of ['reservations', 'booking-requests']) {
+      const doc = (await this.all(collection, identity, req)).find(
+        (d) => d.nexg?.bookingCode === normalized && d.nexg?.recordRole === undefined,
+      );
+      if (doc) {
+        if (!allowedInBranch(identity, doc))
+          throw new BookingError(403, 'This location is outside your access.', 'forbidden');
+        return { collection, doc, code: normalized };
+      }
+    }
+    this.codeFailed(identity);
+    throw new BookingError(404, 'No booking has this code.', 'booking_code_not_found');
+  }
+  private codeView(doc: Doc, code: string) {
+    const view = this.bookingView(doc);
+    const n = doc.nexg ?? {};
+    const pass = isPass(n);
+    // A used code shows only that it was used, not whose booking it was.
+    if (n.arrivedAt && !pass)
+      return { bookingCode: code, used: true, arrivedAt: n.arrivedAt, pass: false };
+    return {
+      ...view,
+      bookingCode: code,
+      used: false,
+      pass,
+      paid: n.paymentState !== 'awaiting_payment',
+      // A test payment while payments are not connected: no money collected.
+      testPayment: n.paymentState === 'simulated',
+      arrivedAt: n.arrivedAt ?? null,
+      visits: pass ? (n.visits ?? []) : undefined,
+    };
+  }
+  /** Merchant: look up a booking by the customer's code. */
+  async bookingByCode(identity: Identity, code: unknown) {
+    requireManager(identity);
+    const found = await this.findByCode(identity, code);
+    return this.codeView(found.doc, found.code);
+  }
+  /**
+   * Merchant: the customer has arrived. The code must match a usable (so,
+   * paid) booking; when the shop types the name the customer gives, it must
+   * match the reservation name too. Entering it marks the reservation used:
+   * the same code then stops working. A pass is different: its code works
+   * once per day (Nairobi) while the pass is valid, and each entry is kept as
+   * a visit.
+   */
+  async arriveByCode(identity: Identity, code: unknown, input: Doc, key?: string) {
+    requireManager(identity);
+    return this.command(
+      identity,
+      key,
+      `booking.code.${String(code)}.arrive`,
+      input,
+      async (req) => {
+        await this.expiredInTransaction(identity, req);
+        const { collection, doc, code: normalized } = await this.findByCode(identity, code, req);
+        const n = doc.nexg ?? {},
+          state = this.bookingView(doc).status,
+          pass = isPass(n),
+          now = this.clock(),
+          today = nairobiDay(now);
+        if (n.arrivedAt && !pass)
+          throw new BookingError(409, 'This code was already used.', 'booking_code_used');
+        if (pass && (n.visits ?? []).some((v: any) => nairobiDay(Date.parse(v.at)) === today))
+          throw new BookingError(409, 'This pass was already used today.', 'pass_used_today');
+        if (!codeUsable(n, state))
+          throw new BookingError(
+            409,
+            state === 'held' || n.paymentState === 'awaiting_payment'
+              ? 'This booking is not paid yet, so it is not confirmed.'
+              : `This booking is ${state}; it cannot be checked in.`,
+            state === 'held' || n.paymentState === 'awaiting_payment'
+              ? 'payment_required'
+              : 'invalid_transition',
+          );
+        const ends = pass ? (n.entitlementValidity?.endsAt ?? n.endTime) : n.endTime;
+        if (ends && Date.parse(ends) <= now)
+          throw new BookingError(409, 'This booking has already ended.', 'booking_ended');
+        if (
+          input.reservationName !== undefined &&
+          !sameReservationName(input.reservationName, n.customer?.name)
+        ) {
+          this.codeFailed(identity);
+          throw new BookingError(
+            409,
+            'The name does not match this booking.',
+            'reservation_name_mismatch',
+          );
+        }
+        const at = new Date(now).toISOString();
+        const result = await this.update(
+          collection,
+          doc.id,
+          {
+            nexg: {
+              ...n,
+              arrivedAt: n.arrivedAt ?? at,
+              arrivalRecordedBy: n.arrivalRecordedBy ?? identity.userId,
+              ...(pass
+                ? { visits: [...(n.visits ?? []), { at, recordedBy: identity.userId }] }
+                : {}),
+              version: n.version + 1,
+            },
+          },
+          identity,
+          req,
+        );
+        await this.audit(identity, req, 'booking.arrived', doc.publicId, {
+          version: result.nexg?.version,
+        });
+        const view = this.codeView(result, normalized);
+        return pass
+          ? view
+          : { ...this.bookingView(result), bookingCode: normalized, used: true, arrivedAt: at };
+      },
+    );
+  }
+  /**
+   * NexG's payment side: a customer booking was paid in full. Confirms the
+   * held booking. A payment that lands after the hold ran out is refused, so
+   * the payment side refunds it instead of a booking appearing unannounced.
+   */
+  async settlePayment(identity: Identity, id: string, input: Doc, key?: string) {
+    requirePlatform(identity);
+    return this.command(identity, key, `booking.${id}.settle`, input, async (req) => {
+      await this.expiredInTransaction(identity, req);
+      const doc = await this.own('reservations', id, identity, req);
+      const n = doc.nexg ?? {};
+      if (n.acceptedPolicies?.paymentPolicyId !== PREPAID_POLICY)
+        throw new BookingError(
+          409,
+          'This booking is not paid through NexG.',
+          'payment_policy_required',
+        );
+      const provider = text(input.provider, 'Payment provider', 40),
+        reference = text(input.reference, 'Payment reference', 200),
+        simulated = provider === 'simulated';
+      if (simulated && !this.options.simulatedPayments)
+        throw new BookingError(403, 'Test payments are switched off.', 'simulated_payments_off');
+      const due = (n.pricing?.totalDueMinor ?? n.priceMinor) - (n.paidMinor ?? 0);
+      // A test payment is always for exactly the amount due.
+      const amountMinor = simulated ? due : integer(input.amountMinor, 'Paid amount', 1);
+      if (
+        (n.paymentEvidence ?? []).some(
+          (e: any) => e.provider === provider && e.reference === reference,
+        )
+      )
+        return this.bookingView(doc);
+      if (this.isExpiredHold(doc) || doc.status !== 'held')
+        throw new BookingError(
+          409,
+          'This booking is no longer held. Refund the payment.',
+          'hold_expired',
+        );
+      if (amountMinor !== due)
+        throw new BookingError(
+          422,
+          'The amount paid does not match the amount due.',
+          'payment_amount_mismatch',
+        );
+      const at = new Date(this.clock()).toISOString();
+      const result = await this.update(
+        'reservations',
+        doc.id,
+        {
+          status: 'confirmed',
+          nexg: {
+            ...n,
+            status: 'confirmed',
+            paidMinor: (n.paidMinor ?? 0) + amountMinor,
+            paymentState: simulated ? 'simulated' : 'provider_verified',
+            paymentEvidence: [
+              ...(n.paymentEvidence ?? []),
+              {
+                amountMinor,
+                currency: 'KES',
+                provider,
+                reference,
+                recordedAt: at,
+                verification: simulated ? 'simulated' : 'provider_verified',
+                ...(simulated ? { note: 'Test payment: no money was collected.' } : {}),
+              },
+            ],
+            expiresAt: null,
+            confirmedAt: at,
+            version: n.version + 1,
+          },
+        },
+        identity,
+        req,
+      );
+      await this.audit(identity, req, simulated ? 'booking.paid_simulated' : 'booking.paid', id, {
+        version: result.nexg?.version,
+      });
       return this.bookingView(result);
+    });
+  }
+  /**
+   * NexG: a customer deleted their account. Every booking at this business
+   * under their reference loses the reservation name, notes and addresses,
+   * and the reference itself. Cached command results for those bookings are
+   * cleared too.
+   */
+  async forgetCustomer(identity: Identity, ref: unknown, key?: string) {
+    requirePlatform(identity);
+    if (typeof ref !== 'string' || !CUSTOMER_REF.test(ref))
+      throw new BookingError(422, 'Send a customer reference.', 'invalid_customer_ref');
+    return this.command(identity, key, 'customer.forget', { ref }, async (req) => {
+      const at = new Date(this.clock()).toISOString();
+      const ids = new Set<string>();
+      for (const collection of ['reservations', 'booking-requests']) {
+        for (const doc of await this.all(collection, identity, req)) {
+          const n = doc.nexg ?? {};
+          // Bookings made before references existed carry it as createdBy.
+          const mine =
+            n.customer?.ref === ref || (n.createdBy === ref && n.customerTokenHash !== undefined);
+          if (!mine) continue;
+          const { createdBy: _createdBy, ...rest } = forgottenFields(n, at);
+          await this.update(
+            collection,
+            doc.id,
+            {
+              ...(collection === 'reservations'
+                ? {
+                    guest: {
+                      name: rest.customer.name,
+                      email: placeholderEmail(doc.publicId),
+                      phone: null,
+                    },
+                  }
+                : {}),
+              nexg: rest,
+            },
+            identity,
+            req,
+          );
+          ids.add(doc.publicId);
+        }
+      }
+      if (ids.size) {
+        const operations = await this.all('booking-operations', identity, req);
+        for (const op of operations) {
+          const r = op.result ?? {};
+          const recordId = r.booking?.id ?? r.id;
+          if (typeof recordId === 'string' && ids.has(recordId))
+            await this.update(
+              'booking-operations',
+              op.id,
+              { result: { id: recordId, erased: true } },
+              identity,
+              req,
+            );
+        }
+      }
+      await this.audit(identity, req, 'customer.forgotten', 'customer', { bookings: ids.size });
+      return { forgotten: ids.size };
     });
   }
 }
