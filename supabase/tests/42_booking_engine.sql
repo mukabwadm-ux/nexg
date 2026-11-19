@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(17);
+select plan(18);
 
 set local session_replication_role = replica;
 delete from public.booking;
@@ -16,7 +16,8 @@ insert into auth.users (instance_id, id, aud, role, email, encrypted_password, e
 values
   ('00000000-0000-0000-0000-000000000000', '55555555-5555-5555-5555-555555555555', 'authenticated', 'authenticated', 'owner@rent.example', '', now(), now(), now()),
   ('00000000-0000-0000-0000-000000000000', '66666666-6666-6666-6666-666666666666', 'authenticated', 'authenticated', 'guest@rent.example', '', now(), now(), now()),
-  ('00000000-0000-0000-0000-000000000000', '77777777-7777-7777-7777-777777777777', 'authenticated', 'authenticated', 'rival@rent.example', '', now(), now(), now());
+  ('00000000-0000-0000-0000-000000000000', '77777777-7777-7777-7777-777777777777', 'authenticated', 'authenticated', 'rival@rent.example', '', now(), now(), now()),
+  ('00000000-0000-0000-0000-000000000000', '88888888-8888-8888-8888-888888888888', 'authenticated', 'authenticated', 'second@rent.example', '', now(), now(), now());
 
 insert into public.merchant (id, legal_name, trading_name, category, contact_name, contact_phone, contact_email, city_id, answers)
 values
@@ -96,36 +97,41 @@ select set_config('t.block_id', (select id::text from public.booking where notes
 set local request.jwt.claims = '{"sub":"66666666-6666-6666-6666-666666666666","role":"authenticated"}';
 
 select throws_ok(
-  $$select public.rpc_booking_create('dddddddd-0000-0000-0000-000000000001', now() + interval '30 minutes', now() + interval '2 days')$$,
+  $$select public.rpc_booking_create('dddddddd-0000-0000-0000-000000000001', now() + interval '30 minutes', now() + interval '2 days', p_guest_name => 'Guest')$$,
   '22023', null,
   'minimum notice is enforced for guests'
 );
 
 select is(
   (select status::text from public.rpc_booking_create(
-     'dddddddd-0000-0000-0000-000000000001', now() + interval '30 days', now() + interval '31 days')),
+     'dddddddd-0000-0000-0000-000000000001', now() + interval '30 days', now() + interval '31 days',
+     p_guest_name => 'Guest')),
   'pending',
-  'a guest booking waits for the merchant to confirm'
+  'a guest booking waits for payment (20270109000900)'
 );
 
 select is(
   (select total_cents from public.rpc_booking_create(
-     'dddddddd-0000-0000-0000-000000000003', now() + interval '40 days', now() + interval '40 days 3 hours')),
+     'dddddddd-0000-0000-0000-000000000003', now() + interval '40 days', now() + interval '40 days 3 hours',
+     p_guest_name => 'Guest')),
   null::bigint,
   'a quote-required offer has no price and stays pending'
 );
 
 select is(
-  (select status::text from public.rpc_booking_create('dddddddd-0000-0000-0000-000000000002', null, null, 'eeeeeeee-0000-0000-0000-000000000001', 3)),
+  (select status::text from public.rpc_booking_create('dddddddd-0000-0000-0000-000000000002', null, null, 'eeeeeeee-0000-0000-0000-000000000001', 3, 'Guest')),
   'pending',
   'three seats on a four-seat session are accepted'
 );
 
+-- A second guest (the first already has two bookings waiting for payment).
+set local request.jwt.claims = '{"sub":"88888888-8888-8888-8888-888888888888","role":"authenticated"}';
 select throws_ok(
-  $$select public.rpc_booking_create('dddddddd-0000-0000-0000-000000000002', null, null, 'eeeeeeee-0000-0000-0000-000000000001', 2)$$,
+  $$select public.rpc_booking_create('dddddddd-0000-0000-0000-000000000002', null, null, 'eeeeeeee-0000-0000-0000-000000000001', 2, 'Guest')$$,
   '23P01', null,
   'a session cannot be oversold'
 );
+set local request.jwt.claims = '{"sub":"66666666-6666-6666-6666-666666666666","role":"authenticated"}';
 
 select is(
   (select seats_left from public.rpc_booking_slots('dddddddd-0000-0000-0000-000000000002', now(), now() + interval '10 days')),
@@ -157,12 +163,27 @@ select is(
 -- Owner confirms then cancels.
 set local request.jwt.claims = '{"sub":"55555555-5555-5555-5555-555555555555","role":"authenticated"}';
 
+select throws_ok(
+  $$select public.rpc_booking_set_status((select id from public.booking where guest_user_id = '66666666-6666-6666-6666-666666666666' and resource_id = 'dddddddd-0000-0000-0000-000000000001'), 'confirmed')$$,
+  '22023', 'This booking is not paid yet. It is confirmed when the customer pays.',
+  'the merchant cannot confirm it before the customer pays'
+);
+
+-- The customer pays (the payment side), then the booking is confirmed.
+reset role;
+select public.fn_booking_mark_paid(id, total_cents, 'PAY-42') from public.booking
+ where guest_user_id = '66666666-6666-6666-6666-666666666666' and resource_id = 'dddddddd-0000-0000-0000-000000000001';
+update public.booking set status = 'pending'
+ where guest_user_id = '66666666-6666-6666-6666-666666666666' and resource_id = 'dddddddd-0000-0000-0000-000000000001';
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"55555555-5555-5555-5555-555555555555","role":"authenticated"}';
+
 select is(
   (select status::text from public.rpc_booking_set_status(
      (select id from public.booking where guest_user_id = '66666666-6666-6666-6666-666666666666' and resource_id = 'dddddddd-0000-0000-0000-000000000001'),
      'confirmed')),
   'confirmed',
-  'the merchant confirms a pending booking'
+  'once paid, the merchant may confirm it (here it was set back to pending to try)'
 );
 
 select throws_ok(

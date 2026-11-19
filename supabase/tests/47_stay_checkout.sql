@@ -91,13 +91,13 @@ select throws_ok(
 
 select set_config('request.jwt.claims',
   '{"sub":"d4700000-0000-4000-8000-000000000003","role":"authenticated","is_anonymous":true}', true);
-/* Since 20261223000500 a temporary session cannot even hold dates; payment
-   (rpc_payment_begin_stay) still refuses one as well. */
+/* Since 20270109000900 a temporary session may hold dates and pay (116), once
+   it gives the name to book under. */
 select throws_ok(
   $$ select public.rpc_stay_hold('d4730000-0000-4000-8000-00000000000a',
        (select today + 50 from d), (select today + 51 from d)) $$,
-  '42501', 'Sign in with your account to hold these dates.',
-  'An anonymous session must sign in with an account before it can hold dates.');
+  '22023', 'Add the name to book under.',
+  'An anonymous session gives the name to book under before it can hold dates.');
 
 reset role;
 
