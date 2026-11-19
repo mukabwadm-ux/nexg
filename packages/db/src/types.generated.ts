@@ -26846,8 +26846,9 @@ export type Database = {
           updated_at: string;
           weather_fee_cents: number;
           zone_id: string | null;
+          fn_order_is_collection: boolean | null;
         };
-        ComputedFields: never;
+        ComputedFields: 'fn_order_is_collection';
         Insert: {
           branch_id?: string | null;
           cancel_note?: string | null;
@@ -57263,12 +57264,7 @@ export type Database = {
         };
       };
       fn_rider_trip_pay: {
-        Args: {
-          p_cancelled?: boolean;
-          p_city_id: string;
-          p_trip_km: number;
-          p_wait_min?: number;
-        };
+        Args: { p_cancelled?: boolean; p_city_id: string; p_trip_km: number; p_wait_min?: number };
         Returns: Json;
       };
       fn_rider_unpaid: { Args: { p_rider_id: string }; Returns: Json };
@@ -62821,14 +62817,11 @@ export type Database = {
       };
       rpc_msg_take: { Args: { p_conversation: string }; Returns: Json };
       rpc_my_bookings: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_my_order_collection_code: { Args: { p_order_id: string }; Returns: Json };
+      rpc_my_order_handoff_code: { Args: { p_order_id: string }; Returns: Json };
       rpc_my_order_map:
         | { Args: { p_order_id: string }; Returns: Json }
         | { Args: { p_contract_version: string; p_order_id: string }; Returns: Json };
-      rpc_my_order_collection_code: {
-        Args: { p_order_id: string };
-        Returns: Json;
-      };
-      rpc_my_order_handoff_code: { Args: { p_order_id: string }; Returns: Json };
       rpc_my_rider_jobs: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_rider_map_assignments: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_rider_offers: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -62859,10 +62852,7 @@ export type Database = {
         };
         Returns: Json;
       };
-      rpc_my_ticket_reply: {
-        Args: { p_body: string; p_ticket_id: string };
-        Returns: Json;
-      };
+      rpc_my_ticket_reply: { Args: { p_body: string; p_ticket_id: string }; Returns: Json };
       rpc_nearest_free: {
         Args: { p_job_id: string; p_limit?: number };
         Returns: {
@@ -63778,14 +63768,8 @@ export type Database = {
           isSetofReturn: false;
         };
       };
-      rpc_rider_agreement_accept: {
-        Args: { p_version_id: string };
-        Returns: Json;
-      };
-      rpc_rider_agreement_current: {
-        Args: Record<PropertyKey, never>;
-        Returns: Json;
-      };
+      rpc_rider_agreement_accept: { Args: { p_version_id: string }; Returns: Json };
+      rpc_rider_agreement_current: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_rider_apply: {
         Args: {
           p_city_id: string;
@@ -63803,12 +63787,7 @@ export type Database = {
       };
       rpc_rider_console_counts: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_rider_contact_attempt: {
-        Args: {
-          p_channel: string;
-          p_order_id: string;
-          p_outcome?: string;
-          p_who: string;
-        };
+        Args: { p_channel: string; p_order_id: string; p_outcome?: string; p_who: string };
         Returns: Json;
       };
       rpc_rider_cooldown: {
@@ -64002,10 +63981,7 @@ export type Database = {
         Args: { p_order_id: string; p_photo_path: string; p_reason: string };
         Returns: Json;
       };
-      rpc_rider_go_online: {
-        Args: { p_online: boolean; p_reason?: string };
-        Returns: Json;
-      };
+      rpc_rider_go_online: { Args: { p_online: boolean; p_reason?: string }; Returns: Json };
       rpc_rider_issue_kit:
         | { Args: { p_rider_id: string }; Returns: string }
         | {
@@ -64049,6 +64025,7 @@ export type Database = {
               offboard_reason: string | null;
               offboarded_at: string | null;
               offers_paused_reason: string | null;
+              offline_after_trip: boolean;
               onboarding_session_at: string | null;
               onboarding_slot_id: string | null;
               onboarding_step: number;
@@ -64057,6 +64034,7 @@ export type Database = {
               ownership: Database['public']['Enums']['vehicle_ownership'] | null;
               pay_on_delivery_eligible: boolean;
               payout_msisdn: string | null;
+              payout_msisdn_changed_at: string | null;
               payout_name_lookup: Json | null;
               phone: string;
               phone_code_attempts: number;
@@ -64105,11 +64083,7 @@ export type Database = {
       rpc_rider_kit_status: { Args: { p_rider_id: string }; Returns: Json };
       rpc_rider_live_location: { Args: { p_reason?: string; p_rider_id: string }; Returns: Json };
       rpc_rider_location_ping: {
-        Args: {
-          p_latitude: number;
-          p_longitude: number;
-          p_observed_at?: string;
-        };
+        Args: { p_latitude: number; p_longitude: number; p_observed_at?: string };
         Returns: Json;
       };
       rpc_rider_log_call: {
@@ -64183,18 +64157,12 @@ export type Database = {
       };
       rpc_rider_payout_cancel: { Args: { p_request_id: string }; Returns: Json };
       rpc_rider_payout_name_check: { Args: { p_rider_id: string }; Returns: Json };
-      rpc_rider_payout_overview: {
-        Args: Record<PropertyKey, never>;
-        Returns: Json;
-      };
+      rpc_rider_payout_overview: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_rider_payout_request: {
         Args: { p_amount_kes: number; p_reason?: string };
         Returns: Json;
       };
-      rpc_rider_phone_change_start: {
-        Args: { p_kind: string; p_phone: string };
-        Returns: Json;
-      };
+      rpc_rider_phone_change_start: { Args: { p_kind: string; p_phone: string }; Returns: Json };
       rpc_rider_phone_change_verify: {
         Args: { p_challenge_id: string; p_code: string };
         Returns: Json;
