@@ -72,7 +72,7 @@ function DisposalItem({ row }: { row: DisposalRow }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={row.photoUrl}
-            alt={`Photo from the rider for ${row.order_reference}`}
+            alt={`What the rider left for ${row.order_reference}`}
             className="h-28 w-28 rounded-lg object-cover"
           />
         </a>
