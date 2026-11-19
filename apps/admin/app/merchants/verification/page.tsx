@@ -49,6 +49,7 @@ import {
 import { merchantPhotoUrl, shortCategory } from '@/lib/merchant-categories';
 import { loadMerchantDocuments } from '@/lib/merchant-documents';
 import { hrefWith } from '@/lib/portal';
+import { MerchantOnboardingAnswers } from '@/components/merchants/onboarding-answers';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 import {
@@ -662,7 +663,10 @@ async function ReviewPane({
         {pane === 'details' && <BusinessDetails detail={detail} />}
 
         {pane === 'compliance' && (
-          <ComplianceDetails detail={detail} checks={checks} standing={standing} />
+          <>
+            <ComplianceDetails detail={detail} checks={checks} standing={standing} />
+            <MerchantOnboardingAnswers merchantId={merchantId} />
+          </>
         )}
 
         {pane === 'activity' && <ActivityAndNotes detail={detail} documents={docs} />}

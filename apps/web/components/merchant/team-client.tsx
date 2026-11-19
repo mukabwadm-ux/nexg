@@ -90,19 +90,22 @@ export function InviteMember({
         open={open}
         onClose={() => setOpen(false)}
         title="Invite a member"
-        lead="They get a message and join when they sign in with it. Until then they have no access to anything."
+        lead="They get an email and join when they sign in to NexG with that address. Until then they have no access to anything."
       >
         <div className="space-y-4">
           <Grid>
             <Field
-              label="Phone or email"
+              label="Email address"
               wide
-              hint="However you normally reach them. A phone number gets an SMS; an address gets an email."
+              hint="The address they sign in to NexG with. If they have no account yet, they create one with it."
             >
               <Text
+                type="email"
+                inputMode="email"
+                autoComplete="off"
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
-                placeholder="+254 7.. or name@example.com"
+                placeholder="name@example.com"
               />
             </Field>
             <Field label="Role" wide>
