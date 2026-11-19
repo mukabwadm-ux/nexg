@@ -1,4 +1,5 @@
 import { DASH, Panel, Pill } from '@/components/partner/bits';
+import { AgreementAccept, PhoneChange } from '@/components/rider/rider-actions';
 import { RiderProfile } from '@/components/partner/rider-profile';
 import { RiderPageHead } from '@/components/rider/frame';
 import { requireRider } from '@/lib/partner';
@@ -21,10 +22,15 @@ export default async function RiderProfilePage() {
   const me = await requireRider();
   const supabase = createClient();
 
-  const [{ data: home }, { data: zones }] = await Promise.all([
+  const [{ data: home }, { data: zones }, { data: agreementData }] = await Promise.all([
     supabase.from('rider_home_v').select('*').eq('rider_id', me.id).maybeSingle(),
     supabase.from('zone').select('name').eq('active', true).order('name'),
+    supabase.rpc('rpc_rider_agreement_current', {}),
   ]);
+  const agreement = (agreementData ?? {}) as {
+    accepted?: boolean;
+    current?: { versionId: string; version: string; pdfPath: string | null } | null;
+  };
 
   const r = home as RiderHome | null;
   if (!r) {
@@ -53,13 +59,41 @@ export default async function RiderProfilePage() {
           <Fact label="Vehicle" value={r.vehicle ?? DASH} />
           <Fact label="Plate" value={r.plate_no ?? DASH} />
           <Fact label="City" value={r.city} />
-          <Fact label="Paid to" value={r.payout_msisdn ?? DASH} />
         </dl>
         <p className="text-muted-light mt-3 text-[0.75rem] font-semibold">
-          Changing your bike, your plate or where you are paid needs a person — they are checked
-          against your documents. Message us and it is a quick call.
+          Changing your bike or your plate needs a person — they are checked against your documents.
+          Message us and it is a quick call.
         </p>
       </Panel>
+
+      <Panel title="Your numbers">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <p className="text-muted-light mb-1 text-[0.625rem] font-extrabold uppercase tracking-[0.08em]">
+              Paid to (M-Pesa)
+            </p>
+            <PhoneChange kind="payout" current={r.payout_msisdn ?? null} />
+          </div>
+          <div>
+            <p className="text-muted-light mb-1 text-[0.625rem] font-extrabold uppercase tracking-[0.08em]">
+              Account phone
+            </p>
+            <PhoneChange kind="account" current={r.phone ?? null} />
+          </div>
+        </div>
+      </Panel>
+
+      {agreement.current && !agreement.accepted && (
+        <Panel title="Rider agreement" note="needed to go online">
+          <AgreementAccept
+            versionId={agreement.current.versionId}
+            version={agreement.current.version}
+            pdfUrl={
+              agreement.current.pdfPath?.startsWith('https://') ? agreement.current.pdfPath : null
+            }
+          />
+        </Panel>
+      )}
 
       <Panel title="What you are cleared to carry">
         <div className="flex flex-wrap gap-2">

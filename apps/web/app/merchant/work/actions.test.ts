@@ -44,7 +44,8 @@ describe('Work page orders', () => {
     ['cooking', 'preparing', 'ready'],
     ['you_are_late', 'preparing', 'ready'],
     ['awaiting_payment', 'placed', undefined],
-    ['waiting_for_a_rider', 'ready', undefined],
+    ['waiting_for_a_rider', 'ready', 'handover'],
+    ['on_the_way', 'picked_up', undefined],
   ])('%s at %s offers %s', async (whatNow, stage, action) => {
     mock.rows = [order(whatNow, stage)];
     const result = await loadMerchantWork('WF_ORDER');
@@ -65,6 +66,40 @@ describe('Work page orders', () => {
   it('refuses a step the order does not offer', async () => {
     mock.rows = [order('awaiting_payment', 'placed')];
     const result = await advanceMerchantOrder(id, 'start');
+    expect(result.ok).toBe(false);
+    expect(mock.rpc).not.toHaveBeenCalled();
+  });
+
+  it('a ready order asks for the code shown to the shop', async () => {
+    mock.rows = [order('rider_coming', 'ready')];
+    const result = await loadMerchantWork('WF_ORDER');
+    expect(result.ok && result.records[0]?.nextAction?.needsCode).toBe(true);
+  });
+
+  it('enters the code through rpc_merchant_handover_code_enter', async () => {
+    mock.rows = [order('rider_coming', 'ready')];
+    mock.rpc.mockResolvedValue({ data: { ok: true, stage: 'picked_up' }, error: null });
+    const result = await advanceMerchantOrder(id, 'handover:4821');
+    expect(mock.rpc).toHaveBeenCalledWith('rpc_merchant_handover_code_enter', {
+      p_order_id: id,
+      p_code: '4821',
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  it('passes the database’s words back for a wrong code', async () => {
+    mock.rows = [order('rider_coming', 'ready')];
+    mock.rpc.mockResolvedValue({
+      data: { ok: false, reason: 'wrong_code', message: 'That code is not right.' },
+      error: null,
+    });
+    const result = await advanceMerchantOrder(id, 'handover:0000');
+    expect(result).toEqual({ ok: false, message: 'That code is not right.' });
+  });
+
+  it('refuses a code before the order is ready', async () => {
+    mock.rows = [order('cooking', 'preparing')];
+    const result = await advanceMerchantOrder(id, 'handover:4821');
     expect(result.ok).toBe(false);
     expect(mock.rpc).not.toHaveBeenCalled();
   });
