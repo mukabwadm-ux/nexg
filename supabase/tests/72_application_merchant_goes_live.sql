@@ -9,7 +9,7 @@ select plan(18);
    details, the agreement details and the agreement accepted: this fills them
    in with valid sample answers for the merchant's category. */
 create function pg_temp.complete_setup(p_merchant uuid, p_category text, p_user uuid)
-returns void language sql as \$
+returns void language sql as $f$
   insert into public.merchant_onboarding_answer (merchant_id, answers)
   select p_merchant, jsonb_object_agg(f.key,
     case f.type
@@ -31,7 +31,7 @@ returns void language sql as \$
   insert into public.merchant_agreement_acceptance (merchant_id, category, agreement_id, version, accepted_by)
   select p_merchant, p_category, a.id, a.version, p_user
   from public.fn_merchant_agreement_for_category(p_category) a where a.id is not null;
-\$;
+$f$;
 
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password,
