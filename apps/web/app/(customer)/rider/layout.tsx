@@ -46,6 +46,7 @@ export interface RiderHome {
   shifts: string[] | null;
   bike_max_km: number | null;
   payout_msisdn: string | null;
+  phone?: string | null;
   agreement_to_accept: boolean;
   alcohol_eligible: boolean;
   large_items_eligible: boolean;

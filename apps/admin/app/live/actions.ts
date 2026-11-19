@@ -206,3 +206,19 @@ export async function nearestRiders(jobId: string, limit = 8): Promise<Outcome> 
   if (bad) return bad;
   return { ok: true, data: { riders: data ?? [] } };
 }
+
+/** A rider could not deliver and photographed disposing of the order. */
+export async function decideDisposal(
+  disposalId: string,
+  approve: boolean,
+  note: string,
+): Promise<Outcome> {
+  return call(
+    createClient().rpc('rpc_dispatch_disposal_decide', {
+      p_disposal_id: disposalId,
+      p_approve: approve,
+      p_note: note || undefined,
+    }),
+    LIVE,
+  );
+}

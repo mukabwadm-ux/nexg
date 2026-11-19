@@ -1,4 +1,5 @@
 import { DASH, Empty, Panel, Pill, Stat, day, kesWhole, plural } from '@/components/partner/bits';
+import { EarlyPayout } from '@/components/rider/rider-actions';
 import { RiderPageHead } from '@/components/rider/frame';
 import { requireRider } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
@@ -32,7 +33,12 @@ export default async function RiderEarnings() {
   const me = await requireRider();
   const supabase = createClient();
 
-  const [{ data: home }, { data: earnings, error }, { data: settlements }] = await Promise.all([
+  const [
+    { data: home },
+    { data: earnings, error },
+    { data: settlements },
+    { data: payoutOverview },
+  ] = await Promise.all([
     supabase.from('rider_home_v').select('*').eq('rider_id', me.id).maybeSingle(),
     supabase
       .from('rider_earning')
@@ -47,7 +53,21 @@ export default async function RiderEarnings() {
       .eq('rider_id', me.id)
       .order('paid_at', { ascending: false, nullsFirst: true })
       .limit(8),
+    supabase.rpc('rpc_rider_payout_overview', {}),
   ]);
+  const payout = (payoutOverview ?? {}) as {
+    availableKes?: number;
+    minimumKes?: number;
+    payoutPhone?: string | null;
+    requests?: {
+      id: string;
+      amountKes: number;
+      status: string;
+      requestedAt: string;
+      note?: string | null;
+      providerRef?: string | null;
+    }[];
+  };
 
   const r = home as RiderHome | null;
   const rows = (earnings as Earning[] | null) ?? [];
@@ -124,6 +144,15 @@ export default async function RiderEarnings() {
             ))}
           </ul>
         )}
+      </Panel>
+
+      <Panel title="Need it before the weekly run?" note="Early payout">
+        <EarlyPayout
+          availableKes={payout.availableKes ?? 0}
+          minimumKes={payout.minimumKes ?? 100}
+          payoutPhone={payout.payoutPhone ?? null}
+          requests={payout.requests ?? []}
+        />
       </Panel>
 
       <Panel title="Settlements" note={settled.length > 0 ? 'Weekly' : undefined}>
