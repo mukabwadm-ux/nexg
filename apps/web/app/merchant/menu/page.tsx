@@ -35,7 +35,7 @@ export default async function MerchantMenu() {
     supabase
       .from('catalogue_item')
       .select(
-        'id, section_id, name, description, price_kes, available, age_restricted, sort, photo_path, portion_size, ingredients, allergens, dietary_labels, availability_notes, handling_notes, storage_guidance, prep_time_minutes, sold_by, unit_label, unit_step, unit_min, unit_max, price_is_estimate',
+        'id, section_id, name, description, price_kes, available, age_restricted, sort, photo_path, portion_size, ingredients, allergens, dietary_labels, availability_notes, handling_notes, storage_guidance, prep_time_minutes, sold_by, unit_label, unit_step, unit_min, unit_max, price_is_estimate, kind, booking_offering_id',
       )
       .eq('merchant_id', me.id)
       .order('sort'),
