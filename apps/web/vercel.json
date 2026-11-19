@@ -6,5 +6,6 @@
       "**": false,
       "main": true
     }
-  }
+  },
+  "crons": [{ "path": "/api/cron/booking-erasure", "schedule": "30 2 * * *" }]
 }

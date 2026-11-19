@@ -3,6 +3,7 @@ import type { BookingEngine } from './engine.js';
 import { randomUUID } from 'node:crypto';
 import { validateReservationFeePolicy } from '@nexg/booking-config';
 import { requireManager } from './auth.js';
+import { normalizePublicDetails } from './public-details.js';
 
 type Doc = Record<string, any>;
 const RESERVED = new Set(['held', 'confirmed']);
@@ -187,6 +188,9 @@ export async function manageOffering(
       'paymentPolicyId',
       'changePolicyId',
       'policyVersion',
+      'ticketTypes',
+      'rentalTerms',
+      'quoteRange',
     ];
     const permitted = new Set([
       'expectedVersion',
@@ -218,6 +222,10 @@ export async function manageOffering(
         );
       for (const field of financial)
         if (input[field] !== undefined) data.nexg[field] = input[field];
+      // null clears a detail; anything else is checked for this offering's model.
+      Object.assign(data.nexg, normalizePublicDetails(doc.nexg.model, data.nexg));
+      for (const field of ['ticketTypes', 'rentalTerms', 'quoteRange'])
+        if (input[field] === null) delete data.nexg[field];
       integer(data.nexg.priceMinor, 'Price');
       if (
         !['per_booking', 'per_quantity', 'per_duration', 'per_night', 'indicative'].includes(
