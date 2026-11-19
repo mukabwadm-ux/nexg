@@ -3,7 +3,8 @@ import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 export interface BookingIdentity {
   businessId: string;
   userId: string;
-  role: 'owner' | 'manager' | 'customer';
+  /** 'platform': NexG itself (payment confirmation, account erasure); see platform.ts. */
+  role: 'owner' | 'manager' | 'customer' | 'platform';
   branches?: string[] | null;
   businessName?: string;
   subcategoryId?: string;
@@ -102,6 +103,12 @@ export function allowedBookingPath(
         : ['bookings', 'quote'].includes(section ?? '');
   }
   if (section === 'bookings' && id && parts.length === 2 && method === 'GET') return true;
+  // The business checks the code a customer shows: look it up, then check in.
+  if (audience === 'merchant' && section === 'codes' && id) {
+    if (parts.length === 2) return method === 'GET';
+    if (parts.length === 3 && action === 'arrive') return method === 'POST';
+    return false;
+  }
   if (section === 'bookings' && id && action && parts.length === 3 && method === 'POST') {
     return audience === 'customer'
       ? ['cancel', 'reschedule', 'quote', 'workflow'].includes(action)
@@ -241,10 +248,16 @@ export async function forwardBookingRequest(
   parts: string[],
   identity: BookingIdentity,
   audience: 'merchant' | 'customer',
+  options: {
+    /** Signed in with the app's bearer token: no browser cookie, so no cross-site risk. */
+    appSession?: boolean;
+    /** The customer's saved private token for this booking, used when none is sent. */
+    customerToken?: string | null;
+  } = {},
 ) {
   if (!allowedBookingPath(parts, request.method, audience))
     return problem(404, 'This booking action is not available.', 'not_found');
-  if (!sameOriginMutation(request))
+  if (!(options.appSession && audience === 'customer') && !sameOriginMutation(request))
     return problem(403, 'Open this action from your NEXG portal.', 'origin_mismatch');
   const secret = process.env.BOOKING_BRIDGE_SECRET;
   if (!secret || secret.length < 32)
@@ -286,6 +299,13 @@ export async function forwardBookingRequest(
     const value = request.headers.get(key);
     if (value && value.length <= 512) headers.set(key, value);
   }
+  if (
+    audience === 'customer' &&
+    options.customerToken &&
+    options.customerToken.length <= 512 &&
+    !headers.has('x-booking-customer-token')
+  )
+    headers.set('x-booking-customer-token', options.customerToken);
   let body: string | undefined;
   if (!['GET', 'HEAD'].includes(request.method)) {
     const length = Number(request.headers.get('content-length') ?? '0');

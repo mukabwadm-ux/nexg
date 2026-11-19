@@ -4959,6 +4959,8 @@ export type Database = {
       };
       booking: {
         Row: {
+          checked_in_at: string | null;
+          checked_in_by: string | null;
           created_at: string;
           ends_at: string;
           exclusive: boolean;
@@ -4970,6 +4972,11 @@ export type Database = {
           id: string;
           merchant_id: string;
           notes: string | null;
+          paid_at: string | null;
+          paid_cents: number | null;
+          paid_simulated: boolean;
+          payment_due_by: string | null;
+          payment_reference: string | null;
           quantity: number;
           reference: string;
           resource_id: string;
@@ -4982,6 +4989,8 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          checked_in_at?: string | null;
+          checked_in_by?: string | null;
           created_at?: string;
           ends_at: string;
           exclusive?: boolean;
@@ -4993,6 +5002,11 @@ export type Database = {
           id?: string;
           merchant_id: string;
           notes?: string | null;
+          paid_at?: string | null;
+          paid_cents?: number | null;
+          paid_simulated?: boolean;
+          payment_due_by?: string | null;
+          payment_reference?: string | null;
           quantity?: number;
           reference?: string;
           resource_id: string;
@@ -5004,6 +5018,8 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          checked_in_at?: string | null;
+          checked_in_by?: string | null;
           created_at?: string;
           ends_at?: string;
           exclusive?: boolean;
@@ -5015,6 +5031,11 @@ export type Database = {
           id?: string;
           merchant_id?: string;
           notes?: string | null;
+          paid_at?: string | null;
+          paid_cents?: number | null;
+          paid_simulated?: boolean;
+          payment_due_by?: string | null;
+          payment_reference?: string | null;
           quantity?: number;
           reference?: string;
           resource_id?: string;
@@ -9820,6 +9841,199 @@ export type Database = {
           },
         ];
       };
+      customer_engine_booking: {
+        Row: {
+          amount_due_cents: number | null;
+          booking_code: string | null;
+          catalogue_item_id: string | null;
+          created_at: string;
+          customer_ref: string | null;
+          customer_token: string;
+          ends_at: string | null;
+          engine_booking_id: string;
+          forgotten_at: string | null;
+          hold_expires_at: string | null;
+          id: string;
+          merchant_id: string;
+          offering_id: string | null;
+          payment_state: string | null;
+          reservation_name: string | null;
+          starts_at: string | null;
+          status: string | null;
+          title: string | null;
+          total_cents: number | null;
+          updated_at: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_due_cents?: number | null;
+          booking_code?: string | null;
+          catalogue_item_id?: string | null;
+          created_at?: string;
+          customer_ref?: string | null;
+          customer_token: string;
+          ends_at?: string | null;
+          engine_booking_id: string;
+          forgotten_at?: string | null;
+          hold_expires_at?: string | null;
+          id?: string;
+          merchant_id: string;
+          offering_id?: string | null;
+          payment_state?: string | null;
+          reservation_name?: string | null;
+          starts_at?: string | null;
+          status?: string | null;
+          title?: string | null;
+          total_cents?: number | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Update: {
+          amount_due_cents?: number | null;
+          booking_code?: string | null;
+          catalogue_item_id?: string | null;
+          created_at?: string;
+          customer_ref?: string | null;
+          customer_token?: string;
+          ends_at?: string | null;
+          engine_booking_id?: string;
+          forgotten_at?: string | null;
+          hold_expires_at?: string | null;
+          id?: string;
+          merchant_id?: string;
+          offering_id?: string | null;
+          payment_state?: string | null;
+          reservation_name?: string | null;
+          starts_at?: string | null;
+          status?: string | null;
+          title?: string | null;
+          total_cents?: number | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'customer_engine_booking_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
       customer_notification_pref: {
         Row: {
           choices: NonNullable<Json>;
@@ -10732,6 +10946,136 @@ export type Database = {
           updated_by?: string | null;
         };
         Relationships: [];
+      };
+      engine_booking_erasure: {
+        Row: {
+          attempts: number;
+          customer_ref: string;
+          done_at: string | null;
+          id: string;
+          last_error: string | null;
+          merchant_id: string;
+          requested_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          attempts?: number;
+          customer_ref: string;
+          done_at?: string | null;
+          id?: string;
+          last_error?: string | null;
+          merchant_id: string;
+          requested_at?: string;
+        };
+        Update: {
+          attempts?: number;
+          customer_ref?: string;
+          done_at?: string | null;
+          id?: string;
+          last_error?: string | null;
+          merchant_id?: string;
+          requested_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
       };
       event: {
         Row: {
@@ -31539,6 +31883,78 @@ export type Database = {
           },
         ];
       };
+      reservation_code: {
+        Row: {
+          booking_id: string | null;
+          code: string;
+          created_at: string;
+          id: string;
+          stay_id: string | null;
+          used_at: string | null;
+          used_by: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          booking_id?: string | null;
+          code: string;
+          created_at?: string;
+          id?: string;
+          stay_id?: string | null;
+          used_at?: string | null;
+          used_by?: string | null;
+        };
+        Update: {
+          booking_id?: string | null;
+          code?: string;
+          created_at?: string;
+          id?: string;
+          stay_id?: string | null;
+          used_at?: string | null;
+          used_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'reservation_code_booking_id_fkey';
+            columns: ['booking_id'];
+            isOneToOne: true;
+            referencedRelation: 'booking';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reservation_code_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_stay_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reservation_code_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: true;
+            referencedRelation: 'stay';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      reservation_code_attempt: {
+        Row: {
+          actor: string;
+          at: string;
+          id: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          actor: string;
+          at?: string;
+          id?: number;
+        };
+        Update: {
+          actor?: string;
+          at?: string;
+          id?: number;
+        };
+        Relationships: [];
+      };
       retention_rule: {
         Row: {
           anonymise: boolean;
@@ -35328,6 +35744,8 @@ export type Database = {
         Row: {
           check_in: string;
           check_out: string;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -35364,6 +35782,8 @@ export type Database = {
         Insert: {
           check_in: string;
           check_out: string;
+          checked_in_at?: string | null;
+          checked_in_by?: string | null;
           commission_kes?: number | null;
           confirmation_sent_at?: string | null;
           confirmed_at?: string | null;
@@ -35399,6 +35819,8 @@ export type Database = {
         Update: {
           check_in?: string;
           check_out?: string;
+          checked_in_at?: string | null;
+          checked_in_by?: string | null;
           commission_kes?: number | null;
           confirmation_sent_at?: string | null;
           confirmed_at?: string | null;
@@ -54907,6 +55329,11 @@ export type Database = {
         };
         Returns: string;
       };
+      fn_booking_code_normalise: { Args: { p_code: string }; Returns: string };
+      fn_booking_mark_paid: {
+        Args: { p_amount_cents: number; p_booking_id: string; p_reference: string };
+        Returns: Json;
+      };
       fn_booking_open_at: {
         Args: { p_at: string; p_is_end?: boolean; p_merchant_id: string };
         Returns: boolean;
@@ -54978,6 +55405,28 @@ export type Database = {
       };
       fn_email_route_for: { Args: { p_template: string }; Returns: string };
       fn_encrypt_secret: { Args: { p_plain: string }; Returns: string };
+      fn_engine_booking_erasure_done: {
+        Args: { p_error?: string; p_id: string };
+        Returns: undefined;
+      };
+      fn_engine_booking_erasure_next: {
+        Args: { p_limit?: number };
+        Returns: {
+          attempts: number;
+          customer_ref: string;
+          done_at: string | null;
+          id: string;
+          last_error: string | null;
+          merchant_id: string;
+          requested_at: string;
+        }[];
+        SetofOptions: {
+          from: '*';
+          to: 'engine_booking_erasure';
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
       fn_event_anchor_effects: { Args: { p_plan_id: string }; Returns: undefined };
       fn_experience_partner_payout_masked: {
         Args: { p_account: Json; p_rail: string };
@@ -55806,6 +56255,10 @@ export type Database = {
       };
       fn_refund_routes: { Args: { p_order_id: string }; Returns: Json };
       fn_render_featured_pitch: { Args: { p_payload: Json }; Returns: Json };
+      fn_reservation_code_failed: { Args: Record<PropertyKey, never>; Returns: undefined };
+      fn_reservation_code_locked: { Args: Record<PropertyKey, never>; Returns: boolean };
+      fn_reservation_code_new: { Args: Record<PropertyKey, never>; Returns: string };
+      fn_reservation_name: { Args: { p_name: string }; Returns: string };
       fn_review_checks: { Args: { p_body: string; p_plan_id: string }; Returns: Json };
       fn_rider_cash_cap: { Args: { p_rider_id: string }; Returns: number };
       fn_rider_condition_matches: {
@@ -55943,6 +56396,7 @@ export type Database = {
         };
       };
       fn_run_invariants: { Args: Record<PropertyKey, never>; Returns: Json };
+      fn_same_reservation_name: { Args: { p_a: string; p_b: string }; Returns: boolean };
       fn_serving_city: {
         Args: { p_point: unknown };
         Returns: {
@@ -55982,6 +56436,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      fn_short_booking_code: { Args: Record<PropertyKey, never>; Returns: string };
       fn_slot_order: {
         Args: { p_slot: Database['public']['Enums']['block_slot'] };
         Returns: number;
@@ -56654,6 +57109,7 @@ export type Database = {
           starts_at: string;
         }[];
       };
+      rpc_booking_pay_simulated: { Args: { p_booking_id: string }; Returns: Json };
       rpc_booking_set_status: {
         Args: { p_booking_id: string; p_status: Database['public']['Enums']['reservation_status'] };
         Returns: {
@@ -59333,6 +59789,8 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_host_stay_by_code: { Args: { p_code: string }; Returns: Json };
+      rpc_host_stay_check_in: { Args: { p_code: string; p_name?: string }; Returns: Json };
       rpc_host_verify: {
         Args: { p_evidence?: Json; p_host_id: string; p_method: string };
         Returns: {
@@ -60062,6 +60520,8 @@ export type Database = {
         };
         Returns: string;
       };
+      rpc_merchant_booking_by_code: { Args: { p_code: string }; Returns: Json };
+      rpc_merchant_booking_check_in: { Args: { p_code: string; p_name?: string }; Returns: Json };
       rpc_merchant_catalogue_detail: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_catalogue_list: {
         Args: {
@@ -61478,6 +61938,7 @@ export type Database = {
       rpc_msg_take: { Args: { p_conversation: string }; Returns: Json };
       rpc_my_account_deletion: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_account_deletion_request: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_my_booking_code: { Args: { p_booking_id: string }; Returns: string };
       rpc_my_bookings: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_order_map:
         | { Args: { p_order_id: string }; Returns: Json }
@@ -61487,6 +61948,10 @@ export type Database = {
         Returns: Json;
       };
       rpc_my_data_requests: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_my_engine_booking_code: {
+        Args: { p_engine_booking_id: string; p_merchant_id: string };
+        Returns: string;
+      };
       rpc_my_rider_map_assignments: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_saved_places: {
         Args: {
@@ -61514,6 +61979,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_my_stay_code: { Args: { p_stay_id: string }; Returns: string };
       rpc_my_support_ticket_create: {
         Args: {
           p_body: string;
