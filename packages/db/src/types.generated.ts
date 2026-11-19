@@ -15598,6 +15598,342 @@ export type Database = {
         };
         Relationships: [];
       };
+      group_order: {
+        Row: {
+          closes_at: string;
+          created_at: string;
+          emoji: string;
+          fulfilment: Database['public']['Enums']['order_fulfilment'];
+          host_user_id: string;
+          id: string;
+          invite_token_hash: string;
+          merchant_id: string;
+          name: string;
+          order_id: string | null;
+          payment_mode: string;
+          scheduled_for: string | null;
+          status: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          closes_at?: string;
+          created_at?: string;
+          emoji: string;
+          fulfilment?: Database['public']['Enums']['order_fulfilment'];
+          host_user_id: string;
+          id?: string;
+          invite_token_hash: string;
+          merchant_id: string;
+          name: string;
+          order_id?: string | null;
+          payment_mode?: string;
+          scheduled_for?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          closes_at?: string;
+          created_at?: string;
+          emoji?: string;
+          fulfilment?: Database['public']['Enums']['order_fulfilment'];
+          host_user_id?: string;
+          id?: string;
+          invite_token_hash?: string;
+          merchant_id?: string;
+          name?: string;
+          order_id?: string | null;
+          payment_mode?: string;
+          scheduled_for?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'group_order_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_live_orders_needs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_live_orders_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_order_detail_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_arriving_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'group_order_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_delivery_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'group_order_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_qr_activity_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'group_order_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_orders_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'order';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'order_money_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'group_order_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_jobs_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      group_order_item: {
+        Row: {
+          catalogue_item_id: string;
+          created_at: string;
+          group_id: string;
+          id: string;
+          member_id: string;
+          note: string | null;
+          quantity: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          catalogue_item_id: string;
+          created_at?: string;
+          group_id: string;
+          id?: string;
+          member_id: string;
+          note?: string | null;
+          quantity: number;
+        };
+        Update: {
+          catalogue_item_id?: string;
+          created_at?: string;
+          group_id?: string;
+          id?: string;
+          member_id?: string;
+          note?: string | null;
+          quantity?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'group_order_item_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_item_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_item_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
+            foreignKeyName: 'group_order_item_group_id_fkey';
+            columns: ['group_id'];
+            isOneToOne: false;
+            referencedRelation: 'group_order';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_item_member_id_fkey';
+            columns: ['member_id'];
+            isOneToOne: false;
+            referencedRelation: 'group_order_member';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      group_order_member: {
+        Row: {
+          display_name: string;
+          group_id: string;
+          id: string;
+          is_host: boolean;
+          joined_at: string;
+          left_at: string | null;
+          ready_at: string | null;
+          removed_at: string | null;
+          share_cents: number | null;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          display_name: string;
+          group_id: string;
+          id?: string;
+          is_host?: boolean;
+          joined_at?: string;
+          left_at?: string | null;
+          ready_at?: string | null;
+          removed_at?: string | null;
+          share_cents?: number | null;
+          user_id: string;
+        };
+        Update: {
+          display_name?: string;
+          group_id?: string;
+          id?: string;
+          is_host?: boolean;
+          joined_at?: string;
+          left_at?: string | null;
+          ready_at?: string | null;
+          removed_at?: string | null;
+          share_cents?: number | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'group_order_member_group_id_fkey';
+            columns: ['group_id'];
+            isOneToOne: false;
+            referencedRelation: 'group_order';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       guest: {
         Row: {
           anonymised_at: string | null;
@@ -26628,10 +26964,11 @@ export type Database = {
           delivery_context: Json | null;
           delivery_fee_cents: number;
           delivery_supplier: string | null;
-          dropoff_label: string;
+          dropoff_label: string | null;
           dropoff_note: string | null;
           dropoff_point: unknown;
           eta_at: string | null;
+          fulfilment: Database['public']['Enums']['order_fulfilment'];
           guest_contact_attempts: number;
           guest_id: string | null;
           guest_unreachable: boolean;
@@ -26690,10 +27027,11 @@ export type Database = {
           delivery_context?: Json | null;
           delivery_fee_cents?: number;
           delivery_supplier?: string | null;
-          dropoff_label: string;
+          dropoff_label?: string | null;
           dropoff_note?: string | null;
           dropoff_point?: unknown;
           eta_at?: string | null;
+          fulfilment?: Database['public']['Enums']['order_fulfilment'];
           guest_contact_attempts?: number;
           guest_id?: string | null;
           guest_unreachable?: boolean;
@@ -26751,10 +27089,11 @@ export type Database = {
           delivery_context?: Json | null;
           delivery_fee_cents?: number;
           delivery_supplier?: string | null;
-          dropoff_label?: string;
+          dropoff_label?: string | null;
           dropoff_note?: string | null;
           dropoff_point?: unknown;
           eta_at?: string | null;
+          fulfilment?: Database['public']['Enums']['order_fulfilment'];
           guest_contact_attempts?: number;
           guest_id?: string | null;
           guest_unreachable?: boolean;
@@ -55051,6 +55390,7 @@ export type Database = {
         Args: { p_lat: number; p_lng: number; p_precision?: number };
         Returns: string;
       };
+      fn_group_order_payload: { Args: { p_group_id: string; p_payload: Json }; Returns: Json };
       fn_handoff_sentence: { Args: { p_unit_id: string }; Returns: string };
       fn_health_green_streak: { Args: { p_merchant_id: string }; Returns: number };
       fn_host_documents_missing: { Args: { p_host_id: string }; Returns: string[] };
@@ -55547,6 +55887,7 @@ export type Database = {
       fn_order_reference: { Args: Record<PropertyKey, never>; Returns: string };
       fn_order_reprice: { Args: { p_changes: Json; p_order_id: string }; Returns: Json };
       fn_order_require: { Args: { p_city_id: string; p_what: string }; Returns: string };
+      fn_order_schedule_refusal: { Args: { p_at: string; p_merchant_id: string }; Returns: string };
       fn_order_split: { Args: { p_order_id: string }; Returns: Json };
       fn_order_split_corrected: { Args: { p_order_id: string }; Returns: Json };
       fn_outbound_blocked: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -58820,6 +59161,19 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_group_order_cancel: { Args: { p_group_id: string }; Returns: Json };
+      rpc_group_order_create: { Args: { p_payload: Json }; Returns: Json };
+      rpc_group_order_get: { Args: { p_group_id: string }; Returns: Json };
+      rpc_group_order_invite: { Args: { p_group_id: string }; Returns: Json };
+      rpc_group_order_join: { Args: { p_display_name: string; p_token: string }; Returns: Json };
+      rpc_group_order_leave: { Args: { p_group_id: string }; Returns: Json };
+      rpc_group_order_place: { Args: { p_group_id: string; p_payload: Json }; Returns: Json };
+      rpc_group_order_preview: { Args: { p_token: string }; Returns: Json };
+      rpc_group_order_quote: { Args: { p_group_id: string; p_payload: Json }; Returns: Json };
+      rpc_group_order_ready: { Args: { p_group_id: string; p_ready: boolean }; Returns: Json };
+      rpc_group_order_remove: { Args: { p_group_id: string; p_member_id: string }; Returns: Json };
+      rpc_group_order_set_items: { Args: { p_group_id: string; p_items: Json }; Returns: Json };
+      rpc_group_order_update: { Args: { p_group_id: string; p_payload: Json }; Returns: Json };
       rpc_guest_consent_set: {
         Args: {
           p_granted: boolean;
@@ -64717,6 +65071,7 @@ export type Database = {
       notification_status: 'pending' | 'sent' | 'failed' | 'no_address';
       notification_tone: 'info' | 'good' | 'warning' | 'urgent';
       order_channel: 'web' | 'qr' | 'qr_return' | 'desk' | 'concierge' | 'api' | 'manual';
+      order_fulfilment: 'delivery' | 'pickup';
       order_payment_method:
         | 'mpesa_stk'
         | 'card'
@@ -66520,6 +66875,7 @@ export const Constants = {
       notification_status: ['pending', 'sent', 'failed', 'no_address'],
       notification_tone: ['info', 'good', 'warning', 'urgent'],
       order_channel: ['web', 'qr', 'qr_return', 'desk', 'concierge', 'api', 'manual'],
+      order_fulfilment: ['delivery', 'pickup'],
       order_payment_method: [
         'mpesa_stk',
         'card',
