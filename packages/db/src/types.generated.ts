@@ -1443,7 +1443,6 @@ export type Database = {
         Returns: string;
       };
       cron_chain_check: { Args: Record<PropertyKey, never>; Returns: Json };
-      cron_merchant_setup_reminders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_run_alerts: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_actor_name: {
         Args: {
@@ -1467,7 +1466,6 @@ export type Database = {
       fn_diff: { Args: { p_after: Json; p_before: Json }; Returns: Json };
       fn_mask_email: { Args: { p_email: string }; Returns: string };
       fn_mask_payload: { Args: { p_fields: string[]; p_payload: Json }; Returns: Json };
-      fn_merchant_go_live_missing: { Args: { p_merchant_id: string }; Returns: Json };
       fn_require: { Args: { p_level: string }; Returns: string };
       fn_sentence: {
         Args: {
@@ -1541,7 +1539,6 @@ export type Database = {
         Returns: Json;
       };
       rpc_legal_hold_release: { Args: { p_id: string; p_reason: string }; Returns: Json };
-      rpc_merchant_setup_todo: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_pack_create: {
         Args: {
           p_filter: Json;
@@ -57292,6 +57289,7 @@ export type Database = {
       cron_finance_invariants: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_holiday_reminders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_merchant_deleted_retention: { Args: Record<PropertyKey, never>; Returns: number };
+      cron_merchant_setup_reminders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_native_push_dispatch: { Args: Record<PropertyKey, never>; Returns: boolean };
       cron_notify_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_payments_worker: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -57996,6 +57994,7 @@ export type Database = {
           source: string;
         }[];
       };
+      fn_merchant_go_live_missing: { Args: { p_merchant_id: string }; Returns: Json };
       fn_merchant_holiday_city: {
         Args: { p_merchant_id: string };
         Returns: {
@@ -63924,6 +63923,7 @@ export type Database = {
         Returns: Json;
       };
       rpc_merchant_setup_review_dismiss: { Args: { p_review_id: string }; Returns: Json };
+      rpc_merchant_setup_todo: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_soft_delete: {
         Args: { p_confirmation_name: string; p_merchant_id: string; p_reason: string };
         Returns: Json;
