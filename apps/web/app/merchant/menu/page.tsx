@@ -5,6 +5,7 @@ import {
   type OptionGroupRow,
 } from '@/components/partner/merchant-item-choices';
 import { Menu, type ItemRow, type SectionRow } from '@/components/partner/merchant-menu';
+import { SetupReview } from '@/components/partner/merchant-setup-review';
 import { requireMerchant, setupPageOrWorkspace } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 import { getCatalogueExample } from '@nexg/contracts';
@@ -33,6 +34,7 @@ export default async function MerchantMenu() {
     { data: linkData },
     { data: attributeData },
     { data: variantData },
+    { data: reviewData },
   ] = await Promise.all([
     supabase
       .from('catalogue_item')
@@ -64,6 +66,12 @@ export default async function MerchantMenu() {
       .from('catalogue_variant')
       .select('id, item_id, value_ids, price_kes, available, stock_count, sku')
       .is('archived_at', null),
+    supabase
+      .from('catalogue_setup_review')
+      .select('id, item_id, kind, message, created_at')
+      .eq('merchant_id', me.id)
+      .is('resolved_at', null)
+      .order('created_at'),
   ]);
 
   const itemRows = (data as ItemRow[] | null) ?? [];
@@ -140,6 +148,7 @@ export default async function MerchantMenu() {
           Your menu could not be read: {error.message}
         </p>
       )}
+      <SetupReview lines={reviewData ?? []} />
       <Menu
         items={items}
         available={on.length}
