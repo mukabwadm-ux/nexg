@@ -228,3 +228,15 @@ export async function saveItemVariants(itemId: string, grid: VariantGridInput): 
       : 'Versions turned off for this item.',
   };
 }
+
+/** Clear a line the earlier setup left to finish (rpc_merchant_setup_review_dismiss, 20270117000100). */
+export async function dismissSetupReview(reviewId: string): Promise<Outcome> {
+  const { client } = await merchantActionClient({ access: 'setup' });
+  if (!uuid.test(reviewId)) return { ok: false, message: 'Choose a valid line.' };
+  const { error } = await client.rpc('rpc_merchant_setup_review_dismiss', {
+    p_review_id: reviewId,
+  });
+  if (error) return { ok: false, message: error.message };
+  refresh();
+  return { ok: true, message: 'Cleared.' };
+}

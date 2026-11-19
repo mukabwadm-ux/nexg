@@ -6167,6 +6167,7 @@ export type Database = {
           item_id: string;
           name: string;
           sort: number;
+          source: string;
         };
         ComputedFields: never;
         Insert: {
@@ -6174,12 +6175,14 @@ export type Database = {
           item_id: string;
           name: string;
           sort?: number;
+          source?: string;
         };
         Update: {
           id?: string;
           item_id?: string;
           name?: string;
           sort?: number;
+          source?: string;
         };
         Relationships: [
           {
@@ -7467,6 +7470,167 @@ export type Database = {
           },
           {
             foreignKeyName: 'catalogue_section_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      catalogue_setup_review: {
+        Row: {
+          created_at: string;
+          detail: NonNullable<Json>;
+          id: string;
+          item_id: string | null;
+          kind: string;
+          merchant_id: string;
+          message: string;
+          resolved_at: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          detail?: NonNullable<Json>;
+          id?: string;
+          item_id?: string | null;
+          kind: string;
+          merchant_id: string;
+          message: string;
+          resolved_at?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          detail?: NonNullable<Json>;
+          id?: string;
+          item_id?: string | null;
+          kind?: string;
+          merchant_id?: string;
+          message?: string;
+          resolved_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_setup_review_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
@@ -25443,6 +25607,7 @@ export type Database = {
           min_choices: number;
           name: string;
           required: boolean;
+          setup_item_id: string | null;
           sort: number;
         };
         ComputedFields: never;
@@ -25455,6 +25620,7 @@ export type Database = {
           min_choices?: number;
           name: string;
           required?: boolean;
+          setup_item_id?: string | null;
           sort?: number;
         };
         Update: {
@@ -25466,6 +25632,7 @@ export type Database = {
           min_choices?: number;
           name?: string;
           required?: boolean;
+          setup_item_id?: string | null;
           sort?: number;
         };
         Relationships: [
@@ -25566,6 +25733,34 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'modifier_group_setup_item_id_fkey';
+            columns: ['setup_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'modifier_group_setup_item_id_fkey';
+            columns: ['setup_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'modifier_group_setup_item_id_fkey';
+            columns: ['setup_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'modifier_group_setup_item_id_fkey';
+            columns: ['setup_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
           },
         ];
       };
@@ -57799,6 +57994,10 @@ export type Database = {
         };
         Returns: string;
       };
+      fn_offering_setup_project: {
+        Args: { p_item_id: string };
+        Returns: undefined;
+      };
       fn_ops_kinds: { Args: { p_tab: string }; Returns: string[] };
       fn_ops_rows: {
         Args: { p_from: string; p_to: string };
@@ -58173,6 +58372,20 @@ export type Database = {
           p_to: Database['public']['Enums']['settlement_state'];
         };
         Returns: Json;
+      };
+      fn_setup_review_add: {
+        Args: {
+          p_item: string;
+          p_key?: string;
+          p_kind: string;
+          p_merchant: string;
+          p_message: string;
+        };
+        Returns: undefined;
+      };
+      fn_setup_review_from_onboarding: {
+        Args: Record<PropertyKey, never>;
+        Returns: number;
       };
       fn_short_booking_code: { Args: Record<PropertyKey, never>; Returns: string };
       fn_slot_order: {
@@ -63438,6 +63651,10 @@ export type Database = {
       rpc_merchant_setup_offerings: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_setup_offerings_import: {
         Args: { p_merchant_id: string; p_rows: Json };
+        Returns: Json;
+      };
+      rpc_merchant_setup_review_dismiss: {
+        Args: { p_review_id: string };
         Returns: Json;
       };
       rpc_merchant_soft_delete: {
