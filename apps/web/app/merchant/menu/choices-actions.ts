@@ -183,7 +183,7 @@ export interface VariantGridInput {
   }[];
 }
 
-/** Save an item's versions (rpc_merchant_item_variants_save, 20270111000400). */
+/** Save an item's versions (rpc_merchant_item_variants_save, 20270111000900). */
 export async function saveItemVariants(itemId: string, grid: VariantGridInput): Promise<Outcome> {
   const { client } = await merchantActionClient({ access: 'setup' });
   if (!uuid.test(itemId)) return { ok: false, message: 'Choose a valid item.' };
