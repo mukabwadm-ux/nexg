@@ -20,8 +20,17 @@
  *    phone number will fail identically five times and then be
  *    abandoned five minutes after the code expired; it should
  *    be abandoned on the first attempt instead.
+ *
+ * Emails go out in NexG's design (email-design.ts, a copy of
+ * packages/contracts/src/email-design.ts), or in the design
+ * uploaded for their kind in Admin > Settings > Notifications &
+ * templates, with the plain text alongside. If the design cannot
+ * be drawn the plain text goes alone; EMAIL_HTML=off sends plain
+ * text only.
  */
-import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { createClient, type SupabaseClient } from 'jsr:@supabase/supabase-js@2';
+
+import { composeEmailHtml, purposeForTemplate } from './email-design.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -38,6 +47,8 @@ const TWILIO_FROM = Deno.env.get('TWILIO_FROM') ?? '';
 /* Email */
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? '';
+const EMAIL_HTML = (Deno.env.get('EMAIL_HTML') ?? 'on') !== 'off';
+const EMAIL_ASSET_BASE = Deno.env.get('EMAIL_ASSET_BASE') || undefined;
 
 /* WhatsApp — Meta Cloud API */
 const WA_TOKEN = Deno.env.get('WHATSAPP_TOKEN') ?? '';
@@ -86,9 +97,10 @@ Deno.serve(async (request) => {
   let sent = 0;
   let failed = 0;
   const unconfigured = new Set<string>();
+  const designs = rows.some((r) => r.channel === 'email') ? await liveDesigns(supabase) : new Map();
 
   for (const row of rows) {
-    const outcome = await send(row);
+    const outcome = await send(row, designs);
 
     if (outcome.ok) {
       await supabase.rpc('rpc_outbox_sent', {
@@ -123,7 +135,26 @@ Deno.serve(async (request) => {
   });
 });
 
-async function send(row: Due): Promise<Outcome> {
+/*
+ * The designs made live in the console, by purpose. Read once per
+ * run. If they cannot be read (the table is not there yet, say),
+ * every email uses the house design: a design is decoration, and
+ * it must never be the reason an email does not go.
+ */
+async function liveDesigns(supabase: SupabaseClient): Promise<Map<string, string>> {
+  try {
+    const { data, error } = await supabase
+      .from('email_design')
+      .select('purpose, html')
+      .eq('status', 'live');
+    if (error || !data) return new Map();
+    return new Map((data as { purpose: string; html: string }[]).map((d) => [d.purpose, d.html]));
+  } catch {
+    return new Map();
+  }
+}
+
+async function send(row: Due, designs: Map<string, string>): Promise<Outcome> {
   if (!row.body) {
     /* Already redacted, or never rendered. Either way there is
        nothing to send and retrying will not produce one. */
@@ -133,11 +164,24 @@ async function send(row: Due): Promise<Outcome> {
   switch (row.channel) {
     case 'sms':
       return sendSms(row.recipient, row.body);
-    case 'email':
-      return sendEmail(row.recipient, row.subject ?? 'NexG', row.body, {
+    case 'email': {
+      const subject = row.subject ?? 'NexG';
+      const purpose = purposeForTemplate(row.template).key;
+      const html = EMAIL_HTML
+        ? composeEmailHtml({
+            subject,
+            text: row.body,
+            purpose,
+            design: designs.get(purpose) ?? null,
+            assetBase: EMAIL_ASSET_BASE,
+          })
+        : null;
+      return sendEmail(row.recipient, subject, row.body, {
         from: typeof row.payload?.from === 'string' ? row.payload.from : undefined,
         replyTo: typeof row.payload?.reply_to === 'string' ? row.payload.reply_to : undefined,
+        html,
       });
+    }
     case 'whatsapp':
       return sendWhatsApp(row.recipient, row.body);
     default:
@@ -224,7 +268,7 @@ async function sendEmail(
   to: string,
   subject: string,
   body: string,
-  sender?: { from?: string; replyTo?: string },
+  sender?: { from?: string; replyTo?: string; html?: string | null },
 ): Promise<Outcome> {
   if (!RESEND_API_KEY || !EMAIL_FROM) {
     return {
@@ -245,6 +289,7 @@ async function sendEmail(
         to: [to],
         subject,
         text: body,
+        ...(sender?.html ? { html: sender.html } : {}),
         ...(sender?.replyTo ? { reply_to: sender.replyTo } : {}),
       }),
     });

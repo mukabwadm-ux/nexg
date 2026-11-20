@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { composeEmailHtml, type EmailContent } from '@nexg/contracts/email-design';
+
 /**
  * Sending email.
  *
@@ -9,7 +11,12 @@ import 'server-only';
  * assuming everyone has.
  *
  * Resend is the provider named in .env.example. Swapping it means changing
- * `deliver` and nothing else: the templates below are plain strings.
+ * `deliver` and nothing else.
+ *
+ * Every email goes as plain text and, alongside it, in NexG's email design
+ * (@nexg/contracts/email-design) or the design uploaded for its kind in
+ * Settings > Notifications & templates. If the design cannot be drawn the
+ * text goes alone; EMAIL_HTML=off sends text only.
  */
 
 export interface SendOutcome {
@@ -73,7 +80,54 @@ async function senderFor(
   return { ...fallback, enabled: true };
 }
 
-async function deliver(to: string, subject: string, text: string): Promise<SendOutcome> {
+/** The design made live for this kind of email, or null for the house design. */
+async function designFor(purpose: string): Promise<string | null> {
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !anon) return null;
+    const res = await fetch(`${url}/rest/v1/rpc/rpc_email_design_public`, {
+      method: 'POST',
+      headers: {
+        apikey: anon,
+        Authorization: `Bearer ${anon}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ p_purpose: purpose }),
+      cache: 'no-store',
+      signal: AbortSignal.timeout(3_000),
+    });
+    if (!res.ok) return null;
+    const html = (await res.json()) as unknown;
+    return typeof html === 'string' && html.length > 0 ? html : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The email's HTML, or null to send the plain text alone. */
+async function htmlFor(
+  subject: string,
+  text: string,
+  email: { purpose: string; content?: EmailContent },
+): Promise<string | null> {
+  if (process.env.EMAIL_HTML === 'off') return null;
+  const design = await designFor(email.purpose);
+  return composeEmailHtml({
+    subject,
+    text,
+    purpose: email.purpose,
+    content: email.content,
+    design,
+  });
+}
+
+async function deliver(
+  to: string,
+  subject: string,
+  text: string,
+  email: { purpose: string; content?: EmailContent },
+): Promise<SendOutcome> {
   const key = process.env.RESEND_API_KEY;
 
   if (!key) {
@@ -83,7 +137,7 @@ async function deliver(to: string, subject: string, text: string): Promise<SendO
     };
   }
 
-  const sender = await senderFor('support');
+  const [sender, html] = await Promise.all([senderFor('support'), htmlFor(subject, text, email)]);
   if (!sender.enabled) {
     return {
       status: 'skipped',
@@ -104,6 +158,7 @@ async function deliver(to: string, subject: string, text: string): Promise<SendO
         reply_to: sender.replyTo,
         subject,
         text,
+        ...(html ? { html } : {}),
       }),
       // A slow provider must not hold a guest's form open.
       signal: AbortSignal.timeout(10_000),
@@ -152,7 +207,10 @@ export async function sendFinanceEmail({
     return { status: 'skipped', error: 'No RESEND_API_KEY configured — nothing was sent.' };
   }
 
-  const sender = await senderFor('finance', { from: FINANCE_FROM, replyTo: FINANCE_REPLY_TO });
+  const [sender, html] = await Promise.all([
+    senderFor('finance', { from: FINANCE_FROM, replyTo: FINANCE_REPLY_TO }),
+    htmlFor(subject, text, { purpose: 'finance.document' }),
+  ]);
   if (!sender.enabled) {
     return {
       status: 'skipped',
@@ -174,6 +232,7 @@ export async function sendFinanceEmail({
         reply_to: sender.replyTo,
         subject,
         text,
+        ...(html ? { html } : {}),
         ...(attachments.length
           ? {
               attachments: attachments.map((a) => ({
@@ -203,8 +262,8 @@ export async function sendFinanceEmail({
 }
 
 /*
- * Plain text, not HTML. A support acknowledgement read on a phone in a hotel
- * lift does not need a layout, and text cannot render broken.
+ * Each email is written twice: as plain text, which every inbox can show and
+ * which cannot render broken, and as the parts of the designed email.
  */
 
 export function ticketReceived({
@@ -215,10 +274,23 @@ export function ticketReceived({
   reference: string;
   name: string | null;
   summary: string;
-}): { subject: string; text: string } {
+}): { subject: string; text: string; content: EmailContent } {
   const greeting = name ? `Hi ${name},` : 'Hi,';
 
   return {
+    content: {
+      title: 'Your support request is with us',
+      greeting,
+      intro:
+        'Thank you for writing to NexG. A person reads every message, and we will reply on the contact details you gave us.',
+      rows: [
+        ['Reference', reference],
+        ['Status', 'Received'],
+      ],
+      callout: { title: 'What you told us', body: summary },
+      closing: `If anything changes in the meantime, reply to this email or write to us again from nexgapp.com/help and mention ${reference}. You will get another email from us the moment this is closed off.`,
+      preheader: `Your reference is ${reference}. A person reads every message.`,
+    },
     subject: `We have your message — ${reference}`,
     text: `${greeting}
 
@@ -242,10 +314,22 @@ again from nexgapp.com/help and mention ${reference}.
 export function ticketResolved({ reference, name }: { reference: string; name: string | null }): {
   subject: string;
   text: string;
+  content: EmailContent;
 } {
   const greeting = name ? `Hi ${name},` : 'Hi,';
 
   return {
+    content: {
+      title: 'Your support request is resolved',
+      greeting,
+      intro: `We have marked ${reference} as resolved.\n\nIf that matches what you expected, there is nothing for you to do. If it does not, if the problem is still there or our answer missed the point, say so and we will reopen it.`,
+      rows: [
+        ['Reference', reference],
+        ['Status', 'Resolved'],
+      ],
+      closing: `Write to us from nexgapp.com/help and quote ${reference}; you will not have to explain it again from the start.`,
+      preheader: `${reference} is resolved. Tell us if it is not.`,
+    },
     subject: `Closed off — ${reference}`,
     text: `${greeting}
 
@@ -265,14 +349,14 @@ export async function sendTicketReceived(
   to: string,
   parts: Parameters<typeof ticketReceived>[0],
 ): Promise<SendOutcome> {
-  const { subject, text } = ticketReceived(parts);
-  return deliver(to, subject, text);
+  const { subject, text, content } = ticketReceived(parts);
+  return deliver(to, subject, text, { purpose: 'support.received', content });
 }
 
 export async function sendTicketResolved(
   to: string,
   parts: Parameters<typeof ticketResolved>[0],
 ): Promise<SendOutcome> {
-  const { subject, text } = ticketResolved(parts);
-  return deliver(to, subject, text);
+  const { subject, text, content } = ticketResolved(parts);
+  return deliver(to, subject, text, { purpose: 'support.resolved', content });
 }

@@ -852,34 +852,8 @@ export function PaymentsTab({ payments, rails, canEdit }: TabProps) {
   );
 }
 
-// ════════════════════════════ the three tabs not yet drawn
-
-export function NotificationsTab() {
-  return (
-    <>
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Tile label="Templates" value={DASH} hint="awaiting WhatsApp approval" />
-        <Tile label="Sent · 24 h" value={DASH} />
-        <Tile label="Delivery failures · 24 h" value={DASH} />
-        <Tile label="Opt-outs" value={DASH} />
-      </div>
-      <Section title="Templates" sub="Every message NexG sends, in both languages.">
-        <Empty>
-          The templates themselves live in `message_template` from the onboarding builds and the
-          editor is not wired here yet. What exists today: the rules below, and the fact that
-          nothing is sent without a template somebody wrote — there is no code path that composes a
-          message inline.
-        </Empty>
-      </Section>
-      <Section title="Rules" sub="Which channels, in which order, and who is never interrupted.">
-        <Empty>
-          No notification rules are defined. Until they are, each module uses its own quiet-hours
-          handling — which works, and is exactly the duplication this tab exists to collapse.
-        </Empty>
-      </Section>
-    </>
-  );
-}
+// ════════════════════════════ the tabs not yet drawn
+// (Notifications & templates is its own component: email-designs.tsx.)
 
 export function BrandingTab({ legal, canEdit }: TabProps) {
   const legalLocked = !canEdit('legal');

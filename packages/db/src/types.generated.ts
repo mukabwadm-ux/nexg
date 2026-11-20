@@ -11280,6 +11280,55 @@ export type Database = {
         };
         Relationships: [];
       };
+      email_design: {
+        Row: {
+          created_at: string;
+          file_name: string | null;
+          html: string;
+          id: string;
+          images: NonNullable<Json>;
+          live_since: string | null;
+          name: string;
+          notes: string | null;
+          purpose: string;
+          status: string;
+          status_changed_at: string | null;
+          status_changed_by: string | null;
+          uploaded_by: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          file_name?: string | null;
+          html: string;
+          id?: string;
+          images?: NonNullable<Json>;
+          live_since?: string | null;
+          name: string;
+          notes?: string | null;
+          purpose: string;
+          status?: string;
+          status_changed_at?: string | null;
+          status_changed_by?: string | null;
+          uploaded_by?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          file_name?: string | null;
+          html?: string;
+          id?: string;
+          images?: NonNullable<Json>;
+          live_since?: string | null;
+          name?: string;
+          notes?: string | null;
+          purpose?: string;
+          status?: string;
+          status_changed_at?: string | null;
+          status_changed_by?: string | null;
+          uploaded_by?: string | null;
+        };
+        Relationships: [];
+      };
       email_route: {
         Row: {
           description: string | null;
@@ -60853,6 +60902,39 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_email_design_html: { Args: { p_id: string }; Returns: string };
+      rpc_email_design_public: { Args: { p_purpose: string }; Returns: string };
+      rpc_email_design_set_status: { Args: { p_id: string; p_status: string }; Returns: Json };
+      rpc_email_design_upload: {
+        Args: {
+          p_file_name?: string;
+          p_html: string;
+          p_images?: Json;
+          p_make_live?: boolean;
+          p_name: string;
+          p_notes?: string;
+          p_purpose: string;
+        };
+        Returns: string;
+      };
+      rpc_email_designs: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          created_at: string;
+          file_name: string;
+          id: string;
+          image_count: number;
+          live_since: string;
+          name: string;
+          notes: string;
+          purpose: string;
+          size_bytes: number;
+          status: string;
+          status_changed_at: string;
+          uploaded_by: string;
+        }[];
+      };
+      rpc_email_overview: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_email_route_public: { Args: { p_key: string }; Returns: Json };
       rpc_email_route_set: {
         Args: {
