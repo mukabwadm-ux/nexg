@@ -1,0 +1,23 @@
+NEXG
+
+WELCOME TO NEXG HOSTS
+Let’s get you set up
+{{ business_name }}
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, thanks for
+registering with NexG Hosts. Your first month of property management is
+free.
+
+- Set your password with the button below.
+- Upload your ID and proof that you can let the property.
+- List your units once NexG has approved your documents.
+
+Set your password:
+{{ set_password_url }}
+
+The link works once and runs out after 10 minutes. If it has, choose
+“Forgot password” and enter {{ email }}.
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you host with NexG · NexG, nexgapp.com

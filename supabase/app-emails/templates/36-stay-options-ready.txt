@@ -1,0 +1,23 @@
+NEXG
+
+YOUR OPTIONS ARE READY
+{{ option_count }} stays
+for {{ request_dates }}
+
+{{ first_option_name }}
+{{#first_option_line}}{{ first_option_line }}
+{{/first_option_line}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, we’ve picked {{
+option_count }} stays that fit what you asked for. Look through them in
+the app and book the one you like.
+
+Dates aren’t held until you book and pay. Popular places go fast.
+
+See your options:
+{{ activity_url }}
+
+Not quite right? Reply in the app and tell us what to change.
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you booked a stay through NexG · NexG, nexgapp.com

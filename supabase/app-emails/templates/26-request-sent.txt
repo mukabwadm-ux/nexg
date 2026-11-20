@@ -1,0 +1,24 @@
+NEXG
+
+REQUEST SENT
+We’ve sent your request
+to {{ business_name }}
+
+{{ business_name }}
+{{#business_area}}{{ business_area }}
+{{/business_area}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, {{ business_name }}
+will look at it and reply with a price. We’ll tell you on your phone
+when they do. You pay nothing until you accept.
+
+YOUR REQUEST
+  What: {{ request_title }}
+{{#request_when}}  When: {{ request_when }}
+{{/request_when}}  Request: {{ request_number }}
+
+View request:
+{{ activity_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you booked through NexG · NexG, nexgapp.com

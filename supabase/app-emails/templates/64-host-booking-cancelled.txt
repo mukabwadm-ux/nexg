@@ -1,0 +1,21 @@
+NEXG
+
+BOOKING CANCELLED
+{{ stay_dates }}
+{{ unit_name }}
+
+{{ property_name }}
+{{#unit_name}}{{ unit_name }}
+{{/unit_name}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, {{ cancelled_note }}
+The dates are free again.
+
+{{#earnings_note}}YOUR EARNINGS
+{{ earnings_note }}
+{{/earnings_note}}
+View booking:
+{{ host_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you host with NexG · NexG, nexgapp.com

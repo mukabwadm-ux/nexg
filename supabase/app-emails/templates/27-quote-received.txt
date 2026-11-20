@@ -1,0 +1,25 @@
+NEXG
+
+YOUR PRICE IS READY
+{{ quote_amount }}
+
+{{ business_name }}
+{{#business_area}}{{ business_area }}
+{{/business_area}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, {{ business_name }}
+has priced your request. The price holds until {{ quote_valid_until }}.
+
+THE PRICE
+  For: {{ request_title }}
+{{#request_when}}  When: {{ request_when }}
+{{/request_when}}{{#deposit_amount}}  Deposit to book: {{ deposit_amount }}
+{{/deposit_amount}}
+Note from {{ business_name }}:
+{{ quote_note }}
+
+See the price:
+{{ activity_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you booked through NexG · NexG, nexgapp.com

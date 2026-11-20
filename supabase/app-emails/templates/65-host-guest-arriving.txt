@@ -1,0 +1,24 @@
+NEXG
+
+ARRIVING TOMORROW
+{{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
+{{ date_title }}
+
+{{ property_name }}
+{{#unit_name}}{{ unit_name }}
+{{/unit_name}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, {{ guest_name }}
+arrives tomorrow. Make sure the unit is ready and whoever hands over the
+keys knows.
+
+HAND-OVER
+  How: {{ handoff_label }}
+  Guests: {{ guests }}
+  Staying: {{ stay_dates }}
+
+View booking:
+{{ host_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you host with NexG · NexG, nexgapp.com

@@ -1,0 +1,26 @@
+NEXG
+
+BOOKING CHANGED
+{{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
+{{ date_title }}
+
+{{ business_name }}
+{{#business_area}}{{ business_area }}
+{{/business_area}}
+WHAT CHANGED
+  Was: {{ old_when }}
+  Now: {{ new_when }}
+{{#new_place}}  Where: {{ new_place }}
+{{/new_place}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, {{ change_reason }}
+
+View booking:
+{{ activity_url }}
+
+{{#cancellation_terms}}DOESN’T WORK FOR YOU?
+Cancel from the booking in the app. {{ cancellation_terms }}
+{{/cancellation_terms}}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you booked through NexG · NexG, nexgapp.com

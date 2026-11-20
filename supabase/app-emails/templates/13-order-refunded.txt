@@ -1,0 +1,27 @@
+NEXG
+
+REFUND SENT
+{{ refund_amount }}
+back to {{ refund_method }}
+
+{{ business_name }}
+{{#business_area}}{{ business_area }}
+{{/business_area}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, your refund for order
+{{ order_number }} is on its way. {{ refund_timing }}
+
+View refund:
+{{ activity_url }}
+
+REFUND RECEIPT {{ receipt_number }}
+{{#items}}  {{ quantity }} x {{ name }}  {{ amount }}{{#choices}}
+    {{ choices }}{{/choices}}
+{{/items}}{{#price_lines}}  {{ label }}  {{ amount }}
+{{/price_lines}}  TOTAL REFUNDED  {{ total }}
+Payment: {{ payment_method }}{{#payment_reference}} · {{ payment_reference }}{{/payment_reference}}, refunded {{ paid_at }}
+{{ record_label }} {{ record_number }} · Receipt {{ receipt_number }}
+Sorry this one didn’t work out
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you ordered on NexG · NexG, nexgapp.com

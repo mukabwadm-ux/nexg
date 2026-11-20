@@ -1,0 +1,15 @@
+NEXG
+
+TWO-STEP SIGN-IN
+
+Your code: {{ code }}
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, enter this code in
+the NexG app to finish signing in. It works once, for 10 minutes.
+
+Didn’t just sign in? Someone has your password. Change it now in
+Account, then Security.
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because of your NexG account · NexG, nexgapp.com

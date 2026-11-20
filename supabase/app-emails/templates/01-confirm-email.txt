@@ -1,0 +1,20 @@
+NEXG
+
+CONFIRM YOUR EMAIL
+
+Your code: {{ code }}
+
+Confirm my email:
+{{ confirm_url }}
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, tap the button, or
+type the code into the NexG app, to confirm your email and finish
+setting up your account. Both work once, for 10 minutes.
+
+DIDN’T SIGN UP?
+Someone may have typed your email by mistake. You can ignore this email;
+nothing happens without the code.
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because this email was used to sign up for NexG · NexG, nexgapp.com

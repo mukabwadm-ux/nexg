@@ -1,0 +1,19 @@
+NEXG
+
+YOU’RE IN
+Welcome to NexG
+Order, book and follow it all in one app.
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, your account is
+ready. Here’s what you can do with it:
+
+- Order food, groceries and more to your door, and follow your rider live.
+- Book tables, appointments, tickets, rides and stays.
+- Keep your addresses, saved places and receipts in one place.
+
+Open NexG:
+{{ app_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because of your NexG account · NexG, nexgapp.com

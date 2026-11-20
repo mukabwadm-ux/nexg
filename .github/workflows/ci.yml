@@ -84,6 +84,18 @@ jobs:
       - name: Lock-screen words, APNs and FCM payloads, retries and token retirement
         run: node --test supabase/functions/native-push-dispatch/native-push.test.ts
 
+  app-emails:
+    name: App emails sender and templates
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: HTML part to Resend with the sender injected, and templates in step with the design
+        run: node --test supabase/functions/notify-dispatch/email.test.ts
+
   database:
     name: Migrations, RLS and audit chain
     runs-on: ubuntu-latest

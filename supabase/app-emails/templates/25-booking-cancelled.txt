@@ -1,0 +1,20 @@
+NEXG
+
+BOOKING CANCELLED
+{{ booking_title }}
+{{ booking_when }}
+
+{{ business_name }}
+{{#business_area}}{{ business_area }}
+{{/business_area}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, {{ cancelled_note }}
+
+{{#money_note}}YOUR MONEY
+{{ money_note }}
+{{/money_note}}
+View booking:
+{{ activity_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you booked through NexG · NexG, nexgapp.com

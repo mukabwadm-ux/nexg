@@ -1,0 +1,16 @@
+NEXG
+
+REQUEST CLOSED
+We’ve closed your request
+{{ ticket_reference }}
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, we’ve marked {{
+ticket_reference }} as sorted. If it isn’t, reply in the app within 7
+days and we’ll reopen it. You won’t have to explain it again.
+
+Reopen request:
+{{ support_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you wrote to NexG · NexG, nexgapp.com

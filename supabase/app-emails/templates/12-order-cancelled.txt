@@ -1,0 +1,23 @@
+NEXG
+
+ORDER CANCELLED
+Your order was cancelled
+{{ cancel_reason }}
+
+{{ business_name }}
+{{#business_area}}{{ business_area }}
+{{/business_area}}
+{{#money_note}}YOUR MONEY
+{{ money_note }}
+{{/money_note}}
+THE ORDER
+  Order: {{ order_number }}
+  Placed: {{ placed_at }}
+  Total: {{ total }}
+
+View order:
+{{ activity_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you ordered on NexG · NexG, nexgapp.com

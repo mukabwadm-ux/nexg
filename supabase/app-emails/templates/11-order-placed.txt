@@ -1,0 +1,35 @@
+NEXG
+
+ORDER PLACED AND PAID
+{{ total }}
+
+{{ business_name }}
+{{#business_area}}{{ business_area }}
+{{/business_area}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, your order is in.
+We’ll send updates to your phone as it moves.
+
+Follow your order:
+{{ activity_url }}
+
+{{#delivery_address}}Your delivery code is in the app. Show it to your rider at the door, and
+to no one else.
+{{/delivery_address}}
+YOUR ORDER
+  Order: {{ order_number }}
+{{#delivery_address}}  Delivery to: {{ delivery_address }}
+{{/delivery_address}}{{#pickup_address}}  Pickup from: {{ pickup_address }}
+{{/pickup_address}}{{#scheduled_for}}  Scheduled for: {{ scheduled_for }}
+{{/scheduled_for}}
+RECEIPT {{ receipt_number }}
+{{#items}}  {{ quantity }} x {{ name }}  {{ amount }}{{#choices}}
+    {{ choices }}{{/choices}}
+{{/items}}{{#price_lines}}  {{ label }}  {{ amount }}
+{{/price_lines}}  TOTAL PAID  {{ total }}
+Payment: {{ payment_method }}{{#payment_reference}} · {{ payment_reference }}{{/payment_reference}}, paid {{ paid_at }}
+{{ record_label }} {{ record_number }} · Receipt {{ receipt_number }}
+Asante for ordering with NexG
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you ordered on NexG · NexG, nexgapp.com

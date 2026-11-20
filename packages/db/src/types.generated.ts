@@ -27498,6 +27498,7 @@ export type Database = {
           channel: string;
           created_at: string;
           expires_at: string | null;
+          html: string | null;
           id: string;
           last_error: string | null;
           next_attempt_at: string;
@@ -27519,6 +27520,7 @@ export type Database = {
           channel: string;
           created_at?: string;
           expires_at?: string | null;
+          html?: string | null;
           id?: string;
           last_error?: string | null;
           next_attempt_at?: string;
@@ -27539,6 +27541,7 @@ export type Database = {
           channel?: string;
           created_at?: string;
           expires_at?: string | null;
+          html?: string | null;
           id?: string;
           last_error?: string | null;
           next_attempt_at?: string;
@@ -57410,6 +57413,7 @@ export type Database = {
     };
     Functions: {
       authz_outbox_readable: { Args: Record<PropertyKey, never>; Returns: boolean };
+      cron_app_email_reminders: { Args: Record<PropertyKey, never>; Returns: number };
       cron_expire_unpaid_mpesa_orders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_featured_activate: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_eligibility: { Args: Record<PropertyKey, never>; Returns: number };
@@ -59059,6 +59063,7 @@ export type Database = {
       };
       rpc_api_webhook_endpoints: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_api_webhook_ping: { Args: { p_id: string }; Returns: string };
+      rpc_app_email_preview: { Args: { p_key: string; p_vars?: Json }; Returns: Json };
       rpc_approval_decide: {
         Args: { p_approve: boolean; p_note?: string; p_request_id: string };
         Returns: {
@@ -64653,6 +64658,7 @@ export type Database = {
           attempts: number;
           body: string;
           channel: string;
+          html: string;
           id: string;
           payload: Json;
           recipient: string;

@@ -24,3 +24,6 @@ discovery/
 # Generated from the Word originals by scripts/merchant-agreements/build-template.mjs; kept on one line.
 packages/merchant-agreement/src/template.generated.ts
 packages/merchant-agreement/src/logo.generated.ts
+
+# Copied from the Consumer app's docs/email-templates by scripts/app-emails/sync.mjs.
+supabase/app-emails/catalog.json
