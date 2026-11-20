@@ -73,6 +73,8 @@ export interface PlannedRow {
   publish: boolean | null;
   /** What the merchant should know about this row. */
   notes: string[];
+  /** A price that moves by half or more from the current one: check before saving. */
+  priceAlert?: { from: string; to: string };
   /** The offering as it will be saved. Absent when unchanged. */
   item?: Offering;
 }
@@ -354,6 +356,19 @@ export function planOfferingsImport(
     }
     const published = publish ?? wasPublished;
 
+    // A big price jump is usually a wrong column or a typo: say so before saving.
+    let priceAlert: PlannedRow['priceAlert'];
+    if (current && priced(current) && priced(item) && current.price && item.price) {
+      const from = Number(current.price);
+      const to = Number(item.price);
+      if (from > 0 && Math.abs(to - from) / from >= 0.5) {
+        priceAlert = { from: current.price, to: item.price };
+        notes.push(
+          `Price changes from KES ${from.toLocaleString('en-KE')} to KES ${to.toLocaleString('en-KE')} (${to > from ? '+' : ''}${Math.round(((to - from) / from) * 100)}%). Check it is right.`,
+        );
+      }
+    }
+
     let action: PlannedRow['action'] = current ? 'update' : 'create';
     if (
       current &&
@@ -376,6 +391,7 @@ export function planOfferingsImport(
       published,
       publish,
       notes,
+      ...(priceAlert ? { priceAlert } : {}),
       ...(action === 'unchanged' ? {} : { item }),
     });
     if (action === 'create') plan.creates += 1;

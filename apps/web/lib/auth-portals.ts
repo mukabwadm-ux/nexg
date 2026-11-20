@@ -118,11 +118,19 @@ export type PartnerHome = { kind?: string; home?: string } | null;
  *   that points inside that portal (a bookmarked /host?open=… link). An
  *   account with nothing yet goes to where that kind of partner starts.
  */
+/**
+ * Where a customer lands after signing in or up with nowhere else to go:
+ * Discovery (owner, 20 Nov 2026). Their account opens from the account
+ * button at the top right. Not PORTALS.customer.home, which stays '/' because
+ * it also means "every path belongs to the customer site".
+ */
+export const CUSTOMER_LANDING = '/discover';
+
 export function landingFor(portal: Portal, home: PartnerHome, next: string | undefined): string {
   const partner = portalForKind(home?.kind);
   if (portal === 'customer') {
     if (next) return next;
-    return partner && home?.home ? home.home : PORTALS.customer.home;
+    return partner && home?.home ? home.home : CUSTOMER_LANDING;
   }
   if (partner && home?.home) {
     if (partner === portal && next && withinPortal(portal, next)) return next;

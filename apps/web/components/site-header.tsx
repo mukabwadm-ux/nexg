@@ -1,11 +1,12 @@
 import { DeliverToChip } from '@nexg/location';
 
 import { NotificationBell } from './notifications/bell';
-import { Menu, User } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import Link from 'next/link';
 
 import { getTranslations } from '@/lib/i18n';
 
+import { AccountButton } from './account-button';
 import { Logo } from './logo';
 import { SiteMenu } from './site-menu';
 import { ThemeToggle } from './theme/theme';
@@ -15,7 +16,7 @@ export interface SiteHeaderProps {
   action?: { label: string; href: string };
   /** Destination and accessible label for the account icon. */
   signIn?: { label: string; href: string };
-  /** False leaves the account icon out: Discovery's header has none (owner, 12 Nov 2026). */
+  /** False leaves the account button out. Discovery shows it again since 20 Nov 2026 (owner). */
   account?: boolean;
 }
 
@@ -50,15 +51,7 @@ export async function SiteHeader({ action, signIn, account: showAccount = true }
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <DeliverToChip tone="dark" />
           <NotificationBell tone="dark" />
-          {showAccount && (
-            <Link
-              href={account.href}
-              aria-label={account.label}
-              className="focus-visible:ring-gold text-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 sm:h-11 sm:w-11"
-            >
-              <User className="h-4 w-4" aria-hidden="true" fill="currentColor" />
-            </Link>
-          )}
+          {showAccount && <AccountButton href={account.href} label={account.label} />}
 
           <ThemeToggle className="focus-visible:ring-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 sm:h-11 sm:w-11" />
 

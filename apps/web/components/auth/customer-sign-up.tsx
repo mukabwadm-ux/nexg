@@ -16,6 +16,7 @@ import {
   verifyEmailCode,
   type EmailCodeWording,
 } from '@/lib/email-code';
+import { CUSTOMER_LANDING } from '@/lib/auth-portals';
 import { DATA_PROTECTION_POLICY_URL, NEW_TAB } from '@/lib/legal-documents';
 import { createClient } from '@/lib/supabase/client';
 
@@ -225,7 +226,7 @@ export function CustomerSignUp({ next }: { next?: string }) {
         </div>
         <div className="mt-6 flex flex-wrap items-center gap-4">
           <Button asChild size="lg" className="h-12 rounded-xl">
-            <Link href={next ?? '/'}>
+            <Link href={next ?? CUSTOMER_LANDING}>
               {next ? 'Continue' : 'Start exploring'}{' '}
               <ArrowRight className="text-gold h-4 w-4" aria-hidden="true" />
             </Link>

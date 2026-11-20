@@ -18,6 +18,9 @@ vi.mock('./site-menu', () => ({
   SiteMenu: ({ children }: { children: React.ReactNode }) => children,
 }));
 vi.mock('./logo', () => ({ Logo: () => <span>NexG Concierge</span> }));
+/* The account button reads the session in the browser; signed out it is the plain link. */
+vi.mock('@/app/(customer)/sign-in/actions', () => ({ signOut: vi.fn() }));
+vi.mock('@/lib/supabase/client', () => ({ createClient: vi.fn() }));
 
 describe('SiteHeader', () => {
   it('has the account icon on every page by default', async () => {
@@ -26,7 +29,7 @@ describe('SiteHeader', () => {
     expect(html).toContain('href="/account"');
   });
 
-  it('leaves the account icon out for Discovery and keeps the rest of the header', async () => {
+  it('can leave the account icon out and keeps the rest of the header', async () => {
     const html = renderToStaticMarkup(await SiteHeader({ account: false }));
     expect(html).not.toContain('Your account');
     expect(html).not.toContain('href="/account"');
