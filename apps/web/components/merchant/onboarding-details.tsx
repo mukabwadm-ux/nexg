@@ -14,6 +14,8 @@ import type { Database } from '@nexg/db';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import * as React from 'react';
 
+import { MapPinField } from '@/components/merchant/map-pin-field';
+
 /**
  * The owner's onboarding template: the details every merchant gives (business
  * type, county, owner ID number, the refund policy) and the licences, permits,
@@ -242,6 +244,15 @@ function Field({
           placeholder={field.placeholder ?? undefined}
           onChange={(event) => onChange(field.key, event.target.value)}
           className={`${input} mt-1.5`}
+        />
+      ) : field.key === 'map_pin' ? (
+        <MapPinField
+          id={id}
+          value={value}
+          disabled={disabled}
+          placeholder={field.placeholder ?? undefined}
+          className={input}
+          onChange={(next) => onChange(field.key, next)}
         />
       ) : (
         <input

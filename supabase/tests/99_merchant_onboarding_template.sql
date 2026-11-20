@@ -86,7 +86,7 @@ select pg_temp.as_user('0e710000-0000-4000-8000-0000000000a2');
 
 select ok(
   pg_temp.keys(public.rpc_merchant_onboarding_read(null, 'airport_transfers') -> 'fields')
-    @> array['at_drivers', 'at_vehicles', 'business_type', 'county', 'owner_id_number', 'policies_acknowledged'],
+    @> array['at_drivers', 'at_vehicles', 'business_type', 'map_pin', 'policies_acknowledged'],
   'before saving, a category''s fields come with the common ones');
 select ok(
   not (pg_temp.keys(public.rpc_merchant_onboarding_read(null, 'games_sports') -> 'fields') && array['at_vehicles']),
@@ -105,11 +105,11 @@ select throws_ok(
   $$ select public.rpc_merchant_onboarding_save('0e710000-0000-4000-8000-0000000000c1', '{"gr_permit_number": "CP-1234"}') $$,
   '22023', null, 'a field from another category is refused');
 select throws_ok(
-  $$ select public.rpc_merchant_onboarding_save('0e710000-0000-4000-8000-0000000000c1', '{"owner_id_number": "12-34"}') $$,
-  '22023', null, 'an ID number in the wrong format is refused');
+  $$ select public.rpc_merchant_onboarding_save('0e710000-0000-4000-8000-0000000000c1', '{"map_pin": "near the market"}') $$,
+  '22023', null, 'a map pin in the wrong format is refused');
 select throws_ok(
-  $$ select public.rpc_merchant_onboarding_save('0e710000-0000-4000-8000-0000000000c1', '{"county": "Atlantis"}') $$,
-  '22023', null, 'a county that is not on the list is refused');
+  $$ select public.rpc_merchant_onboarding_save('0e710000-0000-4000-8000-0000000000c1', '{"business_type": "cooperative"}') $$,
+  '22023', null, 'a business type that is not on the list is refused');
 select throws_ok(
   $$ select public.rpc_merchant_onboarding_save('0e710000-0000-4000-8000-0000000000c1',
        '{"at_vehicles": [{"registration": "KDA 123A", "make_model_seats": "Toyota Noah, 7 seats",
@@ -125,7 +125,7 @@ select throws_ok(
 
 select lives_ok(
   $$ select public.rpc_merchant_onboarding_save('0e710000-0000-4000-8000-0000000000c1',
-       '{"business_type": "limited_company", "county": "Nairobi", "owner_id_number": "12345678",
+       '{"business_type": "limited_company", "map_pin": "-1.2864, 36.8172",
          "policies_acknowledged": "no",
          "at_vehicles": [{"registration": "KDA 123A", "make_model_seats": "Toyota Noah, 7 seats",
            "psv_licence_number": "PSV-1", "psv_licence_expiry": "2099-01-01",
@@ -144,8 +144,8 @@ select lives_ok(
        '{"policies_acknowledged": "yes", "map_pin": ""}') $$,
   'some answers save without touching the others');
 select is(
-  public.rpc_merchant_onboarding_read('0e710000-0000-4000-8000-0000000000c1', null) #>> '{answers,county}',
-  'Nairobi', 'answers not sent are kept');
+  public.rpc_merchant_onboarding_read('0e710000-0000-4000-8000-0000000000c1', null) #>> '{answers,business_type}',
+  'limited_company', 'answers not sent are kept');
 
 -- ------------------------------------------------------------------ submit check
 
@@ -176,20 +176,20 @@ select lives_ok(
 
 select is(
   pg_temp.keys(public.fn_merchant_onboarding_missing_for('wellness',
-    '{"business_type": "sole_proprietor", "county": "Kisumu", "owner_id_number": "A1234567",
+    '{"business_type": "sole_proprietor",
       "policies_acknowledged": "yes", "we_in_person": "no", "we_regulated_practitioner": "no",
       "we_invasive": "no", "we_contraindications": "yes"}')),
   '{}'::text[], 'with every trigger answered No, no conditional field is asked for');
 select is(
   pg_temp.keys(public.fn_merchant_onboarding_missing_for('wellness',
-    '{"business_type": "sole_proprietor", "county": "Kisumu", "owner_id_number": "A1234567",
+    '{"business_type": "sole_proprietor",
       "policies_acknowledged": "yes", "we_in_person": "yes", "we_regulated_practitioner": "no",
       "we_invasive": "yes", "we_contraindications": "yes"}')),
   array['we_liability_policy', 'we_permit_number'],
   'answering Yes makes the fields that hang off it required');
 select is(
   pg_temp.keys(public.fn_merchant_onboarding_missing_for('groceries_essentials',
-    '{"business_type": "sole_proprietor", "county": "Kisumu", "owner_id_number": "A1234567",
+    '{"business_type": "sole_proprietor",
       "policies_acknowledged": "yes", "gr_permit_number": "CP 1234", "gr_fresh_produce": "yes",
       "gr_fresh_compliance_confirmed": "yes", "gr_substitution_confirmed": "no"}')),
   array['gr_substitution_confirmed'], 'a confirmation must be Yes to count');
@@ -212,7 +212,7 @@ select lives_ok(
 select ok(pg_temp.docs('0e710000-0000-4000-8000-0000000000c2') @> array['business_permit'],
   'and now owes the county permit, also when read as the owner');
 select throws_ok(
-  $$ select public.rpc_merchant_onboarding_save('0e710000-0000-4000-8000-0000000000c1', '{"county": "Nairobi"}') $$,
+  $$ select public.rpc_merchant_onboarding_save('0e710000-0000-4000-8000-0000000000c1', '{"business_type": "partnership"}') $$,
   '42501', null, 'one owner cannot write another merchant''s details');
 
 -- ------------------------------------------------------------------ staff
@@ -225,14 +225,14 @@ select is(
   jsonb_array_length(public.rpc_merchant_onboarding_read('0e710000-0000-4000-8000-0000000000c1', null) -> 'missing'),
   0, 'and see nothing missing');
 select throws_ok(
-  $$ select public.rpc_merchant_onboarding_save('0e710000-0000-4000-8000-0000000000c1', '{"county": "Kisumu"}') $$,
+  $$ select public.rpc_merchant_onboarding_save('0e710000-0000-4000-8000-0000000000c1', '{"business_type": "partnership"}') $$,
   '42501', null, 'staff read but do not write the merchant''s answers');
 
 reset role;
 select ok(
   exists (select 1 from audit.audit_event e where e.action = 'merchant.onboarding_details_saved'
           and e.target_id = '0e710000-0000-4000-8000-0000000000c1'
-          and not (e.after::text like '%12345678%')),
+          and not (e.after::text like '%limited_company%')),
   'saves are audited by field name, without the values');
 
 select * from finish();
