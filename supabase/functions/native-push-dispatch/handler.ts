@@ -1,5 +1,5 @@
 import type { Delivery } from './payload.ts';
-import type { Outcome } from './providers.ts';
+import type { Outcome, ProbeReport } from './providers.ts';
 
 type Queue = {
   claim: (limit: number) => Promise<Delivery[]>;
@@ -11,6 +11,8 @@ type Dependencies = {
   enabled: boolean;
   queue: Queue;
   send: (delivery: Delivery) => Promise<Outcome>;
+  /** Checks each provider's credential with a made-up token; sends nothing to any phone. */
+  probe?: () => Promise<ProbeReport>;
 };
 
 async function verified(presented: string, secret: string) {
@@ -29,6 +31,15 @@ export function createNativeDispatcher(deps: Dependencies) {
       return Response.json({ error: 'method_not_allowed' }, { status: 405 });
     if (!(await verified(request.headers.get('x-native-push-secret') ?? '', deps.secret))) {
       return Response.json({ error: 'unauthorized' }, { status: 401 });
+    }
+    // A signed probe works whether or not delivery is on: it touches no queue and no phone.
+    const body = await request.json().catch(() => null);
+    if (body && typeof body === 'object' && (body as { probe?: unknown }).probe === true) {
+      if (!deps.probe) return Response.json({ error: 'probe_unavailable' }, { status: 501 });
+      return Response.json({
+        delivery: deps.enabled ? 'enabled' : 'disabled',
+        providers: await deps.probe(),
+      });
     }
     if (!deps.enabled) return Response.json({ error: 'delivery_disabled' }, { status: 503 });
 

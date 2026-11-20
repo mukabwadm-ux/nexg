@@ -5,7 +5,7 @@ import { createNativeSender } from './providers.ts';
 const read = (key: string) => Deno.env.get(key);
 const url = read('SUPABASE_URL')?.replace(/\/+$/, '');
 const credential = read('SUPABASE_SERVICE_ROLE_KEY');
-const send = createNativeSender({
+const sender = createNativeSender({
   read,
   fetch: (endpoint, request) => fetch(endpoint, request),
   now: Date.now,
@@ -35,7 +35,8 @@ Deno.serve(
   createNativeDispatcher({
     secret: read('D8_DISPATCH_SECRET') ?? '',
     enabled: read('D8_DELIVERY_ENABLED') === 'true',
-    send,
+    send: sender,
+    probe: sender.probe,
     queue: {
       async claim(limit) {
         const result = await rpc('fn_native_push_claim', { p_limit: limit });

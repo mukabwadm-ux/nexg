@@ -2,6 +2,23 @@ import { apnsMessage, fcmMessage, type Delivery } from './payload.ts';
 
 export type Outcome = 'sent' | 'retry' | 'gone' | 'failed' | 'expired';
 type Environment = (key: string) => string | undefined;
+
+/**
+ * What a probe learned about one provider. "credential_ok": the provider accepted our credential and refused only
+ * the made-up token, as it should. "credential_refused": authentication failed (wrong key, wrong project, API off).
+ */
+export type ProbeResult = {
+  result: 'credential_ok' | 'credential_refused' | 'not_configured' | 'unreachable';
+  status?: number;
+  reason?: string;
+};
+export type ProbeReport = { fcm: ProbeResult; fcm_sandbox: ProbeResult; apns: ProbeResult };
+
+// Never a real device: an FCM token cannot contain dots, and an APNs token is 64 hex characters of zeros.
+const PROBE_FCM_TOKEN = 'nexg.probe.not.a.device';
+const PROBE_APNS_TOKEN = '0'.repeat(64);
+const reasonText = (value: unknown) =>
+  typeof value === 'string' && /^[A-Za-z0-9_ .:-]{1,80}$/.test(value) ? value : undefined;
 type ProviderFetch = (input: string, init: RequestInit) => Promise<Response>;
 
 type ProviderDeps = {
@@ -119,7 +136,88 @@ export function createNativeSender({ read, fetch, now }: ProviderDeps) {
     return refreshingGoogle;
   }
 
-  return async (delivery: Delivery): Promise<Outcome> => {
+  async function probeFcm(key: 'D8_FCM_PROJECT' | 'D8_FCM_SANDBOX_PROJECT'): Promise<ProbeResult> {
+    const project = read(key);
+    if (!project || !read('D8_FCM_CLIENT_EMAIL') || !read('D8_FCM_PRIVATE_KEY')) {
+      return { result: 'not_configured' };
+    }
+    if (!/^[a-z0-9-]{6,63}$/.test(project))
+      return { result: 'not_configured', reason: 'project id' };
+    try {
+      const credential = await googleToken();
+      if (!credential) return { result: 'credential_refused', reason: 'oauth' };
+      // validate_only: Firebase checks the request and the credential and delivers nothing.
+      const response = await request(
+        'https://fcm.googleapis.com/v1/projects/' + project + '/messages:send',
+        {
+          method: 'POST',
+          headers: { authorization: 'Bearer ' + credential, 'content-type': 'application/json' },
+          body: JSON.stringify({
+            validate_only: true,
+            message: { token: PROBE_FCM_TOKEN, data: { nexg_probe: '1' } },
+          }),
+        },
+      );
+      const error = await response.json().catch(() => null);
+      const detail = Array.isArray(error?.error?.details)
+        ? error.error.details.find((row: { errorCode?: string }) => row?.errorCode)?.errorCode
+        : undefined;
+      const reason = reasonText(detail ?? error?.error?.status);
+      if (response.status === 401 || response.status === 403) {
+        if (response.status === 401) google = null;
+        return { result: 'credential_refused', status: response.status, reason };
+      }
+      if (response.ok || response.status === 400 || response.status === 404) {
+        return { result: 'credential_ok', status: response.status, reason };
+      }
+      return { result: 'unreachable', status: response.status, reason };
+    } catch {
+      return { result: 'unreachable' };
+    }
+  }
+
+  async function probeApns(): Promise<ProbeResult> {
+    if (!read('D8_APNS_KEY') || !read('D8_APNS_KEY_ID') || !read('D8_APNS_TEAM_ID')) {
+      return { result: 'not_configured' };
+    }
+    try {
+      const credential = await appleToken();
+      if (!credential) return { result: 'not_configured' };
+      const response = await request(
+        'https://api.sandbox.push.apple.com/3/device/' + PROBE_APNS_TOKEN,
+        {
+          method: 'POST',
+          headers: {
+            'apns-topic': 'com.nexg.app',
+            'apns-push-type': 'alert',
+            'apns-priority': '5',
+            authorization: 'bearer ' + credential,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify({ aps: { 'content-available': 1 } }),
+        },
+      );
+      const reason = reasonText((await response.json().catch(() => null))?.reason);
+      if (response.status === 403) {
+        apple = null;
+        return { result: 'credential_refused', status: 403, reason };
+      }
+      if (response.status === 400 || response.status === 410 || response.ok) {
+        return { result: 'credential_ok', status: response.status, reason };
+      }
+      return { result: 'unreachable', status: response.status, reason };
+    } catch {
+      return { result: 'unreachable' };
+    }
+  }
+
+  const probe = async (): Promise<ProbeReport> => ({
+    fcm: await probeFcm('D8_FCM_PROJECT'),
+    fcm_sandbox: await probeFcm('D8_FCM_SANDBOX_PROJECT'),
+    apns: await probeApns(),
+  });
+
+  const send = async (delivery: Delivery): Promise<Outcome> => {
     const expiry = Date.parse(delivery.expires_at);
     if (!Number.isFinite(expiry) || expiry <= now()) return 'expired';
     try {
@@ -180,4 +278,5 @@ export function createNativeSender({ read, fetch, now }: ProviderDeps) {
       return 'retry';
     }
   };
+  return Object.assign(send, { probe });
 }
