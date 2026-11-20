@@ -186,6 +186,10 @@ export function AgreementPanel({
         </p>
       ) : (
         <div className="space-y-3">
+          {/* The details come first: they are what NexG fills the agreement in with. */}
+          {details && !details.locked ? (
+            <DetailsEditor merchantId={merchantId} record={details} />
+          ) : null}
           <p className="text-ink flex items-center gap-2 text-[0.9375rem] font-extrabold">
             <FileText className="h-4 w-4 shrink-0" aria-hidden="true" />
             NexG Merchant Agreement – {agreement.title}
@@ -224,7 +228,7 @@ export function AgreementPanel({
               {current
                 ? null
                 : details
-                  ? ' NexG signs it with the details below when your business is approved; if it already is, NexG’s team signs it once you save them.'
+                  ? ' NexG signs it with the details above when your business is approved; if it already is, NexG’s team signs it once you save them.'
                   : null}
             </p>
           ) : (
@@ -261,9 +265,6 @@ export function AgreementPanel({
               ) : null}
             </div>
           )}
-          {details && !details.locked ? (
-            <DetailsEditor merchantId={merchantId} record={details} />
-          ) : null}
           {earlier.length ? (
             <div>
               <p className="text-muted text-[0.75rem] font-bold">Earlier signed agreements</p>
