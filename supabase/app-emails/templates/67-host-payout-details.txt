@@ -1,0 +1,18 @@
+NEXG
+
+PAYOUT DETAILS
+New payout details saved
+to {{ payout_destination }}
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, once our finance team
+has checked them, your earnings go to {{ payout_destination }}.
+
+Didn’t change this? Write to info@nexgapp.com straight away. We’ll hold
+your payouts until it’s sorted.
+
+Review payout details:
+{{ host_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you host with NexG · NexG, nexgapp.com

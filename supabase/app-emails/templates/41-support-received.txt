@@ -1,0 +1,18 @@
+NEXG
+
+MESSAGE RECEIVED
+{{ ticket_reference }}
+your reference
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, thanks for writing. A
+person reads every message and will reply in the app and by email.
+
+What you told us:
+{{ summary }}
+
+View your request:
+{{ support_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you wrote to NexG · NexG, nexgapp.com

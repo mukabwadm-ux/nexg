@@ -1,0 +1,25 @@
+NEXG
+
+STAY CHANGED
+{{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
+{{ date_title }}
+
+{{ property_name }}
+{{#area}}{{ area }}
+{{/area}}
+WHAT CHANGED
+  Was: {{ old_when }}
+  Now: {{ new_when }}
+{{#new_room}}  Room: {{ new_room }}
+{{/new_room}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, {{ change_reason }}
+
+{{#price_note}}THE PRICE
+{{ price_note }}
+{{/price_note}}
+View your stay:
+{{ activity_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you booked a stay through NexG · NexG, nexgapp.com

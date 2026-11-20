@@ -1,0 +1,21 @@
+NEXG
+
+DOCUMENTS
+We need another copy
+{{ document_name }}
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, we couldn’t approve
+your {{ document_name }}.
+
+Why:
+{{ review_reason }}
+
+Upload a new copy:
+{{ host_url }}
+
+Your other documents are still being checked. You can list units once
+all of them are approved.
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you host with NexG · NexG, nexgapp.com

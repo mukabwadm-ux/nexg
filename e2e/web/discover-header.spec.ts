@@ -2,7 +2,8 @@ import { expect, test } from '@playwright/test';
 
 /**
  * Discovery's top bar is the site header (owner, 12 Nov 2026): the same logo, Deliver to chip,
- * theme toggle and menu as every other page, without the account icon. Discovery's own bar
+ * theme toggle and menu as every other page. Since 20 Nov 2026 customers land on Discovery after
+ * signing in, so it shows the account icon too (apps/web/app/discover/page.tsx). Discovery's own bar
  * (catalog area and search) sits under it and stays pinned under it while the page scrolls.
  *
  * Discovery is a separate app that /discover mounts under the header
@@ -10,7 +11,7 @@ import { expect, test } from '@playwright/test';
  */
 
 test.describe('Discovery has the site header', () => {
-  test('the site header, without the account icon', async ({ page }) => {
+  test('the site header, with the account icon', async ({ page }) => {
     await page.goto('/discover');
     const header = page.getByRole('banner');
 
@@ -20,7 +21,7 @@ test.describe('Discovery has the site header', () => {
       header.getByRole('button', { name: /switch to (light|dark) mode/i }),
     ).toBeVisible();
     await expect(header.getByRole('button', { name: 'Open menu' })).toBeVisible();
-    await expect(header.getByRole('link', { name: 'Your account' })).toHaveCount(0);
+    await expect(header.getByRole('link', { name: 'Your account' })).toBeVisible();
 
     /* Discovery itself, with its search, and none of its old account links. */
     await expect(page.getByRole('combobox', { name: 'Search merchants' })).toBeVisible();

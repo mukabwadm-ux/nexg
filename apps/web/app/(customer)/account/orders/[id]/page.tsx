@@ -61,17 +61,30 @@ export default async function OrderPage({ params }: { params: { id: string } }) 
       .from('order_item')
       .select('id, name, quantity, line_total_cents, variant_label, unit_label, removed_at')
       .eq('order_id', order.id),
-    supabase.from('order_event').select('id, at, title, detail').eq('order_id', order.id).order('at', { ascending: false }).limit(30),
+    supabase
+      .from('order_event')
+      .select('id, at, title, detail')
+      .eq('order_id', order.id)
+      .order('at', { ascending: false })
+      .limit(30),
     order.merchant_id
-      ? supabase.from('merchant_public').select('trading_name').eq('id', order.merchant_id).maybeSingle()
+      ? supabase
+          .from('merchant_public')
+          .select('trading_name')
+          .eq('id', order.merchant_id)
+          .maybeSingle()
       : Promise.resolve({ data: null }),
-    (supabase.rpc as unknown as (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }>)(
-      'rpc_my_order_rating',
-      { p_order_id: order.id },
-    ),
+    (
+      supabase.rpc as unknown as (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: unknown }>
+    )('rpc_my_order_rating', { p_order_id: order.id }),
   ]);
 
-  const paid = ['paid', 'collected', 'partially_refunded', 'refunded'].includes(order.payment_status ?? '');
+  const paid = ['paid', 'collected', 'partially_refunded', 'refunded'].includes(
+    order.payment_status ?? '',
+  );
   const canCancel = order.stage === 'placed' && !paid;
   const rated = typeof rating.data === 'number' ? rating.data : null;
   const name = (merchant.data as { trading_name: string } | null)?.trading_name ?? 'Your order';
@@ -80,7 +93,10 @@ export default async function OrderPage({ params }: { params: { id: string } }) 
     <>
       <SiteHeader />
       <main id="main" className="mx-auto flex max-w-[56rem] flex-col gap-5 px-4 pb-16 pt-8 sm:px-8">
-        <Link href={user.is_anonymous ? '/discover' : '/account?tab=orders'} className="text-sm font-bold">
+        <Link
+          href={user.is_anonymous ? '/discover' : '/account?tab=orders'}
+          className="text-sm font-bold"
+        >
           {user.is_anonymous ? 'Back to Discovery' : 'All orders'}
         </Link>
         <div>
@@ -97,7 +113,10 @@ export default async function OrderPage({ params }: { params: { id: string } }) 
         {order.stage === 'placed' && !paid && order.payment_method !== 'cash_on_delivery' && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[#fdecea] p-4">
             <p className="font-bold">Not paid yet. The business starts once you pay.</p>
-            <Link href={`/pay/${order.reference}`} className="bg-ink inline-flex min-h-11 items-center rounded-full px-5 font-bold text-white no-underline">
+            <Link
+              href={`/pay/${order.reference}`}
+              className="bg-ink inline-flex min-h-11 items-center rounded-full px-5 font-bold text-white no-underline"
+            >
               Pay {kes(order.total_cents)}
             </Link>
           </div>
@@ -106,10 +125,24 @@ export default async function OrderPage({ params }: { params: { id: string } }) 
         <OrderLive orderId={order.id} stage={order.stage} />
 
         <section aria-labelledby="items" className="border-border rounded-2xl border bg-white p-5">
-          <h2 id="items" className="text-lg font-extrabold">What you ordered</h2>
+          <h2 id="items" className="text-lg font-extrabold">
+            What you ordered
+          </h2>
           <ul className="divide-border mt-2 divide-y">
-            {((items.data ?? []) as { id: string; name: string; quantity: number; line_total_cents: number; variant_label: string | null; removed_at: string | null }[]).map((i) => (
-              <li key={i.id} className={`flex justify-between gap-3 py-2.5 text-sm ${i.removed_at ? 'text-muted line-through' : ''}`}>
+            {(
+              (items.data ?? []) as {
+                id: string;
+                name: string;
+                quantity: number;
+                line_total_cents: number;
+                variant_label: string | null;
+                removed_at: string | null;
+              }[]
+            ).map((i) => (
+              <li
+                key={i.id}
+                className={`flex justify-between gap-3 py-2.5 text-sm ${i.removed_at ? 'text-muted line-through' : ''}`}
+              >
                 <span>
                   {i.quantity} × {i.name}
                   {i.variant_label ? ` · ${i.variant_label}` : ''}
@@ -119,12 +152,18 @@ export default async function OrderPage({ params }: { params: { id: string } }) 
             ))}
           </ul>
           <dl className="border-border mt-2 grid grid-cols-[1fr_auto] gap-y-1 border-t pt-3 text-sm">
-            <dt className="text-muted">Items</dt><dd>{kes(order.subtotal_cents)}</dd>
-            <dt className="text-muted">Delivery</dt><dd>{kes(order.delivery_fee_cents)}</dd>
-            <dt className="text-muted">Service fee</dt><dd>{kes(order.service_fee_cents + order.small_basket_fee_cents)}</dd>
-            <dt className="font-extrabold">Total</dt><dd className="font-extrabold">{kes(order.total_cents)}</dd>
+            <dt className="text-muted">Items</dt>
+            <dd>{kes(order.subtotal_cents)}</dd>
+            <dt className="text-muted">Delivery</dt>
+            <dd>{kes(order.delivery_fee_cents)}</dd>
+            <dt className="text-muted">Service fee</dt>
+            <dd>{kes(order.service_fee_cents + order.small_basket_fee_cents)}</dd>
+            <dt className="font-extrabold">Total</dt>
+            <dd className="font-extrabold">{kes(order.total_cents)}</dd>
           </dl>
-          {order.dropoff_label && <p className="text-muted mt-3 text-sm">Delivering to {order.dropoff_label}</p>}
+          {order.dropoff_label && (
+            <p className="text-muted mt-3 text-sm">Delivering to {order.dropoff_label}</p>
+          )}
         </section>
 
         <OrderActions
@@ -135,13 +174,28 @@ export default async function OrderPage({ params }: { params: { id: string } }) 
           rated={rated}
         />
 
-        <section aria-labelledby="timeline" className="border-border rounded-2xl border bg-white p-5">
-          <h2 id="timeline" className="text-lg font-extrabold">Timeline</h2>
+        <section
+          aria-labelledby="timeline"
+          className="border-border rounded-2xl border bg-white p-5"
+        >
+          <h2 id="timeline" className="text-lg font-extrabold">
+            Timeline
+          </h2>
           <ol className="mt-2 flex flex-col gap-3">
-            {((events.data ?? []) as { id: number; at: string; title: string; detail: string | null }[]).map((e) => (
+            {(
+              (events.data ?? []) as {
+                id: number;
+                at: string;
+                title: string;
+                detail: string | null;
+              }[]
+            ).map((e) => (
               <li key={e.id} className="text-sm">
                 <p className="font-bold">{e.title}</p>
-                <p className="text-muted">{time(e.at)}{e.detail ? ` · ${e.detail}` : ''}</p>
+                <p className="text-muted">
+                  {time(e.at)}
+                  {e.detail ? ` · ${e.detail}` : ''}
+                </p>
               </li>
             ))}
           </ol>

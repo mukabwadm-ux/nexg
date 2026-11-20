@@ -1,0 +1,16 @@
+NEXG
+
+PAYOUT DETAILS CHECKED
+All set for payouts
+to {{ payout_destination }}
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, our finance team has
+checked your payout details. Your next payout goes to {{
+payout_destination }}.
+
+Open your host workspace:
+{{ host_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you host with NexG · NexG, nexgapp.com

@@ -63,43 +63,67 @@ export async function AccountHome() {
   const ahead = comingUp(activity).slice(0, 4);
   const recent = activity.orders.filter((o) => !unpaid.includes(o)).slice(0, 5);
   const again = new Set(orderAgain(activity, 10).map((e) => e.merchant.id));
-  const step = live ? Math.max(STAGES.indexOf(live.stage === 'ready' ? 'preparing' : live.stage), 0) : 0;
+  const step = live
+    ? Math.max(STAGES.indexOf(live.stage === 'ready' ? 'preparing' : live.stage), 0)
+    : 0;
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap gap-2">
-        <Link href="/discover" className="bg-gold text-ink inline-flex min-h-11 items-center rounded-full px-5 font-extrabold no-underline">
+        <Link
+          href="/discover"
+          className="bg-gold text-ink inline-flex min-h-11 items-center rounded-full px-5 font-extrabold no-underline"
+        >
           Order delivery
         </Link>
-        <Link href="/discover?category=experiences" className="border-border-strong text-ink inline-flex min-h-11 items-center rounded-full border bg-white px-5 font-bold no-underline">
+        <Link
+          href="/discover?category=experiences"
+          className="border-border-strong text-ink inline-flex min-h-11 items-center rounded-full border bg-white px-5 font-bold no-underline"
+        >
           Book something
         </Link>
-        <Link href="/ask" className="border-border-strong text-ink inline-flex min-h-11 items-center rounded-full border bg-white px-5 font-bold no-underline">
+        <Link
+          href="/ask"
+          className="border-border-strong text-ink inline-flex min-h-11 items-center rounded-full border bg-white px-5 font-bold no-underline"
+        >
           Ask a concierge
         </Link>
       </div>
 
       {live && (
-        <section aria-labelledby="live-order" className="bg-ink flex flex-col gap-4 rounded-2xl p-5 text-white">
+        <section
+          aria-labelledby="live-order"
+          className="bg-ink flex flex-col gap-4 rounded-2xl p-5 text-white"
+        >
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className={`${pill} bg-gold text-ink`}>{STAGE_LABEL[live.stage] ?? live.stage}</span>
+            <span className={`${pill} bg-gold text-ink`}>
+              {STAGE_LABEL[live.stage] ?? live.stage}
+            </span>
             <span className="text-[0.8125rem] text-white/70">{live.reference}</span>
           </div>
           <h2 id="live-order" className="text-[1.375rem] font-extrabold">
             {merchantName(activity, live.merchant_id)}
           </h2>
-          <ol className="grid grid-cols-6 gap-1.5" aria-label={`Step ${step + 1} of ${STAGES.length}`}>
+          <ol
+            className="grid grid-cols-6 gap-1.5"
+            aria-label={`Step ${step + 1} of ${STAGES.length}`}
+          >
             {STAGES.map((s, i) => (
               <li key={s} className="flex flex-col gap-1.5">
                 <span className={`h-1.5 rounded-full ${i <= step ? 'bg-gold' : 'bg-white/20'}`} />
-                <span className={`text-[0.6875rem] ${i === step ? 'font-extrabold text-white' : 'text-white/60'}`}>
+                <span
+                  className={`text-[0.6875rem] ${i === step ? 'font-extrabold text-white' : 'text-white/60'}`}
+                >
                   {STAGE_LABEL[s]}
                 </span>
               </li>
             ))}
           </ol>
           <div className="flex flex-wrap gap-2">
-            <Link href={`/account/orders/${live.id}`} className="bg-gold text-ink inline-flex min-h-11 items-center rounded-full px-5 font-extrabold no-underline">
+            <Link
+              href={`/account/orders/${live.id}`}
+              className="bg-gold text-ink inline-flex min-h-11 items-center rounded-full px-5 font-extrabold no-underline"
+            >
               Track order
             </Link>
             <span className="inline-flex min-h-11 items-center text-sm text-white/80">
@@ -111,17 +135,26 @@ export async function AccountHome() {
 
       <div className="grid gap-5 md:grid-cols-2">
         <section aria-labelledby="needs-you" className={`${panel} flex flex-col gap-3`}>
-          <h2 id="needs-you" className="text-lg font-extrabold">Needs you</h2>
+          <h2 id="needs-you" className="text-lg font-extrabold">
+            Needs you
+          </h2>
           {unpaid.length === 0 && unrated.length === 0 && (
             <p className="text-muted text-sm">Nothing waiting on you.</p>
           )}
           {unpaid.slice(0, 3).map((o) => (
             <div key={o.id} className="flex items-start gap-3 rounded-xl bg-[#fdecea] p-3">
               <div className="min-w-0 flex-1">
-                <p className="font-bold">Payment not finished · {merchantName(activity, o.merchant_id)}</p>
-                <p className="text-muted text-[0.8125rem]">{kes(o.total_cents)} · {o.reference}</p>
+                <p className="font-bold">
+                  Payment not finished · {merchantName(activity, o.merchant_id)}
+                </p>
+                <p className="text-muted text-[0.8125rem]">
+                  {kes(o.total_cents)} · {o.reference}
+                </p>
               </div>
-              <Link href={`/pay/${o.reference}`} className="bg-ink inline-flex min-h-11 shrink-0 items-center rounded-full px-4 font-bold text-white no-underline">
+              <Link
+                href={`/pay/${o.reference}`}
+                className="bg-ink inline-flex min-h-11 shrink-0 items-center rounded-full px-4 font-bold text-white no-underline"
+              >
                 Pay
               </Link>
             </div>
@@ -130,9 +163,14 @@ export async function AccountHome() {
             <div key={o.id} className="flex items-start gap-3 rounded-xl bg-[#f6f3ec] p-3">
               <div className="min-w-0 flex-1">
                 <p className="font-bold">How was {merchantName(activity, o.merchant_id)}?</p>
-                <p className="text-muted text-[0.8125rem]">Delivered {date(o.placed_at)}. Your rating helps the next guest.</p>
+                <p className="text-muted text-[0.8125rem]">
+                  Delivered {date(o.placed_at)}. Your rating helps the next guest.
+                </p>
               </div>
-              <Link href={`/account/orders/${o.id}#rate`} className="border-border-strong text-ink inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 font-bold no-underline">
+              <Link
+                href={`/account/orders/${o.id}#rate`}
+                className="border-border-strong text-ink inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 font-bold no-underline"
+              >
                 Rate
               </Link>
             </div>
@@ -141,13 +179,20 @@ export async function AccountHome() {
 
         <section aria-labelledby="coming-up" className={`${panel} flex flex-col gap-1`}>
           <div className="mb-2 flex items-baseline justify-between">
-            <h2 id="coming-up" className="text-lg font-extrabold">Coming up</h2>
-            <Link href="/account?tab=bookings" className="text-sm font-bold">All bookings</Link>
+            <h2 id="coming-up" className="text-lg font-extrabold">
+              Coming up
+            </h2>
+            <Link href="/account?tab=bookings" className="text-sm font-bold">
+              All bookings
+            </Link>
           </div>
           {ahead.length === 0 && <p className="text-muted text-sm">No bookings or stays ahead.</p>}
           {ahead.map((item) =>
             item.kind === 'booking' ? (
-              <div key={item.booking.id} className="border-border flex items-center gap-3 border-b py-2.5 last:border-0">
+              <div
+                key={item.booking.id}
+                className="border-border flex items-center gap-3 border-b py-2.5 last:border-0"
+              >
                 <div className="min-w-0 flex-1">
                   <p className="font-bold">
                     {item.booking.resource_name}
@@ -155,12 +200,17 @@ export async function AccountHome() {
                   </p>
                   <p className="text-muted text-[0.8125rem]">{dateTime(item.booking.starts_at)}</p>
                 </div>
-                <span className={`${pill} ${item.booking.status === 'confirmed' ? 'bg-success-bg text-success' : 'bg-gold-soft text-gold-text'}`}>
+                <span
+                  className={`${pill} ${item.booking.status === 'confirmed' ? 'bg-success-bg text-success' : 'bg-gold-soft text-gold-text'}`}
+                >
                   {item.booking.status === 'confirmed' ? 'Confirmed' : 'Waiting'}
                 </span>
               </div>
             ) : (
-              <div key={item.stay.id} className="border-border flex items-center gap-3 border-b py-2.5 last:border-0">
+              <div
+                key={item.stay.id}
+                className="border-border flex items-center gap-3 border-b py-2.5 last:border-0"
+              >
                 <div className="min-w-0 flex-1">
                   <p className="font-bold">Stay</p>
                   <p className="text-muted text-[0.8125rem]">
@@ -178,12 +228,20 @@ export async function AccountHome() {
 
       <section aria-labelledby="recent-orders" className={panel}>
         <div className="mb-2 flex items-baseline justify-between">
-          <h2 id="recent-orders" className="text-lg font-extrabold">Recent orders</h2>
-          <Link href="/account?tab=orders" className="text-sm font-bold">All orders</Link>
+          <h2 id="recent-orders" className="text-lg font-extrabold">
+            Recent orders
+          </h2>
+          <Link href="/account?tab=orders" className="text-sm font-bold">
+            All orders
+          </Link>
         </div>
         {recent.length === 0 ? (
           <p className="text-muted text-sm">
-            No orders yet. <Link href="/discover" className="font-bold">Find something on Discovery</Link>.
+            No orders yet.{' '}
+            <Link href="/discover" className="font-bold">
+              Find something on Discovery
+            </Link>
+            .
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -194,25 +252,39 @@ export async function AccountHome() {
                   <th className="border-border border-b py-2 pr-2">From</th>
                   <th className="border-border border-b py-2 pr-2">Status</th>
                   <th className="border-border border-b py-2 pr-2 text-right">Total</th>
-                  <th className="border-border border-b py-2"><span className="sr-only">Actions</span></th>
+                  <th className="border-border border-b py-2">
+                    <span className="sr-only">Actions</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {recent.map((o) => (
                   <tr key={o.id}>
                     <td className="border-border border-b py-2.5 pr-2">
-                      <Link href={`/account/orders/${o.id}`} className="font-bold">{o.reference}</Link>
+                      <Link href={`/account/orders/${o.id}`} className="font-bold">
+                        {o.reference}
+                      </Link>
                       <br />
                       <span className="text-muted text-[0.75rem]">{date(o.placed_at)}</span>
                     </td>
-                    <td className="border-border border-b py-2.5 pr-2 font-bold">{merchantName(activity, o.merchant_id)}</td>
-                    <td className="border-border border-b py-2.5 pr-2">{STAGE_LABEL[o.stage] ?? o.stage}</td>
-                    <td className="border-border border-b py-2.5 pr-2 text-right font-bold">{kes(o.total_cents)}</td>
+                    <td className="border-border border-b py-2.5 pr-2 font-bold">
+                      {merchantName(activity, o.merchant_id)}
+                    </td>
+                    <td className="border-border border-b py-2.5 pr-2">
+                      {STAGE_LABEL[o.stage] ?? o.stage}
+                    </td>
+                    <td className="border-border border-b py-2.5 pr-2 text-right font-bold">
+                      {kes(o.total_cents)}
+                    </td>
                     <td className="border-border border-b py-2.5 text-right">
                       {o.merchant_id && again.has(o.merchant_id) ? (
-                        <a href={`/discover?merchant=${o.merchant_id}`} className="font-bold">Order again</a>
+                        <a href={`/discover?merchant=${o.merchant_id}`} className="font-bold">
+                          Order again
+                        </a>
                       ) : (
-                        <Link href={`/account/orders/${o.id}`} className="font-bold">Details</Link>
+                        <Link href={`/account/orders/${o.id}`} className="font-bold">
+                          Details
+                        </Link>
                       )}
                     </td>
                   </tr>
@@ -223,12 +295,19 @@ export async function AccountHome() {
         )}
       </section>
 
-      <section className={`${panel} bg-gold-soft flex flex-wrap items-center justify-between gap-3`}>
+      <section
+        className={`${panel} bg-gold-soft flex flex-wrap items-center justify-between gap-3`}
+      >
         <div>
           <h2 className="text-base font-extrabold">Something wrong with an order?</h2>
-          <p className="text-muted text-sm">Open the order and report it. We sort it out with the business.</p>
+          <p className="text-muted text-sm">
+            Open the order and report it. We sort it out with the business.
+          </p>
         </div>
-        <Link href="/help" className="bg-ink inline-flex min-h-11 items-center rounded-full px-5 font-bold text-white no-underline">
+        <Link
+          href="/help"
+          className="bg-ink inline-flex min-h-11 items-center rounded-full px-5 font-bold text-white no-underline"
+        >
           Get help
         </Link>
       </section>

@@ -1,0 +1,24 @@
+NEXG
+
+PAYOUT SENT
+{{ total }}
+to {{ payout_destination }}
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, we’ve sent your
+earnings. {{ arrival_note }}
+
+View statement:
+{{ host_url }}
+
+PAYOUT RECEIPT {{ receipt_number }}
+{{#items}}  {{ quantity }} x {{ name }}  {{ amount }}{{#choices}}
+    {{ choices }}{{/choices}}
+{{/items}}{{#price_lines}}  {{ label }}  {{ amount }}
+{{/price_lines}}  TOTAL SENT  {{ total }}
+Payment: {{ payment_method }}{{#payment_reference}} · {{ payment_reference }}{{/payment_reference}}, sent {{ paid_at }}
+{{ record_label }} {{ record_number }} · Receipt {{ receipt_number }}
+Asante for hosting with NexG
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you host with NexG · NexG, nexgapp.com

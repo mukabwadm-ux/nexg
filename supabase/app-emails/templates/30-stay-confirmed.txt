@@ -1,0 +1,41 @@
+NEXG
+
+STAY BOOKED
+{{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
+{{ date_title }}
+
+{{ property_name }}
+{{#area}}{{ area }}
+{{/area}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, your stay is booked.
+We’ll send the exact address and how to get in 2 days before you arrive.
+
+YOUR STAY
+  Check in: {{ check_in }}
+  Check out: {{ check_out }}
+  Guests: {{ guests }}
+  Booking: {{ booking_number }}
+
+View your stay:
+{{ activity_url }}
+
+{{#calendar_url}}Add to calendar: {{ calendar_url }}
+{{/calendar_url}}
+Your check-in code is in the app. You’ll show it when you arrive.
+
+RECEIPT {{ receipt_number }}
+{{#items}}  {{ quantity }} x {{ name }}  {{ amount }}{{#choices}}
+    {{ choices }}{{/choices}}
+{{/items}}{{#price_lines}}  {{ label }}  {{ amount }}
+{{/price_lines}}  TOTAL PAID  {{ total }}
+Payment: {{ payment_method }}{{#payment_reference}} · {{ payment_reference }}{{/payment_reference}}, paid {{ paid_at }}
+{{ record_label }} {{ record_number }} · Receipt {{ receipt_number }}
+Asante for staying with NexG
+
+{{#cancellation_terms}}CHANGING YOUR PLANS
+{{ cancellation_terms }} Do it from the stay in the app.
+{{/cancellation_terms}}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you booked a stay through NexG · NexG, nexgapp.com
