@@ -12,6 +12,21 @@ export interface Property extends Base {
   area: string;
   image: string;
   status: string;
+  /* The exact map pin guests see. */
+  lat?: number;
+  lng?: number;
+  amenities?: string[];
+  neighbourhoodNote?: string;
+  houseRules?: string;
+  cancellationPolicy?: string;
+}
+/** The publish switch and what a unit still needs before it can go live. */
+export interface UnitListing {
+  published: boolean;
+  listed: boolean;
+  /** NexG took the property off the site; it shows again once NexG lists it. */
+  heldByStaff: boolean;
+  missing: string[];
 }
 export interface Unit extends Base {
   propertyId: string;
@@ -33,6 +48,14 @@ export interface Unit extends Base {
   map?: string;
   modelId?: string;
   modelName?: string;
+  lat?: number;
+  lng?: number;
+  amenities?: string[];
+  bedSetup?: string;
+  sizeSqm?: number;
+  summary?: string;
+  minNights?: number;
+  listing?: UnitListing;
 }
 export interface Stay extends Base {
   ref: string;
@@ -204,7 +227,8 @@ export interface Command {
     | 'settings'
     | 'theme'
     | 'referral'
-    | 'sign-out-others';
+    | 'sign-out-others'
+    | 'listing';
   collection?: Collection | 'workspace-task';
   id?: string;
   record?: Record<string, unknown>;
@@ -298,5 +322,7 @@ export interface WorkspaceSnapshot {
   data: WorkspaceData;
   today: string;
   propertyWrites: boolean;
+  /** The site's browser Maps key and Map ID, when both are configured. */
+  maps?: { key: string; mapId: string } | null;
   setup: HostSetup;
 }

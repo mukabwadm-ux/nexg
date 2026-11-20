@@ -9,6 +9,7 @@ import {
   HOST_REQUEST_STATUSES,
   HOST_REQUEST_TYPES,
   KINDS,
+  LISTING_TEXT_MAX,
   SPOTS,
 } from '@/lib/host-workspace/vocab';
 import { EVENTS, FEATURES, ROLES } from '@/lib/host-workspace/settings-vocab';
@@ -24,6 +25,15 @@ const note = z.string().trim().max(4000);
 const time = z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/);
 const day = z.string().date();
 const positiveInt = z.number().int().positive().max(1_000_000);
+/* What a guest reads. An empty string clears the field. */
+const listingText = z.string().trim().max(LISTING_TEXT_MAX);
+const amenities = z.array(z.string().trim().min(1).max(80)).max(40);
+const pin = {
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
+};
+const pinComplete = (value: { lat?: number; lng?: number }) =>
+  (value.lat === undefined) === (value.lng === undefined);
 const scopeError = () =>
   new HostWorkspaceError(403, 'This record is outside your workspace access.');
 const invalid = (message: string) => new HostWorkspaceError(400, message);
@@ -273,6 +283,7 @@ const commandSchema = z.object({
     'restore',
     'unpublish',
     'remove-guide-file',
+    'listing',
   ]),
   collection: z.string().optional(),
   id: uuid.optional(),
@@ -422,7 +433,13 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
         checkInFrom: time.optional(),
         checkOutBy: time.optional(),
         kind: z.string().refine((kind) => KINDS.some((item) => item.value === kind)),
+        ...pin,
+        amenities: amenities.optional(),
+        neighbourhoodNote: listingText.optional(),
+        houseRules: listingText.optional(),
+        cancellationPolicy: listingText.optional(),
       })
+      .refine(pinComplete, { message: 'Place the map pin again.', path: ['lat'] })
       .parse(record);
     return checked(
       await db.rpc('rpc_property_upsert', {
@@ -437,6 +454,12 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
           summary: property.summary,
           check_in_from: property.checkInFrom,
           check_out_by: property.checkOutBy,
+          lat: property.lat,
+          lng: property.lng,
+          amenities: property.amenities,
+          neighbourhood_note: property.neighbourhoodNote,
+          house_rules: property.houseRules,
+          cancellation_policy: property.cancellationPolicy,
         },
       }),
       'Property saved.',
@@ -486,7 +509,14 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
         deliveryTo: time.optional(),
         checkInFrom: time.optional(),
         checkOutBy: time.optional(),
+        ...pin,
+        amenities: amenities.optional(),
+        bedSetup: z.string().trim().max(200).optional(),
+        sizeSqm: z.number().int().min(1).max(100_000).optional(),
+        summary: listingText.optional(),
+        minNights: z.number().int().min(1).max(365).optional(),
       })
+      .refine(pinComplete, { message: 'Place the map pin again.', path: ['lat'] })
       .parse(record);
     if (!id && !unit.propertyId) throw invalid('Choose a property for the unit.');
     if (Boolean(unit.deliveryFrom) !== Boolean(unit.deliveryTo))
@@ -512,6 +542,13 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
           handoff_note: unit.handoffNote,
           checkin_time: unit.checkInFrom,
           checkout_time: unit.checkOutBy,
+          lat: unit.lat,
+          lng: unit.lng,
+          unit_amenities: unit.amenities,
+          bed_setup: unit.bedSetup,
+          size_sqm: unit.sizeSqm,
+          unit_summary: unit.summary,
+          min_nights: unit.minNights,
           delivery_hours:
             unit.deliveryFrom && unit.deliveryTo
               ? { from: unit.deliveryFrom, to: unit.deliveryTo }
@@ -520,6 +557,28 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
       }),
       'Unit saved.',
     );
+  }
+
+  /* The publish switch. Owners and managers with every unit only: going
+     live is an account decision, not a unit task. */
+  if (command.type === 'listing' && collection === 'units' && id) {
+    if (unitScope) throw scopeError();
+    const { published } = z.object({ published: z.boolean() }).parse(record);
+    const result = await db.rpc('rpc_unit_set_published', {
+      p_unit: id,
+      p_published: published,
+    });
+    const done = checked(
+      result,
+      published ? 'Unit published on NEXG Stays.' : 'Unit taken off NEXG Stays.',
+    );
+    const state = result.data as { held_by_staff?: boolean } | null;
+    return published && state?.held_by_staff
+      ? {
+          message:
+            'Unit published. NexG has taken this property off the site, so guests will see it once NexG lists it again.',
+        }
+      : done;
   }
 
   if (command.type === 'save' && collection === 'calendarConnections' && !id) {

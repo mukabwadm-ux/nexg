@@ -42,6 +42,38 @@ export async function allRows<T>(
   }
 }
 
+/**
+ * A pin from a PostGIS point as PostgREST returns it: GeoJSON, or the hex
+ * EWKB string (byte order, type with an SRID flag, optional SRID, x, y).
+ */
+export function pinOf(point: unknown): { lat: number; lng: number } | null {
+  let lng: number | undefined;
+  let lat: number | undefined;
+  if (point && typeof point === 'object' && 'coordinates' in point) {
+    const coordinates = (point as { coordinates?: unknown }).coordinates;
+    if (Array.isArray(coordinates)) [lng, lat] = coordinates as number[];
+  } else if (typeof point === 'string' && /^[0-9a-f]+$/i.test(point) && point.length >= 42) {
+    const bytes = Buffer.from(point, 'hex');
+    const little = bytes[0] === 1;
+    const type = little ? bytes.readUInt32LE(1) : bytes.readUInt32BE(1);
+    if ((type & 0xff) !== 1) return null;
+    const offset = type & 0x20000000 ? 9 : 5;
+    if (bytes.length < offset + 16) return null;
+    lng = little ? bytes.readDoubleLE(offset) : bytes.readDoubleBE(offset);
+    lat = little ? bytes.readDoubleLE(offset + 8) : bytes.readDoubleBE(offset + 8);
+  }
+  if (typeof lat !== 'number' || typeof lng !== 'number') return null;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return { lat: Number(lat.toFixed(6)), lng: Number(lng.toFixed(6)) };
+}
+
+/** The browser Maps key and Map ID the site already uses, when both are set. */
+function mapsConfig() {
+  const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
+  const mapId = process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID ?? '';
+  return key && mapId ? { key, mapId } : null;
+}
+
 export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<WorkspaceSnapshot> {
   const { db, hostId, unitScope } = access;
   const units =
@@ -51,7 +83,7 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
           const query = db
             .from('unit')
             .select(
-              'id, property_id, name, status, max_guests, bedrooms, bathrooms, nightly_rate_kes, photos, caretaker_name, handoff, label_public, floor, address_line, building, unit_no, handoff_note, delivery_hours, checkin_time, checkout_time',
+              'id, property_id, name, status, max_guests, bedrooms, bathrooms, nightly_rate_kes, photos, caretaker_name, handoff, label_public, floor, address_line, building, unit_no, handoff_note, delivery_hours, checkin_time, checkout_time, point, unit_amenities, bed_setup, size_sqm, unit_summary, min_nights',
             )
             .eq('host_id', hostId)
             .is('archived_at', null);
@@ -61,6 +93,11 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
   const propertyIds = Array.from(
     new Set(units.flatMap((unit) => (unit.property_id ? [unit.property_id] : []))),
   );
+  /* Started now, read after the rest: what each unit needs before it can go live. */
+  const checklistLoad = (async () =>
+    unitScope?.length === 0
+      ? { data: [], error: null }
+      : await db.rpc('rpc_host_listing_checklist', { p_host_id: hostId }))();
 
   const [
     properties,
@@ -93,7 +130,7 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
           const query = db
             .from('property')
             .select(
-              'id, name, area, kind, photos, description, listed, floors, summary, check_in_from, check_out_by',
+              'id, name, area, kind, photos, description, listed, floors, summary, check_in_from, check_out_by, point, amenities, neighbourhood_note, house_rules, cancellation_policy',
             )
             .eq('host_id', hostId)
             .is('deleted_at', null);
@@ -323,6 +360,9 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
       },
     ]),
   );
+  const checklist = new Map(
+    (loaded(await checklistLoad) ?? []).map((row) => [row.unit_id, row] as const),
+  );
   const settings = loaded(settingsResult);
   const profileRow = loaded(profileResult);
   const savedProfile = profileRow?.workspace_profile;
@@ -359,6 +399,20 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
     }
   }
   const image = (id: string) => photoUrls.get(covers.get(id) ?? '') ?? '';
+
+  const pinFields = (point: unknown) => {
+    const at = pinOf(point);
+    return at ? { lat: at.lat, lng: at.lng } : {};
+  };
+  const listingOf = (unitId: string) => {
+    const row = checklist.get(unitId);
+    return {
+      published: row?.published === true,
+      listed: row?.listed === true,
+      heldByStaff: row?.held_by_staff === true,
+      missing: row?.missing ?? [],
+    };
+  };
 
   const stayStatus: Record<string, string> = {
     booked: 'Confirmed',
@@ -404,6 +458,11 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
         summary: row.summary ?? '',
         checkInFrom: row.check_in_from?.slice(0, 5) ?? '',
         checkOutBy: row.check_out_by?.slice(0, 5) ?? '',
+        ...pinFields(row.point),
+        amenities: row.amenities ?? [],
+        neighbourhoodNote: row.neighbourhood_note ?? '',
+        houseRules: row.house_rules ?? '',
+        cancellationPolicy: row.cancellation_policy ?? '',
       }))
       .sort((a, b) => a.name.localeCompare(b.name)),
     units: units
@@ -445,6 +504,13 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
             deliveryTo,
             checkInFrom: row.checkin_time?.slice(0, 5) ?? '',
             checkOutBy: row.checkout_time?.slice(0, 5) ?? '',
+            ...pinFields(row.point),
+            amenities: row.unit_amenities ?? [],
+            bedSetup: row.bed_setup ?? '',
+            sizeSqm: row.size_sqm ?? undefined,
+            summary: row.unit_summary ?? '',
+            minNights: row.min_nights ?? 1,
+            listing: listingOf(row.id),
           },
         ];
       })
@@ -807,6 +873,7 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
     data,
     today: dateKey(new Date(), zone),
     propertyWrites: !unitScope,
+    maps: mapsConfig(),
     setup: {
       live: setup?.is_live === true,
       status: label(setup?.status ?? null),
