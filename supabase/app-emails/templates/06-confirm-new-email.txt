@@ -8,12 +8,12 @@ Confirm my new email:
 {{ confirm_url }}
 
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, tap the button, or
-type the code into the NexG app, to start using {{ new_email }} for
-NexG. Both work once, for 10 minutes.
+type the code into the NEXG app, to start using {{ new_email }} for
+NEXG. Both work once, for 10 minutes.
 
 DIDN’T ASK FOR THIS?
-You can ignore this email. Your NexG email won’t change.
+You can ignore this email. Your NEXG email won’t change.
 
 --
 Questions? Open Help in the app or write to info@nexgapp.com.
-You’re getting this because of your NexG account · NexG, nexgapp.com
+You’re getting this because of your NEXG account · NEXG, nexgapp.com

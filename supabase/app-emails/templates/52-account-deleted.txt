@@ -4,7 +4,7 @@ ACCOUNT DELETED
 Your account is deleted
 {{ deleted_at }}
 
-Hi{{#first_name}} {{ first_name }}{{/first_name}}, your NexG account is
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, your NEXG account is
 deleted, as you asked. Your profile, addresses, saved places and saved
 cards are gone.
 
@@ -14,9 +14,9 @@ off.
 
 Didn’t do this? Write to info@nexgapp.com straight away.
 
-Thanks for using NexG. You can order as a guest or make a new account
+Thanks for using NEXG. You can order as a guest or make a new account
 any time.
 
 --
 Questions? Open Help in the app or write to info@nexgapp.com.
-You’re getting this because you asked to delete your NexG account · NexG, nexgapp.com
+You’re getting this because you asked to delete your NEXG account · NEXG, nexgapp.com

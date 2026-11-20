@@ -29,7 +29,7 @@ You pay {{ business_name }} {{ pay_later }}.
 {{/price_lines}}  TOTAL PAID  {{ total }}
 Payment: {{ payment_method }}{{#payment_reference}} · {{ payment_reference }}{{/payment_reference}}, paid {{ paid_at }}
 {{ record_label }} {{ record_number }} · Receipt {{ receipt_number }}
-Asante for booking with NexG
+Asante for booking with NEXG
 {{/paid}}
 {{#cancellation_terms}}CHANGING YOUR PLANS
 {{ cancellation_terms }} Do it from the booking in the app.
@@ -37,4 +37,4 @@ Asante for booking with NexG
 
 --
 Questions? Open Help in the app or write to info@nexgapp.com.
-You’re getting this because you booked through NexG · NexG, nexgapp.com
+You’re getting this because you booked through NEXG · NEXG, nexgapp.com

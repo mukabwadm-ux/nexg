@@ -21,8 +21,8 @@ DEPOSIT RECEIPT {{ receipt_number }}
 {{/price_lines}}  DEPOSIT PAID  {{ total }}
 Payment: {{ payment_method }}{{#payment_reference}} · {{ payment_reference }}{{/payment_reference}}, paid {{ paid_at }}
 {{ record_label }} {{ record_number }} · Receipt {{ receipt_number }}
-Asante for booking with NexG
+Asante for booking with NEXG
 
 --
 Questions? Open Help in the app or write to info@nexgapp.com.
-You’re getting this because you booked through NexG · NexG, nexgapp.com
+You’re getting this because you booked through NEXG · NEXG, nexgapp.com

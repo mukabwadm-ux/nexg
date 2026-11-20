@@ -8,7 +8,7 @@ How was your stay?
 {{#area}}{{ area }}
 {{/area}}
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, thanks for staying
-with NexG. A quick rating helps the next guest and helps your host.
+with NEXG. A quick rating helps the next guest and helps your host.
 
 Rate your stay:
 {{ activity_url }}
@@ -17,4 +17,4 @@ Your receipt stays in Activity in the app.
 
 --
 Questions? Open Help in the app or write to info@nexgapp.com.
-You’re getting this because you booked a stay through NexG · NexG, nexgapp.com
+You’re getting this because you booked a stay through NEXG · NEXG, nexgapp.com

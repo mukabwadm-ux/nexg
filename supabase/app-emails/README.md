@@ -1,4 +1,4 @@
-# App emails (NexG and NexG Stays)
+# App emails (NEXG and NEXG Stays)
 
 Customer emails for the phone apps, sent by the backend when the event happens, through the email system the site and portals already use: `fn_notify_enqueue` → `notification_outbox` → `notify-dispatch` → Resend, with the sender and an on/off switch per group in **Admin > Settings > Email routing**. Everything is built **off**.
 
@@ -10,7 +10,8 @@ Customer emails for the phone apps, sent by the backend when the event happens, 
 | Copies the database sends             | `supabase/app-emails/templates/<id>.html` and `.txt`, `catalog.json` (subject, group, required, choice, sample) |
 | Supabase Auth versions (Go templates) | `supabase/templates/app/`                                                                                       |
 | The system                            | `supabase/migrations/20270128000200_app_emails.sql` (schema `app_email`)                                        |
-| The stored templates                  | `supabase/migrations/20270128000200_app_email_templates.sql`, generated                                         |
+| The sender of every group             | `supabase/migrations/20270128000400_app_email_sender.sql`                                                       |
+| The stored templates                  | the newest `supabase/migrations/*_app_email_templates.sql`, generated                                           |
 | The wordmark pictures                 | `apps/web/public/email/app/` (served at `https://www.nexgapp.com/email/app/` once the website deploys)          |
 | Tests                                 | `supabase/tests/99_app_emails.sql`, `supabase/functions/notify-dispatch/email.test.ts`                          |
 
@@ -37,7 +38,7 @@ Staff with Settings access can call `rpc_app_email_preview(p_key, p_vars)`. Noth
 
 ## Turning it on (the owner)
 
-1. **Sender.** In Resend, confirm the domain `nexgapp.com` is verified for `info@nexgapp.com` (the sender of every app group; change it per group in Email routing). `notify-dispatch` needs `RESEND_API_KEY` and `EMAIL_FROM` set as function secrets, and the Vault pair `notify_dispatch_url` / `notify_dispatch_secret`, as for the emails that already go out.
+1. **Sender.** Every app group sends from **NEXG Concierge <no-reply@nexgapp.com>**, and replies go to `info@nexgapp.com` (owner, 20 Nov 2026; change it per group in Email routing). In Resend, confirm the domain `nexgapp.com` is verified. `notify-dispatch` needs `RESEND_API_KEY` and `EMAIL_FROM` set as function secrets, and the Vault pair `notify_dispatch_url` / `notify_dispatch_secret`, as for the emails that already go out.
 2. **Deploy** the migrations, the `notify-dispatch` function (it now sends the HTML part) and the website (for the wordmark pictures).
 3. **One test send to your own address:** switch on one group, for example **App emails: help**, then send a help request from the app signed in with your own email. Check `select * from app_email.sent order by created_at desc` and `notification_log`.
 4. **Switch on** the groups you want in Admin > Settings > Email routing: `App emails: orders`, `bookings`, `stays`, `help`, `your data`. While a group is on, its email replaces the plain receipt and order bell emails it covers, so the customer gets one email.
@@ -50,16 +51,16 @@ In the Supabase dashboard, **Authentication > Emails**:
 
 | Email                  | Dashboard template                                       | Subject                         | Body file                                                                                                                                  |
 | ---------------------- | -------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| 01 Confirm your email  | Confirm signup                                           | Confirm your email for NexG     | `supabase/templates/app/confirm-signup.html`                                                                                               |
-| 02 Sign-in code        | Magic link                                               | Your NexG sign-in code          | `supabase/templates/app/magic-link.html`                                                                                                   |
-| 04 Reset password      | Reset password                                           | Reset your NexG password        | `supabase/templates/app/reset-password.html` (only once the welcome branches in `password-recovery.html` have a new home: shared-services) |
-| 06 Confirm a new email | Change email address                                     | Confirm your new email for NexG | `supabase/templates/app/email-change.html`                                                                                                 |
-| 05 Password changed    | Security notifications > Password changed (turn on)      | Your NexG password was changed  | `supabase/templates/app/password-changed.html`                                                                                             |
-| 07 Email changed       | Security notifications > Email address changed (turn on) | Your NexG email was changed     | `supabase/templates/app/email-changed.html`                                                                                                |
+| 01 Confirm your email  | Confirm signup                                           | Confirm your email for NEXG     | `supabase/templates/app/confirm-signup.html`                                                                                               |
+| 02 Sign-in code        | Magic link                                               | Your NEXG sign-in code          | `supabase/templates/app/magic-link.html`                                                                                                   |
+| 04 Reset password      | Reset password                                           | Reset your NEXG password        | `supabase/templates/app/reset-password.html` (only once the welcome branches in `password-recovery.html` have a new home: shared-services) |
+| 06 Confirm a new email | Change email address                                     | Confirm your new email for NEXG | `supabase/templates/app/email-change.html`                                                                                                 |
+| 05 Password changed    | Security notifications > Password changed (turn on)      | Your NEXG password was changed  | `supabase/templates/app/password-changed.html`                                                                                             |
+| 07 Email changed       | Security notifications > Email address changed (turn on) | Your NEXG email was changed     | `supabase/templates/app/email-changed.html`                                                                                                |
 
 Also in Authentication:
 
-- **SMTP** (Settings > SMTP): host `smtp.resend.com`, port `465`, user `resend`, password = a Resend API key the owner types in, sender `info@nexgapp.com`, name `NexG`. Without it Supabase's own mailer sends, with low limits.
+- **SMTP** (Settings > SMTP): host `smtp.resend.com`, port `465`, user `resend`, password = a Resend API key the owner types in, sender `no-reply@nexgapp.com`, name `NEXG Concierge` (set by the owner, 20 Nov 2026). Without it Supabase's own mailer sends, with low limits.
 - **Email OTP length** 6 and **expiry** 600 seconds (the emails say "10 minutes"; `config.toml` already has `otp_length = 6`, `otp_expiry = 600`).
 - **Redirect URLs** (URL Configuration): add the app's return link, `nexg://auth/confirm` (and the Stays scheme), so the one-tap button lands in the app. Until nexgapp.com has universal links, a tap on a phone opens the website.
 - **Secure email change** is on (`double_confirm_changes`), so 06 goes to both the old and the new address.

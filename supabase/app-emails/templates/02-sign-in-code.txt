@@ -4,18 +4,18 @@ SIGN IN
 
 Your code: {{ code }}
 
-Sign in to NexG:
+Sign in to NEXG:
 {{ sign_in_url }}
 
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, tap the button, or
-type the code into the NexG app, to sign in. Both work once, for 10
+type the code into the NEXG app, to sign in. Both work once, for 10
 minutes.
 
-Never share this code, not even with someone who says they’re from NexG.
+Never share this code, not even with someone who says they’re from NEXG.
 
 DIDN’T ASK FOR THIS?
 You can ignore this email. No one can sign in without the code.
 
 --
 Questions? Open Help in the app or write to info@nexgapp.com.
-You’re getting this because of your NexG account · NexG, nexgapp.com
+You’re getting this because of your NEXG account · NEXG, nexgapp.com

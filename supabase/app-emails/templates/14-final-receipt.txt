@@ -21,8 +21,8 @@ FINAL RECEIPT {{ receipt_number }}
 {{/price_lines}}  TOTAL PAID  {{ total }}
 Payment: {{ payment_method }}{{#payment_reference}} · {{ payment_reference }}{{/payment_reference}}, paid {{ paid_at }}
 {{ record_label }} {{ record_number }} · Receipt {{ receipt_number }}
-Asante for ordering with NexG
+Asante for ordering with NEXG
 
 --
 Questions? Open Help in the app or write to info@nexgapp.com.
-You’re getting this because you ordered on NexG · NexG, nexgapp.com
+You’re getting this because you ordered on NEXG · NEXG, nexgapp.com

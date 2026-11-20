@@ -1,10 +1,10 @@
 NEXG
 
 APPROVED
-You’re live on NexG
+You’re live on NEXG
 
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, your documents are
-approved. A unit appears on NexG as soon as it has an address, a
+approved. A unit appears on NEXG as soon as it has an address, a
 hand-over, a nightly rate, the number of guests and bedrooms, and at
 least one photo.
 
@@ -13,4 +13,4 @@ Open your host workspace:
 
 --
 Questions? Open Help in the app or write to info@nexgapp.com.
-You’re getting this because you host with NexG · NexG, nexgapp.com
+You’re getting this because you host with NEXG · NEXG, nexgapp.com

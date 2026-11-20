@@ -54,7 +54,7 @@ select results_eq($$
   select o.recipient, o.template, o.payload ->> 'from', o.sensitive
     from public.notification_outbox o where o.template = 'app_support.41-support-received'
 $$, $$ values ('amani.app-email@example.com'::text, 'app_support.41-support-received'::text,
-               'NexG Support <info@nexgapp.com>'::text, false) $$,
+               'NEXG Concierge <no-reply@nexgapp.com>'::text, false) $$,
   'through fn_notify_enqueue, to the account''s email, with the route''s sender');
 
 select ok((select o.html like '%&lt;b&gt;Juice&lt;/b&gt; &amp; chips%' and o.body like '%<b>Juice</b> & chips%'

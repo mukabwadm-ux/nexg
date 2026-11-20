@@ -17,8 +17,8 @@ PAYOUT RECEIPT {{ receipt_number }}
 {{/price_lines}}  TOTAL SENT  {{ total }}
 Payment: {{ payment_method }}{{#payment_reference}} · {{ payment_reference }}{{/payment_reference}}, sent {{ paid_at }}
 {{ record_label }} {{ record_number }} · Receipt {{ receipt_number }}
-Asante for hosting with NexG
+Asante for hosting with NEXG
 
 --
 Questions? Open Help in the app or write to info@nexgapp.com.
-You’re getting this because you host with NexG · NexG, nexgapp.com
+You’re getting this because you host with NEXG · NEXG, nexgapp.com
