@@ -1,5 +1,6 @@
 'use client';
 
+import { readPositionOnce } from '@nexg/location';
 import { maps as mapsCapability } from '@nexg/ui/capabilities';
 import dynamic from 'next/dynamic';
 import * as React from 'react';
@@ -60,23 +61,24 @@ export function MapPinField({
     setOpen(true);
   };
 
-  const here = () => {
-    if (!navigator.geolocation) {
-      setProblem('This browser cannot share its location. Drop the pin on the map instead.');
-      return;
-    }
+  /* Escape closes the map, like any dialog. */
+  React.useEffect(() => {
+    if (!open) return;
+    const close = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', close);
+    return () => window.removeEventListener('keydown', close);
+  }, [open]);
+
+  /* Read inside the click, through the one sanctioned geolocation helper. */
+  const here = async () => {
     setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocating(false);
-        setPicked({ lat: position.coords.latitude, lng: position.coords.longitude });
-      },
-      () => {
-        setLocating(false);
-        setProblem('Your location could not be read. Allow location access, or drop the pin.');
-      },
-      { enableHighAccuracy: true, timeout: 15000 },
-    );
+    setProblem(null);
+    const result = await readPositionOnce({ highAccuracy: true });
+    setLocating(false);
+    if (result.ok) setPicked({ lat: result.fix.lat, lng: result.fix.lng });
+    else setProblem(result.message);
   };
 
   return (
@@ -107,9 +109,6 @@ export function MapPinField({
           aria-modal="true"
           aria-labelledby={`${id}-map-title`}
           className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4"
-          onClick={(event) => {
-            if (event.target === event.currentTarget) setOpen(false);
-          }}
         >
           <div className="bg-surface w-full max-w-2xl rounded-t-2xl p-4 sm:rounded-2xl">
             <h3 id={`${id}-map-title`} className="text-base font-extrabold">

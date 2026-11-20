@@ -195,14 +195,14 @@ select is(
   array['gr_substitution_confirmed'], 'a confirmation must be Yes to count');
 
 select ok(pg_temp.docs('0e710000-0000-4000-8000-0000000000c1')
-            @> array['business_registration_cert', 'kra_pin', 'owner_id', 'transfer_compliance_bundle'],
-  'every merchant owes the ID copy, KRA PIN and registration certificates; transfers owe their bundle');
-select ok(not (pg_temp.docs('0e710000-0000-4000-8000-0000000000c1') && array['business_permit']),
-  'airport transfers do not owe a county permit');
+            @> array['business_permit', 'business_registration_cert', 'kra_pin', 'transfer_compliance_bundle'],
+  'every merchant is asked for the permit, KRA PIN and registration certificates; transfers owe their bundle');
+select ok(not (pg_temp.docs('0e710000-0000-4000-8000-0000000000c1') && array['owner_id']),
+  'nobody is asked for the owner ID any more (20270126000200)');
 select ok(pg_temp.docs('0e710000-0000-4000-8000-0000000000c3') @> array['business_permit'],
   'groceries always owe the county permit');
-select ok(not (pg_temp.docs('0e710000-0000-4000-8000-0000000000c2') && array['business_permit']),
-  'wellness owes no permit before saying it works in person');
+select ok(pg_temp.docs('0e710000-0000-4000-8000-0000000000c2') @> array['business_permit'],
+  'every category owes the county business permit (20270126000200)');
 
 set local role authenticated;
 select pg_temp.as_user('0e710000-0000-4000-8000-0000000000a4');
