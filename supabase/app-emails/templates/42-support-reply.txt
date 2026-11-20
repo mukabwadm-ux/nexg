@@ -4,7 +4,7 @@ NEW REPLY
 We’ve replied
 about {{ ticket_reference }}
 
-{{ agent_first_name }} from NexG:
+{{ agent_first_name }} from NEXG:
 {{ reply_text }}
 
 Reply in the app:
@@ -12,4 +12,4 @@ Reply in the app:
 
 --
 Questions? Open Help in the app or write to info@nexgapp.com.
-You’re getting this because you wrote to NexG · NexG, nexgapp.com
+You’re getting this because you wrote to NEXG · NEXG, nexgapp.com

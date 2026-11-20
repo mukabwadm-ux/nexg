@@ -7,7 +7,7 @@ NEW BOOKING
 {{ property_name }}
 {{#unit_name}}{{ unit_name }}
 {{/unit_name}}
-Hi{{#first_name}} {{ first_name }}{{/first_name}}, you have a new NexG
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, you have a new NEXG
 booking. The guest has paid.
 
 THE BOOKING
@@ -30,8 +30,8 @@ EARNINGS RECEIPT {{ receipt_number }}
 {{/price_lines}}  YOU EARN  {{ total }}
 Payment: {{ payment_method }}{{#payment_reference}} · {{ payment_reference }}{{/payment_reference}}, recorded {{ paid_at }}
 {{ record_label }} {{ record_number }} · Receipt {{ receipt_number }}
-Asante for hosting with NexG
+Asante for hosting with NEXG
 
 --
 Questions? Open Help in the app or write to info@nexgapp.com.
-You’re getting this because you host with NexG · NexG, nexgapp.com
+You’re getting this because you host with NEXG · NEXG, nexgapp.com

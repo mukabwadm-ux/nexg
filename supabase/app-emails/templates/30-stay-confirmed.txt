@@ -30,7 +30,7 @@ RECEIPT {{ receipt_number }}
 {{/price_lines}}  TOTAL PAID  {{ total }}
 Payment: {{ payment_method }}{{#payment_reference}} · {{ payment_reference }}{{/payment_reference}}, paid {{ paid_at }}
 {{ record_label }} {{ record_number }} · Receipt {{ receipt_number }}
-Asante for staying with NexG
+Asante for staying with NEXG
 
 {{#cancellation_terms}}CHANGING YOUR PLANS
 {{ cancellation_terms }} Do it from the stay in the app.
@@ -38,4 +38,4 @@ Asante for staying with NexG
 
 --
 Questions? Open Help in the app or write to info@nexgapp.com.
-You’re getting this because you booked a stay through NexG · NexG, nexgapp.com
+You’re getting this because you booked a stay through NEXG · NEXG, nexgapp.com
