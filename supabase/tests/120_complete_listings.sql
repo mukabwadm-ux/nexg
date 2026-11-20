@@ -198,9 +198,9 @@ select is((select round(latitude::numeric, 5) || ',' || round(longitude::numeric
              from public.property_unit_public where id = 'e1230000-0000-4000-8000-00000000000a'),
   '-1.29215,36.78565 14:00:00-10:30:00',
   'property_unit_public shows the unit''s pin and times.');
-select is((select ordinal_position from information_schema.columns
+select is((select ordinal_position::int from information_schema.columns
             where table_schema = 'public' and table_name = 'property_public' and column_name = 'latitude'),
-  (select ordinal_position from information_schema.columns
+  (select ordinal_position::int from information_schema.columns
     where table_schema = 'public' and table_name = 'property_public' and column_name = 'is_sample') + 1,
   'The new columns come after the old ones.');
 
