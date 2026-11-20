@@ -59,7 +59,9 @@ export async function loadCustomerActivity(): Promise<CustomerActivity | null> {
   const [orders, bookings, stays] = await Promise.all([
     supabase
       .from('order')
-      .select('id, reference, merchant_id, stage, payment_status, payment_method, total_cents, placed_at')
+      .select(
+        'id, reference, merchant_id, stage, payment_status, payment_method, total_cents, placed_at',
+      )
       .order('placed_at', { ascending: false })
       .limit(30),
     supabase.rpc('rpc_my_bookings'),
@@ -86,7 +88,8 @@ export async function loadCustomerActivity(): Promise<CustomerActivity | null> {
 
   const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
   return {
-    name: typeof meta.first_name === 'string' && meta.first_name.trim() ? meta.first_name.trim() : null,
+    name:
+      typeof meta.first_name === 'string' && meta.first_name.trim() ? meta.first_name.trim() : null,
     email: user.email ?? null,
     orders: orderRows,
     bookings: Array.isArray(bookings.data) ? (bookings.data as unknown as MyBooking[]) : [],
@@ -101,7 +104,9 @@ export async function loadSimilarMerchants(
   limit = 4,
 ): Promise<PublicMerchant[]> {
   const known = [...activity.merchants.values()];
-  const keys = [...new Set(known.map((m) => m.category_key ?? m.category).filter(Boolean))] as string[];
+  const keys = [
+    ...new Set(known.map((m) => m.category_key ?? m.category).filter(Boolean)),
+  ] as string[];
   if (!keys.length) return [];
   const supabase = createClient();
   const { data } = await supabase
@@ -110,14 +115,18 @@ export async function loadSimilarMerchants(
     .in('category_key', keys)
     .eq('explore_visible', true)
     .limit(limit + known.length);
-  return ((data ?? []) as PublicMerchant[]).filter((m) => !activity.merchants.has(m.id)).slice(0, limit);
+  return ((data ?? []) as PublicMerchant[])
+    .filter((m) => !activity.merchants.has(m.id))
+    .slice(0, limit);
 }
 
 export const kes = (cents: number) => `KES ${Math.round(cents / 100).toLocaleString('en-KE')}`;
 
 /** The order still in motion, newest first: what Home and Discovery put on top. */
 export function liveOrder(orders: CustomerOrder[]): CustomerOrder | null {
-  return orders.find((o) => LIVE_STAGES.includes(o.stage) && o.payment_status !== 'pending') ?? null;
+  return (
+    orders.find((o) => LIVE_STAGES.includes(o.stage) && o.payment_status !== 'pending') ?? null
+  );
 }
 
 /** Orders waiting for the customer to pay, still open. */

@@ -34,7 +34,10 @@ export function OrderLive({ orderId, stage }: { orderId: string; stage: string }
   const [map, setMap] = React.useState<OrderMap | null>(null);
   const caps = React.useMemo(() => mapsCapability(), []);
   const host = React.useRef<HTMLDivElement>(null);
-  const drawn = React.useRef<{ map: google.maps.Map; markers: google.maps.marker.AdvancedMarkerElement[] } | null>(null);
+  const drawn = React.useRef<{
+    map: google.maps.Map;
+    markers: google.maps.marker.AdvancedMarkerElement[];
+  } | null>(null);
   const active = ACTIVE.includes(stage);
 
   React.useEffect(() => {
@@ -66,8 +69,22 @@ export function OrderLive({ orderId, stage }: { orderId: string; stage: string }
     void loadGoogleMaps({ key: caps.key }).then((g) => {
       if (cancelled || !host.current) return;
       const points = [
-        ...(map.places ?? []).map((p) => ({ lat: p.latitude, lng: p.longitude, title: p.title, kind: p.role })),
-        ...(map.courier ? [{ lat: map.courier.latitude, lng: map.courier.longitude, title: 'Your rider', kind: 'rider' }] : []),
+        ...(map.places ?? []).map((p) => ({
+          lat: p.latitude,
+          lng: p.longitude,
+          title: p.title,
+          kind: p.role,
+        })),
+        ...(map.courier
+          ? [
+              {
+                lat: map.courier.latitude,
+                lng: map.courier.longitude,
+                title: 'Your rider',
+                kind: 'rider',
+              },
+            ]
+          : []),
       ];
       if (!drawn.current) {
         drawn.current = {
@@ -89,7 +106,12 @@ export function OrderLive({ orderId, stage }: { orderId: string; stage: string }
         pin.style.cssText = `display:inline-block;padding:3px 8px;border-radius:8px;font:800 12px Manrope,sans-serif;${
           p.kind === 'rider' ? 'background:#fdd128;color:#141414' : 'background:#141414;color:#fff'
         }`;
-        return new g.marker.AdvancedMarkerElement({ map: view.map, position: p, title: p.title, content: pin });
+        return new g.marker.AdvancedMarkerElement({
+          map: view.map,
+          position: p,
+          title: p.title,
+          content: pin,
+        });
       });
       const bounds = new g.LatLngBounds();
       points.forEach((p) => bounds.extend(p));
@@ -108,8 +130,13 @@ export function OrderLive({ orderId, stage }: { orderId: string; stage: string }
       : 'The map shows your rider once your order is picked up.';
 
   return (
-    <section aria-labelledby="track" className="border-border flex flex-col gap-3 rounded-2xl border bg-white p-5">
-      <h2 id="track" className="text-lg font-extrabold">Track your order</h2>
+    <section
+      aria-labelledby="track"
+      className="border-border flex flex-col gap-3 rounded-2xl border bg-white p-5"
+    >
+      <h2 id="track" className="text-lg font-extrabold">
+        Track your order
+      </h2>
       {caps.live && map?.places?.length ? (
         <div
           ref={host}
@@ -118,7 +145,9 @@ export function OrderLive({ orderId, stage }: { orderId: string; stage: string }
           className="h-72 w-full overflow-hidden rounded-xl bg-[#ece8df]"
         />
       ) : null}
-      <p className="text-muted text-sm" aria-live="polite">{riderNote}</p>
+      <p className="text-muted text-sm" aria-live="polite">
+        {riderNote}
+      </p>
     </section>
   );
 }

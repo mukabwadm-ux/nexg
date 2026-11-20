@@ -26,7 +26,10 @@ const text = (v: unknown) => (typeof v === 'string' ? v.trim().slice(0, 1000) : 
 export async function POST(request: NextRequest) {
   const parsed = body.safeParse(await request.json().catch(() => null));
   if (!parsed.success)
-    return NextResponse.json({ ok: false, message: 'Check the request and try again.' }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, message: 'Check the request and try again.' },
+      { status: 400 },
+    );
 
   const supabase = createClient();
   const {
@@ -34,7 +37,11 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user)
     return NextResponse.json(
-      { ok: false, signIn: true, message: 'Sign in, or continue as a guest, to send your request.' },
+      {
+        ok: false,
+        signIn: true,
+        message: 'Sign in, or continue as a guest, to send your request.',
+      },
       { status: 401 },
     );
 
@@ -42,7 +49,8 @@ export async function POST(request: NextRequest) {
   const lines = [
     `Quote request: ${itemName}${merchantName ? ` from ${merchantName}` : ''}.`,
     text(answers.brief) && `What they need: ${text(answers.brief)}`,
-    text(answers.date) && `When: ${text(answers.date)}${text(answers.time) ? ` ${text(answers.time)}` : ''}`,
+    text(answers.date) &&
+      `When: ${text(answers.date)}${text(answers.time) ? ` ${text(answers.time)}` : ''}`,
     text(answers.place) && `Where: ${text(answers.place)}`,
     text(answers.budget) && `Budget: ${text(answers.budget)}`,
     text(answers.contact) && `Contact: ${text(answers.contact)}`,
@@ -58,8 +66,7 @@ export async function POST(request: NextRequest) {
     p_body: lines.join('\n'),
     p_details: { kind: 'quote_request', merchant_id: merchantId, item_id: itemId, answers },
   });
-  if (error)
-    return NextResponse.json({ ok: false, message: error.message }, { status: 422 });
+  if (error) return NextResponse.json({ ok: false, message: error.message }, { status: 422 });
 
   const reference = (data as { reference?: string } | null)?.reference ?? null;
   return NextResponse.json({

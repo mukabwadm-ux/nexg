@@ -90,8 +90,12 @@ export function CheckoutForm({
       .eq('id', cart.merchantId)
       .maybeSingle()
       .then(({ data }) => {
-        const key = (data as { category_key?: string | null; category?: string | null } | null) ?? null;
-        if (live) setIsLaundry(['laundry', 'laundry_cleaning'].includes(key?.category_key ?? key?.category ?? ''));
+        const key =
+          (data as { category_key?: string | null; category?: string | null } | null) ?? null;
+        if (live)
+          setIsLaundry(
+            ['laundry', 'laundry_cleaning'].includes(key?.category_key ?? key?.category ?? ''),
+          );
       });
     return () => {
       live = false;
@@ -227,7 +231,9 @@ export function CheckoutForm({
           p_at: new Date(pickupAt).toISOString(),
         });
         if (set.error) {
-          setError(`Your order ${result.reference} is saved, but the collection time was not: ${set.error.message}`);
+          setError(
+            `Your order ${result.reference} is saved, but the collection time was not: ${set.error.message}`,
+          );
         }
       }
 

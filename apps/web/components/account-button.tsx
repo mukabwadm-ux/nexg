@@ -57,7 +57,11 @@ export function AccountButton({ href, label }: { href: string; label: string }) 
   React.useEffect(() => {
     if (!open) return;
     const close = (event: MouseEvent | KeyboardEvent) => {
-      if (event instanceof KeyboardEvent ? event.key === 'Escape' : !wrap.current?.contains(event.target as Node))
+      if (
+        event instanceof KeyboardEvent
+          ? event.key === 'Escape'
+          : !wrap.current?.contains(event.target as Node)
+      )
         setOpen(false);
     };
     document.addEventListener('mousedown', close);
