@@ -102,8 +102,8 @@ export const kindPresentation: Record<OfferingKind, KindPresentation> = {
     sheetAction: 'Save request', saved: kept, pending: requestOnDevice },
   activity: { section: 'Experiences', intro: 'Choose an experience, then a date and your group.', cardAction: 'Choose a date', pricePrefix: 'From ', noPrice: 'Price on request',
     sheetAction: 'Save request', saved: kept, pending: requestOnDevice },
-  task: { section: 'Services', intro: 'Choose a service and describe what you need.', cardAction: 'Start a request', pricePrefix: 'From ', noPrice: 'Quoted after review',
-    sheetAction: 'Save request', saved: kept, pending: requestOnDevice },
+  task: { section: 'Services', intro: 'Choose a service and describe what you need.', cardAction: 'Request a quote', pricePrefix: 'From ', noPrice: 'Quoted after review',
+    sheetAction: 'Send request', saved: 'Saved on this device.', pending: 'NexG confirms the price with the business and replies to you.' },
   vehicle: { section: 'Vehicles', intro: 'Choose a vehicle, then your dates and place.', cardAction: 'Check dates', pricePrefix: 'From ', noPrice: 'Price on request',
     sheetAction: 'Save request', saved: kept, pending: requestOnDevice },
 };

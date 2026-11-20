@@ -312,6 +312,25 @@ export function OfferingSheet({ merchant, item, kind, saved, onSave, onClose, tr
       setOwn(next);
     } else onKeep?.(item, answers);
     setStatus(copy.saved);
+    // A quoted request goes to NexG, which confirms the price with the business (20 Nov 2026).
+    if (block.type === 'request' && block.form === 'task') void sendQuoteRequest(answers);
+  };
+  const sendQuoteRequest = async (answers: OfferingAnswers) => {
+    setStatus('Sending your request…');
+    try {
+      const response = await fetch('/api/quote-requests', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ merchantId: merchant.id, merchantName: merchant.name, itemId: item.id, itemName: item.name, answers }),
+      });
+      const result = (await response.json().catch(() => ({}))) as { ok?: boolean; message?: string; signIn?: boolean };
+      if (result.ok) { setStatus(result.message ?? 'Sent. NexG confirms the price and replies to you.'); return; }
+      setError(result.signIn
+        ? 'Sign in to send your request. It is saved on this device in the meantime.'
+        : result.message ?? 'Your request could not be sent. It is saved on this device; try again.');
+    } catch {
+      setError('Your request could not be sent. It is saved on this device; try again.');
+    }
   };
   const forget = () => {
     if (block.type === 'cart') { onList?.(item, 0); sheet.close(); return; }

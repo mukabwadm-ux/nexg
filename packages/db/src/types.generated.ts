@@ -64400,6 +64400,7 @@ export type Database = {
       rpc_my_order_map:
         | { Args: { p_order_id: string }; Returns: Json }
         | { Args: { p_contract_version: string; p_order_id: string }; Returns: Json };
+      rpc_my_order_rating: { Args: { p_order_id: string }; Returns: number };
       rpc_my_rider_jobs: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_rider_map_assignments: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_rider_offers: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -64589,6 +64590,7 @@ export type Database = {
         Returns: Json;
       };
       rpc_order_breakdown: { Args: { p_order_id: string }; Returns: Json };
+      rpc_order_cancel_mine: { Args: { p_order_id: string; p_reason?: string }; Returns: Json };
       rpc_order_contact: {
         Args: { p_channel: string; p_order_id: string; p_party: string; p_reveal?: boolean };
         Returns: Json;
@@ -64608,6 +64610,10 @@ export type Database = {
       };
       rpc_order_place_web: { Args: { p_payload: Json }; Returns: Json };
       rpc_order_quote_web: { Args: { p_payload: Json }; Returns: Json };
+      rpc_order_rate: {
+        Args: { p_about?: string; p_comment?: string; p_order_id: string; p_stars: number };
+        Returns: Json;
+      };
       rpc_order_read_api: {
         Args: {
           p_api_key: string;
@@ -64639,6 +64645,7 @@ export type Database = {
         Returns: Json;
       };
       rpc_order_rider_api_test: { Args: { p_api_key: string; p_order_id: string }; Returns: Json };
+      rpc_order_set_pickup_time: { Args: { p_at: string; p_order_id: string }; Returns: Json };
       rpc_order_stage_api_test: {
         Args: { p_api_key: string; p_order_id: string; p_stage: string };
         Returns: Json;

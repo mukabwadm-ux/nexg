@@ -33,10 +33,10 @@ describe('safeNext', () => {
 });
 
 describe('landingFor', () => {
-  it('sends a customer to next, or home', () => {
+  it('sends a customer to next, or Discovery', () => {
     expect(landingFor('customer', guest, '/stays/a/book')).toBe('/stays/a/book');
-    expect(landingFor('customer', guest, undefined)).toBe('/');
-    expect(landingFor('customer', null, undefined)).toBe('/');
+    expect(landingFor('customer', guest, undefined)).toBe('/discover');
+    expect(landingFor('customer', null, undefined)).toBe('/discover');
   });
 
   it('takes a partner who used the customer page to their workspace unless next says otherwise', () => {

@@ -55,9 +55,9 @@ export function DiscoveryApp() {
     const element = root.current;
     if (!element) return;
 
-    /* Discovery's bar pins right under the site header (the element just before this one), so it
-       gets the header's measured height. */
-    const header = element.previousElementSibling;
+    /* Discovery's bar pins right under the site header, so it gets the header's measured height.
+       The "For you" strip may sit between the two, so the header is found by tag. */
+    const header = document.querySelector('body header');
     const observer =
       header instanceof HTMLElement && header.tagName === 'HEADER'
         ? new ResizeObserver(() =>
