@@ -9,8 +9,8 @@ Customer emails for the phone apps, sent by the backend when the event happens, 
 | The designs (source of truth)         | Consumer app repo `langs4u/nexg-app`, `docs/email-templates/` (gallery `index.html`)                            |
 | Copies the database sends             | `supabase/app-emails/templates/<id>.html` and `.txt`, `catalog.json` (subject, group, required, choice, sample) |
 | Supabase Auth versions (Go templates) | `supabase/templates/app/`                                                                                       |
-| The system                            | `supabase/migrations/20270127000100_app_emails.sql` (schema `app_email`)                                        |
-| The stored templates                  | `supabase/migrations/20270127000200_app_email_templates.sql`, generated                                         |
+| The system                            | `supabase/migrations/20270128000200_app_emails.sql` (schema `app_email`)                                        |
+| The stored templates                  | `supabase/migrations/20270128000200_app_email_templates.sql`, generated                                         |
 | The wordmark pictures                 | `apps/web/public/email/app/` (served at `https://www.nexgapp.com/email/app/` once the website deploys)          |
 | Tests                                 | `supabase/tests/99_app_emails.sql`, `supabase/functions/notify-dispatch/email.test.ts`                          |
 
