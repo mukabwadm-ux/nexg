@@ -31297,6 +31297,7 @@ export type Database = {
         Row: {
           amenities: string[];
           area: string | null;
+          cancellation_policy: string | null;
           check_in_from: string | null;
           check_out_by: string | null;
           city_id: string | null;
@@ -31306,6 +31307,7 @@ export type Database = {
           description: string | null;
           floors: number | null;
           host_id: string;
+          house_rules: string | null;
           id: string;
           is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
@@ -31325,6 +31327,7 @@ export type Database = {
         Insert: {
           amenities?: string[];
           area?: string | null;
+          cancellation_policy?: string | null;
           check_in_from?: string | null;
           check_out_by?: string | null;
           city_id?: string | null;
@@ -31334,6 +31337,7 @@ export type Database = {
           description?: string | null;
           floors?: number | null;
           host_id: string;
+          house_rules?: string | null;
           id?: string;
           is_sample?: boolean;
           kind?: Database['public']['Enums']['property_kind'];
@@ -31352,6 +31356,7 @@ export type Database = {
         Update: {
           amenities?: string[];
           area?: string | null;
+          cancellation_policy?: string | null;
           check_in_from?: string | null;
           check_out_by?: string | null;
           city_id?: string | null;
@@ -31361,6 +31366,7 @@ export type Database = {
           description?: string | null;
           floors?: number | null;
           host_id?: string;
+          house_rules?: string | null;
           id?: string;
           is_sample?: boolean;
           kind?: Database['public']['Enums']['property_kind'];
@@ -38643,6 +38649,7 @@ export type Database = {
           handoff: Database['public']['Enums']['handoff_mode'] | null;
           handoff_note: string | null;
           host_id: string;
+          host_published: boolean;
           house_rules_link: string | null;
           id: string;
           label_public: string | null;
@@ -38695,6 +38702,7 @@ export type Database = {
           handoff?: Database['public']['Enums']['handoff_mode'] | null;
           handoff_note?: string | null;
           host_id: string;
+          host_published?: boolean;
           house_rules_link?: string | null;
           id?: string;
           label_public?: string | null;
@@ -38746,6 +38754,7 @@ export type Database = {
           handoff?: Database['public']['Enums']['handoff_mode'] | null;
           handoff_note?: string | null;
           host_id?: string;
+          host_published?: boolean;
           house_rules_link?: string | null;
           id?: string;
           label_public?: string | null;
@@ -53704,15 +53713,19 @@ export type Database = {
           area: string | null;
           bedrooms_max: number | null;
           bedrooms_min: number | null;
+          cancellation_policy: string | null;
           check_in_from: string | null;
           check_out_by: string | null;
           city_id: string | null;
           city_name: string | null;
           description: string | null;
           from_rate_kes: number | null;
+          house_rules: string | null;
           id: string | null;
           is_sample: boolean | null;
           kind: Database['public']['Enums']['property_kind'] | null;
+          latitude: number | null;
+          longitude: number | null;
           name: string | null;
           neighbourhood_note: string | null;
           photos: Json | null;
@@ -53802,11 +53815,15 @@ export type Database = {
           bathrooms: number | null;
           bed_setup: string | null;
           bedrooms: number | null;
+          checkin_time: string | null;
+          checkout_time: string | null;
           floor: string | null;
           handoff_arranged: boolean | null;
           id: string | null;
           is_sample: boolean | null;
           label_public: string | null;
+          latitude: number | null;
+          longitude: number | null;
           max_guests: number | null;
           min_nights: number | null;
           name: string | null;
@@ -57804,7 +57821,13 @@ export type Database = {
       fn_handoff_code_new: { Args: Record<PropertyKey, never>; Returns: string };
       fn_handoff_sentence: { Args: { p_unit_id: string }; Returns: string };
       fn_health_green_streak: { Args: { p_merchant_id: string }; Returns: number };
+      fn_host_amenity_labels: { Args: { p_value: Json }; Returns: string[] };
       fn_host_documents_missing: { Args: { p_host_id: string }; Returns: string[] };
+      fn_host_listing_point: { Args: { p_value: Json }; Returns: unknown };
+      fn_host_listing_text: {
+        Args: { p_label: string; p_max: number; p_value: Json };
+        Returns: string;
+      };
       fn_integration_rotation_due: {
         Args: {
           i: Omit<
@@ -58764,6 +58787,7 @@ export type Database = {
       fn_tax_issue_order_compliant: { Args: { p_order_id: string }; Returns: number };
       fn_tax_next_number: { Args: { p_at?: string }; Returns: string };
       fn_translations: { Args: { p_locale: string }; Returns: Json };
+      fn_unit_listing_missing: { Args: { p_unit_id: string }; Returns: string[] };
       fn_unit_listing_ready: { Args: { p_unit_id: string }; Returns: boolean };
       fn_unit_readiness: { Args: { p_unit_id: string }; Returns: Json };
       fn_vacancy_hiring_team: { Args: { p_vacancy_id: string }; Returns: string[] };
@@ -61864,6 +61888,16 @@ export type Database = {
         Args: { p_host_id: string };
         Returns: Database['public']['Enums']['host_status'];
       };
+      rpc_host_listing_checklist: {
+        Args: { p_host_id: string };
+        Returns: {
+          held_by_staff: boolean;
+          listed: boolean;
+          missing: string[];
+          published: boolean;
+          unit_id: string;
+        }[];
+      };
       rpc_host_listing_photo_set: {
         Args: { p_alt?: string; p_host_id: string; p_path: string; p_unit_id: string };
         Returns: undefined;
@@ -64779,6 +64813,7 @@ export type Database = {
         Returns: {
           amenities: string[];
           area: string | null;
+          cancellation_policy: string | null;
           check_in_from: string | null;
           check_out_by: string | null;
           city_id: string | null;
@@ -64788,6 +64823,7 @@ export type Database = {
           description: string | null;
           floors: number | null;
           host_id: string;
+          house_rules: string | null;
           id: string;
           is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
@@ -64815,6 +64851,7 @@ export type Database = {
         Returns: {
           amenities: string[];
           area: string | null;
+          cancellation_policy: string | null;
           check_in_from: string | null;
           check_out_by: string | null;
           city_id: string | null;
@@ -64824,6 +64861,7 @@ export type Database = {
           description: string | null;
           floors: number | null;
           host_id: string;
+          house_rules: string | null;
           id: string;
           is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
@@ -64851,6 +64889,7 @@ export type Database = {
         Returns: {
           amenities: string[];
           area: string | null;
+          cancellation_policy: string | null;
           check_in_from: string | null;
           check_out_by: string | null;
           city_id: string | null;
@@ -64860,6 +64899,7 @@ export type Database = {
           description: string | null;
           floors: number | null;
           host_id: string;
+          house_rules: string | null;
           id: string;
           is_sample: boolean;
           kind: Database['public']['Enums']['property_kind'];
@@ -66995,6 +67035,7 @@ export type Database = {
           handoff: Database['public']['Enums']['handoff_mode'] | null;
           handoff_note: string | null;
           host_id: string;
+          host_published: boolean;
           house_rules_link: string | null;
           id: string;
           label_public: string | null;
@@ -67032,6 +67073,7 @@ export type Database = {
         Args: { p_reason: string; p_unit_id: string; p_which: string };
         Returns: Json;
       };
+      rpc_unit_set_published: { Args: { p_published: boolean; p_unit: string }; Returns: Json };
       rpc_unit_upsert: {
         Args: { p_host_id: string; p_unit: Json; p_unit_id?: string };
         Returns: {
@@ -67059,6 +67101,7 @@ export type Database = {
           handoff: Database['public']['Enums']['handoff_mode'] | null;
           handoff_note: string | null;
           host_id: string;
+          host_published: boolean;
           house_rules_link: string | null;
           id: string;
           label_public: string | null;
@@ -67119,6 +67162,7 @@ export type Database = {
           handoff: Database['public']['Enums']['handoff_mode'] | null;
           handoff_note: string | null;
           host_id: string;
+          host_published: boolean;
           house_rules_link: string | null;
           id: string;
           label_public: string | null;

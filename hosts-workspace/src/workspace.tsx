@@ -104,6 +104,7 @@ function useWorkspaceState(initial: WorkspaceSnapshot) {
     today,
     setup,
     propertyWrites,
+    maps: snapshot.maps ?? null,
     scope,
     setScope,
     units,

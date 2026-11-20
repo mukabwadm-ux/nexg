@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent, type ReactNode } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import QRCode from 'qrcode';
 import { useWorkspace } from './workspace';
@@ -10,8 +10,17 @@ import {
   SPOTS,
 } from '../../apps/web/lib/host-workspace/vocab';
 import { Button, Icon, Badge } from './ui';
+import { AmenityField, PinField } from './ListingFields';
+import { ListingPanel } from './ListingPanel';
 import { money, nextDate, totals, type Collection } from './model';
 type Field = { key: string; label: string; type?: string; required?: boolean; options?: string[] };
+/* The limits the database holds these to. */
+const LONG_TEXT: Record<string, number> = {
+  neighbourhoodNote: 2000,
+  houseRules: 2000,
+  cancellationPolicy: 2000,
+  summary: 2000,
+};
 const f = (
   key: string,
   label: string,
@@ -96,6 +105,15 @@ const connectedFields: Partial<Record<Collection, Field[]>> = {
     f('summary', 'Listing summary', 'textarea'),
     f('checkInFrom', 'Check-in from', 'time'),
     f('checkOutBy', 'Check-out by', 'time'),
+    f('pin', 'Map pin · the building entrance', 'pin'),
+    f('amenities', 'Amenities', 'amenities'),
+    f(
+      'neighbourhoodNote',
+      'Neighbourhood note · what guests should know about the area',
+      'textarea',
+    ),
+    f('houseRules', 'House rules', 'textarea'),
+    f('cancellationPolicy', 'Cancellation policy · in your own words', 'textarea'),
   ],
   units: [
     f('propertyId', 'Property', 'property'),
@@ -122,6 +140,12 @@ const connectedFields: Partial<Record<Collection, Field[]>> = {
     f('deliveryTo', 'Delivery until', 'time'),
     f('checkInFrom', 'Check-in from', 'time'),
     f('checkOutBy', 'Check-out by', 'time'),
+    f('summary', 'Unit summary · what makes this unit different', 'textarea'),
+    f('bedSetup', 'Bed setup · e.g. 1 queen, 2 singles'),
+    f('sizeSqm', 'Size · m²', 'number'),
+    f('minNights', 'Minimum nights', 'number'),
+    f('pin', 'Map pin · the unit’s entrance, if not the building’s', 'pin'),
+    f('amenities', 'Unit amenities', 'amenities'),
   ],
   stays: [
     f('unitId', 'Property / unit', 'unit', true),
@@ -226,6 +250,27 @@ const singular: Partial<Record<Collection, string>> = {
   feedback: 'feedback',
   invoices: 'invoice',
 };
+/* A labelled field; a group of several inputs (map pin, amenities) is a group, not a label. */
+function FieldShell({
+  group,
+  wide,
+  label,
+  children,
+}: {
+  group: boolean;
+  wide: boolean;
+  label: string;
+  children: ReactNode;
+}) {
+  const className = 'field' + (wide ? ' field-wide' : '');
+  return group ? (
+    <div className={className} role="group" aria-label={label}>
+      {children}
+    </div>
+  ) : (
+    <label className={className}>{children}</label>
+  );
+}
 export function RecordDialog() {
   const w = useWorkspace();
   if (!w.dialog) return null;
@@ -324,8 +369,16 @@ function RecordContent() {
       return;
     }
     setSaving(true);
+    const pinField = fields.some((field) => field.type === 'pin');
+    const pinned = typeof draft.lat === 'number' && typeof draft.lng === 'number';
+    if (pinField && (typeof draft.lat === 'number') !== (typeof draft.lng === 'number')) {
+      setSaving(false);
+      setError('Enter both the latitude and the longitude, or place the pin on the map.');
+      return;
+    }
     const fieldsToSave = Object.fromEntries(
       fields
+        .filter((field) => field.type !== 'pin')
         .filter(
           (field) =>
             draft[field.key] != null &&
@@ -338,6 +391,7 @@ function RecordContent() {
         )
         .map((field) => [field.key, draft[field.key]]),
     );
+    if (pinField && pinned) Object.assign(fieldsToSave, { lat: draft.lat, lng: draft.lng });
     const ok = await w.run({
       type: 'save',
       collection: workspaceTask ? 'workspace-task' : d.collection,
@@ -455,19 +509,37 @@ function RecordContent() {
           </div>
           <div className="field-grid">
             {fields.slice(step * perStep, (step + 1) * perStep).map((field) => (
-              <label
-                className={`field ${field.type === 'textarea' ? 'field-wide' : ''}`}
+              <FieldShell
+                group={['pin', 'amenities'].includes(field.type || '')}
+                wide={['textarea', 'pin', 'amenities'].includes(field.type || '')}
+                label={field.label}
                 key={field.key}
               >
                 <span>
                   {field.label}
                   {field.required ? ' *' : ''}
                 </span>
-                {field.type === 'textarea' ? (
+                {field.type === 'pin' ? (
+                  <PinField
+                    label={field.label}
+                    maps={w.maps}
+                    value={{
+                      lat: typeof draft.lat === 'number' ? draft.lat : undefined,
+                      lng: typeof draft.lng === 'number' ? draft.lng : undefined,
+                    }}
+                    onChange={(pin) => setDraft((current) => ({ ...current, ...pin }))}
+                  />
+                ) : field.type === 'amenities' ? (
+                  <AmenityField
+                    value={Array.isArray(draft[field.key]) ? (draft[field.key] as string[]) : []}
+                    onChange={(list) => set(field.key, list)}
+                  />
+                ) : field.type === 'textarea' ? (
                   <textarea
                     value={String(draft[field.key] || '')}
                     required={field.required}
                     rows={3}
+                    maxLength={LONG_TEXT[field.key]}
                     onChange={(e) => set(field.key, e.target.value)}
                   />
                 ) : field.type === 'checkbox' ? (
@@ -586,7 +658,7 @@ function RecordContent() {
                     }
                   />
                 )}
-              </label>
+              </FieldShell>
             ))}
           </div>
           {error && (
@@ -642,6 +714,13 @@ function RecordContent() {
                   value = w.data.packages.find((item) => item.id === value)?.title || record?.title;
                 if (field.type === 'unit') value = w.unitLabel(String(value));
                 if (field.type === 'property') value = w.propertyLabel(String(value));
+                if (field.type === 'pin')
+                  value =
+                    typeof record?.lat === 'number' && typeof record?.lng === 'number'
+                      ? record.lat + ', ' + record.lng
+                      : '';
+                if (field.type === 'amenities')
+                  value = Array.isArray(value) ? (value as string[]).join(', ') : '';
                 if (field.type === 'member')
                   value = w.data.team.find((t) => t.id === value)?.name || 'Unassigned';
                 return (
@@ -768,6 +847,9 @@ function RecordContent() {
                 ? ' · Paid through NexG; contact NexG to change it'
                 : ''}
             </p>
+          )}
+          {d.collection === 'units' && record && w.propertyWrites && (
+            <ListingPanel unitId={record.id} />
           )}
           <div className="detail-actions">
             {d.collection === 'tasks' && transitions.length > 0 && (

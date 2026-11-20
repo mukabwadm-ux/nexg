@@ -1,4 +1,5 @@
--- A stay request becomes a support ticket, and a complete unit lists itself.
+-- A stay request becomes a support ticket, and a complete unit the host has
+-- published lists itself (the switch itself: 120_complete_listings.sql).
 
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -61,7 +62,7 @@ select is(
   true,
   'And the stay request points at its ticket.');
 
--- ══════════════════════════════════════════ 2. a complete unit lists itself
+-- ══════════════════════════════ 2. a complete, published unit lists itself
 
 insert into public.host (id, kind, display_name, phone, city_id, status)
 values ('d5110000-0000-4000-8000-00000000000a','single_unit','[Host 51]','+254700051000',
@@ -70,11 +71,13 @@ insert into public.property (id, host_id, slug, name, kind, area, city_id)
 values ('d5120000-0000-4000-8000-00000000000a','d5110000-0000-4000-8000-00000000000a',
         'block-51','Block 51','apartment_block','Kilimani',(select id from public.city where slug = 'nairobi'));
 insert into public.unit (id, host_id, property_id, name, label_public, address_line, area,
-                         city_id, handoff, status, bedrooms, max_guests, nightly_rate_kes, photos)
+                         city_id, handoff, status, bedrooms, max_guests, nightly_rate_kes, photos,
+                         host_published)
 values ('d5130000-0000-4000-8000-00000000000a','d5110000-0000-4000-8000-00000000000a',
         'd5120000-0000-4000-8000-00000000000a','A','A','[Address]','Kilimani',
         (select id from public.city where slug = 'nairobi'),'lockbox','live', 1, 2, 6000,
-        '[{"path":"d5110000-0000-4000-8000-00000000000a/d5130000-0000-4000-8000-00000000000a/a.jpg"}]'::jsonb);
+        '[{"path":"d5110000-0000-4000-8000-00000000000a/d5130000-0000-4000-8000-00000000000a/a.jpg"}]'::jsonb,
+        true);
 
 select is(
   (select listed from public.unit where id = 'd5130000-0000-4000-8000-00000000000a'),
