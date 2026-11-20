@@ -18,6 +18,7 @@ import { MerchantControls } from '@/components/merchant-controls';
 import { MerchantLifecycleActions } from '@/components/merchant-lifecycle-actions';
 import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
+import { applicationAnswerGroups } from '@/lib/application-answers';
 import { ApplicationReviewUnavailable } from '@/components/merchants/application-review-view';
 import { BookingReadiness } from '@/components/merchants/booking-readiness';
 import { MerchantAgreementSigned } from '@/components/merchants/agreement-signed';
@@ -69,14 +70,16 @@ export default async function MerchantApplicationPage({
    * approved, staff manage the merchant here like any other: documents,
    * Take live, deactivate, delete.
    */
+  let applicationPayload: unknown = null;
   if (managed) {
     const { data: application } = await supabase
       .from('merchant_application')
-      .select('review_state')
+      .select('review_state, payload')
       .eq('merchant_id', params.id)
       .maybeSingle();
     if (application?.review_state !== 'approved')
       redirect(`/merchants/applications/${encodeURIComponent(params.id)}`);
+    applicationPayload = application.payload;
   }
 
   const { data: merchant, error: merchantError } = await supabase
@@ -316,6 +319,7 @@ export default async function MerchantApplicationPage({
                 branches={(branches as BranchRow[] | null) ?? []}
                 fleet={(fleet as FleetRow[] | null) ?? []}
                 readiness={readiness as Record<string, unknown> | null}
+                applicationAnswers={managed ? applicationAnswerGroups(applicationPayload) : null}
               />
             </div>
           </div>

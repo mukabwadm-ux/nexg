@@ -1,6 +1,7 @@
 import { Card } from '@nexg/ui';
 
 import type { BranchRow, FleetRow } from '@/app/merchants/[id]/page';
+import type { ApplicationAnswerGroup } from '@/lib/application-answers';
 
 /**
  * What the merchant told us, as they were told it back.
@@ -75,6 +76,7 @@ export function OnboardingRecord({
   branches,
   fleet,
   readiness,
+  applicationAnswers,
 }: {
   merchant: MerchantRecord;
   config: {
@@ -86,6 +88,8 @@ export function OnboardingRecord({
   branches: BranchRow[];
   fleet: FleetRow[];
   readiness: Record<string, unknown> | null;
+  /** A new-form merchant's answers, from their application. Null for the old form. */
+  applicationAnswers?: ApplicationAnswerGroup[] | null;
 }) {
   const answers = (merchant.answers ?? {}) as Record<string, string | string[]>;
   const categoryQuestions = (config?.questions ?? []) as Question[];
@@ -159,7 +163,31 @@ export function OnboardingRecord({
       )}
 
       {/* ------------------------------------------------------- the answers */}
-      {questions.length > 0 && (
+      {applicationAnswers
+        ? applicationAnswers.map((group) => (
+            <Card key={group.subcategoryId} className="mt-4 p-5">
+              <h3 className="text-sm font-extrabold uppercase tracking-wide">
+                {config?.label ? `${config.label} · ` : ''}
+                {group.name} questions
+              </h3>
+              {group.rows.length === 0 ? (
+                <p className="text-muted mt-2 text-sm font-semibold">
+                  No questions for this specialty.
+                </p>
+              ) : (
+                <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {group.rows.map((row) => (
+                    <div key={row.id}>
+                      <dt className="text-muted-light text-xs font-semibold">{row.label}</dt>
+                      <dd className="mt-0.5 text-sm font-bold">{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+            </Card>
+          ))
+        : null}
+      {!applicationAnswers && questions.length > 0 && (
         <Card className="mt-4 p-5">
           <h3 className="text-sm font-extrabold uppercase tracking-wide">
             {config?.label}
