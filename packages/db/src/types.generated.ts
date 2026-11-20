@@ -66994,10 +66994,7 @@ export type Database = {
         Args: { p_reason: string; p_unit_id: string; p_which: string };
         Returns: Json;
       };
-      rpc_unit_set_published: {
-        Args: { p_published: boolean; p_unit: string };
-        Returns: Json;
-      };
+      rpc_unit_set_published: { Args: { p_published: boolean; p_unit: string }; Returns: Json };
       rpc_unit_upsert: {
         Args: { p_host_id: string; p_unit: Json; p_unit_id?: string };
         Returns: {
