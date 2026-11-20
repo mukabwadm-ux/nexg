@@ -456,3 +456,9 @@ verify_jwt = false
 # The handler checks its own x-native-push-secret header; the scheduler sends no JWT.
 [functions.native-push-dispatch]
 verify_jwt = false
+
+# The handler checks its own x-dispatch-secret header; cron_notify_dispatch sends no JWT.
+# Without this a plain `supabase functions deploy notify-dispatch` turns JWT checks on,
+# and every queued email and SMS is refused at the gateway.
+[functions.notify-dispatch]
+verify_jwt = false
