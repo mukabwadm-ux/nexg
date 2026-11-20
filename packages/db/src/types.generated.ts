@@ -27056,6 +27056,70 @@ export type Database = {
           },
         ];
       };
+      native_stay_checkout: {
+        Row: {
+          adults: number;
+          check_in: string;
+          check_out: string;
+          children: number;
+          expires_at: string;
+          guest_name_hash: string | null;
+          guest_user_id: string;
+          id: string;
+          nightly_minor: number;
+          property_id: string;
+          stay_id: string | null;
+          total_minor: number;
+          unit_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          adults: number;
+          check_in: string;
+          check_out: string;
+          children: number;
+          expires_at: string;
+          guest_name_hash?: string | null;
+          guest_user_id: string;
+          id?: string;
+          nightly_minor: number;
+          property_id: string;
+          stay_id?: string | null;
+          total_minor: number;
+          unit_id: string;
+        };
+        Update: {
+          adults?: number;
+          check_in?: string;
+          check_out?: string;
+          children?: number;
+          expires_at?: string;
+          guest_name_hash?: string | null;
+          guest_user_id?: string;
+          id?: string;
+          nightly_minor?: number;
+          property_id?: string;
+          stay_id?: string | null;
+          total_minor?: number;
+          unit_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'native_stay_checkout_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_stay_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'native_stay_checkout_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: true;
+            referencedRelation: 'stay';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       notification: {
         Row: {
           attempts: number;
@@ -58205,6 +58269,8 @@ export type Database = {
       };
       fn_native_push_reminders: { Args: Record<PropertyKey, never>; Returns: number };
       fn_native_push_retention: { Args: Record<PropertyKey, never>; Returns: number };
+      fn_native_stay_checkout_view: { Args: { p_checkout_id: string }; Returns: Json };
+      fn_native_stay_customer: { Args: Record<PropertyKey, never>; Returns: string };
       fn_needs_action_reads_as: { Args: { p_reasons: string[] }; Returns: string };
       fn_notify_enqueue: {
         Args: {
@@ -64299,6 +64365,19 @@ export type Database = {
         };
         Returns: boolean;
       };
+      rpc_native_stay_hold: { Args: { p_first_name: string; p_quote_id: string }; Returns: Json };
+      rpc_native_stay_quote: {
+        Args: {
+          p_adults: number;
+          p_check_in: string;
+          p_check_out: string;
+          p_children: number;
+          p_property_id: string;
+          p_unit_id: string;
+        };
+        Returns: Json;
+      };
+      rpc_native_stay_status: { Args: { p_operation_id: string }; Returns: Json };
       rpc_nearest_free: {
         Args: { p_job_id: string; p_limit?: number };
         Returns: {
