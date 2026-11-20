@@ -50,3 +50,16 @@ Rollback: unschedule `native-push-dispatch`, `native-push-reminders` and `native
 - Customer push for "rider assigned": no wording decided; the live activity moves at the next stage.
 - Quiet hours stay on the phone.
 - Android progress while the app is closed needs a native FCM receiver in each app.
+
+## Proving the credentials before any phone exists (20 November 2026)
+
+`POST /functions/v1/native-push-dispatch` with the header `x-native-push-secret` and the body `{"probe": true}` returns
+`{ delivery: "enabled" | "disabled", providers: { fcm, fcm_sandbox, apns } }`, without touching the queue or any phone.
+
+- **FCM:** the probe gets the OAuth token, then sends a `validate_only` message to a made-up token.
+  - `credential_ok` means Firebase accepted the credential and refused only the token (HTTP 400 `INVALID_ARGUMENT`).
+  - `credential_refused` (401 or 403) means a wrong key or project, or the Cloud Messaging API is off.
+- **APNs:** the probe sends to an all-zeros token on the sandbox.
+  - `credential_ok` means `BadDeviceToken` (400).
+  - `credential_refused` means `InvalidProviderToken` (403).
+- **Without the secret:** the call answers 401.

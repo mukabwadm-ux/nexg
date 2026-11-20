@@ -319,3 +319,92 @@ test('A rider offer is time-sensitive on iPhone', () => {
   );
   assert.equal(offer.body.aps['interruption-level'], 'time-sensitive');
 });
+
+test('the probe proves the Firebase credential with a made-up token and sends nothing real', async () => {
+  const key = await pem({
+    name: 'RSASSA-PKCS1-v1_5',
+    modulusLength: 2048,
+    publicExponent: new Uint8Array([1, 0, 1]),
+    hash: 'SHA-256',
+  });
+  const run = async (status: number, errorCode: string) => {
+    const bodies: string[] = [];
+    const send = createNativeSender({
+      read: (name) =>
+        ({
+          D8_FCM_PROJECT: 'nexg-live',
+          D8_FCM_CLIENT_EMAIL: 'probe@nexg-live.iam.gserviceaccount.com',
+          D8_FCM_PRIVATE_KEY: key,
+        })[name],
+      now: () => instant,
+      async fetch(endpoint, options) {
+        if (endpoint === 'https://oauth2.googleapis.com/token') {
+          return Response.json({ access_token: 'fixture-access', expires_in: 3600 });
+        }
+        bodies.push(String(options.body));
+        return Response.json(
+          { error: { status: 'INVALID_ARGUMENT', details: [{ errorCode }] } },
+          { status },
+        );
+      },
+    });
+    return { report: await send.probe(), bodies };
+  };
+  const ok = await run(400, 'INVALID_ARGUMENT');
+  assert.equal(ok.report.fcm.result, 'credential_ok');
+  assert.equal(ok.report.fcm.reason, 'INVALID_ARGUMENT');
+  assert.equal(ok.report.fcm_sandbox.result, 'not_configured');
+  assert.equal(ok.report.apns.result, 'not_configured');
+  const sent = JSON.parse(ok.bodies[0]);
+  assert.equal(sent.validate_only, true);
+  assert.equal(sent.message.token, 'nexg.probe.not.a.device');
+  assert.equal(sent.message.notification, undefined, 'the probe carries no visible notification');
+  const refused = await run(403, 'SENDER_ID_MISMATCH');
+  assert.equal(refused.report.fcm.result, 'credential_refused');
+});
+
+test('a probe needs the secret, works while delivery is off, and claims nothing', async () => {
+  let claims = 0;
+  const handler = createNativeDispatcher({
+    secret: 'fixture-secret',
+    enabled: false,
+    queue: {
+      async claim() {
+        claims += 1;
+        return [];
+      },
+      async finish() {
+        return true;
+      },
+    },
+    send: async () => 'sent',
+    probe: async () => ({
+      fcm: { result: 'credential_ok', status: 400 },
+      fcm_sandbox: { result: 'not_configured' },
+      apns: { result: 'not_configured' },
+    }),
+  });
+  const url = 'https://fixture.example/native-push-dispatch';
+  const body = JSON.stringify({ probe: true });
+  assert.equal((await handler(new Request(url, { method: 'POST', body }))).status, 401);
+  const response = await handler(
+    new Request(url, {
+      method: 'POST',
+      body,
+      headers: { 'x-native-push-secret': 'fixture-secret' },
+    }),
+  );
+  assert.equal(response.status, 200);
+  const report = await response.json();
+  assert.equal(report.delivery, 'disabled');
+  assert.equal(report.providers.fcm.result, 'credential_ok');
+  const plain = await handler(
+    new Request(url, {
+      method: 'POST',
+      body: '{}',
+      headers: { 'x-native-push-secret': 'fixture-secret' },
+    }),
+  );
+  assert.equal(plain.status, 503, 'without the probe flag a disabled sender still refuses to send');
+  assert.equal(claims, 0);
+});
