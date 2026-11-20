@@ -8,6 +8,9 @@
   height: 100dvh;
   min-height: 0;
   overflow: hidden;
+  /* Clips absolutely positioned descendants too (hidden file inputs in a
+     scrolled panel), which otherwise stretch the page below the shell. */
+  position: relative;
   background: #f6f3ec;
   color: var(--workspace-ink);
   font-family: var(--font-manrope), Arial, sans-serif;
