@@ -23672,6 +23672,111 @@ export type Database = {
           },
         ];
       };
+      merchant_import_batch: {
+        Row: {
+          attention_count: number;
+          created_at: string;
+          created_by: string | null;
+          created_count: number;
+          file_name: string;
+          headers: Json;
+          id: string;
+          mapping: Json;
+          merchant_id: string;
+          storage_path: string | null;
+          undone_at: string | null;
+          undone_removed: number | null;
+          updated_count: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          attention_count?: number;
+          created_at?: string;
+          created_by?: string | null;
+          created_count?: number;
+          file_name: string;
+          headers?: Json;
+          id?: string;
+          mapping?: Json;
+          merchant_id: string;
+          storage_path?: string | null;
+          undone_at?: string | null;
+          undone_removed?: number | null;
+          updated_count?: number;
+        };
+        Update: {
+          attention_count?: number;
+          created_at?: string;
+          created_by?: string | null;
+          created_count?: number;
+          file_name?: string;
+          headers?: Json;
+          id?: string;
+          mapping?: Json;
+          merchant_id?: string;
+          storage_path?: string | null;
+          undone_at?: string | null;
+          undone_removed?: number | null;
+          updated_count?: number;
+        };
+        Relationships: [];
+      };
+      merchant_import_mapping: {
+        Row: {
+          header_key: string;
+          headers: Json;
+          mapping: Json;
+          merchant_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          header_key: string;
+          headers: Json;
+          mapping: Json;
+          merchant_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          header_key?: string;
+          headers?: Json;
+          mapping?: Json;
+          merchant_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      merchant_import_row: {
+        Row: {
+          batch_id: string;
+          created: boolean;
+          item_id: string | null;
+          message: string | null;
+          raw: Json;
+          row_no: number;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          batch_id: string;
+          created?: boolean;
+          item_id?: string | null;
+          message?: string | null;
+          raw: Json;
+          row_no: number;
+          status: string;
+        };
+        Update: {
+          batch_id?: string;
+          created?: boolean;
+          item_id?: string | null;
+          message?: string | null;
+          raw?: Json;
+          row_no?: number;
+          status?: string;
+        };
+        Relationships: [];
+      };
       merchant_invite: {
         Row: {
           accepted_at: string | null;
@@ -23816,6 +23921,31 @@ export type Database = {
             referencedColumns: ['merchant_id'];
           },
         ];
+      };
+      merchant_item_extra: {
+        Row: {
+          batch_id: string | null;
+          extras: Json;
+          item_id: string;
+          merchant_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          batch_id?: string | null;
+          extras: Json;
+          item_id: string;
+          merchant_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          batch_id?: string | null;
+          extras?: Json;
+          item_id?: string;
+          merchant_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
       };
       merchant_message: {
         Row: {
@@ -63279,6 +63409,12 @@ export type Database = {
         Args: { p_merchant_id: string; p_override_id: string };
         Returns: undefined;
       };
+      rpc_merchant_import_batch_undo: { Args: { p_batch_id: string }; Returns: Json };
+      rpc_merchant_import_batches: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_import_mapping_read: {
+        Args: { p_header_key: string; p_merchant_id: string };
+        Returns: Json;
+      };
       rpc_merchant_invite_member: {
         Args: {
           p_branches?: string[];
@@ -63346,6 +63482,10 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_merchant_offerings_import_any: {
+        Args: { p_batch: Json; p_merchant_id: string; p_rows: Json };
+        Returns: Json;
       };
       rpc_merchant_onboarding_read: {
         Args: { p_category?: string; p_merchant_id?: string };
