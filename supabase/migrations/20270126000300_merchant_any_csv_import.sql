@@ -185,6 +185,15 @@ begin
       set headers = excluded.headers, mapping = excluded.mapping, updated_at = now();
   end if;
 
+  perform audit.log(
+    p_actor_type => 'merchant_user'::public.actor_type,
+    p_module => 'merchant',
+    p_action => 'merchant.offerings_import_recorded',
+    p_target_type => 'merchant',
+    p_target_id => p_merchant_id,
+    p_after => jsonb_build_object('batch_id', v_batch, 'rows', jsonb_array_length(p_batch->'rows'),
+      'created', v_result->'created', 'updated', v_result->'updated', 'attention', v_attention));
+
   return v_result || jsonb_build_object('batch_id', v_batch, 'attention', v_attention);
 end;
 $$;
@@ -278,7 +287,9 @@ $$;
 
 insert into audit.action_registry
   (action, module, default_severity, needs_review, pii_fields, two_person, money, description)
-values ('merchant.offerings_import_undone', 'merchants', 'info', false, '{}', false, false,
+values ('merchant.offerings_import_recorded', 'merchants', 'info', false, '{}', false, false,
+        'A merchant imported a spreadsheet: the file, its rows and their outcome were recorded as a batch'),
+       ('merchant.offerings_import_undone', 'merchants', 'info', false, '{}', false, false,
         'A merchant undid an offerings import: the new, never published offerings it added were removed')
 on conflict (action) do nothing;
 
