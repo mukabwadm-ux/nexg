@@ -1,5 +1,3 @@
-NEXG
-
 PAYOUT SENT
 {{ total }}
 to {{ payout_destination }}

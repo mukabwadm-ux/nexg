@@ -1,5 +1,3 @@
-NEXG
-
 ASANTE FOR STAYING
 How was your stay?
 {{ property_name }}, {{ stay_dates }}

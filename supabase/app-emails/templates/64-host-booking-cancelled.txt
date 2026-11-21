@@ -1,5 +1,3 @@
-NEXG
-
 BOOKING CANCELLED
 {{ stay_dates }}
 {{ unit_name }}

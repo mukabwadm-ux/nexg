@@ -1,5 +1,3 @@
-NEXG
-
 PAYOUT DETAILS CHECKED
 All set for payouts
 to {{ payout_destination }}

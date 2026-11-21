@@ -1,5 +1,3 @@
-NEXG
-
 NEW SIGN-IN
 Was this you?
 {{ device }} · {{ signed_in_at }}

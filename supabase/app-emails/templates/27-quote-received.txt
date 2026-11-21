@@ -1,5 +1,3 @@
-NEXG
-
 YOUR PRICE IS READY
 {{ quote_amount }}
 

@@ -1,5 +1,3 @@
-NEXG
-
 ACCOUNT DELETED
 Your account is deleted
 {{ deleted_at }}

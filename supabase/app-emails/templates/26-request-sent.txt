@@ -1,5 +1,3 @@
-NEXG
-
 REQUEST SENT
 We’ve sent your request
 to {{ business_name }}

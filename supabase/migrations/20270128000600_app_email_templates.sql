@@ -5,7 +5,7 @@ insert into app_email.template
   (key, group_key, name, required, pref_category, subject, preheader, html, text, sample)
 values
   ($tpl$01-confirm-email$tpl$, $tpl$account$tpl$, $tpl$Confirm your email$tpl$, true, null,
-   $tpl$Confirm your email for NEXG$tpl$, $tpl$Type the code into the NEXG app. It works for 10 minutes.$tpl$,
+   $tpl${{ code }} is your NEXG verification code$tpl$, $tpl$Your NEXG verification code is {{ code }}. It confirms your email.$tpl$,
    $tpl$<!doctype html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -16,7 +16,7 @@ values
 <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
 <meta name="color-scheme" content="light dark">
 <meta name="supported-color-schemes" content="light dark">
-<title>Confirm your email for NEXG</title>
+<title>{{ code }} is your NEXG verification code</title>
 <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
 <style>
 :root{color-scheme:light dark;supported-color-schemes:light dark}
@@ -27,7 +27,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -97,7 +97,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </style>
 </head>
 <body class="nx-page" style="margin:0;padding:0;background:#F7F8FA">
-<div style="display:none;max-height:0;max-width:0;overflow:hidden;opacity:0;mso-hide:all;font-size:1px;line-height:1px;color:#F7F8FA">Type the code into the NEXG app. It works for 10 minutes.&#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; </div>
+<div style="display:none;max-height:0;max-width:0;overflow:hidden;opacity:0;mso-hide:all;font-size:1px;line-height:1px;color:#F7F8FA">Your NEXG verification code is {{ code }}. It confirms your email.&#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; </div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="nx-page" style="background:#F7F8FA">
 <tr><td align="center" style="padding:20px 12px 24px">
 <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
@@ -108,7 +108,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </td></tr>
 <tr><td class="nx-card" bgcolor="#FFFFFF" style="background:#FFFFFF;border-radius:32px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-<tr><td class="nx-pad" align="center" style="padding:34px 28px 0;text-align:center"><p class="nx-gold" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.4;font-weight:700;color:#77510A">Confirm your email</p><p class="nx-muted" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin-top:14px;font-size:14px;line-height:1.5;color:#50666E">Your code</p><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:10px auto 0"><tr><td class="nx-soft" style="padding:14px 16px 14px 20px;border-radius:20px;background:#F3F6F7"><span class="nx-ink nx-code" style="display:block;font-family:'SF Mono',Menlo,Consolas,'Courier New',monospace;font-size:32px;line-height:1.2;font-weight:700;letter-spacing:4px;white-space:nowrap;color:#142D35;-webkit-user-select:all;user-select:all">{{ code }}</span></td></tr></table><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:12px auto 0"><tr><td align="center" bgcolor="#F8C54B" style="border-radius:999px;background:#F8C54B"><a href="https://www.nexgapp.com/copy-code.html#{{ code }}" target="_blank" style="display:block;padding:9px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:18px;font-weight:700;color:#14242A;text-decoration:none;border-radius:999px">Copy</a></td></tr></table></td></tr>
+<tr><td class="nx-pad" align="center" style="padding:34px 28px 0;text-align:center"><p class="nx-muted" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.4;color:#50666E">Your NEXG verification code is</p><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:10px auto 0"><tr><td class="nx-soft" style="padding:14px 20px;border-radius:20px;background:#F3F6F7"><span class="nx-ink nx-code" style="display:block;font-family:'SF Mono',Menlo,Consolas,'Courier New',monospace;font-size:34px;line-height:1.2;font-weight:700;white-space:nowrap;color:#142D35;-webkit-user-select:all;user-select:all">{{ code }}</span></td></tr></table><p class="nx-gold" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin-top:12px;font-size:16px;line-height:1.4;font-weight:700;color:#77510A">To confirm your email</p></td></tr>
 <tr><td class="nx-pad" align="left" style="padding:22px 28px 0;text-align:left"><p class="nx-ink" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.55;color:#142D35">Hi{{#first_name}} {{ first_name }}{{/first_name}}, type this code into the NEXG app to confirm your email and finish setting up your account. It works once, for 10 minutes.</p></td></tr>
 <tr><td class="nx-pad" align="left" style="padding:22px 28px 0;text-align:left"><p class="nx-muted" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.4;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#50666E">Didn’t sign up?</p><p class="nx-ink" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin-top:4px;font-size:16px;line-height:1.55;color:#142D35">Someone may have typed your email by mistake. You can ignore this email; nothing happens without the code.</p></td></tr>
 <tr><td style="height:30px;line-height:30px;font-size:0">&nbsp;</td></tr>
@@ -125,12 +125,9 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
+   $tpl$Your NEXG verification code is {{ code }}
 
-CONFIRM YOUR EMAIL
-
-Your code: {{ code }}
-Copy: https://www.nexgapp.com/copy-code.html#{{ code }}
+To confirm your email.
 
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, type this code into
 the NEXG app to confirm your email and finish setting up your account.
@@ -146,7 +143,7 @@ You’re getting this because this email was used to sign up for NEXG · NEXG, n
 $tpl$,
    $tpl${"first_name":"Amani","email":"amani@example.com","activity_url":"https://nexgapp.com/activity/sample","app_url":"https://nexgapp.com/app","security_url":"https://nexgapp.com/account/security","support_url":"https://nexgapp.com/account/support/requests","privacy_url":"https://nexgapp.com/account/privacy","calendar_url":"https://nexgapp.com/sample/calendar","directions_url":"https://nexgapp.com/sample/directions","code":"48291637","confirm_url":"https://nexgapp.com/auth/confirm?token_hash=SAMPLE&type=email","sign_in_url":"https://nexgapp.com/auth/confirm?token_hash=SAMPLE&type=magiclink"}$tpl$::jsonb),
   ($tpl$02-sign-in-code$tpl$, $tpl$account$tpl$, $tpl$Sign-in and password code$tpl$, true, null,
-   $tpl$Your NEXG code$tpl$, $tpl$Type it into the NEXG app. It works for 10 minutes.$tpl$,
+   $tpl${{ code }} is your NEXG verification code$tpl$, $tpl$Your NEXG verification code is {{ code }}. Use it to sign in.$tpl$,
    $tpl$<!doctype html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -157,7 +154,7 @@ $tpl$,
 <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
 <meta name="color-scheme" content="light dark">
 <meta name="supported-color-schemes" content="light dark">
-<title>Your NEXG code</title>
+<title>{{ code }} is your NEXG verification code</title>
 <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
 <style>
 :root{color-scheme:light dark;supported-color-schemes:light dark}
@@ -168,7 +165,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -238,7 +235,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </style>
 </head>
 <body class="nx-page" style="margin:0;padding:0;background:#F7F8FA">
-<div style="display:none;max-height:0;max-width:0;overflow:hidden;opacity:0;mso-hide:all;font-size:1px;line-height:1px;color:#F7F8FA">Type it into the NEXG app. It works for 10 minutes.&#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; </div>
+<div style="display:none;max-height:0;max-width:0;overflow:hidden;opacity:0;mso-hide:all;font-size:1px;line-height:1px;color:#F7F8FA">Your NEXG verification code is {{ code }}. Use it to sign in.&#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; </div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="nx-page" style="background:#F7F8FA">
 <tr><td align="center" style="padding:20px 12px 24px">
 <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
@@ -249,7 +246,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </td></tr>
 <tr><td class="nx-card" bgcolor="#FFFFFF" style="background:#FFFFFF;border-radius:32px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-<tr><td class="nx-pad" align="center" style="padding:34px 28px 0;text-align:center"><p class="nx-gold" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.4;font-weight:700;color:#77510A">Your NEXG code</p><p class="nx-muted" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin-top:14px;font-size:14px;line-height:1.5;color:#50666E">Your code</p><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:10px auto 0"><tr><td class="nx-soft" style="padding:14px 16px 14px 20px;border-radius:20px;background:#F3F6F7"><span class="nx-ink nx-code" style="display:block;font-family:'SF Mono',Menlo,Consolas,'Courier New',monospace;font-size:32px;line-height:1.2;font-weight:700;letter-spacing:4px;white-space:nowrap;color:#142D35;-webkit-user-select:all;user-select:all">{{ code }}</span></td></tr></table><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:12px auto 0"><tr><td align="center" bgcolor="#F8C54B" style="border-radius:999px;background:#F8C54B"><a href="https://www.nexgapp.com/copy-code.html#{{ code }}" target="_blank" style="display:block;padding:9px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:18px;font-weight:700;color:#14242A;text-decoration:none;border-radius:999px">Copy</a></td></tr></table></td></tr>
+<tr><td class="nx-pad" align="center" style="padding:34px 28px 0;text-align:center"><p class="nx-muted" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.4;color:#50666E">Your NEXG verification code is</p><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:10px auto 0"><tr><td class="nx-soft" style="padding:14px 20px;border-radius:20px;background:#F3F6F7"><span class="nx-ink nx-code" style="display:block;font-family:'SF Mono',Menlo,Consolas,'Courier New',monospace;font-size:34px;line-height:1.2;font-weight:700;white-space:nowrap;color:#142D35;-webkit-user-select:all;user-select:all">{{ code }}</span></td></tr></table><p class="nx-gold" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin-top:12px;font-size:16px;line-height:1.4;font-weight:700;color:#77510A">To sign in, or to change your password</p></td></tr>
 <tr><td class="nx-pad" align="left" style="padding:22px 28px 0;text-align:left"><p class="nx-ink" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.55;color:#142D35">Hi{{#first_name}} {{ first_name }}{{/first_name}}, type this code into the NEXG app to sign in, or to confirm it’s you when you change your password. It works once, for 10 minutes.</p></td></tr>
 <tr><td class="nx-pad" align="left" style="padding:16px 28px 0;text-align:left"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style=""><tr><td class="nx-gold-soft" style="padding:14px 16px;border-radius:18px;background:#FDF0CF;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;color:#77510A"><strong>Never share this code</strong>, not even with someone who says they’re from NEXG.</td></tr></table></td></tr>
 <tr><td class="nx-pad" align="left" style="padding:22px 28px 0;text-align:left"><p class="nx-muted" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.4;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#50666E">Didn’t ask for this?</p><p class="nx-ink" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin-top:4px;font-size:16px;line-height:1.55;color:#142D35">You can ignore this email. No one can sign in without the code.</p></td></tr>
@@ -267,12 +264,9 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
+   $tpl$Your NEXG verification code is {{ code }}
 
-YOUR NEXG CODE
-
-Your code: {{ code }}
-Copy: https://www.nexgapp.com/copy-code.html#{{ code }}
+To sign in, or to change your password.
 
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, type this code into
 the NEXG app to sign in, or to confirm it’s you when you change your
@@ -311,7 +305,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -410,9 +404,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-YOU’RE IN
+   $tpl$YOU’RE IN
 Welcome to NEXG
 Order, book and follow it all in one app.
 
@@ -454,7 +446,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -555,9 +547,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-PASSWORD
+   $tpl$PASSWORD
 Choose a new password
 
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, we got a request to
@@ -601,7 +591,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -700,9 +690,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-PASSWORD CHANGED
+   $tpl$PASSWORD CHANGED
 Your password was changed
 {{ changed_at }}
 
@@ -722,7 +710,7 @@ You’re getting this because of your NEXG account · NEXG, nexgapp.com
 $tpl$,
    $tpl${"first_name":"Amani","email":"amani@example.com","activity_url":"https://nexgapp.com/activity/sample","app_url":"https://nexgapp.com/app","security_url":"https://nexgapp.com/account/security","support_url":"https://nexgapp.com/account/support/requests","privacy_url":"https://nexgapp.com/account/privacy","calendar_url":"https://nexgapp.com/sample/calendar","directions_url":"https://nexgapp.com/sample/directions","code":"48291637","confirm_url":"https://nexgapp.com/auth/confirm?token_hash=SAMPLE&type=email","sign_in_url":"https://nexgapp.com/auth/confirm?token_hash=SAMPLE&type=magiclink","changed_at":"Fri 20 Nov 2026, 10:14 am","device":"iPhone"}$tpl$::jsonb),
   ($tpl$06-confirm-new-email$tpl$, $tpl$account$tpl$, $tpl$Confirm a new email$tpl$, true, null,
-   $tpl$Confirm your new email for NEXG$tpl$, $tpl$Enter the code in the NEXG app. It works for 10 minutes.$tpl$,
+   $tpl${{ code }} is your NEXG verification code$tpl$, $tpl$Your NEXG verification code is {{ code }}. It confirms your new email.$tpl$,
    $tpl$<!doctype html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -733,7 +721,7 @@ $tpl$,
 <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
 <meta name="color-scheme" content="light dark">
 <meta name="supported-color-schemes" content="light dark">
-<title>Confirm your new email for NEXG</title>
+<title>{{ code }} is your NEXG verification code</title>
 <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
 <style>
 :root{color-scheme:light dark;supported-color-schemes:light dark}
@@ -744,7 +732,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -814,7 +802,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </style>
 </head>
 <body class="nx-page" style="margin:0;padding:0;background:#F7F8FA">
-<div style="display:none;max-height:0;max-width:0;overflow:hidden;opacity:0;mso-hide:all;font-size:1px;line-height:1px;color:#F7F8FA">Enter the code in the NEXG app. It works for 10 minutes.&#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; </div>
+<div style="display:none;max-height:0;max-width:0;overflow:hidden;opacity:0;mso-hide:all;font-size:1px;line-height:1px;color:#F7F8FA">Your NEXG verification code is {{ code }}. It confirms your new email.&#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; </div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="nx-page" style="background:#F7F8FA">
 <tr><td align="center" style="padding:20px 12px 24px">
 <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
@@ -825,7 +813,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </td></tr>
 <tr><td class="nx-card" bgcolor="#FFFFFF" style="background:#FFFFFF;border-radius:32px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-<tr><td class="nx-pad" align="center" style="padding:34px 28px 0;text-align:center"><p class="nx-gold" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.4;font-weight:700;color:#77510A">Confirm your new email</p><p class="nx-muted" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin-top:14px;font-size:14px;line-height:1.5;color:#50666E">Your code</p><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:10px auto 0"><tr><td class="nx-soft" style="padding:14px 16px 14px 20px;border-radius:20px;background:#F3F6F7"><span class="nx-ink nx-code" style="display:block;font-family:'SF Mono',Menlo,Consolas,'Courier New',monospace;font-size:32px;line-height:1.2;font-weight:700;letter-spacing:4px;white-space:nowrap;color:#142D35;-webkit-user-select:all;user-select:all">{{ code }}</span></td></tr></table><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:12px auto 0"><tr><td align="center" bgcolor="#F8C54B" style="border-radius:999px;background:#F8C54B"><a href="https://www.nexgapp.com/copy-code.html#{{ code }}" target="_blank" style="display:block;padding:9px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:18px;font-weight:700;color:#14242A;text-decoration:none;border-radius:999px">Copy</a></td></tr></table></td></tr>
+<tr><td class="nx-pad" align="center" style="padding:34px 28px 0;text-align:center"><p class="nx-muted" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.4;color:#50666E">Your NEXG verification code is</p><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:10px auto 0"><tr><td class="nx-soft" style="padding:14px 20px;border-radius:20px;background:#F3F6F7"><span class="nx-ink nx-code" style="display:block;font-family:'SF Mono',Menlo,Consolas,'Courier New',monospace;font-size:34px;line-height:1.2;font-weight:700;white-space:nowrap;color:#142D35;-webkit-user-select:all;user-select:all">{{ code }}</span></td></tr></table><p class="nx-gold" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin-top:12px;font-size:16px;line-height:1.4;font-weight:700;color:#77510A">To confirm your new email</p></td></tr>
 <tr><td class="nx-pad" align="left" style="padding:22px 28px 0;text-align:left"><p class="nx-ink" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.55;color:#142D35">Hi{{#first_name}} {{ first_name }}{{/first_name}}, type this code into the NEXG app to start using <strong>{{ new_email }}</strong> for NEXG. It works once, for 10 minutes.</p></td></tr>
 <tr><td class="nx-pad" align="left" style="padding:22px 28px 0;text-align:left"><p class="nx-muted" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.4;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#50666E">Didn’t ask for this?</p><p class="nx-ink" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin-top:4px;font-size:16px;line-height:1.55;color:#142D35">You can ignore this email. Your NEXG email won’t change.</p></td></tr>
 <tr><td style="height:30px;line-height:30px;font-size:0">&nbsp;</td></tr>
@@ -842,12 +830,9 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
+   $tpl$Your NEXG verification code is {{ code }}
 
-CONFIRM YOUR NEW EMAIL
-
-Your code: {{ code }}
-Copy: https://www.nexgapp.com/copy-code.html#{{ code }}
+To confirm your new email.
 
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, type this code into
 the NEXG app to start using {{ new_email }} for NEXG. It works once, for
@@ -884,7 +869,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -983,9 +968,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-EMAIL CHANGED
+   $tpl$EMAIL CHANGED
 Your NEXG email was changed
 Now: {{ new_email_masked }}
 
@@ -1027,7 +1010,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -1126,9 +1109,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-NEW SIGN-IN
+   $tpl$NEW SIGN-IN
 Was this you?
 {{ device }} · {{ signed_in_at }}
 
@@ -1149,7 +1130,7 @@ You’re getting this because of your NEXG account · NEXG, nexgapp.com
 $tpl$,
    $tpl${"first_name":"Amani","email":"amani@example.com","activity_url":"https://nexgapp.com/activity/sample","app_url":"https://nexgapp.com/app","security_url":"https://nexgapp.com/account/security","support_url":"https://nexgapp.com/account/support/requests","privacy_url":"https://nexgapp.com/account/privacy","calendar_url":"https://nexgapp.com/sample/calendar","directions_url":"https://nexgapp.com/sample/directions","code":"48291637","confirm_url":"https://nexgapp.com/auth/confirm?token_hash=SAMPLE&type=email","sign_in_url":"https://nexgapp.com/auth/confirm?token_hash=SAMPLE&type=magiclink","device":"Samsung Galaxy phone","signed_in_at":"Fri 20 Nov 2026, 8:02 pm","approximate_place":"Nairobi, Kenya"}$tpl$::jsonb),
   ($tpl$09-two-step-code$tpl$, $tpl$account$tpl$, $tpl$Two-step sign-in code$tpl$, true, null,
-   $tpl$Your NEXG sign-in code$tpl$, $tpl$Enter the code to finish signing in.$tpl$,
+   $tpl${{ code }} is your NEXG verification code$tpl$, $tpl$Your NEXG verification code is {{ code }}. Use it to finish signing in.$tpl$,
    $tpl$<!doctype html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -1160,7 +1141,7 @@ $tpl$,
 <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
 <meta name="color-scheme" content="light dark">
 <meta name="supported-color-schemes" content="light dark">
-<title>Your NEXG sign-in code</title>
+<title>{{ code }} is your NEXG verification code</title>
 <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
 <style>
 :root{color-scheme:light dark;supported-color-schemes:light dark}
@@ -1171,7 +1152,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -1241,7 +1222,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </style>
 </head>
 <body class="nx-page" style="margin:0;padding:0;background:#F7F8FA">
-<div style="display:none;max-height:0;max-width:0;overflow:hidden;opacity:0;mso-hide:all;font-size:1px;line-height:1px;color:#F7F8FA">Enter the code to finish signing in.&#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; </div>
+<div style="display:none;max-height:0;max-width:0;overflow:hidden;opacity:0;mso-hide:all;font-size:1px;line-height:1px;color:#F7F8FA">Your NEXG verification code is {{ code }}. Use it to finish signing in.&#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; &#8199;&#65279;&#847; </div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="nx-page" style="background:#F7F8FA">
 <tr><td align="center" style="padding:20px 12px 24px">
 <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
@@ -1252,7 +1233,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </td></tr>
 <tr><td class="nx-card" bgcolor="#FFFFFF" style="background:#FFFFFF;border-radius:32px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-<tr><td class="nx-pad" align="center" style="padding:34px 28px 0;text-align:center"><p class="nx-gold" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.4;font-weight:700;color:#77510A">Two-step sign-in</p><p class="nx-muted" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin-top:14px;font-size:14px;line-height:1.5;color:#50666E">Your code</p><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:10px auto 0"><tr><td class="nx-soft" style="padding:14px 16px 14px 20px;border-radius:20px;background:#F3F6F7"><span class="nx-ink nx-code" style="display:block;font-family:'SF Mono',Menlo,Consolas,'Courier New',monospace;font-size:32px;line-height:1.2;font-weight:700;letter-spacing:4px;white-space:nowrap;color:#142D35;-webkit-user-select:all;user-select:all">{{ code }}</span></td></tr></table><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:12px auto 0"><tr><td align="center" bgcolor="#F8C54B" style="border-radius:999px;background:#F8C54B"><a href="https://www.nexgapp.com/copy-code.html#{{ code }}" target="_blank" style="display:block;padding:9px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:18px;font-weight:700;color:#14242A;text-decoration:none;border-radius:999px">Copy</a></td></tr></table></td></tr>
+<tr><td class="nx-pad" align="center" style="padding:34px 28px 0;text-align:center"><p class="nx-muted" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.4;color:#50666E">Your NEXG verification code is</p><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:10px auto 0"><tr><td class="nx-soft" style="padding:14px 20px;border-radius:20px;background:#F3F6F7"><span class="nx-ink nx-code" style="display:block;font-family:'SF Mono',Menlo,Consolas,'Courier New',monospace;font-size:34px;line-height:1.2;font-weight:700;white-space:nowrap;color:#142D35;-webkit-user-select:all;user-select:all">{{ code }}</span></td></tr></table><p class="nx-gold" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin-top:12px;font-size:16px;line-height:1.4;font-weight:700;color:#77510A">To finish signing in</p></td></tr>
 <tr><td class="nx-pad" align="left" style="padding:22px 28px 0;text-align:left"><p class="nx-ink" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.55;color:#142D35">Hi{{#first_name}} {{ first_name }}{{/first_name}}, enter this code in the NEXG app to finish signing in. It works once, for 10 minutes.</p></td></tr>
 <tr><td class="nx-pad" align="left" style="padding:16px 28px 0;text-align:left"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style=""><tr><td class="nx-red-soft" style="padding:14px 16px;border-radius:18px;background:#F9E3E8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;color:#A32940"><strong>Didn’t just sign in?</strong> Someone has your password. Change it now in Account, then Security.</td></tr></table></td></tr>
 <tr><td style="height:30px;line-height:30px;font-size:0">&nbsp;</td></tr>
@@ -1269,12 +1250,9 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
+   $tpl$Your NEXG verification code is {{ code }}
 
-TWO-STEP SIGN-IN
-
-Your code: {{ code }}
-Copy: https://www.nexgapp.com/copy-code.html#{{ code }}
+To finish signing in.
 
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, enter this code in
 the NEXG app to finish signing in. It works once, for 10 minutes.
@@ -1310,7 +1288,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -1412,9 +1390,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-ORDER PLACED AND PAID
+   $tpl$ORDER PLACED AND PAID
 {{ total }}
 
 {{ business_name }}
@@ -1472,7 +1448,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -1572,9 +1548,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-ORDER CANCELLED
+   $tpl$ORDER CANCELLED
 Your order was cancelled
 {{ cancel_reason }}
 
@@ -1620,7 +1594,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -1720,9 +1694,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-REFUND SENT
+   $tpl$REFUND SENT
 {{ refund_amount }}
 back to {{ refund_method }}
 
@@ -1772,7 +1744,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -1872,9 +1844,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-DELIVERED
+   $tpl$DELIVERED
 {{ total }}
 your final price, after weighing
 
@@ -1925,7 +1895,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -2029,9 +1999,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-BOOKING CONFIRMED
+   $tpl$BOOKING CONFIRMED
 {{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
 {{ date_title }}
 
@@ -2094,7 +2062,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -2198,9 +2166,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-TABLE RESERVED
+   $tpl$TABLE RESERVED
 {{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
 {{ date_title }}
 
@@ -2264,7 +2230,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -2365,9 +2331,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-{{ reminder_label }}
+   $tpl${{ reminder_label }}
 {{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
 {{ date_title }}
 
@@ -2414,7 +2378,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -2515,9 +2479,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-BOOKING CHANGED
+   $tpl$BOOKING CHANGED
 {{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
 {{ date_title }}
 
@@ -2566,7 +2528,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -2666,9 +2628,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-BOOKING CANCELLED
+   $tpl$BOOKING CANCELLED
 {{ booking_title }}
 {{ booking_when }}
 
@@ -2711,7 +2671,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -2811,9 +2771,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-REQUEST SENT
+   $tpl$REQUEST SENT
 We’ve sent your request
 to {{ business_name }}
 
@@ -2860,7 +2818,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -2961,9 +2919,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-YOUR PRICE IS READY
+   $tpl$YOUR PRICE IS READY
 {{ quote_amount }}
 
 {{ business_name }}
@@ -3011,7 +2967,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -3111,9 +3067,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-DEPOSIT RECEIVED
+   $tpl$DEPOSIT RECEIVED
 {{ deposit_amount }}
 for {{ booking_title }}
 
@@ -3164,7 +3118,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -3263,9 +3217,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-REQUEST RECEIVED
+   $tpl$REQUEST RECEIVED
 We’re finding you a stay
 reference {{ ticket_reference }}
 
@@ -3311,7 +3263,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -3412,9 +3364,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-YOUR OPTIONS ARE READY
+   $tpl$YOUR OPTIONS ARE READY
 {{ option_count }} stays
 for {{ request_dates }}
 
@@ -3460,7 +3410,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -3564,9 +3514,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-STAY BOOKED
+   $tpl$STAY BOOKED
 {{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
 {{ date_title }}
 
@@ -3630,7 +3578,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -3733,9 +3681,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-CHECK-IN DETAILS
+   $tpl$CHECK-IN DETAILS
 {{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
 {{ date_title }}
 
@@ -3792,7 +3738,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -3893,9 +3839,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-STAY CHANGED
+   $tpl$STAY CHANGED
 {{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
 {{ date_title }}
 
@@ -3943,7 +3887,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -4043,9 +3987,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-STAY CANCELLED
+   $tpl$STAY CANCELLED
 {{ property_name }}
 {{ check_in_date }} to {{ check_out_date }}
 
@@ -4088,7 +4030,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -4189,9 +4131,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-CHECK-OUT TOMORROW
+   $tpl$CHECK-OUT TOMORROW
 {{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
 {{ date_title }}
 
@@ -4238,7 +4178,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -4338,9 +4278,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-ASANTE FOR STAYING
+   $tpl$ASANTE FOR STAYING
 How was your stay?
 {{ property_name }}, {{ stay_dates }}
 
@@ -4383,7 +4321,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -4483,9 +4421,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-WELCOME TO NEXG HOSTS
+   $tpl$WELCOME TO NEXG HOSTS
 Let’s get you set up
 {{ business_name }}
 
@@ -4531,7 +4467,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -4631,9 +4567,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-DOCUMENTS
+   $tpl$DOCUMENTS
 We need another copy
 {{ document_name }}
 
@@ -4677,7 +4611,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -4775,9 +4709,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-APPROVED
+   $tpl$APPROVED
 You’re live on NEXG
 
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, your documents are
@@ -4816,7 +4748,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -4918,9 +4850,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-NEW BOOKING
+   $tpl$NEW BOOKING
 {{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
 {{ date_title }}
 
@@ -4980,7 +4910,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -5080,9 +5010,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-BOOKING CANCELLED
+   $tpl$BOOKING CANCELLED
 {{ stay_dates }}
 {{ unit_name }}
 
@@ -5126,7 +5054,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -5226,9 +5154,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-ARRIVING TOMORROW
+   $tpl$ARRIVING TOMORROW
 {{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
 {{ date_title }}
 
@@ -5275,7 +5201,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -5374,9 +5300,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-PAYOUT SENT
+   $tpl$PAYOUT SENT
 {{ total }}
 to {{ payout_destination }}
 
@@ -5423,7 +5347,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -5522,9 +5446,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-PAYOUT DETAILS
+   $tpl$PAYOUT DETAILS
 New payout details saved
 to {{ payout_destination }}
 
@@ -5565,7 +5487,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -5663,9 +5585,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-PAYOUT DETAILS CHECKED
+   $tpl$PAYOUT DETAILS CHECKED
 All set for payouts
 to {{ payout_destination }}
 
@@ -5704,7 +5624,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -5803,9 +5723,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-MESSAGE RECEIVED
+   $tpl$MESSAGE RECEIVED
 {{ ticket_reference }}
 your reference
 
@@ -5846,7 +5764,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -5944,9 +5862,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-NEW REPLY
+   $tpl$NEW REPLY
 We’ve replied
 about {{ ticket_reference }}
 
@@ -5984,7 +5900,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -6082,9 +5998,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-REQUEST CLOSED
+   $tpl$REQUEST CLOSED
 We’ve closed your request
 {{ ticket_reference }}
 
@@ -6123,7 +6037,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -6223,9 +6137,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-ACCOUNT DELETED
+   $tpl$ACCOUNT DELETED
 Your account is deleted
 {{ deleted_at }}
 
@@ -6270,7 +6182,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 @media (max-width:620px){
 .nx-pad{padding-left:22px!important;padding-right:22px!important}
 .nx-huge{font-size:40px!important}
-.nx-code{font-size:28px!important;letter-spacing:3px!important}
+.nx-code{font-size:30px!important}
 }
 @media (prefers-color-scheme:dark){
 .nx-page{background:#080F12!important}
@@ -6370,9 +6282,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
 </body>
 </html>
 $tpl$,
-   $tpl$NEXG
-
-YOUR DATA
+   $tpl$YOUR DATA
 Your data is ready
 download it by {{ download_expires }}
 

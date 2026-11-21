@@ -1,5 +1,3 @@
-NEXG
-
 ORDER CANCELLED
 Your order was cancelled
 {{ cancel_reason }}

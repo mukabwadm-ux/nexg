@@ -1,5 +1,3 @@
-NEXG
-
 MESSAGE RECEIVED
 {{ ticket_reference }}
 your reference

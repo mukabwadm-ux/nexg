@@ -5,8 +5,8 @@
     "name": "Confirm your email",
     "required": true,
     "pref_category": null,
-    "subject": "Confirm your email for NEXG",
-    "preheader": "Type the code into the NEXG app. It works for 10 minutes.",
+    "subject": "{{ code }} is your NEXG verification code",
+    "preheader": "Your NEXG verification code is {{ code }}. It confirms your email.",
     "auth": "supabase/templates/app/confirm-signup.html",
     "sample": {
       "first_name": "Amani",
@@ -29,8 +29,8 @@
     "name": "Sign-in and password code",
     "required": true,
     "pref_category": null,
-    "subject": "Your NEXG code",
-    "preheader": "Type it into the NEXG app. It works for 10 minutes.",
+    "subject": "{{ code }} is your NEXG verification code",
+    "preheader": "Your NEXG verification code is {{ code }}. Use it to sign in.",
     "auth": "supabase/templates/app/magic-link.html",
     "sample": {
       "first_name": "Amani",
@@ -128,8 +128,8 @@
     "name": "Confirm a new email",
     "required": true,
     "pref_category": null,
-    "subject": "Confirm your new email for NEXG",
-    "preheader": "Enter the code in the NEXG app. It works for 10 minutes.",
+    "subject": "{{ code }} is your NEXG verification code",
+    "preheader": "Your NEXG verification code is {{ code }}. It confirms your new email.",
     "auth": "supabase/templates/app/email-change.html",
     "sample": {
       "first_name": "Amani",
@@ -205,8 +205,8 @@
     "name": "Two-step sign-in code",
     "required": true,
     "pref_category": null,
-    "subject": "Your NEXG sign-in code",
-    "preheader": "Enter the code to finish signing in.",
+    "subject": "{{ code }} is your NEXG verification code",
+    "preheader": "Your NEXG verification code is {{ code }}. Use it to finish signing in.",
     "auth": null,
     "sample": {
       "first_name": "Amani",

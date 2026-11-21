@@ -1,5 +1,3 @@
-NEXG
-
 STAY CANCELLED
 {{ property_name }}
 {{ check_in_date }} to {{ check_out_date }}
