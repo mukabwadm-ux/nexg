@@ -4,12 +4,9 @@ CONFIRM YOUR NEW EMAIL
 
 Your code: {{ code }}
 
-Confirm my new email:
-{{ confirm_url }}
-
-Hi{{#first_name}} {{ first_name }}{{/first_name}}, tap the button, or
-type the code into the NEXG app, to start using {{ new_email }} for
-NEXG. Both work once, for 10 minutes.
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, type this code into
+the NEXG app to start using {{ new_email }} for NEXG. It works once, for
+10 minutes.
 
 DIDN’T ASK FOR THIS?
 You can ignore this email. Your NEXG email won’t change.
