@@ -4,16 +4,17 @@ Customer emails for the phone apps, sent by the backend when the event happens, 
 
 ## Where things are
 
-| What                                  | Where                                                                                                           |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| The designs (source of truth)         | Consumer app repo `langs4u/nexg-app`, `docs/email-templates/` (gallery `index.html`)                            |
-| Copies the database sends             | `supabase/app-emails/templates/<id>.html` and `.txt`, `catalog.json` (subject, group, required, choice, sample) |
-| Supabase Auth versions (Go templates) | `supabase/templates/app/`                                                                                       |
-| The system                            | `supabase/migrations/20270128000200_app_emails.sql` (schema `app_email`)                                        |
-| The sender of every group             | `supabase/migrations/20270128000400_app_email_sender.sql`                                                       |
-| The stored templates                  | the newest `supabase/migrations/*_app_email_templates.sql`, generated                                           |
-| The wordmark pictures                 | `apps/web/public/email/app/` (served at `https://www.nexgapp.com/email/app/` once the website deploys)          |
-| Tests                                 | `supabase/tests/99_app_emails.sql`, `supabase/functions/notify-dispatch/email.test.ts`                          |
+| What                                         | Where                                                                                                                                                   |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The designs (source of truth)                | Consumer app repo `langs4u/nexg-app`, `docs/email-templates/` (gallery `index.html`)                                                                    |
+| Copies the database sends                    | `supabase/app-emails/templates/<id>.html` and `.txt`, `catalog.json` (subject, group, required, choice, sample)                                         |
+| Supabase Auth versions (Go templates)        | `supabase/templates/app/`                                                                                                                               |
+| The system                                   | `supabase/migrations/20270128000200_app_emails.sql` (schema `app_email`)                                                                                |
+| The sender of every group                    | `supabase/migrations/20270128000400_app_email_sender.sql`                                                                                               |
+| The stored templates                         | the newest `supabase/migrations/*_app_email_templates.sql`, generated                                                                                   |
+| The wordmark pictures                        | `apps/web/public/email/app/` (served at `https://www.nexgapp.com/email/app/` once the website deploys)                                                  |
+| The page behind the code emails' Copy button | `apps/web/public/copy-code.html` (served at `https://www.nexgapp.com/copy-code.html#<code>`; keep it the same as `docs/email-templates/copy-code.html`) |
+| Tests                                        | `supabase/tests/99_app_emails.sql`, `supabase/functions/notify-dispatch/email.test.ts`                                                                  |
 
 ## Keeping the design and the database in step
 

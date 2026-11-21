@@ -3,6 +3,7 @@ NEXG
 TWO-STEP SIGN-IN
 
 Your code: {{ code }}
+Copy: https://www.nexgapp.com/copy-code.html#{{ code }}
 
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, enter this code in
 the NEXG app to finish signing in. It works once, for 10 minutes.

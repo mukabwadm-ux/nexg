@@ -3,6 +3,7 @@ NEXG
 YOUR NEXG CODE
 
 Your code: {{ code }}
+Copy: https://www.nexgapp.com/copy-code.html#{{ code }}
 
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, type this code into
 the NEXG app to sign in, or to confirm it’s you when you change your

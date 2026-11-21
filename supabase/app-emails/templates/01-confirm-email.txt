@@ -3,6 +3,7 @@ NEXG
 CONFIRM YOUR EMAIL
 
 Your code: {{ code }}
+Copy: https://www.nexgapp.com/copy-code.html#{{ code }}
 
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, type this code into
 the NEXG app to confirm your email and finish setting up your account.
