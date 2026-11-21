@@ -135,4 +135,20 @@ export const privacy: LegalDocument = {
       plainEnglish: 'Email derrick@nexgapp.com, or complain to the Data Protection Commissioner.',
     },
   ],
+  // Ours, like the plain-English notes: each point restates a section above.
+  glance: [
+    'We never sell your personal data.',
+    'Your rider gets only what they need to deliver: your name, delivery location and contact number.',
+    'Exact delivery locations are kept for 90 days after delivery, unless an investigation needs them longer.',
+    'Order records are kept for up to 7 years after you close your account, for tax.',
+    'Marketing only if you opt in.',
+    'You can ask to see, correct, move or delete your data.',
+  ],
+  request: {
+    afterSection: 'your-rights',
+    title: 'Make a privacy request',
+    text: 'To see, correct, move or delete your data, write to our Data Protection Officer.',
+    email: 'derrick@nexgapp.com',
+    label: 'Email the privacy team',
+  },
 };

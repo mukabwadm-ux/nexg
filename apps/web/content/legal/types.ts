@@ -46,4 +46,29 @@ export interface LegalDocument {
    */
   draft: boolean;
   sections: LegalSection[];
+  /**
+   * "At a glance": the few points a reader most needs, in plain English,
+   * above the first section. Like `plainEnglish`, an aid to reading and
+   * never a term; the page says the full text is what applies. Each point
+   * must be something the operative text actually says.
+   */
+  glance?: string[];
+  /**
+   * Something a reader can ask for under this document (the privacy policy:
+   * a data request), offered as a button after the section it belongs to.
+   */
+  request?: LegalRequest;
 }
+
+export interface LegalRequest {
+  /** The `LegalSection.id` it follows. */
+  afterSection: string;
+  title: string;
+  text: string;
+  /** The address the operative text names for these requests. */
+  email: string;
+  label: string;
+}
+
+/** Who the legal hub's "Show documents for" filter is choosing between. */
+export type LegalAudience = 'customers' | 'merchants' | 'riders';
