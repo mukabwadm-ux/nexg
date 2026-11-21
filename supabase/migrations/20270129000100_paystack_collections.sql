@@ -668,6 +668,15 @@ begin
 end
 $cron$;
 
+insert into public.wiring_audit_exempt (function_name, reason, recorded_in) values
+  ('rpc_payment_paystack_attempt',
+   'Opens a try at Paystack before Paystack has heard of it; the try is audited as payment.paystack_started when Paystack accepts it.',
+   'paystack_attempt; audit payment.paystack_started from rpc_payment_paystack_opened'),
+  ('rpc_payment_paystack_verified',
+   'Records when Paystack was last asked; any change to the payment goes through rpc_payment_webhook, which audits payment.settled or payment.amount_mismatch.',
+   'paystack_attempt.checked_at; payment_event; audit from rpc_payment_webhook')
+on conflict (function_name) do nothing;
+
 insert into public.wiring_anon_allow (function_name, reason, guarded_by) values
   ('rpc_payment_paystack_webhook', 'Paystack calls in with no application session.',
    'The database checks the HMAC-SHA512 of the raw body against the Vault Paystack secret keys, then the attempt, mode, currency and amount before any payment changes.'),
