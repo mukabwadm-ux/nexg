@@ -4,16 +4,17 @@ Customer emails for the phone apps, sent by the backend when the event happens, 
 
 ## Where things are
 
-| What                                  | Where                                                                                                           |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| The designs (source of truth)         | Consumer app repo `langs4u/nexg-app`, `docs/email-templates/` (gallery `index.html`)                            |
-| Copies the database sends             | `supabase/app-emails/templates/<id>.html` and `.txt`, `catalog.json` (subject, group, required, choice, sample) |
-| Supabase Auth versions (Go templates) | `supabase/templates/app/`                                                                                       |
-| The system                            | `supabase/migrations/20270128000200_app_emails.sql` (schema `app_email`)                                        |
-| The sender of every group             | `supabase/migrations/20270128000400_app_email_sender.sql`                                                       |
-| The stored templates                  | the newest `supabase/migrations/*_app_email_templates.sql`, generated                                           |
-| The wordmark pictures                 | `apps/web/public/email/app/` (served at `https://www.nexgapp.com/email/app/` once the website deploys)          |
-| Tests                                 | `supabase/tests/99_app_emails.sql`, `supabase/functions/notify-dispatch/email.test.ts`                          |
+| What                                  | Where                                                                                                                                                                              |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The designs (source of truth)         | Consumer app repo `langs4u/nexg-app`, `docs/email-templates/` (gallery `index.html`)                                                                                               |
+| Copies the database sends             | `supabase/app-emails/templates/<id>.html` and `.txt`, `catalog.json` (subject, group, required, choice, sample)                                                                    |
+| Supabase Auth versions (Go templates) | `supabase/templates/app/`                                                                                                                                                          |
+| The system                            | `supabase/migrations/20270128000200_app_emails.sql` (schema `app_email`)                                                                                                           |
+| The sender of every group             | `supabase/migrations/20270128000400_app_email_sender.sql`                                                                                                                          |
+| The stored templates                  | the newest `supabase/migrations/*_app_email_templates.sql`, generated                                                                                                              |
+| The wordmark pictures                 | `apps/web/public/email/app/` (served at `https://www.nexgapp.com/email/app/` once the website deploys)                                                                             |
+| The page behind the Open NEXG button  | `apps/web/public/app-code.html`, served at `https://www.nexgapp.com/app/code` by a rewrite in `apps/web/next.config.mjs`; keep it the same as `docs/email-templates/app-code.html` |
+| Tests                                 | `supabase/tests/99_app_emails.sql`, `supabase/functions/notify-dispatch/email.test.ts`                                                                                             |
 
 ## Keeping the design and the database in step
 
@@ -39,11 +40,13 @@ Staff with Settings access can call `rpc_app_email_preview(p_key, p_vars)`. Noth
 ## Turning it on (the owner)
 
 1. **Sender.** Every app group sends from **NEXG Concierge <no-reply@nexgapp.com>**, and replies go to `info@nexgapp.com` (owner, 20 Nov 2026; change it per group in Email routing). In Resend, confirm the domain `nexgapp.com` is verified. `notify-dispatch` needs `RESEND_API_KEY` and `EMAIL_FROM` set as function secrets, and the Vault pair `notify_dispatch_url` / `notify_dispatch_secret`, as for the emails that already go out.
-2. **Deploy** the migrations, the `notify-dispatch` function (it now sends the HTML part) and the website (for the wordmark pictures).
+2. **Deploy** the migrations, the `notify-dispatch` function (it now sends the HTML part) and the website (for the wordmark pictures and the `/app/code` page).
 3. **One test send to your own address:** switch on one group, for example **App emails: help**, then send a help request from the app signed in with your own email. Check `select * from app_email.sent order by created_at desc` and `notification_log`.
 4. **Switch on** the groups you want in Admin > Settings > Email routing: `App emails: orders`, `bookings`, `stays`, `help`, `your data`. While a group is on, its email replaces the plain receipt and order bell emails it covers, so the customer gets one email.
 
 ## Supabase Auth emails (settings only; nothing here changes them)
+
+**Deploy the website before pasting these templates.** The confirm-email (01) and code (02) emails have an **Open NEXG** button under the code. It opens `https://www.nexgapp.com/app/code#type=…&email=…&code=…`. That page hands the code to the app (`nexg://account/code?…`), which fills it in. Without the app, the page shows the code to type in, with a link to get NEXG. Everything is after the `#`, so it never reaches a server. Until the website with that page is live, the button leads to a page that doesn't exist.
 
 Supabase Auth sends confirm, code, reset and change emails itself. They are project-wide: **the same template serves the website, merchant, host and rider sign-ins**, so replacing one changes theirs too. Today `config.toml` points `magic_link` and `email_change` at `templates/otp-code.html` and `recovery` at `templates/password-recovery.html` (which also carries the merchant, host and rider welcomes). Check the live dashboard before replacing anything.
 

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<title>Open NEXG</title>
+<!--
+  The page behind the "Open NEXG" button in the code emails:
+    https://www.nexgapp.com/app/code#type=signup&email=<address>&code=<digits>
+  Everything is after the # (the fragment), which browsers never send to a server, so nothing is logged.
+  The page clears it from the address bar, then hands the code to the app on
+    nexg://account/code?type=…&email=…&code=…   (see docs/sign-in-code-link.md)
+  which fills it in. Without the app, the code is shown to type in, with the store link.
+  No cookies, no storage, no requests, not indexed.
+  Source: langs4u/nexg-app docs/email-templates/app-code.html. Hosted copy: mukabwadm-ux/nexg apps/web
+  (served at /app/code). Keep the two the same.
+-->
+<style>
+:root{--bg:#F7F8FA;--soft:#F3F6F7;--ink:#142D35;--muted:#50666E;--btn:#F8C54B;--on:#14242A}
+@media (prefers-color-scheme:dark){:root{--bg:#080F12;--soft:#1C2C32;--ink:#F3F7F7;--muted:#A6BBC3}}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+main{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;box-sizing:border-box;text-align:center}
+.brand{font-weight:800;letter-spacing:3px;font-size:20px;margin:0}.brand b{color:#F8A51C}
+.code{padding:14px 20px;border-radius:20px;background:var(--soft);font:700 34px/1.2 'SF Mono',Menlo,Consolas,'Courier New',monospace;white-space:nowrap;-webkit-user-select:all;user-select:all}
+a.open{display:block;width:100%;max-width:320px;box-sizing:border-box;padding:16px 20px;border-radius:16px;background:var(--btn);color:var(--on);font-weight:700;font-size:17px;text-decoration:none}
+.small{font-size:14px;color:var(--muted);margin:0}.small a{color:inherit;font-weight:700}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <p class="brand">NE<b>XG</b></p>
+  <div class="code" id="code" hidden></div>
+  <a class="open" id="open" href="#" hidden>Open NEXG</a>
+  <p class="small" id="get" hidden>No NEXG app on this phone? <a href="https://play.google.com/store/apps/details?id=com.nexg.app">Get NEXG</a> and type the code in.</p>
+  <p class="small" id="none" hidden>Open this page from the button in your NEXG email.</p>
+</main>
+<script>
+(function () {
+  var p = new URLSearchParams((location.hash || '').slice(1));
+  try { history.replaceState(null, '', location.pathname); } catch (e) {}
+  var code = (p.get('code') || '').replace(/\D/g, '');
+  var type = p.get('type') || '';
+  var email = (p.get('email') || '').trim();
+  if (code.length < 6 || code.length > 10 || !/^(signup|signin|password)$/.test(type)) {
+    document.getElementById('none').hidden = false; return;
+  }
+  if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+    document.querySelector('#get a').href = 'https://www.nexgapp.com';
+  }
+  var link = 'nexg://account/code?type=' + encodeURIComponent(type) +
+    (email ? '&email=' + encodeURIComponent(email) : '') + '&code=' + encodeURIComponent(code);
+  var box = document.getElementById('code'), open = document.getElementById('open');
+  box.textContent = code; box.hidden = false;
+  open.href = link; open.hidden = false;
+  document.getElementById('get').hidden = false;
+  // On Android, try once on arrival (Chrome quietly does nothing without the app). iPhone Safari shows an
+  // error for an app that isn't there, so it waits for the tap.
+  if (/Android/.test(navigator.userAgent)) { try { location.href = link; } catch (e) {} }
+})();
+</script>
+</body>
+</html>

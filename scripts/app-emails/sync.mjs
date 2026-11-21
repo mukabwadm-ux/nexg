@@ -82,6 +82,7 @@ function toGo(id, html) {
   const map = {
     code: '{{ .Token }}',
     email: '{{ .Email }}',
+    email_q: '{{ .Email | urlquery }}',
     new_email: '{{ .NewEmail }}',
     new_email_masked: '{{ .Email }}',
     first_name: '{{ .Data.first_name }}',
