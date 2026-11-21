@@ -20699,6 +20699,7 @@ export type Database = {
           hours: Json | null;
           hours_pattern: string | null;
           id: string;
+          is_sample: boolean;
           kra_pin: string | null;
           landmark: string | null;
           late_night_until: string | null;
@@ -20796,6 +20797,7 @@ export type Database = {
           hours?: Json | null;
           hours_pattern?: string | null;
           id?: string;
+          is_sample?: boolean;
           kra_pin?: string | null;
           landmark?: string | null;
           late_night_until?: string | null;
@@ -20892,6 +20894,7 @@ export type Database = {
           hours?: Json | null;
           hours_pattern?: string | null;
           id?: string;
+          is_sample?: boolean;
           kra_pin?: string | null;
           landmark?: string | null;
           late_night_until?: string | null;
@@ -52559,6 +52562,7 @@ export type Database = {
           featured: boolean | null;
           health_badge: string | null;
           id: string | null;
+          is_sample: boolean | null;
           listed_at: string | null;
           opens_today: string | null;
           parent_merchant_id: string | null;
