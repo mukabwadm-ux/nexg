@@ -1,8 +1,6 @@
-NEXG
+Your NEXG verification code is {{ code }}
 
-TWO-STEP SIGN-IN
-
-Your code: {{ code }}
+To finish signing in.
 
 Hi{{#first_name}} {{ first_name }}{{/first_name}}, enter this code in
 the NEXG app to finish signing in. It works once, for 10 minutes.

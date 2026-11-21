@@ -1,5 +1,3 @@
-NEXG
-
 BOOKING CANCELLED
 {{ booking_title }}
 {{ booking_when }}

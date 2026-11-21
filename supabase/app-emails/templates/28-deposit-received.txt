@@ -1,5 +1,3 @@
-NEXG
-
 DEPOSIT RECEIVED
 {{ deposit_amount }}
 for {{ booking_title }}

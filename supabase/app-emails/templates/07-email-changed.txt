@@ -1,5 +1,3 @@
-NEXG
-
 EMAIL CHANGED
 Your NEXG email was changed
 Now: {{ new_email_masked }}

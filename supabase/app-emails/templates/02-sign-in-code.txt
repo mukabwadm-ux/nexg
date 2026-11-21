@@ -1,15 +1,10 @@
-NEXG
+Your NEXG verification code is {{ code }}
 
-SIGN IN
+To sign in, or to change your password.
 
-Your code: {{ code }}
-
-Sign in to NEXG:
-{{ sign_in_url }}
-
-Hi{{#first_name}} {{ first_name }}{{/first_name}}, tap the button, or
-type the code into the NEXG app, to sign in. Both work once, for 10
-minutes.
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, type this code into
+the NEXG app to sign in, or to confirm it’s you when you change your
+password. It works once, for 10 minutes.
 
 Never share this code, not even with someone who says they’re from NEXG.
 

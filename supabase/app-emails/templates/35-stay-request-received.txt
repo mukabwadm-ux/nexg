@@ -1,5 +1,3 @@
-NEXG
-
 REQUEST RECEIVED
 We’re finding you a stay
 reference {{ ticket_reference }}

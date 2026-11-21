@@ -1,5 +1,3 @@
-NEXG
-
 WELCOME TO NEXG HOSTS
 Let’s get you set up
 {{ business_name }}

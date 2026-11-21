@@ -1,5 +1,3 @@
-NEXG
-
 YOUR OPTIONS ARE READY
 {{ option_count }} stays
 for {{ request_dates }}

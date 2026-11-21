@@ -1,5 +1,3 @@
-NEXG
-
 REFUND SENT
 {{ refund_amount }}
 back to {{ refund_method }}

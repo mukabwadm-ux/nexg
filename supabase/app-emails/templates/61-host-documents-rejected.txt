@@ -1,5 +1,3 @@
-NEXG
-
 DOCUMENTS
 We need another copy
 {{ document_name }}

@@ -1,5 +1,3 @@
-NEXG
-
 NEW REPLY
 We’ve replied
 about {{ ticket_reference }}

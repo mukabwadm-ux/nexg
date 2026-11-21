@@ -1,5 +1,3 @@
-NEXG
-
 YOUR DATA
 Your data is ready
 download it by {{ download_expires }}

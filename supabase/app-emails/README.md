@@ -49,20 +49,20 @@ Supabase Auth sends confirm, code, reset and change emails itself. They are proj
 
 In the Supabase dashboard, **Authentication > Emails**:
 
-| Email                  | Dashboard template                                       | Subject                         | Body file                                                                                                                                  |
-| ---------------------- | -------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| 01 Confirm your email  | Confirm signup                                           | Confirm your email for NEXG     | `supabase/templates/app/confirm-signup.html`                                                                                               |
-| 02 Sign-in code        | Magic link                                               | Your NEXG sign-in code          | `supabase/templates/app/magic-link.html`                                                                                                   |
-| 04 Reset password      | Reset password                                           | Reset your NEXG password        | `supabase/templates/app/reset-password.html` (only once the welcome branches in `password-recovery.html` have a new home: shared-services) |
-| 06 Confirm a new email | Change email address                                     | Confirm your new email for NEXG | `supabase/templates/app/email-change.html`                                                                                                 |
-| 05 Password changed    | Security notifications > Password changed (turn on)      | Your NEXG password was changed  | `supabase/templates/app/password-changed.html`                                                                                             |
-| 07 Email changed       | Security notifications > Email address changed (turn on) | Your NEXG email was changed     | `supabase/templates/app/email-changed.html`                                                                                                |
+| Email                  | Dashboard template                                       | Subject                                       | Body file                                                                                                                                  |
+| ---------------------- | -------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 01 Confirm your email  | Confirm signup                                           | `{{ .Token }} is your NEXG verification code` | `supabase/templates/app/confirm-signup.html`                                                                                               |
+| 02 Sign-in code        | Magic link                                               | `{{ .Token }} is your NEXG verification code` | `supabase/templates/app/magic-link.html`                                                                                                   |
+| 04 Reset password      | Reset password                                           | Reset your NEXG password                      | `supabase/templates/app/reset-password.html` (only once the welcome branches in `password-recovery.html` have a new home: shared-services) |
+| 06 Confirm a new email | Change email address                                     | `{{ .Token }} is your NEXG verification code` | `supabase/templates/app/email-change.html`                                                                                                 |
+| 05 Password changed    | Security notifications > Password changed (turn on)      | Your NEXG password was changed                | `supabase/templates/app/password-changed.html`                                                                                             |
+| 07 Email changed       | Security notifications > Email address changed (turn on) | Your NEXG email was changed                   | `supabase/templates/app/email-changed.html`                                                                                                |
 
 Also in Authentication:
 
 - **SMTP** (Settings > SMTP): host `smtp.resend.com`, port `465`, user `resend`, password = a Resend API key the owner types in, sender `no-reply@nexgapp.com`, name `NEXG Concierge` (set by the owner, 20 Nov 2026). Without it Supabase's own mailer sends, with low limits.
 - **Email OTP length** 6 and **expiry** 600 seconds (the emails say "10 minutes"; `config.toml` already has `otp_length = 6`, `otp_expiry = 600`).
-- **Redirect URLs** (URL Configuration): add the app's return link, `nexg://auth/confirm` (and the Stays scheme), so the one-tap button lands in the app. Until nexgapp.com has universal links, a tap on a phone opens the website.
+- **Redirect URLs** (URL Configuration): add the app's return link, `nexg://auth/confirm` (and the Stays scheme), for when the app can take a one-tap link. Since 21 Nov 2026 the code emails (01, 02, 06) carry no one-tap button, only the code, because the link opened the website instead of the app. The code is also in the subject, so a phone offers it to copy. `config.toml` uses the same subject for `magic_link` and `email_change`, which serve every sign-in.
 - **Secure email change** is on (`double_confirm_changes`), so 06 goes to both the old and the new address.
 
 ## Guests
