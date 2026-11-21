@@ -268,8 +268,15 @@ test.describe('a guessed city is never presented as an address', () => {
   });
 });
 
+/**
+ * Pages that sell nothing carry no shop controls: sign-in, and the legal
+ * pages, which have their own header (owner, 21 Nov 2026: the location
+ * banner and cart bar covered the text).
+ */
+const WITHOUT_SHOP_CHROME = ['/sign-in', '/legal/privacy'];
+
 test.describe('the chip is on every public page', () => {
-  for (const route of PUBLIC_ROUTES.filter((r) => r !== '/sign-in')) {
+  for (const route of PUBLIC_ROUTES.filter((r) => !WITHOUT_SHOP_CHROME.includes(r))) {
     test(`${route} renders the Deliver to chip`, async ({ page }) => {
       await page.goto(route);
       await page.waitForTimeout(1500);
@@ -277,6 +284,18 @@ test.describe('the chip is on every public page', () => {
          and at least one visible at any viewport. */
       const chips = page.getByRole('button', { name: /deliver to/i });
       expect(await chips.count()).toBeGreaterThan(0);
+    });
+  }
+});
+
+test.describe('the legal pages carry no shop controls', () => {
+  for (const route of ['/legal', '/legal/privacy']) {
+    test(`${route} has no Deliver to chip and no cart bar`, async ({ page }) => {
+      await page.goto(route);
+      await page.waitForTimeout(1500);
+      await expect(page.getByRole('button', { name: /deliver to/i })).toHaveCount(0);
+      await expect(page.getByText(/view cart/i)).toHaveCount(0);
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     });
   }
 });
