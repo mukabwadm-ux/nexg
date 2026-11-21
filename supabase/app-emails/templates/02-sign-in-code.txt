@@ -2,9 +2,11 @@ Your NEXG verification code is {{ code }}
 
 To sign in, or to change your password.
 
-Hi{{#first_name}} {{ first_name }}{{/first_name}}, type this code into
-the NEXG app to sign in, or to confirm it’s you when you change your
-password. It works once, for 10 minutes.
+Open NEXG: https://www.nexgapp.com/app/code#type=signin&email={{ email_q }}&code={{ code }}
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, tap Open NEXG and the
+code goes in for you, or type it into the app, to sign in or to change
+your password. It works once, for 10 minutes.
 
 Never share this code, not even with someone who says they’re from NEXG.
 
