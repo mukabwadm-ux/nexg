@@ -1,5 +1,6 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import type { Payload } from 'payload';
+import { stayHoldView } from './stays.js';
 import { checkAvailability } from 'payload-reserve';
 import {
   normalizeBookingAnswers,
@@ -180,6 +181,8 @@ export class BookingEngine {
       audit: this.audit.bind(this),
       request: this.request.bind(this),
       now: this.clock,
+      scheduleAllows: this.scheduleAllows.bind(this),
+      expireHolds: this.expiredInTransaction.bind(this),
     };
   }
   specialistContext() {
@@ -662,6 +665,7 @@ export class BookingEngine {
    */
   bookingView(d: Doc, audience: 'merchant' | 'customer' = 'merchant') {
     const n = d.nexg ?? {};
+    if (n.stayHold) return stayHoldView(d, this.clock());
     const holdExpired = this.isExpiredHold(d);
     const {
       customerTokenHash: _,
@@ -2026,6 +2030,8 @@ export class BookingEngine {
     const result = await this.command(identity, key, 'booking.create', input, async (req) => {
       await this.expiredInTransaction(identity, req);
       const service = await this.own('services', input.offeringId, identity, req);
+      if (service.nexg?.stayInventory)
+        throw new BookingError(422, 'Use the dedicated Stay quote and hold workflow.', 'stay_command_required');
       if (publicOnly) await this.assertPublished(identity, service, req);
       const ticket = chosenTicketType(service.nexg, input.ticketTypeId);
       if (ticket?.maxPerBooking && quantity > ticket.maxPerBooking)
@@ -2494,6 +2500,8 @@ export class BookingEngine {
       if (identity.role === 'customer') this.assertCustomerToken(doc, customerToken);
       const n = doc.nexg ?? {},
         state = doc.status ?? n.status;
+      if (n.stayHold)
+        throw new BookingError(422, 'Use the dedicated Stay lifecycle workflow.', 'stay_command_required');
       if (n.recordRole === 'specialist_allocation')
         throw new BookingError(
           422,
