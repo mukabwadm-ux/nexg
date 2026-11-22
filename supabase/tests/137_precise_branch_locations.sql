@@ -1,4 +1,4 @@
--- Precise branch locations (20270130009700): every branch a merchant adds or
+-- Precise branch locations (20270203009700): every branch a merchant adds or
 -- edits keeps its exact pin, its position and its area in step, and a shop
 -- goes live only with its main location pinned in a served area and its
 -- opening hours set.

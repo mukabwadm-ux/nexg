@@ -86,7 +86,7 @@ export async function saveSetupLocation(
       p_latitude: point?.lat ?? null,
       p_longitude: point?.lng ?? null,
     });
-    /* Until 20270130009700 is on the database the save has no pin arguments. */
+    /* Until 20270203009700 is on the database the save has no pin arguments. */
     if (error?.code === 'PGRST202')
       ({ data, error } = await rpc('rpc_merchant_setup_location_save', args));
     if (error)
