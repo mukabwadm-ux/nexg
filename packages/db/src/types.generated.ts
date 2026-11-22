@@ -60005,6 +60005,13 @@ export type Database = {
       };
       fn_phone_country_code: { Args: { p_phone: string }; Returns: string };
       fn_pick_concierge: { Args: { p_city_id: string }; Returns: string };
+      fn_pin_from_text: {
+        Args: { p_text: string };
+        Returns: {
+          latitude: number;
+          longitude: number;
+        }[];
+      };
       fn_plan_flags: { Args: { p_plan_id: string }; Returns: Json };
       fn_plan_totals: {
         Args: { p_plan_id: string };
@@ -65679,6 +65686,8 @@ export type Database = {
           p_branch_id: string;
           p_contact: string;
           p_expected_updated_at: string;
+          p_latitude?: number;
+          p_longitude?: number;
           p_merchant_id: string;
           p_name: string;
           p_place_type: string;

@@ -15,6 +15,8 @@ const HREF: Record<string, string> = {
   agreement: '/merchant/documents#agreement',
   documents: '/merchant/documents#documents-list',
   branch: '/merchant/business',
+  branch_pin: '/merchant/stores',
+  hours: '/merchant/hours',
 };
 
 const ACTION: Record<string, string> = {
@@ -23,6 +25,8 @@ const ACTION: Record<string, string> = {
   agreement: 'Read and accept',
   documents: 'Upload',
   branch: 'Add location',
+  branch_pin: 'Pin on map',
+  hours: 'Set hours',
 };
 
 /**
@@ -30,6 +34,47 @@ const ACTION: Record<string, string> = {
  * here, in its dashboard, and NexG takes it live once everything is in and
  * checked. Shown only while something is still open.
  */
+/**
+ * For a shop that is already live: what keeps it off the apps' map or shows
+ * it as always open. Shown only while something is open.
+ */
+export function LiveGaps({ items }: { items: SetupTodoItem[] }) {
+  if (items.length === 0) return null;
+  return (
+    <section
+      aria-labelledby="live-gaps-title"
+      className="border-gold bg-surface mx-4 mt-6 rounded-2xl border-2 p-5 sm:mx-6 lg:mx-8"
+    >
+      <h2 id="live-gaps-title" className="text-lg font-extrabold tracking-tight">
+        Customers cannot find you on the map yet
+      </h2>
+      <p className="text-muted mt-1 text-sm font-semibold leading-[1.6]">
+        The NexG apps show shops by their exact pin and opening hours.
+      </p>
+      <ol className="mt-4 space-y-2">
+        {items.map((item, index) => (
+          <li
+            key={item.key}
+            className="border-border flex items-center justify-between gap-3 rounded-xl border px-4 py-3"
+          >
+            <span className="text-sm font-bold">
+              {index + 1}. {item.label}
+            </span>
+            {HREF[item.key] ? (
+              <Link
+                href={HREF[item.key]!}
+                className="bg-gold text-ink shrink-0 rounded-full px-4 py-2 text-xs font-extrabold"
+              >
+                {ACTION[item.key] ?? 'Open'}
+              </Link>
+            ) : null}
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
 export function SetupTodo({ items }: { items: SetupTodoItem[] }) {
   if (items.length === 0) return null;
   const yours = items.filter((i) => i.who === 'merchant');

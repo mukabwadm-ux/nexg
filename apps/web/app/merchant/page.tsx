@@ -9,7 +9,7 @@ import { HomeSetup } from '@/components/merchant/home-setup';
 import { DashboardLive } from '@/components/merchant/dashboard-live';
 import { DashboardSetup } from '@/components/merchant/dashboard-setup';
 import { DocumentsLive } from '@/components/merchant/documents-live';
-import { SetupTodo, type SetupTodoItem } from '@/components/merchant/setup-todo';
+import { LiveGaps, SetupTodo, type SetupTodoItem } from '@/components/merchant/setup-todo';
 import { firstName, merchantContext } from '@/components/merchant/frame';
 import type {
   AttentionRow,
@@ -142,6 +142,45 @@ export default async function MerchantDashboard() {
       : null;
   const todoItems = ((todo as { items?: SetupTodoItem[] } | null)?.items ?? []) as SetupTodoItem[];
 
+  // A live shop with no pin, or no hours, is on no map and shows as always
+  // open (22 Nov 2026): going live checks both now, but shops already live
+  // are told here.
+  const liveGaps: SetupTodoItem[] = [];
+  if (live) {
+    const [pinRes, hoursRes] = await Promise.all([
+      supabase
+        .from('merchant_branch')
+        .select('latitude, longitude, zone_id')
+        .eq('merchant_id', me.id)
+        .eq('is_primary', true)
+        .is('deleted_at', null)
+        .maybeSingle(),
+      supabase
+        .from('merchant_hours')
+        .select('id', { count: 'exact', head: true })
+        .eq('merchant_id', me.id),
+    ]);
+    const pin = pinRes.data as {
+      latitude: number | null;
+      longitude: number | null;
+      zone_id: string | null;
+    } | null;
+    if (!pinRes.error && (!pin || pin.latitude === null || pin.longitude === null))
+      liveGaps.push({
+        key: 'branch_pin',
+        who: 'merchant',
+        label: 'Put your main location on the map',
+      });
+    else if (!pinRes.error && pin && pin.zone_id === null)
+      liveGaps.push({
+        key: 'branch_pin',
+        who: 'merchant',
+        label: 'Your pin is outside the areas NexG serves. Check it is on your door',
+      });
+    if (!hoursRes.error && hoursRes.count === 0)
+      liveGaps.push({ key: 'hours', who: 'merchant', label: 'Set your opening hours' });
+  }
+
   /*
    * Everything the dashboard reads, in one batch: these used to go out as
    * three batches one after another. Documents are optional while
@@ -216,6 +255,7 @@ export default async function MerchantDashboard() {
       {dashboard ? (
         <>
           <SetupTodo items={todoItems} />
+          <LiveGaps items={liveGaps} />
           <HomeLive
             m={m}
             personName={person}

@@ -61,8 +61,12 @@ select '71000000-0000-4000-8000-0000000000c1', 'Glow Applied Ltd', 'Glow Applied
        'makeup', 'Wanjiru Kamau', '+254700000771', 'glow.applied@example.test', c.id, 'under_review'
 from public.city c where c.slug = 'nairobi';
 
-insert into public.merchant_branch (merchant_id, name, address_text, is_primary)
-values ('71000000-0000-4000-8000-0000000000c1', 'Main', '[Address]', true);
+-- Since 20270130009700 the main location needs its pin in a served area (Kilimani)
+-- and the shop its opening hours.
+insert into public.merchant_branch (merchant_id, name, address_text, is_primary, latitude, longitude)
+values ('71000000-0000-4000-8000-0000000000c1', 'Main', '[Address]', true, -1.285, 36.780);
+insert into public.merchant_hours (merchant_id, day_of_week, opens, closes)
+select '71000000-0000-4000-8000-0000000000c1', d, '09:00', '18:00' from generate_series(0, 6) d;
 select pg_temp.complete_setup('71000000-0000-4000-8000-0000000000c1', 'beauty', '71000000-0000-4000-8000-0000000000a1');
 
 insert into public.merchant_application (
@@ -237,8 +241,12 @@ select '71000000-0000-4000-8000-0000000000c2', 'Glow Edited Ltd', 'Glow Edited',
        'makeup', 'Achieng Otieno', '+254700000772', 'glow.edited@example.test', c.id, 'under_review'
 from public.city c where c.slug = 'nairobi';
 
-insert into public.merchant_branch (merchant_id, name, address_text, is_primary)
-values ('71000000-0000-4000-8000-0000000000c2', 'Main', '[Address]', true);
+-- Since 20270130009700 the main location needs its pin in a served area (Kilimani)
+-- and the shop its opening hours.
+insert into public.merchant_branch (merchant_id, name, address_text, is_primary, latitude, longitude)
+values ('71000000-0000-4000-8000-0000000000c2', 'Main', '[Address]', true, -1.285, 36.780);
+insert into public.merchant_hours (merchant_id, day_of_week, opens, closes)
+select '71000000-0000-4000-8000-0000000000c2', d, '09:00', '18:00' from generate_series(0, 6) d;
 select pg_temp.complete_setup('71000000-0000-4000-8000-0000000000c2', 'beauty', '71000000-0000-4000-8000-0000000000a1');
 
 -- Approved at revision 1, then edited: revision 2 waits for review.
