@@ -13,9 +13,6 @@ values ('c1320000-0000-4000-8000-00000000000a', '[Legal 132] Ltd', '[Shop 132]',
         '[Contact]', '+254700013201', 'shop132@example.test',
         (select id from public.city where slug = 'nairobi'), 'documents_pending');
 
-insert into public.merchant_application (merchant_id, payload)
-values ('c1320000-0000-4000-8000-00000000000a', '{}'::jsonb);
-
 insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, is_anonymous, created_at, updated_at)
 values
   ('00000000-0000-0000-0000-000000000000', 'c1320000-0000-4000-8000-000000000101',
@@ -25,6 +22,10 @@ values
 
 insert into public.merchant_user (merchant_id, user_id, role)
 values ('c1320000-0000-4000-8000-00000000000a', 'c1320000-0000-4000-8000-000000000101', 'owner');
+
+-- After the member: a merchant with an application only takes members from a live session.
+insert into public.merchant_application (merchant_id, payload)
+values ('c1320000-0000-4000-8000-00000000000a', '{}'::jsonb);
 
 -- Every session signed in 20 minutes ago, with no workspace activity since.
 insert into auth.sessions (id, user_id, created_at, updated_at)
