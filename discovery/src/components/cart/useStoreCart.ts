@@ -17,7 +17,7 @@ export const cartable = (item: Pick<CatalogItem, 'price' | 'currency' | 'isAvail
   && typeof item.price === 'number' && Number.isFinite(item.price) && item.price > 0 && (item.currency === undefined || item.currency === 'KES');
 
 /** "KES 3,400". */
-export const kes = (amount: number) => formatPrice({ price: amount, currency: 'KES' }, 'code') ?? `KES ${Math.round(amount).toLocaleString('en-KE')}`;
+export const kes = (amount: number) => formatPrice({ price: amount, currency: 'KES' }, 'code', false) ?? `KES ${Math.round(amount).toLocaleString('en-KE')}`;
 /** "1 item", "3 items". */
 export const itemCount = (count: number) => `${count} ${count === 1 ? 'item' : 'items'}`;
 /** The cart's one line about checkout. Off the website's own origin the cart can't reach checkout from here. */

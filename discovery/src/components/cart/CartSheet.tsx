@@ -6,6 +6,7 @@ import { ImageWithFallback } from '../ImageWithFallback';
 import { Stepper } from '../cards/OfferingSheet';
 import { useModalDialog } from './useModalDialog';
 import { checkoutNote, itemCount, kes, MAX_CART_QUANTITY, type StoreCart } from './useStoreCart';
+import { convertedKes } from '../../lib/displayCurrency';
 import './cart.css';
 
 const sentence = (text: string) => (/[.!?]$/.test(text) ? text : `${text}.`);
@@ -76,7 +77,7 @@ export function CartSheet({ merchant, cart, items, onClose }: {
         {cleared && <button type="button" className="cart-sheet__undo" onClick={undo}><Undo2 size={16} strokeWidth={2} aria-hidden="true" />Undo</button>}
       </div>}
     <footer className="cart-sheet__footer">
-      {lines.length > 0 && <p className="cart-sheet__subtotal"><span>Subtotal</span><strong>{kes(subtotalKes)}</strong></p>}
+      {lines.length > 0 && <p className="cart-sheet__subtotal"><span>Subtotal</span><strong>{kes(subtotalKes)}{convertedKes(subtotalKes) ? <span className="cart-sheet__approx"> ({convertedKes(subtotalKes)})</span> : null}</strong></p>}
       <p className="cart-sheet__note">{checkoutNote(checkoutUrl)}</p>
       <div className="cart-sheet__actions">
         {lines.length > 0 && <button type="button" className="cart-sheet__clear" onClick={clear}><Trash2 size={16} strokeWidth={2} aria-hidden="true" />Clear cart</button>}

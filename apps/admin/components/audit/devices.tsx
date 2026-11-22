@@ -2,6 +2,10 @@ import { Card } from '@nexg/ui';
 import Link from 'next/link';
 import * as React from 'react';
 
+import { signOutDevice } from '@/app/audit/actions';
+
+import { DeviceSignOut } from './actions-ui';
+
 import {
   DASH,
   Empty,
@@ -89,11 +93,17 @@ export function DevicesTab({
   selected,
   detail,
   error,
+  canSignOut = false,
+  currentDevice = null,
 }: {
   devices: DeviceRow[];
   selected: string | null;
   detail: DeviceDetail | null;
   error: string | null;
+  /** Super admins can end another device's sessions. */
+  canSignOut?: boolean;
+  /** This browser's own device id, which cannot sign itself out here. */
+  currentDevice?: string | null;
 }) {
   if (error) {
     return (
@@ -192,7 +202,13 @@ export function DevicesTab({
         ))}
       </div>
 
-      <DevicePanel device={current ?? null} id={selected} detail={detail} />
+      <DevicePanel
+        device={current ?? null}
+        id={selected}
+        detail={detail}
+        canSignOut={canSignOut}
+        isCurrent={!!selected && selected === currentDevice}
+      />
     </div>
   );
 }
@@ -201,10 +217,14 @@ function DevicePanel({
   device,
   id,
   detail,
+  canSignOut,
+  isCurrent,
 }: {
   device: DeviceRow | null;
   id: string | null;
   detail: DeviceDetail | null;
+  canSignOut: boolean;
+  isCurrent: boolean;
 }) {
   if (!id || !detail) {
     return (
@@ -233,6 +253,26 @@ function DevicePanel({
           Open these actions in the Activity tab
         </Link>
       </p>
+
+      {isCurrent ? (
+        <p className="text-muted mt-3 text-[0.75rem] font-semibold">
+          This is the browser you are using now.
+        </p>
+      ) : (
+        canSignOut &&
+        (device?.live_sessions ?? 0) > 0 && (
+          <div className="border-border mt-4 border-t pt-3">
+            <p className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-[0.12em]">
+              Sign this device out
+            </p>
+            <p className="text-muted mt-1 text-[0.75rem] font-semibold leading-[1.6]">
+              Ends its sessions now; every other device stays signed in. If it still knows the
+              password it can sign in again, so change the password as well if it should not.
+            </p>
+            <DeviceSignOut deviceId={id} onSignOut={signOutDevice} />
+          </div>
+        )
+      )}
 
       <h3 className="text-muted-light mt-5 text-[0.625rem] font-extrabold uppercase tracking-[0.12em]">
         Sign-ins · {detail.sign_ins.length}

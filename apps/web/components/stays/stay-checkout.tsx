@@ -12,6 +12,7 @@ import {
   stayCheckoutStatus,
   type CheckoutStatus,
 } from '@/app/(customer)/stays/[slug]/book/actions';
+import { ChargedInKesNote, ChargedPrice, Price } from '@/components/currency/price';
 
 interface UnitOption {
   id: string;
@@ -226,11 +227,12 @@ export function StayCheckout({
       </p>
       <p className="flex justify-between">
         <span className="text-muted">
-          {kes(unit.nightlyKes)} × {status?.nights ?? nights} night
+          <Price kes={unit.nightlyKes} /> × {status?.nights ?? nights} night
           {(status?.nights ?? nights) === 1 ? '' : 's'}
         </span>
-        <span className="font-extrabold">{kes(status?.totalKes ?? total)}</span>
+        <ChargedPrice kes={status?.totalKes ?? total} className="font-extrabold" />
       </p>
+      <ChargedInKesNote className="text-muted text-xs" />
     </div>
   );
 

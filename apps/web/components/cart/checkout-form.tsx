@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
+import { ChargedInKesNote, ChargedPrice, Price } from '@/components/currency/price';
 import { createClient } from '@/lib/supabase/client';
 
 import { kesFromCents, useCart } from './cart-provider';
@@ -337,7 +338,7 @@ export function CheckoutForm({
                 <div className="min-w-0 flex-1 basis-40">
                   <p className="truncate text-sm font-extrabold">{line.name}</p>
                   <p className="text-muted text-xs font-semibold">
-                    KES {line.price_kes.toLocaleString('en-KE')} each
+                    <Price kes={line.price_kes} /> each
                   </p>
                 </div>
                 <div className="border-border flex items-center rounded-full border">
@@ -362,7 +363,7 @@ export function CheckoutForm({
                   </button>
                 </div>
                 <span className="ml-auto w-24 text-right text-sm font-extrabold">
-                  KES {(line.price_kes * line.quantity).toLocaleString('en-KE')}
+                  <Price kes={line.price_kes * line.quantity} />
                 </span>
                 <button
                   type="button"
@@ -484,9 +485,10 @@ export function CheckoutForm({
           <div className="border-border mt-3 flex items-baseline justify-between border-t pt-3">
             <span className="font-extrabold">Total</span>
             <span className="text-xl font-extrabold">
-              {quote?.ok ? kesFromCents(quote.total_cents) : '—'}
+              {quote?.ok ? <ChargedPrice kes={quote.total_cents / 100} /> : '—'}
             </span>
           </div>
+          <ChargedInKesNote className="text-muted mt-2 text-xs font-semibold" />
 
           {quote && !quote.located && (
             <p className="text-muted mt-2 text-xs font-semibold">
