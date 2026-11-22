@@ -268,6 +268,56 @@ export async function setItemSoldOut(itemId: string, soldOut: boolean): Promise<
   };
 }
 
+/** The smallest basket the shop takes, in whole shillings; null for none. */
+export async function setMinOrder(minOrderKes: number | null): Promise<Outcome> {
+  const { client, merchantId } = await merchantActionClient({ access: 'setup' });
+  if (minOrderKes !== null && (!Number.isInteger(minOrderKes) || minOrderKes < 1))
+    return { ok: false, message: 'Enter a whole amount in shillings, or leave it empty for none.' };
+  const { data, error } = await client.rpc('rpc_merchant_set_min_order', {
+    p_merchant_id: merchantId,
+    p_min_order_kes: minOrderKes ?? undefined,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/merchant/menu');
+  const reply = data as { message?: string } | null;
+  return { ok: true, message: reply?.message ?? 'Saved.' };
+}
+
+/**
+ * Whether an item takes a message (a cake's writing, a card) and what
+ * customers are asked. An empty label turns messages off.
+ */
+export async function setItemMessage(
+  itemId: string,
+  label: string,
+  maxLength = 100,
+): Promise<Outcome> {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup',
+  });
+  const asked = label.trim() || null;
+  if (asked && asked.length > 60)
+    return { ok: false, message: 'Keep the question to 60 characters.' };
+  if (!Number.isInteger(maxLength) || maxLength < 1 || maxLength > 500)
+    return { ok: false, message: 'Allow between 1 and 500 characters.' };
+  const { data, error } = await client
+    .from('catalogue_item')
+    .update({ message_label: asked, message_max_length: maxLength })
+    .eq('id', itemId)
+    .eq('merchant_id', authorizedMerchantId)
+    .select('id')
+    .maybeSingle();
+  if (error) return { ok: false, message: error.message };
+  if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
+  revalidatePath('/merchant/menu');
+  return {
+    ok: true,
+    message: asked
+      ? `Saved. Customers are asked "${asked}", up to ${maxLength} characters.`
+      : 'Saved. This item no longer takes a message.',
+  };
+}
+
 /*
  * Prices and new items. Row security on catalogue_item already limits
  * every write here to members of the merchant, and checkout re-reads the

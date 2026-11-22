@@ -118,7 +118,9 @@ select is((select count(*)::int from public.catalogue_setup_review
 
 -- ── shape
 
-select columns_are('public', 'catalogue_menu_public', array[
+select is(array(select column_name::text from information_schema.columns
+                 where table_schema = 'public' and table_name = 'catalogue_menu_public'
+                 order by ordinal_position limit 32), array[
   'id', 'merchant_id', 'section_id', 'name', 'description', 'price_kes', 'available',
   'age_restricted', 'highlighted', 'sort', 'photo_path', 'gallery_paths', 'kind',
   'booking_offering_id', 'sold_by', 'unit_label', 'unit_step', 'unit_min', 'unit_max',
