@@ -62473,6 +62473,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_developer_session: { Args: { p_activity?: boolean }; Returns: Json };
       rpc_dispatch_assign_manual: {
         Args: { p_job_id: string; p_reason: string; p_rider_id: string };
         Returns: Json;
