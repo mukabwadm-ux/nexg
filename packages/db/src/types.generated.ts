@@ -53117,6 +53117,8 @@ export type Database = {
           pay_on_delivery_enabled: boolean | null;
           prep_minutes: number | null;
           public_answers: Json | null;
+          rating_avg: number | null;
+          rating_count: number | null;
           subcategory: string | null;
           trading_name: string | null;
           zone_id: string | null;
