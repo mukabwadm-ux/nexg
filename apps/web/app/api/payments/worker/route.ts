@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { callbackOrigin, callbackSecretValid, registerPaybillUrls } from '@/lib/daraja';
 import { settleDuePrompts } from '@/lib/mpesa-prompt';
 import { sendQueuedPayouts } from '@/lib/mpesa-payout';
+import { sweepPaystack } from '@/lib/order-payment';
+import { sweepSignatureValid } from '@/lib/paystack';
 import { createPublicClient } from '@/lib/supabase/public';
 
 export const dynamic = 'force-dynamic';
@@ -22,6 +24,19 @@ export const maxDuration = 60;
  * - Registers the Paybill confirmation address, when asked to.
  */
 export async function POST(request: Request) {
+  /* The database's Paystack sweep signs its call with a Paystack key instead
+     of the Daraja token, so it works with Daraja switched off. */
+  const paystackSweep = request.headers.get('x-paystack-worker');
+  if (paystackSweep !== null) {
+    if (!sweepSignatureValid(paystackSweep)) {
+      return NextResponse.json({ ok: false, message: 'Not allowed.' }, { status: 401 });
+    }
+    const paystack = await sweepPaystack(
+      createPublicClient() as unknown as Parameters<typeof sweepPaystack>[0],
+    );
+    return NextResponse.json({ ok: true, paystack });
+  }
+
   if (!callbackSecretValid(request.headers.get('x-payments-secret'))) {
     return NextResponse.json({ ok: false, message: 'Not allowed.' }, { status: 401 });
   }

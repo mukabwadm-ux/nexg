@@ -20752,6 +20752,7 @@ export type Database = {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
           accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          accepts_test_payments: boolean;
           acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
           acquisition_source: string | null;
           answers: NonNullable<Json>;
@@ -20849,6 +20850,7 @@ export type Database = {
           accepting_orders?: boolean;
           accepting_orders_changed_at?: string | null;
           accepting_orders_source?: Database['public']['Enums']['merchant_control_source'] | null;
+          accepts_test_payments?: boolean;
           acquisition_channel?: Database['public']['Enums']['acquisition_channel'] | null;
           acquisition_source?: string | null;
           answers?: NonNullable<Json>;
@@ -20945,6 +20947,7 @@ export type Database = {
           accepting_orders?: boolean;
           accepting_orders_changed_at?: string | null;
           accepting_orders_source?: Database['public']['Enums']['merchant_control_source'] | null;
+          accepts_test_payments?: boolean;
           acquisition_channel?: Database['public']['Enums']['acquisition_channel'] | null;
           acquisition_source?: string | null;
           answers?: NonNullable<Json>;
@@ -30724,11 +30727,13 @@ export type Database = {
           guest_id: string | null;
           id: string;
           intent: Database['public']['Enums']['payment_intent'];
+          is_test: boolean;
           merchant_id: string | null;
           order_id: string | null;
           paid_at: string | null;
           payer_phone: string | null;
           provider: string;
+          provider_fee_cents: number | null;
           provider_receipt: string | null;
           provider_ref: string | null;
           reference: string;
@@ -30753,11 +30758,13 @@ export type Database = {
           guest_id?: string | null;
           id?: string;
           intent: Database['public']['Enums']['payment_intent'];
+          is_test?: boolean;
           merchant_id?: string | null;
           order_id?: string | null;
           paid_at?: string | null;
           payer_phone?: string | null;
           provider?: string;
+          provider_fee_cents?: number | null;
           provider_receipt?: string | null;
           provider_ref?: string | null;
           reference: string;
@@ -30781,11 +30788,13 @@ export type Database = {
           guest_id?: string | null;
           id?: string;
           intent?: Database['public']['Enums']['payment_intent'];
+          is_test?: boolean;
           merchant_id?: string | null;
           order_id?: string | null;
           paid_at?: string | null;
           payer_phone?: string | null;
           provider?: string;
+          provider_fee_cents?: number | null;
           provider_receipt?: string | null;
           provider_ref?: string | null;
           reference?: string;
@@ -31335,6 +31344,69 @@ export type Database = {
             columns: ['updated_by'];
             isOneToOne: false;
             referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      paystack_attempt: {
+        Row: {
+          access_code: string | null;
+          authorization_url: string | null;
+          channel: string;
+          check_count: number;
+          checked_at: string | null;
+          created_at: string;
+          created_by: string | null;
+          failure_reason: string | null;
+          id: string;
+          is_test: boolean;
+          opened_at: string | null;
+          outcome: string | null;
+          payment_id: string;
+          phone: string | null;
+          reference: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          access_code?: string | null;
+          authorization_url?: string | null;
+          channel: string;
+          check_count?: number;
+          checked_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          failure_reason?: string | null;
+          id?: string;
+          is_test: boolean;
+          opened_at?: string | null;
+          outcome?: string | null;
+          payment_id: string;
+          phone?: string | null;
+          reference: string;
+        };
+        Update: {
+          access_code?: string | null;
+          authorization_url?: string | null;
+          channel?: string;
+          check_count?: number;
+          checked_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          failure_reason?: string | null;
+          id?: string;
+          is_test?: boolean;
+          opened_at?: string | null;
+          outcome?: string | null;
+          payment_id?: string;
+          phone?: string | null;
+          reference?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'paystack_attempt_payment_id_fkey';
+            columns: ['payment_id'];
+            isOneToOne: false;
+            referencedRelation: 'payment';
             referencedColumns: ['id'];
           },
         ];
@@ -58175,6 +58247,7 @@ export type Database = {
       cron_native_push_dispatch: { Args: Record<PropertyKey, never>; Returns: boolean };
       cron_notify_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_payments_worker: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_paystack_sweep: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_push_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_refresh_reports: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_scan_partitions: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -58774,6 +58847,7 @@ export type Database = {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
           accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          accepts_test_payments: boolean;
           acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
           acquisition_source: string | null;
           answers: NonNullable<Json>;
@@ -59210,6 +59284,10 @@ export type Database = {
       fn_payment_reference: { Args: Record<PropertyKey, never>; Returns: string };
       fn_payments_require: { Args: { p_city_id: string; p_what: string }; Returns: string };
       fn_payments_worker_poke: { Args: { p_body?: Json }; Returns: Json };
+      fn_paystack_apply: {
+        Args: { p_data: Json; p_event: string; p_mode: string; p_payload: Json };
+        Returns: Json;
+      };
       fn_phone_country_code: { Args: { p_phone: string }; Returns: string };
       fn_pick_concierge: { Args: { p_city_id: string }; Returns: string };
       fn_plan_flags: { Args: { p_plan_id: string }; Returns: Json };
@@ -63740,6 +63818,7 @@ export type Database = {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
           accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          accepts_test_payments: boolean;
           acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
           acquisition_source: string | null;
           answers: NonNullable<Json>;
@@ -63858,6 +63937,7 @@ export type Database = {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
           accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          accepts_test_payments: boolean;
           acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
           acquisition_source: string | null;
           answers: NonNullable<Json>;
@@ -64219,6 +64299,7 @@ export type Database = {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
           accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          accepts_test_payments: boolean;
           acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
           acquisition_source: string | null;
           answers: NonNullable<Json>;
@@ -64389,6 +64470,7 @@ export type Database = {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
           accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          accepts_test_payments: boolean;
           acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
           acquisition_source: string | null;
           answers: NonNullable<Json>;
@@ -64502,6 +64584,7 @@ export type Database = {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
           accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          accepts_test_payments: boolean;
           acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
           acquisition_source: string | null;
           answers: NonNullable<Json>;
@@ -64607,6 +64690,7 @@ export type Database = {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
           accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          accepts_test_payments: boolean;
           acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
           acquisition_source: string | null;
           answers: NonNullable<Json>;
@@ -64730,6 +64814,7 @@ export type Database = {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
           accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          accepts_test_payments: boolean;
           acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
           acquisition_source: string | null;
           answers: NonNullable<Json>;
@@ -64891,6 +64976,7 @@ export type Database = {
           accepting_orders: boolean;
           accepting_orders_changed_at: string | null;
           accepting_orders_source: Database['public']['Enums']['merchant_control_source'] | null;
+          accepts_test_payments: boolean;
           acquisition_channel: Database['public']['Enums']['acquisition_channel'] | null;
           acquisition_source: string | null;
           answers: NonNullable<Json>;
@@ -65363,6 +65449,7 @@ export type Database = {
         Args: { p_detail?: Json; p_event: string; p_order_id: string; p_reason: string };
         Returns: Json;
       };
+      rpc_order_payment_state: { Args: { p_order_id: string }; Returns: Json };
       rpc_order_place_api: {
         Args: { p_api_key: string; p_idempotency_key: string; p_payload: Json };
         Returns: Json;
@@ -65574,6 +65661,35 @@ export type Database = {
           p_phone: string;
           p_reference: string;
         };
+        Returns: Json;
+      };
+      rpc_payment_paystack_attempt: {
+        Args: { p_channel: string; p_payment_reference: string; p_phone: string; p_proof: string };
+        Returns: Json;
+      };
+      rpc_payment_paystack_due: {
+        Args: { p_proof: string };
+        Returns: {
+          attempt_reference: string;
+          is_test: boolean;
+        }[];
+      };
+      rpc_payment_paystack_opened: {
+        Args: {
+          p_access_code: string;
+          p_attempt_reference: string;
+          p_authorization_url: string;
+          p_failure: string;
+          p_proof: string;
+        };
+        Returns: Json;
+      };
+      rpc_payment_paystack_verified: {
+        Args: { p_attempt_reference: string; p_proof: string; p_verify_body: string };
+        Returns: Json;
+      };
+      rpc_payment_paystack_webhook: {
+        Args: { p_raw_body: string; p_signature: string };
         Returns: Json;
       };
       rpc_payment_webhook: {
