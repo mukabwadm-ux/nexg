@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@nexg/ui';
-import { AlertCircle, CheckCircle2, CircleDashed, FileUp, RefreshCw } from 'lucide-react';
+import { AlertCircle, CheckCircle2, CircleDashed, Eye, FileUp, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
@@ -28,6 +28,8 @@ export interface OnFile {
   expires_at: string | null;
   side: string | null;
   created_at: string;
+  /** A short-lived link to the uploaded file, where the page signed one. */
+  view_url?: string | null;
 }
 
 export interface Asked {
@@ -420,6 +422,17 @@ function SideUpload({
         </span>
       </div>
 
+      {have?.view_url && state.kind === 'idle' && (
+        <a
+          href={have.view_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gold-text mt-1.5 inline-flex items-center gap-1 text-[0.8125rem] font-bold underline underline-offset-4"
+        >
+          <Eye aria-hidden="true" className="h-3.5 w-3.5" />
+          View uploaded file
+        </a>
+      )}
       {have?.status === 'rejected' && have.rejection_reason && state.kind !== 'sent' && (
         <p className="text-danger mt-1.5 text-[0.8125rem] font-bold">{have.rejection_reason}</p>
       )}

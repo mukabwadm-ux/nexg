@@ -115,10 +115,16 @@ export function ProfileView({
   request,
   preview,
   message,
+  onImage,
 }: {
   data: Business;
   readOnly: boolean;
   live?: boolean;
+  /**
+   * Saves a logo or banner straight away (a live business). Without it the
+   * image joins the draft and is saved with the rest of the profile.
+   */
+  onImage?: (target: 'logo' | 'cover', dataUrl: string | null) => void;
   draft: Business['profile'];
   onChange: (value: Business['profile']) => void;
   onSave: () => void;
@@ -128,8 +134,11 @@ export function ProfileView({
   message: ViewProps['message'];
 }) {
   const patch = (value: Partial<Business['profile']>) => onChange({ ...draft, ...value });
+  const imagesLocked = readOnly && !onImage;
+  const setImage = (target: 'logo' | 'cover', value: string) =>
+    onImage ? onImage(target, value || null) : patch({ [target]: value });
   function image(file: File | undefined, target: 'logo' | 'cover') {
-    if (!file || readOnly) return;
+    if (!file || imagesLocked) return;
     if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 2000000) {
       message('Choose a PNG, JPEG or WebP image up to 2 MB.');
       return;
@@ -164,7 +173,7 @@ export function ProfileView({
           message('Choose a smaller photo so the profile can be saved in this browser.');
           return;
         }
-        patch({ [target]: result });
+        setImage(target, result);
       };
       photo.src = String(reader.result);
     };
@@ -208,7 +217,7 @@ export function ProfileView({
                       aria-label="Upload brand logo"
                       type="file"
                       accept="image/png,image/jpeg,image/webp"
-                      disabled={readOnly}
+                      disabled={imagesLocked}
                       className="sr-only"
                       onChange={(e) => {
                         image(e.target.files?.[0], 'logo');
@@ -244,7 +253,7 @@ export function ProfileView({
                         aria-label="Upload banner photo"
                         type="file"
                         accept="image/png,image/jpeg,image/webp"
-                        disabled={readOnly}
+                        disabled={imagesLocked}
                         className="sr-only"
                         onChange={(e) => {
                           image(e.target.files?.[0], 'cover');
@@ -256,8 +265,8 @@ export function ProfileView({
                       <button
                         type="button"
                         className="bu-link bu-small"
-                        disabled={readOnly}
-                        onClick={() => patch({ cover: '' })}
+                        disabled={imagesLocked}
+                        onClick={() => setImage('cover', '')}
                       >
                         Remove banner
                       </button>

@@ -11,6 +11,7 @@ import {
 import { AlertCircle, Download, FileText, MapPin, Package } from 'lucide-react';
 import { MerchantLivePreviewShell } from '../live-preview-shell';
 import { useMerchantOnboardingDemoContext } from '../merchant-onboarding-demo-provider';
+import { saveBrandImage } from './brand-upload';
 import { ActivityEditor, DocumentEditor, LocationEditor, MemberEditor } from './editors';
 import {
   blockingImpact,
@@ -79,6 +80,7 @@ export function BusinessWorkspace({
   liveTools,
   liveMemberTools,
   liveDocuments,
+  liveBrand,
 }: {
   initialProfileId?: string;
   initialTab?: Section;
@@ -89,6 +91,8 @@ export function BusinessWorkspace({
   liveMemberTools?: Record<string, ReactNode>;
   /** The real requirements and files, so a document panel can upload. */
   liveDocuments?: LiveDocuments | null;
+  /** A live business whose owner or manager may change the logo and banner. */
+  liveBrand?: { merchantId: string } | null;
 }) {
   const inheritedDemo = useMerchantOnboardingDemoContext();
   const live = Boolean(liveData);
@@ -389,6 +393,36 @@ export function BusinessWorkspace({
         setNotice('The profile draft could not be stored in this browser.');
       }
   }
+  async function saveImage(target: 'logo' | 'cover', dataUrl: string | null) {
+    if (!liveBrand || busy) return;
+    setBusy(true);
+    setError('');
+    setNotice(dataUrl ? 'Uploading…' : 'Removing…');
+    try {
+      const url = await saveBrandImage(
+        liveBrand.merchantId,
+        target === 'logo' ? 'logo' : 'banner',
+        dataUrl,
+      );
+      const value = url ?? '';
+      setProfileDraft((current) => (current ? { ...current, [target]: value } : current));
+      setData((current) =>
+        current ? { ...current, profile: { ...current.profile, [target]: value } } : current,
+      );
+      setNotice(
+        target === 'logo'
+          ? 'Logo saved.'
+          : value
+            ? 'Banner photo saved. Guests see it on your store.'
+            : 'Banner photo removed.',
+      );
+    } catch (e) {
+      setNotice('');
+      setError(e instanceof Error ? e.message : 'The image could not be saved. Try again.');
+    } finally {
+      setBusy(false);
+    }
+  }
   function requestChange(kind: string) {
     setRequest({ kind, text: '' });
     setError('');
@@ -654,6 +688,7 @@ export function BusinessWorkspace({
                   request={requestChange}
                   preview={showPreview}
                   message={message}
+                  {...(liveBrand && !busy ? { onImage: saveImage } : {})}
                 />
               ) : tab === 'activities' ? (
                 <ActivitiesView {...viewProps} />
