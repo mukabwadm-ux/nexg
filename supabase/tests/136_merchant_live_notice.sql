@@ -1,5 +1,5 @@
 -- Going live: the bell is true and the congratulations email is the only
--- email (20270131000550); coming back after a pause is still emailed.
+-- email (20270131000650); coming back after a pause is still emailed.
 
 begin;
 create extension if not exists pgtap with schema extensions;
