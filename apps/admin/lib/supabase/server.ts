@@ -1,7 +1,18 @@
 import type { Database } from '@nexg/db';
 import { createServerClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+
+import { DEVICE_COOKIE, contextHeaders } from '@/lib/request-context';
+
+function requestHeaders(deviceId: string | undefined): Record<string, string> {
+  try {
+    return contextHeaders(headers(), deviceId, 'admin');
+  } catch {
+    /* Outside a request (build time): nothing to forward. */
+    return {};
+  }
+}
 
 /**
  * Supabase client for server components, route handlers and server actions.
@@ -28,6 +39,8 @@ export function createClient(): SupabaseClient<Database> {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      /* Which device and address this call came from, for the audit log. */
+      global: { headers: requestHeaders(cookieStore.get(DEVICE_COOKIE)?.value) },
       cookies: {
         getAll() {
           return cookieStore.getAll();

@@ -4,7 +4,16 @@ import { dirname, join } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { readStored, upsertSql } from '../../../scripts/app-emails/sync.mjs';
-import { resendBody, sendEmail, type Fetch } from './email.ts';
+import {
+  contentFrom,
+  prepareAttachments,
+  resendBody,
+  sendEmail,
+  sha256Hex,
+  toBase64,
+  type Download,
+  type Fetch,
+} from './email.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const config = { apiKey: 'test-key-not-real', from: 'NexG <info@nexgapp.com>' };
@@ -75,6 +84,156 @@ test('no key means nothing is sent and the row waits for one', async () => {
   );
   assert.equal(outcome.provider, 'none');
   assert.equal(calls.length, 0);
+});
+
+/* The signed agreement as the live email's payload names it (20270131000500). */
+const AGREEMENT_PATH =
+  'signed/a1340000-0000-4000-8000-0000000000c1/a1340000-0000-4000-8000-0000000000f1.pdf';
+const pdf = new TextEncoder().encode('%PDF-1.7 the signed agreement %%EOF');
+
+function storage(files: Record<string, Uint8Array>) {
+  const reads: string[] = [];
+  const download: Download = async (bucket, path) => {
+    reads.push(`${bucket}/${path}`);
+    return files[`${bucket}/${path}`] ?? null;
+  };
+  return { reads, download };
+}
+
+async function agreementPayload(overrides: Record<string, unknown> = {}) {
+  return {
+    attachments: [
+      {
+        bucket: 'merchant-agreements',
+        path: AGREEMENT_PATH,
+        filename: 'NexG-merchant-agreement-Mama-s-Kitchen.pdf',
+        sha256: await sha256Hex(pdf),
+        bytes: pdf.byteLength,
+        ...overrides,
+      },
+    ],
+  };
+}
+
+test('the signed agreement is read from storage, checked and attached', async () => {
+  const { reads, download } = storage({ [`merchant-agreements/${AGREEMENT_PATH}`]: pdf });
+  const files = await prepareAttachments(await agreementPayload(), download);
+  assert.deepEqual(reads, [`merchant-agreements/${AGREEMENT_PATH}`]);
+  assert.deepEqual(files, {
+    ok: true,
+    attachments: [
+      { filename: 'NexG-merchant-agreement-Mama-s-Kitchen.pdf', content: toBase64(pdf) },
+    ],
+  });
+  assert.equal(
+    Buffer.from(files.ok ? files.attachments[0]!.content : '', 'base64').toString(),
+    '%PDF-1.7 the signed agreement %%EOF',
+  );
+
+  const { calls, fetchImpl } = recorder(200, { id: 'resend-2' });
+  const outcome = await sendEmail(
+    {
+      recipient: 'owner@example.com',
+      subject: 'Congratulations! Mama’s Kitchen is live on NexG',
+      body: 'Hi Achieng,',
+      attachments: files.ok ? files.attachments : [],
+    },
+    config,
+    fetchImpl,
+  );
+  assert.equal(outcome.ok, true);
+  assert.deepEqual(JSON.parse(String(calls[0]!.init.body)).attachments, [
+    { filename: 'NexG-merchant-agreement-Mama-s-Kitchen.pdf', content: toBase64(pdf) },
+  ]);
+});
+
+test('an email that names no attachments sends none and reads nothing', async () => {
+  const { reads, download } = storage({});
+  assert.deepEqual(await prepareAttachments({ kind: 'bell' }, download), {
+    ok: true,
+    attachments: [],
+  });
+  assert.deepEqual(reads, []);
+  assert.equal(
+    'attachments' in
+      resendBody({ recipient: 'a@example.com', subject: 's', body: 'b' }, config.from),
+    false,
+  );
+});
+
+test('only signed agreements may be attached, and only the one on record', async () => {
+  const { reads, download } = storage({ [`merchant-agreements/${AGREEMENT_PATH}`]: pdf });
+  const elsewhere = await prepareAttachments(
+    await agreementPayload({ bucket: 'documents', path: 'merchant/id-card.jpg' }),
+    download,
+  );
+  assert.equal(elsewhere.ok, false);
+  assert.equal(!elsewhere.ok && elsewhere.retryable, false);
+
+  const signature = await prepareAttachments(
+    await agreementPayload({ path: 'signer/a1340000-0000-4000-8000-0000000000e1.png' }),
+    download,
+  );
+  assert.equal(signature.ok, false, 'NexG’s signature image is never attachable');
+  assert.deepEqual(reads, [], 'nothing outside the allowed files is even read');
+
+  const changed = await prepareAttachments(
+    await agreementPayload({ sha256: 'a'.repeat(64) }),
+    download,
+  );
+  assert.deepEqual(changed, {
+    ok: false,
+    error:
+      'NexG-merchant-agreement-Mama-s-Kitchen.pdf in storage is not the file on record (SHA-256 differs).',
+    retryable: false,
+  });
+
+  const badName = await prepareAttachments(
+    await agreementPayload({ filename: '../x.pdf' }),
+    download,
+  );
+  assert.equal(badName.ok, false);
+});
+
+test('a file storage cannot hand over is retried, not sent without it', async () => {
+  const { download } = storage({});
+  assert.deepEqual(await prepareAttachments(await agreementPayload(), download), {
+    ok: false,
+    error: 'NexG-merchant-agreement-Mama-s-Kitchen.pdf could not be read from storage.',
+    retryable: true,
+  });
+});
+
+test('the designed parts come from the payload, and only the message’s own parts', () => {
+  const content = contentFrom({
+    content: {
+      title: 'Congratulations! Mama’s Kitchen is live',
+      greeting: 'Hi Achieng,',
+      intro: 'Congratulations, and welcome to NexG.\n\nHere is what to do next:',
+      steps: ['Add your menu in Offerings.', 42, 'Check your opening hours in Availability.'],
+      action: { label: 'Open your dashboard', url: 'https://nexgapp.com/merchant' },
+      callout: { title: 'Your signed agreement is attached', body: 'NexG has signed it.' },
+      eyebrow: 'SOMETHING ELSE',
+      tone: 'red',
+    },
+  });
+  assert.deepEqual(content, {
+    title: 'Congratulations! Mama’s Kitchen is live',
+    greeting: 'Hi Achieng,',
+    intro: 'Congratulations, and welcome to NexG.\n\nHere is what to do next:',
+    steps: ['Add your menu in Offerings.', 'Check your opening hours in Availability.'],
+    action: { label: 'Open your dashboard', url: 'https://nexgapp.com/merchant' },
+    callout: { title: 'Your signed agreement is attached', body: 'NexG has signed it.' },
+  });
+  assert.equal(contentFrom({}), undefined, 'no content: the email is drawn from its text');
+  assert.equal(contentFrom({ content: { title: 'Only a title' } }), undefined);
+  assert.equal(
+    contentFrom({
+      content: { title: 't', intro: 'i', action: { label: 'Go', url: 'javascript:x' } },
+    })?.action,
+    undefined,
+    'a button only ever links to an https address',
+  );
 });
 
 test('the seeded templates match supabase/app-emails, so the design and the database stay in step', () => {

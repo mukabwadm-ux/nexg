@@ -20,6 +20,7 @@ import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
 import { applicationAnswerGroups } from '@/lib/application-answers';
 import { ApplicationReviewUnavailable } from '@/components/merchants/application-review-view';
+import { MerchantActivityLog } from '@/components/merchants/activity-log';
 import { BookingReadiness } from '@/components/merchants/booking-readiness';
 import { MerchantAgreementSigned } from '@/components/merchants/agreement-signed';
 import { MerchantDocumentsSection } from '@/components/merchants/documents-section';
@@ -495,6 +496,10 @@ export default async function MerchantApplicationPage({
               />
             )}
           </div>
+        </div>
+
+        <div className="mt-6">
+          <MerchantActivityLog merchantId={params.id} />
         </div>
       </main>
     </ConsoleShell>

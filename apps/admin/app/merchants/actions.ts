@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { issueSignedAgreement, issueSummary } from '@/lib/merchant-agreement-signing';
+import { liveEmailStatus, liveEmailSummary } from '@/lib/merchant-live-email';
 import { createClient } from '@/lib/supabase/server';
 
 export interface ReviewResult {
@@ -61,10 +62,13 @@ export async function goLive(merchantId: string, reason: string): Promise<Review
 
   // Approve first (20270124000100): the merchant gives its agreement details
   // after approval, so NexG signs the agreement when it goes live. Reported,
-  // never a reason to undo going live.
+  // never a reason to undo going live. Live and signed emails the owner, with
+  // the signed agreement attached (20270131000500); that is reported too.
   let agreement = '';
   try {
     agreement = issueSummary(await issueSignedAgreement(supabase, merchantId));
+    const email = liveEmailSummary((await liveEmailStatus(supabase, merchantId)).status);
+    if (email) agreement = `${agreement} ${email}`;
   } catch {
     agreement =
       'The merchant agreement could not be signed. Use Issue signed agreement on this page.';

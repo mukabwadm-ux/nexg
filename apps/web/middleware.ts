@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { localHostBookmark, hostWorkspaceEnabled } from '@/lib/host-workspace/routes';
+import {
+  DEVICE_COOKIE,
+  DEVICE_COOKIE_MAX_AGE_S,
+  isDeviceId,
+  newDeviceId,
+} from '@/lib/request-context';
 
 /**
  * The scan happens here, not in the page.
@@ -267,6 +273,20 @@ async function refreshMerchantSession(request: NextRequest) {
     // with getUser: identity, current membership, application revision and
     // session deadlines.
     await client.auth.getSession();
+  }
+  /*
+   * A random id per browser, so the admin console can say which device
+   * a merchant user acted from. Never shown to the merchant. See
+   * lib/request-context.ts.
+   */
+  if (!isDeviceId(request.cookies.get(DEVICE_COOKIE)?.value)) {
+    response.cookies.set(DEVICE_COOKIE, newDeviceId(), {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: request.nextUrl.protocol === 'https:',
+      maxAge: DEVICE_COOKIE_MAX_AGE_S,
+    });
   }
   response.headers.set('Cache-Control', 'private, no-store, max-age=0');
   response.headers.set('Pragma', 'no-cache');

@@ -1,7 +1,9 @@
 import { signingContext, type SigningContext } from '@/lib/merchant-agreement-signing';
+import { liveEmailStatus, recipientLabel, type LiveEmailStatus } from '@/lib/merchant-live-email';
 import { createClient } from '@/lib/supabase/server';
 
 import { IssueAgreementButton } from './issue-agreement-button';
+import { ResendLiveEmailButton } from './resend-live-email-button';
 
 const day = (iso: string) =>
   new Date(iso).toLocaleString('en-KE', {
@@ -22,7 +24,11 @@ const BASIS: Record<string, string> = {
  * can be signed, and the details it is (or will be) filled in with.
  */
 export async function MerchantAgreementSigned({ merchantId }: { merchantId: string }) {
-  const { context, error } = await signingContext(createClient(), merchantId);
+  const client = createClient();
+  const [{ context, error }, email] = await Promise.all([
+    signingContext(client, merchantId),
+    liveEmailStatus(client, merchantId),
+  ]);
   return (
     <section
       aria-labelledby="merchant-agreement-signed"
@@ -36,13 +42,63 @@ export async function MerchantAgreementSigned({ merchantId }: { merchantId: stri
           The signing record could not be read{error ? `: ${error}` : '.'}
         </p>
       ) : (
-        <Body merchantId={merchantId} context={context} />
+        <Body merchantId={merchantId} context={context} email={email.status} />
       )}
     </section>
   );
 }
 
-function Body({ merchantId, context }: { merchantId: string; context: SigningContext }) {
+/**
+ * Where the owner's "business is live" email stands, under the signed copy
+ * it carries: it goes by itself once the agreement is signed and the business
+ * is live, and Send again is offered only when it did not go.
+ */
+function LiveEmail({ merchantId, email }: { merchantId: string; email: LiveEmailStatus | null }) {
+  if (!email || email.state === 'not_signed') return null;
+  const to = recipientLabel(email);
+  const line = (() => {
+    switch (email.state) {
+      case 'not_live':
+        return 'The owner is emailed, with this agreement attached, when the business goes live.';
+      case 'sent':
+        return `Emailed to ${to ?? 'the owner'}${email.sent_at ? ` ${day(email.sent_at)}` : ''}, with this agreement attached.`;
+      case 'waiting':
+        return `Waiting to go out to ${to ?? 'the owner'}${
+          email.attempts && email.last_error
+            ? `. Attempt ${email.attempts} of 5 failed: ${email.last_error}`
+            : ''
+        }.`;
+      case 'failed':
+        return `Not sent: it failed after its retries${email.last_error ? ` (${email.last_error})` : ''}.`;
+      case 'skipped':
+        return `Not sent: ${email.reason ?? 'it was skipped.'}`;
+      case 'error':
+        return `Not sent: it could not be queued${email.reason ? ` (${email.reason})` : ''}.`;
+      default:
+        return 'Not sent yet.';
+    }
+  })();
+  const good = email.state === 'sent' || email.state === 'waiting' || email.state === 'not_live';
+  return (
+    <div className="border-border mt-3 border-t pt-3">
+      <p className="text-ink text-[0.8125rem] font-bold">“Your business is live” email</p>
+      <p className={`mt-1 text-[0.8125rem] font-semibold ${good ? 'text-muted' : 'text-warning'}`}>
+        {line}
+      </p>
+      {email.can_resend ? <ResendLiveEmailButton merchantId={merchantId} /> : null}
+    </div>
+  );
+}
+
+function Body({
+  merchantId,
+  context,
+  email,
+}: {
+  merchantId: string;
+  context: SigningContext;
+  email: LiveEmailStatus | null;
+}) {
   const { signed, party } = context;
   return (
     <div className="mt-3 space-y-3 text-sm">
@@ -61,6 +117,7 @@ function Body({ merchantId, context }: { merchantId: string; context: SigningCon
           >
             Download signed agreement (PDF)
           </a>
+          <LiveEmail merchantId={merchantId} email={email} />
         </div>
       ) : context.missing.length ? (
         <div className="bg-warning-bg rounded-xl px-4 py-3">

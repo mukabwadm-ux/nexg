@@ -25,10 +25,10 @@ import { ProviderReadError } from './readState';
 import { SUPABASE_PROVIDER_VERSION, supabaseCapabilities, supabaseSettings } from './supabaseSettings';
 
 /** The catalog bridge's columns. */
-const MERCHANT_COLUMNS = 'id,trading_name,category_key,subcategory,branch_address,branch_latitude,branch_longitude,accepting_orders,busy_mode_until,closed_today,opens_today,closes_today,featured,closed_early_at';
+const MERCHANT_COLUMNS = 'id,trading_name,category_key,subcategory,branch_address,branch_latitude,branch_longitude,accepting_orders,busy_mode_until,closed_today,opens_today,closes_today,featured,closed_early_at,cover_photo_path';
 /** Recommended, as on the platform: featured merchants first, then by name. Supabase has no ratings. */
 const MERCHANT_ORDER = 'featured.desc.nullslast,trading_name.asc,id.asc';
-const ITEM_COLUMNS = 'id,merchant_id,section_id,name,description,price_kes,sort';
+const ITEM_COLUMNS = 'id,merchant_id,section_id,name,description,price_kes,sort,photo_path';
 /** A store's promotion banner (promotion_banner_v). */
 const PROMOTION_COLUMNS = 'promotion_id,creative_id,name,kind,value,item_name,ends_at,media_kind';
 /** The website's route that serves a banner's picture or video (apps/web/app/api/promo-media). */
@@ -124,6 +124,7 @@ function merchantRow(value: unknown): SupabaseMerchantRow {
     branch_address: text(row.branch_address), branch_latitude: finite(row.branch_latitude), branch_longitude: finite(row.branch_longitude),
     accepting_orders: flag(row.accepting_orders), busy_mode_until: text(row.busy_mode_until), closed_today: flag(row.closed_today),
     opens_today: text(row.opens_today), closes_today: text(row.closes_today), featured: flag(row.featured), closed_early_at: text(row.closed_early_at),
+    cover_photo_path: text(row.cover_photo_path),
   };
 }
 /**
@@ -160,7 +161,8 @@ type SupabaseItemRow = ItemRow & { section_id: string | null };
 function itemRow(value: unknown): SupabaseItemRow {
   const row = fields(value);
   return { id: uuid(row.id), merchant_id: uuid(row.merchant_id), section_id: row.section_id === null || row.section_id === undefined ? null : uuid(row.section_id),
-    name: required(row.name), description: text(row.description), price_kes: finite(row.price_kes), sort: finite(row.sort) };
+    name: required(row.name), description: text(row.description), price_kes: finite(row.price_kes), sort: finite(row.sort),
+    photo_path: text(row.photo_path) ?? null };
 }
 interface SectionRow { id: string; merchant_id: string; name: string; sort: number }
 function sectionRow(value: unknown): SectionRow {

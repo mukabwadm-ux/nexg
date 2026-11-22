@@ -47,6 +47,7 @@ describe('purposes', () => {
   it('match the emails NexG sends today', () => {
     const cases: [string, string][] = [
       ['bell_merchant.live', 'merchant.live'],
+      ['partner_merchant_live', 'merchant.live'],
       ['bell_merchant.application_approved', 'merchant.approved'],
       ['bell_merchant.setup_reminder', 'merchant.setup'],
       ['bell_merchant.suspended', 'merchant.restricted'],

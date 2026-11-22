@@ -151,7 +151,8 @@ export function ProfileView({
       photo.onerror = () =>
         message('This file could not be opened as an image. Choose another photo.');
       photo.onload = () => {
-        const maximum = target === 'cover' ? 1600 : 512;
+        // Sharp on large and high-density screens; still under the 2 MB upload limit.
+        const maximum = target === 'cover' ? 2400 : 1024;
         const scale = Math.min(1, maximum / Math.max(photo.naturalWidth, photo.naturalHeight));
         const canvas = document.createElement('canvas');
         canvas.width = Math.max(1, Math.round(photo.naturalWidth * scale));
@@ -161,12 +162,14 @@ export function ProfileView({
           message('Image preview is unavailable in this browser.');
           return;
         }
+        context.imageSmoothingEnabled = true;
+        context.imageSmoothingQuality = 'high';
         context.drawImage(photo, 0, 0, canvas.width, canvas.height);
-        let quality = 0.85;
+        let quality = 0.92;
         let result = canvas.toDataURL('image/webp', quality);
-        const budget = target === 'cover' ? 600000 : 250000;
-        while (result.length > budget && quality > 0.4) {
-          quality -= 0.15;
+        const budget = target === 'cover' ? 2600000 : 1000000;
+        while (result.length > budget && quality > 0.5) {
+          quality -= 0.1;
           result = canvas.toDataURL('image/webp', quality);
         }
         if (result.length > budget) {

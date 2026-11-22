@@ -26,12 +26,14 @@
  * uploaded for their kind in Admin > Settings > Notifications &
  * templates, with the plain text alongside. If the design cannot
  * be drawn the plain text goes alone; EMAIL_HTML=off sends plain
- * text only.
+ * text only. An email whose payload names attachments (the
+ * signed merchant agreement, say) carries them, read from
+ * storage and checked against their SHA-256 (email.ts).
  */
 import { createClient, type SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 
 import { composeEmailHtml, purposeForTemplate } from './email-design.ts';
-import { sendEmail } from './email.ts';
+import { contentFrom, prepareAttachments, sendEmail, type Download } from './email.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -48,6 +50,8 @@ const TWILIO_FROM = Deno.env.get('TWILIO_FROM') ?? '';
 /* Email */
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? '';
+/* Local runs only: a stand-in that records what would be sent (email.ts). */
+const RESEND_API_URL = Deno.env.get('RESEND_API_URL') || undefined;
 const EMAIL_HTML = (Deno.env.get('EMAIL_HTML') ?? 'on') !== 'off';
 const EMAIL_ASSET_BASE = Deno.env.get('EMAIL_ASSET_BASE') || undefined;
 
@@ -101,9 +105,13 @@ Deno.serve(async (request) => {
   let failed = 0;
   const unconfigured = new Set<string>();
   const designs = rows.some((r) => r.channel === 'email') ? await liveDesigns(supabase) : new Map();
+  const download: Download = async (bucket, path) => {
+    const { data, error } = await supabase.storage.from(bucket).download(path);
+    return error || !data ? null : new Uint8Array(await data.arrayBuffer());
+  };
 
   for (const row of rows) {
-    const outcome = await send(row, designs);
+    const outcome = await send(row, designs, download);
 
     if (outcome.ok) {
       await supabase.rpc('rpc_outbox_sent', {
@@ -157,7 +165,7 @@ async function liveDesigns(supabase: SupabaseClient): Promise<Map<string, string
   }
 }
 
-async function send(row: Due, designs: Map<string, string>): Promise<Outcome> {
+async function send(row: Due, designs: Map<string, string>, download: Download): Promise<Outcome> {
   if (!row.body) {
     /* Already redacted, or never rendered. Either way there is
        nothing to send and retrying will not produce one. */
@@ -183,12 +191,32 @@ async function send(row: Due, designs: Map<string, string>): Promise<Outcome> {
             subject,
             text: row.body,
             purpose,
+            content: contentFrom(row.payload),
             design: designs.get(purpose) ?? null,
             assetBase: EMAIL_ASSET_BASE,
           }));
+      /*
+       * Files are read only when there is a provider to send them
+       * through; without one, sendEmail reports that and the row
+       * waits, as every other email does.
+       */
+      const files =
+        RESEND_API_KEY && EMAIL_FROM
+          ? await prepareAttachments(row.payload, download)
+          : ({ ok: true, attachments: [] } as const);
+      if (!files.ok) {
+        return { ok: false, provider: 'storage', error: files.error, retryable: files.retryable };
+      }
       return sendEmail(
-        { recipient: row.recipient, subject, body: row.body, html, payload: row.payload },
-        { apiKey: RESEND_API_KEY, from: EMAIL_FROM },
+        {
+          recipient: row.recipient,
+          subject,
+          body: row.body,
+          html,
+          payload: row.payload,
+          attachments: files.attachments,
+        },
+        { apiKey: RESEND_API_KEY, from: EMAIL_FROM, endpoint: RESEND_API_URL },
         fetch,
       );
     }
