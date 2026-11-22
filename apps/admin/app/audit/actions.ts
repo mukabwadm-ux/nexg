@@ -284,3 +284,22 @@ export async function recordExport(input: {
   });
   return fail(error) ?? done('Export recorded.');
 }
+
+// ───────────────────────────────────────────────────────── devices
+
+/** Ends one device's sign-in sessions. Super admin only; the RPC checks. */
+export async function signOutDevice(deviceId: string, reason: string): Promise<Outcome> {
+  const { data, error } = await audit().rpc('rpc_audit_sign_out_device', {
+    p_device_id: deviceId,
+    p_reason: reason,
+  });
+  const ended = Number((data as { sessions_ended?: number } | null)?.sessions_ended ?? 0);
+  return (
+    fail(error) ??
+    done(
+      ended === 0
+        ? 'That device had no live session. Nothing to end.'
+        : `Signed out: ${ended} session${ended === 1 ? '' : 's'} ended.`,
+    )
+  );
+}

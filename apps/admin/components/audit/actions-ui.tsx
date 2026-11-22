@@ -556,3 +556,58 @@ export function RetentionApprove({
     </Button>
   );
 }
+
+/**
+ * Sign one device out of the console. Asks for a reason, then asks once
+ * more, because the person on that device loses what they were doing.
+ */
+export function DeviceSignOut({
+  deviceId,
+  onSignOut,
+}: {
+  deviceId: string;
+  onSignOut: (deviceId: string, reason: string) => Promise<Outcome>;
+}) {
+  const { pending, run } = useRun();
+  const [reason, setReason] = React.useState('');
+  const [confirming, setConfirming] = React.useState(false);
+  return (
+    <div className="mt-2 space-y-2">
+      <Input
+        id={`device-sign-out-${deviceId}`}
+        label="Reason"
+        labelHidden
+        value={reason}
+        onChange={(e) => {
+          setReason(e.target.value);
+          setConfirming(false);
+        }}
+        placeholder="Why this device is being signed out"
+      />
+      {confirming ? (
+        <div className="flex flex-wrap gap-2">
+          <Button
+            size="sm"
+            variant="black"
+            loading={pending}
+            onClick={() => run(() => onSignOut(deviceId, reason)).then(() => setConfirming(false))}
+          >
+            Yes, sign it out
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setConfirming(false)}>
+            Cancel
+          </Button>
+        </div>
+      ) : (
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={reason.trim() === ''}
+          onClick={() => setConfirming(true)}
+        >
+          Sign out this device
+        </Button>
+      )}
+    </div>
+  );
+}

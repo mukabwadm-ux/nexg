@@ -61183,6 +61183,7 @@ export type Database = {
         Args: { p_reason: string; p_staff_user_id: string };
         Returns: Json;
       };
+      rpc_audit_sign_out_device: { Args: { p_device_id: string; p_reason: string }; Returns: Json };
       rpc_audit_verify_chain: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_best_sellers: {
         Args: { p_city_slug?: string; p_limit?: number };
