@@ -51,6 +51,7 @@ describe('purposes', () => {
       ['bell_merchant.application_approved', 'merchant.approved'],
       ['bell_merchant.setup_reminder', 'merchant.setup'],
       ['bell_merchant.suspended', 'merchant.restricted'],
+      ['bell_merchant.resumed', 'merchant.restored'],
       ['bell_merchant.holiday_reminder', 'merchant.holiday_reminder'],
       ['bell_merchant.vacancy_application', 'careers.employer'],
       ['bell_merchant.something_new', 'merchant.other'],

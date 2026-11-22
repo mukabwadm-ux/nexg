@@ -467,14 +467,15 @@ export const EMAIL_PURPOSES: EmailPurpose[] = [
   },
   {
     key: 'merchant.restored',
-    label: 'Business restored',
+    label: 'Business live again after a pause',
     area: 'Team and account',
     audience: M,
     tone: 'green',
     eyebrow: 'BUSINESS STATUS UPDATE',
     actionLabel: 'Open merchant workspace',
     conceptId: '26-account-restored',
-    sender: 'none',
+    sender: 'outbox',
+    templates: ['bell_merchant.resumed'],
   },
   {
     key: 'merchant.holiday_reminder',
