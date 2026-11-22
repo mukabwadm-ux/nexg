@@ -8,6 +8,7 @@ import {
   addMenuItems,
   removeMenuItem,
   setItemAvailable,
+  setItemMessage,
   setItemPrice,
   setItemSoldOut,
   type Outcome,
@@ -45,6 +46,8 @@ export interface ItemRow {
   price_is_estimate?: boolean | null;
   /** Undefined until the database has the column; the switch stays hidden. */
   sold_out?: boolean;
+  /** Whether the item takes a message; undefined until the database has it. */
+  message?: { label: string | null; maxLength: number };
 }
 
 export interface SectionRow {
@@ -220,6 +223,35 @@ export function Menu({
                       }`}
                     >
                       {busy === `s${i.id}` ? '…' : i.sold_out ? 'Sold out' : 'In stock'}
+                    </button>
+                  )}
+                  {i.message && (
+                    <button
+                      type="button"
+                      disabled={busy === `m${i.id}`}
+                      onClick={() => {
+                        const asked = window.prompt(
+                          `What should customers be asked when they order ${i.name}? For example "Message on the cake". Leave it empty if it takes no message.`,
+                          i.message?.label ?? '',
+                        );
+                        if (asked === null) return;
+                        void run(`m${i.id}`, () =>
+                          setItemMessage(i.id, asked, i.message?.maxLength ?? 100),
+                        );
+                      }}
+                      aria-pressed={Boolean(i.message.label)}
+                      title={
+                        i.message.label
+                          ? `Customers are asked "${i.message.label}".`
+                          : 'Let customers add a message, such as the writing on a cake.'
+                      }
+                      className={`rounded-lg px-3 py-2 text-[0.6875rem] font-extrabold transition-colors disabled:opacity-40 ${
+                        i.message.label
+                          ? 'bg-success-bg text-success'
+                          : 'border-border-strong text-muted border'
+                      }`}
+                    >
+                      {busy === `m${i.id}` ? '…' : 'Message'}
                     </button>
                   )}
                   <button
