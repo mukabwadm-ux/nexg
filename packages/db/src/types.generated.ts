@@ -6196,6 +6196,13 @@ export type Database = {
             foreignKeyName: 'catalogue_attribute_item_id_fkey';
             columns: ['item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_attribute_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
           },
@@ -6325,6 +6332,13 @@ export type Database = {
             foreignKeyName: 'catalogue_branch_override_item_id_fkey';
             columns: ['item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_branch_override_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
           },
@@ -6391,6 +6405,13 @@ export type Database = {
             columns: ['catalogue_item_id'];
             isOneToOne: false;
             referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_edit_request_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
             referencedColumns: ['id'];
           },
           {
@@ -6688,6 +6709,7 @@ export type Database = {
           price_kes: number | null;
           section_id: string;
           sold_by: string;
+          sold_out: boolean;
           sort: number;
           storage_guidance: string | null;
           unit_label: string | null;
@@ -6720,6 +6742,7 @@ export type Database = {
           price_kes?: number | null;
           section_id: string;
           sold_by?: string;
+          sold_out?: boolean;
           sort?: number;
           storage_guidance?: string | null;
           unit_label?: string | null;
@@ -6751,6 +6774,7 @@ export type Database = {
           price_kes?: number | null;
           section_id?: string;
           sold_by?: string;
+          sold_out?: boolean;
           sort?: number;
           storage_guidance?: string | null;
           unit_label?: string | null;
@@ -6910,6 +6934,13 @@ export type Database = {
             foreignKeyName: 'catalogue_item_modifier_item_id_fkey';
             columns: ['item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_modifier_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
           },
@@ -6986,6 +7017,13 @@ export type Database = {
             foreignKeyName: 'catalogue_photo_item_id_fkey';
             columns: ['item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
           },
@@ -7047,6 +7085,13 @@ export type Database = {
             columns: ['catalogue_item_id'];
             isOneToOne: false;
             referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_task_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
             referencedColumns: ['id'];
           },
           {
@@ -7217,6 +7262,13 @@ export type Database = {
             columns: ['catalogue_item_id'];
             isOneToOne: false;
             referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
             referencedColumns: ['id'];
           },
           {
@@ -7521,6 +7573,13 @@ export type Database = {
             foreignKeyName: 'catalogue_setup_review_item_id_fkey';
             columns: ['item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
           },
@@ -7685,6 +7744,13 @@ export type Database = {
             columns: ['item_id'];
             isOneToOne: false;
             referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_variant_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
             referencedColumns: ['id'];
           },
           {
@@ -10283,6 +10349,13 @@ export type Database = {
             foreignKeyName: 'customer_engine_booking_catalogue_item_id_fkey';
             columns: ['catalogue_item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
           },
@@ -10451,6 +10524,13 @@ export type Database = {
             columns: ['item_id'];
             isOneToOne: false;
             referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
             referencedColumns: ['id'];
           },
           {
@@ -12620,6 +12700,13 @@ export type Database = {
             foreignKeyName: 'featured_booking_item_id_fkey';
             columns: ['item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
           },
@@ -12976,6 +13063,13 @@ export type Database = {
             columns: ['pinned_item_id'];
             isOneToOne: false;
             referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_pinned_item_id_fkey';
+            columns: ['pinned_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
             referencedColumns: ['id'];
           },
           {
@@ -24170,6 +24264,13 @@ export type Database = {
             foreignKeyName: 'merchant_item_extra_item_id_fkey';
             columns: ['item_id'];
             isOneToOne: true;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_item_extra_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: true;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
           },
@@ -24835,6 +24936,13 @@ export type Database = {
             foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
             columns: ['catalogue_item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
           },
@@ -25296,6 +25404,13 @@ export type Database = {
             columns: ['item_id'];
             isOneToOne: true;
             referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: true;
+            referencedRelation: 'catalogue_menu_public';
             referencedColumns: ['id'];
           },
           {
@@ -26494,6 +26609,13 @@ export type Database = {
             columns: ['setup_item_id'];
             isOneToOne: false;
             referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'modifier_group_setup_item_id_fkey';
+            columns: ['setup_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
             referencedColumns: ['id'];
           },
           {
@@ -29629,6 +29751,13 @@ export type Database = {
             columns: ['catalogue_item_id'];
             isOneToOne: false;
             referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'order_item_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
             referencedColumns: ['id'];
           },
           {
@@ -42493,6 +42622,141 @@ export type Database = {
           },
         ];
       };
+      catalogue_menu_public: {
+        Row: {
+          age_restricted: boolean | null;
+          available: boolean | null;
+          booking_offering_id: string | null;
+          description: string | null;
+          gallery_paths: string[] | null;
+          has_options: boolean | null;
+          has_variants: boolean | null;
+          highlighted: boolean | null;
+          id: string | null;
+          kind: string | null;
+          merchant_id: string | null;
+          name: string | null;
+          photo_path: string | null;
+          price_is_estimate: boolean | null;
+          price_kes: number | null;
+          section_id: string | null;
+          sold_by: string | null;
+          sold_out: boolean | null;
+          sort: number | null;
+          unit_label: string | null;
+          unit_max: number | null;
+          unit_min: number | null;
+          unit_step: number | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_section_id_fkey';
+            columns: ['section_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_section';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       catalogue_option_public: {
         Row: {
           group_id: string | null;
@@ -42511,6 +42775,13 @@ export type Database = {
             columns: ['item_id'];
             isOneToOne: false;
             referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_modifier_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
             referencedColumns: ['id'];
           },
           {
@@ -53873,6 +54144,13 @@ export type Database = {
             columns: ['catalogue_item_id'];
             isOneToOne: false;
             referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
             referencedColumns: ['id'];
           },
           {
