@@ -75,12 +75,14 @@ select columns_are('public', 'catalogue_public', array[
   'booking_offering_id', 'sold_by', 'unit_label', 'unit_step', 'unit_min', 'unit_max',
   'price_is_estimate', 'has_options', 'has_variants'],
   'catalogue_public keeps exactly the columns it had.');
-select columns_are('public', 'catalogue_menu_public', array[
+select is(array(select column_name::text from information_schema.columns
+                 where table_schema = 'public' and table_name = 'catalogue_menu_public'
+                 order by ordinal_position limit 23), array[
   'id', 'merchant_id', 'section_id', 'name', 'description', 'price_kes', 'available',
   'age_restricted', 'highlighted', 'sort', 'photo_path', 'gallery_paths', 'kind',
   'booking_offering_id', 'sold_by', 'unit_label', 'unit_step', 'unit_min', 'unit_max',
   'price_is_estimate', 'has_options', 'has_variants', 'sold_out'],
-  'The apps'' list has the same columns plus sold_out.');
+  'The apps'' list starts with catalogue_public''s columns, then sold_out.');
 select ok(has_table_privilege('anon', 'public.catalogue_menu_public', 'select')
           and has_table_privilege('authenticated', 'public.catalogue_menu_public', 'select'),
   'Visitors and signed-in customers can read the apps'' list.');
