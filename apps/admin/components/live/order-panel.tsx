@@ -21,6 +21,7 @@ import {
   type Outcome,
 } from '@/app/orders/actions';
 import { cancelOrder, previewCancel, reassignRider } from '@/app/live/actions';
+import { PaystackRefundButton } from '@/components/refunds/paystack-refund-button';
 
 import type { Candidate } from './workbench';
 import {
@@ -458,6 +459,13 @@ export function OrderPanel({
                     <p className="text-danger text-[0.6875rem] font-bold">
                       Last M-Pesa send did not go: {failed.result_desc}
                     </p>
+                  )}
+                  {r.method === 'original' && (
+                    <PaystackRefundButton
+                      kind="order"
+                      targetId={r.id}
+                      amount={kes(r.amount_cents)}
+                    />
                   )}
                   {r.method !== 'wallet_credit' && (
                     <SendByMpesa

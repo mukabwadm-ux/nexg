@@ -1,5 +1,7 @@
 import { Card } from '@nexg/ui';
 
+import { PaystackRefundButton } from '@/components/refunds/paystack-refund-button';
+
 import { RecordRefund } from './record-refund';
 import { Chip, DASH, EmptyRow, kes, Pill, Tile, when } from './shared';
 
@@ -163,7 +165,14 @@ export function RefundsTab({
                       {r.refund_note && <p className="text-muted mt-0.5">{r.refund_note}</p>}
                     </div>
                   ) : canRecord ? (
-                    <RecordRefund stayId={r.stay_id} amount={kes(toRefund(r))} />
+                    <div className="space-y-2">
+                      <PaystackRefundButton
+                        kind="stay"
+                        targetId={r.stay_id}
+                        amount={kes(toRefund(r))}
+                      />
+                      <RecordRefund stayId={r.stay_id} amount={kes(toRefund(r))} />
+                    </div>
                   ) : (
                     <span className="text-muted text-[0.6875rem] font-semibold">Due</span>
                   )}
