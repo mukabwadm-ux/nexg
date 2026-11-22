@@ -26,6 +26,27 @@ insert into public.merchant_user (merchant_id, user_id, role) values
   ('a1360000-0000-4000-8000-0000000000c1', 'a1360000-0000-4000-8000-0000000000a1', 'owner'),
   ('a1360000-0000-4000-8000-0000000000c1', 'a1360000-0000-4000-8000-0000000000a2', 'manager');
 
+/* The two members' status bell (staff get their own "New merchant" bells). */
+create temp view t_bells as
+  select n.user_id, n.kind, n.title, n.body from public.user_notification n
+  where n.tag = 'merchant-status:a1360000-0000-4000-8000-0000000000c1'
+    and n.user_id in ('a1360000-0000-4000-8000-0000000000a1', 'a1360000-0000-4000-8000-0000000000a2');
+
+/*
+ * Each status change is its own transaction in real life, so the bell's
+ * updated_at moves and the refreshed bell is emailed. In this one test
+ * transaction now() stands still, so age the bell by hand between steps,
+ * with triggers off so the ageing itself sends nothing.
+ */
+create function pg_temp.age_bells() returns void language plpgsql as $f$
+begin
+  set local session_replication_role = replica;
+  update public.user_notification set updated_at = updated_at - interval '1 minute'
+  where tag = 'merchant-status:a1360000-0000-4000-8000-0000000000c1';
+  set local session_replication_role = origin;
+end
+$f$;
+
 select results_eq(
   $$select kind collate "C", enabled from public.notification_email_kind
     where kind in ('merchant.live', 'merchant.resumed', 'merchant.paused') order by 1$$,
@@ -38,8 +59,7 @@ update public.merchant set status = 'live', went_live_at = now()
 where id = 'a1360000-0000-4000-8000-0000000000c1';
 
 select results_eq(
-  $$select kind, title, body from public.user_notification
-    where object_id = 'a1360000-0000-4000-8000-0000000000c1' order by user_id$$,
+  $$select kind, title, body from t_bells order by user_id$$,
   $$values
     ('merchant.live', 'You are live on NexG', 'Start taking orders from your dashboard Home when you are ready.'),
     ('merchant.live', 'You are live on NexG', 'Start taking orders from your dashboard Home when you are ready.')$$,
@@ -50,16 +70,17 @@ select is(pg_temp.emails('bell_merchant.live'), 0,
 
 -- ------------------------------------------------------------- pause and back
 
+select pg_temp.age_bells();
 update public.merchant set status = 'paused' where id = 'a1360000-0000-4000-8000-0000000000c1';
 
 select is(pg_temp.emails('bell_merchant.paused'), 2,
   'pausing is still emailed to every member');
 
+select pg_temp.age_bells();
 update public.merchant set status = 'live' where id = 'a1360000-0000-4000-8000-0000000000c1';
 
 select results_eq(
-  $$select kind, title from public.user_notification
-    where object_id = 'a1360000-0000-4000-8000-0000000000c1' order by user_id$$,
+  $$select kind, title from t_bells order by user_id$$,
   $$values ('merchant.resumed', 'You are live on NexG again'), ('merchant.resumed', 'You are live on NexG again')$$,
   'coming back after a pause rings the bell as live again');
 
@@ -74,13 +95,14 @@ select ok(
 
 -- ------------------------------------------------- back with orders switched on
 
+select pg_temp.age_bells();
 update public.merchant set status = 'paused' where id = 'a1360000-0000-4000-8000-0000000000c1';
+select pg_temp.age_bells();
 update public.merchant set status = 'live', accepting_orders = true
 where id = 'a1360000-0000-4000-8000-0000000000c1';
 
 select is(
-  (select string_agg(distinct body, ' | ') from public.user_notification
-    where object_id = 'a1360000-0000-4000-8000-0000000000c1'),
+  (select string_agg(distinct body, ' | ') from t_bells),
   'Guests can order from you now.',
   'when orders are on, the bell says guests can order');
 
