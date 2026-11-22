@@ -242,6 +242,32 @@ export async function setItemAvailable(itemId: string, available: boolean): Prom
   };
 }
 
+/**
+ * Sold out: the item stays on the menu, marked sold out, and checkout refuses
+ * it. Off the menu (setItemAvailable) hides it instead.
+ */
+export async function setItemSoldOut(itemId: string, soldOut: boolean): Promise<Outcome> {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup',
+  });
+  const { data, error } = await client
+    .from('catalogue_item')
+    .update({ sold_out: soldOut })
+    .eq('id', itemId)
+    .eq('merchant_id', authorizedMerchantId)
+    .select('id')
+    .maybeSingle();
+  if (error) return { ok: false, message: error.message };
+  if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
+  revalidatePath('/merchant/menu');
+  return {
+    ok: true,
+    message: soldOut
+      ? 'Marked sold out. Customers still see it, but cannot order it.'
+      : 'Back in stock.',
+  };
+}
+
 /*
  * Prices and new items. Row security on catalogue_item already limits
  * every write here to members of the merchant, and checkout re-reads the

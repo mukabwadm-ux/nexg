@@ -9,6 +9,7 @@ import {
   removeMenuItem,
   setItemAvailable,
   setItemPrice,
+  setItemSoldOut,
   type Outcome,
 } from '@/app/merchant/actions';
 import { uploadCatalogueImage } from '@/lib/catalogue-images';
@@ -42,6 +43,8 @@ export interface ItemRow {
   unit_min?: number | null;
   unit_max?: number | null;
   price_is_estimate?: boolean | null;
+  /** Undefined until the database has the column; the switch stays hidden. */
+  sold_out?: boolean;
 }
 
 export interface SectionRow {
@@ -125,6 +128,11 @@ export function Menu({
                         <span className="ml-1">21+</span>
                       </Pill>
                     )}
+                    {i.available && i.sold_out && (
+                      <Pill tone="bg-danger-bg text-danger">
+                        <span className="ml-1">Sold out</span>
+                      </Pill>
+                    )}
                   </p>
                   {i.description && (
                     <p className="text-muted truncate text-[0.75rem] font-semibold">
@@ -198,6 +206,22 @@ export function Menu({
                   >
                     {busy === i.id ? '…' : i.available ? 'ON' : 'OFF'}
                   </button>
+                  {i.available && i.sold_out !== undefined && (
+                    <button
+                      type="button"
+                      disabled={busy === `s${i.id}`}
+                      onClick={() => void run(`s${i.id}`, () => setItemSoldOut(i.id, !i.sold_out))}
+                      aria-pressed={i.sold_out}
+                      title="Sold out keeps the item on the menu, marked sold out, so customers cannot order it."
+                      className={`rounded-lg px-3 py-2 text-[0.6875rem] font-extrabold transition-colors disabled:opacity-40 ${
+                        i.sold_out
+                          ? 'bg-danger-bg text-danger'
+                          : 'border-border-strong text-muted border'
+                      }`}
+                    >
+                      {busy === `s${i.id}` ? '…' : i.sold_out ? 'Sold out' : 'In stock'}
+                    </button>
+                  )}
                   <button
                     type="button"
                     aria-label={`Delete ${i.name}`}

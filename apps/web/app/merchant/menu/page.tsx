@@ -35,6 +35,7 @@ export default async function MerchantMenu() {
     { data: attributeData },
     { data: variantData },
     { data: reviewData },
+    { data: soldOutData },
   ] = await Promise.all([
     supabase
       .from('catalogue_item')
@@ -72,6 +73,9 @@ export default async function MerchantMenu() {
       .eq('merchant_id', me.id)
       .is('resolved_at', null)
       .order('created_at'),
+    // Asked on its own: until the database has sold_out (20270129000100) this
+    // read fails alone, the rest of the page loads and the switch stays hidden.
+    supabase.from('catalogue_item').select('id, sold_out').eq('merchant_id', me.id),
   ]);
 
   const itemRows = (data as ItemRow[] | null) ?? [];
@@ -84,9 +88,16 @@ export default async function MerchantMenu() {
       photo.signedUrl ? [[photo.path, photo.signedUrl]] : [],
     ),
   );
+  const soldOut = new Map(
+    ((soldOutData as { id: string; sold_out: boolean }[] | null) ?? []).map((row) => [
+      row.id,
+      row.sold_out,
+    ]),
+  );
   const items = itemRows.map((item) => ({
     ...item,
     photo_url: item.photo_path ? (photoUrls.get(item.photo_path) ?? null) : null,
+    sold_out: soldOut.get(item.id),
   }));
   const sections = (sectionData as SectionRow[] | null) ?? [];
   const groups: OptionGroupRow[] = (groupData ?? []).map((g) => ({
