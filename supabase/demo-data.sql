@@ -98,7 +98,7 @@ inserted as (
     true
   from demo d, city_ids c
   /* Once per demo business: contact_email is no longer unique (one owner may
-     run several businesses, 20270131000800), so check rather than conflict. */
+     run several businesses, 20270203000600), so check rather than conflict. */
   where not exists (select 1 from public.merchant x where x.contact_email = d.contact_email)
   returning id, trading_name
 )
