@@ -20908,6 +20908,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
           onboarding_source: string | null;
@@ -21005,6 +21006,7 @@ export type Database = {
           landmark?: string | null;
           late_night_until?: string | null;
           legal_name?: string | null;
+          min_order_kes?: number | null;
           notification_rules?: NonNullable<Json>;
           onboarding_call_at?: string | null;
           onboarding_source?: string | null;
@@ -21101,6 +21103,7 @@ export type Database = {
           landmark?: string | null;
           late_night_until?: string | null;
           legal_name?: string | null;
+          min_order_kes?: number | null;
           notification_rules?: NonNullable<Json>;
           onboarding_call_at?: string | null;
           onboarding_source?: string | null;
@@ -25383,6 +25386,25 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      merchant_public_answer_key: {
+        Row: {
+          key: string;
+          label: string;
+          sort: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          key: string;
+          label: string;
+          sort?: number;
+        };
+        Update: {
+          key?: string;
+          label?: string;
+          sort?: number;
+        };
+        Relationships: [];
       };
       merchant_review: {
         Row: {
@@ -52997,11 +53019,13 @@ export type Database = {
           health_badge: string | null;
           id: string | null;
           listed_at: string | null;
+          min_order_kes: number | null;
           opens_today: string | null;
           parent_merchant_id: string | null;
           pay_on_delivery_cap_kes: number | null;
           pay_on_delivery_enabled: boolean | null;
           prep_minutes: number | null;
+          public_answers: Json | null;
           subcategory: string | null;
           trading_name: string | null;
           zone_id: string | null;
@@ -58985,6 +59009,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
           onboarding_source: string | null;
@@ -59173,6 +59198,7 @@ export type Database = {
           submitted_revision: number;
         }[];
       };
+      fn_min_order_from_answers: { Args: { p_answers: Json }; Returns: number };
       fn_mood_chips: {
         Args: { p_city_id: string };
         Returns: {
@@ -63952,6 +63978,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
           onboarding_source: string | null;
@@ -64070,6 +64097,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
           onboarding_source: string | null;
@@ -64431,6 +64459,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
           onboarding_source: string | null;
@@ -64601,6 +64630,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
           onboarding_source: string | null;
@@ -64663,6 +64693,10 @@ export type Database = {
         Args: { p_featured: boolean; p_merchant_id: string; p_reason?: string };
         Returns: Json;
       };
+      rpc_merchant_set_min_order: {
+        Args: { p_merchant_id: string; p_min_order_kes?: number };
+        Returns: Json;
+      };
       rpc_merchant_set_pause: {
         Args: { p_merchant_id: string; p_paused: boolean; p_reason?: string };
         Returns: {
@@ -64714,6 +64748,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
           onboarding_source: string | null;
@@ -64819,6 +64854,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
           onboarding_source: string | null;
@@ -64942,6 +64978,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
           onboarding_source: string | null;
@@ -65103,6 +65140,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
           onboarding_source: string | null;
