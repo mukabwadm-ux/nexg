@@ -16901,8 +16901,22 @@ export type Database = {
             foreignKeyName: 'group_order_item_catalogue_item_id_fkey';
             columns: ['catalogue_item_id'];
             isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_item_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
             referencedRelation: 'catalogue_public';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_order_item_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
           },
           {
             foreignKeyName: 'group_order_item_catalogue_item_id_fkey';
