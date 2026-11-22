@@ -162,7 +162,7 @@ export function FlagsTable({
     {
       id: 'summary',
       accessorFn: (f) => f.summary ?? '',
-      header: 'What was found',
+      header: 'What Was Found',
       cell: ({ row: { original: f } }) => (
         <span className="block max-w-[22rem]">
           <span className="line-clamp-2 block" title={f.summary ?? undefined}>
@@ -209,7 +209,7 @@ export function FlagsTable({
     },
   ];
 
-  const title = mode === 'open' ? 'Open flags' : 'Reviewed flags';
+  const title = mode === 'open' ? 'Open Flags' : 'Reviewed Flags';
 
   return (
     <div className="flex min-w-0 flex-col gap-4">
@@ -250,7 +250,7 @@ export function FlagsTable({
               onChange={setCheck}
               className="flex-1 sm:flex-none"
               options={[
-                { value: 'all', label: 'Every check' },
+                { value: 'all', label: 'Every Check' },
                 ...checks.map(([k, label]) => ({ value: k, label })),
               ]}
             />
@@ -278,7 +278,7 @@ export function FlagsTable({
           {...(filtered
             ? {
                 action: {
-                  label: 'Clear filters',
+                  label: 'Clear Filters',
                   onClick: () => {
                     setQ('');
                     setWho('all');
@@ -419,7 +419,7 @@ function FlagPanel({ flag, onClose }: { flag: FraudFlag | null; onClose: () => v
                   ...(flag.amount_cents != null
                     ? [
                         [
-                          'At stake',
+                          'At Stake',
                           <span key="a" className="font-bold">
                             {kes(flag.amount_cents)}
                           </span>,
@@ -500,7 +500,7 @@ function DecidePanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title={confirm ? 'Confirm this flag' : 'Dismiss this flag'}
+      title={confirm ? 'Confirm This Flag' : 'Dismiss This Flag'}
       subtitle={`${flag.rule_label ?? flag.kind} · ${flag.subject_label ?? ''}`}
       submitLabel={confirm ? 'Confirm' : 'Dismiss'}
       danger={confirm}
@@ -525,7 +525,7 @@ function DecidePanel({
         </p>
       )}
       <TextArea
-        label={confirm ? 'What you found' : 'Why it is not a problem'}
+        label={confirm ? 'What You Found' : 'Why It Is Not a Problem'}
         required={!confirm}
         value={note}
         onChange={(e) => setNote(e.target.value)}
@@ -551,7 +551,7 @@ export function RunChecksButton({ variant = 'gold' }: { variant?: 'gold' | 'outl
       leadingIcon={<Play className="h-4 w-4" />}
       onClick={() => run(() => runChecks())}
     >
-      Run checks now
+      Run Checks Now
     </Button>
   );
 }
@@ -598,7 +598,7 @@ export function RulesList({ rules, canChange }: { rules: FraudRule[]; canChange:
                     </div>
                     {!r.automated ? (
                       <Pill tone="grey" icon={Hand}>
-                        By hand
+                        By Hand
                       </Pill>
                     ) : r.enabled ? (
                       <Pill tone="green" dot>
@@ -661,7 +661,7 @@ function RulePanel({ rule, onClose }: { rule: FraudRule; onClose: () => void }) 
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title="Change this check"
+      title="Change This Check"
       subtitle={rule.label}
       submitLabel="Save"
       busy={busy}
@@ -683,7 +683,7 @@ function RulePanel({ rule, onClose }: { rule: FraudRule; onClose: () => void }) 
       {rule.description && <p className="text-muted text-sm">{rule.description}</p>}
       <Switch
         id={switchId}
-        label="Check is on"
+        label="Check Is On"
         description={
           enabled
             ? 'Runs every five minutes and raises flags.'

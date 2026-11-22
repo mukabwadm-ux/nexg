@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { AccountHome } from '@/components/account/account-home';
 import { MyBookings } from '@/components/booking/my-bookings';
 import {
   MyApplications,
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 const TABS = [
+  { key: 'home', label: 'Home' },
   { key: 'receipts', label: 'Receipts' },
   { key: 'orders', label: 'Orders' },
   { key: 'bookings', label: 'Bookings' },
@@ -42,7 +44,7 @@ const label = (value: string | null) =>
 export default async function AccountPage({ searchParams }: { searchParams?: { tab?: string } }) {
   const tab: Tab = TABS.some((t) => t.key === searchParams?.tab)
     ? (searchParams!.tab as Tab)
-    : 'receipts';
+    : 'home';
   const supabase = createClient();
   const {
     data: { user },
@@ -103,7 +105,7 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
       <SiteHeader />
       <main id="main" className="mx-auto max-w-[56rem] px-4 pb-16 pt-8 sm:px-8">
         <p className="text-muted text-[0.75rem] font-bold">{user.email}</p>
-        <h1 className="mt-1 text-[1.75rem] font-extrabold tracking-[-0.02em]">Your account</h1>
+        <h1 className="mt-1 text-[1.75rem] font-extrabold tracking-[-0.02em]">My account</h1>
 
         <nav
           className="border-border mt-6 flex gap-6 overflow-x-auto whitespace-nowrap border-b"
@@ -126,6 +128,7 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
         </nav>
 
         <section className="mt-6">
+          {tab === 'home' && <AccountHome />}
           {tab === 'receipts' && (
             <ReceiptList
               receipts={receipts.error ? null : toReceipts(receipts.data)}
@@ -160,9 +163,12 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
                 ).map((order) => (
                   <li key={order.id} className="flex items-center justify-between gap-4 px-4 py-3">
                     <span>
-                      <span className="block text-[0.8125rem] font-extrabold">
+                      <Link
+                        href={`/account/orders/${order.id}`}
+                        className="block text-[0.8125rem] font-extrabold"
+                      >
                         {order.reference}
-                      </span>
+                      </Link>
                       <span className="text-muted block text-[0.75rem] font-semibold">
                         {receiptDate(order.placed_at)} · {label(order.stage)}
                       </span>

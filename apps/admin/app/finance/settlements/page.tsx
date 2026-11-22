@@ -6,12 +6,12 @@ import {
   CheckCircle2,
   Clock3,
   Coins,
+  Handshake,
   History,
   Home,
   LayoutGrid,
   Layers,
   Store,
-  Users,
   XCircle,
   type LucideIcon,
 } from 'lucide-react';
@@ -20,7 +20,10 @@ import Link from 'next/link';
 
 import { ShareDonut } from '@/components/charts';
 import { ConsoleShell } from '@/components/console-shell';
+import { EarlyPayouts, type EarlyPayoutRow } from '@/components/finance/early-payouts';
+import { HostPayoutDetails } from '@/components/finance/host-payouts';
 import { MovementsTable } from '@/components/finance/movements';
+import { PartnerPayoutDetails } from '@/components/finance/partner-payouts';
 import { Settlement, type LineRow, type RunRow } from '@/components/finance/settlement';
 import {
   BatchesTable,
@@ -33,7 +36,9 @@ import { RangeControl } from '@/components/portal/client-kit';
 import { PageHeader, PanelHead, Sheet, Stat, StatGrid, ViewTabs } from '@/components/portal/kit';
 import { lineBucket, PAYEE_GROUPS, payeeGroup, share, type PayeeGroup } from '@/lib/finance';
 import { movementList } from '@/lib/finance-server';
-import { previousPeriod } from '@/lib/office-finance';
+import { hostPayouts } from '@/lib/host-payouts';
+import { previousPeriod, vsLabel } from '@/lib/office-finance';
+import { partnerPayouts } from '@/lib/partner-payouts';
 import {
   change,
   day,
@@ -47,18 +52,19 @@ import {
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = { title: 'Settlements & payouts' };
+export const metadata: Metadata = { title: 'Settlements & Payouts' };
 export const dynamic = 'force-dynamic';
 
-type Tab = 'overview' | 'merchants' | 'hosts' | 'riders' | 'batches' | 'history';
+type Tab = 'overview' | 'merchants' | 'hosts' | 'riders' | 'partners' | 'batches' | 'history';
 
 const TABS: { key: Tab; label: string; icon: LucideIcon }[] = [
   { key: 'overview', label: 'Overview', icon: LayoutGrid },
-  { key: 'merchants', label: 'Merchant settlements', icon: Store },
-  { key: 'hosts', label: 'Host payouts', icon: Home },
-  { key: 'riders', label: 'Rider payouts', icon: Bike },
-  { key: 'batches', label: 'Settlement batches', icon: Layers },
-  { key: 'history', label: 'Payout history', icon: History },
+  { key: 'merchants', label: 'Merchant Settlements', icon: Store },
+  { key: 'hosts', label: 'Host Payouts', icon: Home },
+  { key: 'riders', label: 'Rider Payouts', icon: Bike },
+  { key: 'partners', label: 'Partner Payouts', icon: Handshake },
+  { key: 'batches', label: 'Settlement Batches', icon: Layers },
+  { key: 'history', label: 'Payout History', icon: History },
 ];
 
 interface RunListRow {
@@ -85,10 +91,12 @@ const LINE_COLUMNS =
 
 /**
  * Finance → Settlements & payouts: what the weekly runs pay merchants,
- * hosts and riders, where each payout stands, and what is owed but not
- * yet in a run. Runs come from fin_settlement_run and its lines; a run in
- * the period is one whose pay date falls in it. Draft and cancelled runs
- * pay nothing and are left out of the totals.
+ * hosts, riders and experience partners, where each payout stands, and
+ * what is owed but not yet in a run. Runs come from fin_settlement_run and
+ * its lines; a run in the period is one whose pay date falls in it. Draft
+ * and cancelled runs pay nothing and are left out of the totals. Host and
+ * Partner Payouts also list where each host and partner is paid, for
+ * Finance to verify.
  */
 export default async function SettlementsPage({
   searchParams,
@@ -96,9 +104,11 @@ export default async function SettlementsPage({
   searchParams?: { tab?: string; from?: string; to?: string; run?: string };
 }) {
   const staff = await requireStaff();
-  requireModule(staff, 'finance');
+  const finance = requireModule(staff, 'finance');
   const canBuild =
     staff.isSuperAdmin || staff.roles.includes('finance') || staff.roles.includes('finance_lead');
+  /* Verifying partner payout details is full Finance's; the database checks again. */
+  const canVerify = staff.isSuperAdmin || finance.level === 'full';
   const tab: Tab = TABS.some((t) => t.key === searchParams?.tab)
     ? (searchParams!.tab as Tab)
     : searchParams?.run
@@ -111,6 +121,17 @@ export default async function SettlementsPage({
   /* A period that ends today also lists the runs built but not yet paid. */
   const upTo = period.to === today ? plusDays(today, 31) : period.to;
   const supabase = createClient();
+
+  /* Riders' special early payout requests, answered here. */
+  const { data: earlyRows } = await supabase
+    .from('rider_payout_request_queue_v')
+    .select(
+      'id, rider_name, rider_phone, amount_kes, reason, payout_msisdn, status, requested_at, payout_msisdn_changed_at',
+    )
+    .in('status', ['pending', 'approved'])
+    .order('requested_at')
+    .limit(50);
+  const earlyPayouts = (earlyRows ?? []) as EarlyPayoutRow[];
 
   const [runsRes, owedRes, calendarRes] = await Promise.all([
     supabase
@@ -222,6 +243,7 @@ export default async function SettlementsPage({
       };
     })
     .filter((x) => x.cents > 0);
+  const owedPayees = owedByGroup.reduce((s, x) => s + x.n, 0);
   const calendar = (calendarRes.data ?? []) as unknown as {
     id: string;
     due_on: string;
@@ -298,7 +320,7 @@ export default async function SettlementsPage({
             href={href('batches')}
             className="text-muted hover:text-ink text-sm font-bold underline underline-offset-4"
           >
-            All batches
+            All Batches
           </Link>
         </PanelHead>
         <div className="mt-4">
@@ -332,12 +354,54 @@ export default async function SettlementsPage({
         <MovementsTable
           rows={rows}
           truncated={lists.some((l) => l.truncated)}
-          title="Payout history"
+          title="Payout History"
           filename={`nexg-payouts-${period.from}-to-${period.to}.csv`}
           emptyTitle="No payouts in this period"
-          emptyText="Settlement payouts to merchants, hosts and riders, and M-Pesa payouts to customers, appear here once a run is built."
+          emptyText="Settlement payouts to merchants, hosts, riders and partners, and M-Pesa payouts to customers, appear here once a run is built."
         />
       </Sheet>
+    );
+  }
+
+  /* Partner Payouts: where each partner is paid, and whether Finance has checked it. */
+  let partnerDetails: React.ReactNode = null;
+  if (tab === 'partners') {
+    const { data, error } = await supabase.rpc('rpc_experience_partner_payouts');
+    partnerDetails = error ? (
+      <p
+        role="alert"
+        className="bg-danger-bg text-danger rounded-xl px-4 py-3 text-sm font-semibold"
+      >
+        Partner payout details could not be loaded: {error.message}
+      </p>
+    ) : (
+      <PartnerPayoutDetails
+        rows={partnerPayouts(data)}
+        canVerify={canVerify}
+        myStaffId={staff.staffId}
+        isSuperAdmin={staff.isSuperAdmin}
+      />
+    );
+  }
+
+  /* Host Payouts: where each host is paid, and whether Finance has checked it. */
+  let hostDetails: React.ReactNode = null;
+  if (tab === 'hosts') {
+    const { data, error } = await supabase.rpc('rpc_host_payouts');
+    hostDetails = error ? (
+      <p
+        role="alert"
+        className="bg-danger-bg text-danger rounded-xl px-4 py-3 text-sm font-semibold"
+      >
+        Host payout details could not be loaded: {error.message}
+      </p>
+    ) : (
+      <HostPayoutDetails
+        rows={hostPayouts(data)}
+        canVerify={canVerify}
+        myStaffId={staff.staffId}
+        isSuperAdmin={staff.isSuperAdmin}
+      />
     );
   }
 
@@ -359,8 +423,8 @@ export default async function SettlementsPage({
     <ConsoleShell staff={staff}>
       <PageHeader
         icon={Coins}
-        title="Settlements & payouts"
-        subtitle="Merchant, host and rider settlements, payout runs, and what is still owed."
+        title="Settlements & Payouts"
+        subtitle="Merchant, host, rider and partner settlements, payout runs, and what is still owed."
         actions={
           <>
             <RangeControl from={period.from} to={period.to} />
@@ -381,6 +445,8 @@ export default async function SettlementsPage({
           }))}
         />
 
+        <EarlyPayouts rows={earlyPayouts} canDecide={canVerify} />
+
         {failed && (
           <p
             role="alert"
@@ -396,8 +462,9 @@ export default async function SettlementsPage({
               <Stat
                 icon={Coins}
                 value={kes(total)}
-                label="Total payouts"
+                label="Total Payouts"
                 delta={delta == null ? null : { value: delta }}
+                deltaNote={vsLabel(before)}
                 note={delta == null ? `${now.length.toLocaleString('en-KE')} payouts` : undefined}
               />
               <Stat
@@ -410,33 +477,29 @@ export default async function SettlementsPage({
               <Stat
                 icon={Home}
                 value={kes(byGroup('host'))}
-                label="Hosts (stays)"
+                label="Hosts (Stays)"
                 note={pctOf(byGroup('host'))}
                 href={href('hosts')}
               />
               <Stat
                 icon={Bike}
                 value={kes(byGroup('rider'))}
-                label="Riders (delivery)"
+                label="Riders (Delivery)"
                 note={pctOf(byGroup('rider'))}
                 href={href('riders')}
               />
               <Stat
-                icon={Users}
-                value={owed.length || owedTotal ? kes(owedTotal) : null}
-                label="Owed, not yet in a run"
-                note={
-                  owedByGroup.length
-                    ? `${owedByGroup.reduce((s, x) => s + x.n, 0).toLocaleString('en-KE')} payees waiting`
-                    : 'Nothing waiting'
-                }
-                noteTone="muted"
+                icon={Handshake}
+                value={kes(byGroup('other'))}
+                label="Partners & Others"
+                note={pctOf(byGroup('other'))}
+                href={href('partners')}
               />
             </StatGrid>
 
             <div className="grid gap-5 xl:grid-cols-3">
               <Sheet>
-                <PanelHead title="Settlement breakdown" aside={formatRange(period)} />
+                <PanelHead title="Settlement Breakdown" aside={formatRange(period)} />
                 <div className="mt-4">
                   {total > 0 ? (
                     <ShareDonut
@@ -462,7 +525,7 @@ export default async function SettlementsPage({
               </Sheet>
 
               <Sheet>
-                <PanelHead title="Payout status" aside={formatRange(period)} />
+                <PanelHead title="Payout Status" aside={formatRange(period)} />
                 <ul className="mt-4 space-y-2.5">
                   {(
                     [
@@ -492,7 +555,14 @@ export default async function SettlementsPage({
               </Sheet>
 
               <Sheet>
-                <PanelHead title="Upcoming settlements" />
+                <PanelHead
+                  title="Upcoming Settlements"
+                  aside={
+                    owedTotal > 0
+                      ? `${kes(owedTotal)} owed, not yet in a run · ${owedPayees.toLocaleString('en-KE')} payee${owedPayees === 1 ? '' : 's'}`
+                      : undefined
+                  }
+                />
                 {calendar.length === 0 && owedByGroup.length === 0 ? (
                   <p className="text-muted-light py-10 text-center text-sm">
                     Nothing is owed and no settlement is scheduled.
@@ -548,31 +618,47 @@ export default async function SettlementsPage({
           <Sheet>
             <LinesTable
               rows={groupLines('merchant')}
-              title="Merchant settlements"
+              title="Merchant Settlements"
               noun="merchant"
               batchesHref={href('batches')}
             />
           </Sheet>
         )}
         {tab === 'hosts' && (
-          <Sheet>
-            <LinesTable
-              rows={groupLines('host')}
-              title="Host payouts"
-              noun="host"
-              batchesHref={href('batches')}
-            />
-          </Sheet>
+          <>
+            <Sheet>
+              <LinesTable
+                rows={groupLines('host')}
+                title="Host Payouts"
+                noun="host"
+                batchesHref={href('batches')}
+              />
+            </Sheet>
+            <Sheet>{hostDetails}</Sheet>
+          </>
         )}
         {tab === 'riders' && (
           <Sheet>
             <LinesTable
               rows={groupLines('rider')}
-              title="Rider payouts"
+              title="Rider Payouts"
               noun="rider"
               batchesHref={href('batches')}
             />
           </Sheet>
+        )}
+        {tab === 'partners' && (
+          <>
+            <Sheet>
+              <LinesTable
+                rows={groupLines('other')}
+                title="Partner Payouts"
+                noun="partner"
+                batchesHref={href('batches')}
+              />
+            </Sheet>
+            <Sheet>{partnerDetails}</Sheet>
+          </>
         )}
         {tab === 'batches' && (
           <>

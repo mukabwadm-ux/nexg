@@ -19,6 +19,7 @@ const REASONS: Record<string, string> = {
   session_expired: 'Your session ended. Sign in again to continue.',
   'workspace-access': 'This account cannot open that workspace. Sign in with the right account.',
   oauth: 'We could not finish signing you in with that provider. Try again, or use your email.',
+  join: 'Sign in with the email address your team invitation was sent to. No account yet? Create one with that address.',
 };
 
 /** One sign-in page per portal, all built the same way. */

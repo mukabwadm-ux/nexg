@@ -202,7 +202,7 @@ export function RequestsTable({
         },
       mayEdit(r) &&
         r.status === 'draft' && {
-          label: 'Send for approval',
+          label: 'Send for Approval',
           icon: <Send />,
           onSelect: () => run(() => submitPurchase(r.id)),
         },
@@ -216,14 +216,14 @@ export function RequestsTable({
         },
       mayDecide(r) &&
         r.status === 'submitted' && {
-          label: 'Turn down',
+          label: 'Turn Down',
           icon: <XCircle />,
           opensOverlay: true,
           onSelect: () => setPanel({ kind: 'reject', row: r }),
         },
       canApprove &&
         r.status === 'approved' && {
-          label: 'Raise purchase order',
+          label: 'Raise Purchase Order',
           icon: <FileCheck2 />,
           separated: true,
           opensOverlay: true,
@@ -232,7 +232,7 @@ export function RequestsTable({
       canWrite &&
         order &&
         ['issued', 'partially_received'].includes(order.status) && {
-          label: 'Receive delivery',
+          label: 'Receive Delivery',
           icon: <PackageCheck />,
           separated: true,
           opensOverlay: true,
@@ -243,7 +243,7 @@ export function RequestsTable({
         },
       mayEdit(r) &&
         ['draft', 'submitted', 'approved', 'rejected'].includes(r.status) && {
-          label: 'Cancel request',
+          label: 'Cancel Request',
           icon: <Ban />,
           tone: 'danger' as const,
           separated: true,
@@ -282,7 +282,7 @@ export function RequestsTable({
     {
       id: 'requester',
       accessorFn: (r) => requesterName(r) ?? '',
-      header: 'Requested by',
+      header: 'Requested By',
       cell: ({ row: { original: r } }) => (
         <Person name={requesterName(r)} sub={day(r.created_at)} />
       ),
@@ -298,7 +298,7 @@ export function RequestsTable({
     {
       id: 'needed',
       accessorFn: (r) => r.needed_by ?? '9999',
-      header: 'Needed by',
+      header: 'Needed By',
       cell: ({ row: { original: r } }) => (
         <span className="whitespace-nowrap tabular-nums">
           {r.needed_by ? day(r.needed_by) : '—'}
@@ -371,7 +371,7 @@ export function RequestsTable({
               onChange={setStatus}
               className="flex-1 sm:flex-none"
               options={[
-                { value: 'all', label: 'All statuses' },
+                { value: 'all', label: 'All Statuses' },
                 ...Object.entries(REQUEST_STATUS).map(([k, v]) => ({ value: k, label: v.label })),
               ]}
             />
@@ -382,7 +382,7 @@ export function RequestsTable({
             onChange={setDept}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All departments' },
+              { value: 'all', label: 'All Departments' },
               ...Object.entries(DEPARTMENTS).map(([k, v]) => ({ value: k, label: v })),
             ]}
           />
@@ -396,12 +396,12 @@ export function RequestsTable({
           description={
             filtered
               ? 'Try another search, status or department.'
-              : 'Ask for something to be bought with New request. Someone else approves it, then a purchase order goes to the vendor.'
+              : 'Ask for something to be bought with New Request. Someone else approves it, then a purchase order goes to the vendor.'
           }
           {...(filtered
             ? {
                 action: {
-                  label: 'Clear filters',
+                  label: 'Clear Filters',
                   onClick: () => {
                     setQ('');
                     setStatus('all');
@@ -469,9 +469,9 @@ export function RequestsTable({
       )}
       {panel?.kind === 'cancel' && (
         <ReasonPanel
-          title="Cancel request"
+          title="Cancel Request"
           subtitle={`${panel.row.number} · ${panel.row.title}`}
-          button="Cancel request"
+          button="Cancel Request"
           required={panel.row.status !== 'draft'}
           onClose={() => setPanel(null)}
           onSubmit={(reason) => run(() => cancelPurchase(panel.row.id, reason))}
@@ -556,7 +556,7 @@ export function OrdersTable({
     {
       id: 'to',
       accessorFn: (o) => o.location?.name ?? '',
-      header: 'Deliver to',
+      header: 'Deliver To',
       cell: ({ row: { original: o } }) => <span>{o.location?.name}</span>,
     },
     {
@@ -622,14 +622,14 @@ export function OrdersTable({
             label={`Actions for ${o.number}`}
             actions={[
               requestOf(o) && {
-                label: 'Request details',
+                label: 'Request Details',
                 icon: <Eye />,
                 opensOverlay: true,
                 onSelect: () => setPanel({ kind: 'view', row: requestOf(o)! }),
               },
               canApprove &&
                 o.status === 'issued' && {
-                  label: 'Cancel order',
+                  label: 'Cancel Order',
                   icon: <Ban />,
                   tone: 'danger' as const,
                   separated: true,
@@ -661,8 +661,8 @@ export function OrdersTable({
             value={status}
             onChange={setStatus}
             options={[
-              { value: 'open', label: 'Open orders' },
-              { value: 'all', label: 'All orders' },
+              { value: 'open', label: 'Open Orders' },
+              { value: 'all', label: 'All Orders' },
               ...Object.entries(ORDER_STATUS).map(([k, v]) => ({ value: k, label: v.label })),
             ]}
           />
@@ -675,7 +675,7 @@ export function OrdersTable({
           description={
             rows.length
               ? 'Try another search or status.'
-              : 'An approved request becomes a purchase order with Raise purchase order.'
+              : 'An approved request becomes a purchase order with Raise Purchase Order.'
           }
         />
       ) : (
@@ -720,9 +720,9 @@ export function OrdersTable({
       )}
       {panel?.kind === 'cancel_order' && (
         <ReasonPanel
-          title="Cancel purchase order"
+          title="Cancel Purchase Order"
           subtitle={`${panel.order.number} · ${panel.order.vendor?.name ?? ''}`}
-          button="Cancel order"
+          button="Cancel Order"
           required
           hint="Nothing has arrived on it. The request goes back to approved, ready for another order."
           onClose={() => setPanel(null)}
@@ -757,20 +757,20 @@ function RequestDetail({
   const order = liveOrder(r);
   const steps: { label: string; at: string | null; note?: string | null; done: boolean }[] = [
     { label: `Asked by ${requesterName(r) ?? 'someone'}`, at: r.created_at, done: true },
-    { label: 'Sent for approval', at: r.submitted_at, done: Boolean(r.submitted_at) },
+    { label: 'Sent for Approval', at: r.submitted_at, done: Boolean(r.submitted_at) },
     {
       label:
         r.status === 'rejected'
-          ? `Turned down by ${r.decider?.display_name ?? 'someone'}`
+          ? `Turned Down by ${r.decider?.display_name ?? 'someone'}`
           : r.decided_at
             ? `Approved by ${r.decider?.display_name ?? 'someone'}`
-            : 'Waiting for a decision',
+            : 'Waiting for a Decision',
       at: r.decided_at,
       note: r.decision_note,
       done: Boolean(r.decided_at),
     },
     {
-      label: order ? `Ordered: ${order.number}` : 'Purchase order',
+      label: order ? `Ordered: ${order.number}` : 'Purchase Order',
       at: order?.issued_at ?? null,
       done: Boolean(order),
     },
@@ -789,7 +789,7 @@ function RequestDetail({
             {REQUEST_STATUS[r.status]?.label}
           </Pill>
           <Pill tone={PRIORITY[r.priority]?.tone ?? 'grey'}>
-            {PRIORITY[r.priority]?.label} priority
+            {PRIORITY[r.priority]?.label} Priority
           </Pill>
         </>
       }
@@ -798,7 +798,7 @@ function RequestDetail({
         canDecide && r.status === 'submitted' ? (
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => onDecide(false)}>
-              Turn down
+              Turn Down
             </Button>
             <Button variant="black" onClick={() => onDecide(true)}>
               Approve {kes(r.total_cents)}
@@ -862,11 +862,11 @@ function RequestDetail({
             <dd className="font-semibold">{r.vendor?.name ?? 'Not chosen yet'}</dd>
           </div>
           <div>
-            <dt className="text-muted text-xs font-bold">Deliver to</dt>
+            <dt className="text-muted text-xs font-bold">Deliver To</dt>
             <dd className="font-semibold">{r.location?.name ?? 'Not chosen yet'}</dd>
           </div>
           <div>
-            <dt className="text-muted text-xs font-bold">Needed by</dt>
+            <dt className="text-muted text-xs font-bold">Needed By</dt>
             <dd className="font-semibold">{r.needed_by ? day(r.needed_by) : 'No date'}</dd>
           </div>
           {order?.expected_on && (
@@ -963,7 +963,7 @@ export function NewPurchase({
         leadingIcon={<Plus className="h-4 w-4" />}
         onClick={() => setOpen(true)}
       >
-        New request
+        New Request
       </Button>
       {open && (
         <PurchasePanel
@@ -1063,16 +1063,16 @@ function PurchasePanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title={request ? `Edit ${request.number}` : 'New purchase request'}
+      title={request ? `Edit ${request.number}` : 'New Purchase Request'}
       subtitle="Someone with full Company access approves it before anything is ordered."
-      submitLabel="Send for approval"
+      submitLabel="Send for Approval"
       busy={busy}
       width="lg"
-      secondary={{ label: 'Save as draft', onSubmit: () => save(false) }}
+      secondary={{ label: 'Save as Draft', onSubmit: () => save(false) }}
       onSubmit={() => save(true)}
     >
       <TextField
-        label="What is being bought"
+        label="What Is Being Bought"
         required
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -1095,14 +1095,14 @@ function PurchasePanel({
       </FieldRow>
       <FieldRow>
         <SelectField
-          label="Suggested vendor"
+          label="Suggested Vendor"
           value={vendorId}
           onChange={(e) => setVendorId(e.target.value)}
           placeholder="Let the approver choose"
           options={vendors.map((v) => ({ value: v.id, label: v.name }))}
         />
         <SelectField
-          label="Deliver to"
+          label="Deliver To"
           value={locationId}
           onChange={(e) => setLocationId(e.target.value)}
           placeholder="Choose later"
@@ -1110,7 +1110,7 @@ function PurchasePanel({
         />
       </FieldRow>
       <TextField
-        label="Needed by"
+        label="Needed By"
         type="date"
         min={todayInNairobi()}
         value={neededBy}
@@ -1135,7 +1135,7 @@ function PurchasePanel({
               )}
             </div>
             <SelectField
-              label="Inventory item"
+              label="Inventory Item"
               value={l.itemId}
               onChange={(e) => {
                 const item = items.find((x) => x.id === e.target.value);
@@ -1168,7 +1168,7 @@ function PurchasePanel({
                 onChange={(e) => setLine(l.key, { quantity: e.target.value })}
               />
               <TextField
-                label="Unit price (KES)"
+                label="Unit Price (KES)"
                 required
                 inputMode="decimal"
                 value={l.price}
@@ -1183,7 +1183,7 @@ function PurchasePanel({
           leadingIcon={<Plus className="h-4 w-4" />}
           onClick={() => setLines((ls) => [...ls, blankLine()])}
         >
-          Add line
+          Add Line
         </Button>
       </fieldset>
       <p className="bg-ink flex items-center justify-between rounded-xl px-4 py-3 text-sm text-white">
@@ -1193,7 +1193,7 @@ function PurchasePanel({
         </span>
       </p>
       <TextArea
-        label="Why it is needed"
+        label="Why It Is Needed"
         value={justification}
         onChange={(e) => setJustification(e.target.value)}
         maxLength={2000}
@@ -1222,9 +1222,9 @@ function DecidePanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title={approve ? `Approve ${kes(r.total_cents)}` : 'Turn down request'}
+      title={approve ? `Approve ${kes(r.total_cents)}` : 'Turn Down Request'}
       subtitle={`${r.number} · ${r.title} · asked by ${requesterName(r) ?? 'someone'}`}
-      submitLabel={approve ? 'Approve' : 'Turn down'}
+      submitLabel={approve ? 'Approve' : 'Turn Down'}
       danger={!approve}
       busy={busy}
       onSubmit={() => run(() => decidePurchase(r.id, approve, note))}
@@ -1249,7 +1249,7 @@ function DecidePanel({
       </ul>
       {r.justification && <p className="bg-bg rounded-xl px-4 py-3 text-sm">{r.justification}</p>}
       <TextArea
-        label={approve ? 'Note for whoever asked' : 'Why it is turned down'}
+        label={approve ? 'Note for Whoever Asked' : 'Why It Is Turned Down'}
         required={!approve}
         value={note}
         onChange={(e) => setNote(e.target.value)}
@@ -1280,9 +1280,9 @@ function IssuePanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title="Raise purchase order"
+      title="Raise Purchase Order"
       subtitle={`${r.number} · ${r.title} · ${kes(r.total_cents)}`}
-      submitLabel="Raise order"
+      submitLabel="Raise Order"
       busy={busy}
       onSubmit={() =>
         run(() =>
@@ -1305,7 +1305,7 @@ function IssuePanel({
         options={vendors.map((v) => ({ value: v.id, label: v.name }))}
       />
       <SelectField
-        label="Deliver to"
+        label="Deliver To"
         required
         value={locationId}
         onChange={(e) => setLocationId(e.target.value)}
@@ -1313,14 +1313,14 @@ function IssuePanel({
         options={locations.map((l) => ({ value: l.id, label: l.name }))}
       />
       <TextField
-        label="Expected delivery"
+        label="Expected Delivery"
         type="date"
         min={todayInNairobi()}
         value={expected}
         onChange={(e) => setExpected(e.target.value)}
       />
       <TextArea
-        label="Notes for the order"
+        label="Notes for the Order"
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         maxLength={1000}
@@ -1353,9 +1353,9 @@ function ReceivePanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title="Receive delivery"
+      title="Receive Delivery"
       subtitle={`${order.number} · ${order.vendor?.name ?? ''} · into ${order.location?.name ?? ''}`}
-      submitLabel="Record delivery"
+      submitLabel="Record Delivery"
       busy={busy}
       width="lg"
       onSubmit={() =>
@@ -1390,7 +1390,7 @@ function ReceivePanel({
                 </span>
               </span>
               <TextField
-                label="Arrived now"
+                label="Arrived Now"
                 type="number"
                 min={0}
                 max={left}
@@ -1405,7 +1405,7 @@ function ReceivePanel({
         })}
       </ul>
       <TextArea
-        label="Delivery note"
+        label="Delivery Note"
         value={note}
         onChange={(e) => setNote(e.target.value)}
         maxLength={400}

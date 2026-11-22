@@ -172,10 +172,12 @@ update public.order set stage = 'preparing'
 where id = (select (v ->> 'order_id')::uuid from t where k = 'booking');
 
 select is(
-  (select count(*) from public.api_webhook_event ev
+  (select string_agg(ev.type || ':' || coalesce(ev.body #>> '{data,previous_stage}', '-')
+                     || '>' || (ev.body #>> '{data,booking,stage}'), ',' order by ev.created_at)
+   from public.api_webhook_event ev
    where ev.booking_id = (select (v ->> 'order_id')::uuid from t where k = 'booking')),
-  2::bigint,
-  'a stage change inside the same status writes nothing');
+  'booking.created:->placed,booking.status_changed:placed>confirmed,booking.stage_changed:confirmed>preparing',
+  'a stage change inside the same status writes booking.stage_changed (20270105030100), not a status change');
 
 insert into t values ('sandbox', public.rpc_order_place_api_test(
   'nexg_test_hooks-key-0000000000000000', 'hooks-idem-0000000000000002',

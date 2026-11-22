@@ -73,6 +73,41 @@ function Amount({ m, strong = false }: { m: Movement; strong?: boolean }) {
  * payouts and office expenses, with the filters the designs show and a
  * CSV of whatever is filtered.
  */
+/** The CSV a transaction export downloads. */
+function csvRows(rows: Movement[]) {
+  return [
+    [
+      'Reference',
+      'Date & time',
+      'Type',
+      'Description',
+      'Party',
+      'Channel',
+      'Direction',
+      'Amount (KES)',
+      'Status',
+      'Provider reference',
+    ],
+    ...rows.map((r) => [
+      r.reference,
+      dateTime(r.happened_at),
+      typeOf(r).label,
+      r.description,
+      r.party ?? '',
+      channelLabel(r.channel),
+      r.direction === 'in' ? 'In' : 'Out',
+      Math.round(r.amount_cents) / 100,
+      STATUSES[r.status].label,
+      r.provider_ref ?? '',
+    ]),
+  ];
+}
+
+/** The page header's Export, as the Transactions design places it: every row in view. */
+export function MovementsExport({ rows, filename }: { rows: Movement[]; filename: string }) {
+  return <ExportButton filename={filename} rows={() => csvRows(rows)} />;
+}
+
 export function MovementsTable({
   rows,
   title,
@@ -80,6 +115,7 @@ export function MovementsTable({
   truncated = false,
   showType = true,
   compact = false,
+  hideExport = false,
   emptyTitle = 'No transactions in this period',
   emptyText = 'Payments, refunds, payouts and paid office expenses appear here as they happen. Try a longer period.',
 }: {
@@ -90,6 +126,8 @@ export function MovementsTable({
   truncated?: boolean;
   showType?: boolean;
   compact?: boolean;
+  /** The page header carries the Export instead. */
+  hideExport?: boolean;
   emptyTitle?: string;
   emptyText?: string;
 }) {
@@ -120,7 +158,7 @@ export function MovementsTable({
     {
       id: 'when',
       accessorFn: (r) => r.happened_at,
-      header: 'Reference · date & time',
+      header: 'Reference · Date & Time',
       cell: ({ row: { original: r } }) => (
         <span className="block whitespace-nowrap tabular-nums">
           <span className="block font-semibold">{r.reference}</span>
@@ -143,7 +181,7 @@ export function MovementsTable({
     {
       id: 'description',
       accessorFn: (r) => `${r.description} ${r.party ?? ''}`,
-      header: 'Description · party',
+      header: 'Description · Party',
       cell: ({ row: { original: r } }) => (
         <span className="block max-w-[15rem]">
           <span className="block truncate" title={r.description}>
@@ -219,7 +257,7 @@ export function MovementsTable({
               onChange={setType}
               className="flex-1 sm:flex-none"
               options={[
-                { value: 'all', label: 'All types' },
+                { value: 'all', label: 'All Types' },
                 ...types.map((t) => ({ value: t, label: t })),
               ]}
             />
@@ -230,7 +268,7 @@ export function MovementsTable({
             onChange={setStatus}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All statuses' },
+              { value: 'all', label: 'All Statuses' },
               ...(Object.keys(STATUSES) as Status[])
                 .filter((s) => statuses.includes(s))
                 .map((s) => ({ value: s, label: STATUSES[s].label })),
@@ -242,39 +280,11 @@ export function MovementsTable({
             onChange={setChannel}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All channels' },
+              { value: 'all', label: 'All Channels' },
               ...channels.map((c) => ({ value: c, label: channelLabel(c) })),
             ]}
           />
-          <ExportButton
-            filename={filename}
-            rows={() => [
-              [
-                'Reference',
-                'Date & time',
-                'Type',
-                'Description',
-                'Party',
-                'Channel',
-                'Direction',
-                'Amount (KES)',
-                'Status',
-                'Provider reference',
-              ],
-              ...shown.map((r) => [
-                r.reference,
-                dateTime(r.happened_at),
-                typeOf(r).label,
-                r.description,
-                r.party ?? '',
-                channelLabel(r.channel),
-                r.direction === 'in' ? 'In' : 'Out',
-                Math.round(r.amount_cents) / 100,
-                STATUSES[r.status].label,
-                r.provider_ref ?? '',
-              ]),
-            ]}
-          />
+          {!hideExport && <ExportButton filename={filename} rows={() => csvRows(shown)} />}
         </div>
       </div>
 
@@ -286,7 +296,7 @@ export function MovementsTable({
           {...(filtered
             ? {
                 action: {
-                  label: 'Clear filters',
+                  label: 'Clear Filters',
                   onClick: () => {
                     setQ('');
                     setType('all');
@@ -351,12 +361,12 @@ export function MovementsTable({
                       {STATUSES[open.status].label}
                     </Pill>,
                   ],
-                  ['Recorded state', open.state.replace(/_/g, ' ')],
-                  ['Date & time', dateTime(open.happened_at)],
+                  ['Recorded State', open.state.replace(/_/g, ' ')],
+                  ['Date & Time', dateTime(open.happened_at)],
                   ['Description', open.description],
                   ['Party', open.party ?? '—'],
                   ['Channel', <Channel key="c" channel={open.channel} />],
-                  ['Provider reference', open.provider_ref ?? '—'],
+                  ['Provider Reference', open.provider_ref ?? '—'],
                   ...(open.note ? [['Note', open.note] as [string, React.ReactNode]] : []),
                 ] as [string, React.ReactNode][]
               ).map(([k, v]) => (
@@ -372,7 +382,7 @@ export function MovementsTable({
                   href={open.href}
                   className="text-ink hover:text-gold-text text-sm font-bold underline underline-offset-4"
                 >
-                  {open.source === 'payout' ? 'Open the settlement run' : 'Open in Office finance'}
+                  {open.source === 'payout' ? 'Open the Settlement Run' : 'Open in Office Finance'}
                 </Link>
               </p>
             )}

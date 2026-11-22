@@ -41,6 +41,21 @@ const nextConfig = {
   async redirects() {
     return [{ source: '/discover/index.html', destination: '/discover', permanent: false }];
   },
+  /*
+   * The page behind the "Open NEXG" button in the code emails (supabase/app-emails/README.md):
+   * https://www.nexgapp.com/app/code#type=…&email=…&code=…  A rewrite, not a redirect, so the address
+   * keeps its fragment. The file is public/app-code.html, a copy of the Consumer app's
+   * docs/email-templates/app-code.html; it is static and not indexed, and middleware does not run on it.
+   */
+  async rewrites() {
+    return [{ source: '/app/code', destination: '/app-code.html' }];
+  },
+  async headers() {
+    return [
+      { source: '/app/code', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
+      { source: '/app-code.html', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
+    ];
+  },
   experimental: {
     // Without @nexg/ui here, importing a Button from the barrel pulls in
     // PhoneInput and therefore libphonenumber-js on every page.

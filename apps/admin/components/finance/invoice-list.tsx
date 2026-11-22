@@ -1,7 +1,9 @@
 'use client';
 
 import { DataTable, EmptyState, type ColumnDef } from '@nexg/ui';
-import { FileText, Home, Hotel, Store } from 'lucide-react';
+import { Briefcase, FileText, Home, Hotel, Store } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
 import { ExportButton, FilterSelect, SearchBox, useShowMore } from '@/components/portal/client-kit';
@@ -16,7 +18,7 @@ import {
 import { day, kes, shillings } from '@/lib/portal';
 
 export interface InvoiceListRow {
-  party_kind: 'host' | 'hotel' | 'merchant';
+  party_kind: 'host' | 'hotel' | 'merchant' | 'client';
   id: string;
   number: string;
   party_name: string | null;
@@ -27,19 +29,22 @@ export interface InvoiceListRow {
   due_at: string | null;
   paid_at: string | null;
   provider_ref: string | null;
+  /** Client invoices take part payments: what is still owed. */
+  balance_cents?: number | null;
 }
 
-const PARTY_ICON = { host: Home, hotel: Hotel, merchant: Store } as const;
+const PARTY_ICON = { host: Home, hotel: Hotel, merchant: Store, client: Briefcase } as const;
 
 /**
- * Host invoices, hotel statements and merchant statements in one list.
- * Balance is the whole amount until it is paid: none of these take part
- * payments.
+ * Host invoices, hotel statements, merchant statements and client invoices
+ * in one list. Balance is the whole amount until it is paid, except for a
+ * client invoice, which takes part payments and carries its own balance. A
+ * client invoice opens in its panel (?invoice=).
  */
 export function InvoicesTable({
   rows,
   today,
-  title = 'Invoice list',
+  title = 'Invoice List',
   emptyTitle = 'No invoices in this period',
 }: {
   rows: InvoiceListRow[];
@@ -66,19 +71,42 @@ export function InvoicesTable({
   const filtered = term !== '' || type !== 'all' || status !== 'all';
   const { shown: page, more } = useShowMore(shown, 25);
   const balance = (r: InvoiceListRow) =>
-    ['paid', 'credited', 'draft'].includes(bucketOf(r)) ? 0 : r.total_cents;
+    ['paid', 'credited', 'draft'].includes(bucketOf(r)) ? 0 : (r.balance_cents ?? r.total_cents);
+  const pathname = usePathname();
+  const params = useSearchParams();
+  const openHref = (r: InvoiceListRow) => {
+    if (r.party_kind !== 'client') return null;
+    const next = new URLSearchParams(params.toString());
+    next.set('invoice', r.id);
+    return `${pathname}?${next.toString()}`;
+  };
 
   const columns: ColumnDef<InvoiceListRow, unknown>[] = [
     {
       id: 'number',
       accessorFn: (r) => r.number,
-      header: 'Invoice no. · period',
-      cell: ({ row: { original: r } }) => (
-        <span className="block whitespace-nowrap tabular-nums">
-          <span className="block font-semibold">{r.number}</span>
-          <span className="text-muted-light block text-xs">{r.period}</span>
-        </span>
-      ),
+      header: 'Invoice No. · Period',
+      cell: ({ row: { original: r } }) => {
+        const href = openHref(r);
+        return (
+          <span className="block whitespace-nowrap tabular-nums">
+            {href ? (
+              <Link
+                href={href}
+                scroll={false}
+                className="hover:text-gold-text focus-visible:ring-gold block rounded font-semibold underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2"
+              >
+                {r.number}
+              </Link>
+            ) : (
+              <span className="block font-semibold">{r.number}</span>
+            )}
+            <span className="text-muted-light block max-w-[14rem] truncate text-xs">
+              {r.period}
+            </span>
+          </span>
+        );
+      },
     },
     {
       id: 'party',
@@ -109,7 +137,7 @@ export function InvoicesTable({
     {
       id: 'issued',
       accessorFn: (r) => r.issued_at,
-      header: 'Issued · due',
+      header: 'Issued · Due',
       cell: ({ row: { original: r } }) => (
         <span className="block whitespace-nowrap tabular-nums">
           <span className="block">{day(r.issued_at)}</span>
@@ -179,7 +207,7 @@ export function InvoicesTable({
             onChange={setType}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All types' },
+              { value: 'all', label: 'All Types' },
               ...types.map((t) => ({ value: t, label: INVOICE_TYPES[t]?.label ?? t })),
             ]}
           />
@@ -189,7 +217,7 @@ export function InvoicesTable({
             onChange={setStatus}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All statuses' },
+              { value: 'all', label: 'All Statuses' },
               ...(Object.keys(INVOICE_BUCKETS) as InvoiceBucket[])
                 .filter((b) => buckets.includes(b))
                 .map((b) => ({ value: b, label: INVOICE_BUCKETS[b].label })),
@@ -236,12 +264,12 @@ export function InvoicesTable({
           description={
             filtered
               ? 'Try another search, type or status.'
-              : 'Host invoices and hotel statements are raised monthly, merchant statements with each settlement. Try a longer period.'
+              : 'Host invoices and hotel statements are raised monthly, merchant statements with each settlement, and client invoices with Create Invoice. Try a longer period.'
           }
           {...(filtered
             ? {
                 action: {
-                  label: 'Clear filters',
+                  label: 'Clear Filters',
                   onClick: () => {
                     setQ('');
                     setType('all');
@@ -259,11 +287,22 @@ export function InvoicesTable({
           <ul className="divide-border border-border divide-y overflow-hidden rounded-2xl border md:hidden">
             {page.map((r) => {
               const b = INVOICE_BUCKETS[bucketOf(r)];
+              const href = openHref(r);
               return (
                 <li key={`${r.party_kind}-${r.id}`} className="bg-white px-3 py-3">
-                  <span className="block truncate text-sm font-bold">
-                    {r.party_name ?? 'Unnamed'}
-                  </span>
+                  {href ? (
+                    <Link
+                      href={href}
+                      scroll={false}
+                      className="focus-visible:ring-gold block truncate rounded text-sm font-bold underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2"
+                    >
+                      {r.party_name ?? 'Unnamed'}
+                    </Link>
+                  ) : (
+                    <span className="block truncate text-sm font-bold">
+                      {r.party_name ?? 'Unnamed'}
+                    </span>
+                  )}
                   <span className="text-muted-light block truncate text-xs">
                     {r.number} · {INVOICE_TYPES[r.party_kind]?.label} · due{' '}
                     {r.due_at ? day(r.due_at) : '—'}
@@ -304,12 +343,15 @@ export interface TaxDoc {
   kra_reference: string | null;
 }
 
-const KRA: Record<string, { label: string; tone: React.ComponentProps<typeof Pill>['tone'] }> = {
-  pending: { label: 'Not sent to KRA', tone: 'amber' },
+export const KRA_STATUS: Record<
+  string,
+  { label: string; tone: React.ComponentProps<typeof Pill>['tone'] }
+> = {
+  pending: { label: 'Not Sent to KRA', tone: 'amber' },
   submitted: { label: 'Submitted', tone: 'blue' },
   accepted: { label: 'Accepted by KRA', tone: 'green' },
   rejected: { label: 'Rejected by KRA', tone: 'red' },
-  not_required: { label: 'Not required', tone: 'grey' },
+  not_required: { label: 'Not Required', tone: 'grey' },
 };
 
 export function TaxDocsTable({
@@ -339,7 +381,7 @@ export function TaxDocsTable({
     {
       id: 'number',
       accessorFn: (r) => r.issued_at,
-      header: 'Number · issued',
+      header: 'Number · Issued',
       cell: ({ row: { original: r } }) => (
         <span className="block whitespace-nowrap tabular-nums">
           <span className="block font-semibold">{r.number}</span>
@@ -350,7 +392,7 @@ export function TaxDocsTable({
     {
       id: 'party',
       accessorFn: (r) => r.party_name ?? '',
-      header: 'Billed to',
+      header: 'Billed To',
       cell: ({ row: { original: r } }) => (
         <span className="block max-w-[11rem]">
           <span className="block truncate font-semibold">{r.party_name ?? '—'}</span>
@@ -395,7 +437,7 @@ export function TaxDocsTable({
       accessorFn: (r) => r.kra_status,
       header: 'KRA',
       cell: ({ row: { original: r } }) => {
-        const k = KRA[r.kra_status] ?? { label: r.kra_status, tone: 'grey' as const };
+        const k = KRA_STATUS[r.kra_status] ?? { label: r.kra_status, tone: 'grey' as const };
         return (
           <span className="flex flex-col items-start gap-1">
             <Pill tone={k.tone} dot>
@@ -428,8 +470,8 @@ export function TaxDocsTable({
             onChange={setKra}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'Any KRA status' },
-              ...Object.entries(KRA)
+              { value: 'all', label: 'Any KRA Status' },
+              ...Object.entries(KRA_STATUS)
                 .filter(([k]) => rows.some((r) => r.kra_status === k))
                 .map(([k, v]) => ({ value: k, label: v.label })),
             ]}
@@ -458,7 +500,7 @@ export function TaxDocsTable({
                 r.net_cents / 100,
                 r.vat_cents / 100,
                 r.gross_cents / 100,
-                KRA[r.kra_status]?.label ?? r.kra_status,
+                KRA_STATUS[r.kra_status]?.label ?? r.kra_status,
                 r.kra_reference ?? '',
               ]),
             ]}
@@ -472,7 +514,7 @@ export function TaxDocsTable({
           description={
             filtered
               ? 'Try another search or KRA status.'
-              : `A ${noun} is issued for each order's commission and guest fees, and sent to KRA. Try a longer period.`
+              : `A ${noun} is issued for each order's commission and guest fees and for each client invoice, and sent to KRA. Try a longer period.`
           }
         />
       ) : (
@@ -491,8 +533,8 @@ export function TaxDocsTable({
                   <span className="whitespace-nowrap text-sm font-extrabold tabular-nums">
                     {kes(r.gross_cents)}
                   </span>
-                  <Pill tone={(KRA[r.kra_status] ?? { tone: 'grey' }).tone} dot>
-                    {KRA[r.kra_status]?.label ?? r.kra_status}
+                  <Pill tone={(KRA_STATUS[r.kra_status] ?? { tone: 'grey' }).tone} dot>
+                    {KRA_STATUS[r.kra_status]?.label ?? r.kra_status}
                   </Pill>
                 </span>
               </li>

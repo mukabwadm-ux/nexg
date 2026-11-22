@@ -1,0 +1,17 @@
+EMAIL CHANGED
+Your NEXG email was changed
+Now: {{ new_email_masked }}
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, from now on, sign-ins
+and NEXG emails use {{ new_email_masked }}. This address won’t get them
+any more.
+
+Wasn’t you? Write to info@nexgapp.com straight away and we’ll lock the
+account.
+
+Contact NEXG:
+mailto:info@nexgapp.com
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because of your NEXG account · NEXG, nexgapp.com

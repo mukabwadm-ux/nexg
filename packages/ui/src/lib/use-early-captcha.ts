@@ -15,6 +15,11 @@ const FRESH_FOR_MS = 240_000;
  * `take()` hands over the prepared token, or asks for a fresh one when none
  * is ready or it is too old. A token is single-use, so call `prepare()` after
  * a failed attempt to have the next one ready for the retry.
+ *
+ * A prepared check that came back empty (Turnstile errored or timed out while
+ * the page was opening) is not handed over as if it were a token: sending no
+ * token is what made Supabase refuse the first sign-in, which the form then
+ * reported as a wrong password. The check is run again instead.
  */
 export function useEarlyCaptcha(): {
   take: () => Promise<string | undefined>;
@@ -25,10 +30,11 @@ export function useEarlyCaptcha(): {
     early.current = { at: Date.now(), token: getCaptchaToken() };
   }, []);
   React.useEffect(prepare, [prepare]);
-  const take = React.useCallback(() => {
+  const take = React.useCallback(async () => {
     const ready = early.current;
     early.current = null;
-    return ready && Date.now() - ready.at < FRESH_FOR_MS ? ready.token : getCaptchaToken();
+    const prepared = ready && Date.now() - ready.at < FRESH_FOR_MS ? await ready.token : undefined;
+    return prepared ?? getCaptchaToken();
   }, []);
   return { take, prepare };
 }

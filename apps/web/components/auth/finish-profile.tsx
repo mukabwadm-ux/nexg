@@ -8,6 +8,7 @@ import * as React from 'react';
 
 import { finishOAuthProfile } from '@/app/(customer)/sign-in/actions';
 import { goTo } from '@/components/auth/password-recovery';
+import { CUSTOMER_LANDING } from '@/lib/auth-portals';
 import { DATA_PROTECTION_POLICY_URL, NEW_TAB } from '@/lib/legal-documents';
 
 /** The one short step after a first Google or Apple sign-in. */
@@ -46,7 +47,7 @@ export function FinishProfile({
       return;
     }
     toast({ title: 'Welcome', description: result.message, tone: 'success' });
-    goTo(router, result.redirectTo ?? next ?? '/');
+    goTo(router, result.redirectTo ?? next ?? CUSTOMER_LANDING);
   }
 
   return (

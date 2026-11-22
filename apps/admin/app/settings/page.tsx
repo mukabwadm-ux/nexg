@@ -17,6 +17,11 @@ import {
 } from '@/components/settings/api';
 import type { AdminApiKey } from '@/components/settings/api-keys';
 import { SaveBar, ScheduledBanner } from '@/components/settings/controls';
+import {
+  EmailDesignsTab,
+  type EmailDesignRow,
+  type EmailOverview,
+} from '@/components/settings/email-designs';
 import { EmailRoutingTab, type EmailRouteRow } from '@/components/settings/email-routing';
 import type { HolidayAdminRow } from '@/components/settings/holidays';
 import {
@@ -41,7 +46,6 @@ import {
   BrandingTab,
   CitiesTab,
   FeesTab,
-  NotificationsTab,
   PaymentsTab,
   RetentionTab,
   type TabProps,
@@ -164,6 +168,27 @@ export default async function SettingsPage({
   if (tab === 'emails') {
     const { data } = await s.rpc('rpc_email_routes' as never);
     emailRoutes = (data as unknown as EmailRouteRow[] | null) ?? [];
+  }
+
+  /* Notifications & templates. The house designs need nothing from the
+     database; uploaded ones need 20270127000100_email_designs.sql. */
+  let emailDesigns: EmailDesignRow[] = [];
+  let emailOverview: EmailOverview | null = null;
+  let emailDesignsUnavailable: string | null = null;
+  if (tab === 'notifications') {
+    const [designsRes, overviewRes] = await Promise.all([
+      s.rpc('rpc_email_designs' as never),
+      s.rpc('rpc_email_overview' as never),
+    ]);
+    const error = designsRes.error ?? overviewRes.error;
+    if (error) {
+      emailDesignsUnavailable =
+        error.code === 'PGRST202' || error.code === '42883'
+          ? 'Uploading designs is not switched on yet: this database does not have the email designs update. Every email goes out in the house design, shown below.'
+          : `Uploaded designs could not be read: ${error.message}`;
+    }
+    emailDesigns = (designsRes.data as unknown as EmailDesignRow[] | null) ?? [];
+    emailOverview = (overviewRes.data as unknown as EmailOverview | null) ?? null;
   }
 
   const [{ data: cities }, { data: definitions }, { data: changeSets }] = await Promise.all([
@@ -387,7 +412,13 @@ export default async function SettingsPage({
         {tab === 'cities' && <CitiesTab {...props} />}
         {tab === 'fees' && <FeesTab {...props} />}
         {tab === 'payments' && <PaymentsTab {...props} />}
-        {tab === 'notifications' && <NotificationsTab />}
+        {tab === 'notifications' && (
+          <EmailDesignsTab
+            designs={emailDesigns}
+            overview={emailOverview}
+            unavailable={emailDesignsUnavailable}
+          />
+        )}
         {tab === 'emails' && <EmailRoutingTab routes={emailRoutes} />}
         {tab === 'signing' && (
           <SigningTab record={signer} signatureUrl={signatureUrl} error={signerError} />

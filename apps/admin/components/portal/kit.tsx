@@ -29,12 +29,12 @@ export function PageHeader({
   return (
     <header className="console-header flex flex-wrap items-end justify-between gap-x-6 gap-y-4 px-1 pb-5 pt-2 text-white sm:px-2">
       <div className="flex min-w-0 items-center gap-4">
-        <span
+        {/* The designs draw the page's icon large and gold, on its own. */}
+        <Icon
           aria-hidden="true"
-          className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FFE27A] via-[#FDD128] to-[#E5A800] shadow-[0_10px_24px_-10px_rgba(240,185,11,0.8)] sm:h-16 sm:w-16"
-        >
-          <Icon className="text-ink h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.9} />
-        </span>
+          className="h-12 w-12 shrink-0 text-[#F5B800] drop-shadow-[0_6px_14px_rgba(240,185,11,0.35)] sm:h-14 sm:w-14"
+          strokeWidth={1.6}
+        />
         <div className="min-w-0">
           <h1 className="text-balance text-[1.75rem] font-extrabold leading-tight tracking-[-0.02em] sm:text-[2rem]">
             {title}
@@ -189,6 +189,7 @@ export function Stat({
   note,
   noteTone,
   delta,
+  deltaNote,
   href,
   wide = false,
   visual,
@@ -202,6 +203,8 @@ export function Stat({
   noteTone?: 'good' | 'bad' | 'muted';
   /** Percentage change; up is good unless `upIsBad`. */
   delta?: { value: number; upIsBad?: boolean } | null;
+  /** What the change is measured against, after the figure: "vs Oct". */
+  deltaNote?: string;
   href?: string;
   /** Twice as wide on large screens, like the designs' storage card. */
   wide?: boolean;
@@ -215,40 +218,46 @@ export function Stat({
   const good = delta ? (delta.upIsBad ? !up : up) : true;
   const body = (
     <>
+      {/* As drawn: every card on the same cream, the icon large and bare,
+          and only the icon (and the note) take the card's colour. */}
       {visual ?? (
-        <span
+        <Icon
           aria-hidden="true"
           className={cn(
-            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full sm:h-11 sm:w-11',
-            t.ring,
+            'h-10 w-10 shrink-0 sm:h-11 sm:w-11',
+            /* Five cards of money in a row: a slightly smaller icon leaves
+               "KES 24,860,000" room to stay on one line, as drawn. */
+            'min-[1500px]:group-data-[dense]/stats:h-9 min-[1500px]:group-data-[dense]/stats:w-9 min-[1760px]:group-data-[dense]/stats:h-11 min-[1760px]:group-data-[dense]/stats:w-11',
+            t.icon,
           )}
-        >
-          <Icon className={cn('h-[1.35rem] w-[1.35rem]', t.icon)} strokeWidth={1.8} />
-        </span>
+          strokeWidth={1.6}
+        />
       )}
       <span className="w-full min-w-0 flex-1">
         <span
           data-figure
-          className="text-ink block break-words text-[1.25rem] font-extrabold leading-tight tracking-[-0.02em] sm:text-[1.5rem]"
+          className="text-ink block break-words text-[1.25rem] font-extrabold leading-tight tracking-[-0.02em] sm:text-[1.375rem] min-[1500px]:group-data-[dense]/stats:whitespace-nowrap min-[1500px]:group-data-[dense]/stats:text-[clamp(1.0625rem,1.12vw,1.375rem)] min-[1760px]:text-[1.5rem]"
         >
           {value ?? '—'}
         </span>
-        <span className="text-muted line-clamp-2 block text-[0.8125rem] font-semibold leading-snug">
+        <span className="text-ink/80 line-clamp-2 block text-[0.875rem] font-semibold leading-snug">
           {label}
         </span>
         {delta ? (
           <span
             className={cn(
-              'mt-1 inline-flex items-center gap-1 rounded-full px-1.5 py-px text-xs font-bold',
-              good ? 'bg-success-bg text-success' : 'bg-danger-bg text-danger',
+              'mt-1 flex flex-wrap items-center gap-x-1 text-[0.8125rem] font-extrabold',
+              good ? 'text-success' : 'text-danger',
             )}
           >
             <Triangle
               aria-hidden="true"
-              className={cn('h-2 w-2 fill-current', !up && 'rotate-180')}
+              className={cn('h-2.5 w-2.5 fill-current', !up && 'rotate-180')}
             />
             <span className="sr-only">{up ? 'Up' : 'Down'}</span>
+            {up ? '+' : '−'}
             {Math.abs(delta.value).toLocaleString('en-KE', { maximumFractionDigits: 1 })}%
+            {deltaNote && <span className="text-ink/70 font-semibold">{deltaNote}</span>}
           </span>
         ) : (
           note && (
@@ -271,9 +280,9 @@ export function Stat({
   const cls = cn(
     'flex min-w-0 flex-1 flex-col items-start gap-2.5 rounded-2xl border bg-gradient-to-br p-3.5 sm:flex-row sm:items-center sm:gap-3 sm:p-4',
     'sm:group-data-[dense]/stats:flex-col sm:group-data-[dense]/stats:items-start sm:group-data-[dense]/stats:gap-2.5',
-    'min-[1760px]:group-data-[dense]/stats:flex-row min-[1760px]:group-data-[dense]/stats:items-center min-[1760px]:group-data-[dense]/stats:gap-3',
+    'min-[1500px]:group-data-[dense]/stats:flex-row min-[1500px]:group-data-[dense]/stats:items-center min-[1500px]:group-data-[dense]/stats:gap-3',
     'shadow-[0_1px_2px_rgba(20,20,20,0.04),0_10px_26px_-22px_rgba(20,20,20,0.35)]',
-    t.card,
+    STAT_TONES.gold.card,
     href &&
       'focus-visible:ring-gold transition-[box-shadow,transform] duration-200 hover:-translate-y-px hover:shadow-[0_14px_30px_-16px_rgba(20,20,20,0.4)] focus-visible:outline-none focus-visible:ring-2',
   );
@@ -434,6 +443,7 @@ export function Sheet({
   return (
     <section
       id={id}
+      data-portal-sheet
       className={cn(
         'border-border bg-surface min-w-0 rounded-2xl border p-4 shadow-[0_1px_2px_rgba(20,20,20,0.04),0_10px_26px_-22px_rgba(20,20,20,0.35)] sm:p-5',
         className,

@@ -1,0 +1,26 @@
+DELIVERED
+{{ total }}
+your final price, after weighing
+
+{{ business_name }}
+{{#business_area}}{{ business_area }}
+{{/business_area}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, some items were
+weighed when they were packed, so your final price changed. {{
+difference_note }}
+
+View receipt:
+{{ activity_url }}
+
+FINAL RECEIPT {{ receipt_number }}
+{{#items}}  {{ quantity }} x {{ name }}  {{ amount }}{{#choices}}
+    {{ choices }}{{/choices}}
+{{/items}}{{#price_lines}}  {{ label }}  {{ amount }}
+{{/price_lines}}  TOTAL PAID  {{ total }}
+Payment: {{ payment_method }}{{#payment_reference}} · {{ payment_reference }}{{/payment_reference}}, paid {{ paid_at }}
+{{ record_label }} {{ record_number }} · Receipt {{ receipt_number }}
+Asante for ordering with NEXG
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you ordered on NEXG · NEXG, nexgapp.com

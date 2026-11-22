@@ -43,7 +43,8 @@ export const TAB_COPY: Record<string, { title: string; subtitle: string }> = {
   },
   notifications: {
     title: 'Notifications & templates',
-    subtitle: 'Every message NexG sends, in both languages, with who gets what and when',
+    subtitle:
+      'Every email NexG sends and the design it goes out in · upload your own design for any of them and make it live',
   },
   emails: {
     title: 'Email routing',

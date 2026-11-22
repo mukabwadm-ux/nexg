@@ -1,0 +1,22 @@
+CHECK-OUT TOMORROW
+{{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
+{{ date_title }}
+
+{{ property_name }}
+{{#area}}{{ area }}
+{{/area}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, we hope you’ve
+enjoyed your stay. Please check out by {{ check_out_time }} tomorrow.
+
+{{#check_out_note}}BEFORE YOU GO
+{{ check_out_note }}
+{{/check_out_note}}
+View your stay:
+{{ activity_url }}
+
+Want to stay longer? Ask in the app and we’ll check if the dates are
+free.
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you booked a stay through NEXG · NEXG, nexgapp.com

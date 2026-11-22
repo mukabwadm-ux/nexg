@@ -156,15 +156,35 @@ export async function quotePlan(planId: string): Promise<Outcome> {
   return { ok: true, message: 'Quote sent.' };
 }
 
-export async function markPaid(planId: string, reference: string): Promise<Outcome> {
+/**
+ * Records the guest's payment: the reference it was taken under and how
+ * (M-PESA or bank). The RPC posts the quote total to the ledger, where it
+ * waits until each block is done and the day is closed.
+ */
+export async function markPaid(
+  planId: string,
+  reference: string,
+  method: 'mpesa' | 'bank',
+): Promise<Outcome> {
   const supabase = createClient();
-  const { error } = await supabase.rpc('rpc_mark_paid', {
+  let { error } = await supabase.rpc('rpc_mark_paid', {
     p_plan_id: planId,
     p_reference: reference,
+    p_method: method,
   });
+  /* Until 20270108300600 is in the database the function takes no method
+     (PostgREST answers PGRST202): record the payment the old way rather than
+     refuse it. Nothing reaches the ledger in that version either way. */
+  if (error?.code === 'PGRST202') {
+    ({ error } = await supabase.rpc('rpc_mark_paid', {
+      p_plan_id: planId,
+      p_reference: reference,
+    }));
+  }
   const bad = fail(error);
   if (bad) return bad;
   revalidatePath(`/experiences/plans/${planId}`);
+  revalidatePath('/finance/settlements');
   return { ok: true, message: 'Recorded against that reference.' };
 }
 
@@ -328,6 +348,33 @@ export async function partnerGoLive(partnerId: string): Promise<Outcome> {
   if (bad) return bad;
   revalidatePath('/experiences');
   return { ok: true, message: 'Live.' };
+}
+
+/**
+ * Declares where a partner is paid. Declaring again clears Finance's
+ * verification, and the weekly run holds the partner's payouts until
+ * someone with full Finance, other than whoever declared them, verifies the
+ * details. Who may declare is checked by the RPC.
+ */
+export async function declarePartnerPayout(
+  partnerId: string,
+  payout: Record<string, string>,
+): Promise<Outcome> {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('rpc_experience_partner_payout_declare', {
+    p_partner_id: partnerId,
+    p_payout: payout,
+  });
+  const bad = fail(error);
+  if (bad) return bad;
+  revalidatePath('/experiences');
+  revalidatePath('/finance/settlements');
+  return {
+    ok: true,
+    message:
+      (data as { message?: string } | null)?.message ??
+      'Saved. Finance verifies the details before a payout run pays the partner.',
+  };
 }
 
 /** A concierge clocking on or off. */

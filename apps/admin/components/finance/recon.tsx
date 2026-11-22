@@ -22,7 +22,7 @@ export interface ReconDay {
 }
 
 function sourceLabel(provider: string) {
-  return provider === 'ledger only' ? 'Ledger only' : channelLabel(provider);
+  return provider === 'ledger only' ? 'Ledger Only' : channelLabel(provider);
 }
 
 /**
@@ -32,7 +32,7 @@ function sourceLabel(provider: string) {
  */
 export function ReconDetailsTable({
   rows,
-  title = 'Reconciliation details',
+  title = 'Reconciliation Details',
 }: {
   rows: ReconDay[];
   title?: string;
@@ -152,7 +152,7 @@ export function ReconDetailsTable({
             onChange={setSource}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All sources' },
+              { value: 'all', label: 'All Sources' },
               ...sources.map((s) => ({ value: s, label: sourceLabel(s) })),
             ]}
           />
@@ -162,7 +162,7 @@ export function ReconDetailsTable({
             onChange={setStatus}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All statuses' },
+              { value: 'all', label: 'All Statuses' },
               { value: 'ok', label: 'Reconciled' },
               { value: 'variance', label: 'Variance' },
             ]}
@@ -207,7 +207,7 @@ export function ReconDetailsTable({
           {...(filtered
             ? {
                 action: {
-                  label: 'Clear filters',
+                  label: 'Clear Filters',
                   onClick: () => {
                     setQ('');
                     setSource('all');

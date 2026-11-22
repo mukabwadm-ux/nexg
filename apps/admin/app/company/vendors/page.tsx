@@ -33,13 +33,13 @@ import {
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = { title: 'Vendors & suppliers' };
+export const metadata: Metadata = { title: 'Vendors & Suppliers' };
 export const dynamic = 'force-dynamic';
 
 const TABS = [
   { key: 'overview', label: 'Overview', icon: LayoutGrid },
   { key: 'active', label: 'Active', icon: ListChecks },
-  { key: 'on_hold', label: 'On hold', icon: CirclePause },
+  { key: 'on_hold', label: 'On Hold', icon: CirclePause },
   { key: 'archived', label: 'Archived', icon: Archive },
 ] as const;
 
@@ -122,7 +122,7 @@ export default async function VendorsPage({
     <ConsoleShell staff={staff}>
       <PageHeader
         icon={Truck}
-        title="Vendors & suppliers"
+        title="Vendors & Suppliers"
         subtitle="The businesses NexG buys from: who to call, what they supply, their terms and what has been ordered."
         actions={
           <>
@@ -159,34 +159,34 @@ export default async function VendorsPage({
               <Stat
                 icon={Truck}
                 value={active.length.toLocaleString('en-KE')}
-                label="Active vendors"
+                label="Active Vendors"
                 href={href('active')}
               />
               <Stat
                 icon={CirclePause}
                 tone="amber"
                 value={onHold.length.toLocaleString('en-KE')}
-                label="On hold"
+                label="On Hold"
                 href={href('on_hold')}
               />
               <Stat
                 icon={Layers}
                 value={covered.size.toLocaleString('en-KE')}
-                label="Categories covered"
+                label="Categories Covered"
                 note={`of ${Object.keys(VENDOR_CATEGORIES).length} kinds of supply`}
               />
               <Stat
                 icon={FileCheck2}
                 tone="purple"
                 value={open.length.toLocaleString('en-KE')}
-                label="Open orders"
+                label="Open Orders"
                 note={kes(sum(open))}
                 href="/company/procurement?tab=orders"
               />
               <Stat
                 icon={Wallet}
                 value={kes(sum(inPeriod))}
-                label="Ordered this period"
+                label="Ordered This Period"
                 note={`${inPeriod.length} ${inPeriod.length === 1 ? 'order' : 'orders'}`}
               />
             </StatGrid>
@@ -201,7 +201,7 @@ export default async function VendorsPage({
               </Sheet>
               <div className="grid min-w-0 content-start gap-5 lg:grid-cols-2 2xl:grid-cols-1">
                 <Sheet>
-                  <PanelHead title="Most ordered from" aside={formatRange(period)} />
+                  <PanelHead title="Most Ordered From" aside={formatRange(period)} />
                   {top.length === 0 ? (
                     <p className="text-muted-light py-6 text-center text-sm">
                       No orders in this period.
@@ -226,7 +226,7 @@ export default async function VendorsPage({
                   )}
                 </Sheet>
                 <Sheet>
-                  <PanelHead title="Supply gaps" />
+                  <PanelHead title="Supply Gaps" />
                   {missing.length === 0 ? (
                     <p className="text-muted-light py-4 text-sm">
                       Every kind of supply has an active vendor.
@@ -257,8 +257,8 @@ export default async function VendorsPage({
             {table(
               vendors.filter((v) => v.status === tab),
               TABS.find((t) => t.key === tab)!.label === 'Active'
-                ? 'Active vendors'
-                : `${TABS.find((t) => t.key === tab)!.label} vendors`,
+                ? 'Active Vendors'
+                : `${TABS.find((t) => t.key === tab)!.label} Vendors`,
             )}
           </Sheet>
         )}

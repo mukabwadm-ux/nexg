@@ -1,5 +1,6 @@
 'use server';
 
+import { checkDesign } from '@nexg/contracts/email-design';
 import { revalidatePath } from 'next/cache';
 
 import { createClient } from '@/lib/supabase/server';
@@ -69,6 +70,75 @@ export async function saveEmailRoute(input: {
   const failed = fail(error);
   if (failed) return failed;
   return done('Saved. It applies to the next email sent.');
+}
+
+// ─────────────────────────────────────────────── email designs
+
+/*
+ * The file is read in the browser and sent here as text; its images were
+ * already put in the email-assets bucket and their addresses swapped in.
+ * The database checks the design again, and decides who may upload.
+ */
+export async function uploadEmailDesign(input: {
+  purpose: string;
+  name: string;
+  html: string;
+  fileName: string | null;
+  notes: string;
+  images: Record<string, string>;
+  makeLive: boolean;
+}): Promise<Outcome> {
+  const problems = checkDesign(input.html, input.purpose);
+  if (problems.length) return { ok: false, message: problems.join(' ') };
+  const { data, error } = await s().rpc(
+    'rpc_email_design_upload' as never,
+    {
+      p_purpose: input.purpose,
+      p_name: input.name,
+      p_html: input.html,
+      p_file_name: input.fileName,
+      p_notes: input.notes || null,
+      p_images: input.images,
+      p_make_live: input.makeLive,
+    } as never,
+  );
+  const failed = fail(error);
+  if (failed) return failed;
+  return done(
+    input.makeLive
+      ? 'Uploaded and live. The next email of this kind goes out in it.'
+      : 'Uploaded. It is not used until you make it live.',
+    { id: String(data) },
+  );
+}
+
+export async function setEmailDesignStatus(
+  id: string,
+  status: 'live' | 'draft' | 'archived',
+): Promise<Outcome> {
+  const { error } = await s().rpc(
+    'rpc_email_design_set_status' as never,
+    { p_id: id, p_status: status } as never,
+  );
+  const failed = fail(error);
+  if (failed) return failed;
+  return done(
+    status === 'live'
+      ? 'Live. The next email of this kind goes out in this design.'
+      : status === 'draft'
+        ? 'Taken off. This kind of email goes out in the house design again.'
+        : 'Removed.',
+  );
+}
+
+export async function loadEmailDesign(
+  id: string,
+): Promise<{ ok: boolean; html?: string; message?: string }> {
+  const { data, error } = await s().rpc('rpc_email_design_html' as never, { p_id: id } as never);
+  if (error) return { ok: false, message: error.message };
+  return typeof data === 'string'
+    ? { ok: true, html: data }
+    : { ok: false, message: 'That design is not there any more.' };
 }
 
 // ─────────────────────────────────────────────── drafting

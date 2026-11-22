@@ -12,9 +12,9 @@ const MOVED: Record<string, string> = {
   overview: '/finance/reports?tab=financial',
   settlement: '/finance/settlements?tab=batches',
   reconciliation: '/finance/reconciliation',
-  fees: '/finance/reports?tab=fees',
+  fees: '/finance/reports?tab=financial#fees',
   invoices: '/finance/invoices',
-  tax: '/finance/reports?tab=tax',
+  tax: '/finance/reports?tab=financial#tax',
   exports: '/finance/reports?tab=exports',
 };
 

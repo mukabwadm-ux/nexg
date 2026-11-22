@@ -5,6 +5,34 @@ begin;
 create extension if not exists pgtap with schema extensions;
 select plan(18);
 
+/* Since 20270124000100 (approve first) going live also needs the onboarding
+   details, the agreement details and the agreement accepted: this fills them
+   in with valid sample answers for the merchant's category. */
+create function pg_temp.complete_setup(p_merchant uuid, p_category text, p_user uuid)
+returns void language sql as $f$
+  insert into public.merchant_onboarding_answer (merchant_id, answers)
+  select p_merchant, jsonb_object_agg(f.key,
+    case f.type
+      when 'yes_no' then '"yes"'::jsonb
+      when 'date' then '"2030-01-01"'::jsonb
+      when 'select' then f.options -> 0 -> 'value'
+      when 'rows' then jsonb_build_array((select jsonb_object_agg(col ->> 'key',
+          case when col ->> 'type' = 'date' then '2030-01-01'
+               else coalesce(col ->> 'placeholder', 'Sample value') end)
+        from jsonb_array_elements(f.columns) col))
+      else to_jsonb(coalesce(f.placeholder, 'Sample value'))
+    end)
+  from public.merchant_onboarding_field f
+  where f.categories is null or p_category = any (f.categories);
+  insert into public.merchant_agreement_party (merchant_id, legal_name, registration_number, kra_pin,
+    address, signatory_name, signatory_title, representative_name, representative_title, principal_name)
+  values (p_merchant, 'Sample Ltd', 'PVT-AB12CD3', 'P051234567X', 'Moi Avenue, Nairobi',
+    'Jane Owner', 'Director', 'Jane Owner', 'Director', 'Jane Owner');
+  insert into public.merchant_agreement_acceptance (merchant_id, category, agreement_id, version, accepted_by)
+  select p_merchant, p_category, a.id, a.version, p_user
+  from public.fn_merchant_agreement_for_category(p_category) a where a.id is not null;
+$f$;
+
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password,
   email_confirmed_at, created_at, updated_at
@@ -35,6 +63,7 @@ from public.city c where c.slug = 'nairobi';
 
 insert into public.merchant_branch (merchant_id, name, address_text, is_primary)
 values ('71000000-0000-4000-8000-0000000000c1', 'Main', '[Address]', true);
+select pg_temp.complete_setup('71000000-0000-4000-8000-0000000000c1', 'beauty', '71000000-0000-4000-8000-0000000000a1');
 
 insert into public.merchant_application (
   merchant_id, revision, payload, review_state, submitted_revision, submitted_at
@@ -210,6 +239,7 @@ from public.city c where c.slug = 'nairobi';
 
 insert into public.merchant_branch (merchant_id, name, address_text, is_primary)
 values ('71000000-0000-4000-8000-0000000000c2', 'Main', '[Address]', true);
+select pg_temp.complete_setup('71000000-0000-4000-8000-0000000000c2', 'beauty', '71000000-0000-4000-8000-0000000000a1');
 
 -- Approved at revision 1, then edited: revision 2 waits for review.
 insert into public.merchant_application (

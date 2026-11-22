@@ -1,0 +1,32 @@
+CHECK-IN DETAILS
+{{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
+{{ date_title }}
+
+{{ property_name }}
+{{#area}}{{ area }}
+{{/area}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, here’s everything you
+need to get in. It’s also in the app.
+
+GETTING IN
+  Address: {{ address }}
+  Check in: {{ check_in }}
+  Keys: {{ handoff_label }}
+{{#handoff_note}}  Good to know: {{ handoff_note }}
+{{/handoff_note}}{{#parking_note}}  Parking: {{ parking_note }}
+{{/parking_note}}{{#house_rules}}  House rules: {{ house_rules }}
+{{/house_rules}}
+Your check-in code is in the app. Show it when you arrive, and to no one
+else.
+
+Need your host? Message them from your stay in the app.
+
+View your stay:
+{{ activity_url }}
+
+{{#directions_url}}Get directions: {{ directions_url }}
+{{/directions_url}}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you booked a stay through NEXG · NEXG, nexgapp.com

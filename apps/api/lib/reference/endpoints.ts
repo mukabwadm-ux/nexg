@@ -3,6 +3,10 @@ import {
   BOOKING_RECEIPT_FIELDS,
   BOOKING_REQUEST_FIELDS,
   CATALOGUE_ITEM_FIELDS,
+  DELIVERY_CHECK_FIELDS,
+  DELIVERY_CHECK_REQUEST_FIELDS,
+  DELIVERY_DROPOFF_FIELDS,
+  DELIVERY_PICKUP_FIELDS,
   EVENT_FIELDS,
   MERCHANT_FIELDS,
   ORDER_FIELDS,
@@ -558,6 +562,166 @@ export const ENDPOINTS: EndpointDoc[] = [
     source: 'apps/api/app/v1/catalog/items/[id]/route.ts',
   },
   {
+    slug: 'update-catalogue-items',
+    method: 'PATCH',
+    host: 'api',
+    path: '/v1/catalog/items',
+    status: 'live',
+    group: 'Catalogue',
+    title: 'Update many catalogue items',
+    summary: 'Change the price or availability of up to 100 items in one call.',
+    description: [
+      'Changes up to 100 of your merchant’s catalogue items in one call: each one’s price (price_kes), whether it is on sale (available), or both. Name each item by its id and send only what changes. This is how a till or ERP keeps a whole price list in step without one call per item.',
+      'It is all or nothing. If any item is refused (an id your merchant does not have, an item listed twice, or a change that breaks the rules), nothing in the call is saved. Ids your merchant does not have come back together, each named by its place in the list, so you can drop them and send the rest again.',
+      'Each change follows the same rules as Update a catalogue item. With a live key the changes are saved at once and apply to the next order, and NexG keeps a record of each one and the key that made it. With a test key nothing is saved: the answer shows the items as the changes would leave them, with applied false.',
+    ],
+    auth: { kind: 'key', scope: 'catalogue_write', merchantBound: true },
+    rateCost: 1,
+    cache: 'no-store',
+    paginated: false,
+    params: [
+      {
+        name: 'X-Api-Key',
+        in: 'header',
+        type: 'string',
+        required: true,
+        description:
+          'A key bound to your merchant, with catalogue_write. A test key (nexg_test_…) changes nothing.',
+      },
+      {
+        name: 'Content-Type',
+        in: 'header',
+        type: 'string',
+        required: true,
+        description: 'application/json',
+      },
+    ],
+    example: {
+      body: {
+        items: [
+          { id: '6e9f2a3b-4c5d-4e6f-9a7b-8c9d0e1f2a3b', price_kes: 1250 },
+          { id: '7f0a3b4c-5d6e-4f70-8b9c-0d1e2f3a4b5c', available: false },
+        ],
+      },
+    },
+    requestResources: [
+      {
+        title: 'Changes',
+        at: 'body',
+        fields: [
+          {
+            name: 'items',
+            type: 'array',
+            description: 'From 1 to 100 changes, each item once. See Change.',
+          },
+        ],
+      },
+      {
+        title: 'Change',
+        at: 'body.items[]',
+        fields: [
+          {
+            name: 'id',
+            type: 'uuid',
+            description: 'The item’s id, from List your catalogue items.',
+          },
+          {
+            name: 'price_kes',
+            type: 'integer',
+            description: 'The new price, in whole shillings from 1 to 1,000,000. Optional.',
+          },
+          {
+            name: 'available',
+            type: 'boolean',
+            description:
+              'false while the item is sold out, true when it is back on sale. Optional, but send price_kes, available or both.',
+          },
+        ],
+      },
+    ],
+    responseStatus: '200 OK',
+    responseExample: {
+      ok: true,
+      data: {
+        items: [
+          {
+            id: '6e9f2a3b-4c5d-4e6f-9a7b-8c9d0e1f2a3b',
+            merchant_id: MERCHANT_ID,
+            section_id: '2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d',
+            name: 'Grilled tilapia',
+            description: 'Whole fish, lemon and chilli, sukuma wiki',
+            price_kes: 1250,
+            available: true,
+            age_restricted: false,
+            highlighted: true,
+            sort: 1,
+          },
+          {
+            id: '7f0a3b4c-5d6e-4f70-8b9c-0d1e2f3a4b5c',
+            merchant_id: MERCHANT_ID,
+            section_id: '2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d',
+            name: 'Nyama choma platter',
+            description: 'Goat ribs, kachumbari, ugali',
+            price_kes: 1800,
+            available: false,
+            age_restricted: false,
+            highlighted: false,
+            sort: 2,
+          },
+        ],
+        applied: true,
+      },
+      meta: { api_version: 'v1' },
+    },
+    responseResources: [
+      {
+        schema: 'CatalogueItem',
+        title: 'Catalogue item',
+        at: 'data.items[]',
+        fields: CATALOGUE_ITEM_FIELDS,
+      },
+      {
+        title: 'Saved',
+        at: 'data',
+        fields: [
+          {
+            name: 'applied',
+            type: 'boolean',
+            description:
+              'true when the changes were saved, with a live key. false with a test key, which saves nothing.',
+          },
+        ],
+      },
+    ],
+    errors: [
+      ...credentialErrors('catalogue_write', false),
+      {
+        status: 400,
+        code: 'invalid_request',
+        when: 'The body is not JSON with items, the list is empty or longer than 100, an item is listed twice, or an item has no id, no change, a price that is not whole shillings from 1 to 1,000,000, an available that is not true or false, or another field. error.fields names each one, as items.3.price_kes.',
+      },
+      {
+        status: 403,
+        code: 'not_found',
+        when: 'The key is not bound to a merchant.',
+      },
+      {
+        status: 404,
+        code: 'not_found',
+        when: 'Your merchant has no item with one or more of the ids. error.fields names each, as items.3.id. Nothing was changed.',
+      },
+      { status: 500, code: 'internal_error', when: 'NexG could not update the items.' },
+      UNEXPECTED_ERROR,
+    ],
+    notes: [
+      'One call costs one token, however many items it carries.',
+      'The answer lists the items in the order you sent them, each with the public catalogue’s fields, as Update a catalogue item answers one.',
+      'Sending a value an item already has changes nothing and records nothing, so you can send a whole price list each time.',
+    ],
+    since: '2026-11-18',
+    source: 'apps/api/app/v1/catalog/items/route.ts',
+  },
+  {
     slug: 'list-zones',
     method: 'GET',
     host: 'api',
@@ -623,6 +787,118 @@ export const ENDPOINTS: EndpointDoc[] = [
     notes: ['Zones are a small set and change rarely, so the whole list comes in one response.'],
     since: '2026-10-21',
     source: 'apps/api/app/v1/zones/route.ts',
+  },
+  {
+    slug: 'check-delivery',
+    method: 'POST',
+    host: 'api',
+    path: '/v1/delivery/check',
+    status: 'live',
+    group: 'Zones',
+    title: 'Check a delivery',
+    summary:
+      'Whether NexG can deliver between two points, how long it usually takes and what it costs.',
+    description: [
+      'Send a pickup and a drop-off. The answer says whether NexG can take the trip now. When it can, you get the drop-off zone’s usual delivery time and the delivery fee from NexG’s rate card. When it cannot, deliverable is false and reason says why: the pickup or the drop-off is outside the areas NexG serves, the trip is longer than NexG goes in that city, or deliveries into the drop-off zone are paused.',
+      'NexG answers with the rules its own checkout uses. Distances are in a straight line. The fee is a base fee covering the first kilometre plus a per-kilometre rate for each further kilometre begun, both set per city.',
+      'The check reserves nothing and is not binding: a zone can be paused at any minute, and an order is priced when it is placed. A ride or courier booked through Book a service is priced by that service, which can differ from this fee.',
+    ],
+    auth: { kind: 'optional_key', scope: 'public_read' },
+    rateCost: 1,
+    cache: 'no-store',
+    paginated: false,
+    params: [
+      ...AUTH_HEADERS,
+      {
+        name: 'Content-Type',
+        in: 'header',
+        type: 'string',
+        required: true,
+        description: 'application/json',
+      },
+    ],
+    example: {
+      body: {
+        pickup_lat: -1.2648,
+        pickup_lng: 36.8027,
+        dropoff_lat: -1.2921,
+        dropoff_lng: 36.7865,
+      },
+    },
+    requestResources: [
+      {
+        schema: 'DeliveryCheckRequest',
+        title: 'Trip',
+        at: 'body',
+        fields: DELIVERY_CHECK_REQUEST_FIELDS,
+      },
+    ],
+    responseStatus: '200 OK',
+    responseExample: {
+      ok: true,
+      data: {
+        deliverable: true,
+        reason: null,
+        message: null,
+        city_slug: 'nairobi',
+        city_name: 'Nairobi',
+        pickup: {
+          served: true,
+          zone_id: '8a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d',
+          zone_name: 'Westlands',
+        },
+        dropoff: {
+          served: true,
+          zone_id: '7f1e2d3c-4b5a-4968-8776-655443322110',
+          zone_name: 'Kilimani',
+          paused: false,
+        },
+        distance_km: 3.5,
+        max_distance_km: 15,
+        eta_min: 20,
+        eta_max: 30,
+        delivery_fee_cents: 15500,
+        currency: 'KES',
+      },
+      meta: { api_version: 'v1' },
+    },
+    responseResources: [
+      {
+        schema: 'DeliveryCheck',
+        title: 'Delivery check',
+        at: 'data',
+        fields: DELIVERY_CHECK_FIELDS,
+      },
+      {
+        schema: 'DeliveryPickup',
+        title: 'Pickup',
+        at: 'data.pickup',
+        fields: DELIVERY_PICKUP_FIELDS,
+      },
+      {
+        schema: 'DeliveryDropoff',
+        title: 'Drop-off',
+        at: 'data.dropoff',
+        fields: DELIVERY_DROPOFF_FIELDS,
+      },
+    ],
+    errors: [
+      ...credentialErrors('public_read', true),
+      {
+        status: 400,
+        code: 'invalid_request',
+        when: 'The body is not JSON, a coordinate is missing or out of range (latitudes -90 to 90, longitudes -180 to 180), or it has another field. error.fields names it.',
+      },
+      { status: 500, code: 'internal_error', when: 'NexG could not check the trip.' },
+      UNEXPECTED_ERROR,
+    ],
+    notes: [
+      'A trip NexG cannot take still answers 200 OK: deliverable is false, with a reason and a message a person can read.',
+      'The body has the same four fields Book a service takes for a ride or courier, so you can check a trip and then book it with the same values.',
+      'It is a POST so that a customer’s address stays out of URLs and the logs that keep them. It changes nothing, and its answer is never cached.',
+    ],
+    since: '2026-11-18',
+    source: 'apps/api/app/v1/delivery/check/route.ts',
   },
   {
     slug: 'list-experiences',
@@ -1066,10 +1342,12 @@ export const ENDPOINTS: EndpointDoc[] = [
     status: 'live',
     group: 'Orders',
     title: 'Move a test booking',
-    summary: 'Sandbox only: move a test booking to a later status, to try status-change events.',
+    summary:
+      'Sandbox only: move a test booking to a later status or stage, to try status and stage events.',
     description: [
-      'A real booking changes status as the merchant and NexG work on it. A test booking has nobody working on it, so this endpoint moves it for you: book with a test key, move the booking to confirmed, in_progress, completed or cancelled, and watch booking.status_changed arrive at your test endpoint.',
-      'A booking only moves forward: requested, confirmed, in_progress, completed. You may skip steps, and you may cancel it at any point before it is completed. Completed and cancelled are final. Each status gets the first stage a real order uses for it: confirmed, picked_up, delivered or cancelled.',
+      'A real booking changes as the merchant, NexG and the rider work on it. A test booking has nobody working on it, so this endpoint moves it for you: book with a test key, move the booking on, and watch the events arrive at your test endpoint.',
+      'Send a status (confirmed, in_progress, completed or cancelled) or a stage (confirmed, preparing, ready, picked_up, arriving, delivered or cancelled). A status gets the first stage a real order uses for it. A move that changes the status sends booking.status_changed; one inside a status, such as picked_up to arriving, sends booking.stage_changed.',
+      'A booking only moves forward. You may skip steps, and you may cancel it at any point before it is completed. Completed and cancelled are final.',
       'Test keys only. A live key is refused with 403: real bookings move only as the work happens. The developer console does the same with buttons, under Test bookings.',
     ],
     auth: { kind: 'key', scope: 'merchant_write', merchantBound: true },
@@ -1105,14 +1383,20 @@ export const ENDPOINTS: EndpointDoc[] = [
     },
     requestResources: [
       {
-        title: 'Status change',
+        title: 'Move',
         at: 'body',
         fields: [
           {
             name: 'status',
             type: "'confirmed' | 'in_progress' | 'completed' | 'cancelled'",
             description:
-              'Where to move the booking: a status later than the one it has, or cancelled.',
+              'Where to move the booking: a status later than the one it has, or cancelled. Send this or stage.',
+          },
+          {
+            name: 'stage',
+            type: "'confirmed' | 'preparing' | 'ready' | 'picked_up' | 'arriving' | 'delivered' | 'cancelled'",
+            description:
+              'Where to move the booking: a stage later than the one it has, or cancelled. Send this or status.',
           },
         ],
       },
@@ -1152,6 +1436,12 @@ export const ENDPOINTS: EndpointDoc[] = [
             type: 'string',
             description: 'The status the booking had before this move.',
           },
+          {
+            name: 'previous_stage',
+            type: 'string',
+            description:
+              'The stage the booking had before this move. Sent when you moved it by stage.',
+          },
         ],
       },
     ],
@@ -1160,12 +1450,12 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 400,
         code: 'invalid_request',
-        when: 'The id is not a UUID, or the body is not JSON with a status of confirmed, in_progress, completed or cancelled.',
+        when: 'The id is not a UUID, or the body is not JSON with one of status or stage, set to a value listed above.',
       },
       {
         status: 400,
         code: 'invalid_request',
-        when: 'The booking cannot move there: it already has that status, the status comes before its own, or it is completed or cancelled. The message says which.',
+        when: 'The booking cannot move there: it is already there, it is past it, or it is completed or cancelled. The message says which.',
       },
       {
         status: 403,
@@ -1181,11 +1471,112 @@ export const ENDPOINTS: EndpointDoc[] = [
       UNEXPECTED_ERROR,
     ],
     notes: [
-      'Each move sends booking.status_changed to your enabled test endpoints, with the booking as GET /v1/orders/{id} returns it, previous_status and previous_stage. Cancelling sends it too.',
+      'Each move sends one event to your enabled test endpoints, with the booking as GET /v1/orders/{id} returns it: booking.status_changed with previous_status and previous_stage, or booking.stage_changed with previous_stage. Cancelling sends booking.status_changed.',
+      'Give a test ride or courier a test rider with Assign a test rider, to try booking.rider_assigned.',
       'Test bookings made in the developer console move the same way, and appear in List your orders for your test keys.',
     ],
     since: '2026-11-17',
     source: 'apps/api/app/v1/test/orders/[id]/status/route.ts',
+  },
+  {
+    slug: 'assign-test-rider',
+    method: 'POST',
+    host: 'api',
+    path: '/v1/test/orders/{id}/rider',
+    status: 'live',
+    group: 'Orders',
+    title: 'Assign a test rider',
+    summary: 'Sandbox only: give a test ride or courier a rider, to try booking.rider_assigned.',
+    description: [
+      'A real ride or courier gets a rider when one accepts its delivery job, and NexG sends booking.rider_assigned. A test booking has no riders, so this endpoint assigns a test rider and sends the same event to your test endpoint. Call it again to try a new rider taking over.',
+      'Rides and couriers only, and not once the booking is completed or cancelled. There is no body. Test keys only: a live key is refused with 403.',
+    ],
+    auth: { kind: 'key', scope: 'merchant_write', merchantBound: true },
+    rateCost: 5,
+    cache: 'no-store',
+    paginated: false,
+    params: [
+      {
+        name: 'id',
+        in: 'path',
+        type: 'uuid',
+        required: true,
+        description: 'The order_id of a test ride or courier.',
+      },
+      {
+        name: 'X-Api-Key',
+        in: 'header',
+        type: 'string',
+        required: true,
+        description: 'A test key (nexg_test_…) bound to your merchant, with merchant_write.',
+      },
+    ],
+    example: { path: { id: '7c6b5a49-3827-4615-a4b3-c2d1e0f9a8b7' } },
+    responseStatus: '200 OK',
+    responseExample: {
+      ok: true,
+      data: {
+        order: {
+          order_id: '7c6b5a49-3827-4615-a4b3-c2d1e0f9a8b7',
+          reference: 'TEST-261117-A1B2C3',
+          service: 'airport_transfer',
+          quantity: 2,
+          status: 'confirmed',
+          stage: 'confirmed',
+          payment_method: 'on_account',
+          payment_status: 'pending',
+          currency: 'KES',
+          total_cents: 200000,
+          scheduled_for: '2026-11-18T03:30:00+00:00',
+          pickup_label: 'JKIA Terminal 1A',
+          dropoff_label: 'Woodvale Grove, Westlands, Nairobi',
+          created_at: '2026-11-17T09:12:44.512+00:00',
+        },
+        assigned_at: '2026-11-17T09:20:03.118+00:00',
+      },
+      meta: { api_version: 'v1' },
+    },
+    responseResources: [
+      { schema: 'ApiOrder', title: 'Order', at: 'data.order', fields: ORDER_FIELDS },
+      {
+        title: 'The rider',
+        at: 'data',
+        fields: [
+          {
+            name: 'assigned_at',
+            type: 'string',
+            description:
+              'When the test rider was assigned. booking.rider_assigned carries the same.',
+          },
+        ],
+      },
+    ],
+    errors: [
+      ...credentialErrors('merchant_write', false),
+      { status: 400, code: 'invalid_request', when: 'The id is not a UUID.' },
+      {
+        status: 400,
+        code: 'invalid_request',
+        when: 'The booking is not a ride or a courier, or it is completed or cancelled. The message says which.',
+      },
+      {
+        status: 403,
+        code: 'not_found',
+        when: 'The key is a live key, or it is not bound to a merchant.',
+      },
+      {
+        status: 404,
+        code: 'not_found',
+        when: 'Your merchant has no test booking with that id.',
+      },
+      { status: 500, code: 'internal_error', when: 'NexG could not assign the test rider.' },
+      UNEXPECTED_ERROR,
+    ],
+    notes: [
+      'booking.rider_assigned carries the booking and assigned_at, and nothing about the rider yet.',
+    ],
+    since: '2026-11-18',
+    source: 'apps/api/app/v1/test/orders/[id]/rider/route.ts',
   },
   {
     slug: 'bank-webhook',

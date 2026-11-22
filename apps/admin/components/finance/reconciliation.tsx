@@ -67,7 +67,7 @@ export function Reconciliation({
       {/* ─────────────────────────────────────── in flight */}
       <section>
         <SectionTitle note="A clearing balance is not wrong. It is only wrong once it is old.">
-          Money in flight
+          Money in Flight
         </SectionTitle>
 
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
@@ -77,9 +77,9 @@ export function Reconciliation({
                 <th className="px-4 py-2">Account</th>
                 <th className="px-4 py-2 text-right">Balance</th>
                 <th className="px-4 py-2 text-right">Entries</th>
-                <th className="px-4 py-2 text-right">Under 1 day</th>
-                <th className="px-4 py-2 text-right">1–7 days</th>
-                <th className="px-4 py-2 text-right">Over 7 days</th>
+                <th className="px-4 py-2 text-right">Under 1 Day</th>
+                <th className="px-4 py-2 text-right">1–7 Days</th>
+                <th className="px-4 py-2 text-right">Over 7 Days</th>
                 <th className="px-4 py-2">Oldest</th>
               </tr>
             </thead>
@@ -146,7 +146,7 @@ export function Reconciliation({
       {/* ─────────────────────────────── provider vs ledger */}
       <section>
         <SectionTitle note="What the providers say against what the books say. Written by different code, on purpose.">
-          Provider against ledger
+          Provider Against Ledger
         </SectionTitle>
 
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
@@ -156,8 +156,8 @@ export function Reconciliation({
                 <th className="px-4 py-2">Day</th>
                 <th className="px-4 py-2">Provider</th>
                 <th className="px-4 py-2 text-right">Payments</th>
-                <th className="px-4 py-2 text-right">Provider says</th>
-                <th className="px-4 py-2 text-right">Ledger says</th>
+                <th className="px-4 py-2 text-right">Provider Says</th>
+                <th className="px-4 py-2 text-right">Ledger Says</th>
                 <th className="px-4 py-2 text-right">Difference</th>
               </tr>
             </thead>
@@ -216,7 +216,7 @@ export function Reconciliation({
       {/* ───────────────────────────────────── dead callbacks */}
       <section>
         <SectionTitle note="A callback that changed nothing is silent in the product. It exists only if somebody looks.">
-          Callbacks that did nothing
+          Callbacks That Did Nothing
         </SectionTitle>
 
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
@@ -228,7 +228,7 @@ export function Reconciliation({
                 <th className="px-4 py-2">Event</th>
                 <th className="px-4 py-2">Payment</th>
                 <th className="px-4 py-2 text-right">Amount</th>
-                <th className="px-4 py-2">What is wrong</th>
+                <th className="px-4 py-2">What Is Wrong</th>
               </tr>
             </thead>
             <tbody>

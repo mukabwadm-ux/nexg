@@ -66,9 +66,9 @@ export interface RenderOptions {
   metadata?: { subject?: string; createdAt?: Date; keywords?: string[] };
 }
 
-const PAGE_W = 595.28;
-const PAGE_H = 841.89;
-const MARGIN_X = 65;
+export const PAGE_W = 595.28;
+export const PAGE_H = 841.89;
+export const MARGIN_X = 65;
 const CONTENT_W = PAGE_W - 2 * MARGIN_X;
 const BOTTOM = 78;
 const TOP_FIRST = PAGE_H - 140;
@@ -78,13 +78,13 @@ const TOP_PLAIN = PAGE_H - 65;
 const BODY = { size: 10, leading: 13.6 };
 const TABLE = { size: 9, leading: 12, padX: 5, padY: 4 };
 
-const INK = rgb(0.08, 0.08, 0.08);
-const MUTED = rgb(0.4, 0.4, 0.4);
-const RULE = rgb(0.72, 0.72, 0.72);
-const GOLD = rgb(0.91, 0.64, 0.09);
-const SHADE = rgb(0.95, 0.95, 0.95);
+export const INK = rgb(0.08, 0.08, 0.08);
+export const MUTED = rgb(0.4, 0.4, 0.4);
+export const RULE = rgb(0.72, 0.72, 0.72);
+export const GOLD = rgb(0.91, 0.64, 0.09);
+export const SHADE = rgb(0.95, 0.95, 0.95);
 
-interface Fonts {
+export interface Fonts {
   regular: PDFFont;
   bold: PDFFont;
   italic: PDFFont;
@@ -125,7 +125,7 @@ let charset: Set<number> | null = null;
  * one. A string is the sum of its characters, each measured once per font.
  */
 const widths = new WeakMap<PDFFont, Map<string, number>>();
-function widthOf(font: PDFFont, text: string, size: number): number {
+export function widthOf(font: PDFFont, text: string, size: number): number {
   let byFont = widths.get(font);
   if (!byFont) widths.set(font, (byFont = new Map()));
   let units = 0;
@@ -138,7 +138,7 @@ function widthOf(font: PDFFont, text: string, size: number): number {
 }
 
 /** Standard fonts speak WinAnsi only: map anything else to what they can print. */
-function printable(text: string, font: PDFFont): string {
+export function printable(text: string, font: PDFFont): string {
   charset ??= new Set(font.getCharacterSet());
   let out = '';
   for (const ch of text) {
@@ -288,6 +288,20 @@ function layoutLines(runs: ResolvedRun[], avail: number, fonts: Fonts, size: num
   return lines;
 }
 
+/** Plain text wrapped to a width, one string per line, in printable characters. */
+export function wrapText(
+  text: string,
+  width: number,
+  fonts: Fonts,
+  size: number,
+  bold = false,
+): string[] {
+  const runs = [{ text, bold, italic: false, underline: false }];
+  return layoutLines(runs, width, fonts, size).map((line) =>
+    line.words.map((word) => word.pieces.map((p) => p.text).join('')).join(' '),
+  );
+}
+
 /* Baseline of a line whose box starts at `top`. */
 const baseline = (top: number, size: number, leading: number) =>
   top - (leading - 0.925 * size) / 2 - 0.718 * size;
@@ -336,7 +350,7 @@ function showSegments(
   page.pushOperators(...ops);
 }
 
-function drawString(
+export function drawString(
   page: PDFPage,
   text: string,
   options: { x: number; y: number; size: number; font: PDFFont; color?: Color },
@@ -769,7 +783,12 @@ function drawExecution(w: Writer, e: ExecutionBlock, signature: PDFImage | null)
 
 /* -------------------------------------------------------- page furniture */
 
-function drawLetterhead(
+/**
+ * The full NexG letterhead across the top of a first page: the logo on the
+ * left, the company and its contact lines on the right, a gold rule under
+ * them. Agreements and client invoices share it.
+ */
+export function drawLetterhead(
   page: PDFPage,
   fonts: Fonts,
   letterhead: Letterhead,

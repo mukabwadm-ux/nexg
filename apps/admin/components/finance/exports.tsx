@@ -34,17 +34,17 @@ export interface ExportLogRow {
 const KINDS = [
   {
     key: 'ledger',
-    label: 'Ledger entries',
+    label: 'Ledger Entries',
     note: 'Every debit and credit, with its transaction, account and order.',
   },
   {
     key: 'settlement',
-    label: 'Settlement lines',
+    label: 'Settlement Lines',
     note: 'What each partner was paid, by run.',
   },
   {
     key: 'revenue',
-    label: 'Revenue by fee',
+    label: 'Revenue by Fee',
     note: 'Daily totals per fee account, per city.',
   },
   {
@@ -152,7 +152,7 @@ export function Exports({
     <div className="space-y-8">
       <section>
         <SectionTitle note="Every export is recorded before the rows are handed over, with who took it and how many.">
-          Take a copy
+          Take a Copy
         </SectionTitle>
 
         <div className="border-border bg-surface rounded-xl border p-4">
@@ -238,7 +238,7 @@ export function Exports({
 
       <section>
         <SectionTitle note="Visible rather than buried in the audit trail. The deterrent only works if people know it is here.">
-          Who has taken a copy
+          Who Has Taken a Copy
         </SectionTitle>
 
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">

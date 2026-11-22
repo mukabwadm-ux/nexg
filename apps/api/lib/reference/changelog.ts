@@ -10,6 +10,56 @@ import type { ChangelogEntry } from './types';
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-11-18',
+    kind: 'added',
+    title: 'Update many catalogue items at once',
+    body: [
+      'PATCH /v1/catalog/items changes the price or availability of up to 100 of your items in one call, so a till or ERP can keep a whole price list in step without one call per item. Each change follows the rules of PATCH /v1/catalog/items/{id}.',
+      'It is all or nothing: if any item is refused, nothing in the call is saved, and ids your merchant does not have come back together, each named by its place in the list. One call costs one token. A test key answers with the result and saves nothing.',
+    ],
+    endpoints: ['update-catalogue-items'],
+  },
+  {
+    date: '2026-11-18',
+    kind: 'added',
+    title: 'Can NexG deliver here?',
+    body: [
+      'POST /v1/delivery/check takes a pickup and a drop-off and answers whether NexG can deliver the trip now, and why not when it cannot: a pickup or drop-off outside the areas NexG serves, a trip longer than NexG goes, or deliveries into the drop-off zone paused.',
+      'When it can, the answer gives the city, the zone at each end, the straight-line distance, the drop-off zone’s usual delivery time and the delivery fee from NexG’s rate card. It needs no key, like the zone list.',
+    ],
+    endpoints: ['check-delivery'],
+  },
+  {
+    date: '2026-11-18',
+    kind: 'added',
+    title: 'OpenAPI spec and Postman collection',
+    body: [
+      'https://api.nexgapp.com/openapi.json describes every endpoint in OpenAPI 3.1, for code generators and API clients. https://api.nexgapp.com/postman.json is a Postman collection of the same: import it and set apiKey to a test key.',
+      'Both are built from the same source as this reference, so they always match it.',
+    ],
+    endpoints: [],
+  },
+  {
+    date: '2026-11-18',
+    kind: 'added',
+    title: 'Rider milestones in order events',
+    body: [
+      'booking.stage_changed: a booking’s stage changed inside the same status, such as picked_up to arriving, or preparing to ready. Every stage change now sends exactly one event: booking.status_changed when the status changes, booking.stage_changed when it does not.',
+      'booking.rider_assigned: a rider took the booking’s delivery job, and again when another rider takes over. It carries the booking and assigned_at; details about the rider will follow.',
+      'In the sandbox, POST /v1/test/orders/{id}/rider gives a test ride or courier a test rider. The console’s Test bookings card has the same button.',
+    ],
+    endpoints: ['assign-test-rider'],
+  },
+  {
+    date: '2026-11-18',
+    kind: 'changed',
+    title: 'Test bookings move by stage too',
+    body: [
+      'POST /v1/test/orders/{id}/status takes a stage (confirmed, preparing, ready, picked_up, arriving, delivered or cancelled) as well as a status, so you can try booking.stage_changed. The answer then also gives previous_stage.',
+    ],
+    endpoints: ['move-test-order'],
+  },
+  {
     date: '2026-11-17',
     kind: 'added',
     title: 'Updating your catalogue',

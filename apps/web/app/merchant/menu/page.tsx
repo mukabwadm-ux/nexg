@@ -1,5 +1,11 @@
 import { PageHead } from '@/components/merchant/frame';
+import {
+  ItemChoices,
+  type ChoiceItemRow,
+  type OptionGroupRow,
+} from '@/components/partner/merchant-item-choices';
 import { Menu, type ItemRow, type SectionRow } from '@/components/partner/merchant-menu';
+import { SetupReview } from '@/components/partner/merchant-setup-review';
 import { requireMerchant, setupPageOrWorkspace } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
 import { getCatalogueExample } from '@nexg/contracts';
@@ -20,11 +26,24 @@ export default async function MerchantMenu() {
   );
   const supabase = createClient();
 
-  const [{ data, error }, { data: sectionData }, { data: merchantData }] = await Promise.all([
+  const [
+    { data, error },
+    { data: sectionData },
+    { data: merchantData },
+    { data: groupData },
+    { data: linkData },
+    { data: attributeData },
+    { data: variantData },
+    { data: reviewData },
+    { data: soldOutData },
+    { data: messageData },
+    { data: minOrderData },
+    { data: digitalData },
+  ] = await Promise.all([
     supabase
       .from('catalogue_item')
       .select(
-        'id, section_id, name, description, price_kes, available, age_restricted, sort, photo_path, portion_size, ingredients, allergens, dietary_labels, availability_notes, handling_notes, storage_guidance, prep_time_minutes',
+        'id, section_id, name, description, price_kes, available, age_restricted, sort, photo_path, portion_size, ingredients, allergens, dietary_labels, availability_notes, handling_notes, storage_guidance, prep_time_minutes, sold_by, unit_label, unit_step, unit_min, unit_max, price_is_estimate, kind, booking_offering_id',
       )
       .eq('merchant_id', me.id)
       .order('sort'),
@@ -34,6 +53,44 @@ export default async function MerchantMenu() {
       .select('category, category_key, subcategory')
       .eq('id', me.id)
       .maybeSingle(),
+    supabase
+      .from('modifier_group')
+      .select(
+        'id, name, required, max_choices, sort, modifier_option(id, name, extra_cents, available, sort)',
+      )
+      .eq('merchant_id', me.id)
+      .is('archived_at', null)
+      .order('sort'),
+    supabase.from('catalogue_item_modifier').select('item_id, group_id, sort').order('sort'),
+    supabase
+      .from('catalogue_attribute')
+      .select('id, item_id, name, sort, catalogue_attribute_value(id, name, sort)')
+      .order('sort'),
+    supabase
+      .from('catalogue_variant')
+      .select('id, item_id, value_ids, price_kes, available, stock_count, sku')
+      .is('archived_at', null),
+    supabase
+      .from('catalogue_setup_review')
+      .select('id, item_id, kind, message, created_at')
+      .eq('merchant_id', me.id)
+      .is('resolved_at', null)
+      .order('created_at'),
+    // Asked on its own: until the database has sold_out (20270129000100) this
+    // read fails alone, the rest of the page loads and the switch stays hidden.
+    supabase.from('catalogue_item').select('id, sold_out').eq('merchant_id', me.id),
+    // The same for messages (20270129000300).
+    supabase
+      .from('catalogue_item')
+      .select('id, message_label, message_max_length')
+      .eq('merchant_id', me.id),
+    // And the minimum order (20270129000400).
+    supabase.from('merchant').select('min_order_kes').eq('id', me.id).maybeSingle(),
+    // And digital items and the buyer's ID (20270130000400, 20270130000500).
+    supabase
+      .from('catalogue_item')
+      .select('id, digital, requires_buyer_id')
+      .eq('merchant_id', me.id),
   ]);
 
   const itemRows = (data as ItemRow[] | null) ?? [];
@@ -46,11 +103,52 @@ export default async function MerchantMenu() {
       photo.signedUrl ? [[photo.path, photo.signedUrl]] : [],
     ),
   );
+  const soldOut = new Map(
+    ((soldOutData as { id: string; sold_out: boolean }[] | null) ?? []).map((row) => [
+      row.id,
+      row.sold_out,
+    ]),
+  );
+  const messages = new Map(
+    (
+      (messageData as
+        | { id: string; message_label: string | null; message_max_length: number }[]
+        | null) ?? []
+    ).map((row) => [row.id, row]),
+  );
+  const digital = new Map(
+    (
+      (digitalData as { id: string; digital: boolean; requires_buyer_id: boolean }[] | null) ?? []
+    ).map((row) => [row.id, row]),
+  );
   const items = itemRows.map((item) => ({
     ...item,
+    digital: digital.get(item.id)?.digital,
+    requires_buyer_id: digital.get(item.id)?.requires_buyer_id,
     photo_url: item.photo_path ? (photoUrls.get(item.photo_path) ?? null) : null,
+    sold_out: soldOut.get(item.id),
+    message: messages.has(item.id)
+      ? {
+          label: messages.get(item.id)!.message_label,
+          maxLength: messages.get(item.id)!.message_max_length,
+        }
+      : undefined,
   }));
   const sections = (sectionData as SectionRow[] | null) ?? [];
+  const groups: OptionGroupRow[] = (groupData ?? []).map((g) => ({
+    id: g.id,
+    name: g.name,
+    required: g.required,
+    max_choices: g.max_choices,
+    options: [...(g.modifier_option ?? [])]
+      .sort((a, b) => a.sort - b.sort)
+      .map((o) => ({ id: o.id, name: o.name, extra_cents: o.extra_cents, available: o.available })),
+  }));
+  const choiceItems: ChoiceItemRow[] = itemRows.map((item) => ({
+    ...item,
+    group_ids: (linkData ?? []).filter((l) => l.item_id === item.id).map((l) => l.group_id),
+    variants: itemVariants(item.id, attributeData ?? [], variantData ?? []),
+  }));
   const on = items.filter((i) => i.available);
   const categoryId = merchantData?.category_key ?? merchantData?.category;
   const { data: categoryConfig, error: categoryConfigError } = categoryId
@@ -96,13 +194,20 @@ export default async function MerchantMenu() {
           Your menu could not be read: {error.message}
         </p>
       )}
+      <SetupReview lines={reviewData ?? []} />
       <Menu
         items={items}
         available={on.length}
         merchantId={me.id}
         sections={sections}
         catalogueExample={catalogueExample}
+        minOrderKes={
+          minOrderData
+            ? ((minOrderData as { min_order_kes: number | null }).min_order_kes ?? null)
+            : undefined
+        }
       />
+      <ItemChoices groups={groups} items={choiceItems} />
     </div>
   );
 }
@@ -121,4 +226,46 @@ function isCatalogueExample(value: unknown): value is {
     typeof example.pricePlaceholder === 'string' &&
     typeof example.photoHint === 'string'
   );
+}
+
+interface AttributeRow {
+  id: string;
+  item_id: string;
+  name: string;
+  sort: number;
+  catalogue_attribute_value: { id: string; name: string; sort: number }[] | null;
+}
+interface VariantRow {
+  id: string;
+  item_id: string;
+  value_ids: string[];
+  price_kes: number;
+  available: boolean;
+  stock_count: number | null;
+  sku: string | null;
+}
+
+/** An item's saved versions in the shape the Menu grid edits: names, not ids. */
+function itemVariants(itemId: string, attributes: AttributeRow[], variants: VariantRow[]) {
+  const mine = attributes.filter((a) => a.item_id === itemId).sort((a, b) => a.sort - b.sort);
+  const names = new Map(
+    mine.flatMap((a) => (a.catalogue_attribute_value ?? []).map((v) => [v.id, v.name] as const)),
+  );
+  return {
+    attributes: mine.map((a) => ({
+      name: a.name,
+      values: [...(a.catalogue_attribute_value ?? [])]
+        .sort((x, y) => x.sort - y.sort)
+        .map((v) => v.name),
+    })),
+    variants: variants
+      .filter((v) => v.item_id === itemId)
+      .map((v) => ({
+        values: v.value_ids.map((id) => names.get(id) ?? ''),
+        priceKes: v.price_kes,
+        available: v.available,
+        stockCount: v.stock_count,
+        sku: v.sku,
+      })),
+  };
 }

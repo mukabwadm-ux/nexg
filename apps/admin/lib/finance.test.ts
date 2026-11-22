@@ -4,6 +4,8 @@ import {
   daysBetween,
   humanize,
   invoiceBucket,
+  PAYEE_GROUPS,
+  payeeGroup,
   series,
   share,
   statusTotals,
@@ -101,18 +103,27 @@ describe('trends', () => {
 describe('words', () => {
   it('names each kind of row', () => {
     expect(typeOf({ source: 'payout', kind: 'merchant', category: 'host' }).label).toBe(
-      'Host payout',
+      'Host Payout',
     );
     expect(typeOf({ source: 'payment', kind: 'rider', category: 'rider_float' }).label).toBe(
-      'Rider float',
+      'Rider Float',
     );
     expect(typeOf({ source: 'b2c', kind: 'refund', category: 'return_excess' }).label).toBe(
       'Refund',
     );
+    expect(
+      typeOf({ source: 'payout', kind: 'merchant', category: 'experience_partner' }).label,
+    ).toBe('Partner Payout');
+  });
+
+  it('puts experience partners with Partners & Others', () => {
+    expect(payeeGroup('experience_partner')).toBe('other');
+    expect(PAYEE_GROUPS[payeeGroup('experience_partner')].label).toBe('Partners & Others');
   });
 
   it('turns keys into words', () => {
-    expect(humanize('restaurants_food')).toBe('Restaurants food');
+    expect(humanize('restaurants_food')).toBe('Restaurants Food');
+    expect(humanize('cost_of_sales')).toBe('Cost of Sales');
     expect(humanize(null)).toBe('—');
   });
 });

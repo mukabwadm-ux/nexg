@@ -12,6 +12,9 @@ import {
   saveCatalogueRecord,
   type CatalogueKind,
 } from '@/app/experiences/actions';
+import type { PartnerPayout } from '@/lib/partner-payouts';
+
+import { PartnerPayoutPanel } from './partner-payout';
 
 type Tables = Database['public']['Tables'];
 type City = Pick<Tables['city']['Row'], 'id' | 'name' | 'slug'>;
@@ -128,9 +131,13 @@ interface Props {
   dayBlocks?: DayBlock[];
   events?: EventRow[];
   thinGroups?: { swap_group: string; tiers: number }[];
+  /** Where each partner is paid, by partner id (rpc_experience_partner_payouts). */
+  payouts?: Record<string, PartnerPayout>;
   canEdit: boolean;
   canManagePartners: boolean;
   canActivatePartners: boolean;
+  /** Staff who work Experiences at full level declare payout details. */
+  canDeclarePayouts?: boolean;
 }
 
 const SELECT_CLASS =
@@ -1251,6 +1258,12 @@ export function ExperienceCatalogue(props: Props) {
                     </div>
                     <Status>{partner.status}</Status>
                   </div>
+                  <PartnerPayoutPanel
+                    partnerId={partner.id}
+                    partnerName={partner.name}
+                    payout={props.payouts?.[partner.id] ?? null}
+                    canDeclare={props.canDeclarePayouts ?? false}
+                  />
                   {editorId === partner.id ? (
                     <PartnerEditor record={partner} cities={cities} onCancel={close} />
                   ) : (

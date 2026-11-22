@@ -31,11 +31,16 @@ export async function saveFolder(input: {
   id?: string | null;
   name: string;
   color?: string;
+  /** Adds the folder inside this top-level folder. Ignored when renaming. */
+  parentId?: string | null;
 }): Promise<Outcome> {
   const { data, error } = await createClient().rpc('rpc_company_folder_save', {
     p_name: input.name,
     p_color: input.color,
     p_id: input.id ?? undefined,
+    /* Sent only when adding inside a folder, so adding a top-level folder
+       also works against the database before sub-folders existed. */
+    ...(input.parentId && !input.id ? { p_parent_id: input.parentId } : {}),
   });
   refresh('/company/files');
   return done(error, input.id ? 'Folder renamed' : 'Folder added', data ?? undefined);

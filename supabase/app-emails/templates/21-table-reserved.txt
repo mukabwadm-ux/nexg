@@ -1,0 +1,39 @@
+TABLE RESERVED
+{{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
+{{ date_title }}
+
+{{ business_name }}
+{{#business_area}}{{ business_area }}
+{{/business_area}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, {{ business_name }}
+is expecting you. Give the name {{ reservation_name }} at the door.
+
+View reservation:
+{{ activity_url }}
+
+{{#calendar_url}}Add to calendar: {{ calendar_url }}
+{{/calendar_url}}{{#directions_url}}Get directions: {{ directions_url }}
+{{/directions_url}}
+{{#hold_minutes}}RUNNING LATE?
+Your table is held for {{ hold_minutes }} minutes after your time. If
+you’ll be later, change the time in the app.
+{{/hold_minutes}}
+{{#no_deposit}}NOTHING TO PAY NOW
+You pay for what you order on the night.
+{{/no_deposit}}
+{{#deposit_paid}}DEPOSIT RECEIPT {{ receipt_number }}
+{{#items}}  {{ quantity }} x {{ name }}  {{ amount }}{{#choices}}
+    {{ choices }}{{/choices}}
+{{/items}}{{#price_lines}}  {{ label }}  {{ amount }}
+{{/price_lines}}  DEPOSIT PAID  {{ total }}
+Payment: {{ payment_method }}{{#payment_reference}} · {{ payment_reference }}{{/payment_reference}}, paid {{ paid_at }}
+{{ record_label }} {{ record_number }} · Receipt {{ receipt_number }}
+Asante for booking with NEXG
+{{/deposit_paid}}
+{{#cancellation_terms}}CHANGING YOUR PLANS
+{{ cancellation_terms }} Do it from the reservation in the app.
+{{/cancellation_terms}}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you booked through NEXG · NEXG, nexgapp.com

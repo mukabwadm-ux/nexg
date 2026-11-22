@@ -127,11 +127,22 @@ describe('real onboarding entry and resume', () => {
     expect(html).toContain(`data-connected-registration="${actorId}"`);
     expect(html).toContain('data-anonymous="true"');
   });
-  it('routes the canonical apply entry to the connected form with default flags', async () => {
+  it('sends a new visitor from the apply link to the sign-up form on the Merchants page', async () => {
     vi.stubEnv('MERCHANT_ONBOARDING_V1_ENABLED', '');
+    mocks.getUser.mockResolvedValue({ data: { user: null } });
     await expect(ApplyIndex({ searchParams: { city: 'nairobi' } })).rejects.toThrow(
-      'redirect:/merchants/register?city=nairobi',
+      'redirect:/merchants#register',
     );
+  });
+  it('keeps resuming a saved registration on the standalone page', async () => {
+    await expect(ApplyIndex({ searchParams: { merchantId: 'm1' } })).rejects.toThrow(
+      'redirect:/merchants/register?merchantId=m1',
+    );
+  });
+  it('sends someone who already has a merchant to their workspace', async () => {
+    mocks.getUser.mockResolvedValue({ data: { user: { id: actorId, is_anonymous: false } } });
+    mocks.rpc.mockResolvedValue({ data: { kind: 'merchant', id: 'm1' }, error: null });
+    await expect(ApplyIndex({ searchParams: {} })).rejects.toThrow('redirect:/merchant');
   });
   it('does not create an empty registration when existing ownership cannot be checked', async () => {
     mocks.rpc.mockResolvedValue({ data: null, error: { code: 'service_unavailable' } });

@@ -1,6 +1,7 @@
 'use client';
 
 import { useLocation } from '@nexg/location';
+import { getCaptchaToken } from '@nexg/ui';
 import { Loader2, Lock, MapPin, Minus, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -69,6 +70,37 @@ export function CheckoutForm({
   const [quoting, setQuoting] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  /* One id per checkout attempt, so a retry on a weak connection returns the same order. */
+  const requestId = React.useRef<string | null>(null);
+  /* A laundry collects from the customer, at a time they choose (agreed 11 Nov 2026). */
+  const [isLaundry, setIsLaundry] = React.useState(false);
+  const [pickupAt, setPickupAt] = React.useState(() => {
+    const t = new Date(Date.now() + 86_400_000);
+    t.setHours(9, 0, 0, 0);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}T09:00`;
+  });
+
+  React.useEffect(() => {
+    if (!cart.merchantId) return;
+    let live = true;
+    void createClient()
+      .from('merchant_public')
+      .select('category, category_key')
+      .eq('id', cart.merchantId)
+      .maybeSingle()
+      .then(({ data }) => {
+        const key =
+          (data as { category_key?: string | null; category?: string | null } | null) ?? null;
+        if (live)
+          setIsLaundry(
+            ['laundry', 'laundry_cleaning'].includes(key?.category_key ?? key?.category ?? ''),
+          );
+      });
+    return () => {
+      live = false;
+    };
+  }, [cart.merchantId]);
 
   const rpc = React.useCallback((): LooseRpc => {
     const supabase = createClient();
@@ -154,13 +186,21 @@ export function CheckoutForm({
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      /* A temporary session (the trip planner makes one) is not an account,
-         and the database refuses it an order, so it signs in first too. */
-      if (!user || user.is_anonymous) {
-        router.push('/sign-in?next=/checkout');
-        return;
+      /* No account needed (owner, 18 and 20 Nov 2026): a visitor who is not signed in orders
+         from a temporary session, the way the Consumer app does. The database allows a
+         temporary session three unpaid orders at a time. */
+      if (!user) {
+        const captchaToken = await getCaptchaToken().catch(() => undefined);
+        const { error: guestError } = await supabase.auth.signInAnonymously({
+          options: { captchaToken },
+        });
+        if (guestError) {
+          setError('We could not start your order. Refresh the page and try again, or sign in.');
+          return;
+        }
       }
 
+      requestId.current ??= crypto.randomUUID();
       const placed = await rpc()('rpc_order_place_web', {
         p_payload: {
           ...payload,
@@ -168,12 +208,33 @@ export function CheckoutForm({
           guest_name: name || null,
           dropoff_label: place.label,
           dropoff_note: note || null,
+          client_request_id: requestId.current,
         },
       });
       const result = placed.data as Placed | null;
       if (placed.error || !result?.ok) {
-        setError(placed.error?.message ?? result?.message ?? 'Could not place the order.');
+        const hint = (placed.error as { hint?: string } | null)?.hint;
+        setError(
+          hint === 'phone_on_file'
+            ? 'That number belongs to a NexG account. Sign in to order with it, or use another number.'
+            : (placed.error?.message ?? result?.message ?? 'Could not place the order.'),
+        );
         return;
+      }
+      requestId.current = null;
+
+      /* A laundry collects at the time chosen above. The order is saved either way: a time that
+         cannot be set is shown, and the laundry can be messaged from the order page. */
+      if (isLaundry && pickupAt) {
+        const set = await rpc()('rpc_order_set_pickup_time', {
+          p_order_id: result.order_id,
+          p_at: new Date(pickupAt).toISOString(),
+        });
+        if (set.error) {
+          setError(
+            `Your order ${result.reference} is saved, but the collection time was not: ${set.error.message}`,
+          );
+        }
       }
 
       if (!result.pay_online) {
@@ -354,6 +415,21 @@ export function CheckoutForm({
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
+          {isLaundry && (
+            <label className="block">
+              <span className="text-sm font-extrabold">When should the laundry collect?</span>
+              <input
+                type="datetime-local"
+                className={`${field} mt-1.5`}
+                value={pickupAt}
+                onChange={(e) => setPickupAt(e.target.value)}
+              />
+              <span className="text-muted mt-1 block text-xs font-semibold">
+                From 30 minutes to 14 days ahead. The laundry weighs your items and confirms the
+                final price.
+              </span>
+            </label>
+          )}
         </section>
 
         <PaymentMethods

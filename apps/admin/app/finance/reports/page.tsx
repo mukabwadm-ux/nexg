@@ -1,7 +1,9 @@
 import { Button, formatRange } from '@nexg/ui';
 import {
+  Activity,
   ArrowLeftRight,
   BarChart3,
+  Bike,
   ChevronRight,
   Coins,
   Download,
@@ -13,11 +15,14 @@ import {
   Receipt,
   Scale,
   Send,
+  Store,
+  Users,
   Wallet,
   type LucideIcon,
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 import { ShareDonut, TrendArea } from '@/components/charts';
 import { ConsoleShell } from '@/components/console-shell';
@@ -32,13 +37,19 @@ import {
   type OwedRow,
   type RevenueRow,
 } from '@/components/finance/overview';
+import {
+  CustomersReport,
+  MerchantsReport,
+  OperationsReport,
+  RidersReport,
+} from '@/components/finance/report-tabs';
 import { Freshness } from '@/components/finance/shared';
 import { Tax, type TaxDocRow, type TaxRow, type VatMonthRow } from '@/components/finance/tax';
 import { RangeControl } from '@/components/portal/client-kit';
 import { PageHeader, PanelHead, Sheet, Stat, StatGrid, ViewTabs } from '@/components/portal/kit';
 import { humanize, series, statusTotals, totalsBy } from '@/lib/finance';
 import { invoiceList, movementSummary } from '@/lib/finance-server';
-import { previousPeriod } from '@/lib/office-finance';
+import { previousPeriod, vsLabel } from '@/lib/office-finance';
 import {
   change,
   dateTime,
@@ -53,18 +64,30 @@ import {
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = { title: 'Finance reports' };
+export const metadata: Metadata = { title: 'Finance Reports' };
 export const dynamic = 'force-dynamic';
 
-type Tab = 'overview' | 'financial' | 'fees' | 'tax' | 'exports';
+type Tab =
+  | 'overview'
+  | 'financial'
+  | 'operations'
+  | 'merchants'
+  | 'riders'
+  | 'customers'
+  | 'exports';
 
 const TABS: { key: Tab; label: string; icon: LucideIcon }[] = [
   { key: 'overview', label: 'Overview', icon: LayoutGrid },
   { key: 'financial', label: 'Financial', icon: Wallet },
-  { key: 'fees', label: 'Fees & commissions', icon: Percent },
-  { key: 'tax', label: 'Tax', icon: Receipt },
-  { key: 'exports', label: 'Exports', icon: FileDown },
+  { key: 'operations', label: 'Operations', icon: Activity },
+  { key: 'merchants', label: 'Merchants', icon: Store },
+  { key: 'riders', label: 'Riders', icon: Bike },
+  { key: 'customers', label: 'Customers', icon: Users },
+  { key: 'exports', label: 'Custom Reports', icon: FileDown },
 ];
+
+/** Fees & Commissions and Tax were tabs of their own; they are sections of Financial now. */
+const FINANCIAL_SECTIONS = ['fees', 'tax'];
 
 const CATEGORY_COLORS = [
   '#F5B800',
@@ -85,8 +108,9 @@ const EXPORT_NAMES: Record<string, string> = {
 
 /**
  * Finance → Reports: the headline figures for the period from the same
- * readers the other Finance screens use, the month's financial summary
- * (the fin_* projections, rebuilt from the ledger), fees, tax, and the
+ * readers the other Finance screens use; the month's financial summary
+ * (the fin_* projections, rebuilt from the ledger) with fees and tax;
+ * operations, merchants, riders and customers for the period; and the
  * audited exports.
  */
 export default async function FinanceReportsPage({
@@ -96,29 +120,35 @@ export default async function FinanceReportsPage({
 }) {
   const staff = await requireStaff();
   requireModule(staff, 'finance');
-  const tab: Tab = TABS.some((t) => t.key === searchParams?.tab)
-    ? (searchParams!.tab as Tab)
-    : 'overview';
+  const asked = searchParams?.tab ?? '';
+  const tab: Tab = TABS.some((t) => t.key === asked) ? (asked as Tab) : 'overview';
   const period = periodFrom(searchParams);
   const pq = periodQuery(period);
   const before = previousPeriod(period.from, period.to);
   const today = todayInNairobi();
   const monthStart = `${today.slice(0, 7)}-01`;
-  const supabase = createClient();
-
-  const { data: fresh } = await supabase.from('fin_freshness_v').select('*').maybeSingle();
-  const freshness = fresh as {
-    newest: string | null;
-    stale_count: number;
-    failing_count: number;
-    through_entry: number | null;
-  } | null;
 
   const href = (key: Tab) =>
     hrefWith('/finance/reports', {
       tab: key === 'overview' ? null : key,
       ...(pq ? { from: period.from, to: period.to } : {}),
     });
+
+  /* Old links and bookmarks to ?tab=fees or ?tab=tax land on that section. */
+  if (FINANCIAL_SECTIONS.includes(asked)) redirect(`${href('financial')}#${asked}`);
+
+  const supabase = createClient();
+  /* Only Financial reads the fin_* projections, so only it says how fresh they are. */
+  const { data: fresh } =
+    tab === 'financial'
+      ? await supabase.from('fin_freshness_v').select('*').maybeSingle()
+      : { data: null };
+  const freshness = fresh as {
+    newest: string | null;
+    stale_count: number;
+    failing_count: number;
+    through_entry: number | null;
+  } | null;
 
   let body: React.ReactNode = null;
   let failed: string | null = null;
@@ -206,7 +236,7 @@ export default async function FinanceReportsPage({
     const slices = [
       ...shownCats.map((c, i) => ({
         key: c.key,
-        label: c.key === 'stays' ? 'Stays (bookings)' : (labels.get(c.key) ?? humanize(c.key)),
+        label: c.key === 'stays' ? 'Stays (Bookings)' : (labels.get(c.key) ?? humanize(c.key)),
         value: Math.round(c.cents / 100),
         color: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
       })),
@@ -214,7 +244,7 @@ export default async function FinanceReportsPage({
         ? [
             {
               key: 'other',
-              label: 'Other services',
+              label: 'Other Services',
               value: Math.round(rest / 100),
               color: '#E8E4DA',
             },
@@ -227,19 +257,19 @@ export default async function FinanceReportsPage({
     const reports: { icon: LucideIcon; title: string; text: string; href: string }[] = [
       {
         icon: Coins,
-        title: 'Financial report',
+        title: 'Financial Report',
         text: 'Revenue, money flow and what is owed',
         href: href('financial'),
       },
       {
         icon: ArrowLeftRight,
-        title: 'Transactions report',
+        title: 'Transactions Report',
         text: 'Every payment, refund and payout',
         href: hrefWith('/finance/transactions', pq ? { from: period.from, to: period.to } : {}),
       },
       {
         icon: Handshake,
-        title: 'Settlements report',
+        title: 'Settlements Report',
         text: 'Merchant, host and rider runs',
         href: hrefWith('/finance/settlements', {
           tab: 'batches',
@@ -248,13 +278,13 @@ export default async function FinanceReportsPage({
       },
       {
         icon: Scale,
-        title: 'Reconciliation report',
+        title: 'Reconciliation Report',
         text: 'Providers against the ledger',
         href: hrefWith('/finance/reconciliation', pq ? { from: period.from, to: period.to } : {}),
       },
       {
         icon: FileText,
-        title: 'Invoice report',
+        title: 'Invoice Report',
         text: 'Invoices, payments and balances',
         href: hrefWith('/finance/invoices', {
           tab: 'all',
@@ -263,25 +293,25 @@ export default async function FinanceReportsPage({
       },
       {
         icon: Wallet,
-        title: 'Office expense report',
+        title: 'Office Expense Report',
         text: 'Spend by category and month',
         href: '/finance/office?tab=reports',
       },
       {
         icon: Percent,
-        title: 'Fees & commissions',
+        title: 'Fees & Commissions',
         text: 'What NexG earned, by line and merchant',
-        href: href('fees'),
+        href: `${href('financial')}#fees`,
       },
       {
         icon: Receipt,
-        title: 'Tax report',
+        title: 'Tax Report',
         text: 'VAT, withholding and KRA invoices',
-        href: href('tax'),
+        href: `${href('financial')}#tax`,
       },
       {
         icon: Send,
-        title: 'Ledger exports',
+        title: 'Ledger Exports',
         text: 'Audited CSVs for the accountants',
         href: href('exports'),
       },
@@ -293,37 +323,42 @@ export default async function FinanceReportsPage({
           <Stat
             icon={Coins}
             value={kes(value)}
-            label="Total transaction value"
+            label="Total Transaction Value"
             delta={deltaOf(value, valueBefore)}
+            deltaNote={vsLabel(before)}
             href={hrefWith('/finance/transactions', pq ? { from: period.from, to: period.to } : {})}
           />
           <Stat
             icon={FileText}
             value={kes(inv)}
-            label="Total invoices"
+            label="Total Invoices"
             delta={deltaOf(inv, invBefore)}
+            deltaNote={vsLabel(before)}
             href={hrefWith('/finance/invoices', pq ? { from: period.from, to: period.to } : {})}
           />
           <Stat
             icon={Send}
             value={kes(payouts)}
-            label="Total payouts"
+            label="Total Payouts"
             delta={deltaOf(payouts, payoutsBefore)}
+            deltaNote={vsLabel(before)}
             href={hrefWith('/finance/settlements', pq ? { from: period.from, to: period.to } : {})}
           />
           <Stat
             icon={Wallet}
             value={kes(office)}
-            label="Office expenses"
+            label="Office Expenses"
             delta={deltaOf(office, officeBefore, true)}
+            deltaNote={vsLabel(before)}
             href="/finance/office"
           />
           <Stat
             icon={BarChart3}
             tone={variance ? 'red' : 'gold'}
             value={kes(variance)}
-            label="Reconciliation variance"
+            label="Reconciliation Variance"
             delta={deltaOf(variance, varianceBefore, true)}
+            deltaNote={vsLabel(before)}
             href={hrefWith(
               '/finance/reconciliation',
               pq ? { from: period.from, to: period.to } : {},
@@ -333,7 +368,7 @@ export default async function FinanceReportsPage({
 
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
           <Sheet>
-            <PanelHead title="Transaction & payout trend" aside={formatRange(period)} />
+            <PanelHead title="Transaction & Payout Trend" aside={formatRange(period)} />
             <div className="mt-4">
               {trend.points.some((p) => Number(p.value) > 0) ? (
                 <TrendArea
@@ -341,7 +376,7 @@ export default async function FinanceReportsPage({
                   unit="kes"
                   step={trend.step}
                   series={[
-                    { key: 'value', label: 'Transaction value', color: '#F5B800', fill: true },
+                    { key: 'value', label: 'Transaction Value', color: '#F5B800', fill: true },
                     { key: 'payouts', label: 'Payouts', color: '#141414' },
                   ]}
                 />
@@ -353,7 +388,7 @@ export default async function FinanceReportsPage({
             </div>
           </Sheet>
           <Sheet>
-            <PanelHead title="Customer payments by category" aside={formatRange(period)} />
+            <PanelHead title="Customer Payments by Category" aside={formatRange(period)} />
             <div className="mt-4">
               {slices.length ? (
                 <ShareDonut unit="kes" centre={kesShort(paidTotal)} caption="Paid" data={slices} />
@@ -368,7 +403,7 @@ export default async function FinanceReportsPage({
 
         <div className="grid gap-5 2xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
           <Sheet>
-            <PanelHead title="Available reports" />
+            <PanelHead title="Available Reports" />
             <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {reports.map((r) => (
                 <li key={r.title}>
@@ -393,12 +428,12 @@ export default async function FinanceReportsPage({
             </ul>
           </Sheet>
           <Sheet>
-            <PanelHead title="Recent exports">
+            <PanelHead title="Recent Reports">
               <Link
                 href={href('exports')}
                 className="text-ink text-sm font-bold underline underline-offset-4"
               >
-                View all
+                View All →
               </Link>
             </PanelHead>
             {recent.length === 0 ? (
@@ -431,7 +466,19 @@ export default async function FinanceReportsPage({
   }
 
   if (tab === 'financial') {
-    const [overview, flow, revenue, decisions, calendar, owed] = await Promise.all([
+    const [
+      overview,
+      flow,
+      revenue,
+      decisions,
+      calendar,
+      owed,
+      feeLines,
+      take,
+      taxPosition,
+      taxDocs,
+      vatMonths,
+    ] = await Promise.all([
       supabase.from('fin_overview_v').select('*'),
       supabase.from('fin_money_flow').select('*').eq('period_start', monthStart).order('sort'),
       supabase
@@ -451,6 +498,17 @@ export default async function FinanceReportsPage({
         .select('*')
         .order('owed_cents', { ascending: false })
         .limit(10),
+      supabase.from('fin_fee_line_v').select('*').gte('day', period.from).lte('day', period.to),
+      supabase.from('fin_merchant_take_v').select('*').limit(100),
+      supabase.from('fin_tax_position_v').select('*').order('sort'),
+      supabase
+        .from('tax_invoice')
+        .select(
+          'id, number, kind, purpose, party_name, party_pin, issued_at, net_cents, vat_cents, gross_cents, kra_status, kra_reference',
+        )
+        .order('issued_at', { ascending: false })
+        .limit(100),
+      supabase.from('tax_vat_summary_v').select('*').order('month', { ascending: false }).limit(24),
     ]);
 
     /*
@@ -512,67 +570,57 @@ export default async function FinanceReportsPage({
     }
 
     body = (
-      <Sheet>
-        <PanelHead
-          title="Financial summary"
-          aside={`this month so far: ${formatRange({ from: monthStart, to: today })}`}
-        />
-        <div className="mt-5">
-          <Overview
-            totals={totals}
-            cities={cityRows}
-            flow={newest(flow.data as (FlowRow & { period_end: string })[] | null)}
-            revenue={newest(revenue.data as (RevenueRow & { period_end: string })[] | null)}
-            decisions={(decisions.data as DecisionRow[] | null) ?? []}
-            calendar={(calendar.data as CalendarRow[] | null) ?? []}
-            owed={(owed.data as OwedRow[] | null) ?? []}
-            from={monthStart}
-            to={today}
+      <>
+        <Sheet>
+          <PanelHead
+            title="Financial Summary"
+            aside={`this month so far: ${formatRange({ from: monthStart, to: today })}`}
           />
-        </div>
-      </Sheet>
+          <div className="mt-5">
+            <Overview
+              totals={totals}
+              cities={cityRows}
+              flow={newest(flow.data as (FlowRow & { period_end: string })[] | null)}
+              revenue={newest(revenue.data as (RevenueRow & { period_end: string })[] | null)}
+              decisions={(decisions.data as DecisionRow[] | null) ?? []}
+              calendar={(calendar.data as CalendarRow[] | null) ?? []}
+              owed={(owed.data as OwedRow[] | null) ?? []}
+              from={monthStart}
+              to={today}
+            />
+          </div>
+        </Sheet>
+
+        <Sheet id="fees" className="scroll-mt-24">
+          <PanelHead title="Fees & Commissions" aside={formatRange(period)} />
+          <div className="mt-5">
+            <Fees
+              lines={(feeLines.data as FeeLineRow[] | null) ?? []}
+              take={(take.data as TakeRow[] | null) ?? []}
+              from={period.from}
+              to={period.to}
+            />
+          </div>
+        </Sheet>
+
+        <Sheet id="tax" className="scroll-mt-24">
+          <PanelHead title="Tax" />
+          <div className="mt-5">
+            <Tax
+              rows={(taxPosition.data as TaxRow[] | null) ?? []}
+              docs={(taxDocs.data as unknown as TaxDocRow[] | null) ?? []}
+              months={(vatMonths.data as unknown as VatMonthRow[] | null) ?? []}
+            />
+          </div>
+        </Sheet>
+      </>
     );
   }
 
-  if (tab === 'fees') {
-    const [lines, take] = await Promise.all([
-      supabase.from('fin_fee_line_v').select('*').gte('day', period.from).lte('day', period.to),
-      supabase.from('fin_merchant_take_v').select('*').limit(100),
-    ]);
-    body = (
-      <Sheet>
-        <Fees
-          lines={(lines.data as FeeLineRow[] | null) ?? []}
-          take={(take.data as TakeRow[] | null) ?? []}
-          from={period.from}
-          to={period.to}
-        />
-      </Sheet>
-    );
-  }
-
-  if (tab === 'tax') {
-    const [position, docs, months] = await Promise.all([
-      supabase.from('fin_tax_position_v').select('*').order('sort'),
-      supabase
-        .from('tax_invoice')
-        .select(
-          'id, number, kind, purpose, party_name, party_pin, issued_at, net_cents, vat_cents, gross_cents, kra_status, kra_reference',
-        )
-        .order('issued_at', { ascending: false })
-        .limit(100),
-      supabase.from('tax_vat_summary_v').select('*').order('month', { ascending: false }).limit(24),
-    ]);
-    body = (
-      <Sheet>
-        <Tax
-          rows={(position.data as TaxRow[] | null) ?? []}
-          docs={(docs.data as unknown as TaxDocRow[] | null) ?? []}
-          months={(months.data as unknown as VatMonthRow[] | null) ?? []}
-        />
-      </Sheet>
-    );
-  }
+  if (tab === 'operations') body = <OperationsReport period={period} before={before} />;
+  if (tab === 'merchants') body = <MerchantsReport period={period} before={before} />;
+  if (tab === 'riders') body = <RidersReport period={period} before={before} />;
+  if (tab === 'customers') body = <CustomersReport period={period} before={before} />;
 
   if (tab === 'exports') {
     const { data } = await supabase
@@ -596,10 +644,10 @@ export default async function FinanceReportsPage({
       <PageHeader
         icon={BarChart3}
         title="Reports"
-        subtitle="Financial reports across the platform: summaries, fees, tax and audited exports."
+        subtitle="Reports across the platform: money, fees and tax, operations, merchants, riders and customers, and audited exports."
         actions={
           <>
-            {(tab === 'financial' || tab === 'fees' || tab === 'tax') && (
+            {tab === 'financial' && (
               <Freshness
                 asOf={freshness?.newest ?? null}
                 stale={freshness?.stale_count ?? 0}
@@ -611,7 +659,7 @@ export default async function FinanceReportsPage({
             <Button asChild variant="gold" size="md">
               <Link href={href('exports')}>
                 <Download aria-hidden="true" className="h-4 w-4" />
-                Download report
+                Download Report
               </Link>
             </Button>
           </>

@@ -1,0 +1,18 @@
+STAY CANCELLED
+{{ property_name }}
+{{ check_in_date }} to {{ check_out_date }}
+
+{{ property_name }}
+{{#area}}{{ area }}
+{{/area}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, {{ cancelled_note }}
+
+{{#money_note}}YOUR MONEY
+{{ money_note }}
+{{/money_note}}
+View your stay:
+{{ activity_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you booked a stay through NEXG · NEXG, nexgapp.com

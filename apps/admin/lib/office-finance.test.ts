@@ -9,6 +9,7 @@ import {
   previousPeriod,
   spendBetween,
   utilisation,
+  vsLabel,
 } from './office-finance';
 
 const rows = [
@@ -51,6 +52,11 @@ describe('periods and months', () => {
       from: '2026-10-16',
       to: '2026-10-31',
     });
+  });
+
+  it('names the month a KPI is compared with, or says prior period', () => {
+    expect(vsLabel({ from: '2026-10-16', to: '2026-10-31' })).toBe('vs Oct');
+    expect(vsLabel({ from: '2026-10-20', to: '2026-11-18' })).toBe('vs prior period');
   });
 });
 

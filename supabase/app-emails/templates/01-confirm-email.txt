@@ -1,0 +1,17 @@
+Your NEXG verification code is {{ code }}
+
+To confirm your email.
+
+Open NEXG: https://www.nexgapp.com/app/code#type=signup&email={{ email_q }}&code={{ code }}
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, tap Open NEXG and the
+code goes in for you, or type it into the app, to confirm your email. It
+works once, for 10 minutes.
+
+DIDN’T SIGN UP?
+Someone may have typed your email by mistake. You can ignore this email;
+nothing happens without the code.
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because this email was used to sign up for NEXG · NEXG, nexgapp.com

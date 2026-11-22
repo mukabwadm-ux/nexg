@@ -187,6 +187,7 @@ export function WorkWorkspace({
     setDetailTab(next);
     document.getElementById(`work-tab-${next}`)?.focus();
   }
+  const [handoverCode, setHandoverCode] = useState('');
   async function advance(action = selected?.nextAction) {
     if (!selected || !action || pending) return;
     if (action.id === 'cancelled' && !window.confirm('Cancel this booking?')) return;
@@ -641,6 +642,38 @@ export function WorkWorkspace({
                       >
                         Manage booking
                       </Link>
+                    ) : selected.nextAction?.needsCode ? (
+                      <form
+                        className="flex gap-2"
+                        onSubmit={(event) => {
+                          event.preventDefault();
+                          if (selected.nextAction && handoverCode.length === 4)
+                            void advance({
+                              ...selected.nextAction,
+                              id: `handover:${handoverCode}`,
+                            }).then(() => setHandoverCode(''));
+                        }}
+                      >
+                        <input
+                          aria-label={selected.nextAction.label}
+                          inputMode="numeric"
+                          autoComplete="off"
+                          maxLength={4}
+                          value={handoverCode}
+                          onChange={(event) =>
+                            setHandoverCode(event.target.value.replace(/\D/g, '').slice(0, 4))
+                          }
+                          placeholder="4-digit code"
+                          className="w-32 rounded-md border px-3 py-2 text-center text-sm font-bold tracking-[0.3em]"
+                        />
+                        <button
+                          type="submit"
+                          disabled={pending || handoverCode.length !== 4}
+                          className="flex-1 rounded-md bg-[#FDD128] px-4 py-2 text-sm font-bold text-[#171b24] hover:bg-[#c49a29] disabled:opacity-50"
+                        >
+                          {pending ? 'Checking…' : 'Hand over'}
+                        </button>
+                      </form>
                     ) : selected.nextAction ? (
                       <button
                         type="button"

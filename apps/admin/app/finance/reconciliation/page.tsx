@@ -2,6 +2,7 @@ import { formatRange } from '@nexg/ui';
 import {
   AlertTriangle,
   CheckCircle2,
+  FileText,
   FileWarning,
   Landmark,
   Layers,
@@ -25,6 +26,13 @@ import {
   type ReconRow,
   type WebhookRow,
 } from '@/components/finance/reconciliation';
+import {
+  NewReconciliation,
+  StatementDetail,
+  StatementImports,
+  type StatementDetailData,
+  type StatementImportRow,
+} from '@/components/finance/statement-import';
 import { RangeControl } from '@/components/portal/client-kit';
 import {
   PageHeader,
@@ -56,10 +64,10 @@ export const dynamic = 'force-dynamic';
 type Tab = 'overview' | 'settlement' | 'payouts' | 'provider' | 'discrepancies';
 
 const SOURCES: Record<string, { label: string; color: string }> = {
-  sales: { label: 'Merchants (sales)', color: '#F5B800' },
-  stays: { label: 'NexG Stays (bookings)', color: '#141414' },
-  featured: { label: 'Featured placements', color: '#F9DC7A' },
-  rider: { label: 'Riders (float)', color: '#8C8678' },
+  sales: { label: 'Merchants (Sales)', color: '#F5B800' },
+  stays: { label: 'NexG Stays (Bookings)', color: '#141414' },
+  featured: { label: 'Featured Placements', color: '#F9DC7A' },
+  rider: { label: 'Riders (Float)', color: '#8C8678' },
 };
 
 interface MismatchLine {
@@ -92,13 +100,18 @@ interface Invariant {
 export default async function ReconciliationPage({
   searchParams,
 }: {
-  searchParams?: { tab?: string; from?: string; to?: string };
+  searchParams?: { tab?: string; from?: string; to?: string; import?: string };
 }) {
   const staff = await requireStaff();
-  requireModule(staff, 'finance');
+  const finance = requireModule(staff, 'finance');
+  const canWrite = staff.isSuperAdmin || finance.level === 'full';
   const period = periodFrom(searchParams);
   const pq = periodQuery(period);
   const supabase = createClient();
+  /* Statement imports: started with the reads below; an error there stays in its own tab. */
+  const statementsQuery = Promise.resolve(
+    supabase.rpc('rpc_fin_statement_imports', { p_from: period.from, p_to: period.to }),
+  );
 
   const [reconRes, clearingRes, webhookRes, invariantRes, mismatchRes, runsRes, summary] =
     await Promise.all([
@@ -132,6 +145,15 @@ export default async function ReconciliationPage({
         .order('pay_date', { ascending: false }),
       movementSummary(supabase, period.from, period.to),
     ]);
+
+  const statementsRes = await statementsQuery;
+  const statements = (statementsRes.data ?? []) as unknown as StatementImportRow[];
+  const statementsOpen = statements
+    .filter((s) => s.status === 'open')
+    .reduce((n, s) => n + Number(s.open_count), 0);
+  const importId = /^[0-9a-f-]{36}$/i.test(searchParams?.import ?? '')
+    ? searchParams!.import!
+    : null;
 
   const recon = ((reconRes.data ?? []) as unknown as ReconRow[]).map((r) => ({
     ...r,
@@ -233,11 +255,20 @@ export default async function ReconciliationPage({
   );
 
   /* Payouts not yet confirmed: lines sent or failed, M-Pesa payouts in doubt. */
-  const tab: Tab = (
-    ['overview', 'settlement', 'payouts', 'provider', 'discrepancies'] as const
-  ).includes(searchParams?.tab as Tab)
-    ? (searchParams!.tab as Tab)
-    : 'overview';
+  /* Imported statements live on the Bank/M-PESA tab, as the design groups them;
+     the old ?tab=statements links land there. */
+  const tab: Tab =
+    searchParams?.tab === 'statements'
+      ? 'provider'
+      : (['overview', 'settlement', 'payouts', 'provider', 'discrepancies'] as const).includes(
+            searchParams?.tab as Tab,
+          )
+        ? (searchParams!.tab as Tab)
+        : 'overview';
+  const detailRes =
+    tab === 'provider' && importId
+      ? await supabase.rpc('rpc_fin_statement_detail', { p_import_id: importId })
+      : null;
   let payoutRows: Awaited<ReturnType<typeof movementList>>['rows'] = [];
   let payoutsTruncated = false;
   let uncertain = 0;
@@ -269,22 +300,29 @@ export default async function ReconciliationPage({
       tab: key === 'overview' ? null : key,
       ...(pq ? { from: period.from, to: period.to } : {}),
     });
-  const tabs: { key: Tab; label: string; icon: LucideIcon; alert?: number | null }[] = [
+  const tabs: { key: Tab | 'reports'; label: string; icon: LucideIcon; alert?: number | null }[] = [
     { key: 'overview', label: 'Overview', icon: LayoutGrid },
     {
       key: 'settlement',
-      label: 'Settlement reconciliation',
+      label: 'Settlement Reconciliation',
       icon: Layers,
       alert: mismatches.length || null,
     },
-    { key: 'payouts', label: 'Payout reconciliation', icon: Send, alert: uncertain || null },
-    { key: 'provider', label: 'Bank & M-Pesa', icon: Landmark },
+    { key: 'payouts', label: 'Payout Reconciliation', icon: Send, alert: uncertain || null },
+    {
+      key: 'provider',
+      label: 'Bank/M-PESA Reconciliation',
+      icon: Landmark,
+      alert: statementsOpen || null,
+    },
     {
       key: 'discrepancies',
       label: 'Discrepancies',
       icon: AlertTriangle,
       alert: discrepancies || null,
     },
+    /* The designs end the bar with Reports: the reconciliation exports on Finance → Reports. */
+    { key: 'reports', label: 'Reports', icon: FileText },
   ];
   const pct = (part: number) => {
     const s = share(part, toReconcile);
@@ -297,7 +335,12 @@ export default async function ReconciliationPage({
         icon={Scale}
         title="Reconciliations"
         subtitle="Match payments, settlements, payouts and M-Pesa records against the ledger."
-        actions={<RangeControl from={period.from} to={period.to} />}
+        actions={
+          <>
+            <RangeControl from={period.from} to={period.to} />
+            {canWrite && <NewReconciliation from={period.from} to={period.to} />}
+          </>
+        }
       />
 
       <main className="space-y-5 px-3 py-5 sm:px-6 sm:py-6">
@@ -307,7 +350,13 @@ export default async function ReconciliationPage({
             key: t.key,
             label: t.label,
             icon: t.icon,
-            href: href(t.key),
+            href:
+              t.key === 'reports'
+                ? hrefWith('/finance/reports', {
+                    tab: 'exports',
+                    ...(pq ? { from: period.from, to: period.to } : {}),
+                  })
+                : href(t.key),
             alert: t.alert,
           }))}
         />
@@ -327,7 +376,7 @@ export default async function ReconciliationPage({
               <Stat
                 icon={Wallet}
                 value={kes(toReconcile)}
-                label="Total to reconcile"
+                label="Total to Reconcile"
                 note="Payments or ledger cash, whichever is larger each day"
               />
               <Stat
@@ -365,7 +414,7 @@ export default async function ReconciliationPage({
 
             <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
               <Sheet>
-                <PanelHead title="Reconciliation trend" aside={formatRange(period)} />
+                <PanelHead title="Reconciliation Trend" aside={formatRange(period)} />
                 <div className="mt-4">
                   {trend.some((t) => t.reconciled || t.unreconciled) ? (
                     <TrendArea
@@ -384,7 +433,7 @@ export default async function ReconciliationPage({
                 </div>
               </Sheet>
               <Sheet>
-                <PanelHead title="Payments by source" aside={formatRange(period)} />
+                <PanelHead title="Payments by Source" aside={formatRange(period)} />
                 <div className="mt-4">
                   {sources.length ? (
                     <ShareDonut
@@ -417,7 +466,7 @@ export default async function ReconciliationPage({
           <>
             <Sheet>
               <PanelHead
-                title="Runs in this period"
+                title="Runs in This Period"
                 aside="every line re-summed against the ledger entries it claims"
               />
               {runs.length === 0 ? (
@@ -444,14 +493,14 @@ export default async function ReconciliationPage({
                         <Pill tone={st.tone}>{st.label}</Pill>
                         {bad ? (
                           <Pill tone="red" dot>
-                            {bad} line{bad === 1 ? '' : 's'} do not re-sum
+                            {bad} Line{bad === 1 ? '' : 's'} Do Not Re-Sum
                           </Pill>
                         ) : (
                           <Pill tone="green" dot>
-                            Every line re-sums
+                            Every Line Re-Sums
                           </Pill>
                         )}
-                        {!r.checks_pass && <Pill tone="amber">Checks failing</Pill>}
+                        {!r.checks_pass && <Pill tone="amber">Checks Failing</Pill>}
                       </li>
                     );
                   })}
@@ -461,7 +510,7 @@ export default async function ReconciliationPage({
             {mismatches.length > 0 && (
               <Sheet>
                 <PanelHead
-                  title="Lines that do not re-sum"
+                  title="Lines That Do Not Re-Sum"
                   aside="hold these before anything is sent"
                 />
                 <div className="border-border mt-4 overflow-x-auto rounded-2xl border">
@@ -478,10 +527,10 @@ export default async function ReconciliationPage({
                           Run
                         </th>
                         <th scope="col" className="px-4 py-2.5 text-right">
-                          On the line (KES)
+                          On the Line (KES)
                         </th>
                         <th scope="col" className="px-4 py-2.5 text-right">
-                          Ledger now (KES)
+                          Ledger Now (KES)
                         </th>
                         <th scope="col" className="px-4 py-2.5 text-right">
                           Gap (KES)
@@ -523,7 +572,7 @@ export default async function ReconciliationPage({
             <MovementsTable
               rows={payoutRows}
               truncated={payoutsTruncated}
-              title="Payouts not yet confirmed"
+              title="Payouts Not Yet Confirmed"
               filename={`nexg-unconfirmed-payouts-${period.from}-to-${period.to}.csv`}
               emptyTitle="Every payout in this period is confirmed"
               emptyText="Settlement lines sent but not confirmed paid, failed payouts, and M-Pesa payouts whose result is uncertain appear here until they are resolved."
@@ -531,15 +580,41 @@ export default async function ReconciliationPage({
           </Sheet>
         )}
 
-        {tab === 'provider' && (
-          <Sheet>
-            <Reconciliation
-              clearing={(clearingRes.data as ClearingRow[] | null) ?? []}
-              recon={recon}
-              webhooks={webhooks}
-            />
-          </Sheet>
-        )}
+        {tab === 'provider' &&
+          (detailRes ? (
+            detailRes.error || !detailRes.data ? (
+              <p
+                role="alert"
+                className="bg-danger-bg text-danger rounded-xl px-4 py-3 text-sm font-semibold"
+              >
+                This statement import could not be loaded:{' '}
+                {detailRes.error?.message ?? 'it does not exist.'}
+              </p>
+            ) : (
+              <StatementDetail
+                data={detailRes.data as unknown as StatementDetailData}
+                canWrite={canWrite}
+                listHref={href('provider')}
+              />
+            )
+          ) : (
+            <>
+              <Sheet>
+                <StatementImports
+                  rows={statements}
+                  error={statementsRes.error?.message ?? null}
+                  listHref={href('provider')}
+                />
+              </Sheet>
+              <Sheet>
+                <Reconciliation
+                  clearing={(clearingRes.data as ClearingRow[] | null) ?? []}
+                  recon={recon}
+                  webhooks={webhooks}
+                />
+              </Sheet>
+            </>
+          ))}
 
         {tab === 'discrepancies' && (
           <Sheet>
@@ -569,7 +644,7 @@ export default async function ReconciliationPage({
                   <Item
                     key={`inv-${i.key}`}
                     tone={i.severity === 'critical' ? 'red' : 'amber'}
-                    kind="Check failing"
+                    kind="Check Failing"
                     title={i.label}
                     detail={`${i.question ?? ''} ${Number(i.breaches)} breach${Number(i.breaches) === 1 ? '' : 'es'}${i.ran_at ? `, checked ${dateTime(i.ran_at)}` : ''}.`}
                   />

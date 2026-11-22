@@ -8,6 +8,7 @@ import type { GuestRow, QueueRow, ReviewRow, Stats } from '@/components/experien
 import { PillTabs } from '@/components/console-kit';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
+import { partnerPayouts } from '@/lib/partner-payouts';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -36,7 +37,7 @@ export default async function ExperiencesPage({
   searchParams?: { tab?: string; filter?: string; guest?: string };
 }) {
   const staff = await requireStaff();
-  requireModule(staff, 'experiences');
+  const experiences = requireModule(staff, 'experiences');
   const supabase = createClient();
 
   const tab = TABS.some((t) => t.key === searchParams?.tab) ? searchParams!.tab! : 'all';
@@ -124,6 +125,7 @@ export default async function ExperiencesPage({
               staff.roles.includes('ops_manager')
             }
             canActivatePartners={staff.isSuperAdmin || staff.roles.includes('ops_manager')}
+            canDeclarePayouts={staff.isSuperAdmin || experiences.level === 'full'}
           />
         )}
       </main>
@@ -145,30 +147,38 @@ async function CatalogueTab({
   canEdit,
   canManagePartners,
   canActivatePartners,
+  canDeclarePayouts,
 }: {
   kind: 'curated' | 'components' | 'events' | 'partners';
   supabase: ReturnType<typeof createClient>;
   canEdit: boolean;
   canManagePartners: boolean;
   canActivatePartners: boolean;
+  canDeclarePayouts: boolean;
 }) {
   const { data: cities } = await supabase.from('city').select('id, name, slug').order('sort');
 
   if (kind === 'partners') {
-    const { data } = await supabase
-      .from('experience_partner')
-      .select(
-        'id, name, kind, city_id, contact_name, contact_phone, contact_email, preferred_channel, can_answer_holds, terms, status, went_live_at',
-      )
-      .order('name');
+    const [{ data }, { data: payouts }] = await Promise.all([
+      supabase
+        .from('experience_partner')
+        .select(
+          'id, name, kind, city_id, contact_name, contact_phone, contact_email, preferred_channel, can_answer_holds, terms, status, went_live_at',
+        )
+        .order('name'),
+      /* Where each partner is paid, masked, and whether Finance verified it. */
+      supabase.rpc('rpc_experience_partner_payouts'),
+    ]);
     return (
       <ExperienceCatalogue
         kind={kind}
         cities={cities ?? []}
         partners={data ?? []}
+        payouts={Object.fromEntries(partnerPayouts(payouts).map((p) => [p.partner_id, p]))}
         canEdit={canManagePartners}
         canManagePartners={canManagePartners}
         canActivatePartners={canActivatePartners}
+        canDeclarePayouts={canDeclarePayouts}
       />
     );
   }

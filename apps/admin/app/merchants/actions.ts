@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 
+import { issueSignedAgreement, issueSummary } from '@/lib/merchant-agreement-signing';
 import { createClient } from '@/lib/supabase/server';
 
 export interface ReviewResult {
@@ -58,14 +59,28 @@ export async function goLive(merchantId: string, reason: string): Promise<Review
     p_explore_visible: true,
   });
 
+  // Approve first (20270124000100): the merchant gives its agreement details
+  // after approval, so NexG signs the agreement when it goes live. Reported,
+  // never a reason to undo going live.
+  let agreement = '';
+  try {
+    agreement = issueSummary(await issueSignedAgreement(supabase, merchantId));
+  } catch {
+    agreement =
+      'The merchant agreement could not be signed. Use Issue signed agreement on this page.';
+  }
+
   revalidatePath(`/merchants/${merchantId}`);
   revalidatePath('/merchants');
   return listed.error
     ? {
         ok: true,
-        message: `Live, but not shown in Discovery yet: ${listed.error.message} Switch it on under Status & controls.`,
+        message: `Live, but not shown in Discovery yet: ${listed.error.message} Switch it on under Status & controls. ${agreement}`,
       }
-    : { ok: true, message: 'Live and shown in Discovery. Customers can now find and book it.' };
+    : {
+        ok: true,
+        message: `Live and shown in Discovery. Customers can now find and book it. ${agreement}`,
+      };
 }
 
 /**

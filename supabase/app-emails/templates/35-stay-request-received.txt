@@ -1,0 +1,21 @@
+REQUEST RECEIVED
+We’re finding you a stay
+reference {{ ticket_reference }}
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, thanks for telling us
+what you need. A person on our team is looking now and will send you
+options that fit. You pay nothing until you choose one.
+
+WHAT YOU ASKED FOR
+  Where: {{ request_area }}
+  Dates: {{ request_dates }}
+  Guests: {{ guests }}
+{{#budget}}  Budget: {{ budget }}
+{{/budget}}{{#purpose}}  For: {{ purpose }}
+{{/purpose}}
+View your request:
+{{ activity_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you booked a stay through NEXG · NEXG, nexgapp.com

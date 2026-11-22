@@ -8,7 +8,12 @@ import {
   addMenuItems,
   removeMenuItem,
   setItemAvailable,
+  setItemDigital,
+  setItemMessage,
+  setItemRequiresBuyerId,
   setItemPrice,
+  setMinOrder,
+  setItemSoldOut,
   type Outcome,
 } from '@/app/merchant/actions';
 import { uploadCatalogueImage } from '@/lib/catalogue-images';
@@ -36,6 +41,20 @@ export interface ItemRow {
   handling_notes?: string | null;
   storage_guidance?: string | null;
   prep_time_minutes?: number | null;
+  sold_by?: string | null;
+  unit_label?: string | null;
+  unit_step?: number | null;
+  unit_min?: number | null;
+  unit_max?: number | null;
+  price_is_estimate?: boolean | null;
+  /** Undefined until the database has the column; the switch stays hidden. */
+  sold_out?: boolean;
+  /** Delivered as a code in the app; undefined until the database has it. */
+  digital?: boolean;
+  /** The buyer must give a passport or national ID (an eSIM); undefined until the database has it. */
+  requires_buyer_id?: boolean;
+  /** Whether the item takes a message; undefined until the database has it. */
+  message?: { label: string | null; maxLength: number };
 }
 
 export interface SectionRow {
@@ -59,17 +78,24 @@ export function Menu({
   merchantId,
   sections,
   catalogueExample,
+  minOrderKes,
 }: {
   items: ItemRow[];
   available: number;
   merchantId: string;
   sections: SectionRow[];
   catalogueExample?: CatalogueExample;
+  /** Undefined until the database has the column; the field stays hidden. */
+  minOrderKes?: number | null;
 }) {
   const router = useRouter();
   const [busy, setBusy] = React.useState<string | null>(null);
   const [said, setSaid] = React.useState<Outcome | null>(null);
   const [edits, setEdits] = React.useState<Record<string, string>>({});
+  const [minOrder, setMinOrderDraft] = React.useState(
+    minOrderKes == null ? '' : String(minOrderKes),
+  );
+  const minOrderDirty = minOrder !== (minOrderKes == null ? '' : String(minOrderKes));
 
   const run = async (key: string, action: () => Promise<Outcome>) => {
     setBusy(key);
@@ -95,6 +121,38 @@ export function Menu({
           </p>
         )}
 
+        {minOrderKes !== undefined && (
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <label
+              htmlFor="min-order"
+              className="text-muted text-[0.75rem] font-bold"
+              title="Customers cannot check out a basket below this, after offers and before delivery."
+            >
+              Minimum order · KES
+            </label>
+            <input
+              id="min-order"
+              inputMode="numeric"
+              placeholder="None"
+              className={`${input} w-28 text-right tabular-nums`}
+              value={minOrder}
+              onChange={(e) => setMinOrderDraft(e.target.value.replace(/\D/g, ''))}
+            />
+            {minOrderDirty && (
+              <button
+                type="button"
+                disabled={busy === 'min-order'}
+                onClick={() =>
+                  void run('min-order', () => setMinOrder(minOrder ? Number(minOrder) : null))
+                }
+                className="bg-gold text-ink rounded-lg px-3 py-2 text-[0.6875rem] font-extrabold disabled:opacity-40"
+              >
+                {busy === 'min-order' ? '…' : 'Save'}
+              </button>
+            )}
+          </div>
+        )}
+
         <ul className="divide-border divide-y">
           {items.map((i) => {
             const draft = edits[i.id];
@@ -117,6 +175,11 @@ export function Menu({
                     {i.age_restricted && (
                       <Pill tone="bg-danger-bg text-danger">
                         <span className="ml-1">21+</span>
+                      </Pill>
+                    )}
+                    {i.available && i.sold_out && (
+                      <Pill tone="bg-danger-bg text-danger">
+                        <span className="ml-1">Sold out</span>
                       </Pill>
                     )}
                   </p>
@@ -192,6 +255,87 @@ export function Menu({
                   >
                     {busy === i.id ? '…' : i.available ? 'ON' : 'OFF'}
                   </button>
+                  {i.available && i.sold_out !== undefined && (
+                    <button
+                      type="button"
+                      disabled={busy === `s${i.id}`}
+                      onClick={() => void run(`s${i.id}`, () => setItemSoldOut(i.id, !i.sold_out))}
+                      aria-pressed={i.sold_out}
+                      title="Sold out keeps the item on the menu, marked sold out, so customers cannot order it."
+                      className={`rounded-lg px-3 py-2 text-[0.6875rem] font-extrabold transition-colors disabled:opacity-40 ${
+                        i.sold_out
+                          ? 'bg-danger-bg text-danger'
+                          : 'border-border-strong text-muted border'
+                      }`}
+                    >
+                      {busy === `s${i.id}` ? '…' : i.sold_out ? 'Sold out' : 'In stock'}
+                    </button>
+                  )}
+                  {i.message && (
+                    <button
+                      type="button"
+                      disabled={busy === `m${i.id}`}
+                      onClick={() => {
+                        const asked = window.prompt(
+                          `What should customers be asked when they order ${i.name}? For example "Message on the cake". Leave it empty if it takes no message.`,
+                          i.message?.label ?? '',
+                        );
+                        if (asked === null) return;
+                        void run(`m${i.id}`, () =>
+                          setItemMessage(i.id, asked, i.message?.maxLength ?? 100),
+                        );
+                      }}
+                      aria-pressed={Boolean(i.message.label)}
+                      title={
+                        i.message.label
+                          ? `Customers are asked "${i.message.label}".`
+                          : 'Let customers add a message, such as the writing on a cake.'
+                      }
+                      className={`rounded-lg px-3 py-2 text-[0.6875rem] font-extrabold transition-colors disabled:opacity-40 ${
+                        i.message.label
+                          ? 'bg-success-bg text-success'
+                          : 'border-border-strong text-muted border'
+                      }`}
+                    >
+                      {busy === `m${i.id}` ? '…' : 'Message'}
+                    </button>
+                  )}
+                  {i.digital !== undefined && (
+                    <button
+                      type="button"
+                      disabled={busy === `g${i.id}`}
+                      onClick={() => void run(`g${i.id}`, () => setItemDigital(i.id, !i.digital))}
+                      aria-pressed={i.digital}
+                      title="Digital: customers get a code in the app (an eSIM, a voucher), with no delivery."
+                      className={`rounded-lg px-3 py-2 text-[0.6875rem] font-extrabold transition-colors disabled:opacity-40 ${
+                        i.digital
+                          ? 'bg-success-bg text-success'
+                          : 'border-border-strong text-muted border'
+                      }`}
+                    >
+                      {busy === `g${i.id}` ? '…' : 'Digital'}
+                    </button>
+                  )}
+                  {i.requires_buyer_id !== undefined && (
+                    <button
+                      type="button"
+                      disabled={busy === `n${i.id}`}
+                      onClick={() =>
+                        void run(`n${i.id}`, () =>
+                          setItemRequiresBuyerId(i.id, !i.requires_buyer_id),
+                        )
+                      }
+                      aria-pressed={i.requires_buyer_id}
+                      title="Needs ID: checkout asks for the buyer's passport or national ID (an eSIM)."
+                      className={`rounded-lg px-3 py-2 text-[0.6875rem] font-extrabold transition-colors disabled:opacity-40 ${
+                        i.requires_buyer_id
+                          ? 'bg-success-bg text-success'
+                          : 'border-border-strong text-muted border'
+                      }`}
+                    >
+                      {busy === `n${i.id}` ? '…' : 'Needs ID'}
+                    </button>
+                  )}
                   <button
                     type="button"
                     aria-label={`Delete ${i.name}`}

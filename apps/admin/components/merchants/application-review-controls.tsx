@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { createClient } from '@/lib/supabase/client';
 
-type Decision = 'approved' | 'changes_requested' | 'rejected';
+export type Decision = 'approved' | 'changes_requested' | 'rejected';
 type Attempt = {
   merchantId: string;
   expectedRevision: number;
@@ -27,14 +27,17 @@ export function ApplicationReviewControls({
   merchantId,
   revision,
   canReview,
+  initialDecision = 'approved',
 }: {
   actorId: string;
   merchantId: string;
   revision: number;
   canReview: boolean;
+  /** The decision the form opens on, when a button chose it already. */
+  initialDecision?: Decision;
 }) {
   const router = useRouter();
-  const [decision, setDecision] = useState<Decision>('approved');
+  const [decision, setDecision] = useState<Decision>(initialDecision);
   const [reason, setReason] = useState('');
   const [phase, setPhase] = useState<Phase>('ready');
   const [message, setMessage] = useState('');
@@ -122,9 +125,9 @@ export function ApplicationReviewControls({
           command.decision === 'approved'
             ? (response.headers.get('x-merchant-live') === 'true'
                 ? 'Application approved. The merchant is live, shown in Discovery, and their home is now the dashboard.'
-                : `Application approved, but going live is not finished: ${decodeURIComponent(
+                : `Application approved. The merchant now finishes setting up in their dashboard and is not live yet: ${decodeURIComponent(
                     response.headers.get('x-merchant-live-detail') ?? 'reason unavailable',
-                  )} Use Take live on the merchant record.`) +
+                  )} Use Take live on the merchant record once that is done.`) +
                 (agreement ? ` ${decodeURIComponent(agreement)}` : '')
             : command.decision === 'changes_requested'
               ? 'Changes requested. The merchant can update and resubmit the application.'

@@ -32,13 +32,13 @@ export function BuildRunButton({ batchesHref }: { batchesHref: string }) {
     <ConfirmAction
       trigger={
         <Button variant="gold" size="md" leadingIcon={<Plus className="h-4 w-4" />}>
-          Build payout run
+          Create Payout
         </Button>
       }
       tone="black"
       title="Build last week's payout run?"
-      body="Gathers what merchants, hosts and riders are owed for Monday to Sunday just finished. Nothing is approved or sent: the run then needs its checks and two signatures. Building again before approval rebuilds it."
-      confirmLabel="Build run"
+      body="Gathers what merchants, hosts, riders and experience partners are owed for Monday to Sunday just finished. Nothing is approved or sent: the run then needs its checks and two signatures. Building again before approval rebuilds it."
+      confirmLabel="Build Run"
       onConfirm={async () => {
         const r = await buildPayoutRun();
         if (!r.ok) {
@@ -90,16 +90,16 @@ function batchStatus(b: BatchRow): {
   tone: React.ComponentProps<typeof Pill>['tone'];
 } {
   if (b.recipients > 0 && b.paid === b.recipients) return { label: 'Paid', tone: 'green' };
-  if (b.failed > 0) return { label: `${b.failed} failed`, tone: 'red' };
+  if (b.failed > 0) return { label: `${b.failed} Failed`, tone: 'red' };
   if (b.held > 0 && ['built', 'checked'].includes(b.runState))
-    return { label: `${b.held} held`, tone: 'red' };
+    return { label: `${b.held} Held`, tone: 'red' };
   return RUN_STATES[b.runState] ?? { label: b.runState, tone: 'grey' };
 }
 
 export function BatchesTable({
   rows,
   batchesHref,
-  title = 'Settlement batches',
+  title = 'Settlement Batches',
   compact = false,
 }: {
   rows: BatchRow[];
@@ -131,7 +131,7 @@ export function BatchesTable({
     {
       id: 'reference',
       accessorFn: (b) => b.processedAt ?? b.payDate,
-      header: 'Batch · weekly',
+      header: 'Batch · Weekly',
       cell: ({ row: { original: b } }) => (
         <span className="block whitespace-nowrap tabular-nums">
           <span className="block font-semibold">{b.reference}</span>
@@ -144,7 +144,7 @@ export function BatchesTable({
     {
       id: 'type',
       accessorFn: (b) => PAYEE_GROUPS[b.group].batch,
-      header: 'Payout type',
+      header: 'Payout Type',
       cell: ({ row: { original: b } }) => (
         <Pill
           tone={
@@ -174,7 +174,7 @@ export function BatchesTable({
               ? 'host'
               : b.group === 'rider'
                 ? 'rider'
-                : 'payee'}
+                : 'partner'}
           {b.recipients === 1 ? '' : 's'}
         </span>
       ),
@@ -182,7 +182,7 @@ export function BatchesTable({
     {
       id: 'amount',
       accessorFn: (b) => b.cents,
-      header: 'Total amount (KES)',
+      header: 'Total Amount (KES)',
       cell: ({ row: { original: b } }) => (
         <span className="font-semibold tabular-nums">{shillings(b.cents)}</span>
       ),
@@ -190,7 +190,7 @@ export function BatchesTable({
     {
       id: 'method',
       accessorFn: (b) => b.rails.join(' '),
-      header: 'Payout method',
+      header: 'Payout Method',
       cell: ({ row: { original: b } }) => <RailList rails={b.rails} />,
     },
     {
@@ -242,7 +242,7 @@ export function BatchesTable({
             onChange={setGroup}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All payout types' },
+              { value: 'all', label: 'All Payout Types' },
               ...(Object.keys(PAYEE_GROUPS) as PayeeGroup[])
                 .filter((g) => rows.some((b) => b.group === g))
                 .map((g) => ({ value: g, label: PAYEE_GROUPS[g].batch })),
@@ -254,7 +254,7 @@ export function BatchesTable({
             onChange={setStatus}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All statuses' },
+              { value: 'all', label: 'All Statuses' },
               ...statuses.map((s) => ({ value: s, label: s })),
             ]}
           />
@@ -298,7 +298,7 @@ export function BatchesTable({
           {...(filtered
             ? {
                 action: {
-                  label: 'Clear filters',
+                  label: 'Clear Filters',
                   onClick: () => {
                     setQ('');
                     setGroup('all');
@@ -382,7 +382,7 @@ export function LinesTable({
 }: {
   rows: SettlementLine[];
   title: string;
-  /** "merchant", "host", "rider". */
+  /** "merchant", "host", "rider", "partner". */
   noun: string;
   /** The batches view, where a line's run opens. */
   batchesHref: string;
@@ -449,7 +449,7 @@ export function LinesTable({
     {
       id: 'deductions',
       accessorFn: (r) => r.commission_cents - r.adjustment_cents,
-      header: 'Commission & adj.',
+      header: 'Commission & Adj.',
       cell: ({ row: { original: r } }) => {
         const less = r.commission_cents - r.adjustment_cents;
         return (
@@ -518,7 +518,7 @@ export function LinesTable({
             onChange={setState}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All statuses' },
+              { value: 'all', label: 'All Statuses' },
               ...states.map((s) => ({ value: s, label: LINE_STATES[s]?.label ?? s })),
             ]}
           />
@@ -570,7 +570,7 @@ export function LinesTable({
           {...(filtered
             ? {
                 action: {
-                  label: 'Clear filters',
+                  label: 'Clear Filters',
                   onClick: () => {
                     setQ('');
                     setState('all');

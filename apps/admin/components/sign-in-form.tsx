@@ -36,15 +36,21 @@ export function SignInForm({
     setError(null);
 
     const formData = new FormData(event.currentTarget);
-    const token = await captcha();
-    if (token) formData.set(CAPTCHA_FIELD, token);
+    const send = async () => {
+      const token = await captcha();
+      if (token) formData.set(CAPTCHA_FIELD, token);
+      else formData.delete(CAPTCHA_FIELD);
+      return signIn(null, formData);
+    };
     /*
      * A successful sign-in redirects. Next resolves the call with nothing in
      * that case rather than rejecting, so the result is only read when it is
      * actually there — reading `.ok` off undefined threw an error into the
      * console on every successful sign-in.
      */
-    const result: SignInResult | undefined = await signIn(null, formData);
+    let result: SignInResult | undefined = await send();
+    // A refused security check gets one quiet retry with a fresh token.
+    if (result?.captcha) result = await send();
 
     if (!result) return; // redirecting; leave the button busy until it lands.
 

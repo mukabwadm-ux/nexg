@@ -27,6 +27,14 @@ export {
   type MerchantParty,
 } from './document';
 export { COMPANY_NAME, COMPANY_NUMBER, renderAgreementPdf, type Letterhead } from './pdf';
+export {
+  formatAmount,
+  renderInvoicePdf,
+  type InvoicePdfInput,
+  type InvoicePdfLine,
+  type InvoiceVatRate,
+  type RenderedInvoice,
+} from './invoice';
 
 /** Bump when the layout of the generated PDF changes. */
 const RENDERER_VERSION = 1;

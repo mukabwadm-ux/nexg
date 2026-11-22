@@ -12,20 +12,13 @@ import {
   payoutDeclaration,
   payoutForm,
 } from '@/lib/merchant-application-client';
-import {
-  MerchantAgreementDetails,
-  agreementForCategory,
-  type MerchantAgreementDetailsInput,
-} from '@nexg/contracts/merchant-agreements';
 import { sendMerchantPasswordSetupLink } from '@/app/(customer)/sign-in/actions';
-import { AgreementConsent } from '@/components/merchant/agreement-consent';
-import {
-  detailsFormFrom,
-  representativeIsSignatory,
-  withRepresentative,
-  type AgreementDetailsRecord,
-} from '@/components/merchant/agreement-details';
 import { createClient } from '@/lib/supabase/client';
+import {
+  forgetStartedAnonymous,
+  markStartedAnonymous,
+  shouldSendSetupLink,
+} from '@/lib/merchant-setup-email';
 import { subscribeProtectedActor } from '@/lib/supabase/protected-actor';
 import type { MerchantSavedHomeSource } from '@/lib/merchant-home-source';
 import { merchantSessionSignInHref } from '@/lib/merchant-journey-navigation';
@@ -110,19 +103,6 @@ export function ConnectedApplication({
   const payout = useRef(initialPayout);
   const [status, setStatus] = useState(initialRecord?.review.state ?? 'draft');
   const [setupEditor, setSetupEditor] = useState<SetupEditor | null>(null);
-  /* The category whose merchant agreement the applicant has ticked. */
-  const [agreementAcceptedFor, setAgreementAcceptedFor] = useState<string | null>(null);
-  const [agreementError, setAgreementError] = useState<string | null>(null);
-  /*
-   * The details NexG fills the signed agreement in with. Null until the
-   * database answers, and stays null where it does not take them yet (before
-   * 20270103000100) or the agreement is already signed with them.
-   */
-  const [agreementDetails, setAgreementDetails] = useState<MerchantAgreementDetailsInput | null>(
-    null,
-  );
-  const [detailsSameAsSignatory, setDetailsSameAsSignatory] = useState(true);
-  const [detailsError, setDetailsError] = useState<string | null>(null);
   const closeSetupEditor = () => setSetupEditor(null);
   const refreshSetup = () => router.refresh();
   const openLegacySetup = useCallback(
@@ -152,34 +132,11 @@ export function ConnectedApplication({
   const lastActivity = useRef(0);
   const currentEmail = useRef('');
   const setupLinkSent = useRef(false);
-  /*
-   * Whether the database takes the agreement details, and what is saved.
-   * Without a saved application, asking about an id nobody owns still tells
-   * the two apart: "not yours" means the function is there.
-   */
+  // Verifying the email makes this anonymous visitor permanent before they
+  // submit, so remember that they started anonymous (see merchant-setup-email).
   useEffect(() => {
-    let live = true;
-    const saved = record.current;
-    void createClient()
-      .rpc('rpc_merchant_agreement_details_read', {
-        p_merchant_id: saved?.merchant_id ?? '00000000-0000-0000-0000-000000000000',
-      })
-      .then(({ data, error }) => {
-        if (!live || (error && error.code !== '42501' && error.code !== 'P0002')) return;
-        const details = error ? null : (data as unknown as AgreementDetailsRecord);
-        if (details?.locked) return;
-        const business = saved?.payload.business;
-        const form = detailsFormFrom(details, {
-          legalName: business?.name,
-          signatory: [business?.firstName, business?.lastName].filter(Boolean).join(' '),
-        });
-        setAgreementDetails(form);
-        setDetailsSameAsSignatory(representativeIsSignatory(form));
-      });
-    return () => {
-      live = false;
-    };
-  }, []);
+    if (anonymousSession) markStartedAnonymous(actorId);
+  }, [anonymousSession, actorId]);
   useEffect(() => {
     alive.current = true;
     abort.current = new AbortController();
@@ -475,7 +432,7 @@ export function ConnectedApplication({
     );
   }
   async function completeSubmission(email: string) {
-    if (anonymousSession && emailOtpEnabled) {
+    if (shouldSendSetupLink({ anonymousSession, emailOtpEnabled, actorId })) {
       if (!setupLinkSent.current) {
         const result = await sendMerchantPasswordSetupLink(await getCaptchaToken());
         if (!result.ok) throw new Error(result.message);
@@ -486,6 +443,7 @@ export function ConnectedApplication({
         throw new Error(
           'Your password setup link was sent, but we could not sign out. Please try again.',
         );
+      forgetStartedAnonymous();
       const params = new URLSearchParams({ next: '/merchant', setup: 'sent', email });
       router.push(`/merchants/sign-in?${params.toString()}`);
     } else {
@@ -520,62 +478,6 @@ export function ConnectedApplication({
       window.history.replaceState(null, '', `/merchants/register?merchantId=${saved.merchant_id}`);
     return saved;
   }
-  /*
-   * The merchant agreement for the application's category. Ticking the box
-   * is remembered per category, so changing category asks again; the
-   * acceptance itself is recorded (agreement, version, who, when) just
-   * before submitting, and the database refuses a submission without it.
-   */
-  async function acceptAgreement(merchantId: string, categoryId: string) {
-    const agreement = agreementForCategory(categoryId);
-    if (!agreement) throw new Error('Choose your business category before submitting.');
-    if (agreementAcceptedFor !== categoryId) {
-      setAgreementError('Tick "I have read and agree" to accept the NexG Merchant Agreement.');
-      throw new Error(
-        'Read and accept the NexG Merchant Agreement for your category (Registration and policies) before submitting.',
-      );
-    }
-    const { error } = await createClient().rpc('rpc_merchant_agreement_accept', {
-      p_merchant_id: merchantId,
-      p_agreement_id: agreement.id,
-      p_version: agreement.version,
-    });
-    if (error)
-      throw new Error(
-        error.message ||
-          'Your acceptance of the merchant agreement could not be saved. Please retry.',
-      );
-  }
-  /*
-   * The details the agreement is filled in with: required to submit, so the
-   * signed copy has no blanks, and saved with a draft once they are
-   * complete. `quiet` (a draft) skips incomplete ones instead of stopping.
-   */
-  async function saveAgreementDetails(merchantId: string, quiet = false) {
-    if (!agreementDetails) return;
-    const parsed = MerchantAgreementDetails.safeParse(
-      withRepresentative(agreementDetails, detailsSameAsSignatory),
-    );
-    if (!parsed.success) {
-      if (quiet) return;
-      const message = parsed.error.issues[0]?.message ?? 'Complete your details for the agreement.';
-      setDetailsError(message);
-      throw new Error(`Your details for the agreement: ${message}`);
-    }
-    const { error } = await createClient().rpc('rpc_merchant_agreement_details_save', {
-      p_merchant_id: merchantId,
-      p_details: parsed.data,
-    });
-    if (error) {
-      if (quiet) return;
-      setDetailsError(error.message);
-      throw new Error(
-        error.message || 'Your details for the agreement could not be saved. Please retry.',
-      );
-    }
-    setDetailsError(null);
-  }
-
   async function submit(input: Record<string, unknown>) {
     if (emailOtpEnabled) {
       const email = String((input.business as { email?: unknown } | undefined)?.email ?? '')
@@ -606,8 +508,8 @@ export function ConnectedApplication({
         );
         return { applicationId: saved.merchant_id, status: saved.review.state, redirecting: true };
       }
-      await saveAgreementDetails(saved.merchant_id);
-      await acceptAgreement(saved.merchant_id, String(input.categoryId ?? ''));
+      // Approve first (20270124000100): the onboarding details and the merchant
+      // agreement are given from the dashboard after NexG approves, not here.
       const submitted = MerchantApplicationRecord.parse(
         await post({
           command: 'submit',
@@ -733,36 +635,16 @@ export function ConnectedApplication({
         authenticatedSession={undefined}
         onSaveDraft={(input: Record<string, unknown>) =>
           serialize(async () => {
-            const saved = await save(input);
-            await saveAgreementDetails(saved.merchant_id, true);
-            return saved;
+            return await save(input);
           })
         }
         onSubmit={submit}
-        renderAgreement={(categoryId: string) => (
-          <AgreementConsent
-            categoryId={categoryId}
-            checked={agreementAcceptedFor === categoryId && Boolean(categoryId)}
-            error={agreementError}
-            onChange={(checked) => {
-              setAgreementAcceptedFor(checked ? categoryId : null);
-              setAgreementError(null);
-            }}
-            details={
-              agreementDetails
-                ? {
-                    value: agreementDetails,
-                    onChange: (value) => {
-                      setAgreementDetails(value);
-                      setDetailsError(null);
-                    },
-                    sameAsSignatory: detailsSameAsSignatory,
-                    onSameAsSignatoryChange: setDetailsSameAsSignatory,
-                    error: detailsError,
-                  }
-                : null
-            }
-          />
+        renderAgreement={() => (
+          <p className="border-border text-muted mb-4 rounded-xl border p-4 text-sm font-semibold leading-[1.6]">
+            That is all we need to review your application. Once NexG approves it, you finish the
+            rest from your dashboard: your onboarding details, the merchant agreement and your
+            documents. We take your business live once they are in and checked.
+          </p>
         )}
         canSubmit={!emailOtpEnabled || emailIsVerified}
         emailFieldDisabled={

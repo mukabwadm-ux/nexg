@@ -40,16 +40,16 @@ import {
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = { title: 'Assets & equipment' };
+export const metadata: Metadata = { title: 'Assets & Equipment' };
 export const dynamic = 'force-dynamic';
 
 const TABS = [
   { key: 'overview', label: 'Overview', icon: LayoutGrid },
-  { key: 'all', label: 'All equipment', icon: ListChecks },
+  { key: 'all', label: 'All Equipment', icon: ListChecks },
   { key: 'in_use', label: 'Assigned', icon: Hand },
   { key: 'available', label: 'Available', icon: CircleCheck },
   { key: 'maintenance', label: 'Maintenance', icon: Wrench },
-  { key: 'retired', label: 'Retired & lost', icon: Archive },
+  { key: 'retired', label: 'Retired & Lost', icon: Archive },
 ] as const;
 
 type Tab = (typeof TABS)[number]['key'];
@@ -156,7 +156,7 @@ export default async function CompanyAssetsPage({
     <ConsoleShell staff={staff}>
       <PageHeader
         icon={Laptop}
-        title="Assets & equipment"
+        title="Assets & Equipment"
         subtitle="Who holds each laptop, phone, motorbike and machine, what condition it is in, and when it is serviced."
         actions={
           <>
@@ -195,7 +195,7 @@ export default async function CompanyAssetsPage({
               <Stat
                 icon={Laptop}
                 value={live.length.toLocaleString('en-KE')}
-                label="Equipment in service"
+                label="Equipment in Service"
                 href={href('all')}
               />
               <Stat
@@ -216,14 +216,14 @@ export default async function CompanyAssetsPage({
                 icon={Wrench}
                 tone="amber"
                 value={count('maintenance').toLocaleString('en-KE')}
-                label="Under maintenance"
+                label="Under Maintenance"
                 href={href('maintenance')}
               />
               <Stat
                 icon={CalendarClock}
                 tone="red"
                 value={dueSoon.length.toLocaleString('en-KE')}
-                label="Service due in 30 days"
+                label="Service Due in 30 Days"
                 note={
                   dueSoon.some((a) => daysUntil(a.next_service_on!) < 0)
                     ? 'Some overdue'
@@ -234,20 +234,20 @@ export default async function CompanyAssetsPage({
               <Stat
                 icon={Wallet}
                 value={kes(value)}
-                label="Bought for"
+                label="Bought For"
                 note="Equipment in service"
               />
             </StatGrid>
 
             <div className="grid gap-5 xl:grid-cols-3">
               <Sheet>
-                <PanelHead title="Where the equipment is" />
+                <PanelHead title="Where the Equipment Is" />
                 <div className="mt-4">
                   {live.length ? (
                     <ShareDonut
                       stacked
                       centre={live.length.toLocaleString('en-KE')}
-                      caption="In service"
+                      caption="In Service"
                       data={[
                         {
                           key: 'in_use',
@@ -263,7 +263,7 @@ export default async function CompanyAssetsPage({
                         },
                         {
                           key: 'maintenance',
-                          label: 'Under maintenance',
+                          label: 'Under Maintenance',
                           value: count('maintenance'),
                           color: '#F5B800',
                         },
@@ -277,7 +277,7 @@ export default async function CompanyAssetsPage({
                 </div>
               </Sheet>
               <Sheet>
-                <PanelHead title="Service due" aside="next 30 days" />
+                <PanelHead title="Service Due" aside="next 30 days" />
                 {dueSoon.length === 0 ? (
                   <p className="text-muted-light py-6 text-center text-sm">
                     Nothing due for service in the next 30 days.
@@ -295,7 +295,7 @@ export default async function CompanyAssetsPage({
                             </span>
                           </span>
                           <Pill tone={d < 0 ? 'red' : d <= 7 ? 'amber' : 'grey'}>
-                            {d < 0 ? `${-d}d overdue` : d === 0 ? 'Today' : `In ${d}d`}
+                            {d < 0 ? `${-d}d Overdue` : d === 0 ? 'Today' : `In ${d}d`}
                           </Pill>
                         </li>
                       );
@@ -304,7 +304,7 @@ export default async function CompanyAssetsPage({
                 )}
               </Sheet>
               <Sheet>
-                <PanelHead title="Recent equipment activity" />
+                <PanelHead title="Recent Equipment Activity" />
                 <div className="mt-4">
                   <ActivityFeed
                     rows={(activityRes.data ?? []) as ActivityRow[]}
@@ -314,11 +314,11 @@ export default async function CompanyAssetsPage({
               </Sheet>
             </div>
 
-            <Sheet>{table(live, 'Equipment in service', true)}</Sheet>
+            <Sheet>{table(live, 'Equipment in Service', true)}</Sheet>
 
             {count('in_use') > 0 && (
               <Sheet>
-                <PanelHead title="Who holds what" />
+                <PanelHead title="Who Holds What" />
                 <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                   {Object.entries(
                     rowsFor.in_use.reduce<Record<string, AssetRow[]>>((m, a) => {
@@ -350,7 +350,7 @@ export default async function CompanyAssetsPage({
             {table(
               rowsFor[tab],
               tab === 'all'
-                ? 'All equipment in service'
+                ? 'All Equipment in Service'
                 : (TABS.find((t) => t.key === tab)?.label ?? ''),
             )}
           </Sheet>

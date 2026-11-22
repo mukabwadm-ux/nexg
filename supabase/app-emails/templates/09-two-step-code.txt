@@ -1,0 +1,13 @@
+Your NEXG verification code is {{ code }}
+
+To finish signing in.
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, enter this code in
+the NEXG app to finish signing in. It works once, for 10 minutes.
+
+Didn’t just sign in? Someone has your password. Change it now in
+Account, then Security.
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because of your NEXG account · NEXG, nexgapp.com

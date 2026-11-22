@@ -1,0 +1,35 @@
+NEW BOOKING
+{{ date_weekday }} {{ date_day }} {{ date_month }}, {{ date_time }}{{#date_note}} ({{ date_note }}){{/date_note}}
+{{ date_title }}
+
+{{ property_name }}
+{{#unit_name}}{{ unit_name }}
+{{/unit_name}}
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, you have a new NEXG
+booking. The guest has paid.
+
+THE BOOKING
+  Guest: {{ guest_name }}
+  Check in: {{ check_in }}
+  Check out: {{ check_out }}
+  Guests: {{ guests }}
+  Booking: {{ booking_number }}
+
+At check-in the guest shows a check-in code from their app. Type it into
+your workspace to check them in.
+
+View booking:
+{{ host_url }}
+
+EARNINGS RECEIPT {{ receipt_number }}
+{{#items}}  {{ quantity }} x {{ name }}  {{ amount }}{{#choices}}
+    {{ choices }}{{/choices}}
+{{/items}}{{#price_lines}}  {{ label }}  {{ amount }}
+{{/price_lines}}  YOU EARN  {{ total }}
+Payment: {{ payment_method }}{{#payment_reference}} · {{ payment_reference }}{{/payment_reference}}, recorded {{ paid_at }}
+{{ record_label }} {{ record_number }} · Receipt {{ receipt_number }}
+Asante for hosting with NEXG
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because you host with NEXG · NEXG, nexgapp.com

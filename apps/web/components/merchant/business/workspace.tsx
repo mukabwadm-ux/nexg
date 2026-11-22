@@ -43,6 +43,7 @@ import {
   LocationsView,
   ProfileView,
   TeamView,
+  type LiveDocuments,
   type ViewProps,
 } from './views';
 import styles from './workspace.module.css';
@@ -77,6 +78,7 @@ export function BusinessWorkspace({
   liveData,
   liveTools,
   liveMemberTools,
+  liveDocuments,
 }: {
   initialProfileId?: string;
   initialTab?: Section;
@@ -85,6 +87,8 @@ export function BusinessWorkspace({
   liveData?: Business;
   liveTools?: Partial<Record<Section, ReactNode>>;
   liveMemberTools?: Record<string, ReactNode>;
+  /** The real requirements and files, so a document panel can upload. */
+  liveDocuments?: LiveDocuments | null;
 }) {
   const inheritedDemo = useMerchantOnboardingDemoContext();
   const live = Boolean(liveData);
@@ -434,6 +438,7 @@ export function BusinessWorkspace({
         readOnly: scopedReadOnly,
         live,
         liveMemberTools,
+        liveDocuments,
         edit,
         save,
         message,
@@ -604,43 +609,64 @@ export function BusinessWorkspace({
             id={`business-content-${tab}`}
             role="tabpanel"
             aria-labelledby={`business-tab-${tab}`}
-            style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              minHeight: 0,
+              /* A tab with live tools above its view (the agreement panel on
+                 Documents) can be taller than the window, and the page itself
+                 does not scroll: scroll the tab instead. */
+              ...(liveTools?.[tab] ? { overflowY: 'auto' as const } : {}),
+            }}
             key={`${profileId}-${tab}`}
           >
-            {liveTools?.[tab] && <div className="mb-3">{liveTools[tab]}</div>}
-            {tab === 'profile' ? (
-              <ProfileView
-                data={display}
-                readOnly={scopedReadOnly}
-                live={live}
-                draft={profileDraft}
-                onChange={setProfile}
-                onSave={() =>
-                  save({ ...data, profile: profileDraft }, 'Public profile updated', true)
-                }
-                onCancel={() => {
-                  setProfileDraft({
-                    ...data.profile,
-                    ...(activeDemo ? { name: activeDemo.businessName } : {}),
-                  });
-                  writeDraft(localStorage, profileId, null);
-                  setNotice('Profile draft discarded.');
-                }}
-                request={requestChange}
-                preview={showPreview}
-                message={message}
-              />
-            ) : tab === 'activities' ? (
-              <ActivitiesView {...viewProps} />
-            ) : tab === 'locations' ? (
-              <LocationsView {...viewProps} />
-            ) : tab === 'team' ? (
-              <TeamView {...viewProps} />
-            ) : tab === 'documents' ? (
-              <DocumentsView {...viewProps} />
-            ) : (
-              <FeedbackView {...viewProps} />
+            {liveTools?.[tab] && (
+              <div className="mb-3" style={{ flexShrink: 0 }}>
+                {liveTools[tab]}
+              </div>
             )}
+            <div
+              style={
+                liveTools?.[tab]
+                  ? { display: 'flex', flexDirection: 'column', flex: '1 0 auto', minHeight: 520 }
+                  : { display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }
+              }
+            >
+              {tab === 'profile' ? (
+                <ProfileView
+                  data={display}
+                  readOnly={scopedReadOnly}
+                  live={live}
+                  draft={profileDraft}
+                  onChange={setProfile}
+                  onSave={() =>
+                    save({ ...data, profile: profileDraft }, 'Public profile updated', true)
+                  }
+                  onCancel={() => {
+                    setProfileDraft({
+                      ...data.profile,
+                      ...(activeDemo ? { name: activeDemo.businessName } : {}),
+                    });
+                    writeDraft(localStorage, profileId, null);
+                    setNotice('Profile draft discarded.');
+                  }}
+                  request={requestChange}
+                  preview={showPreview}
+                  message={message}
+                />
+              ) : tab === 'activities' ? (
+                <ActivitiesView {...viewProps} />
+              ) : tab === 'locations' ? (
+                <LocationsView {...viewProps} />
+              ) : tab === 'team' ? (
+                <TeamView {...viewProps} />
+              ) : tab === 'documents' ? (
+                <DocumentsView {...viewProps} />
+              ) : (
+                <FeedbackView {...viewProps} />
+              )}
+            </div>
           </div>
         )
       )}

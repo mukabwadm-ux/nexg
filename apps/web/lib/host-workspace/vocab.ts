@@ -56,6 +56,39 @@ export const KINDS: { value: string; label: string }[] = [
 
 /* ════════════════════════════════════════════════ photos */
 
+/* ════════════════════════════════════════════════ amenities */
+
+/**
+ * The 17 amenities guests can filter NEXG Stays by. Each value is a
+ * label the Discovery engine's stays vocabulary maps exactly
+ * (config/stays-vocabulary.v1.json), so a ticked box becomes a filter.
+ * "Guarded gate" is how security is stored: the plain word "Security"
+ * does not map. Hosts can add their own amenities too; those are shown
+ * to guests but cannot be filtered on.
+ */
+export const STAY_AMENITIES: readonly string[] = [
+  'Wi-Fi',
+  'Parking',
+  'Kitchen',
+  'Washing machine',
+  'Workspace',
+  'Backup power',
+  'Lift',
+  'Guarded gate',
+  'Swimming pool',
+  'Gym',
+  'Garden',
+  'Balcony',
+  'Terrace',
+  'Fireplace',
+  'Breakfast',
+  'Beach access',
+  'Pet friendly',
+];
+
+/** Long free text a guest reads: house rules, cancellation, neighbourhood. */
+export const LISTING_TEXT_MAX = 2000;
+
 export interface Photo {
   path: string;
   alt?: string;

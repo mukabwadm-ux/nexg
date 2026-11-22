@@ -93,7 +93,7 @@ export function Fees({
         <SectionTitle
           note={`Revenue by the account it was credited to, ${from} to ${to}. The order count is the denominator — a fee total without one cannot be read.`}
         >
-          What we charged
+          What We Charged
         </SectionTitle>
 
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
@@ -104,7 +104,7 @@ export function Fees({
                 <th className="px-4 py-2 text-right">Total</th>
                 <th className="px-4 py-2 text-right">Share</th>
                 <th className="px-4 py-2 text-right">Orders</th>
-                <th className="px-4 py-2 text-right">Per order</th>
+                <th className="px-4 py-2 text-right">Per Order</th>
               </tr>
             </thead>
             <tbody>
@@ -146,7 +146,7 @@ export function Fees({
             {byAccount.length > 0 ? (
               <tfoot className="border-border bg-bg border-t">
                 <tr className="text-[0.8125rem] font-extrabold">
-                  <td className="px-4 py-2.5">Total revenue</td>
+                  <td className="px-4 py-2.5">Total Revenue</td>
                   <td className="px-4 py-2.5 text-right tabular-nums">{kesMoney(total)}</td>
                   <td
                     colSpan={3}
@@ -163,7 +163,7 @@ export function Fees({
 
       <section>
         <SectionTitle note="What each merchant agreed to pay, against what was actually taken. These drift through tier changes and waivers.">
-          Commission, agreed against taken
+          Commission, Agreed Against Taken
         </SectionTitle>
 
         {drifting.length > 0 ? (
@@ -181,7 +181,7 @@ export function Fees({
                 <th className="px-4 py-2">Merchant</th>
                 <th className="px-4 py-2">Tier</th>
                 <th className="px-4 py-2 text-right">Orders</th>
-                <th className="px-4 py-2 text-right">Paid out</th>
+                <th className="px-4 py-2 text-right">Paid Out</th>
                 <th className="px-4 py-2 text-right">Commission</th>
                 <th className="px-4 py-2 text-right">Agreed</th>
                 <th className="px-4 py-2 text-right">Actual</th>

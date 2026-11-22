@@ -26,9 +26,12 @@ interface Line {
 export function ManualOrder({
   cityId,
   merchants,
+  trigger,
 }: {
   cityId: string;
   merchants: { id: string; trading_name: string | null; legal_name: string }[];
+  /** Draws the opener instead of the "+ Manual order" button, e.g. a Quick Actions tile. */
+  trigger?: (open: () => void) => React.ReactNode;
 }) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
@@ -117,13 +120,17 @@ export function ManualOrder({
    */
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="bg-gold text-ink rounded-lg px-4 py-2 text-[0.8125rem] font-extrabold"
-      >
-        + Manual order
-      </button>
+      {trigger ? (
+        trigger(() => setOpen(true))
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="bg-gold text-ink rounded-lg px-4 py-2 text-[0.8125rem] font-extrabold"
+        >
+          + Manual order
+        </button>
+      )}
 
       {open && (
         <div

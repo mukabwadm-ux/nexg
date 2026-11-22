@@ -200,7 +200,7 @@ export default async function ProcurementPage({
             },
             {
               key: 'orders',
-              label: 'Purchase orders',
+              label: 'Purchase Orders',
               icon: FileCheck2,
               href: href('orders'),
               count: open.length || null,
@@ -225,7 +225,7 @@ export default async function ProcurementPage({
                 icon={Hourglass}
                 tone="amber"
                 value={waiting.length.toLocaleString('en-KE')}
-                label="Awaiting approval"
+                label="Awaiting Approval"
                 note={kes(sum(waiting))}
                 href={href('approvals')}
               />
@@ -233,7 +233,7 @@ export default async function ProcurementPage({
                 icon={ClipboardCheck}
                 tone="blue"
                 value={approved.length.toLocaleString('en-KE')}
-                label="Approved, not ordered"
+                label="Approved, Not Ordered"
                 note={kes(sum(approved))}
                 href={href('requests')}
               />
@@ -241,28 +241,28 @@ export default async function ProcurementPage({
                 icon={FileCheck2}
                 tone="purple"
                 value={open.length.toLocaleString('en-KE')}
-                label="Open purchase orders"
+                label="Open Purchase Orders"
                 note={kes(sum(open))}
                 href={href('orders')}
               />
               <Stat
                 icon={Wallet}
                 value={kes(sum(ordered))}
-                label="Ordered this period"
+                label="Ordered This Period"
                 note={`${ordered.length} ${ordered.length === 1 ? 'order' : 'orders'}`}
               />
               <Stat
                 icon={PackageCheck}
                 tone="green"
                 value={kes(sum(received))}
-                label="Received this period"
+                label="Received This Period"
                 note={`${received.length} ${received.length === 1 ? 'order' : 'orders'} complete`}
               />
             </StatGrid>
 
             <div className="grid gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
               <Sheet>
-                <PanelHead title="Ordered and received" aside={formatRange(period)} />
+                <PanelHead title="Ordered and Received" aside={formatRange(period)} />
                 <div className="mt-4">
                   {ordered.length + received.length > 0 ? (
                     <TrendArea
@@ -281,7 +281,7 @@ export default async function ProcurementPage({
                 </div>
               </Sheet>
               <Sheet>
-                <PanelHead title="Ordered by department" aside={formatRange(period)} />
+                <PanelHead title="Ordered by Department" aside={formatRange(period)} />
                 <div className="mt-4">
                   {byDept.length ? (
                     <ShareDonut
@@ -301,20 +301,20 @@ export default async function ProcurementPage({
             </div>
 
             {canApprove && forMe.length > 0 && (
-              <Sheet>{requestTable(forMe, 'Waiting for your decision', true, false)}</Sheet>
+              <Sheet>{requestTable(forMe, 'Waiting for Your Decision', true, false)}</Sheet>
             )}
-            <Sheet>{requestTable(requests, 'Recent requests', true)}</Sheet>
+            <Sheet>{requestTable(requests, 'Recent Requests', true)}</Sheet>
           </>
         )}
 
-        {tab === 'requests' && <Sheet>{requestTable(requests, 'Purchase requests')}</Sheet>}
+        {tab === 'requests' && <Sheet>{requestTable(requests, 'Purchase Requests')}</Sheet>}
         {tab === 'approvals' && (
           <Sheet>
             {requestTable(
               waiting,
               canApprove
-                ? 'Awaiting approval'
-                : 'Awaiting approval (someone with full Company access decides)',
+                ? 'Awaiting Approval'
+                : 'Awaiting Approval (someone with full Company access decides)',
               false,
               false,
             )}
@@ -327,7 +327,7 @@ export default async function ProcurementPage({
               requests={requests}
               canWrite={canWrite}
               canApprove={canApprove}
-              title="Purchase orders"
+              title="Purchase Orders"
             />
           </Sheet>
         )}

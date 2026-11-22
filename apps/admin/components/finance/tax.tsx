@@ -69,7 +69,7 @@ export function Tax({
     <div className="space-y-6">
       <section>
         <SectionTitle note="Output VAT on commission and fees, from the numbered tax documents.">
-          VAT by month
+          VAT by Month
         </SectionTitle>
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full text-left">
@@ -112,7 +112,7 @@ export function Tax({
 
       <section>
         <SectionTitle note="Newest first. KRA status stays pending until an e-invoicing provider is connected.">
-          Tax documents
+          Tax Documents
         </SectionTitle>
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
           <table className="w-full min-w-[48rem] text-left">
@@ -150,7 +150,7 @@ export function Tax({
                       ) : null}
                     </td>
                     <td className="text-muted px-4 py-2.5">
-                      {d.purpose === 'merchant_commission' ? 'Commission' : 'Guest fees'}
+                      {d.purpose === 'merchant_commission' ? 'Commission' : 'Guest Fees'}
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{kesMoney(d.net_cents)}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{kesMoney(d.vat_cents)}</td>
@@ -181,7 +181,7 @@ export function Tax({
 
       <section>
         <SectionTitle note="What the books know about tax, including what they do not.">
-          Tax position
+          Tax Position
         </SectionTitle>
 
         <div className="border-border bg-surface overflow-x-auto rounded-xl border">
@@ -190,9 +190,9 @@ export function Tax({
               <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                 <th className="px-4 py-2">Source</th>
                 <th className="px-4 py-2">Basis</th>
-                <th className="px-4 py-2 text-right">Amount it applies to</th>
+                <th className="px-4 py-2 text-right">Amount It Applies To</th>
                 <th className="px-4 py-2 text-right">Tax</th>
-                <th className="px-4 py-2">Rate comes from</th>
+                <th className="px-4 py-2">Rate Comes From</th>
               </tr>
             </thead>
             <tbody>
@@ -235,7 +235,7 @@ export function Tax({
               <tfoot className="border-border bg-bg border-t">
                 <tr className="text-[0.8125rem] font-extrabold">
                   <td colSpan={3} className="px-4 py-2.5">
-                    Tax accounted for
+                    Tax Accounted For
                   </td>
                   <td className="px-4 py-2.5 text-right tabular-nums">{kesMoney(taxKnown)}</td>
                   <td className="text-muted-light px-4 py-2.5 text-[0.6875rem] font-semibold">
@@ -249,7 +249,7 @@ export function Tax({
       </section>
 
       <section className="border-border bg-surface rounded-xl border p-4">
-        <h3 className="text-[0.9375rem] font-extrabold tracking-tight">Before this is filed</h3>
+        <h3 className="text-[0.9375rem] font-extrabold tracking-tight">Before This Is Filed</h3>
         <ul className="text-muted mt-2 space-y-1.5 text-[0.8125rem] font-semibold">
           <li>
             · Output VAT on commission and fees is now charged at the configured rate (16%) and

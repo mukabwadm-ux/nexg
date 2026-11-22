@@ -18,6 +18,18 @@ import type { RpcCaller } from './webhooks';
 export const TEST_STATUSES = ['confirmed', 'in_progress', 'completed', 'cancelled'] as const;
 export type TestStatus = (typeof TEST_STATUSES)[number];
 
+/** The stages a test booking can be moved to, in the order a booking goes through them. */
+export const TEST_STAGES = [
+  'confirmed',
+  'preparing',
+  'ready',
+  'picked_up',
+  'arriving',
+  'delivered',
+  'cancelled',
+] as const;
+export type TestStage = (typeof TEST_STAGES)[number];
+
 const Row = z.object({
   order_id: z.string().uuid(),
   reference: z.string(),
@@ -30,6 +42,9 @@ const Row = z.object({
   created_at: z.string(),
   merchant_id: z.string().uuid(),
   merchant_name: z.string(),
+  /** The service's kind: ride, courier, booking or experience. */
+  kind: z.string().nullable().optional(),
+  rider_assigned_at: z.string().nullable().optional(),
   next: z.array(z.enum(TEST_STATUSES)),
 });
 
@@ -45,6 +60,9 @@ export interface TestBooking {
   createdAt: string;
   merchantId: string;
   merchantName: string;
+  kind: string | null;
+  /** When a test rider was last assigned, for a ride or courier. */
+  riderAssignedAt: string | null;
   /** Where it may move to, nearest first. Empty once completed or cancelled. */
   next: TestStatus[];
 }
@@ -73,6 +91,8 @@ export async function listTestBookings(client: RpcCaller): Promise<TestBookingLi
       createdAt: r.created_at,
       merchantId: r.merchant_id,
       merchantName: r.merchant_name,
+      kind: r.kind ?? null,
+      riderAssignedAt: r.rider_assigned_at ?? null,
       next: r.next,
     })),
   };
@@ -94,3 +114,32 @@ export const MOVE_LABELS: Record<TestStatus, string> = {
   completed: 'Complete',
   cancelled: 'Cancel',
 };
+
+/** What the console offers for a test booking: a test rider, a stage, a status. */
+export type ConsoleAction =
+  | { kind: 'rider'; label: string }
+  | { kind: 'stage'; value: TestStage; label: string }
+  | { kind: 'status'; value: TestStatus; label: string };
+
+/**
+ * The console's buttons, in the order a ride goes: a test rider while a
+ * ride or courier is under way, Arriving once picked up, the next status,
+ * and Cancel.
+ */
+export function consoleActions(booking: TestBooking): ConsoleAction[] {
+  const moves = consoleMoves(booking.next);
+  const carried = booking.kind === 'ride' || booking.kind === 'courier';
+  const step = moves.find((status) => status !== 'cancelled');
+  return [
+    ...(carried && moves.length > 0
+      ? [{ kind: 'rider' as const, label: booking.riderAssignedAt ? 'New rider' : 'Assign rider' }]
+      : []),
+    ...(booking.stage === 'picked_up'
+      ? [{ kind: 'stage' as const, value: 'arriving' as const, label: 'Arriving' }]
+      : []),
+    ...(step ? [{ kind: 'status' as const, value: step, label: MOVE_LABELS[step] }] : []),
+    ...(moves.includes('cancelled')
+      ? [{ kind: 'status' as const, value: 'cancelled' as const, label: MOVE_LABELS.cancelled }]
+      : []),
+  ];
+}

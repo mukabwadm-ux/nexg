@@ -1,0 +1,18 @@
+NEW SIGN-IN
+Was this you?
+{{ device }} · {{ signed_in_at }}
+
+THE SIGN-IN
+  Phone: {{ device }}
+{{#approximate_place}}  Near: {{ approximate_place }}
+{{/approximate_place}}  When: {{ signed_in_at }}
+
+If it was you, there’s nothing to do. If not, change your password and
+sign that phone out.
+
+Review my devices:
+{{ security_url }}
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because of your NEXG account · NEXG, nexgapp.com

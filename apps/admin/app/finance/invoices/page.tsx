@@ -9,6 +9,7 @@ import {
   Files,
   LayoutGrid,
   ReceiptText,
+  Send,
   Wallet,
   type LucideIcon,
 } from 'lucide-react';
@@ -16,6 +17,7 @@ import type { Metadata } from 'next';
 
 import { ShareDonut, TrendArea } from '@/components/charts';
 import { ConsoleShell } from '@/components/console-shell';
+import { ClientInvoicePanel, CreateInvoiceButton } from '@/components/finance/client-invoice';
 import {
   InvoicesTable,
   TaxDocsTable,
@@ -24,9 +26,10 @@ import {
 } from '@/components/finance/invoice-list';
 import { RangeControl } from '@/components/portal/client-kit';
 import { PageHeader, PanelHead, Sheet, Stat, StatGrid, ViewTabs } from '@/components/portal/kit';
+import { normaliseDetail, type ClientInvoiceDetail, type FinClient } from '@/lib/client-invoices';
 import { INVOICE_BUCKETS, invoiceBucket, share, type InvoiceBucket } from '@/lib/finance';
 import { invoiceList } from '@/lib/finance-server';
-import { lastMonths, previousPeriod } from '@/lib/office-finance';
+import { lastMonths, previousPeriod, vsLabel } from '@/lib/office-finance';
 import {
   change,
   hrefWith,
@@ -47,28 +50,35 @@ type Tab = 'overview' | 'all' | 'drafts' | 'outstanding' | 'paid' | 'overdue' | 
 
 const TABS: { key: Tab; label: string; icon: LucideIcon }[] = [
   { key: 'overview', label: 'Overview', icon: LayoutGrid },
-  { key: 'all', label: 'All invoices', icon: Files },
+  { key: 'all', label: 'All Invoices', icon: Files },
   { key: 'drafts', label: 'Drafts', icon: FilePen },
-  { key: 'outstanding', label: 'Outstanding', icon: Clock3 },
+  { key: 'outstanding', label: 'Sent', icon: Send },
   { key: 'paid', label: 'Paid', icon: CheckCircle2 },
   { key: 'overdue', label: 'Overdue', icon: AlertTriangle },
-  { key: 'tax', label: 'Tax invoices', icon: ReceiptText },
-  { key: 'credit', label: 'Credit notes', icon: FileMinus },
+  { key: 'tax', label: 'Tax Invoices', icon: ReceiptText },
+  { key: 'credit', label: 'Credit Notes', icon: FileMinus },
 ];
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
 /**
- * Finance → Invoices: host invoices, hotel statements and merchant
- * statements (rpc_finance_invoices, amounts in cents), and the KRA tax
- * invoices and credit notes issued per order (tax_invoice). Totals count
- * what was issued in the period; drafts are not issued and are left out.
+ * Finance → Invoices: host invoices, hotel statements, merchant statements
+ * and client invoices (rpc_finance_invoices, amounts in cents), and the KRA
+ * tax invoices and credit notes (tax_invoice). Totals count what was issued
+ * in the period; drafts are not issued and are left out. Full Finance
+ * creates client invoices (Create Invoice); ?invoice= opens one in its
+ * panel.
  */
 export default async function InvoicesPage({
   searchParams,
 }: {
-  searchParams?: { tab?: string; from?: string; to?: string };
+  searchParams?: { tab?: string; from?: string; to?: string; invoice?: string };
 }) {
   const staff = await requireStaff();
-  requireModule(staff, 'finance');
+  const mod = requireModule(staff, 'finance');
+  const canWrite = staff.isSuperAdmin || mod.level === 'full';
+  const openId =
+    searchParams?.invoice && UUID.test(searchParams.invoice) ? searchParams.invoice : null;
   const tab: Tab = TABS.some((t) => t.key === searchParams?.tab)
     ? (searchParams!.tab as Tab)
     : 'overview';
@@ -81,7 +91,7 @@ export default async function InvoicesPage({
   const bounds = periodBounds(period);
   const supabase = createClient();
 
-  const [invoices, taxRes] = await Promise.all([
+  const [invoices, taxRes, clientsRes, detailRes] = await Promise.all([
     invoiceList(supabase, earliest, period.to),
     tab === 'tax' || tab === 'credit'
       ? supabase
@@ -95,8 +105,21 @@ export default async function InvoicesPage({
           .order('issued_at', { ascending: false })
           .limit(1000)
       : Promise.resolve({ data: [], error: null }),
+    canWrite ? supabase.rpc('rpc_fin_clients') : Promise.resolve({ data: null, error: null }),
+    openId
+      ? supabase.rpc('rpc_fin_invoice_detail', { p_id: openId })
+      : Promise.resolve({ data: null, error: null }),
   ]);
-  const failed = invoices.error ?? taxRes.error?.message ?? null;
+  const failed = invoices.error ?? taxRes.error?.message ?? clientsRes.error?.message ?? null;
+  const clientData = clientsRes.data as unknown as {
+    vat_pct: number;
+    clients: FinClient[];
+  } | null;
+  const clients = clientData?.clients ?? [];
+  const vatPct = Number(clientData?.vat_pct ?? 16);
+  const detail = detailRes.data
+    ? normaliseDetail(detailRes.data as unknown as ClientInvoiceDetail)
+    : null;
 
   const issuedDay = (r: InvoiceListRow) =>
     new Date(r.issued_at).toLocaleDateString('en-CA', { timeZone: 'Africa/Nairobi' });
@@ -163,9 +186,25 @@ export default async function InvoicesPage({
       <PageHeader
         icon={FileText}
         title="Invoices"
-        subtitle="Track invoices and statements for merchants, hosts and hotels, and the tax invoices sent to KRA."
-        actions={<RangeControl from={period.from} to={period.to} />}
+        subtitle="Track invoices and statements for merchants, hosts, hotels and clients, and the tax invoices sent to KRA."
+        actions={
+          <>
+            <RangeControl from={period.from} to={period.to} />
+            {canWrite && <CreateInvoiceButton clients={clients} vatPct={vatPct} />}
+          </>
+        }
       />
+
+      {detail && (
+        <ClientInvoicePanel
+          key={detail.invoice.id}
+          detail={detail}
+          canWrite={canWrite}
+          emailReady={Boolean(process.env.RESEND_API_KEY)}
+          clients={clients}
+          vatPct={vatPct}
+        />
+      )}
 
       <main className="space-y-5 px-3 py-5 sm:px-6 sm:py-6">
         <ViewTabs
@@ -187,6 +226,14 @@ export default async function InvoicesPage({
             Invoices could not be loaded in full: {failed}
           </p>
         )}
+        {openId && detailRes.error && (
+          <p
+            role="alert"
+            className="bg-danger-bg text-danger rounded-xl px-4 py-3 text-sm font-semibold"
+          >
+            That invoice could not be opened: {detailRes.error.message}
+          </p>
+        )}
 
         {tab === 'overview' && (
           <>
@@ -194,15 +241,16 @@ export default async function InvoicesPage({
               <Stat
                 icon={Wallet}
                 value={kes(total)}
-                label="Total invoiced"
+                label="Total Invoiced"
                 delta={delta == null ? null : { value: delta }}
+                deltaNote={vsLabel(before)}
                 note={delta == null ? 'Issued in this period' : undefined}
               />
               <Stat
                 icon={CheckCircle2}
                 tone="green"
                 value={kes(by('paid'))}
-                label="Paid invoices"
+                label="Paid Invoices"
                 note={pct(by('paid'))}
                 noteTone="good"
                 href={href('paid')}
@@ -228,7 +276,7 @@ export default async function InvoicesPage({
               <Stat
                 icon={Files}
                 value={issued.length.toLocaleString('en-KE')}
-                label="Total invoices"
+                label="Total Invoices"
                 note={
                   inPeriod.length > issued.length
                     ? `${inPeriod.length - issued.length} drafts besides`
@@ -240,7 +288,7 @@ export default async function InvoicesPage({
 
             <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
               <Sheet>
-                <PanelHead title="Invoice value trend" aside="last six months" />
+                <PanelHead title="Invoice Value Trend" aside="last six months" />
                 <div className="mt-4">
                   {trend.some((t) => t.invoiced > 0) ? (
                     <TrendArea
@@ -259,7 +307,7 @@ export default async function InvoicesPage({
                 </div>
               </Sheet>
               <Sheet>
-                <PanelHead title="Invoices by status" aside={formatRange(period)} />
+                <PanelHead title="Invoices by Status" aside={formatRange(period)} />
                 <div className="mt-4">
                   {slices.length ? (
                     <ShareDonut unit="kes" centre={kesShort(total)} caption="Total" data={slices} />
@@ -299,7 +347,7 @@ export default async function InvoicesPage({
           <Sheet>
             <TaxDocsTable
               rows={((taxRes.data ?? []) as unknown as TaxDoc[]).map(numeric)}
-              title="Tax invoices"
+              title="Tax Invoices"
               noun="tax invoice"
             />
           </Sheet>
@@ -308,7 +356,7 @@ export default async function InvoicesPage({
           <Sheet>
             <TaxDocsTable
               rows={((taxRes.data ?? []) as unknown as TaxDoc[]).map(numeric)}
-              title="Credit notes"
+              title="Credit Notes"
               noun="credit note"
             />
           </Sheet>

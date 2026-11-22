@@ -16,14 +16,16 @@ export interface V1Route {
 }
 
 export const V1_ROUTES: readonly V1Route[] = [
-  { path: '/v1/catalog/items', methods: ['GET'] },
+  { path: '/v1/catalog/items', methods: ['GET', 'PATCH'] },
   { path: '/v1/catalog/items/{id}', methods: ['PATCH'] },
   { path: '/v1/catalog/merchants', methods: ['GET'] },
   { path: '/v1/catalog/merchants/{id}', methods: ['GET'] },
+  { path: '/v1/delivery/check', methods: ['POST'] },
   { path: '/v1/experiences', methods: ['GET'] },
   { path: '/v1/orders', methods: ['GET', 'POST'] },
   { path: '/v1/orders/{id}', methods: ['GET'] },
   { path: '/v1/services', methods: ['GET'] },
+  { path: '/v1/test/orders/{id}/rider', methods: ['POST'] },
   { path: '/v1/test/orders/{id}/status', methods: ['POST'] },
   { path: '/v1/zones', methods: ['GET'] },
 ];

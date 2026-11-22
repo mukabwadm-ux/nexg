@@ -26,17 +26,21 @@ export default function IdempotencyPage() {
     <DocPage
       href="/docs/idempotency"
       toc={[
-        { id: 'reads', label: 'Reads are safe to retry' },
+        { id: 'reads', label: 'What is safe to retry' },
         { id: 'keys', label: 'Idempotency keys for writes' },
         { id: 'events', label: 'Events you send NexG' },
         { id: 'banks', label: 'The key NexG sends a bank' },
       ]}
     >
-      <H2 id="reads">Reads are safe to retry</H2>
+      <H2 id="reads">What is safe to retry</H2>
       <P>
-        Every endpoint on api.nexgapp.com except booking a service is a <C>GET</C>, and a read never changes anything at NexG. If a
-        call times out or fails with a <C>5xx</C>, send it again, waiting longer each time (1, 2,
-        then 4 seconds is plenty). After a <C>429</C>, wait for <C>Retry-After</C> first.
+        A read never changes anything at NexG: every <C>GET</C>, and the{' '}
+        <A href="/docs/reference/check-delivery">delivery check</A>, which only answers a
+        question. A <A href="/docs/reference/update-catalogue-items">catalogue change</A> sets a
+        price or availability rather than adding to it, so sending it twice leaves the same
+        result. If one of these times out or fails with a <C>5xx</C>, send it again, waiting
+        longer each time (1, 2, then 4 seconds is plenty). After a <C>429</C>, wait for{' '}
+        <C>Retry-After</C> first.
       </P>
 
       <H2 id="keys">Idempotency keys for writes</H2>

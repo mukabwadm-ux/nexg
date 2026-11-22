@@ -16,6 +16,7 @@ import {
   requestHold,
   sendMessage,
 } from '@/app/experiences/actions';
+import { FormPanel, SelectField, TextField, useRunner } from '@/components/portal/client-kit';
 
 import { countdown, DASH, keslabel, StatusPill, when } from './shared';
 
@@ -106,6 +107,7 @@ export function Workbench({
   const { toast } = useToast();
   const [busy, setBusy] = React.useState<string | null>(null);
   const [draft, setDraft] = React.useState('');
+  const [paying, setPaying] = React.useState(false);
 
   const run = async (key: string, fn: () => Promise<{ ok: boolean; message?: string }>) => {
     setBusy(key);
@@ -140,6 +142,7 @@ export function Workbench({
 
   return (
     <main className="px-4 py-6 sm:px-8">
+      {paying && <RecordPaymentPanel plan={plan} onClose={() => setPaying(false)} />}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="flex flex-wrap items-center gap-2">
@@ -154,23 +157,14 @@ export function Workbench({
         </div>
         <div className="flex flex-wrap gap-2">
           {plan.status === 'approved' && (
-            <Button
-              size="sm"
-              loading={busy === 'paid'}
-              onClick={() => {
-                /*
-                 * No payments provider is wired. Rather than a Pay button
-                 * that does nothing, this records the reference the money
-                 * actually arrived under — which is what the plan table
-                 * requires before it will call a day paid.
-                 */
-                const ref = window.prompt(
-                  'Payment reference from M-Pesa or the card terminal. No provider is wired, so this records what was taken elsewhere.',
-                );
-                if (!ref) return;
-                void run('paid', () => markPaid(plan.id, ref));
-              }}
-            >
+            /*
+             * No payments provider is wired. Rather than a Pay button
+             * that does nothing, this records how the money arrived and
+             * the reference it arrived under, which is what the plan table
+             * requires before it will call a day paid, and what the books
+             * need to post it.
+             */
+            <Button size="sm" onClick={() => setPaying(true)}>
               Record payment
             </Button>
           )}
@@ -411,6 +405,53 @@ export function Workbench({
         </div>
       </div>
     </main>
+  );
+}
+
+/**
+ * The guest's payment, taken elsewhere: how it arrived and its reference.
+ * Recording it posts the quote total to the books, where each partner is
+ * owed their block once it is marked done.
+ */
+function RecordPaymentPanel({ plan, onClose }: { plan: WorkPlan; onClose: () => void }) {
+  const [method, setMethod] = React.useState<'mpesa' | 'bank'>('mpesa');
+  const [reference, setReference] = React.useState('');
+  const { run, busy } = useRunner();
+  return (
+    <FormPanel
+      open
+      onOpenChange={(o) => !o && onClose()}
+      title="Record Payment"
+      subtitle={`${plan.reference} · ${keslabel(plan.quote_total_kes)}`}
+      submitLabel="Record Payment"
+      busy={busy}
+      onSubmit={() => run(() => markPaid(plan.id, reference, method))}
+    >
+      <p className="bg-bg rounded-xl px-4 py-3 text-sm">
+        No payments provider is wired, so this records money taken elsewhere. Check it has arrived
+        before you record it: the quote total goes on the books, and each partner is owed their
+        block once it is marked done.
+      </p>
+      <SelectField
+        label="Paid By"
+        required
+        value={method}
+        onChange={(e) => setMethod(e.target.value === 'bank' ? 'bank' : 'mpesa')}
+        options={[
+          { value: 'mpesa', label: 'M-PESA' },
+          { value: 'bank', label: 'Bank Transfer' },
+        ]}
+      />
+      <TextField
+        label={method === 'mpesa' ? 'M-PESA Code' : 'Bank Reference'}
+        required
+        value={reference}
+        onChange={(e) => setReference(e.target.value.toUpperCase())}
+        maxLength={80}
+        placeholder={method === 'mpesa' ? 'SKL4X2ABCD' : 'FT26318XYZ'}
+        autoComplete="off"
+      />
+    </FormPanel>
   );
 }
 

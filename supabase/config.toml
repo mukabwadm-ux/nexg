@@ -236,11 +236,11 @@ otp_length = 6
 otp_expiry = 600
 
 [auth.email.template.email_change]
-subject = "Your NexG verification code"
+subject = "{{ .Token }} is your NEXG verification code"
 content_path = "./supabase/templates/otp-code.html"
 
 [auth.email.template.magic_link]
-subject = "Your NexG sign-in code"
+subject = "{{ .Token }} is your NEXG verification code"
 content_path = "./supabase/templates/otp-code.html"
 
 # Use a production-ready SMTP server
@@ -451,4 +451,14 @@ enabled = true
 # The handler verifies the caller's bearer with GoTrue and denies temporary accounts.
 # Let the handler return the versioned authentication failure for this function.
 [functions.maps-routes]
+verify_jwt = false
+
+# The handler checks its own x-native-push-secret header; the scheduler sends no JWT.
+[functions.native-push-dispatch]
+verify_jwt = false
+
+# The handler checks its own x-dispatch-secret header; cron_notify_dispatch sends no JWT.
+# Without this a plain `supabase functions deploy notify-dispatch` turns JWT checks on,
+# and every queued email and SMS is refused at the gateway.
+[functions.notify-dispatch]
 verify_jwt = false

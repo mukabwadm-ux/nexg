@@ -1,0 +1,18 @@
+YOUR DATA
+Your data is ready
+download it by {{ download_expires }}
+
+Hi{{#first_name}} {{ first_name }}{{/first_name}}, here’s a copy of the
+personal data NEXG holds about you, as you asked.
+
+Download my data:
+{{ download_url }}
+
+You’ll be asked to sign in first. The link stops working on {{
+download_expires }}.
+
+Didn’t ask for this? Write to info@nexgapp.com straight away.
+
+--
+Questions? Open Help in the app or write to info@nexgapp.com.
+You’re getting this because of your NEXG account · NEXG, nexgapp.com

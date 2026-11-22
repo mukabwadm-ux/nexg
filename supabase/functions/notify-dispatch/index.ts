@@ -20,8 +20,18 @@
  *    phone number will fail identically five times and then be
  *    abandoned five minutes after the code expired; it should
  *    be abandoned on the first attempt instead.
+ *
+ * Emails go out in NexG's design (email-design.ts, a copy of
+ * packages/contracts/src/email-design.ts), or in the design
+ * uploaded for their kind in Admin > Settings > Notifications &
+ * templates, with the plain text alongside. If the design cannot
+ * be drawn the plain text goes alone; EMAIL_HTML=off sends plain
+ * text only.
  */
-import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { createClient, type SupabaseClient } from 'jsr:@supabase/supabase-js@2';
+
+import { composeEmailHtml, purposeForTemplate } from './email-design.ts';
+import { sendEmail } from './email.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -38,6 +48,8 @@ const TWILIO_FROM = Deno.env.get('TWILIO_FROM') ?? '';
 /* Email */
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? '';
+const EMAIL_HTML = (Deno.env.get('EMAIL_HTML') ?? 'on') !== 'off';
+const EMAIL_ASSET_BASE = Deno.env.get('EMAIL_ASSET_BASE') || undefined;
 
 /* WhatsApp — Meta Cloud API */
 const WA_TOKEN = Deno.env.get('WHATSAPP_TOKEN') ?? '';
@@ -50,6 +62,8 @@ interface Due {
   template: string;
   subject: string | null;
   body: string | null;
+  /** The app emails' own HTML (app_email.send), drawn from the owner's designs. */
+  html?: string | null;
   payload: Record<string, unknown>;
   attempts: number;
 }
@@ -86,9 +100,10 @@ Deno.serve(async (request) => {
   let sent = 0;
   let failed = 0;
   const unconfigured = new Set<string>();
+  const designs = rows.some((r) => r.channel === 'email') ? await liveDesigns(supabase) : new Map();
 
   for (const row of rows) {
-    const outcome = await send(row);
+    const outcome = await send(row, designs);
 
     if (outcome.ok) {
       await supabase.rpc('rpc_outbox_sent', {
@@ -123,7 +138,26 @@ Deno.serve(async (request) => {
   });
 });
 
-async function send(row: Due): Promise<Outcome> {
+/*
+ * The designs made live in the console, by purpose. Read once per
+ * run. If they cannot be read (the table is not there yet, say),
+ * every email uses the house design: a design is decoration, and
+ * it must never be the reason an email does not go.
+ */
+async function liveDesigns(supabase: SupabaseClient): Promise<Map<string, string>> {
+  try {
+    const { data, error } = await supabase
+      .from('email_design')
+      .select('purpose, html')
+      .eq('status', 'live');
+    if (error || !data) return new Map();
+    return new Map((data as { purpose: string; html: string }[]).map((d) => [d.purpose, d.html]));
+  } catch {
+    return new Map();
+  }
+}
+
+async function send(row: Due, designs: Map<string, string>): Promise<Outcome> {
   if (!row.body) {
     /* Already redacted, or never rendered. Either way there is
        nothing to send and retrying will not produce one. */
@@ -133,11 +167,31 @@ async function send(row: Due): Promise<Outcome> {
   switch (row.channel) {
     case 'sms':
       return sendSms(row.recipient, row.body);
-    case 'email':
-      return sendEmail(row.recipient, row.subject ?? 'NexG', row.body, {
-        from: typeof row.payload?.from === 'string' ? row.payload.from : undefined,
-        replyTo: typeof row.payload?.reply_to === 'string' ? row.payload.reply_to : undefined,
-      });
+    case 'email': {
+      const subject = row.subject ?? 'NexG';
+      const purpose = purposeForTemplate(row.template).key;
+      /*
+       * An app email (NexG and NexG Stays customers) arrives with its own
+       * HTML, from the designs in supabase/app-emails/. Every other email
+       * is drawn here from its text, as before.
+       */
+      const own = typeof row.html === 'string' && row.html.trim() ? row.html : null;
+      const html = !EMAIL_HTML
+        ? null
+        : (own ??
+          composeEmailHtml({
+            subject,
+            text: row.body,
+            purpose,
+            design: designs.get(purpose) ?? null,
+            assetBase: EMAIL_ASSET_BASE,
+          }));
+      return sendEmail(
+        { recipient: row.recipient, subject, body: row.body, html, payload: row.payload },
+        { apiKey: RESEND_API_KEY, from: EMAIL_FROM },
+        fetch,
+      );
+    }
     case 'whatsapp':
       return sendWhatsApp(row.recipient, row.body);
     default:
@@ -218,47 +272,6 @@ async function sendSms(to: string, body: string): Promise<Outcome> {
     error:
       'No SMS provider configured. Set AT_API_KEY and AT_USERNAME, or TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN and TWILIO_FROM.',
   };
-}
-
-async function sendEmail(
-  to: string,
-  subject: string,
-  body: string,
-  sender?: { from?: string; replyTo?: string },
-): Promise<Outcome> {
-  if (!RESEND_API_KEY || !EMAIL_FROM) {
-    return {
-      ok: false,
-      provider: 'none',
-      error: 'No email provider configured. Set RESEND_API_KEY and EMAIL_FROM.',
-    };
-  }
-  try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: sender?.from || EMAIL_FROM,
-        to: [to],
-        subject,
-        text: body,
-        ...(sender?.replyTo ? { reply_to: sender.replyTo } : {}),
-      }),
-    });
-    const data = await res.json();
-    if (res.ok) return { ok: true, provider: 'resend', ref: data.id };
-    return {
-      ok: false,
-      provider: 'resend',
-      error: data?.message ?? `HTTP ${res.status}`,
-      retryable: res.status >= 500 || res.status === 429,
-    };
-  } catch (e) {
-    return { ok: false, provider: 'resend', error: String(e) };
-  }
 }
 
 async function sendWhatsApp(to: string, body: string): Promise<Outcome> {

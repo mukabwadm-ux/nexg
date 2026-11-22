@@ -79,7 +79,7 @@ test('catering takes requests rather than orders, so it keeps the shared request
   kept.clear();
   const html = render({ id: 'kitchen-control', name: 'Control Catering', subcategoryId: 'restaurants-food_catering', items: [dish('lunch', 'Corporate Lunch (per person)', 1200)] });
   assert.match(html, /class="generic-store/);
-  assert.match(html, /Start a request/);
+  assert.match(html, /Request a quote/);
   assert.doesNotMatch(html, /restaurant-menu/);
 });
 

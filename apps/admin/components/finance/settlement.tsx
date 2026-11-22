@@ -58,11 +58,11 @@ export type LineRow = {
  */
 const RUN_STATE: Record<string, { label: string; tone: string }> = {
   draft: { label: 'Draft', tone: 'bg-bg text-muted' },
-  built: { label: 'Built · needs checking', tone: 'bg-bg text-muted' },
-  checked: { label: 'Checked · needs a first signature', tone: 'bg-warn/15 text-warn' },
-  approved_1: { label: 'One signature · needs a second', tone: 'bg-warn/15 text-warn' },
-  approved_2: { label: 'Both signatures · files not generated', tone: 'bg-warn/15 text-warn' },
-  files_generated: { label: 'Files generated', tone: 'bg-success/15 text-success' },
+  built: { label: 'Built · Needs Checking', tone: 'bg-bg text-muted' },
+  checked: { label: 'Checked · Needs a First Signature', tone: 'bg-warn/15 text-warn' },
+  approved_1: { label: 'One Signature · Needs a Second', tone: 'bg-warn/15 text-warn' },
+  approved_2: { label: 'Both Signatures · Files Not Generated', tone: 'bg-warn/15 text-warn' },
+  files_generated: { label: 'Files Generated', tone: 'bg-success/15 text-success' },
   sending: { label: 'Sending', tone: 'bg-success/15 text-success' },
   sent: { label: 'Sent', tone: 'bg-success/15 text-success' },
   reconciled: { label: 'Reconciled', tone: 'bg-success/15 text-success' },
@@ -72,11 +72,11 @@ const RUN_STATE: Record<string, { label: string; tone: string }> = {
 
 const LINE_STATE: Record<string, { label: string; tone: string }> = {
   ready: { label: 'Ready', tone: 'bg-bg text-muted' },
-  cash_netted: { label: 'Cash netted', tone: 'bg-bg text-muted' },
-  held_suspended: { label: 'Held · suspended', tone: 'bg-danger text-white' },
+  cash_netted: { label: 'Cash Netted', tone: 'bg-bg text-muted' },
+  held_suspended: { label: 'Held · Suspended', tone: 'bg-danger text-white' },
   held_kyc: { label: 'Held · KYC', tone: 'bg-danger text-white' },
-  name_mismatch: { label: 'Held · name mismatch', tone: 'bg-danger text-white' },
-  below_minimum_rolled: { label: 'Rolled to next week', tone: 'bg-bg text-muted' },
+  name_mismatch: { label: 'Held · Name Mismatch', tone: 'bg-danger text-white' },
+  below_minimum_rolled: { label: 'Rolled to Next Week', tone: 'bg-bg text-muted' },
   mismatch: { label: 'Mismatch', tone: 'bg-danger text-white' },
   approved: { label: 'Approved', tone: 'bg-success/15 text-success' },
   queued: { label: 'Queued', tone: 'bg-warn/15 text-warn' },
@@ -266,12 +266,12 @@ export function Settlement({
               <thead className="border-border bg-bg border-b">
                 <tr className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
                   <th className="px-4 py-2">Partner</th>
-                  <th className="px-4 py-2">Paying to</th>
+                  <th className="px-4 py-2">Paying To</th>
                   <th className="px-4 py-2 text-right">Gross</th>
                   <th className="px-4 py-2 text-right">Adjustments</th>
                   <th className="px-4 py-2 text-right">Net</th>
                   <th className="px-4 py-2">State</th>
-                  <th className="px-4 py-2 text-right">Re-sums</th>
+                  <th className="px-4 py-2 text-right">Re-Sums</th>
                 </tr>
               </thead>
               <tbody>
@@ -354,7 +354,7 @@ function Signature({
   return (
     <div className="border-border bg-bg rounded-lg border p-3">
       <p className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-wide">
-        {n} approval
+        {n} Approval
       </p>
       {email ? (
         <>

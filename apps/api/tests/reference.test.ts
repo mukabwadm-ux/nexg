@@ -9,6 +9,10 @@ import {
   ApiService,
   BookingReceipt,
   CatalogueItem,
+  DeliveryCheck,
+  DeliveryCheckRequest,
+  DeliveryDropoff,
+  DeliveryPickup,
   ERROR_CODES,
   ListRequest,
   PageEnvelope,
@@ -80,6 +84,10 @@ const SCHEMAS = {
   PublicBranch,
   ServiceBooking,
   BookingReceipt,
+  DeliveryCheckRequest,
+  DeliveryCheck,
+  DeliveryPickup,
+  DeliveryDropoff,
 } as const;
 
 function endpoint(slug: string): EndpointDoc {
@@ -203,6 +211,19 @@ describe('the documented shapes match @nexg/contracts/api', () => {
       })
       .strict();
     expect(() => receipt.parse(booking.responseExample)).not.toThrow();
+  });
+
+  it('the delivery check example follows its contracts', () => {
+    const check = endpoint('check-delivery');
+    expect(() => DeliveryCheckRequest.parse(check.example.body)).not.toThrow();
+    const answer = z
+      .object({
+        ok: z.literal(true),
+        data: DeliveryCheck,
+        meta: z.object({ api_version: z.literal('v1') }).strict(),
+      })
+      .strict();
+    expect(() => answer.parse(check.responseExample)).not.toThrow();
   });
 
   it('the order events example is a valid event', () => {

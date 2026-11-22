@@ -154,20 +154,20 @@ export function AssetsTable({
 
   const actions = (a: AssetRow) => [
     {
-      label: 'Details and history',
+      label: 'Details and History',
       icon: <Eye />,
       opensOverlay: true,
       onSelect: () => setPanel({ kind: 'view', row: a }),
     },
     canWrite && {
-      label: 'Edit details',
+      label: 'Edit Details',
       icon: <Pencil />,
       opensOverlay: true,
       onSelect: () => setPanel({ kind: 'edit', row: a }),
     },
     canWrite &&
       (a.status === 'available' || a.status === 'in_use') && {
-        label: a.status === 'in_use' ? 'Hand to someone else' : 'Hand over',
+        label: a.status === 'in_use' ? 'Hand to Someone Else' : 'Hand Over',
         icon: <Hand />,
         separated: true,
         opensOverlay: true,
@@ -175,14 +175,14 @@ export function AssetsTable({
       },
     canWrite &&
       a.status === 'in_use' && {
-        label: 'Hand back',
+        label: 'Hand Back',
         icon: <Undo2 />,
         opensOverlay: true,
         onSelect: () => setPanel({ kind: 'return', row: a }),
       },
     canWrite &&
       !['retired', 'lost'].includes(a.status) && {
-        label: 'Schedule service',
+        label: 'Schedule Service',
         icon: <CalendarClock />,
         separated: true,
         opensOverlay: true,
@@ -190,21 +190,21 @@ export function AssetsTable({
       },
     canWrite &&
       (a.status === 'available' || a.status === 'in_use') && {
-        label: 'Send for maintenance',
+        label: 'Send for Maintenance',
         icon: <Wrench />,
         opensOverlay: true,
         onSelect: () => setPanel({ kind: 'start', row: a }),
       },
     canWrite &&
       a.status === 'maintenance' && {
-        label: 'Back from maintenance',
+        label: 'Back from Maintenance',
         icon: <PackageCheck />,
         opensOverlay: true,
         onSelect: () => setPanel({ kind: 'complete', row: a }),
       },
     canWrite &&
       !['retired', 'lost'].includes(a.status) && {
-        label: 'Report lost',
+        label: 'Report Lost',
         icon: <XCircle />,
         tone: 'danger' as const,
         separated: true,
@@ -221,7 +221,7 @@ export function AssetsTable({
       },
     canWrite &&
       ['retired', 'lost'].includes(a.status) && {
-        label: 'Bring back into use',
+        label: 'Bring Back Into Use',
         icon: <RotateCcw />,
         separated: true,
         opensOverlay: true,
@@ -290,7 +290,7 @@ export function AssetsTable({
     {
       id: 'holder',
       accessorFn: (a) => holderOf(a) ?? '',
-      header: 'Assigned to',
+      header: 'Assigned To',
       cell: ({ row: { original: a } }) => (
         <Person name={holderOf(a)} sub={a.assigned_at ? `since ${day(a.assigned_at)}` : null} />
       ),
@@ -314,7 +314,7 @@ export function AssetsTable({
     {
       id: 'service',
       accessorFn: (a) => a.next_service_on ?? '9999',
-      header: 'Next service',
+      header: 'Next Service',
       cell: ({ row: { original: a } }) => <ServiceDue on={a.next_service_on} />,
     },
     {
@@ -363,7 +363,7 @@ export function AssetsTable({
             onChange={setCategory}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All categories' },
+              { value: 'all', label: 'All Categories' },
               ...categories.map((c) => ({ value: c.id, label: c.name })),
             ]}
           />
@@ -373,7 +373,7 @@ export function AssetsTable({
             onChange={setStatus}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'Any status' },
+              { value: 'all', label: 'Any Status' },
               ...Object.entries(ASSET_STATUS).map(([k, v]) => ({ value: k, label: v.label })),
             ]}
           />
@@ -387,12 +387,12 @@ export function AssetsTable({
           description={
             filtered
               ? 'Try another search, category or status.'
-              : 'Register laptops, phones, motorbikes and other serial-numbered equipment with Register asset.'
+              : 'Register laptops, phones, motorbikes and other serial-numbered equipment with Register Asset.'
           }
           {...(filtered
             ? {
                 action: {
-                  label: 'Clear filters',
+                  label: 'Clear Filters',
                   onClick: () => {
                     setQ('');
                     setCategory('all');
@@ -497,9 +497,9 @@ function AssetDetail({
   const facts: [string, React.ReactNode][] = [
     ['Tag', a.tag],
     ['Category', a.category?.name ?? '—'],
-    ['Brand and model', [a.brand, a.model].filter(Boolean).join(' ') || '—'],
-    ['Serial number', a.serial_number ?? '—'],
-    ['Assigned to', holderOf(a) ?? 'Nobody'],
+    ['Brand and Model', [a.brand, a.model].filter(Boolean).join(' ') || '—'],
+    ['Serial Number', a.serial_number ?? '—'],
+    ['Assigned To', holderOf(a) ?? 'Nobody'],
     ['Location', a.location?.name ?? '—'],
     ['Condition', ASSET_CONDITION[a.condition]?.label ?? a.condition],
     [
@@ -507,8 +507,8 @@ function AssetDetail({
       a.purchase_date ? `${day(a.purchase_date)}${a.vendor ? ` from ${a.vendor.name}` : ''}` : '—',
     ],
     ['Cost', a.purchase_cost_cents != null ? kes(a.purchase_cost_cents) : '—'],
-    ['Warranty until', a.warranty_until ? day(a.warranty_until) : '—'],
-    ['Next service', a.next_service_on ? day(a.next_service_on) : 'Not scheduled'],
+    ['Warranty Until', a.warranty_until ? day(a.warranty_until) : '—'],
+    ['Next Service', a.next_service_on ? day(a.next_service_on) : 'Not scheduled'],
   ];
 
   return (
@@ -584,7 +584,7 @@ export function RegisterAsset(props: {
         leadingIcon={<Plus className="h-4 w-4" />}
         onClick={() => setOpen(true)}
       >
-        Register asset
+        Register Asset
       </Button>
       {open && <AssetPanel {...props} asset={null} photo={null} onClose={() => setOpen(false)} />}
     </>
@@ -630,9 +630,9 @@ function AssetPanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title={asset ? 'Edit asset' : 'Register asset'}
+      title={asset ? 'Edit Asset' : 'Register Asset'}
       subtitle={asset ? `${asset.tag} · ${asset.name}` : 'Serial-numbered equipment NexG owns'}
-      submitLabel={asset ? 'Save asset' : 'Register asset'}
+      submitLabel={asset ? 'Save Asset' : 'Register Asset'}
       busy={busy}
       width="lg"
       onSubmit={async () => {
@@ -712,7 +712,7 @@ function AssetPanel({
       </FieldRow>
       <FieldRow>
         <TextField
-          label="Serial number"
+          label="Serial Number"
           value={f.serialNumber}
           onChange={(e) => set('serialNumber', e.target.value)}
           maxLength={80}
@@ -727,7 +727,7 @@ function AssetPanel({
       </FieldRow>
       <FieldRow>
         <TextField
-          label="Bought on"
+          label="Bought On"
           type="date"
           max={todayInNairobi()}
           value={f.purchaseDate}
@@ -742,21 +742,21 @@ function AssetPanel({
       </FieldRow>
       <FieldRow>
         <SelectField
-          label="Bought from"
+          label="Bought From"
           value={f.vendorId}
           onChange={(e) => set('vendorId', e.target.value)}
           placeholder="Not recorded"
           options={vendors.map((v) => ({ value: v.id, label: v.name }))}
         />
         <TextField
-          label="Warranty until"
+          label="Warranty Until"
           type="date"
           value={f.warrantyUntil}
           onChange={(e) => set('warrantyUntil', e.target.value)}
         />
       </FieldRow>
       <TextField
-        label="Next service"
+        label="Next Service"
         type="date"
         value={f.nextServiceOn}
         onChange={(e) => set('nextServiceOn', e.target.value)}
@@ -790,9 +790,9 @@ function AssignPanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title={asset.status === 'in_use' ? 'Hand to someone else' : 'Hand over'}
+      title={asset.status === 'in_use' ? 'Hand to Someone Else' : 'Hand Over'}
       subtitle={`${asset.tag} · ${asset.name}`}
-      submitLabel="Hand over"
+      submitLabel="Hand Over"
       busy={busy}
       onSubmit={() =>
         run(() =>
@@ -806,11 +806,11 @@ function AssignPanel({
       }
     >
       <fieldset className="grid grid-cols-2 gap-2">
-        <legend className="mb-2 text-sm font-bold">Who takes it</legend>
+        <legend className="mb-2 text-sm font-bold">Who Takes It</legend>
         {(
           [
-            ['staff', 'A colleague', 'Someone with a console account'],
-            ['other', 'Someone else', 'A rider, driver or contractor'],
+            ['staff', 'A Colleague', 'Someone with a console account'],
+            ['other', 'Someone Else', 'A rider, driver or contractor'],
           ] as const
         ).map(([k, label, hint]) => (
           <label
@@ -870,14 +870,14 @@ function ReturnPanel({ asset, onClose }: { asset: AssetRow; onClose: () => void 
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title="Hand back"
+      title="Hand Back"
       subtitle={`${asset.tag} · ${asset.name} · from ${holderOf(asset)}`}
-      submitLabel="Record hand-back"
+      submitLabel="Record Hand-Back"
       busy={busy}
       onSubmit={() => run(() => returnAsset({ id: asset.id, condition, note }))}
     >
       <SelectField
-        label="Condition now"
+        label="Condition Now"
         value={condition}
         onChange={(e) => setCondition(e.target.value)}
         options={Object.entries(ASSET_CONDITION).map(([k, v]) => ({ value: k, label: v.label }))}
@@ -911,9 +911,9 @@ function MaintenancePanel({
   const { run, busy } = useRunner();
   const { toast } = useToast();
   const titles = {
-    schedule: 'Schedule service',
-    start: 'Send for maintenance',
-    complete: 'Back from maintenance',
+    schedule: 'Schedule Service',
+    start: 'Send for Maintenance',
+    complete: 'Back from Maintenance',
   };
   return (
     <FormPanel
@@ -943,7 +943,7 @@ function MaintenancePanel({
     >
       {step === 'schedule' && (
         <TextField
-          label="Service date"
+          label="Service Date"
           type="date"
           required
           min={todayInNairobi()}
@@ -967,7 +967,7 @@ function MaintenancePanel({
               onChange={(e) => setCost(e.target.value)}
             />
             <SelectField
-              label="Condition now"
+              label="Condition Now"
               value={condition}
               onChange={(e) => setCondition(e.target.value)}
               options={Object.entries(ASSET_CONDITION).map(([k, v]) => ({
@@ -977,7 +977,7 @@ function MaintenancePanel({
             />
           </FieldRow>
           <TextField
-            label="Next service"
+            label="Next Service"
             type="date"
             min={todayInNairobi()}
             value={dueOn}
@@ -987,7 +987,7 @@ function MaintenancePanel({
         </>
       )}
       <TextArea
-        label={step === 'start' ? 'What is wrong' : 'Note'}
+        label={step === 'start' ? 'What Is Wrong' : 'Note'}
         value={note}
         onChange={(e) => setNote(e.target.value)}
         maxLength={500}
@@ -1009,18 +1009,18 @@ function StatusPanel({
   const { run, busy } = useRunner();
   const copy = {
     retired: {
-      title: 'Retire asset',
+      title: 'Retire Asset',
       button: 'Retire',
       hint: 'Sold, scrapped or worn out. It leaves the active lists; its history stays.',
     },
     lost: {
-      title: 'Report lost',
-      button: 'Report lost',
+      title: 'Report Lost',
+      button: 'Report Lost',
       hint: 'It stays on the holder’s name so the record shows who had it last.',
     },
     available: {
-      title: 'Bring back into use',
-      button: 'Make available',
+      title: 'Bring Back Into Use',
+      button: 'Make Available',
       hint: 'Found again, or returned to service.',
     },
   }[status];

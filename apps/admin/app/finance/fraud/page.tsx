@@ -25,7 +25,7 @@ import { hrefWith } from '@/lib/portal';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = { title: 'Fraud checks' };
+export const metadata: Metadata = { title: 'Fraud Checks' };
 export const dynamic = 'force-dynamic';
 
 type Tab = 'open' | 'reviewed' | 'checks';
@@ -65,7 +65,7 @@ export default async function FraudChecksPage({
     <ConsoleShell staff={staff}>
       <PageHeader
         icon={ShieldAlert}
-        title="Fraud checks"
+        title="Fraud Checks"
         subtitle="Checks run every five minutes and raise a flag for a person to confirm or dismiss. Nothing is blocked on its own."
         actions={!error ? <RunChecksButton /> : undefined}
       />
@@ -76,7 +76,7 @@ export default async function FraudChecksPage({
           tabs={[
             {
               key: 'open',
-              label: 'Open flags',
+              label: 'Open Flags',
               icon: ShieldAlert,
               href: href('open'),
               alert: counts.forMe,
@@ -117,7 +117,7 @@ export default async function FraudChecksPage({
             <Stat
               icon={ShieldAlert}
               value={counts.open.toLocaleString('en-KE')}
-              label="Open flags"
+              label="Open Flags"
               tone={counts.openHigh > 0 ? 'red' : 'gold'}
               note={counts.openHigh > 0 ? `${counts.openHigh} high` : 'None high'}
               noteTone={counts.openHigh > 0 ? 'bad' : 'muted'}
@@ -126,26 +126,26 @@ export default async function FraudChecksPage({
             <Stat
               icon={UserCheck}
               value={counts.forMe.toLocaleString('en-KE')}
-              label="Waiting for you"
+              label="Waiting for You"
               note="Flags you may review"
               noteTone="muted"
             />
             <Stat
               icon={BadgeCheck}
               value={counts.confirmed30.toLocaleString('en-KE')}
-              label="Confirmed, 30 days"
+              label="Confirmed, 30 Days"
               href={href('reviewed')}
             />
             <Stat
               icon={ShieldX}
               value={counts.dismissed30.toLocaleString('en-KE')}
-              label="Dismissed, 30 days"
+              label="Dismissed, 30 Days"
               href={href('reviewed')}
             />
             <Stat
               icon={Activity}
               value={run?.at ? sinceLabel(run.at) : null}
-              label="Last checked"
+              label="Last Checked"
               tone={failedChecks.length > 0 ? 'red' : 'gold'}
               note={
                 !run?.at

@@ -44,7 +44,7 @@ test('small cards share one anatomy and change only their wording and action by 
   assert.match(render('activity', 9300), /Choose a date/);
   const task = render('task');
   assert.match(task, /Quoted after review/);
-  assert.match(task, /Start a request/);
+  assert.match(task, /Request a quote/);
   assert.match(render('vehicle', 6500), /Check dates/);
   for (const kind of kinds) {
     const html = render(kind, 1000);
@@ -128,10 +128,11 @@ test('expanded states ask kind-specific questions and say plainly that nothing i
   assert.doesNotMatch(render('service'), /At my place/);
 });
 
-test('wording is production wording: purchases go to the NexG cart, requests stay on this device', () => {
+test('wording is production wording: purchases go to the NexG cart, quotes go to NexG, other requests stay on this device', () => {
   for (const kind of kinds) {
     for (const text of Object.values(kindPresentation[kind])) assert.doesNotMatch(text, /demo|sample/i, kind);
-    assert.match(kindPresentation[kind].pending, kind === 'product' || kind === 'dish' ? /cart|checkout/i : /this device/, kind);
+    assert.match(kindPresentation[kind].pending,
+      kind === 'product' || kind === 'dish' ? /cart|checkout/i : kind === 'task' ? /NexG confirms the price/ : /this device/, kind);
   }
   assert.equal(transferCardAction, 'Select');
 });

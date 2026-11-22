@@ -13,7 +13,8 @@ const { rpc, createClient } = vi.hoisted(() => ({
 vi.mock('@supabase/supabase-js', () => ({ createClient }));
 
 import { POST as moveTestOrder } from '../app/v1/test/orders/[id]/status/route';
-import { consoleMoves } from '../lib/sandbox';
+import { POST as assignTestRider } from '../app/v1/test/orders/[id]/rider/route';
+import { consoleActions, consoleMoves, type TestBooking } from '../lib/sandbox';
 
 type Result = { data: unknown; error: unknown };
 
@@ -155,10 +156,15 @@ describe('POST /v1/test/orders/{id}/status', () => {
       status: 'One of confirmed, in_progress, completed or cancelled.',
     });
 
-    const extra = await post({ status: 'confirmed', stage: 'picked_up' });
+    const extra = await post({ status: 'confirmed', colour: 'red' });
     expect(extra.status).toBe(400);
     expect((await extra.json()).error.fields).toEqual({
-      stage: 'Not a field this endpoint takes.',
+      colour: 'Not a field this endpoint takes.',
+    });
+
+    const both = await post({ status: 'confirmed', stage: 'picked_up' });
+    expect((await both.json()).error.fields).toEqual({
+      body: 'Send status or stage, one of them.',
     });
 
     expect(moveCalls()).toHaveLength(0);
@@ -233,5 +239,148 @@ describe('the console’s buttons', () => {
     ]);
     expect(consoleMoves(['completed', 'cancelled'])).toEqual(['completed', 'cancelled']);
     expect(consoleMoves([])).toEqual([]);
+  });
+});
+
+describe('moving a test booking by stage', () => {
+  it('asks the stage function and answers with the stage before', async () => {
+    rpc.mockImplementation(async (name: string) => {
+      if (name === 'fn_api_key_lookup') return { data: [TEST_KEY], error: null };
+      if (name === 'fn_api_request_spend') {
+        return { data: [{ allowed: true, retry_after: 0, remaining: 40 }], error: null };
+      }
+      if (name === 'rpc_order_stage_api_test') {
+        return {
+          data: {
+            ok: true,
+            order: { ...MOVED_ORDER, status: 'in_progress', stage: 'arriving' },
+            previous_status: 'in_progress',
+            previous_stage: 'picked_up',
+          },
+          error: null,
+        };
+      }
+      throw new Error(`unexpected rpc ${name}`);
+    });
+
+    const res = await post({ stage: 'arriving' });
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.data).toMatchObject({
+      previous_status: 'in_progress',
+      previous_stage: 'picked_up',
+    });
+    expect(rpc.mock.calls.find(([n]) => n === 'rpc_order_stage_api_test')?.[1]).toEqual({
+      p_api_key: 'nexg_test_a-sandbox-key',
+      p_order_id: ORDER_ID,
+      p_stage: 'arriving',
+    });
+    expect(moveCalls()).toHaveLength(0);
+  });
+
+  it('refuses an unknown stage before asking the database', async () => {
+    answer(moved);
+    const res = await post({ stage: 'flying' });
+    expect(res.status).toBe(400);
+    expect((await res.json()).error.fields).toEqual({
+      stage: 'One of confirmed, preparing, ready, picked_up, arriving, delivered or cancelled.',
+    });
+  });
+});
+
+describe('POST /v1/test/orders/{id}/rider', () => {
+  const rider = (id = ORDER_ID) =>
+    assignTestRider(
+      new Request(`https://api.test/v1/test/orders/${id}/rider`, {
+        method: 'POST',
+        headers: { 'x-api-key': 'nexg_test_a-sandbox-key' },
+      }),
+      { params: { id } },
+    );
+  function riderAnswer(result: Result, key: Record<string, unknown> = TEST_KEY) {
+    rpc.mockImplementation(async (name: string) => {
+      if (name === 'fn_api_key_lookup') return { data: [key], error: null };
+      if (name === 'fn_api_request_spend') {
+        return { data: [{ allowed: true, retry_after: 0, remaining: 40 }], error: null };
+      }
+      if (name === 'rpc_order_rider_api_test') return result;
+      throw new Error(`unexpected rpc ${name}`);
+    });
+  }
+
+  it('assigns a test rider and answers with when', async () => {
+    riderAnswer({
+      data: { ok: true, order: MOVED_ORDER, assigned_at: '2026-11-18T09:20:03.118+00:00' },
+      error: null,
+    });
+
+    const res = await rider();
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({
+      ok: true,
+      data: { order: MOVED_ORDER, assigned_at: '2026-11-18T09:20:03.118+00:00' },
+      meta: { api_version: 'v1' },
+    });
+    expect(res.headers.get('nexg-environment')).toBe('test');
+  });
+
+  it('refuses a live key, and passes on a booking that has no rider', async () => {
+    riderAnswer({ data: null, error: null }, { ...TEST_KEY, environment: 'live' });
+    expect((await rider()).status).toBe(403);
+    expect(rpc.mock.calls.some(([n]) => n === 'rpc_order_rider_api_test')).toBe(false);
+
+    riderAnswer({
+      data: null,
+      error: { code: '22023', message: 'Only a ride or a courier has a rider.' },
+    });
+    const venue = await rider();
+    expect(venue.status).toBe(400);
+    expect((await venue.json()).error.message).toBe('Only a ride or a courier has a rider.');
+  });
+});
+
+describe('the console’s rider and stage buttons', () => {
+  const booking = (over: Partial<TestBooking>): TestBooking => ({
+    id: ORDER_ID,
+    reference: 'TEST-261118-A1B2C3',
+    service: 'courier',
+    quantity: 1,
+    status: 'requested',
+    stage: 'placed',
+    currency: 'KES',
+    totalCents: 100000,
+    createdAt: '2026-11-18T09:00:00+00:00',
+    merchantId: '22222222-2222-4222-8222-222222222222',
+    merchantName: 'Sunrise Tours',
+    kind: 'courier',
+    riderAssignedAt: null,
+    next: ['confirmed', 'in_progress', 'completed', 'cancelled'],
+    ...over,
+  });
+
+  it('offer a rider for rides and couriers, Arriving once picked up, then the next step', () => {
+    expect(consoleActions(booking({})).map((a) => a.label)).toEqual([
+      'Assign rider',
+      'Confirm',
+      'Cancel',
+    ]);
+    expect(
+      consoleActions(
+        booking({
+          status: 'in_progress',
+          stage: 'picked_up',
+          riderAssignedAt: '2026-11-18T09:10:00+00:00',
+          next: ['completed', 'cancelled'],
+        }),
+      ).map((a) => a.label),
+    ).toEqual(['New rider', 'Arriving', 'Complete', 'Cancel']);
+    expect(
+      consoleActions(booking({ kind: 'booking', service: 'venue_booking' })).map((a) => a.label),
+    ).toEqual(['Confirm', 'Cancel']);
+    expect(consoleActions(booking({ status: 'completed', stage: 'delivered', next: [] }))).toEqual(
+      [],
+    );
   });
 });

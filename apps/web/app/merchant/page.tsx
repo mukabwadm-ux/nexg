@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { HomeLive } from '@/components/merchant/home-live';
+import { OrdersSwitch } from '@/components/merchant/orders-switch';
 import { LazyConnectedApplication as ConnectedApplication } from '@/components/onboarding/connected-application-lazy';
 import { loadMerchantHomeSource } from '@/lib/merchant-home-source';
 import { MERCHANT_PAYOUTS_HREF } from '@/lib/merchant-payouts';
@@ -8,6 +9,7 @@ import { HomeSetup } from '@/components/merchant/home-setup';
 import { DashboardLive } from '@/components/merchant/dashboard-live';
 import { DashboardSetup } from '@/components/merchant/dashboard-setup';
 import { DocumentsLive } from '@/components/merchant/documents-live';
+import { SetupTodo, type SetupTodoItem } from '@/components/merchant/setup-todo';
 import { firstName, merchantContext } from '@/components/merchant/frame';
 import type {
   AttentionRow,
@@ -132,6 +134,14 @@ export default async function MerchantDashboard() {
 
   const person = firstName(m.contact_name, m.name);
 
+  // Approve first (20270124000100): an approved merchant that is not live yet
+  // sees what is left before NexG takes it live. Null before that migration.
+  const todo =
+    dashboard && !live
+      ? (await supabase.rpc('rpc_merchant_setup_todo', { p_merchant_id: me.id })).data
+      : null;
+  const todoItems = ((todo as { items?: SetupTodoItem[] } | null)?.items ?? []) as SetupTodoItem[];
+
   /*
    * Everything the dashboard reads, in one batch: these used to go out as
    * three batches one after another. Documents are optional while
@@ -205,6 +215,7 @@ export default async function MerchantDashboard() {
       )}{' '}
       {dashboard ? (
         <>
+          <SetupTodo items={todoItems} />
           <HomeLive
             m={m}
             personName={person}
@@ -220,6 +231,11 @@ export default async function MerchantDashboard() {
               money: !!moneyRes.error,
               bars: !!barRes.error,
             }}
+            ordersSwitch={
+              live && me.access.operations && !me.isAnonymous && m.accepting_orders != null ? (
+                <OrdersSwitch merchantId={me.id} accepting={m.accepting_orders} />
+              ) : undefined
+            }
           />
           {!orderRes.error &&
           !moneyRes.error &&

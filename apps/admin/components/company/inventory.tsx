@@ -143,45 +143,45 @@ export function InventoryTable({
     canWrite
       ? [
           {
-            label: 'Receive stock',
+            label: 'Receive Stock',
             icon: <ArrowDown />,
             opensOverlay: true,
             onSelect: () => setPanel({ kind: 'in', row: r }),
           },
           {
-            label: 'Issue stock',
+            label: 'Issue Stock',
             icon: <ArrowUp />,
             opensOverlay: true,
             disabled: Number(r.quantity) <= 0,
             onSelect: () => setPanel({ kind: 'out', row: r }),
           },
           {
-            label: 'Move to another location',
+            label: 'Move to Another Location',
             icon: <ArrowLeftRight />,
             opensOverlay: true,
             disabled: Number(r.quantity) <= 0 || locations.length < 2,
             onSelect: () => setPanel({ kind: 'transfer', row: r }),
           },
           {
-            label: 'Count stock',
+            label: 'Count Stock',
             icon: <ClipboardCheck />,
             opensOverlay: true,
             onSelect: () => setPanel({ kind: 'count', row: r }),
           },
           {
-            label: 'Request purchase',
+            label: 'Request Purchase',
             icon: <ShoppingCart />,
             separated: true,
             onSelect: () => request(r),
           },
           {
-            label: 'Edit item',
+            label: 'Edit Item',
             icon: <Pencil />,
             opensOverlay: true,
             onSelect: () => setPanel({ kind: 'edit', row: r }),
           },
           (onHandByItem.get(r.item_id) ?? 0) <= 0 && {
-            label: 'Archive item',
+            label: 'Archive Item',
             icon: <Archive />,
             tone: 'danger' as const,
             opensOverlay: true,
@@ -233,12 +233,12 @@ export function InventoryTable({
     {
       id: 'name',
       accessorFn: (r) => r.name,
-      header: 'Item name',
+      header: 'Item Name',
       cell: ({ row: { original: r } }) => (
         <span className="flex min-w-0 items-center gap-3">
           {thumb(r)}
           <span className="min-w-0">
-            <span className="block max-w-[16rem] truncate font-semibold">{r.name}</span>
+            <span className="block max-w-[8.5rem] truncate font-semibold">{r.name}</span>
             {r.sku && <span className="text-muted-light block text-xs">SKU: {r.sku}</span>}
           </span>
         </span>
@@ -251,7 +251,7 @@ export function InventoryTable({
       cell: ({ row: { original: r } }) => (
         <span className="flex items-center gap-2">
           <CategoryIcon icon={r.category_icon} className="h-4 w-4 shrink-0 text-[#E5A800]" />
-          <span className="truncate">{r.category_name}</span>
+          <span className="max-w-[6.5rem] truncate">{r.category_name}</span>
         </span>
       ),
     },
@@ -262,7 +262,7 @@ export function InventoryTable({
       cell: ({ row: { original: r } }) => (
         <span className="flex items-center gap-1.5">
           <MapPin className="h-4 w-4 shrink-0 text-[#E5A800]" aria-hidden="true" />
-          <span className="truncate">{r.location_name}</span>
+          <span className="max-w-[6rem] truncate">{r.location_name}</span>
         </span>
       ),
     },
@@ -277,7 +277,7 @@ export function InventoryTable({
     {
       id: 'unit_cost',
       accessorFn: (r) => r.unit_cost_cents,
-      header: 'Unit cost (KES)',
+      header: 'Unit Cost (KES)',
       cell: ({ row: { original: r } }) => (
         <span className="tabular-nums">
           {shillings(r.unit_cost_cents)}
@@ -290,7 +290,7 @@ export function InventoryTable({
           {
             id: 'reorder',
             accessorFn: (r: StockRow) => Number(r.reorder_level),
-            header: 'Reorder at',
+            header: 'Reorder At',
             cell: ({ row: { original: r } }: { row: { original: StockRow } }) => (
               <span className="tabular-nums">{quantity(r.reorder_level, r.unit)}</span>
             ),
@@ -299,7 +299,7 @@ export function InventoryTable({
             id: 'suggested',
             accessorFn: (r: StockRow) =>
               suggestedOrder(Number(r.quantity), Number(r.reorder_level)),
-            header: 'Suggested order',
+            header: 'Suggested Order',
             cell: ({ row: { original: r } }: { row: { original: StockRow } }) => (
               <span className="font-extrabold tabular-nums">
                 {quantity(suggestedOrder(Number(r.quantity), Number(r.reorder_level)), r.unit)}
@@ -311,7 +311,7 @@ export function InventoryTable({
           {
             id: 'value',
             accessorFn: (r: StockRow) => r.value_cents,
-            header: 'Total value (KES)',
+            header: 'Total Value (KES)',
             cell: ({ row: { original: r } }: { row: { original: StockRow } }) => (
               <span className="font-semibold tabular-nums">{shillings(r.value_cents)}</span>
             ),
@@ -370,7 +370,7 @@ export function InventoryTable({
             onChange={setCategory}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All categories' },
+              { value: 'all', label: 'All Categories' },
               ...categories.map((c) => ({ value: c.id, label: c.name })),
             ]}
           />
@@ -380,7 +380,7 @@ export function InventoryTable({
             onChange={setLocation}
             className="flex-1 sm:flex-none"
             options={[
-              { value: 'all', label: 'All locations' },
+              { value: 'all', label: 'All Locations' },
               ...locations.map((l) => ({ value: l.id, label: l.name })),
             ]}
           />
@@ -391,11 +391,11 @@ export function InventoryTable({
               onChange={setStatus}
               className="flex-1 sm:flex-none"
               options={[
-                { value: 'all', label: 'Any status' },
-                { value: 'in_stock', label: 'In stock' },
-                { value: 'low_stock', label: 'Low stock' },
-                { value: 'out_of_stock', label: 'Out of stock' },
-                { value: 'attention', label: 'Needs attention' },
+                { value: 'all', label: 'Any Status' },
+                { value: 'in_stock', label: 'In Stock' },
+                { value: 'low_stock', label: 'Low Stock' },
+                { value: 'out_of_stock', label: 'Out of Stock' },
+                { value: 'attention', label: 'Needs Attention' },
               ]}
             />
           )}
@@ -417,12 +417,12 @@ export function InventoryTable({
               ? 'Try another name, category, location or status.'
               : reorder
                 ? 'Every item is above its reorder level.'
-                : 'Add the first item with Add item: say where it is kept and how many are on the shelf.'
+                : 'Add the first item with Add Item: say where it is kept and how many are on the shelf.'
           }
           {...(filtered
             ? {
                 action: {
-                  label: 'Clear filters',
+                  label: 'Clear Filters',
                   onClick: () => {
                     setQ('');
                     setCategory('all');
@@ -493,8 +493,8 @@ export function InventoryTable({
 /* ──────────────────────────────────────────────────────── moving stock */
 
 const OUT_REASONS = [
-  { value: 'issued', label: 'Issued to someone' },
-  { value: 'used', label: 'Used up' },
+  { value: 'issued', label: 'Issued to Someone' },
+  { value: 'used', label: 'Used Up' },
   { value: 'damaged', label: 'Damaged' },
   { value: 'lost', label: 'Lost' },
   { value: 'sold', label: 'Sold' },
@@ -527,9 +527,9 @@ function StockPanel({
   const { toast } = useToast();
 
   const titles = {
-    in: 'Receive stock',
-    out: 'Issue stock',
-    transfer: 'Move stock',
+    in: 'Receive Stock',
+    out: 'Issue Stock',
+    transfer: 'Move Stock',
   } as const;
 
   return (
@@ -586,7 +586,7 @@ function StockPanel({
             options={locations.map((l) => ({ value: l.id, label: l.name }))}
           />
           <TextField
-            label="Unit cost (KES)"
+            label="Unit Cost (KES)"
             inputMode="decimal"
             value={cost}
             onChange={(e) => setCost(e.target.value)}
@@ -636,9 +636,9 @@ function CountPanel({ row, onClose }: { row: StockRow; onClose: () => void }) {
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title="Count stock"
+      title="Count Stock"
       subtitle={`${row.name} at ${row.location_name}`}
-      submitLabel="Record count"
+      submitLabel="Record Count"
       busy={busy}
       onSubmit={() =>
         run(() =>
@@ -703,7 +703,7 @@ export function AddItem(props: {
         leadingIcon={<Plus className="h-4 w-4" />}
         onClick={() => setOpen(true)}
       >
-        Add item
+        Add Item
       </Button>
       {open && <ItemPanel {...props} itemId={null} photo={null} onClose={() => setOpen(false)} />}
     </>
@@ -783,9 +783,9 @@ function ItemPanel({
     <FormPanel
       open
       onOpenChange={(o) => !o && onClose()}
-      title={itemId ? 'Edit item' : 'Add item'}
+      title={itemId ? 'Edit Item' : 'Add Item'}
       subtitle={itemId ? name : 'Something NexG keeps in stock by quantity'}
-      submitLabel={itemId ? 'Save item' : 'Add item'}
+      submitLabel={itemId ? 'Save Item' : 'Add Item'}
       busy={busy || !loaded}
       width="lg"
       onSubmit={async () => {
@@ -846,7 +846,7 @@ function ItemPanel({
               onClick={() => setNewCategory('')}
               className="text-gold-text text-xs font-bold underline-offset-4 hover:underline"
             >
-              + New category
+              + New Category
             </button>
           ) : (
             <div className="flex gap-2">
@@ -873,13 +873,13 @@ function ItemPanel({
       </FieldRow>
       <FieldRow>
         <SelectField
-          label="Counted in"
+          label="Counted In"
           value={unit}
           onChange={(e) => setUnit(e.target.value)}
           options={UNITS.map((u) => ({ value: u, label: u === 'pcs' ? 'pieces' : u }))}
         />
         <TextField
-          label="Unit cost (KES)"
+          label="Unit Cost (KES)"
           inputMode="decimal"
           value={cost}
           onChange={(e) => setCost(e.target.value)}
@@ -888,7 +888,7 @@ function ItemPanel({
       </FieldRow>
       <FieldRow>
         <TextField
-          label="Reorder when at or below"
+          label="Reorder When at or Below"
           type="number"
           min={0}
           step="any"
@@ -897,7 +897,7 @@ function ItemPanel({
           hint="Lines at or under this show as low stock."
         />
         <SelectField
-          label="Usual supplier"
+          label="Usual Supplier"
           value={vendorId}
           onChange={(e) => setVendorId(e.target.value)}
           placeholder="None"
@@ -907,7 +907,7 @@ function ItemPanel({
       {!itemId && (
         <FieldRow>
           <SelectField
-            label="Kept at"
+            label="Kept At"
             required
             value={locationId}
             onChange={(e) => setLocationId(e.target.value)}
@@ -915,7 +915,7 @@ function ItemPanel({
             options={locations.map((l) => ({ value: l.id, label: l.name }))}
           />
           <TextField
-            label="On the shelf now"
+            label="On the Shelf Now"
             type="number"
             min={0}
             step="any"
@@ -998,7 +998,7 @@ export function PhotoField({
       )}
       <div className="flex flex-col items-start gap-1.5">
         <Button size="sm" variant="outline" loading={busy} onClick={() => input.current?.click()}>
-          {hasPhoto ? 'Change photo' : 'Add photo'}
+          {hasPhoto ? 'Change Photo' : 'Add Photo'}
         </Button>
         {hasPhoto && (
           <button
@@ -1009,7 +1009,7 @@ export function PhotoField({
             }}
             className="text-muted-light hover:text-danger text-xs font-semibold"
           >
-            Remove photo
+            Remove Photo
           </button>
         )}
         <span className="text-muted-light text-xs">JPG, PNG or WebP, up to 5 MB</span>

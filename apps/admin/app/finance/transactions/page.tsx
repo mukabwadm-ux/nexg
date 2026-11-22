@@ -17,7 +17,7 @@ import type { Metadata } from 'next';
 
 import { ShareDonut, TrendArea } from '@/components/charts';
 import { ConsoleShell } from '@/components/console-shell';
-import { MovementsTable } from '@/components/finance/movements';
+import { MovementsExport, MovementsTable } from '@/components/finance/movements';
 import { RangeControl } from '@/components/portal/client-kit';
 import { PageHeader, PanelHead, Sheet, Stat, StatGrid, ViewTabs } from '@/components/portal/kit';
 import {
@@ -31,7 +31,7 @@ import {
   type MovementSum,
 } from '@/lib/finance';
 import { movementList, movementSummary } from '@/lib/finance-server';
-import { previousPeriod } from '@/lib/office-finance';
+import { previousPeriod, vsLabel } from '@/lib/office-finance';
 import { change, hrefWith, kes, kesShort, periodFrom, periodQuery } from '@/lib/portal';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
@@ -42,12 +42,12 @@ export const dynamic = 'force-dynamic';
 type Tab = 'all' | Kind;
 
 const TABS: { key: Tab; label: string; icon: LucideIcon }[] = [
-  { key: 'all', label: 'All transactions', icon: Layers },
-  { key: 'customer', label: 'Customer payments', icon: UserRound },
-  { key: 'merchant', label: 'Merchant payments', icon: Store },
-  { key: 'rider', label: 'Rider payouts', icon: Bike },
-  { key: 'expense', label: 'Office expenses', icon: Receipt },
-  { key: 'refund', label: 'Refunds & chargebacks', icon: RotateCcw },
+  { key: 'all', label: 'All Transactions', icon: Layers },
+  { key: 'customer', label: 'Customer Payments', icon: UserRound },
+  { key: 'merchant', label: 'Merchant Payments', icon: Store },
+  { key: 'rider', label: 'Rider Payouts', icon: Bike },
+  { key: 'expense', label: 'Office Expenses', icon: Receipt },
+  { key: 'refund', label: 'Refunds & Chargebacks', icon: RotateCcw },
 ];
 
 const CHANNEL_COLORS = ['#F5B800', '#141414', '#F9DC7A', '#8C8678', '#D8D2C4', '#2F6FDB'];
@@ -114,11 +114,10 @@ export default async function TransactionsPage({
       ...(pq ? { from: period.from, to: period.to } : {}),
     });
   const tabLabel = TABS.find((x) => x.key === tab)!.label;
+  const exportName = `nexg-transactions-${tab}-${period.from}-to-${period.to}.csv`;
   const pct = (part: number) => {
     const s = share(part, t.total);
-    return s == null
-      ? undefined
-      : `${s.toLocaleString('en-KE', { maximumFractionDigits: 1 })}% of the total`;
+    return s == null ? undefined : `${s.toLocaleString('en-KE', { maximumFractionDigits: 1 })}%`;
   };
 
   return (
@@ -127,7 +126,12 @@ export default async function TransactionsPage({
         icon={ArrowLeftRight}
         title="Transactions"
         subtitle="View all platform transactions across customers, merchants, riders, and office expenses."
-        actions={<RangeControl from={period.from} to={period.to} />}
+        actions={
+          <>
+            <RangeControl from={period.from} to={period.to} />
+            <MovementsExport rows={list.rows} filename={exportName} />
+          </>
+        }
       />
 
       <main className="space-y-5 px-3 py-5 sm:px-6 sm:py-6">
@@ -149,8 +153,9 @@ export default async function TransactionsPage({
           <Stat
             icon={Coins}
             value={kes(t.total)}
-            label={tab === 'all' ? 'Total transaction value' : `${tabLabel}: total value`}
+            label={tab === 'all' ? 'Total Transaction Value' : `${tabLabel}: Total Value`}
             delta={delta == null ? null : { value: delta }}
+            deltaNote={vsLabel(before)}
             note={delta == null ? `${t.count.toLocaleString('en-KE')} transactions` : undefined}
           />
           <Stat
@@ -189,7 +194,7 @@ export default async function TransactionsPage({
 
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
           <Sheet>
-            <PanelHead title="Transaction volume" aside={formatRange(period)} />
+            <PanelHead title="Transaction Volume" aside={formatRange(period)} />
             <div className="mt-4">
               {hasIn || hasOut ? (
                 <TrendArea
@@ -198,10 +203,10 @@ export default async function TransactionsPage({
                   step={trend.step}
                   series={[
                     ...(hasIn
-                      ? [{ key: 'in', label: 'Money in', color: '#F5B800', fill: true }]
+                      ? [{ key: 'in', label: 'Money In', color: '#F5B800', fill: true }]
                       : []),
                     ...(hasOut
-                      ? [{ key: 'out', label: 'Money out', color: '#141414', fill: !hasIn }]
+                      ? [{ key: 'out', label: 'Money Out', color: '#141414', fill: !hasIn }]
                       : []),
                   ]}
                 />
@@ -214,7 +219,7 @@ export default async function TransactionsPage({
           </Sheet>
           <Sheet>
             <PanelHead
-              title={tab === 'all' ? 'Transactions by type' : 'Transactions by channel'}
+              title={tab === 'all' ? 'Transactions by Type' : 'Transactions by Channel'}
               aside={formatRange(period)}
             />
             <div className="mt-4">
@@ -233,9 +238,10 @@ export default async function TransactionsPage({
           <MovementsTable
             rows={list.rows}
             truncated={list.truncated}
-            title={tab === 'all' ? 'Transaction list' : tabLabel}
-            filename={`nexg-transactions-${tab}-${period.from}-to-${period.to}.csv`}
+            title={tab === 'all' ? 'Transaction List' : tabLabel}
+            filename={exportName}
             showType={tab === 'all' || tab === 'merchant' || tab === 'rider' || tab === 'refund'}
+            hideExport
           />
         </Sheet>
       </main>

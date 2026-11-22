@@ -1,5 +1,6 @@
--- Orders, bookings and stay holds need an account, and an unconfirmed booking
--- lets its time go.
+-- Bookings and stay holds once needed an account; since 20270116000400 a guest may book
+-- with a name and pays first (116). Orders no longer need one either (108). An unconfirmed
+-- booking lets its time go.
 
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -48,18 +49,20 @@ set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"c0690000-0000-4000-8000-000000000020","role":"authenticated","is_anonymous":true}', true);
 
+-- Delivery orders accept a temporary session since 20270109000100_guest_orders
+-- (tests/108_guest_orders.sql); it gets past the account check to the phone check.
 select throws_ok($$select public.rpc_order_place_web('{}'::jsonb)$$,
-  '42501', 'Sign in with your account to place your order.',
-  'A temporary session cannot place an order.');
+  'A phone number the rider can reach you on.',
+  'A temporary session is no longer refused an order for having no account.');
 select throws_ok(
   $$select public.rpc_booking_create('c0690000-0000-4000-8000-0000000000b1',
       (current_date + 2)::timestamptz + interval '10 hours')$$,
-  '28000', 'Sign in with your account to book',
-  'Nor take a booking.');
+  '22023', 'Add the name to book under',
+  'A booking needs only the name to book under now, not an account.');
 select throws_ok(
   $$select public.rpc_stay_hold('c0690000-0000-4000-8000-0000000000c2', current_date + 10, current_date + 12)$$,
-  '42501', 'Sign in with your account to hold these dates.',
-  'Nor hold a stay''s dates.');
+  '22023', 'Add the name to book under.',
+  'And so does a stay hold.');
 
 -- ── accounts
 
@@ -67,7 +70,7 @@ select set_config('request.jwt.claims',
   '{"sub":"c0690000-0000-4000-8000-000000000021","role":"authenticated"}', true);
 select set_config('t.first',
   (public.rpc_booking_create('c0690000-0000-4000-8000-0000000000b1',
-     (current_date + 2)::timestamptz + interval '10 hours')).id::text, true);
+     (current_date + 2)::timestamptz + interval '10 hours', p_guest_name => 'Amina')).id::text, true);
 reset role;
 
 select is((select status::text from public.booking where id = current_setting('t.first')::uuid),
@@ -82,7 +85,7 @@ select set_config('request.jwt.claims',
   '{"sub":"c0690000-0000-4000-8000-000000000022","role":"authenticated"}', true);
 select set_config('t.second',
   (public.rpc_booking_create('c0690000-0000-4000-8000-0000000000b1',
-     (current_date + 2)::timestamptz + interval '10 hours')).id::text, true);
+     (current_date + 2)::timestamptz + interval '10 hours', p_guest_name => 'Amina')).id::text, true);
 reset role;
 
 select isnt(current_setting('t.second'), '', 'The same time can be booked again: the unanswered booking no longer holds it.');

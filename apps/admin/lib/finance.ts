@@ -43,10 +43,10 @@ export interface MovementSum {
 
 /** The kinds, in the order the tabs and charts show them. */
 export const KINDS: Record<Kind, { label: string; plural: string; color: string }> = {
-  customer: { label: 'Customer payment', plural: 'Customer payments', color: '#F5B800' },
-  merchant: { label: 'Merchant payment', plural: 'Merchant payments', color: '#141414' },
-  rider: { label: 'Rider payout', plural: 'Rider payouts', color: '#F9DC7A' },
-  expense: { label: 'Office expense', plural: 'Office expenses', color: '#8C8678' },
+  customer: { label: 'Customer Payment', plural: 'Customer Payments', color: '#F5B800' },
+  merchant: { label: 'Merchant Payment', plural: 'Merchant Payments', color: '#141414' },
+  rider: { label: 'Rider Payout', plural: 'Rider Payouts', color: '#F9DC7A' },
+  expense: { label: 'Office Expense', plural: 'Office Expenses', color: '#8C8678' },
   refund: { label: 'Refund', plural: 'Refunds', color: '#D8D2C4' },
 };
 
@@ -55,22 +55,22 @@ export const STATUSES: Record<Status, { label: string; tone: Tone }> = {
   pending: { label: 'Pending', tone: 'amber' },
   failed: { label: 'Failed', tone: 'red' },
   refunded: { label: 'Refunded', tone: 'blue' },
-  void: { label: 'No money moved', tone: 'grey' },
+  void: { label: 'No Money Moved', tone: 'grey' },
 };
 
 export const CHANNELS: Record<string, string> = {
-  mpesa: 'M-Pesa',
+  mpesa: 'M-PESA',
   card: 'Card',
-  bank: 'Bank transfer',
+  bank: 'Bank Transfer',
   paystack: 'Paystack',
-  mobile_money: 'Mobile money',
+  mobile_money: 'Mobile Money',
   cash: 'Cash',
-  wallet: 'Wallet credit',
-  original: 'Original method',
-  credit: 'Credit note',
+  wallet: 'Wallet Credit',
+  original: 'Original Method',
+  credit: 'Credit Note',
   cheque: 'Cheque',
-  not_paid: 'Not paid yet',
-  unassigned: 'Not chosen',
+  not_paid: 'Not Paid Yet',
+  unassigned: 'Not Chosen',
   unknown: 'Unknown',
   other: 'Other',
 };
@@ -85,25 +85,37 @@ export function typeOf(m: Pick<Movement, 'source' | 'kind' | 'category'>): {
   tone: Tone;
 } {
   if (m.source === 'payout') {
-    if (m.category === 'rider') return { label: 'Rider payout', tone: 'amber' };
-    if (m.category === 'host') return { label: 'Host payout', tone: 'blue' };
-    if (m.category === 'hotel') return { label: 'Hotel payout', tone: 'blue' };
-    return { label: 'Merchant payout', tone: 'grey' };
+    if (m.category === 'rider') return { label: 'Rider Payout', tone: 'amber' };
+    if (m.category === 'host') return { label: 'Host Payout', tone: 'blue' };
+    if (m.category === 'hotel') return { label: 'Hotel Payout', tone: 'blue' };
+    if (m.category === 'experience_partner') return { label: 'Partner Payout', tone: 'green' };
+    return { label: 'Merchant Payout', tone: 'grey' };
   }
   if (m.source === 'payment') {
-    if (m.kind === 'merchant') return { label: 'Merchant payment', tone: 'grey' };
-    if (m.kind === 'rider') return { label: 'Rider float', tone: 'amber' };
-    return { label: 'Customer payment', tone: 'gold' };
+    if (m.kind === 'merchant') return { label: 'Merchant Payment', tone: 'grey' };
+    if (m.kind === 'rider') return { label: 'Rider Float', tone: 'amber' };
+    return { label: 'Customer Payment', tone: 'gold' };
   }
-  if (m.source === 'expense') return { label: 'Office expense', tone: 'purple' };
+  if (m.source === 'expense') return { label: 'Office Expense', tone: 'purple' };
   return { label: 'Refund', tone: 'red' };
 }
 
-/** "restaurants_food" → "Restaurants food". */
+/** Words a Title Case label keeps lower-case, unless first or last. */
+const MINOR_WORDS = new Set(
+  'a an the and or nor but for of to in on at by with as per vs via from'.split(' '),
+);
+
+/** A key as a Title Case label: "restaurants_food" → "Restaurants Food". */
 export function humanize(key: string | null | undefined): string {
   if (!key) return '—';
-  const words = key.replace(/[_-]+/g, ' ').trim();
-  return words.charAt(0).toUpperCase() + words.slice(1);
+  const words = key.replace(/[_-]+/g, ' ').trim().split(/\s+/);
+  return words
+    .map((w, i) =>
+      i > 0 && i < words.length - 1 && MINOR_WORDS.has(w)
+        ? w
+        : w.charAt(0).toUpperCase() + w.slice(1),
+    )
+    .join(' ');
 }
 
 /* ─────────────────────────────────────────────────────────── adding up */
@@ -208,11 +220,11 @@ export function series(
 /** The run's states in the words the run uses (fin_transition). */
 export const RUN_STATES: Record<string, { label: string; tone: Tone }> = {
   draft: { label: 'Draft', tone: 'grey' },
-  built: { label: 'Built · needs checking', tone: 'amber' },
-  checked: { label: 'Checked · needs a signature', tone: 'amber' },
-  approved_1: { label: 'One signature · needs a second', tone: 'amber' },
-  approved_2: { label: 'Approved · files not made', tone: 'amber' },
-  files_generated: { label: 'Files generated', tone: 'blue' },
+  built: { label: 'Built · Needs Checking', tone: 'amber' },
+  checked: { label: 'Checked · Needs a Signature', tone: 'amber' },
+  approved_1: { label: 'One Signature · Needs a Second', tone: 'amber' },
+  approved_2: { label: 'Approved · Files Not Made', tone: 'amber' },
+  files_generated: { label: 'Files Generated', tone: 'blue' },
   sending: { label: 'Sending', tone: 'blue' },
   sent: { label: 'Sent', tone: 'green' },
   reconciled: { label: 'Reconciled', tone: 'green' },
@@ -222,42 +234,43 @@ export const RUN_STATES: Record<string, { label: string; tone: Tone }> = {
 
 export const LINE_STATES: Record<string, { label: string; tone: Tone }> = {
   ready: { label: 'Ready', tone: 'grey' },
-  cash_netted: { label: 'Cash netted', tone: 'green' },
-  held_suspended: { label: 'Held · suspended', tone: 'red' },
+  cash_netted: { label: 'Cash Netted', tone: 'green' },
+  held_suspended: { label: 'Held · Suspended', tone: 'red' },
   held_kyc: { label: 'Held · KYC', tone: 'red' },
-  name_mismatch: { label: 'Held · name mismatch', tone: 'red' },
-  below_minimum_rolled: { label: 'Rolled to next week', tone: 'grey' },
+  name_mismatch: { label: 'Held · Name Mismatch', tone: 'red' },
+  below_minimum_rolled: { label: 'Rolled to Next Week', tone: 'grey' },
   mismatch: { label: 'Mismatch', tone: 'red' },
   approved: { label: 'Approved', tone: 'amber' },
   queued: { label: 'Queued', tone: 'amber' },
   sent: { label: 'Sent', tone: 'blue' },
   paid: { label: 'Paid', tone: 'green' },
   failed: { label: 'Failed', tone: 'red' },
-  rolled_forward: { label: 'Rolled forward', tone: 'grey' },
+  rolled_forward: { label: 'Rolled Forward', tone: 'grey' },
 };
 
 export const RAILS: Record<string, string> = {
-  mpesa_b2b: 'M-Pesa (B2B)',
-  mpesa_b2c: 'M-Pesa',
-  bank_eft: 'Bank transfer',
-  credit_note: 'Credit note',
-  invoice_credit: 'Invoice credit',
+  mpesa_b2b: 'M-PESA (B2B)',
+  mpesa_b2c: 'M-PESA',
+  bank_eft: 'Bank Transfer',
+  credit_note: 'Credit Note',
+  invoice_credit: 'Invoice Credit',
 };
 
 /** Who a settlement line pays, grouped as the designs group them. */
 export type PayeeGroup = 'merchant' | 'host' | 'rider' | 'other';
 
 export const PAYEE_GROUPS: Record<PayeeGroup, { label: string; batch: string; color: string }> = {
-  merchant: { label: 'Merchants', batch: 'Merchant settlement', color: '#F5B800' },
-  host: { label: 'Hosts & hotels (stays)', batch: 'Host payout (stays)', color: '#141414' },
-  rider: { label: 'Riders (delivery)', batch: 'Rider payout', color: '#F9DC7A' },
-  other: { label: 'Partners & others', batch: 'Other payout', color: '#C9C4B8' },
+  merchant: { label: 'Merchants', batch: 'Merchant Settlement', color: '#F5B800' },
+  host: { label: 'Hosts & Hotels (Stays)', batch: 'Host Payout (Stays)', color: '#141414' },
+  rider: { label: 'Riders (Delivery)', batch: 'Rider Payout', color: '#F9DC7A' },
+  other: { label: 'Partners & Others', batch: 'Partner Payout', color: '#C9C4B8' },
 };
 
 export function payeeGroup(partyType: string): PayeeGroup {
   if (partyType === 'merchant') return 'merchant';
   if (partyType === 'host' || partyType === 'hotel') return 'host';
   if (partyType === 'rider') return 'rider';
+  /* experience_partner (the venues and operators behind concierge plans) and anyone else. */
   return 'other';
 }
 
@@ -284,9 +297,10 @@ export const INVOICE_BUCKETS: Record<InvoiceBucket, { label: string; tone: Tone;
   };
 
 export const INVOICE_TYPES: Record<string, { label: string; tone: Tone }> = {
-  host: { label: 'Host invoice', tone: 'purple' },
-  hotel: { label: 'Hotel statement', tone: 'blue' },
-  merchant: { label: 'Merchant statement', tone: 'gold' },
+  host: { label: 'Host Invoice', tone: 'purple' },
+  hotel: { label: 'Hotel Statement', tone: 'blue' },
+  merchant: { label: 'Merchant Statement', tone: 'gold' },
+  client: { label: 'Client Invoice', tone: 'ink' },
 };
 
 /**

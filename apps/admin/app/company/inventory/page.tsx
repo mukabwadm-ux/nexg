@@ -41,15 +41,15 @@ import {
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = { title: 'Company inventory' };
+export const metadata: Metadata = { title: 'Company Inventory' };
 export const dynamic = 'force-dynamic';
 
 const TABS = [
   { key: 'overview', label: 'Overview', icon: LayoutGrid },
   { key: 'items', label: 'Inventory', icon: Package },
-  { key: 'assets', label: 'Assets & equipment', icon: Laptop, href: '/company/assets' },
-  { key: 'movements', label: 'Stock movements', icon: ArrowLeftRight },
-  { key: 'reorder', label: 'Reorder & alerts', icon: Bell },
+  { key: 'assets', label: 'Assets & Equipment', icon: Laptop, href: '/company/assets' },
+  { key: 'movements', label: 'Stock Movements', icon: ArrowLeftRight },
+  { key: 'reorder', label: 'Reorder & Alerts', icon: Bell },
   { key: 'suppliers', label: 'Suppliers', icon: Truck, href: '/company/vendors' },
   { key: 'reports', label: 'Reports', icon: BarChart3 },
 ] as const;
@@ -151,13 +151,13 @@ export default async function CompanyInventoryPage({
 
   const ring = summary
     ? [
-        { key: 'in', label: 'In stock', value: summary.in_stock, color: '#1F9D55' },
-        { key: 'low', label: 'Low stock', value: summary.low_stock, color: '#F5B800' },
-        { key: 'out', label: 'Out of stock', value: summary.out_of_stock, color: '#D4372C' },
-        { key: 'maint', label: 'Under maintenance', value: summary.maintenance, color: '#9A958B' },
+        { key: 'in', label: 'In Stock', value: summary.in_stock, color: '#1F9D55' },
+        { key: 'low', label: 'Low Stock', value: summary.low_stock, color: '#F5B800' },
+        { key: 'out', label: 'Out of Stock', value: summary.out_of_stock, color: '#D4372C' },
+        { key: 'maint', label: 'Under Maintenance', value: summary.maintenance, color: '#9A958B' },
         {
           key: 'active',
-          label: 'Equipment in service',
+          label: 'Equipment in Service',
           value: summary.active_assets,
           color: '#141414',
         },
@@ -168,7 +168,7 @@ export default async function CompanyInventoryPage({
     <ConsoleShell staff={staff}>
       <PageHeader
         icon={Boxes}
-        title="Company inventory"
+        title="Company Inventory"
         subtitle="Track assets, equipment, supplies and company resources across all locations."
         actions={
           <>
@@ -207,7 +207,7 @@ export default async function CompanyInventoryPage({
               <Stat
                 icon={Package}
                 value={total == null ? null : total.toLocaleString('en-KE')}
-                label="Total items"
+                label="Total Items"
                 delta={grew ? { value: grew } : null}
                 note={
                   !summary
@@ -234,14 +234,14 @@ export default async function CompanyInventoryPage({
                 icon={CircleCheck}
                 tone="green"
                 value={summary ? summary.in_stock.toLocaleString('en-KE') : null}
-                label="In stock"
+                label="In Stock"
                 href={href('items', { status: 'in_stock' })}
               />
               <Stat
                 icon={CircleAlert}
                 tone="red"
                 value={summary ? summary.low_stock.toLocaleString('en-KE') : null}
-                label="Low stock"
+                label="Low Stock"
                 note={summary?.out_of_stock ? `${summary.out_of_stock} out of stock` : undefined}
                 noteTone="bad"
                 href={href('reorder')}
@@ -250,12 +250,12 @@ export default async function CompanyInventoryPage({
                 icon={Wrench}
                 tone="amber"
                 value={summary ? summary.maintenance.toLocaleString('en-KE') : null}
-                label="Under maintenance"
+                label="Under Maintenance"
                 href="/company/assets?tab=maintenance"
               />
             </StatGrid>
 
-            <div className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_22rem]">
+            <div className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_16rem]">
               <Sheet>
                 <InventoryTable
                   rows={stock}
@@ -264,19 +264,19 @@ export default async function CompanyInventoryPage({
                   locations={locations}
                   vendors={vendors}
                   canWrite={canWrite}
-                  title="Inventory items"
+                  title="Inventory Items"
                   compact
                 />
               </Sheet>
               <div className="grid min-w-0 content-start gap-5 lg:grid-cols-2 2xl:grid-cols-1">
                 <Sheet>
-                  <PanelHead title="Stock status" />
+                  <PanelHead title="Stock Status" />
                   <div className="mt-4">
                     {total ? (
                       <ShareDonut
                         data={ring}
                         centre={total.toLocaleString('en-KE')}
-                        caption="Total items"
+                        caption="Total Items"
                         stacked
                       />
                     ) : (
@@ -288,12 +288,12 @@ export default async function CompanyInventoryPage({
                   </div>
                 </Sheet>
                 <Sheet>
-                  <PanelHead title="Recent stock movements">
+                  <PanelHead title="Recent Stock Movements">
                     <a
                       href={href('movements')}
                       className="text-gold-text text-[0.8125rem] font-bold underline-offset-4 hover:underline"
                     >
-                      View all →
+                      View All →
                     </a>
                   </PanelHead>
                   <div className="mt-4">
@@ -341,7 +341,7 @@ export default async function CompanyInventoryPage({
               locations={locations}
               vendors={vendors}
               canWrite={canWrite}
-              title="Needs reordering"
+              title="Needs Reordering"
               reorder
             />
           </Sheet>

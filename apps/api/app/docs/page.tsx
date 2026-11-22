@@ -18,7 +18,7 @@ const AUDIENCES = [
   {
     name: 'Partners and developers',
     today:
-      'Build on NexG’s public data: live merchants and catalogues, delivery zones, upcoming experiences and bookable services. Public reads work without a key, and test keys try bookings in a sandbox.',
+      'Build on NexG’s public data: live merchants and catalogues, delivery zones, delivery checks with an ETA and a fee, upcoming experiences and bookable services. Public reads work without a key, and test keys try bookings in a sandbox.',
     soon: 'Availability for every kind of booking, and OAuth sign-in for third-party apps.',
     href: '/docs/quickstart',
     link: 'Quickstart',
@@ -43,7 +43,7 @@ const AUDIENCES = [
 
 function FlowNode({ title, detail }: { title: string; detail: string }) {
   return (
-    <div className="border-border bg-surface rounded-lg border px-4 py-3 shadow-card">
+    <div className="border-border bg-surface shadow-card rounded-lg border px-4 py-3">
       <p className="text-ink text-sm font-bold">{title}</p>
       <p className="text-muted mt-0.5 text-xs leading-5">{detail}</p>
     </div>
@@ -84,9 +84,8 @@ export default function IntroductionPage() {
       <H2 id="what-it-does">What the API does</H2>
       <P>
         NexG is a concierge delivery and booking platform for Kenya. What a guest sees on
-        nexgapp.com, from verified merchants and their catalogues to delivery zones and events,
-        is also available to your systems as JSON over HTTPS, from{' '}
-        <C>https://api.nexgapp.com/v1</C>.
+        nexgapp.com, from verified merchants and their catalogues to delivery zones and events, is
+        also available to your systems as JSON over HTTPS, from <C>https://api.nexgapp.com/v1</C>.
       </P>
       <List>
         <li>
@@ -94,20 +93,37 @@ export default function IntroductionPage() {
           experiences and bookable services. No key is needed to start.
         </li>
         <li>
+          <Strong>Check a delivery</Strong> before you offer it: whether NexG delivers between two
+          points, how long it usually takes and the fee, with{' '}
+          <A href="/docs/reference/check-delivery">POST /v1/delivery/check</A>.
+        </li>
+        <li>
           <Strong>Read your own orders</Strong> with a key bound to your merchant, newest first,
           with the same stage the merchant console shows.
         </li>
         <li>
-          <Strong>Call back to NexG</Strong> with signed events. Banks do this today for payments
-          at checkout.
+          <Strong>Book services</Strong> such as airport transfers and couriers, and{' '}
+          <Strong>hear about every booking</Strong> as it changes, through signed order events.
+        </li>
+        <li>
+          <Strong>Keep your catalogue in step</Strong>: update prices and what is sold out from your
+          own till or ERP, one item or up to 100 at a time.
+        </li>
+        <li>
+          <Strong>Try all of it in the sandbox</Strong> with a test key, without touching real
+          orders or prices.
+        </li>
+        <li>
+          <Strong>Call back to NexG</Strong> with signed events. Banks do this today for payments at
+          checkout.
         </li>
       </List>
 
       <H2 id="how-it-fits">How it fits together</H2>
       <P>
-        NexG keeps one record of every merchant, item and order in its database. The website,
-        the merchant console and this API all read that same record, so what your system reads is
-        what a guest sees.
+        NexG keeps one record of every merchant, item and order in its database. The website, the
+        merchant console and this API all read that same record, so what your system reads is what a
+        guest sees.
       </P>
       <figure className="mt-6">
         <div className="grid items-center gap-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)]">
@@ -133,7 +149,10 @@ export default function IntroductionPage() {
       <H2 id="who-its-for">Who it is for</H2>
       <div className="divide-border border-border mt-6 divide-y border-y">
         {AUDIENCES.map((audience) => (
-          <div key={audience.name} className="grid gap-x-8 gap-y-2 py-5 md:grid-cols-[11rem_minmax(0,1fr)]">
+          <div
+            key={audience.name}
+            className="grid gap-x-8 gap-y-2 py-5 md:grid-cols-[11rem_minmax(0,1fr)]"
+          >
             <h3 className="text-ink text-base font-extrabold">{audience.name}</h3>
             <div className="min-w-0">
               <p className="text-muted text-sm leading-6">
@@ -167,24 +186,29 @@ export default function IntroductionPage() {
           <A href="/docs/rate-limits">Rate limits</A> before you go live, then build against the{' '}
           <A href="/docs/reference">API reference</A>.
         </li>
+        <li>
+          Prefer tools? Download the <A href="/openapi.json">OpenAPI spec</A> for code generators
+          and API clients, or the <A href="/postman.json">Postman collection</A> and set its{' '}
+          <C>apiKey</C> variable to a test key.
+        </li>
       </List>
 
       <H2 id="not-yet">Not available yet</H2>
       <P>
-        These are designed or planned, and each is marked coming soon wherever it appears in
-        these docs. Do not build against them until the <A href="/docs/changelog">changelog</A>{' '}
-        says they are live.
+        These are designed or planned, and each is marked coming soon wherever it appears in these
+        docs. Do not build against them until the <A href="/docs/changelog">changelog</A> says they
+        are live.
       </P>
       <List>
-        <li>Changing an order through the API: any <C>PATCH</C> endpoint.</li>
+        <li>Changing or cancelling a booking through the API.</li>
         <li>Two-way sync with a POS, ERP, booking or inventory system.</li>
         <li>OAuth sign-in for third-party apps. Use API keys.</li>
       </List>
       <Callout tone="note" title="Reads are safe to explore">
         <p>
           Every endpoint except booking a service only reads, so you can explore the live API
-          safely. A booking made with a live key is a real order: it carries an idempotency key,
-          so a retried booking is never made twice. Try bookings with a{' '}
+          safely. A booking made with a live key is a real order: it carries an idempotency key, so
+          a retried booking is never made twice. Try bookings with a{' '}
           <A href="/docs/environments#test-keys">test key</A> first.
         </p>
       </Callout>

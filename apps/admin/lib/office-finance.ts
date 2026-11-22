@@ -7,30 +7,30 @@
 import type { Tone } from './portal';
 
 export const EXPENSE_CATEGORIES: Record<string, { label: string; color: string }> = {
-  rent_utilities: { label: 'Rent & utilities', color: '#F5B800' },
-  salaries_wages: { label: 'Salaries & wages', color: '#141414' },
-  office_supplies: { label: 'Office supplies', color: '#FFD45C' },
-  transport_travel: { label: 'Transport & travel', color: '#8A8578' },
-  it_systems: { label: 'IT & systems', color: '#C9C4B8' },
+  rent_utilities: { label: 'Rent & Utilities', color: '#F5B800' },
+  salaries_wages: { label: 'Salaries & Wages', color: '#141414' },
+  office_supplies: { label: 'Office Supplies', color: '#FFD45C' },
+  transport_travel: { label: 'Transport & Travel', color: '#8A8578' },
+  it_systems: { label: 'IT & Systems', color: '#C9C4B8' },
   marketing: { label: 'Marketing', color: '#E8730C' },
-  professional_fees: { label: 'Professional fees', color: '#2F6FDB' },
-  repairs_maintenance: { label: 'Repairs & maintenance', color: '#1F9D55' },
+  professional_fees: { label: 'Professional Fees', color: '#2F6FDB' },
+  repairs_maintenance: { label: 'Repairs & Maintenance', color: '#1F9D55' },
   insurance: { label: 'Insurance', color: '#A855F7' },
-  bank_charges: { label: 'Bank charges', color: '#6F6A61' },
+  bank_charges: { label: 'Bank Charges', color: '#6F6A61' },
   other: { label: 'Other', color: '#E9E3D4' },
 };
 
 export const EXPENSE_STATUS: Record<string, { label: string; tone: Tone }> = {
-  submitted: { label: 'Waiting for approval', tone: 'amber' },
+  submitted: { label: 'Waiting for Approval', tone: 'amber' },
   approved: { label: 'Approved', tone: 'blue' },
   paid: { label: 'Paid', tone: 'green' },
-  rejected: { label: 'Turned down', tone: 'red' },
+  rejected: { label: 'Turned Down', tone: 'red' },
   cancelled: { label: 'Cancelled', tone: 'grey' },
 };
 
 export const PAYMENT_METHODS: Record<string, string> = {
-  mpesa: 'M-Pesa',
-  bank_transfer: 'Bank transfer',
+  mpesa: 'M-PESA',
+  bank_transfer: 'Bank Transfer',
   cash: 'Cash',
   card: 'Card',
   cheque: 'Cheque',
@@ -96,6 +96,20 @@ export function previousPeriod(from: string, to: string): { from: string; to: st
   const length = Math.round((b - a) / day) + 1;
   const iso = (ms: number) => new Date(ms).toISOString().slice(0, 10);
   return { from: iso(a - length * day), to: iso(a - day) };
+}
+
+/**
+ * What a KPI's change is measured against, for the "▲ +12.6% vs Oct" line:
+ * the month's name when the earlier period lies inside one month, otherwise
+ * "vs prior period".
+ */
+export function vsLabel(before: { from: string; to: string }): string {
+  if (before.from.slice(0, 7) !== before.to.slice(0, 7)) return 'vs prior period';
+  const month = new Date(`${before.from}T00:00:00Z`).toLocaleDateString('en-GB', {
+    month: 'short',
+    timeZone: 'UTC',
+  });
+  return `vs ${month}`;
 }
 
 /** Spend (approved and paid) between two days, inclusive. */

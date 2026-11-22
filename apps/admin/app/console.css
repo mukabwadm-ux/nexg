@@ -85,3 +85,29 @@
 .console-header-actions .hover\:border-ink:hover {
   border-color: rgb(255 255 255 / 0.6);
 }
+
+/*
+ * The dashboard designs (Operations, Merchant Verification, Catalogues,
+ * Performance, Payouts & Settlements) put white cards straight on the
+ * black frame rather than on the light sheet.
+ */
+.console-canvas > [data-canvas='dark'] {
+  background: transparent;
+  color: rgb(255 255 255);
+}
+
+/*
+ * Finance and Company tables, as their designs draw them: column names in
+ * plain bold ink rather than the shared table's small capitals, and rows a
+ * little tighter so a full row fits beside the side panels.
+ */
+[data-portal-sheet] thead th :is(button, span).uppercase {
+  text-transform: none;
+  font-size: 0.8125rem;
+  letter-spacing: normal;
+  color: rgb(var(--ink-rgb));
+}
+[data-portal-sheet] :is(thead th, tbody td) {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}

@@ -80,7 +80,11 @@ export interface ResourceDoc {
     | 'ApiOrder'
     | 'PublicBranch'
     | 'ServiceBooking'
-    | 'BookingReceipt';
+    | 'BookingReceipt'
+    | 'DeliveryCheckRequest'
+    | 'DeliveryCheck'
+    | 'DeliveryPickup'
+    | 'DeliveryDropoff';
   title: string;
   /** Where the object sits in the body, e.g. `data.items[]`. */
   at: string;

@@ -51,7 +51,7 @@ export async function movementList(
 }
 
 export interface InvoiceItem {
-  party_kind: 'host' | 'hotel' | 'merchant';
+  party_kind: 'host' | 'hotel' | 'merchant' | 'client';
   id: string;
   number: string;
   party_id: string;
@@ -63,6 +63,8 @@ export interface InvoiceItem {
   due_at: string | null;
   paid_at: string | null;
   provider_ref: string | null;
+  /** Client invoices only (they take part payments); null for the rest. */
+  balance_cents: number | null;
 }
 
 export async function invoiceList(
@@ -75,6 +77,7 @@ export async function invoiceList(
     rows: ((data as unknown as InvoiceItem[] | null) ?? []).map((r) => ({
       ...r,
       total_cents: Number(r.total_cents),
+      balance_cents: r.balance_cents == null ? null : Number(r.balance_cents),
     })),
     error: error?.message ?? null,
   };

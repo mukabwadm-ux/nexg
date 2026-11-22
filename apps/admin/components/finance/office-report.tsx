@@ -34,7 +34,7 @@ export function OfficeReport({
 
   return (
     <div className="flex flex-col gap-4">
-      <PanelHead title="Office spend by month" aside="approved and paid">
+      <PanelHead title="Office Spend by Month" aside="approved and paid">
         <ExportButton
           label="Export CSV"
           filename="office-expenses-by-month.csv"

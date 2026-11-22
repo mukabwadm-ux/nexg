@@ -242,6 +242,128 @@ export async function setItemAvailable(itemId: string, available: boolean): Prom
   };
 }
 
+/**
+ * Sold out: the item stays on the menu, marked sold out, and checkout refuses
+ * it. Off the menu (setItemAvailable) hides it instead.
+ */
+export async function setItemSoldOut(itemId: string, soldOut: boolean): Promise<Outcome> {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup',
+  });
+  const { data, error } = await client
+    .from('catalogue_item')
+    .update({ sold_out: soldOut })
+    .eq('id', itemId)
+    .eq('merchant_id', authorizedMerchantId)
+    .select('id')
+    .maybeSingle();
+  if (error) return { ok: false, message: error.message };
+  if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
+  revalidatePath('/merchant/menu');
+  return {
+    ok: true,
+    message: soldOut
+      ? 'Marked sold out. Customers still see it, but cannot order it.'
+      : 'Back in stock.',
+  };
+}
+
+/** Digital: delivered as a code in the customer's app (an eSIM, a voucher), no rider. */
+export async function setItemDigital(itemId: string, digital: boolean): Promise<Outcome> {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup',
+  });
+  const { data, error } = await client
+    .from('catalogue_item')
+    .update({ digital })
+    .eq('id', itemId)
+    .eq('merchant_id', authorizedMerchantId)
+    .select('id')
+    .maybeSingle();
+  if (error) return { ok: false, message: error.message };
+  if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
+  revalidatePath('/merchant/menu');
+  return {
+    ok: true,
+    message: digital
+      ? 'Saved. Customers get this item as a code in the app, with no delivery.'
+      : 'Saved. This item is delivered as usual.',
+  };
+}
+
+/** The buyer must give a passport or national ID to order it (an eSIM). */
+export async function setItemRequiresBuyerId(itemId: string, required: boolean): Promise<Outcome> {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup',
+  });
+  const { data, error } = await client
+    .from('catalogue_item')
+    .update({ requires_buyer_id: required })
+    .eq('id', itemId)
+    .eq('merchant_id', authorizedMerchantId)
+    .select('id')
+    .maybeSingle();
+  if (error) return { ok: false, message: error.message };
+  if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
+  revalidatePath('/merchant/menu');
+  return {
+    ok: true,
+    message: required
+      ? "Saved. Checkout asks for the buyer's passport or national ID."
+      : 'Saved. No ID is asked for this item.',
+  };
+}
+
+/** The smallest basket the shop takes, in whole shillings; null for none. */
+export async function setMinOrder(minOrderKes: number | null): Promise<Outcome> {
+  const { client, merchantId } = await merchantActionClient({ access: 'setup' });
+  if (minOrderKes !== null && (!Number.isInteger(minOrderKes) || minOrderKes < 1))
+    return { ok: false, message: 'Enter a whole amount in shillings, or leave it empty for none.' };
+  const { data, error } = await client.rpc('rpc_merchant_set_min_order', {
+    p_merchant_id: merchantId,
+    p_min_order_kes: minOrderKes ?? undefined,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/merchant/menu');
+  const reply = data as { message?: string } | null;
+  return { ok: true, message: reply?.message ?? 'Saved.' };
+}
+
+/**
+ * Whether an item takes a message (a cake's writing, a card) and what
+ * customers are asked. An empty label turns messages off.
+ */
+export async function setItemMessage(
+  itemId: string,
+  label: string,
+  maxLength = 100,
+): Promise<Outcome> {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup',
+  });
+  const asked = label.trim() || null;
+  if (asked && asked.length > 60)
+    return { ok: false, message: 'Keep the question to 60 characters.' };
+  if (!Number.isInteger(maxLength) || maxLength < 1 || maxLength > 500)
+    return { ok: false, message: 'Allow between 1 and 500 characters.' };
+  const { data, error } = await client
+    .from('catalogue_item')
+    .update({ message_label: asked, message_max_length: maxLength })
+    .eq('id', itemId)
+    .eq('merchant_id', authorizedMerchantId)
+    .select('id')
+    .maybeSingle();
+  if (error) return { ok: false, message: error.message };
+  if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
+  revalidatePath('/merchant/menu');
+  return {
+    ok: true,
+    message: asked
+      ? `Saved. Customers are asked "${asked}", up to ${maxLength} characters.`
+      : 'Saved. This item no longer takes a message.',
+  };
+}
+
 /*
  * Prices and new items. Row security on catalogue_item already limits
  * every write here to members of the merchant, and checkout re-reads the
@@ -501,7 +623,12 @@ export async function inviteMember(input: {
     p_branches: input.branches.length > 0 ? input.branches : undefined,
     p_caps: input.caps as never,
   });
-  return unwrap(data, error, ALL, 'Invitation sent. They join when they sign in with it.');
+  return unwrap(
+    data,
+    error,
+    ALL,
+    'Invitation sent. They join when they sign in to NexG with that email address.',
+  );
 }
 
 export async function updateMember(input: {
