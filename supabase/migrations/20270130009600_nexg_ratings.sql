@@ -12,7 +12,7 @@
 -- The map's stars and "Top Rated" read these (Top Rated: highest rating_avg,
 -- with enough ratings).
 --
--- Numbered 20270130009100 to land after Order together (20270130009000).
+-- Numbered 20270130009600, after Order together (20270130009000) and R38, R42 and R39.
 --
 -- Rollback: restore merchant_public from 20270130000300 and drop the index.
 
