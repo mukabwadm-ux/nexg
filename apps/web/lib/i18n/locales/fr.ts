@@ -201,4 +201,38 @@ export const fr: Dictionary = {
   'xp.events.buildAround': 'Composer une journée autour →',
   'xp.events.noMarkup':
     'NexG ne majore jamais un billet. Quand un organisateur nous laisse en réserver, nous le faisons au prix affiché, et nous facturons la journée construite autour.',
+
+  // ── toutes les catégories (/categories)
+  'cats.eyebrow': 'Toutes les catégories',
+  'cats.title': 'Tout ce dont vous avez besoin,',
+  'cats.gold': 'au même endroit.',
+  'cats.lede':
+    '{count} types d’activités à travers Nairobi, des restaurants et pharmacies à la location de voitures et aux sorties d’une journée. Choisissez-en une pour voir qui vous sert là où vous êtes.',
+  'cats.searchPlaceholder': 'Essayez sushi, fleuriste ou safari',
+  'cats.searchLabel': 'Rechercher des catégories',
+  'cats.clear': 'Effacer la recherche',
+  'cats.filterLabel': 'Filtrer par type',
+  'cats.kind.all': 'Tout',
+  'cats.kind.menu': 'Repas et boissons',
+  'cats.kind.products': 'Shopping',
+  'cats.kind.services': 'Services',
+  'cats.matchOne': '1 catégorie correspond à “{query}”',
+  'cats.matchMany': '{count} catégories correspondent à “{query}”',
+  'cats.summaryOne': '1 catégorie · {types} types de commerces et de services',
+  'cats.summaryMany': '{count} catégories · {types} types de commerces et de services',
+  'cats.empty.title': 'Rien ne correspond encore à “{query}”.',
+  'cats.empty.body':
+    'Un concierge peut quand même le trouver. Décrivez ce qu’il vous faut et obtenez un prix et un délai avant tout achat.',
+  'cats.askConcierge': 'Demander à un concierge',
+  'cats.showAll': 'Afficher toutes les catégories',
+  'cats.cta.eyebrow': 'Pas dans la liste ?',
+  'cats.cta.title': 'Demandez n’importe quoi à un concierge.',
+  'cats.cta.body':
+    'Décrivez ce qu’il vous faut. Un concierge vous propose un prix et un délai, et rien n’est acheté tant que vous n’avez pas approuvé.',
+  'cats.cta.list': 'Référencer votre entreprise',
+  'cats.typeOne': '1 type',
+  'cats.typeMany': '{count} types',
+  'cats.matches': 'Correspond à {list}',
+  'cats.more': '+{count} de plus',
+  'cats.seeWho': 'Voir qui vous sert',
 };
