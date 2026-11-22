@@ -30,6 +30,9 @@ const errorStatuses = {
   invalid_request: 400,
   unauthenticated: 401,
   forbidden: 403,
+  /* A guest (temporary session) used their one free Explore plan: sign in, or
+     pay for an order, to plan more (owner, 22 Nov 2026). */
+  sign_in_required: 403,
   method_not_allowed: 405,
   rate_limited: 429,
   unavailable: 503,
@@ -133,7 +136,8 @@ export function createRoutesHandler(config: Config, options: Options = {}) {
       if (!isObject(user) || typeof user.id !== 'string' || !UUID.test(user.id)) {
         return errorResponse('unavailable', requestId);
       }
-      if (user.is_anonymous === true) return errorResponse('forbidden', requestId);
+      /* A temporary (guest) session is allowed: rpc_maps_route_budget gives it
+         one complete Explore plan, then asks it to sign in. */
       const accountId = user.id;
 
       const budget = await supabase('/rest/v1/rpc/rpc_maps_route_budget', {
@@ -147,6 +151,9 @@ export function createRoutesHandler(config: Config, options: Options = {}) {
       const quota = await readBoundedJson(budget, MAX_QUOTA_RESPONSE_BYTES, signal);
       if (!isObject(quota) || quota.accountId !== accountId) {
         return errorResponse('unavailable', requestId);
+      }
+      if (quota.allowed === false && quota.reason === 'sign_in_required') {
+        return errorResponse('sign_in_required', requestId);
       }
       if (quota.allowed === false) {
         const retryAfter = quota.retryAfterSeconds;

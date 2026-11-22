@@ -207,14 +207,27 @@ test('rejects non-POST methods and a missing or rejected bearer', async () => {
   assert.equal(calls.length, 1);
 });
 
-test('denies temporary accounts before charging quota or making a Google request', async () => {
+test('gives a temporary (guest) session its route when the budget allows it', async () => {
   const { handle, calls } = mock({
     auth: () => Response.json({ id: accountId, is_anonymous: true }),
   });
   const response = await handle(routeRequest());
+  assert.equal(response.status, 200);
+  assert.deepEqual(
+    calls.map((call) => call.url.pathname),
+    ['/auth/v1/user', '/rest/v1/rpc/rpc_maps_route_budget', '/directions/v2:computeRoutes'],
+  );
+});
+
+test('asks a guest to sign in once their free plan is used, without a Google request', async () => {
+  const { handle, calls } = mock({
+    auth: () => Response.json({ id: accountId, is_anonymous: true }),
+    budget: () => Response.json({ accountId, allowed: false, reason: 'sign_in_required' }),
+  });
+  const response = await handle(routeRequest());
   assert.equal(response.status, 403);
-  assert.equal((await response.json()).code, 'forbidden');
-  assert.equal(calls.length, 1);
+  assert.equal((await response.json()).code, 'sign_in_required');
+  assert.equal(calls.length, 2);
 });
 
 test('fails closed when the reservation is missing or bound to a different account', async () => {
