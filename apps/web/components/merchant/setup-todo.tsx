@@ -35,8 +35,9 @@ const ACTION: Record<string, string> = {
  * checked. Shown only while something is still open.
  */
 /**
- * For a shop that is already live: what keeps it off the apps' map or shows
- * it as always open. Shown only while something is open.
+ * For a shop that is already live: what keeps it off the apps' map and
+ * "Near you" (it is still listed), or shows it as always open. Shown only
+ * while something is open.
  */
 export function LiveGaps({ items }: { items: SetupTodoItem[] }) {
   if (items.length === 0) return null;
@@ -46,10 +47,12 @@ export function LiveGaps({ items }: { items: SetupTodoItem[] }) {
       className="border-gold bg-surface mx-4 mt-6 rounded-2xl border-2 p-5 sm:mx-6 lg:mx-8"
     >
       <h2 id="live-gaps-title" className="text-lg font-extrabold tracking-tight">
-        Customers cannot find you on the map yet
+        Finish your location and hours
       </h2>
       <p className="text-muted mt-1 text-sm font-semibold leading-[1.6]">
-        The NexG apps show shops by their exact pin and opening hours.
+        Customers can already find your shop in the NexG apps. Your exact pin puts you on the map
+        and in &ldquo;Near you&rdquo;, and riders are sent to it. Without opening hours your shop
+        shows as open at all times.
       </p>
       <ol className="mt-4 space-y-2">
         {items.map((item, index) => (
