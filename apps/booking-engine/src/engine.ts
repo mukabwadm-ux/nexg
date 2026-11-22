@@ -3379,7 +3379,11 @@ export class BookingEngine {
       );
       await this.audit(identity, req, simulated ? 'booking.paid_simulated' : 'booking.paid', id, {
         version: result.nexg?.version,
-        step: balanceStep ? 'balance' : amountMinor === deposit && deposit !== due ? 'deposit' : 'full',
+        step: balanceStep
+          ? 'balance'
+          : amountMinor === deposit && deposit !== due
+            ? 'deposit'
+            : 'full',
       });
       return this.bookingView(result);
     });
