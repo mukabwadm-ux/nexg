@@ -67,7 +67,14 @@ export type Offering = CatalogueOptions & {
   variants: { id: string; name: string; sku: string; price: string; stock?: number }[];
   fulfilmentMethods?: string[];
   fulfilmentInstructions?: string;
+  /** The booking-engine offering this item opens, for kinds that are booked, not bought. */
+  bookingOfferingId?: string;
 };
+
+/** Offering types that customers book rather than buy; the rest go through checkout. */
+export function isBookedSchema(schemaId: string) {
+  return !['PRODUCT_CATALOG_V1', 'MADE_TO_ORDER_V1'].includes(schemaId);
+}
 export type Catalogue = {
   revision: 1;
   writable?: boolean;

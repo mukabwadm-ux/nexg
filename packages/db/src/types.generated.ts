@@ -64634,6 +64634,7 @@ export type Database = {
         Args: { p_confirmation_name: string; p_merchant_id: string; p_reason: string };
         Returns: Json;
       };
+      rpc_merchant_digital_orders: { Args: { p_order_ids: string[] }; Returns: Json };
       rpc_merchant_featured_card_save: {
         Args: { p_blurb?: string; p_booking_id: string; p_media?: Json };
         Returns: Json;

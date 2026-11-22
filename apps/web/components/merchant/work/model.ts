@@ -57,8 +57,9 @@ export type WorkRecord = {
   history: string[];
   confirmation: string;
   sourceLabel: string;
-  /* needsCode: the person in front of the shop shows a code, which is typed in to finish. */
-  nextAction?: { id: string; label: string; needsCode?: boolean };
+  /* needsCode: the person in front of the shop shows a code, which is typed in to finish.
+     needsText: the shop types something to send, such as the code for a digital order. */
+  nextAction?: { id: string; label: string; needsCode?: boolean; needsText?: boolean };
   lines?: { name: string; quantity: number; amount: string }[];
   readOnly?: boolean;
 };
