@@ -11,6 +11,15 @@ import {
   type ImportBatch,
   type OfferingsCsvPreview,
 } from '@/app/merchant/offerings-csv-actions';
+import {
+  CATALOGUE_FILE_ACCEPT,
+  CATALOGUE_FORMATS,
+  FORMAT_LABEL,
+  FORMAT_MIME,
+  detectFormat,
+  fromCsvText,
+  type CatalogueFormat,
+} from '@/lib/catalogue-formats';
 
 import {
   IMPORT_FIELDS,
@@ -61,7 +70,10 @@ export function OfferingsCsvImport({
   onImported: (message: string) => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<{ name: string; text: string } | null>(null);
+  const [file, setFile] = useState<{ name: string; text: string; format: CatalogueFormat } | null>(
+    null,
+  );
+  const [downloadFormat, setDownloadFormat] = useState<CatalogueFormat>('csv');
   const [preview, setPreview] = useState<Preview | null>(null);
   const [mapping, setMapping] = useState<ColumnMapping | null>(null);
   const [priceConfirmed, setPriceConfirmed] = useState(false);
@@ -89,6 +101,7 @@ export function OfferingsCsvImport({
   async function check(next: {
     text: string;
     name: string;
+    format: CatalogueFormat;
     mapping?: ColumnMapping;
     fixes?: RowFixes;
   }) {
@@ -96,6 +109,7 @@ export function OfferingsCsvImport({
     setProblem('');
     const result = await previewOfferingsCsv({
       csv: next.text,
+      format: next.format,
       fileName: next.name,
       profileId: profile.id,
       ...(next.mapping ? { mapping: next.mapping } : {}),
@@ -131,8 +145,9 @@ export function OfferingsCsvImport({
       setProblem('The file could not be read. Choose it again.');
       return;
     }
-    setFile({ name: picked.name, text });
-    await check({ text, name: picked.name });
+    const format = detectFormat(picked.name, text);
+    setFile({ name: picked.name, text, format });
+    await check({ text, name: picked.name, format });
   }
 
   function remap(field: ImportField, value: string) {
@@ -144,7 +159,7 @@ export function OfferingsCsvImport({
     next[field] = index;
     setMapping(next);
     if (field === 'price') setPriceConfirmed(false);
-    void check({ text: file.text, name: file.name, mapping: next, fixes });
+    void check({ text: file.text, name: file.name, format: file.format, mapping: next, fixes });
   }
 
   async function confirm() {
@@ -153,6 +168,7 @@ export function OfferingsCsvImport({
     setProblem('');
     const result = await importOfferingsCsv({
       csv: file.text,
+      format: file.format,
       fileName: file.name,
       profileId: profile.id,
       mapping,
@@ -251,6 +267,8 @@ export function OfferingsCsvImport({
               Any CSV works: NexG matches its columns to name, price, category, description,
               available, SKU and stock, and you confirm the matches. Columns NexG has no field for
               are kept with each item as extra details. Excel or Google Sheets: save as CSV first.
+              JSON (a list of items) and XML (one tag per item, one tag per field) work the same
+              way; row 2 is the first item.
             </p>
             <p>
               A row updates the offering with the same name in the same category, so importing again
@@ -260,10 +278,27 @@ export function OfferingsCsvImport({
           </div>
         </div>
         <div className="of-csv-actions">
+          <select
+            aria-label="Format for the template and export"
+            value={downloadFormat}
+            onChange={(event) => setDownloadFormat(event.target.value as CatalogueFormat)}
+          >
+            {CATALOGUE_FORMATS.map((f) => (
+              <option key={f} value={f}>
+                {FORMAT_LABEL[f]}
+              </option>
+            ))}
+          </select>
           <button
             type="button"
             className="of-button"
-            onClick={() => download('nexg-offerings-template.csv', offeringsTemplateCsv(profile))}
+            onClick={() =>
+              download(
+                `nexg-offerings-template.${downloadFormat}`,
+                fromCsvText(offeringsTemplateCsv(profile), downloadFormat, 'offerings'),
+                FORMAT_MIME[downloadFormat],
+              )
+            }
           >
             <FileDown size={15} />
             Download template
@@ -274,8 +309,9 @@ export function OfferingsCsvImport({
             disabled={!offerings.length}
             onClick={() =>
               download(
-                `nexg-offerings-${new Date().toISOString().slice(0, 10)}.csv`,
-                offeringsExportCsv(offerings),
+                `nexg-offerings-${new Date().toISOString().slice(0, 10)}.${downloadFormat}`,
+                fromCsvText(offeringsExportCsv(offerings), downloadFormat, 'offerings'),
+                FORMAT_MIME[downloadFormat],
               )
             }
           >
@@ -284,13 +320,13 @@ export function OfferingsCsvImport({
           </button>
         </div>
         <Label
-          title="Spreadsheet (CSV)"
+          title="File (CSV, JSON or XML)"
           hint={`Up to ${OFFERINGS_CSV_MAX_ROWS} offerings · ${OFFERINGS_CSV_MAX_BYTES / 1024} KB`}
         >
           <input
             ref={fileRef}
             type="file"
-            accept=".csv,.txt,text/csv,text/plain"
+            accept={CATALOGUE_FILE_ACCEPT}
             disabled={busy !== null}
             onChange={(event) => void choose(event.target.files?.[0])}
           />
@@ -491,7 +527,15 @@ export function OfferingsCsvImport({
                   type="button"
                   className="of-button"
                   disabled={busy !== null || Object.keys(fixes).length === 0}
-                  onClick={() => void check({ text: file.text, name: file.name, mapping, fixes })}
+                  onClick={() =>
+                    void check({
+                      text: file.text,
+                      name: file.name,
+                      format: file.format,
+                      mapping,
+                      fixes,
+                    })
+                  }
                 >
                   Check again
                 </button>

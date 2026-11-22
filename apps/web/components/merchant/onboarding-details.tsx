@@ -258,10 +258,19 @@ function Field({
         <input
           id={id}
           type={field.type === 'date' ? 'date' : 'text'}
+          {...(field.type === 'number' ? { inputMode: 'numeric' as const, maxLength: 4 } : {})}
           value={value}
           disabled={disabled}
           placeholder={field.placeholder ?? undefined}
-          onChange={(event) => onChange(field.key, event.target.value)}
+          onChange={(event) =>
+            onChange(
+              field.key,
+              // A number field keeps digits only: letters and symbols never land.
+              field.type === 'number'
+                ? event.target.value.replace(/[^0-9]/g, '')
+                : event.target.value,
+            )
+          }
           className={`${input} mt-1.5`}
         />
       )}
