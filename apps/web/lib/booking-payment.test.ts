@@ -19,7 +19,12 @@ vi.mock('@/lib/supabase/customer-api', () => ({
 vi.mock('@/lib/booking/bridge', () => ({ forwardBookingRequest: stub.forward }));
 vi.mock('@/lib/booking/platform', () => ({ settleEngineBookingPayment: stub.settle }));
 
-import { settleBookings, startBookingPayment, stepFor } from './booking-payment';
+import {
+  readBookingPayment,
+  settleBookings,
+  startBookingPayment,
+  stepFor,
+} from './booking-payment';
 
 const TEST = 'sk_test_ci_only_0123456789';
 const BOOKING = '01a12345-168a-4456-8b79-0123456789bb';
@@ -229,5 +234,27 @@ describe('settling paid bookings in the engine', () => {
       'rpc_payment_engine_settled',
       expect.objectContaining({ p_ok: false, p_refusal: null }),
     );
+  });
+});
+
+describe('reading what a booking owes', () => {
+  it('says the deposit due now, by the engine id the app knows the booking by', async () => {
+    stub.forward.mockResolvedValue(new Response(JSON.stringify(held)));
+    stub.rpc.mockResolvedValue({ data: { status: 'unpaid' }, error: null });
+    const response = await readBookingPayment(
+      new Request('https://www.nexgapp.com/api/customer/checkout/bookings/bk_123/payment', {
+        headers: { Authorization: 'Bearer access.token' },
+      }),
+      'bk_123',
+    );
+    expect(await response.json()).toEqual({
+      status: 'unpaid',
+      due: {
+        step: 'deposit',
+        amountMinor: 50000,
+        totalMinor: 150000,
+        holdExpiresAt: held.expiresAt,
+      },
+    });
   });
 });

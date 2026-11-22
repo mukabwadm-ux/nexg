@@ -161,12 +161,13 @@ export async function settleBookings(
 
 function bookingTarget(rawId: string) {
   return async ({ supabase }: Session): Promise<PaymentTarget | Response> => {
-    const parsed = bookingId.safeParse(rawId);
-    if (!parsed.success) return problem(404, 'NOT_FOUND', 'No such booking.');
+    if (!validBookingId(rawId)) return problem(404, 'NOT_FOUND', 'No such booking.');
+    /* The saved booking's own id, or the engine's id the app knows it by. Row
+       security shows the customer only their own bookings either way. */
     const found = await supabase
       .from('customer_engine_booking')
       .select('id, merchant_id, engine_booking_id, customer_token, customer_ref')
-      .eq('id', parsed.data)
+      .eq(bookingId.safeParse(rawId).success ? 'id' : 'engine_booking_id', rawId)
       .maybeSingle();
     if (found.error) return unavailable();
     if (!found.data) return problem(404, 'NOT_FOUND', 'No such booking.');
@@ -195,18 +196,36 @@ function bookingTarget(rawId: string) {
       afterPaid: async () => {
         await settleBookings(supabase);
       },
+      /* What is due now, from the engine, so the customer sees the deposit or
+         the balance before paying. Not while a payment is in play. */
+      describe: async (state) => {
+        if (state.status === 'pending') return {};
+        const booking = await engineBooking(row);
+        if (!booking) return {};
+        const total = cents(booking.pricing?.totalDueMinor) ?? cents(booking.priceMinor);
+        const step = stepFor(booking, false);
+        if (typeof step === 'string' || total === null) return { due: null };
+        return {
+          due: {
+            step: step.step,
+            amountMinor: step.amount,
+            totalMinor: total,
+            ...(step.expiresAt ? { holdExpiresAt: step.expiresAt } : {}),
+          },
+        };
+      },
     };
   };
 }
 
+const validBookingId = (value: string) => bookingId.safeParse(value).success || ID.test(value);
+
 export function readBookingPayment(request: Request, rawId: string) {
-  if (!bookingId.safeParse(rawId).success)
-    return Promise.resolve(problem(404, 'NOT_FOUND', 'No such booking.'));
+  if (!validBookingId(rawId)) return Promise.resolve(problem(404, 'NOT_FOUND', 'No such booking.'));
   return readPayment(request, bookingTarget(rawId));
 }
 
 export function startBookingPayment(request: Request, rawId: string) {
-  if (!bookingId.safeParse(rawId).success)
-    return Promise.resolve(problem(404, 'NOT_FOUND', 'No such booking.'));
+  if (!validBookingId(rawId)) return Promise.resolve(problem(404, 'NOT_FOUND', 'No such booking.'));
   return startPayment(request, bookingTarget(rawId));
 }

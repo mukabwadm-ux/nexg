@@ -204,6 +204,8 @@ export interface PaymentTarget {
   metadata: Record<string, unknown>;
   /** Runs after any check that may have marked it paid (bookings settle in the engine). */
   afterPaid?: () => Promise<void>;
+  /** Extra fields for the read answer (a booking says what is due now). */
+  describe?: (state: PaymentState) => Promise<Record<string, unknown>>;
 }
 export type Session = { supabase: Client; email: string | null };
 
@@ -235,7 +237,8 @@ export async function readPayment(
       if (!(again instanceof Response)) state = again;
     }
     if (state.status === 'paid') await found.afterPaid?.();
-    return Response.json(view(state), { headers });
+    const more = found.describe ? await found.describe(state) : {};
+    return Response.json({ ...view(state), ...more }, { headers });
   } catch {
     return unavailable();
   }
