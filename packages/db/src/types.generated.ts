@@ -6795,6 +6795,8 @@ export type Database = {
           ingredients: string | null;
           kind: Database['public']['Enums']['catalogue_item_kind'];
           merchant_id: string;
+          message_label: string | null;
+          message_max_length: number;
           name: string;
           party_max: number | null;
           party_min: number | null;
@@ -6832,6 +6834,8 @@ export type Database = {
           ingredients?: string | null;
           kind?: Database['public']['Enums']['catalogue_item_kind'];
           merchant_id: string;
+          message_label?: string | null;
+          message_max_length?: number;
           name: string;
           party_max?: number | null;
           party_min?: number | null;
@@ -6868,6 +6872,8 @@ export type Database = {
           ingredients?: string | null;
           kind?: Database['public']['Enums']['catalogue_item_kind'];
           merchant_id?: string;
+          message_label?: string | null;
+          message_max_length?: number;
           name?: string;
           party_max?: number | null;
           party_min?: number | null;
@@ -26619,6 +26625,7 @@ export type Database = {
           merchant_id: string;
           min_choices: number;
           name: string;
+          onboarding_key: string | null;
           required: boolean;
           setup_item_id: string | null;
           sort: number;
@@ -26632,6 +26639,7 @@ export type Database = {
           merchant_id: string;
           min_choices?: number;
           name: string;
+          onboarding_key?: string | null;
           required?: boolean;
           setup_item_id?: string | null;
           sort?: number;
@@ -26644,6 +26652,7 @@ export type Database = {
           merchant_id?: string;
           min_choices?: number;
           name?: string;
+          onboarding_key?: string | null;
           required?: boolean;
           setup_item_id?: string | null;
           sort?: number;
@@ -29844,6 +29853,7 @@ export type Database = {
           created_at: string;
           id: string;
           line_total_cents: number;
+          message: string | null;
           name: string;
           note: string | null;
           order_id: string;
@@ -29861,6 +29871,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           line_total_cents: number;
+          message?: string | null;
           name: string;
           note?: string | null;
           order_id: string;
@@ -29877,6 +29888,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           line_total_cents?: number;
+          message?: string | null;
           name?: string;
           note?: string | null;
           order_id?: string;
@@ -42780,6 +42792,8 @@ export type Database = {
           id: string | null;
           kind: string | null;
           merchant_id: string | null;
+          message_label: string | null;
+          message_max_length: number | null;
           name: string | null;
           party_max: number | null;
           party_min: number | null;
@@ -59305,6 +59319,7 @@ export type Database = {
         Returns: string;
       };
       fn_offering_setup_project: { Args: { p_item_id: string }; Returns: undefined };
+      fn_onboarding_choice_groups: { Args: { p_merchant_id?: string }; Returns: number };
       fn_ops_kinds: { Args: { p_tab: string }; Returns: string[] };
       fn_ops_rows: {
         Args: { p_from: string; p_to: string };
