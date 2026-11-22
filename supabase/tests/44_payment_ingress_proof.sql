@@ -35,8 +35,12 @@ from (values
 ) as x(order_reference, reference, provider, provider_ref, state)
 join public.order o on o.reference = x.order_reference;
 
-select ok(to_regprocedure('public.rpc_payment_paystack_webhook(text,text)') is null,
-  'There is no Paystack entry point');
+-- Paystack came back in 20270129000200 (owner, 21 Nov 2026); its only
+-- anonymous entry point is the signed webhook, tested in 124.
+select ok(to_regprocedure('public.rpc_payment_paystack_webhook(text,text)') is not null
+          and exists (select 1 from public.wiring_anon_allow
+                       where function_name = 'rpc_payment_paystack_webhook'),
+  'The Paystack entry point is the signed webhook, written down in wiring_anon_allow');
 
 set local role anon;
 select set_config('request.jwt.claims','{"role":"anon"}',true);
