@@ -165,6 +165,13 @@ export async function stayQuote(request: Request) {
     )
       return unavailable();
 
+    /* The host's cancellation policy, which the stay is held to once made. */
+    const policy = await rpc(supabase, 'rpc_stay_cancellation_policy', { p_unit_id: input.unitId });
+    const policyText =
+      !policy.error && typeof (policy.data as { text?: unknown } | null)?.text === 'string'
+        ? (policy.data as { text: string }).text
+        : null;
+
     return Response.json(
       {
         ...quote,
@@ -181,8 +188,9 @@ export async function stayQuote(request: Request) {
           : [],
         termsText:
           'You get a 15-minute hold while you pay. Your stay is confirmed once NexG has your payment.',
-        cancellationText:
-          'Unpaid holds expire automatically. Contact NexG about changing or cancelling a confirmed stay and any refund that applies.',
+        cancellationText: policyText
+          ? `Unpaid holds expire automatically. If a paid stay is cancelled: ${policyText.charAt(0).toLowerCase()}${policyText.slice(1)} NexG handles the cancellation.`
+          : 'Unpaid holds expire automatically. Contact NexG about changing or cancelling a confirmed stay and any refund that applies.',
       },
       { headers },
     );
