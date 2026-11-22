@@ -141,7 +141,13 @@ export async function SiteFooter({
           <p className="text-sm text-white/55 sm:text-[0.9375rem]">
             © {new Date().getFullYear()} NexG Concierge. All rights reserved.
           </p>
-          <LanguageSwitcher locale={locale} locales={locales} tone="dark" />
+          <LanguageSwitcher
+            locale={locale}
+            locales={locales}
+            tone="dark"
+            languageLabel={t('footer.language')}
+            currencyLabel={t('prefs.currency')}
+          />
         </div>
       </div>
     </footer>
