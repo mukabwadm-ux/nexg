@@ -13,18 +13,29 @@ import {
   CATALOGUE_CSV_MAX_ROWS,
   catalogueExportCsv,
   catalogueTemplateCsv,
-  planCatalogueImport,
   type CatalogueCsvItem,
   type ImportPlan,
 } from '@/lib/catalogue-csv';
+import {
+  CATALOGUE_FILE_ACCEPT,
+  CATALOGUE_FORMATS,
+  FORMAT_LABEL,
+  FORMAT_MIME,
+  detectFormat,
+  fromCsvText,
+  planCatalogueFile,
+  type CatalogueFormat,
+} from '@/lib/catalogue-formats';
 
 import { Panel } from './bits';
 
 const button =
   'border-border hover:border-ink inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-[0.75rem] font-extrabold transition-colors disabled:opacity-40';
 
-function download(filename: string, text: string) {
-  const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
+function download(filename: string, text: string, format: CatalogueFormat = 'csv') {
+  const url = URL.createObjectURL(
+    new Blob([text], { type: `${FORMAT_MIME[format]};charset=utf-8` }),
+  );
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
@@ -52,7 +63,12 @@ export function CatalogueCsv({
 }) {
   const router = useRouter();
   const fileRef = React.useRef<HTMLInputElement>(null);
-  const [file, setFile] = React.useState<{ name: string; text: string } | null>(null);
+  const [file, setFile] = React.useState<{
+    name: string;
+    text: string;
+    format: CatalogueFormat;
+  } | null>(null);
+  const [downloadFormat, setDownloadFormat] = React.useState<CatalogueFormat>('csv');
   const [plan, setPlan] = React.useState<ImportPlan | null>(null);
   const [result, setResult] = React.useState<CatalogueImportResult | null>(null);
   const [busy, setBusy] = React.useState(false);
@@ -75,14 +91,15 @@ export function CatalogueCsv({
       return;
     }
     const text = await picked.text();
-    setFile({ name: picked.name, text });
-    setPlan(planCatalogueImport(text, items));
+    const format = detectFormat(picked.name, text);
+    setFile({ name: picked.name, text, format });
+    setPlan(planCatalogueFile(text, format, items));
   };
 
   const confirm = async () => {
     if (!file) return;
     setBusy(true);
-    const r = await importCatalogueCsv({ merchantId, csv: file.text });
+    const r = await importCatalogueCsv({ merchantId, csv: file.text, format: file.format });
     setBusy(false);
     setResult(r);
     if (r.ok) {
@@ -99,17 +116,41 @@ export function CatalogueCsv({
   const errors = plan?.errors ?? [];
 
   return (
-    <Panel title="Import or export" note={`CSV, up to ${CATALOGUE_CSV_MAX_ROWS} products per file`}>
+    <Panel
+      title="Import or export"
+      note={`CSV, JSON or XML, up to ${CATALOGUE_CSV_MAX_ROWS} products per file`}
+    >
       <p className="text-muted mb-3 text-[0.75rem] font-semibold">
         Edit many products at once in Excel or Google Sheets. Export, change prices or details, and
         import the same file back. Rows with an id update that product; rows without one are added.
-        Photos stay as they are.
+        Photos stay as they are. JSON and XML use the same field names as the CSV columns; row 2 is
+        the first item.
       </p>
       <div className="flex flex-wrap gap-2">
+        <label className="inline-flex items-center gap-1.5 text-[0.75rem] font-extrabold">
+          Format
+          <select
+            className="border-border rounded-lg border bg-transparent px-2 py-2 text-[0.75rem] font-extrabold"
+            value={downloadFormat}
+            onChange={(e) => setDownloadFormat(e.target.value as CatalogueFormat)}
+          >
+            {CATALOGUE_FORMATS.map((f) => (
+              <option key={f} value={f}>
+                {FORMAT_LABEL[f]}
+              </option>
+            ))}
+          </select>
+        </label>
         <button
           type="button"
           className={button}
-          onClick={() => download('nexg-catalogue-template.csv', catalogueTemplateCsv(example))}
+          onClick={() =>
+            download(
+              `nexg-catalogue-template.${downloadFormat}`,
+              fromCsvText(catalogueTemplateCsv(example), downloadFormat),
+              downloadFormat,
+            )
+          }
         >
           <FileDown className="h-3.5 w-3.5" aria-hidden="true" />
           Download template
@@ -120,8 +161,12 @@ export function CatalogueCsv({
           disabled={!items.length}
           onClick={() =>
             download(
-              `nexg-catalogue-${today}.csv`,
-              catalogueExportCsv(items, new Map(sections.map((s) => [s.id, s.name]))),
+              `nexg-catalogue-${today}.${downloadFormat}`,
+              fromCsvText(
+                catalogueExportCsv(items, new Map(sections.map((s) => [s.id, s.name]))),
+                downloadFormat,
+              ),
+              downloadFormat,
             )
           }
         >
@@ -130,11 +175,11 @@ export function CatalogueCsv({
         </button>
         <label className={`${button} cursor-pointer`}>
           <Upload className="h-3.5 w-3.5" aria-hidden="true" />
-          Import CSV
+          Import file
           <input
             ref={fileRef}
             type="file"
-            accept=".csv,text/csv"
+            accept={CATALOGUE_FILE_ACCEPT}
             className="sr-only"
             onChange={(e) => void choose(e.target.files?.[0])}
           />

@@ -38,6 +38,7 @@ export default async function MerchantMenu() {
     { data: soldOutData },
     { data: messageData },
     { data: minOrderData },
+    { data: digitalData },
   ] = await Promise.all([
     supabase
       .from('catalogue_item')
@@ -85,6 +86,11 @@ export default async function MerchantMenu() {
       .eq('merchant_id', me.id),
     // And the minimum order (20270129000400).
     supabase.from('merchant').select('min_order_kes').eq('id', me.id).maybeSingle(),
+    // And digital items and the buyer's ID (20270130000400, 20270130000500).
+    supabase
+      .from('catalogue_item')
+      .select('id, digital, requires_buyer_id')
+      .eq('merchant_id', me.id),
   ]);
 
   const itemRows = (data as ItemRow[] | null) ?? [];
@@ -110,8 +116,15 @@ export default async function MerchantMenu() {
         | null) ?? []
     ).map((row) => [row.id, row]),
   );
+  const digital = new Map(
+    (
+      (digitalData as { id: string; digital: boolean; requires_buyer_id: boolean }[] | null) ?? []
+    ).map((row) => [row.id, row]),
+  );
   const items = itemRows.map((item) => ({
     ...item,
+    digital: digital.get(item.id)?.digital,
+    requires_buyer_id: digital.get(item.id)?.requires_buyer_id,
     photo_url: item.photo_path ? (photoUrls.get(item.photo_path) ?? null) : null,
     sold_out: soldOut.get(item.id),
     message: messages.has(item.id)

@@ -188,6 +188,7 @@ export function WorkWorkspace({
     document.getElementById(`work-tab-${next}`)?.focus();
   }
   const [handoverCode, setHandoverCode] = useState('');
+  const [sendText, setSendText] = useState('');
   async function advance(action = selected?.nextAction) {
     if (!selected || !action || pending) return;
     if (action.id === 'cancelled' && !window.confirm('Cancel this booking?')) return;
@@ -642,6 +643,40 @@ export function WorkWorkspace({
                       >
                         Manage booking
                       </Link>
+                    ) : selected.nextAction?.needsText ? (
+                      <form
+                        className="flex flex-col gap-2"
+                        onSubmit={(event) => {
+                          event.preventDefault();
+                          const text = sendText.trim();
+                          if (selected.nextAction && text)
+                            void advance({
+                              ...selected.nextAction,
+                              id: `${selected.nextAction.id}:${encodeURIComponent(text)}`,
+                            }).then(() => setSendText(''));
+                        }}
+                      >
+                        <label className="text-sm font-bold" htmlFor="work-send-text">
+                          {selected.nextAction.label}
+                        </label>
+                        <textarea
+                          id="work-send-text"
+                          autoComplete="off"
+                          maxLength={2000}
+                          rows={3}
+                          value={sendText}
+                          onChange={(event) => setSendText(event.target.value)}
+                          placeholder="Paste the eSIM activation code (LPA:1$…) or voucher code"
+                          className="rounded-md border px-3 py-2 font-mono text-sm"
+                        />
+                        <button
+                          type="submit"
+                          disabled={pending || !sendText.trim()}
+                          className="rounded-md bg-[#FDD128] px-4 py-2 text-sm font-bold text-[#171b24] hover:bg-[#c49a29] disabled:opacity-50"
+                        >
+                          {pending ? 'Sending…' : 'Send to the customer’s app'}
+                        </button>
+                      </form>
                     ) : selected.nextAction?.needsCode ? (
                       <form
                         className="flex gap-2"

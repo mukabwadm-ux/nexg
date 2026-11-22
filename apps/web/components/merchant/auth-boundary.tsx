@@ -84,8 +84,10 @@ export function MerchantAuthBoundary({
     void watcher.check();
     // A refresh/prefetch is not activity. Only actual input advances the existing
     // Auth session's idle deadline, and the database bounds the absolute expiry.
+    // Reported at most once a minute: the idle limit is 7 minutes, so a longer
+    // gap would sign out someone who had been typing until a moment ago.
     const activity = (event: Event) => {
-      if (!active || !expiresAt || !event.isTrusted || Date.now() - lastActivity < 300_000) return;
+      if (!active || !expiresAt || !event.isTrusted || Date.now() - lastActivity < 60_000) return;
       lastActivity = Date.now();
       void (
         client as unknown as {

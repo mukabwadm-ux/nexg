@@ -71,6 +71,57 @@ function orderNextAction(order: OrderRow): WorkRecord['nextAction'] {
   return undefined;
 }
 
+/* A digital order (an eSIM): no rider. Once it is paid, the shop sends each
+   line's code (rpc_merchant_order_send_codes), one at a time. */
+type DigitalOrder = {
+  order_id: string;
+  codes_missing: number;
+  lines: { order_item_id: string; name: string; has_code: boolean }[];
+  has_buyer_id: boolean;
+};
+
+/* Asked on its own (20270130000600): before the database has it, nothing is digital. */
+async function digitalOrders(
+  client: Awaited<ReturnType<typeof merchantActionClient>>['client'],
+  ids: string[],
+): Promise<Map<string, DigitalOrder>> {
+  if (!ids.length) return new Map();
+  try {
+    const result = await (client as unknown as SupabaseClient).rpc('rpc_merchant_digital_orders', {
+      p_order_ids: ids,
+    });
+    if (!result || result.error || !Array.isArray(result.data)) return new Map();
+    return new Map((result.data as DigitalOrder[]).map((row) => [row.order_id, row]));
+  } catch {
+    return new Map();
+  }
+}
+
+function digitalNextAction(
+  order: OrderRow,
+  digital: DigitalOrder | undefined,
+): WorkRecord['nextAction'] {
+  if (!digital || digital.codes_missing < 1) return undefined;
+  if (
+    order.what_now !== 'to_cook' &&
+    order.what_now !== 'cooking' &&
+    order.what_now !== 'you_are_late'
+  )
+    return undefined;
+  const next = digital.lines.find((line) => !line.has_code);
+  if (!next) return undefined;
+  const total = digital.lines.length;
+  const done = total - digital.codes_missing;
+  return {
+    id: 'send_code',
+    label:
+      total > 1
+        ? `Send the code for ${next.name} (${done + 1} of ${total})`
+        : `Send the code for ${next.name}`,
+    needsText: true,
+  };
+}
+
 /* Ready: the rider (or, for a collection order, the customer) shows a code
    and the shop types it in to hand the order over (rpc_merchant_handover_code_enter). */
 function orderHandoverAction(order: OrderRow): WorkRecord['nextAction'] {
@@ -90,7 +141,7 @@ function formatDate(value: string | null): string {
   return dateTime.format(new Date(value));
 }
 
-function orderRecord(order: OrderRow & { id: string }): WorkRecord {
+function orderRecord(order: OrderRow & { id: string }, digital?: DigitalOrder): WorkRecord {
   const status = orderStatuses[order.what_now ?? ''] ?? { label: 'Status unavailable', stage: 0 };
   return {
     id: order.id,
@@ -101,7 +152,11 @@ function orderRecord(order: OrderRow & { id: string }): WorkRecord {
       order.item_count == null
         ? 'Item count unavailable'
         : `${order.item_count} ${order.item_count === 1 ? 'item' : 'items'}`,
-    context: order.store ?? 'Location unavailable',
+    context: digital
+      ? digital.has_buyer_id
+        ? 'Digital delivery · buyer ID given'
+        : 'Digital delivery'
+      : (order.store ?? 'Location unavailable'),
     milestone: formatDate(order.promised_ready_at ?? order.placed_at),
     operator: order.rider ?? 'Unassigned',
     stage: status.stage,
@@ -114,7 +169,9 @@ function orderRecord(order: OrderRow & { id: string }): WorkRecord {
     confirmation: status.label,
     sourceLabel: 'Orders',
     history: order.placed_at ? [`Placed ${formatDate(order.placed_at)}`] : [],
-    nextAction: orderNextAction(order) ?? orderHandoverAction(order),
+    nextAction: digital
+      ? digitalNextAction(order, digital)
+      : (orderNextAction(order) ?? orderHandoverAction(order)),
   };
 }
 
@@ -170,10 +227,14 @@ export async function loadMerchantWork(
       .order('placed_at', { ascending: false })
       .limit(200);
     if (error) return { ok: false, message: 'Orders could not be loaded. Try again.' };
+    const digital = await digitalOrders(
+      client,
+      (data ?? []).flatMap((order) => (order.id ? [order.id] : [])),
+    );
     return {
       ok: true,
       records: (data ?? []).flatMap((order) =>
-        order.id ? [orderRecord({ ...order, id: order.id })] : [],
+        order.id ? [orderRecord({ ...order, id: order.id }, digital.get(order.id))] : [],
       ),
     };
   }
@@ -262,6 +323,39 @@ export async function advanceMerchantOrder(
       .maybeSingle<OrderRow>();
   const { data, error } = await load();
   if (error || !data?.id) return { ok: false, message: 'This order could not be loaded.' };
+  if (action.startsWith('send_code:')) {
+    const digital = (await digitalOrders(client, [id])).get(id);
+    const next = digitalNextAction(data, digital);
+    const line = digital?.lines.find((item) => !item.has_code);
+    if (!next || !line)
+      return { ok: false, message: 'This order changed. Reload it before trying again.' };
+    let code = '';
+    try {
+      code = decodeURIComponent(action.slice('send_code:'.length)).trim();
+    } catch {
+      return { ok: false, message: 'That code could not be read. Paste it again.' };
+    }
+    if (code.length < 1 || code.length > 2000)
+      return { ok: false, message: 'Paste the code, up to 2,000 characters.' };
+    const { error: sendError } = await (client as unknown as SupabaseClient).rpc(
+      'rpc_merchant_order_send_codes',
+      { p_order_id: id, p_codes: [{ order_item_id: line.order_item_id, code }] },
+    );
+    if (sendError)
+      return {
+        ok: false,
+        message:
+          sendError.hint === 'unpaid'
+            ? 'Wait for the customer’s payment before sending the code.'
+            : 'Could not send the code. Reload the order before trying again.',
+      };
+    const [{ data: sent }, after] = await Promise.all([load(), digitalOrders(client, [id])]);
+    revalidatePath('/merchant/work');
+    revalidatePath('/merchant/orders');
+    const row = sent?.id ? sent : data;
+    return { ok: true, record: orderRecord({ ...row, id: row.id ?? id }, after.get(id)) };
+  }
+  /* A digital order is offered only send_code; the database refuses it a rider. */
   if (action.startsWith('handover:')) {
     if (!orderHandoverAction(data))
       return { ok: false, message: 'This order changed. Reload it before trying again.' };

@@ -52,7 +52,7 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
       .select('name, status, contact_email, contact_phone')
       .eq('merchant_id', me.id)
       .maybeSingle(),
-    db.from('merchant').select('subcategory').eq('id', me.id).maybeSingle(),
+    db.from('merchant').select('*').eq('id', me.id).maybeSingle(),
     db
       .from('merchant_branch')
       .select('id, name, address_text, closed_at, paused_at')
@@ -217,6 +217,14 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
       },
     ];
   });
+  /* logo_path is newer than the generated types, hence the loose read. */
+  const merchantRow = (taxonomy.data ?? {}) as {
+    logo_path?: string | null;
+    cover_photo_path?: string | null;
+  };
+  const brand = { logo: merchantRow.logo_path ?? '', cover: merchantRow.cover_photo_path ?? '' };
+  const myRole = (members.data ?? []).find((member) => member.user_id === me.userId)?.role;
+  const mayChangeBrand = myRole === 'owner' || myRole === 'manager';
   const data: Business = {
     schema: 1,
     profileId: activityIds[0] ?? '',
@@ -231,8 +239,8 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
       description: '',
       email: profile.data.contact_email ?? '',
       contact: profile.data.contact_phone ?? '',
-      logo: '',
-      cover: '',
+      logo: brand.logo,
+      cover: brand.cover,
     },
     activities,
     locations,
@@ -282,6 +290,7 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
       liveData={data}
       liveMemberTools={memberTools}
       liveDocuments={evidence?.ok ? evidence : null}
+      liveBrand={mayChangeBrand ? { merchantId: me.id } : null}
       liveTools={{
         profile: record ? (
           <Link className={manage} href={`/merchants/register?merchantId=${record.merchant_id}`}>

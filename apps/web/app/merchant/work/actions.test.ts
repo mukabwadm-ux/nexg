@@ -52,6 +52,50 @@ describe('Work page orders', () => {
     expect(result.ok && result.records[0]?.nextAction?.id).toBe(action ?? undefined);
   });
 
+  const digitalRow = (codesMissing: number) => ({
+    order_id: id,
+    codes_missing: codesMissing,
+    lines: [{ order_item_id: 'line-1', name: 'eSIM 10 GB', has_code: codesMissing === 0 }],
+    has_buyer_id: true,
+  });
+
+  it('offers to send the code for a paid digital order, never a rider step', async () => {
+    mock.rows = [order('to_cook', 'placed')];
+    mock.rpc.mockImplementation(async (name: string) =>
+      name === 'rpc_merchant_digital_orders'
+        ? { data: [digitalRow(1)], error: null }
+        : { data: null, error: null },
+    );
+    const result = await loadMerchantWork('WF_ORDER');
+    const record = result.ok ? result.records[0] : undefined;
+    expect(record?.nextAction).toEqual({
+      id: 'send_code',
+      label: 'Send the code for eSIM 10 GB',
+      needsText: true,
+    });
+    expect(record?.context).toBe('Digital delivery · buyer ID given');
+  });
+
+  it('sends the code through rpc_merchant_order_send_codes', async () => {
+    mock.rows = [order('to_cook', 'placed')];
+    let sent = false;
+    mock.rpc.mockImplementation(async (name: string) => {
+      if (name === 'rpc_merchant_digital_orders')
+        return { data: [digitalRow(sent ? 0 : 1)], error: null };
+      sent = true;
+      return { data: { ok: true, stage: 'delivered' }, error: null };
+    });
+    const result = await advanceMerchantOrder(
+      id,
+      `send_code:${encodeURIComponent('LPA:1$SM-DP$ABC')}`,
+    );
+    expect(mock.rpc).toHaveBeenCalledWith('rpc_merchant_order_send_codes', {
+      p_order_id: id,
+      p_codes: [{ order_item_id: 'line-1', code: 'LPA:1$SM-DP$ABC' }],
+    });
+    expect(result.ok && result.record.nextAction).toBeUndefined();
+  });
+
   it('saves the step through rpc_merchant_order_step', async () => {
     mock.rows = [order('to_cook', 'placed')];
     mock.rpc.mockResolvedValue({ data: { ok: true }, error: null });

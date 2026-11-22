@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(18);
+select plan(19);
 
 insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, is_anonymous, created_at, updated_at)
 values
@@ -30,8 +30,12 @@ select throws_ok($$ select public.rpc_maps_route_budget('day') $$,
   '42501', 'Sign in with your account to request a map route.', 'An absent or deleted Auth account cannot reserve quota.');
 select set_config('request.jwt.claims',
   '{"sub":"c0720000-0000-4000-8000-000000000003","role":"authenticated","is_anonymous":false}', true);
-select throws_ok($$ select public.rpc_maps_route_budget('day') $$,
-  '42501', 'Sign in with your account to request a map route.', 'An anonymous Auth user is denied.');
+-- Since 20270130009400 (owner, 22 Nov 2026) a temporary session routes one
+-- Explore plan, judged by the Auth record even when its token says otherwise.
+select is(public.rpc_maps_route_budget('day') ->> 'allowed', 'true',
+  'An anonymous Auth user routes one plan as a guest.');
+select is(public.rpc_maps_route_budget('other') ->> 'reason', 'sign_in_required',
+  'A second plan asks it to sign in, whatever its token says.');
 select set_config('request.jwt.claims',
   '{"sub":"c0720000-0000-4000-8000-000000000001","role":"authenticated","is_anonymous":false}', true);
 select throws_ok($$ select public.rpc_maps_route_budget(repeat('x', 121)) $$,
