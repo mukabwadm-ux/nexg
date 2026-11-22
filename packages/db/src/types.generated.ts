@@ -31723,12 +31723,16 @@ export type Database = {
           authorised_at: string | null;
           authorization_url: string | null;
           booking_id: string | null;
+          booking_step: string | null;
           channel: string | null;
           city_id: string | null;
           created_at: string;
           created_by: string | null;
           created_via: string;
           currency: string;
+          customer_engine_booking_id: string | null;
+          engine_settle_error: string | null;
+          engine_settled_at: string | null;
           expires_at: string | null;
           failure_reason: string | null;
           guest_id: string | null;
@@ -31754,12 +31758,16 @@ export type Database = {
           authorised_at?: string | null;
           authorization_url?: string | null;
           booking_id?: string | null;
+          booking_step?: string | null;
           channel?: string | null;
           city_id?: string | null;
           created_at?: string;
           created_by?: string | null;
           created_via: string;
           currency?: string;
+          customer_engine_booking_id?: string | null;
+          engine_settle_error?: string | null;
+          engine_settled_at?: string | null;
           expires_at?: string | null;
           failure_reason?: string | null;
           guest_id?: string | null;
@@ -31784,12 +31792,16 @@ export type Database = {
           authorised_at?: string | null;
           authorization_url?: string | null;
           booking_id?: string | null;
+          booking_step?: string | null;
           channel?: string | null;
           city_id?: string | null;
           created_at?: string;
           created_by?: string | null;
           created_via?: string;
           currency?: string;
+          customer_engine_booking_id?: string | null;
+          engine_settle_error?: string | null;
+          engine_settled_at?: string | null;
           expires_at?: string | null;
           failure_reason?: string | null;
           guest_id?: string | null;
@@ -31921,6 +31933,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'waitlist_city_v';
             referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'payment_customer_engine_booking_id_fkey';
+            columns: ['customer_engine_booking_id'];
+            isOneToOne: false;
+            referencedRelation: 'customer_engine_booking';
+            referencedColumns: ['id'];
           },
           {
             foreignKeyName: 'payment_guest_id_fkey';
@@ -62893,6 +62912,7 @@ export type Database = {
           updated_at: string;
         }[];
       };
+      rpc_engine_booking_payment_state: { Args: { p_booking: string }; Returns: Json };
       rpc_experience_guests: {
         Args: { p_city_id?: string; p_filter?: string };
         Returns: {
@@ -66755,9 +66775,33 @@ export type Database = {
         Args: { p_provider: string; p_raw_body: string; p_signature_header: string };
         Returns: Json;
       };
+      rpc_payment_begin_engine_booking: {
+        Args: {
+          p_amount_cents: number;
+          p_booking: string;
+          p_expires_at: string;
+          p_proof: string;
+          p_step: string;
+        };
+        Returns: Json;
+      };
       rpc_payment_begin_featured: { Args: { p_booking_id: string }; Returns: Json };
       rpc_payment_begin_order: { Args: { p_order_id: string }; Returns: Json };
       rpc_payment_begin_stay: { Args: { p_stay_id: string }; Returns: Json };
+      rpc_payment_engine_due: {
+        Args: { p_proof: string };
+        Returns: {
+          amount_cents: number;
+          engine_booking_id: string;
+          is_test: boolean;
+          merchant_id: string;
+          reference: string;
+        }[];
+      };
+      rpc_payment_engine_settled: {
+        Args: { p_ok: boolean; p_proof: string; p_reference: string; p_refusal: string };
+        Returns: Json;
+      };
       rpc_payment_method_toggle: {
         Args: { p_enabled: boolean; p_key: string; p_reason: string };
         Returns: Json;
@@ -70064,7 +70108,7 @@ export type Database = {
         | 'paused'
         | 'suspended'
         | 'delisted';
-      payment_intent: 'order' | 'featured_slot' | 'rider_float' | 'stay';
+      payment_intent: 'order' | 'featured_slot' | 'rider_float' | 'stay' | 'booking';
       payment_state: 'pending' | 'authorised' | 'paid' | 'failed' | 'abandoned' | 'reversed';
       placement_kind: 'homepage' | 'category_top' | 'popular_request';
       plan_block_status: 'proposed' | 'confirmed' | 'changed' | 'unavailable' | 'removed' | 'done';
@@ -71885,7 +71929,7 @@ export const Constants = {
         'suspended',
         'delisted',
       ],
-      payment_intent: ['order', 'featured_slot', 'rider_float', 'stay'],
+      payment_intent: ['order', 'featured_slot', 'rider_float', 'stay', 'booking'],
       payment_state: ['pending', 'authorised', 'paid', 'failed', 'abandoned', 'reversed'],
       placement_kind: ['homepage', 'category_top', 'popular_request'],
       plan_block_status: ['proposed', 'confirmed', 'changed', 'unavailable', 'removed', 'done'],
