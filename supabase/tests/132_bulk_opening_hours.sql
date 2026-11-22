@@ -39,6 +39,7 @@ select is(jsonb_array_length(pg_temp.hours(array[
 select is((select a ->> 'opens' from jsonb_array_elements(pg_temp.hours(array[
             'c1320000-0000-4000-8000-00000000000a']::uuid[], current_date + 1)) a), '08:00:00',
   'A shop''s hours for the chosen date...');
+reset role;  -- the single answer reads branches, which visitors cannot
 select is((select row(a ->> 'opens', a ->> 'closes', a ->> 'closed')::text
              from jsonb_array_elements(pg_temp.hours(array['c1320000-0000-4000-8000-00000000000a']::uuid[],
                                                        current_date + 1)) a),
@@ -47,6 +48,7 @@ select is((select row(a ->> 'opens', a ->> 'closes', a ->> 'closed')::text
                     (select id from public.merchant_branch where merchant_id = 'c1320000-0000-4000-8000-00000000000a'),
                     current_date + 1) h),
   '...match the single answer the store page uses.');
+set local role anon;
 select ok((select a ->> 'opens' is null and not (a ->> 'closed')::boolean
              from jsonb_array_elements(pg_temp.hours(array[
                'c1320000-0000-4000-8000-00000000000b']::uuid[], current_date + 1)) a),
