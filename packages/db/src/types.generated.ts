@@ -503,6 +503,81 @@ export type Database = {
           },
         ];
       };
+      event_origin: {
+        Row: {
+          at: string;
+          device_id: string | null;
+          device_label: string | null;
+          event_id: number;
+          ip: unknown;
+          merchant_id: string | null;
+          proxy_ip: unknown;
+          session_id: string | null;
+          surface: string | null;
+          tx: number | null;
+          user_agent: string | null;
+          user_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          at?: string;
+          device_id?: string | null;
+          device_label?: string | null;
+          event_id: number;
+          ip?: unknown;
+          merchant_id?: string | null;
+          proxy_ip?: unknown;
+          session_id?: string | null;
+          surface?: string | null;
+          tx?: number | null;
+          user_agent?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          at?: string;
+          device_id?: string | null;
+          device_label?: string | null;
+          event_id?: number;
+          ip?: unknown;
+          merchant_id?: string | null;
+          proxy_ip?: unknown;
+          session_id?: string | null;
+          surface?: string | null;
+          tx?: number | null;
+          user_agent?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'event_origin_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'audit_event';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_origin_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_activity_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_origin_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_data_access_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_origin_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_money_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       evidence_pack: {
         Row: {
           chain_checked_at: string | null;
@@ -990,10 +1065,13 @@ export type Database = {
           city_id: string | null;
           city_name: string | null;
           context: Json | null;
+          device_id: string | null;
+          device_label: string | null;
           diff: Json | null;
           hash: string | null;
           hash_version: number | null;
           id: number | null;
+          ip: string | null;
           is_money: boolean | null;
           module: string | null;
           needs_two_people: boolean | null;
@@ -1007,7 +1085,9 @@ export type Database = {
           reviewed_by: string | null;
           reviewed_by_name: string | null;
           sentence: string | null;
+          session_id: string | null;
           severity: Database['public']['Enums']['audit_severity'] | null;
+          surface: string | null;
           target_id: string | null;
           target_label: string | null;
           target_type: string | null;
@@ -1463,9 +1543,12 @@ export type Database = {
         };
         Returns: string;
       };
+      fn_device_label: { Args: { p_ua: string }; Returns: string };
       fn_diff: { Args: { p_after: Json; p_before: Json }; Returns: Json };
+      fn_inet: { Args: { p_value: string }; Returns: unknown };
       fn_mask_email: { Args: { p_email: string }; Returns: string };
       fn_mask_payload: { Args: { p_fields: string[]; p_payload: Json }; Returns: Json };
+      fn_request_context: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_require: { Args: { p_level: string }; Returns: string };
       fn_sentence: {
         Args: {
@@ -1476,7 +1559,9 @@ export type Database = {
         };
         Returns: string;
       };
+      fn_trim_payload: { Args: { p: Json }; Returns: Json };
       fn_under_hold: { Args: { p_subject_id: string; p_subject_type: string }; Returns: boolean };
+      fn_uuid: { Args: { p_value: string }; Returns: string };
       fn_visible: {
         Args: { p_actor_id: string; p_city_id: string; p_module: string; p_money: boolean };
         Returns: boolean;
@@ -21284,6 +21369,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -21383,6 +21469,7 @@ export type Database = {
           landmark?: string | null;
           late_night_until?: string | null;
           legal_name?: string | null;
+          logo_path?: string | null;
           min_order_kes?: number | null;
           notification_rules?: NonNullable<Json>;
           onboarding_call_at?: string | null;
@@ -21481,6 +21568,7 @@ export type Database = {
           landmark?: string | null;
           late_night_until?: string | null;
           legal_name?: string | null;
+          logo_path?: string | null;
           min_order_kes?: number | null;
           notification_rules?: NonNullable<Json>;
           onboarding_call_at?: string | null;
@@ -41826,10 +41914,13 @@ export type Database = {
           city_id: string | null;
           city_name: string | null;
           context: Json | null;
+          device_id: string | null;
+          device_label: string | null;
           diff: Json | null;
           hash: string | null;
           hash_version: number | null;
           id: number | null;
+          ip: string | null;
           is_money: boolean | null;
           module: string | null;
           needs_two_people: boolean | null;
@@ -41843,7 +41934,9 @@ export type Database = {
           reviewed_by: string | null;
           reviewed_by_name: string | null;
           sentence: string | null;
+          session_id: string | null;
           severity: Database['public']['Enums']['audit_severity'] | null;
+          surface: string | null;
           target_id: string | null;
           target_label: string | null;
           target_type: string | null;
@@ -58956,6 +59049,7 @@ export type Database = {
       cron_notify_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_payments_worker: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_paystack_sweep: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_purge_audit_ips: { Args: Record<PropertyKey, never>; Returns: number };
       cron_purge_order_buyer_ids: { Args: Record<PropertyKey, never>; Returns: number };
       cron_push_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_refresh_reports: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -59604,6 +59698,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -60539,6 +60634,27 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_admin_merchant_activity: {
+        Args: { p_before_id?: number; p_limit?: number; p_merchant_id: string };
+        Returns: {
+          action: string;
+          action_label: string;
+          after: Json;
+          at: string;
+          before: Json;
+          device_id: string;
+          device_label: string;
+          id: number;
+          ip: string;
+          reason: string;
+          sentence: string;
+          session_id: string;
+          target_label: string;
+          target_type: string;
+          who: string;
+          who_role: string;
+        }[];
+      };
       rpc_answer_hold: {
         Args: {
           p_hold_id: string;
@@ -60784,6 +60900,24 @@ export type Database = {
       rpc_audit_break_glass_review: {
         Args: { p_id: string; p_note: string; p_outcome: string };
         Returns: Json;
+      };
+      rpc_audit_device_detail: { Args: { p_device_id: string; p_limit?: number }; Returns: Json };
+      rpc_audit_devices: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          actions: number;
+          device_id: string;
+          device_label: string;
+          failed_sign_ins: number;
+          first_seen: string;
+          ip_count: number;
+          last_ip: string;
+          last_seen: string;
+          live_sessions: number;
+          sign_ins: number;
+          staff_email: string;
+          staff_user_id: string;
+        }[];
       };
       rpc_audit_legal_hold_place: {
         Args: {
@@ -64592,6 +64726,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -64713,6 +64848,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -65079,6 +65215,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -65181,6 +65318,10 @@ export type Database = {
         Args: { p_branches: Json; p_merchant_id: string };
         Returns: Json;
       };
+      rpc_merchant_set_brand_image: {
+        Args: { p_kind: string; p_merchant_id: string; p_url: string };
+        Returns: undefined;
+      };
       rpc_merchant_set_category: {
         Args: {
           p_answers?: Json;
@@ -65251,6 +65392,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -65370,6 +65512,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -65477,6 +65620,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -65602,6 +65746,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -65765,6 +65910,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -66854,6 +67000,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_record_sign_out: { Args: { p_reason?: string }; Returns: Json };
       rpc_refund_issued: {
         Args: { p_payload?: Json; p_provider_ref: string; p_refund_id: string };
         Returns: Json;

@@ -1,7 +1,18 @@
 import type { Database } from '@nexg/db';
 import { createServerClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+
+import { DEVICE_COOKIE, contextHeaders } from '@/lib/request-context';
+
+/* Which device and address this call came from, for the admin's merchant trail. */
+function requestHeaders(deviceId: string | undefined): Record<string, string> {
+  try {
+    return contextHeaders(headers(), deviceId, 'web');
+  } catch {
+    return {};
+  }
+}
 
 /**
  * Supabase client for server components, route handlers and server actions.
@@ -30,6 +41,7 @@ export function createClient(): SupabaseClient<Database> {
     {
       global: {
         fetch: (input, init) => fetch(input, { ...init, cache: 'no-store' }),
+        headers: requestHeaders(cookieStore.get(DEVICE_COOKIE)?.value),
       },
       cookies: {
         getAll() {

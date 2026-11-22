@@ -122,6 +122,7 @@ export function ActivityTab({
   selected,
   filter,
   moduleFilter,
+  origin = {},
 }: {
   health: HealthRow;
   events: ActivityRow[];
@@ -129,7 +130,12 @@ export function ActivityTab({
   selected: ActivityRow | null;
   filter: string;
   moduleFilter: string | null;
+  /** Narrowed to one device or one address, from the Devices tab or the event panel. */
+  origin?: { device?: string | null; ip?: string | null };
 }) {
+  const originQuery = `${origin.device ? `&device=${encodeURIComponent(origin.device)}` : ''}${
+    origin.ip ? `&ip=${encodeURIComponent(origin.ip)}` : ''
+  }`;
   return (
     <>
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -166,6 +172,22 @@ export function ActivityTab({
         ]}
       />
 
+      {(origin.device || origin.ip) && (
+        <div className="bg-gold-soft/40 mt-3 flex flex-wrap items-center gap-2 rounded-lg px-3 py-2 text-[0.75rem] font-bold">
+          <span>
+            Only events from {origin.device ? `device ${origin.device.slice(0, 8)}` : ''}
+            {origin.device && origin.ip ? ' at ' : ''}
+            {origin.ip ? `address ${origin.ip}` : ''}
+          </span>
+          <Link
+            href={`/audit?tab=activity&filter=${filter}${moduleFilter ? `&module=${moduleFilter}` : ''}`}
+            className="text-gold-text underline"
+          >
+            Show every device
+          </Link>
+        </div>
+      )}
+
       {modules.length > 1 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
           <ModuleChip tab="activity" filter={filter} value={null} active={!moduleFilter}>
@@ -201,7 +223,7 @@ export function ActivityTab({
                   <Link
                     href={`/audit?tab=activity&filter=${filter}${
                       moduleFilter ? `&module=${moduleFilter}` : ''
-                    }&event=${e.id}`}
+                    }${originQuery}&event=${e.id}`}
                     className={`hover:bg-bg/60 block px-4 py-3 transition-colors ${
                       selected?.id === e.id ? 'bg-gold-soft/40' : ''
                     }`}
@@ -228,6 +250,8 @@ export function ActivityTab({
                         ? ` · ${e.changed_fields} field${e.changed_fields === 1 ? '' : 's'} changed`
                         : ''}
                       {e.needs_two_people && !e.approver_label ? ' · no second person' : ''}
+                      {e.device_label ? ` · ${e.device_label}` : ''}
+                      {e.ip ? ` · ${e.ip}` : ''}
                     </p>
                   </Link>
                 </li>
@@ -304,6 +328,39 @@ function EventPanel({ event }: { event: ActivityRow | null }) {
           <Diff diff={event.diff} />
         </div>
       </div>
+
+      {(event.device_id || event.ip || event.session_id) && (
+        <div className="mt-4">
+          <p className="text-muted-light text-[0.625rem] font-extrabold uppercase tracking-[0.12em]">
+            Device and address
+          </p>
+          <dl className="mt-1.5 space-y-1.5 text-[0.75rem]">
+            {event.device_label && <Row label="Device" value={event.device_label} />}
+            {event.ip && <Row label="IP address" value={event.ip} />}
+            {event.session_id && (
+              <Row label="Sign-in session" value={event.session_id.slice(0, 8)} />
+            )}
+          </dl>
+          <div className="mt-2 flex flex-wrap gap-3 text-[0.75rem] font-bold">
+            {event.device_id && (
+              <Link
+                href={`/audit?tab=devices&device=${encodeURIComponent(event.device_id)}`}
+                className="text-gold-text underline"
+              >
+                Everything from this device
+              </Link>
+            )}
+            {event.ip && (
+              <Link
+                href={`/audit?tab=activity&ip=${encodeURIComponent(event.ip)}`}
+                className="text-gold-text underline"
+              >
+                Everything from this address
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
 
       {Object.keys(event.context ?? {}).length > 0 && (
         <div className="mt-4">
