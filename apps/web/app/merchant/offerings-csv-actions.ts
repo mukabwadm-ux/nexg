@@ -27,6 +27,7 @@ import {
   type RowError,
 } from '@/components/merchant/offerings/csv';
 import { profiles } from '@/components/merchant/offerings/model';
+import { isCatalogueFormat, toImportCsv, type CatalogueFormat } from '@/lib/catalogue-formats';
 import { isMissingWorkspaceSetupRpc, merchantActionClient } from '@/lib/merchant-action-access';
 import { merchantCatalogueRows } from '@/lib/merchant-catalogue-rows';
 
@@ -34,7 +35,9 @@ import { merchantCatalogueRows } from '@/lib/merchant-catalogue-rows';
 export type PreviewRow = Omit<PlannedRow, 'item'> & { sourceRows: number[] };
 
 export interface ImportInput {
+  /** The file exactly as chosen: CSV, JSON or XML. */
   csv: string;
+  format?: CatalogueFormat;
   fileName?: string;
   profileId: string;
   /** Field → column index; omitted on the first look, which suggests one. */
@@ -102,7 +105,7 @@ async function plan(
   input: ImportInput,
 ): Promise<({ ok: true } & Planned) | { ok: false; message: string }> {
   if (typeof input?.csv !== 'string' || !input.csv.trim())
-    return { ok: false, message: 'Choose a CSV file to import.' };
+    return { ok: false, message: 'Choose a file to import.' };
   if (input.csv.length > OFFERINGS_CSV_MAX_BYTES)
     return {
       ok: false,
@@ -111,7 +114,10 @@ async function plan(
   const profile = profiles.find((entry) => entry.id === input?.profileId);
   if (!profile) return { ok: false, message: 'Choose the business activity to import into.' };
 
-  const table = readTable(input.csv);
+  // JSON and XML become the same CSV text, so every check below applies to all three.
+  const converted = toImportCsv(input.csv, isCatalogueFormat(input.format) ? input.format : 'csv');
+  if ('error' in converted) return { ok: false, message: converted.error };
+  const table = readTable(converted.csv);
   if ('error' in table) return { ok: false, message: table.error };
   if (!table.rows.length) return { ok: false, message: 'The file has column names but no rows.' };
 
@@ -234,12 +240,15 @@ export async function importOfferingsCsv(input: ImportInput): Promise<OfferingsC
     const changes = p.plan.rows.filter((row) => row.item);
 
     // Keep the file exactly as uploaded, privately, with the batch.
-    const fileName = (input.fileName || 'import.csv').slice(0, 255);
-    let storagePath: string | null = `${p.merchantId}/${randomUUID()}.csv`;
+    const format = isCatalogueFormat(input.format) ? input.format : 'csv';
+    const fileName = (input.fileName || `import.${format}`).slice(0, 255);
+    // The bucket takes text types only; a JSON or XML file is kept as plain text.
+    const contentType = format === 'csv' ? 'text/csv' : 'text/plain';
+    let storagePath: string | null = `${p.merchantId}/${randomUUID()}.${format}`;
     const stored = await p.client.storage
       .from('merchant-imports')
-      .upload(storagePath, new Blob([input.csv], { type: 'text/csv' }), {
-        contentType: 'text/csv',
+      .upload(storagePath, new Blob([input.csv], { type: contentType }), {
+        contentType,
         upsert: false,
       });
     if (stored.error) storagePath = null;

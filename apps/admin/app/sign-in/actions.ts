@@ -81,7 +81,7 @@ export async function signOut() {
   const { data } = await supabase.auth.getUser();
 
   if (data.user?.email) {
-    await record(supabase, data.user.email, 'signed_out');
+    await recordSignOut(supabase, 'signed_out');
   }
 
   await supabase.auth.signOut();
@@ -97,9 +97,27 @@ export async function signOut() {
  * Called from the idle-signout route, not a form, so it is a plain
  * export with no client surface of its own.
  */
-export async function recordIdleSignOut(email: string) {
+export async function recordIdleSignOut(_email: string) {
   const supabase = createClient();
-  await record(supabase, email, 'signed_out');
+  await recordSignOut(supabase, 'expired');
+}
+
+/**
+ * Close this session's sign-in row. The session is the JWT's, so the
+ * row closed is the one this browser opened and no other.
+ *
+ * It used to call the sign-in recorder with outcome "success", which
+ * wrote a second sign-in rather than ending the first.
+ */
+async function recordSignOut(
+  supabase: ReturnType<typeof createClient>,
+  reason: 'signed_out' | 'expired',
+) {
+  try {
+    await supabase.rpc('rpc_record_sign_out', { p_reason: reason });
+  } catch {
+    /* Never block a sign-out on the log either. */
+  }
 }
 
 /**
@@ -114,27 +132,21 @@ export async function recordIdleSignOut(email: string) {
  * gap shows on the Audit console as a quiet hour rather than as an
  * outage, which is the right way round.
  *
- * No IP. The country comes from the edge header and the address is
- * never read — a sign-in log is exactly the table somebody would
- * later be tempted to use to place a person.
+ * The address, user agent, device id and session are not passed
+ * here: the database reads them from the request (see
+ * lib/request-context.ts), so they are the same ones every later
+ * action from this browser carries. The owner asked for addresses so
+ * that people sharing one admin account can be told apart; they are
+ * readable at full audit access only and cleared after 365 days.
  */
 async function record(
   supabase: ReturnType<typeof createClient>,
   email: string,
-  outcome: 'success' | 'bad_password' | 'signed_out',
+  outcome: 'success' | 'bad_password',
 ) {
   try {
     const h = headers();
     const ua = h.get('user-agent') ?? '';
-
-    if (outcome === 'signed_out') {
-      await supabase.rpc('rpc_record_sign_in', {
-        p_email: email,
-        p_outcome: 'success',
-        p_session_id: undefined,
-      });
-      return;
-    }
 
     await supabase.rpc('rpc_record_sign_in', {
       p_email: email,

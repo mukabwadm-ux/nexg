@@ -76,14 +76,9 @@ export function RiderPageHead({
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0">
-        <h1 className="font-serif text-[1.875rem] font-extrabold leading-tight tracking-tight">
-          {title}
-        </h1>
-        {lead ? (
-          <p className="text-muted mt-2 max-w-3xl text-[0.9375rem] font-semibold leading-[1.7]">
-            {lead}
-          </p>
-        ) : null}
+        {/* The merchant dashboard's page heading (components/merchant/frame.tsx). */}
+        <h1 className="font-sans text-[1.75rem] font-bold leading-tight tracking-tight">{title}</h1>
+        {lead ? <p className="text-muted mt-2 max-w-3xl text-sm leading-relaxed">{lead}</p> : null}
       </div>
       {actions ? <div className="flex shrink-0 flex-wrap gap-2">{actions}</div> : null}
     </div>
@@ -92,7 +87,7 @@ export function RiderPageHead({
 
 /** The padding a rider board sits in. Full width, with a gutter. */
 export function RiderBoard({ children }: { children: React.ReactNode }) {
-  return <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">{children}</div>;
+  return <div className="space-y-6 px-4 py-6 sm:px-6 lg:px-7">{children}</div>;
 }
 
 /**

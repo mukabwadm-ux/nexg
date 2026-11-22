@@ -9,6 +9,12 @@ import {
   sessionIdOf,
   writeStaffSeen,
 } from '@/lib/idle';
+import {
+  DEVICE_COOKIE,
+  DEVICE_COOKIE_MAX_AGE_S,
+  isDeviceId,
+  newDeviceId,
+} from '@/lib/request-context';
 
 /**
  * Keeps the Supabase session fresh and keeps signed-out visitors out of the
@@ -52,6 +58,20 @@ export async function middleware(request: NextRequest) {
           }),
         ]).finally(() => clearTimeout(budget))
       : await staffSessionMiddleware(request);
+  /*
+   * Every browser gets a random device id the first time it reaches the
+   * console, before it can sign in, so its sign-in and every action after
+   * it say which device they came from. See lib/request-context.ts.
+   */
+  if (!isDeviceId(request.cookies.get(DEVICE_COOKIE)?.value)) {
+    response.cookies.set(DEVICE_COOKIE, newDeviceId(), {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: request.nextUrl.protocol === 'https:',
+      maxAge: DEVICE_COOKIE_MAX_AGE_S,
+    });
+  }
   response.headers.set('Cache-Control', 'private, no-store, max-age=0');
   response.headers.set('CDN-Cache-Control', 'no-store');
   response.headers.set('Vercel-CDN-Cache-Control', 'no-store');

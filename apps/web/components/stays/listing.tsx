@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import midnight from './midnight.module.css';
+import { Price } from '@/components/currency/price';
 
 /** Shared pieces of the stays listing, used by /stays and the /hosts teaser. */
 
@@ -51,6 +52,16 @@ export function bedroomLabel(min: number | null, max: number | null): string {
 
 export function rateLabel(kes: number | null): string {
   return kes === null ? 'Price on request' : `from KES ${kes.toLocaleString('en-KE')}`;
+}
+
+/** rateLabel, in the visitor's display currency. */
+export function RateLabel({ kes }: { kes: number | null }) {
+  if (kes === null) return <>Price on request</>;
+  return (
+    <>
+      from <Price kes={kes} />
+    </>
+  );
 }
 
 /**
@@ -171,7 +182,7 @@ export function PropertyCard({
 
           <span className="border-border mt-3 flex items-center justify-between gap-2 border-t pt-3">
             <span className="text-[0.875rem] font-extrabold">
-              {rateLabel(property.from_rate_kes)}
+              <RateLabel kes={property.from_rate_kes} />
               {property.from_rate_kes !== null && (
                 <span className="text-muted-light text-[0.6875rem] font-semibold"> / night</span>
               )}
@@ -235,7 +246,7 @@ function MidnightPropertyCard({ property }: { property: PropertyCardRow }) {
 
         <span className="mt-3 flex items-center justify-between gap-2 border-t border-white/15 pt-3">
           <span className="text-[0.875rem] font-extrabold text-white">
-            {rateLabel(property.from_rate_kes)}
+            <RateLabel kes={property.from_rate_kes} />
             {property.from_rate_kes !== null && (
               <span className="text-[0.6875rem] font-semibold text-white/70"> / night</span>
             )}

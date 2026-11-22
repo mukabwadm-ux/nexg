@@ -4,7 +4,7 @@ import * as React from 'react';
 import { usePathname } from 'next/navigation';
 
 import { WhatsAppButton } from '@/components/chat/whatsapp-button';
-import { isLocaleTag } from '@/lib/i18n/dictionaries';
+import { dirFor, isLocaleTag } from '@/lib/i18n/dictionaries';
 
 const PREFERENCES_UPDATED = 'nexg:preferences-updated';
 
@@ -26,7 +26,10 @@ export function PersonalizedChrome() {
   React.useEffect(() => {
     const update = () => {
       const locale = readCookie('nexg_locale');
-      if (locale && isLocaleTag(locale)) document.documentElement.lang = locale;
+      if (locale && isLocaleTag(locale)) {
+        document.documentElement.lang = locale;
+        document.documentElement.dir = dirFor(locale);
+      }
     };
 
     update();

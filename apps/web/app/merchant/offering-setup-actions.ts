@@ -9,6 +9,7 @@ import {
   type WorkspaceSetupLoadFailure,
 } from '@/lib/merchant-action-access';
 import { merchantCatalogueRows } from '@/lib/merchant-catalogue-rows';
+import { syncOfferingPhoto } from '@/lib/offering-photo-sync';
 import {
   availableSchemas,
   createOffering,
@@ -151,6 +152,14 @@ export async function loadSetupOfferings(): Promise<
        Offerings saved before the editor's section field reached the
        catalogue show the section they are actually in. */
     const items = data as Offering[];
+    /* Photos added before the editor copied them to the storefront: copy them
+       now, so they show to guests without the merchant uploading again. */
+    await Promise.all(
+      items
+        .filter((item) => item.imageStoragePath)
+        .slice(0, 50)
+        .map((item) => syncOfferingPhoto(client, merchantId, item.id, item.imageStoragePath)),
+    );
     const catalogue = new Map(
       (items.length ? await merchantCatalogueRows(client, merchantId) : []).map((row) => [
         row.id,
@@ -262,6 +271,8 @@ export async function saveSetupOffering(
     });
     if (error || !data)
       return { ok: false, message: error?.message ?? 'Could not save this offering.' };
+    // The photo goes to the storefront too (lib/offering-photo-sync.ts).
+    await syncOfferingPhoto(client, merchantId, item.id, item.imageStoragePath);
     revalidatePath('/merchant');
     revalidatePath('/merchant/offerings');
     return { ok: true, item: data as Offering };

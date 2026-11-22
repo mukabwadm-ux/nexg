@@ -19,6 +19,8 @@ export type WorkspaceFrameProps = {
   bounded?: boolean;
   /** Replaces the complete sidebar identity block, including its home control. */
   sidebarHome?: ReactNode;
+  /** Replaces the sidebar's bottom line (the rider portal names itself). */
+  sidebarFooter?: ReactNode;
 };
 
 export function WorkspaceFrame({
@@ -33,6 +35,7 @@ export function WorkspaceFrame({
   breadcrumb,
   bounded = false,
   sidebarHome,
+  sidebarFooter,
 }: WorkspaceFrameProps) {
   return (
     <div className={styles.shell} data-merchant-workspace>
@@ -50,8 +53,12 @@ export function WorkspaceFrame({
         )}
         {navigation}
         <div className={styles.sidebarFooter}>
-          <strong>NEXG merchant portal</strong>
-          <span>Kenya · East Africa Time</span>
+          {sidebarFooter ?? (
+            <>
+              <strong>NEXG merchant portal</strong>
+              <span>Kenya · East Africa Time</span>
+            </>
+          )}
         </div>
       </aside>
 

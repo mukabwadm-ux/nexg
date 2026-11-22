@@ -1,3 +1,10 @@
+import { ar } from './locales/ar';
+import { de } from './locales/de';
+import { es } from './locales/es';
+import { fr } from './locales/fr';
+import { pt } from './locales/pt';
+import { zh } from './locales/zh';
+
 /**
  * What NexG says, in each language it says it in.
  *
@@ -34,7 +41,7 @@
 export type Locale = string;
 
 /** The languages with a dictionary written by a person in this file. */
-export const AUTHORED_LOCALES = ['en', 'sw'] as const;
+export const AUTHORED_LOCALES = ['en', 'sw', 'fr', 'ar', 'zh', 'es', 'de', 'pt'] as const;
 
 export type AuthoredLocale = (typeof AUTHORED_LOCALES)[number];
 
@@ -44,7 +51,25 @@ export const DEFAULT_LOCALE = 'en';
 export const LOCALE_NAMES: Record<string, string> = {
   en: 'English',
   sw: 'Kiswahili',
+  fr: 'Français',
+  ar: 'العربية',
+  zh: '中文',
+  es: 'Español',
+  de: 'Deutsch',
+  pt: 'Português',
 };
+
+/** Languages written right to left. The page gets dir="rtl" for these. */
+const RTL = new Set(['ar', 'he', 'fa', 'ur']);
+
+export function isRtl(locale: string | null | undefined): boolean {
+  return !!locale && RTL.has(locale.toLowerCase().split('-')[0] ?? '');
+}
+
+/** The <html dir> for a language. */
+export function dirFor(locale: string | null | undefined): 'rtl' | 'ltr' {
+  return isRtl(locale) ? 'rtl' : 'ltr';
+}
 
 /**
  * What a language calls itself, asked of the browser where we do not
@@ -224,6 +249,15 @@ const en: Dictionary = {
   'footer.riders': 'Riders',
   'footer.openings': 'View openings',
   'footer.soon': 'Soon',
+
+  // ── language and currency, in the header
+  'prefs.button': 'Language and currency',
+  'prefs.language': 'Language',
+  'prefs.currency': 'Currency',
+  'prefs.currencyNote':
+    'You always pay in Kenyan shillings (KES). Other currencies are shown at today’s exchange rate, as an approximate guide.',
+  'currency.chargedNote':
+    'You pay in Kenyan shillings (KES). {currency} amounts are approximate, at today’s exchange rate.',
 
   // ── the experience front door
   'xp.eyebrow': 'A concierge is a message away',
@@ -413,6 +447,15 @@ const sw: Dictionary = {
   'footer.openings': 'Tazama nafasi za kazi',
   'footer.soon': 'Hivi karibuni',
 
+  // ── lugha na sarafu, kwenye kichwa
+  'prefs.button': 'Lugha na sarafu',
+  'prefs.language': 'Lugha',
+  'prefs.currency': 'Sarafu',
+  'prefs.currencyNote':
+    'Daima unalipa kwa shilingi za Kenya (KES). Sarafu nyingine zinaonyeshwa kwa kiwango cha leo, kama makadirio tu.',
+  'currency.chargedNote':
+    'Unalipa kwa shilingi za Kenya (KES). Kiasi cha {currency} ni makadirio, kwa kiwango cha leo.',
+
   // ── mlango wa mbele
   'xp.eyebrow': 'Msaidizi yuko ujumbe mmoja tu',
   'xp.title': 'Panga siku yako.',
@@ -444,7 +487,10 @@ const sw: Dictionary = {
     'NexG haipandishi bei ya tikiti kamwe. Pale mwandaaji anaporuhusu tuzishike, tunazishika kwa bei yake halisi, na tunatoza kwa siku iliyojengwa kuizunguka.',
 };
 
-export const DICTIONARIES: Record<string, Dictionary> = { en, sw };
+export const DICTIONARIES: Record<string, Dictionary> = { en, sw, fr, ar, zh, es, de, pt };
+
+/** The English source, for the translation files and their tests. */
+export const ENGLISH: Dictionary = en;
 
 /** True where a person has written this language out by hand. */
 export function isAuthored(value: string | null | undefined): value is AuthoredLocale {

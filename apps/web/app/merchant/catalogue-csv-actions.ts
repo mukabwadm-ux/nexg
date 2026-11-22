@@ -2,7 +2,12 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { CATALOGUE_CSV_MAX_BYTES, planCatalogueImport, type RowError } from '@/lib/catalogue-csv';
+import { CATALOGUE_CSV_MAX_BYTES, type RowError } from '@/lib/catalogue-csv';
+import {
+  isCatalogueFormat,
+  planCatalogueFile,
+  type CatalogueFormat,
+} from '@/lib/catalogue-formats';
 import { merchantActionClient } from '@/lib/merchant-action-access';
 
 export interface CatalogueImportResult {
@@ -26,7 +31,9 @@ export interface CatalogueImportResult {
  */
 export async function importCatalogueCsv(input: {
   merchantId: string;
+  /** The file exactly as chosen: CSV, JSON or XML. */
   csv: string;
+  format?: CatalogueFormat;
 }): Promise<CatalogueImportResult> {
   const { client, merchantId } = await merchantActionClient({
     // Live merchants import too: bulk upload is how large catalogues stay current.
@@ -34,7 +41,7 @@ export async function importCatalogueCsv(input: {
     merchantId: input?.merchantId,
   });
   if (typeof input?.csv !== 'string' || !input.csv) {
-    return { ok: false, message: 'Choose a CSV file to import.' };
+    return { ok: false, message: 'Choose a file to import.' };
   }
   if (input.csv.length > CATALOGUE_CSV_MAX_BYTES) {
     return { ok: false, message: 'The file is too large. Split it into smaller files.' };
@@ -56,7 +63,8 @@ export async function importCatalogueCsv(input: {
     };
   }
 
-  const plan = planCatalogueImport(input.csv, itemRows ?? []);
+  const format = isCatalogueFormat(input.format) ? input.format : 'csv';
+  const plan = planCatalogueFile(input.csv, format, itemRows ?? []);
   if (plan.errors.length) {
     return {
       ok: false,

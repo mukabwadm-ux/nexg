@@ -503,6 +503,81 @@ export type Database = {
           },
         ];
       };
+      event_origin: {
+        Row: {
+          at: string;
+          device_id: string | null;
+          device_label: string | null;
+          event_id: number;
+          ip: unknown;
+          merchant_id: string | null;
+          proxy_ip: unknown;
+          session_id: string | null;
+          surface: string | null;
+          tx: number | null;
+          user_agent: string | null;
+          user_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          at?: string;
+          device_id?: string | null;
+          device_label?: string | null;
+          event_id: number;
+          ip?: unknown;
+          merchant_id?: string | null;
+          proxy_ip?: unknown;
+          session_id?: string | null;
+          surface?: string | null;
+          tx?: number | null;
+          user_agent?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          at?: string;
+          device_id?: string | null;
+          device_label?: string | null;
+          event_id?: number;
+          ip?: unknown;
+          merchant_id?: string | null;
+          proxy_ip?: unknown;
+          session_id?: string | null;
+          surface?: string | null;
+          tx?: number | null;
+          user_agent?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'event_origin_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'audit_event';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_origin_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_activity_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_origin_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_data_access_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_origin_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_money_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       evidence_pack: {
         Row: {
           chain_checked_at: string | null;
@@ -990,10 +1065,13 @@ export type Database = {
           city_id: string | null;
           city_name: string | null;
           context: Json | null;
+          device_id: string | null;
+          device_label: string | null;
           diff: Json | null;
           hash: string | null;
           hash_version: number | null;
           id: number | null;
+          ip: string | null;
           is_money: boolean | null;
           module: string | null;
           needs_two_people: boolean | null;
@@ -1007,7 +1085,9 @@ export type Database = {
           reviewed_by: string | null;
           reviewed_by_name: string | null;
           sentence: string | null;
+          session_id: string | null;
           severity: Database['public']['Enums']['audit_severity'] | null;
+          surface: string | null;
           target_id: string | null;
           target_label: string | null;
           target_type: string | null;
@@ -1463,9 +1543,12 @@ export type Database = {
         };
         Returns: string;
       };
+      fn_device_label: { Args: { p_ua: string }; Returns: string };
       fn_diff: { Args: { p_after: Json; p_before: Json }; Returns: Json };
+      fn_inet: { Args: { p_value: string }; Returns: unknown };
       fn_mask_email: { Args: { p_email: string }; Returns: string };
       fn_mask_payload: { Args: { p_fields: string[]; p_payload: Json }; Returns: Json };
+      fn_request_context: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_require: { Args: { p_level: string }; Returns: string };
       fn_sentence: {
         Args: {
@@ -1476,7 +1559,9 @@ export type Database = {
         };
         Returns: string;
       };
+      fn_trim_payload: { Args: { p: Json }; Returns: Json };
       fn_under_hold: { Args: { p_subject_id: string; p_subject_type: string }; Returns: boolean };
+      fn_uuid: { Args: { p_value: string }; Returns: string };
       fn_visible: {
         Args: { p_actor_id: string; p_city_id: string; p_module: string; p_money: boolean };
         Returns: boolean;
@@ -16611,6 +16696,56 @@ export type Database = {
           },
         ];
       };
+      fx_rate: {
+        Row: {
+          currency: string;
+          per_kes: number;
+          stored_at: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          currency: string;
+          per_kes: number;
+          stored_at?: string;
+          updated_at: string;
+        };
+        Update: {
+          currency?: string;
+          per_kes?: number;
+          stored_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      fx_rate_fetch: {
+        Row: {
+          detail: string | null;
+          finished_at: string | null;
+          id: number;
+          ok: boolean | null;
+          request_id: number;
+          requested_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          detail?: string | null;
+          finished_at?: string | null;
+          id?: never;
+          ok?: boolean | null;
+          request_id: number;
+          requested_at?: string;
+        };
+        Update: {
+          detail?: string | null;
+          finished_at?: string | null;
+          id?: never;
+          ok?: boolean | null;
+          request_id?: number;
+          requested_at?: string;
+        };
+        Relationships: [];
+      };
       geocode_cache: {
         Row: {
           address_line: string | null;
@@ -21284,6 +21419,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -21314,6 +21450,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -21383,6 +21520,7 @@ export type Database = {
           landmark?: string | null;
           late_night_until?: string | null;
           legal_name?: string | null;
+          logo_path?: string | null;
           min_order_kes?: number | null;
           notification_rules?: NonNullable<Json>;
           onboarding_call_at?: string | null;
@@ -21413,6 +21551,7 @@ export type Database = {
           resume_token_expires_at?: string | null;
           resume_token_hash?: string | null;
           rider_parking?: string | null;
+          self_suspended?: Json | null;
           settlement_account?: Json | null;
           source_url?: string | null;
           status?: Database['public']['Enums']['partner_status'];
@@ -21481,6 +21620,7 @@ export type Database = {
           landmark?: string | null;
           late_night_until?: string | null;
           legal_name?: string | null;
+          logo_path?: string | null;
           min_order_kes?: number | null;
           notification_rules?: NonNullable<Json>;
           onboarding_call_at?: string | null;
@@ -21511,6 +21651,7 @@ export type Database = {
           resume_token_expires_at?: string | null;
           resume_token_hash?: string | null;
           rider_parking?: string | null;
+          self_suspended?: Json | null;
           settlement_account?: Json | null;
           source_url?: string | null;
           status?: Database['public']['Enums']['partner_status'];
@@ -24877,6 +25018,176 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      merchant_live_email: {
+        Row: {
+          first_at: string;
+          last_at: string;
+          last_by: string | null;
+          merchant_id: string;
+          outbox_id: string | null;
+          reason: string | null;
+          recipient: string | null;
+          recipient_source: string | null;
+          sends: number;
+          signed_id: string;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          first_at?: string;
+          last_at?: string;
+          last_by?: string | null;
+          merchant_id: string;
+          outbox_id?: string | null;
+          reason?: string | null;
+          recipient?: string | null;
+          recipient_source?: string | null;
+          sends?: number;
+          signed_id: string;
+          status: string;
+        };
+        Update: {
+          first_at?: string;
+          last_at?: string;
+          last_by?: string | null;
+          merchant_id?: string;
+          outbox_id?: string | null;
+          reason?: string | null;
+          recipient?: string | null;
+          recipient_source?: string | null;
+          sends?: number;
+          signed_id?: string;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_live_email_last_by_fkey';
+            columns: ['last_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_outbox_id_fkey';
+            columns: ['outbox_id'];
+            isOneToOne: false;
+            referencedRelation: 'notification_outbox';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_outbox_id_fkey';
+            columns: ['outbox_id'];
+            isOneToOne: false;
+            referencedRelation: 'notification_outbox_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_signed_id_fkey';
+            columns: ['signed_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_agreement_signed';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -41826,10 +42137,13 @@ export type Database = {
           city_id: string | null;
           city_name: string | null;
           context: Json | null;
+          device_id: string | null;
+          device_label: string | null;
           diff: Json | null;
           hash: string | null;
           hash_version: number | null;
           id: number | null;
+          ip: string | null;
           is_money: boolean | null;
           module: string | null;
           needs_two_people: boolean | null;
@@ -41843,7 +42157,9 @@ export type Database = {
           reviewed_by: string | null;
           reviewed_by_name: string | null;
           sentence: string | null;
+          session_id: string | null;
           severity: Database['public']['Enums']['audit_severity'] | null;
+          surface: string | null;
           target_id: string | null;
           target_label: string | null;
           target_type: string | null;
@@ -58949,13 +59265,16 @@ export type Database = {
       cron_featured_reconcile: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_fin_rebuild: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_finance_invariants: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_fx_rates: { Args: Record<PropertyKey, never>; Returns: string };
       cron_holiday_reminders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_merchant_deleted_retention: { Args: Record<PropertyKey, never>; Returns: number };
+      cron_merchant_live_emails: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_merchant_setup_reminders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_native_push_dispatch: { Args: Record<PropertyKey, never>; Returns: boolean };
       cron_notify_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_payments_worker: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_paystack_sweep: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_purge_audit_ips: { Args: Record<PropertyKey, never>; Returns: number };
       cron_purge_order_buyer_ids: { Args: Record<PropertyKey, never>; Returns: number };
       cron_push_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_refresh_reports: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -59398,6 +59717,7 @@ export type Database = {
       fn_fraud_rider_label: { Args: { p_rider_id: string }; Returns: string };
       fn_fraud_staff_label: { Args: { p_staff_id: string }; Returns: string };
       fn_fraud_sweep: { Args: Record<PropertyKey, never>; Returns: Json };
+      fn_fx_rates: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_geo_cell: {
         Args: { p_lat: number; p_lng: number; p_precision?: number };
         Returns: string;
@@ -59604,6 +59924,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -59634,6 +59955,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -59703,6 +60025,11 @@ export type Database = {
       fn_merchant_is_featured: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_is_live: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_liquor_licensed: { Args: { p_merchant_id: string }; Returns: boolean };
+      fn_merchant_live_email_queue: {
+        Args: { p_reason?: string; p_signed_id: string; p_staff?: string };
+        Returns: Json;
+      };
+      fn_merchant_live_next_steps: { Args: { p_merchant_id: string }; Returns: Json };
       fn_merchant_mine: { Args: { p_merchant_id: string }; Returns: string };
       fn_merchant_onboarding_category: { Args: { p_merchant_id: string }; Returns: string };
       fn_merchant_onboarding_date_error: {
@@ -60546,6 +60873,27 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_admin_merchant_activity: {
+        Args: { p_before_id?: number; p_limit?: number; p_merchant_id: string };
+        Returns: {
+          action: string;
+          action_label: string;
+          after: Json;
+          at: string;
+          before: Json;
+          device_id: string;
+          device_label: string;
+          id: number;
+          ip: string;
+          reason: string;
+          sentence: string;
+          session_id: string;
+          target_label: string;
+          target_type: string;
+          who: string;
+          who_role: string;
+        }[];
+      };
       rpc_answer_hold: {
         Args: {
           p_hold_id: string;
@@ -60792,6 +61140,24 @@ export type Database = {
         Args: { p_id: string; p_note: string; p_outcome: string };
         Returns: Json;
       };
+      rpc_audit_device_detail: { Args: { p_device_id: string; p_limit?: number }; Returns: Json };
+      rpc_audit_devices: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          actions: number;
+          device_id: string;
+          device_label: string;
+          failed_sign_ins: number;
+          first_seen: string;
+          ip_count: number;
+          last_ip: string;
+          last_seen: string;
+          live_sessions: number;
+          sign_ins: number;
+          staff_email: string;
+          staff_user_id: string;
+        }[];
+      };
       rpc_audit_legal_hold_place: {
         Args: {
           p_city_id?: string;
@@ -60876,6 +61242,7 @@ export type Database = {
         Args: { p_reason: string; p_staff_user_id: string };
         Returns: Json;
       };
+      rpc_audit_sign_out_device: { Args: { p_device_id: string; p_reason: string }; Returns: Json };
       rpc_audit_verify_chain: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_best_sellers: {
         Args: { p_city_slug?: string; p_limit?: number };
@@ -64599,6 +64966,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -64629,6 +64997,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -64720,6 +65089,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -64750,6 +65120,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -64894,6 +65265,11 @@ export type Database = {
       };
       rpc_merchant_item_variants_save: {
         Args: { p_item_id: string; p_payload: Json };
+        Returns: Json;
+      };
+      rpc_merchant_live_email: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_live_email_resend: {
+        Args: { p_merchant_id: string; p_reason?: string };
         Returns: Json;
       };
       rpc_merchant_membership_remove: {
@@ -65086,6 +65462,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -65116,6 +65493,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -65183,10 +65561,18 @@ export type Database = {
         Args: { p_merchant_id: string; p_patch?: Json; p_step: number };
         Returns: Json;
       };
+      rpc_merchant_self_suspend: {
+        Args: { p_merchant_id: string; p_reason?: string; p_suspend: boolean };
+        Returns: Json;
+      };
       rpc_merchant_session_activity: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_set_branches: {
         Args: { p_branches: Json; p_merchant_id: string };
         Returns: Json;
+      };
+      rpc_merchant_set_brand_image: {
+        Args: { p_kind: string; p_merchant_id: string; p_url: string };
+        Returns: undefined;
       };
       rpc_merchant_set_category: {
         Args: {
@@ -65258,6 +65644,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -65288,6 +65675,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -65377,6 +65765,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -65407,6 +65796,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -65484,6 +65874,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -65514,6 +65905,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -65609,6 +66001,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -65639,6 +66032,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -65774,6 +66168,7 @@ export type Database = {
           landmark: string | null;
           late_night_until: string | null;
           legal_name: string | null;
+          logo_path: string | null;
           min_order_kes: number | null;
           notification_rules: NonNullable<Json>;
           onboarding_call_at: string | null;
@@ -65804,6 +66199,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -66863,6 +67259,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_record_sign_out: { Args: { p_reason?: string }; Returns: Json };
       rpc_refund_issued: {
         Args: { p_payload?: Json; p_provider_ref: string; p_refund_id: string };
         Returns: Json;

@@ -26,6 +26,29 @@ const SAMPLES: Record<string, Sample> = {
       action: { label: 'Set your holiday hours', url: `${SITE}/merchant/hours` },
     },
   },
+  /* What fn_merchant_live_email_queue sends, for a restaurant (20270131000500). */
+  'merchant.live': {
+    subject: 'Congratulations! Karibu Kitchen is live on NexG',
+    content: {
+      title: 'Congratulations! Karibu Kitchen is live',
+      greeting: 'Hi Amina,',
+      intro:
+        'Congratulations, and welcome to NexG. Karibu Kitchen is now live, and customers can find you on NexG.\n\nHere is what to do next:',
+      steps: [
+        'Add your menu in Offerings: each dish with its price and a photo, then publish it.',
+        'Check your opening hours in Availability, so customers order only while you are open.',
+        'Add your logo and a banner photo in Business, so customers recognise you.',
+        'When you are ready for orders, press Start taking orders on your dashboard Home.',
+      ],
+      action: { label: 'Open your dashboard', url: 'https://nexgapp.com/merchant' },
+      callout: {
+        title: 'Your signed agreement is attached',
+        body: 'NexG has signed your merchant agreement (NXG-MA-3F9A1C2B7D4E). The PDF is attached to this email: keep it for your records. You can download it again any time from Business › Documents in your dashboard.',
+      },
+      closing: 'Questions about getting set up? Reply to this email and we will help.',
+      preheader: 'Your business is live. Your signed merchant agreement is attached.',
+    },
+  },
   'merchant.other': {
     subject: 'Your menu changes are live',
     content: {
@@ -175,11 +198,12 @@ const SAMPLES: Record<string, Sample> = {
 /**
  * Sample words for a purpose's preview. A design NexG does not send yet
  * shows exactly as drawn; one it sends shows with the status line, colour
- * and button it is sent with.
+ * and button it is sent with, or as it is actually written when it has a
+ * sample of its own here.
  */
 export function sampleEmail(purpose: EmailPurpose): { subject: string; content: EmailContent } {
   const concept = emailConcept(purpose.conceptId);
-  if (concept) {
+  if (concept && !(purpose.sender !== 'none' && SAMPLES[purpose.key])) {
     if (purpose.sender === 'none') return { subject: concept.subject, content: concept.content };
     return {
       subject: concept.subject,

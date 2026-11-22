@@ -5,7 +5,14 @@
  * The database (merchant_onboarding_field) is the source of truth.
  */
 
-export type OnboardingFieldType = 'text' | 'long_text' | 'date' | 'yes_no' | 'select' | 'rows';
+export type OnboardingFieldType =
+  | 'text'
+  | 'long_text'
+  | 'number'
+  | 'date'
+  | 'yes_no'
+  | 'select'
+  | 'rows';
 export type OnboardingSection = 'business' | 'owner' | 'payout' | 'policies' | 'compliance';
 
 export interface OnboardingColumn {
@@ -57,7 +64,15 @@ export const ONBOARDING_SECTIONS: { key: OnboardingSection; title: string }[] = 
 const obj = (v: unknown): Record<string, unknown> =>
   v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
 const str = (v: unknown): string | null => (typeof v === 'string' && v.length > 0 ? v : null);
-const TYPES: OnboardingFieldType[] = ['text', 'long_text', 'date', 'yes_no', 'select', 'rows'];
+const TYPES: OnboardingFieldType[] = [
+  'text',
+  'long_text',
+  'number',
+  'date',
+  'yes_no',
+  'select',
+  'rows',
+];
 const SECTIONS: OnboardingSection[] = ['business', 'owner', 'payout', 'policies', 'compliance'];
 
 function parseField(raw: unknown): OnboardingField | null {
@@ -202,6 +217,9 @@ export function onboardingValueError(
       if (v.length < 2) return 'is too short';
       if (v.length > (field.type === 'text' ? 200 : 2000)) return 'is too long';
       return matches(field.pattern, v) ? null : 'is not in the expected format';
+    case 'number':
+      if (!/^[0-9]{1,4}$/.test(v)) return 'needs a whole number, digits only';
+      return Number(v) < 1 ? 'needs a number above 0' : null;
     case 'date':
       return dateError(v, field.future_date);
     case 'yes_no':
