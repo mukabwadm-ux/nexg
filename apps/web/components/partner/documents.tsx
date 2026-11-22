@@ -481,7 +481,7 @@ function SideUpload({
             if (file) onFile(file);
           }}
           className={cn(
-            'mt-2.5 flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed px-3 py-3 transition-colors',
+            'relative mt-2.5 flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed px-3 py-3 transition-colors',
             dragging
               ? 'border-gold bg-gold-soft'
               : good

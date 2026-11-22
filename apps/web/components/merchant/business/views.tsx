@@ -211,7 +211,7 @@ export function ProfileView({
                 <div>
                   <strong>Brand logo</strong>
                   <p className="bu-muted bu-small">Square image, PNG, JPEG or WebP · up to 2 MB</p>
-                  <label className="bu-button" style={{ marginTop: 5 }}>
+                  <label className="bu-button" style={{ marginTop: 5, position: 'relative' }}>
                     <Upload size={14} /> Change logo
                     <input
                       aria-label="Upload brand logo"
@@ -246,7 +246,7 @@ export function ProfileView({
                   <strong>Banner photo</strong>
                   <p className="bu-muted bu-small">Landscape photo · 3:1 works best · up to 2 MB</p>
                   <div className="bu-media-actions">
-                    <label className="bu-button">
+                    <label className="bu-button" style={{ position: 'relative' }}>
                       <Upload size={14} />
                       {draft.cover ? 'Change banner' : 'Add banner'}
                       <input
