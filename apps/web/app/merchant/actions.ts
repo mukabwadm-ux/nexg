@@ -268,6 +268,52 @@ export async function setItemSoldOut(itemId: string, soldOut: boolean): Promise<
   };
 }
 
+/** Digital: delivered as a code in the customer's app (an eSIM, a voucher), no rider. */
+export async function setItemDigital(itemId: string, digital: boolean): Promise<Outcome> {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup',
+  });
+  const { data, error } = await client
+    .from('catalogue_item')
+    .update({ digital })
+    .eq('id', itemId)
+    .eq('merchant_id', authorizedMerchantId)
+    .select('id')
+    .maybeSingle();
+  if (error) return { ok: false, message: error.message };
+  if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
+  revalidatePath('/merchant/menu');
+  return {
+    ok: true,
+    message: digital
+      ? 'Saved. Customers get this item as a code in the app, with no delivery.'
+      : 'Saved. This item is delivered as usual.',
+  };
+}
+
+/** The buyer must give a passport or national ID to order it (an eSIM). */
+export async function setItemRequiresBuyerId(itemId: string, required: boolean): Promise<Outcome> {
+  const { client, merchantId: authorizedMerchantId } = await merchantActionClient({
+    access: 'setup',
+  });
+  const { data, error } = await client
+    .from('catalogue_item')
+    .update({ requires_buyer_id: required })
+    .eq('id', itemId)
+    .eq('merchant_id', authorizedMerchantId)
+    .select('id')
+    .maybeSingle();
+  if (error) return { ok: false, message: error.message };
+  if (!data) return { ok: false, message: 'This item is not in your current workspace.' };
+  revalidatePath('/merchant/menu');
+  return {
+    ok: true,
+    message: required
+      ? "Saved. Checkout asks for the buyer's passport or national ID."
+      : 'Saved. No ID is asked for this item.',
+  };
+}
+
 /** The smallest basket the shop takes, in whole shillings; null for none. */
 export async function setMinOrder(minOrderKes: number | null): Promise<Outcome> {
   const { client, merchantId } = await merchantActionClient({ access: 'setup' });
