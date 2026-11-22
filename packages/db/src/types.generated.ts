@@ -20830,6 +20830,25 @@ export type Database = {
           },
         ];
       };
+      maps_guest_route_context: {
+        Row: {
+          account_id: string;
+          context_key: string;
+          first_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          account_id: string;
+          context_key: string;
+          first_at?: string;
+        };
+        Update: {
+          account_id?: string;
+          context_key?: string;
+          first_at?: string;
+        };
+        Relationships: [];
+      };
       maps_route_budget: {
         Row: {
           account_id: string;
