@@ -5,17 +5,23 @@
 -- host pays the one order (split payments come later), pickup is added to
 -- orders, and a group order can be scheduled.
 --
+-- Builds on digital delivery (#183, 20270130000400 and 20270130000500): it
+-- must land after it. The order functions here are #183's latest bodies with
+-- pickup and a time added, and order.fulfilment is one type for both, made
+-- by whichever migration runs first.
+--
 -- 1. Pickup and a time, on every web order.
---    public.order gains fulfilment ('delivery', the default, or 'pickup').
---    A pickup order has no dropoff, so dropoff_label may be null, but only on
---    a pickup order (order_delivery_has_dropoff). fn_web_order_quote skips the
---    location, zone and band step for pickup and charges no delivery;
+--    public.order.fulfilment ('delivery', the default, 'pickup' or 'digital').
+--    A pickup order has no dropoff, so dropoff_label may be null, but never on
+--    a delivery (order_delivery_has_dropoff). fn_web_order_quote skips the
+--    location, zone and band step for pickup and charges no delivery, as for
+--    a digital basket, which stays digital whatever was asked;
 --    rpc_order_place_web asks a pickup order for a phone (the shop calls it)
 --    and no address. Either may carry scheduled_for: at least 30 minutes and
 --    at most 7 days ahead, and the shop must be open then by its hours
 --    (fn_order_schedule_refusal states that rule once). Prices stay those of
---    the moment the order is placed. dispatch.rpc_job_start refuses a pickup
---    order before it writes anything: nobody is to be sent.
+--    the moment the order is placed. A delivery job for a pickup order is
+--    refused (trigger job_not_for_pickup on dispatch.job): nobody is sent.
 --
 --    Not changed here: merchant_orders_v (20261206000100) still calls a
 --    ready order with no rider 'waiting_for_a_rider', pickup included. The
@@ -55,13 +61,13 @@
 --   drop table public.group_order_item, public.group_order_member, public.group_order;
 --   drop function authz.is_group_order_member(uuid);
 --   delete from audit.action_registry where action like 'group\_order.%';
---   re-run fn_web_order_quote from 20261223000400, rpc_order_place_web from
---   20261223000500 and dispatch.rpc_job_start from 20261223000600; then
+--   re-run fn_web_order_quote and rpc_order_place_web from 20270130000500;
+--   drop trigger job_not_for_pickup on dispatch.job;
+--   drop function dispatch.tg_job_not_for_pickup();
 --   drop function public.fn_order_schedule_refusal(uuid, timestamptz);
 --   alter table public.order drop constraint order_delivery_has_dropoff;
 --   (once no pickup order is left) alter table public.order alter column dropoff_label set not null;
---   alter table public.order drop column fulfilment;
---   drop type public.order_fulfilment;
+--   order.fulfilment and its type stay: digital delivery uses them.
 
 insert into audit.action_registry (action, module, default_severity, money, description) values
   ('group_order.created', 'orders', 'info', false, 'A group order was started for one shop'),
@@ -81,21 +87,32 @@ on conflict (action) do nothing;
 
 -- ═══════════════════════════════════════ 1. pickup and scheduled orders
 
-create type public.order_fulfilment as enum ('delivery', 'pickup');
+-- The same type and column as digital delivery (#183, 20270130000400): one
+-- type with all three values, whichever lands first.
+do $$
+begin
+  if not exists (select 1 from pg_type
+                  where typname = 'order_fulfilment' and typnamespace = 'public'::regnamespace) then
+    create type public.order_fulfilment as enum ('delivery', 'pickup', 'digital');
+  else
+    alter type public.order_fulfilment add value if not exists 'pickup';
+  end if;
+end;
+$$;
 
 alter table public.order
-  add column fulfilment public.order_fulfilment not null default 'delivery';
+  add column if not exists fulfilment public.order_fulfilment not null default 'delivery';
 
 alter table public.order alter column dropoff_label drop not null;
 
 alter table public.order
   add constraint order_delivery_has_dropoff
-  check (fulfilment = 'pickup' or dropoff_label is not null);
+  check (fulfilment <> 'delivery' or dropoff_label is not null);
 
 comment on column public.order.fulfilment is
-  'Delivered to the customer, or collected by them at the shop. A pickup order has no dropoff and is never dispatched.';
+  'delivery: a rider brings it. pickup: the customer collects it at the shop; no dropoff, never dispatched. digital: every line is a code the customer gets in the app.';
 comment on constraint order_delivery_has_dropoff on public.order is
-  'A delivery says where it goes. Only a pickup order may leave dropoff_label empty.';
+  'A delivery says where it goes. Only a pickup (or digital) order may leave dropoff_label empty.';
 
 /*
  * When an order is wanted later: at least 30 minutes ahead, at most 7 days
@@ -136,12 +153,13 @@ comment on function public.fn_order_schedule_refusal(uuid, timestamptz) is
 revoke execute on function public.fn_order_schedule_refusal(uuid, timestamptz) from public, anon, authenticated;
 grant execute on function public.fn_order_schedule_refusal(uuid, timestamptz) to service_role;
 
--- fn_web_order_quote: 20261223000400, with fulfilment and scheduled_for.
--- Pickup skips the location, zone and band step and charges no delivery; a
+-- fn_web_order_quote: 20270130000500 (#183), with pickup and scheduled_for.
+-- Pickup skips the location, zone and band step and charges no delivery, as a
+-- digital basket does; a basket of codes stays digital whatever was asked. A
 -- scheduled order is checked against the shop's hours at that time. Prices
 -- stay those of now. rpc_order_quote_web (20260101021500) strips only
 -- commission_pct, commission_cents, pricing_version_ids, city_id and
--- branch_id, so the two new keys reach the basket page as they are.
+-- branch_id, so scheduled_for reaches the basket page as it is.
 create or replace function public.fn_web_order_quote(p_payload jsonb)
 returns jsonb
 language plpgsql
@@ -152,9 +170,6 @@ as $$
 declare
   v_merchant uuid := nullif(p_payload ->> 'merchant_id', '')::uuid;
   v_method text := coalesce(nullif(p_payload ->> 'payment_method', ''), 'card');
-  v_fulfilment text := coalesce(nullif(p_payload ->> 'fulfilment', ''), 'delivery');
-  v_when timestamptz;
-  v_refusal text;
   m public.merchant;
   v_branch uuid;
   v_from extensions.geography;
@@ -168,9 +183,15 @@ declare
   v_lines jsonb;
   v_subtotal bigint;
   v_price jsonb;
-  v_delivery bigint;
   v_cash bigint;
   v_total bigint;
+  v_problem text;
+  v_digital boolean := false;
+  v_delivery bigint;
+  v_needs_id boolean := false;
+  v_fulfilment text := coalesce(nullif(p_payload ->> 'fulfilment', ''), 'delivery');
+  v_when timestamptz;
+  v_refusal text;
 begin
   if v_merchant is null then
     return jsonb_build_object('ok', false, 'message', 'Which merchant is this basket for?');
@@ -218,8 +239,6 @@ begin
     return jsonb_build_object('ok', false, 'message', 'That is a lot for one order. Split it in two.');
   end if;
 
-  /* Age-restricted items only from a shop with a verified liquor licence,
-     the rule catalogue_public applies to the menu. */
   if exists (
        select 1
          from jsonb_to_recordset(p_payload -> 'items') as q(catalogue_item_id uuid)
@@ -231,36 +250,151 @@ begin
       'message', m.trading_name || ' cannot sell age-restricted items on NexG yet. Remove them to continue.');
   end if;
 
+  /* Bookable items are booked, not put in a basket. */
+  if exists (
+       select 1
+         from jsonb_to_recordset(p_payload -> 'items') as q(catalogue_item_id uuid)
+         join public.catalogue_item i
+           on i.id = q.catalogue_item_id and i.merchant_id = v_merchant
+        where i.kind <> 'buy') then
+    return jsonb_build_object('ok', false,
+      'message', 'Something in your basket is booked rather than bought. Book it on its own page.');
+  end if;
+
+  /* Choices and amounts, line by line, with a message for the first that is wrong. */
+  select coalesce(
+           (select i.name || ' is sold out.'
+              from jsonb_array_elements(p_payload -> 'items') with ordinality as l(line, n)
+              join public.catalogue_item i
+                on i.id = nullif(l.line ->> 'catalogue_item_id', '')::uuid and i.merchant_id = v_merchant
+             where i.available and i.sold_out
+             order by l.n limit 1),
+           (select case when i.message_label is null then i.name || ' does not take a message.'
+                        else 'Keep the message for ' || i.name || ' to ' || i.message_max_length || ' characters.' end
+              from jsonb_array_elements(p_payload -> 'items') with ordinality as l(line, n)
+              join public.catalogue_item i
+                on i.id = nullif(l.line ->> 'catalogue_item_id', '')::uuid and i.merchant_id = v_merchant
+             where nullif(trim(l.line ->> 'message'), '') is not null
+               and (i.message_label is null
+                    or char_length(trim(l.line ->> 'message')) > i.message_max_length)
+             order by l.n limit 1),
+           (select lv.v ->> 'message'
+              from jsonb_array_elements(p_payload -> 'items') with ordinality as l(line, n)
+              join public.catalogue_item i
+                on i.id = nullif(l.line ->> 'catalogue_item_id', '')::uuid and i.merchant_id = v_merchant
+              cross join lateral (select public.fn_line_variant(i.id, l.line ->> 'variant_id') as v) lv
+             where not (lv.v ->> 'ok')::boolean
+             order by l.n limit 1),
+           (select 'Only ' || (lv.v ->> 'stock_count') || ' left of ' || i.name || ' (' || (lv.v ->> 'label') || ').'
+              from jsonb_array_elements(p_payload -> 'items') with ordinality as l(line, n)
+              join public.catalogue_item i
+                on i.id = nullif(l.line ->> 'catalogue_item_id', '')::uuid and i.merchant_id = v_merchant
+              cross join lateral (select public.fn_line_variant(i.id, l.line ->> 'variant_id') as v) lv
+             where (lv.v ->> 'stock_count') is not null
+               and (l.line ->> 'quantity') ~ '^[0-9]+$'
+               and (l.line ->> 'quantity')::integer > (lv.v ->> 'stock_count')::integer
+             order by l.n limit 1),
+           (select ln.opts ->> 'message'
+              from jsonb_array_elements(p_payload -> 'items') with ordinality as l(line, n)
+              join public.catalogue_item i
+                on i.id = nullif(l.line ->> 'catalogue_item_id', '')::uuid and i.merchant_id = v_merchant
+              cross join lateral (select public.fn_line_options(i.id, l.line -> 'options') as opts) ln
+             where not (ln.opts ->> 'ok')::boolean
+             order by l.n limit 1),
+           (select 'You can buy ' || i.name || ' from ' || i.unit_min || ' to '
+                   || coalesce(i.unit_max::text, 'any amount') || ' ' || coalesce(i.unit_label, '') || '.'
+              from jsonb_array_elements(p_payload -> 'items') with ordinality as l(line, n)
+              join public.catalogue_item i
+                on i.id = nullif(l.line ->> 'catalogue_item_id', '')::uuid and i.merchant_id = v_merchant
+             where (l.line ->> 'quantity') ~ '^[0-9]+$'
+               and ((i.unit_min is not null and (l.line ->> 'quantity')::numeric * i.unit_step < i.unit_min)
+                 or (i.unit_max is not null and (l.line ->> 'quantity')::numeric * i.unit_step > i.unit_max))
+             order by l.n limit 1))
+    into v_problem;
+  if v_problem is not null then
+    return jsonb_build_object('ok', false, 'message', v_problem);
+  end if;
+
   /* Each line is priced from the catalogue row, at the running promotion's
-     price when there is one, and a line that is not this merchant's, not on
-     sale, or not priced is refused rather than quietly dropped. */
+     price when there is one, for one step of its unit, plus the options
+     chosen. A line that is not this merchant's, not on sale, or not priced
+     is refused rather than quietly dropped. */
   select
     jsonb_agg(jsonb_build_object(
       'catalogue_item_id', i.id,
       'name', i.name,
       'quantity', q.quantity,
-      'unit_price_cents', pp.price_kes::bigint * 100,
-      'list_price_cents', i.price_kes::bigint * 100,
+      'unit_price_cents', round(pp.price_kes::numeric * 100 * i.unit_step)::bigint
+                          + (ln.opts ->> 'extra_cents')::bigint,
+      'list_price_cents', round(coalesce((lv.v ->> 'price_kes')::numeric, i.price_kes::numeric) * 100 * i.unit_step)::bigint
+                          + (ln.opts ->> 'extra_cents')::bigint,
       'promotion_id', pp.promotion_id,
-      'line_total_cents', pp.price_kes::bigint * 100 * q.quantity,
+      'line_total_cents', (round(pp.price_kes::numeric * 100 * i.unit_step)::bigint
+                           + (ln.opts ->> 'extra_cents')::bigint) * q.quantity,
+      'options', ln.opts -> 'chosen',
+      'variant_id', lv.v ->> 'variant_id',
+      'variant_label', lv.v ->> 'label',
+      'sold_by', i.sold_by,
+      'unit_label', i.unit_label,
+      'unit_step', i.unit_step,
+      'price_is_estimate', i.price_is_estimate,
       'note', nullif(trim(q.note), ''),
-      'age_restricted', i.age_restricted)),
-    coalesce(sum(pp.price_kes::bigint * 100 * q.quantity), 0),
+      'message', nullif(trim(q.message), ''),
+      'age_restricted', i.age_restricted) order by q.n),
+    coalesce(sum((round(pp.price_kes::numeric * 100 * i.unit_step)::bigint
+                  + (ln.opts ->> 'extra_cents')::bigint) * q.quantity), 0),
     count(*)
   into v_lines, v_subtotal, v_found
-  from jsonb_to_recordset(p_payload -> 'items')
-         as q(catalogue_item_id uuid, quantity integer, note text)
+  from jsonb_array_elements(p_payload -> 'items') with ordinality as l(line, n)
+  cross join lateral (select nullif(l.line ->> 'catalogue_item_id', '')::uuid as catalogue_item_id,
+                             case when (l.line ->> 'quantity') ~ '^[0-9]+$'
+                                  then (l.line ->> 'quantity')::integer end as quantity,
+                             l.line ->> 'note' as note, l.line ->> 'message' as message, l.n) q
   join public.catalogue_item i
     on i.id = q.catalogue_item_id
    and i.merchant_id = v_merchant
    and i.available
-   and i.price_kes is not null
-  cross join lateral public.fn_item_promo_price(i.id, i.merchant_id, i.price_kes) pp
-  where q.quantity between 1 and 50;
+   and not i.sold_out
+  cross join lateral (select public.fn_line_variant(i.id, l.line ->> 'variant_id') as v) lv
+  cross join lateral public.fn_item_promo_price(
+    i.id, i.merchant_id, coalesce((lv.v ->> 'price_kes')::integer, i.price_kes)) pp
+  cross join lateral (select public.fn_line_options(i.id, l.line -> 'options') as opts) ln
+  where q.quantity between 1 and 50
+    and (lv.v ->> 'ok')::boolean
+    and coalesce((lv.v ->> 'price_kes')::integer, i.price_kes) is not null;
 
   if v_found is distinct from v_wanted then
     return jsonb_build_object('ok', false,
       'message', 'Something in your basket is no longer available. Review it and try again.');
+  end if;
+
+  /* The shop's minimum, on the items after offers, before fees. */
+  if m.min_order_kes is not null and v_subtotal < m.min_order_kes::bigint * 100 then
+    return jsonb_build_object('ok', false,
+      'message', m.trading_name || ' takes orders from KES ' || to_char(m.min_order_kes, 'FM999,999,999')
+                 || '. Add KES ' || to_char(ceil((m.min_order_kes::bigint * 100 - v_subtotal) / 100.0), 'FM999,999,999')
+                 || ' more.',
+      'min_order_kes', m.min_order_kes);
+  end if;
+
+  /* An item that needs the buyer's ID (an eSIM): a passport or national ID. */
+  v_needs_id := exists (
+    select 1 from jsonb_array_elements(p_payload -> 'items') l
+      join public.catalogue_item i on i.id = nullif(l ->> 'catalogue_item_id', '')::uuid
+     where i.requires_buyer_id);
+  if v_needs_id and not public.fn_buyer_id_ok(p_payload -> 'buyer_id') then
+    return jsonb_build_object('ok', false, 'needs_buyer_id', true,
+      'message', 'This order needs the buyer''s passport (with its country) or national ID, and their full name.');
+  end if;
+
+  /* Every line delivered as a code: no location, no rider, no delivery fee. */
+  v_digital := not exists (
+    select 1 from jsonb_array_elements(p_payload -> 'items') l
+      join public.catalogue_item i on i.id = nullif(l ->> 'catalogue_item_id', '')::uuid
+     where not i.digital);
+  /* A basket of codes is delivered in the app, whatever was asked for. */
+  if v_digital then
+    v_fulfilment := 'digital';
   end if;
 
   select b.id, b.location into v_branch, v_from
@@ -269,9 +403,8 @@ begin
    order by b.is_primary desc
    limit 1;
 
-  /* Collected at the shop: nowhere to deliver to, so no zone and no band. */
-  if v_fulfilment = 'delivery'
-     and p_payload ? 'lat' and p_payload ? 'lng'
+  /* Collected at the shop, or delivered as codes: nowhere to deliver to, so no zone and no band. */
+  if v_fulfilment = 'delivery' and p_payload ? 'lat' and p_payload ? 'lng'
      and nullif(p_payload ->> 'lat', '') is not null
      and nullif(p_payload ->> 'lng', '') is not null then
     v_point := extensions.st_setsrid(extensions.st_makepoint(
@@ -300,13 +433,9 @@ begin
     return jsonb_build_object('ok', false, 'message', v_price ->> 'message');
   end if;
 
-  /* Nothing is delivered on a pickup order, so nothing is charged for it. */
-  v_delivery := case when v_fulfilment = 'pickup' then 0
-                     else (v_price ->> 'delivery_fee_cents')::bigint end;
-
-  /* The cash-handling fee is for handling cash. */
   v_cash := case when v_method = 'cash_on_delivery'
                  then (v_price ->> 'cash_handling_cents')::bigint else 0 end;
+  v_delivery := case when v_fulfilment = 'delivery' then (v_price ->> 'delivery_fee_cents')::bigint else 0 end;
 
   v_total := (v_price ->> 'subtotal_cents')::bigint
            + v_delivery
@@ -335,13 +464,14 @@ begin
     'zone_id', case when v_zone is null then null else nullif(v_zone ->> 'zone_id', '') end,
     'located', v_located,
     'payment_method', v_method,
-    'fulfilment', v_fulfilment,
-    'scheduled_for', v_when,
     'lines', v_lines,
     'subtotal_cents', (v_price ->> 'subtotal_cents')::bigint,
     'list_subtotal_cents', (select coalesce(sum((l ->> 'list_price_cents')::bigint * (l ->> 'quantity')::bigint), 0)
                               from jsonb_array_elements(v_lines) l),
     'delivery_fee_cents', v_delivery,
+    'fulfilment', v_fulfilment,
+    'scheduled_for', v_when,
+    'needs_buyer_id', v_needs_id,
     'service_fee_cents', (v_price ->> 'service_fee_cents')::bigint,
     'small_basket_fee_cents', (v_price ->> 'small_basket_fee_cents')::bigint,
     'cash_handling_cents', v_cash,
@@ -351,6 +481,8 @@ begin
     'pricing_version_ids', v_price -> 'pricing_version_ids',
     'has_age_restricted', exists (
       select 1 from jsonb_array_elements(v_lines) l where (l ->> 'age_restricted')::boolean),
+    'has_estimated_prices', exists (
+      select 1 from jsonb_array_elements(v_lines) l where (l ->> 'price_is_estimate')::boolean),
     'currency', 'KES');
 end;
 $$;
@@ -358,8 +490,8 @@ $$;
 revoke execute on function public.fn_web_order_quote(jsonb) from public, anon, authenticated;
 grant execute on function public.fn_web_order_quote(jsonb) to service_role;
 
--- rpc_order_place_web: 20261223000500, with fulfilment and scheduled_for. A
--- pickup order needs a phone (the shop calls it) and no address, and keeps
+-- rpc_order_place_web: 20270130000500 (#183), with pickup and scheduled_for.
+-- A pickup order needs a phone (the shop calls it) and no address, and keeps
 -- no dropoff.
 create or replace function public.rpc_order_place_web(p_payload jsonb)
 returns jsonb
@@ -369,54 +501,56 @@ set search_path = ''
 as $$
 declare
   v_uid uuid := (select auth.uid());
+  v_temporary boolean := authz.is_anonymous_session();
   v_phone text := nullif(regexp_replace(coalesce(p_payload ->> 'guest_phone', ''), '[^0-9+]', '', 'g'), '');
   v_name text := nullif(trim(p_payload ->> 'guest_name'), '');
   v_label text := nullif(trim(p_payload ->> 'dropoff_label'), '');
-  v_fulfilment text := coalesce(nullif(p_payload ->> 'fulfilment', ''), 'delivery');
   q jsonb;
   v_guest public.guest;
   v_point extensions.geography;
   v_order uuid;
   v_ref text;
   v_needs text[] := '{}';
+  v_line jsonb;
+  v_item uuid;
+  v_request text := nullif(trim(p_payload ->> 'client_request_id'), '');
+  v_prior public.order;
 begin
   if v_uid is null then
-    raise exception 'Sign in to place your order.' using errcode = '42501';
-  end if;
-  if authz.is_anonymous_session() then
-    raise exception 'Sign in with your account to place your order.' using errcode = '42501';
+    raise exception 'Sign in or continue as a guest to place your order.' using errcode = '42501';
   end if;
   if v_phone is null or v_phone !~ '^\+?[0-9]{9,15}$' then
-    raise exception '%', case when v_fulfilment = 'pickup'
+    raise exception '%', case when p_payload ->> 'fulfilment' = 'pickup'
                               then 'A phone number the shop can reach you on.'
                               else 'A phone number the rider can reach you on.' end;
   end if;
-  if v_fulfilment <> 'pickup' then
+  q := public.fn_web_order_quote(p_payload);
+  if not (q ->> 'ok')::boolean then
+    raise exception '%', q ->> 'message';
+  end if;
+
+  if q ->> 'fulfilment' = 'digital' then
+    /* Delivered as codes in the app: no address and no map pin. */
+    v_label := 'Digital delivery';
+    v_point := null;
+  elsif q ->> 'fulfilment' = 'pickup' then
+    /* Collected at the shop: there is no dropoff to keep. */
+    v_label := null;
+    v_point := null;
+  else
     if v_label is null then
       raise exception 'Where should we bring it? Set your delivery address first.';
     end if;
     if nullif(p_payload ->> 'lat', '') is null or nullif(p_payload ->> 'lng', '') is null then
       raise exception 'Set your delivery address on the map first.';
     end if;
-  end if;
-
-  q := public.fn_web_order_quote(p_payload);
-  if not (q ->> 'ok')::boolean then
-    raise exception '%', q ->> 'message';
-  end if;
-
-  /* Collected at the shop: there is no dropoff to keep. */
-  if q ->> 'fulfilment' = 'pickup' then
-    v_label := null;
-    v_point := null;
-  else
     v_point := extensions.st_setsrid(extensions.st_makepoint(
       (p_payload ->> 'lng')::float, (p_payload ->> 'lat')::float), 4326)::extensions.geography;
   end if;
 
-  /* One record per account, and a number belongs to the record that already
-     holds it. Signing up proves an email, not a phone, so a number on file is
-     never attached here; support links it after checking who is asking. */
+  /* One record per session, and a number belongs to the record that already
+     holds it (20261223000200). Neither an account nor a temporary session
+     proves a phone, so a number on file is never attached here. */
   select * into v_guest from public.guest where user_id = v_uid;
   if not found then
     if exists (select 1 from public.guest where phone = v_phone) then
@@ -441,6 +575,32 @@ begin
     raise exception 'This account cannot place orders. Contact support.';
   end if;
 
+  /* The same request sent again (a retry on a weak connection) gets the
+     order it already made, not a second one. */
+  if v_request is not null then
+    if v_request !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' then
+      raise exception 'The order request id must be a UUID.' using errcode = '22023';
+    end if;
+    select * into v_prior from public.order
+     where guest_id = v_guest.id and client_request_id = v_request::uuid;
+    if found then
+      return jsonb_build_object(
+        'ok', true, 'order_id', v_prior.id, 'reference', v_prior.reference,
+        'total_cents', v_prior.total_cents, 'payment_method', v_prior.payment_method,
+        'pay_online', v_prior.payment_method::text in ('card', 'mpesa_stk', 'bank_transfer'),
+        'guest', v_temporary, 'repeat', true);
+    end if;
+  end if;
+
+  if v_temporary and (
+       select count(*) from public.order o
+        where o.guest_id = v_guest.id
+          and o.payment_status in ('pending', 'authorised', 'failed')
+          and o.stage in ('placed', 'confirmed')) >= 3 then
+    raise exception 'Pay for or cancel your earlier orders first.'
+      using hint = 'guest_unpaid_limit';
+  end if;
+
   if (q ->> 'has_age_restricted')::boolean then
     v_needs := v_needs || 'alcohol'::text;
   end if;
@@ -449,41 +609,77 @@ begin
 
   insert into public.order (
     reference, guest_id, merchant_id, branch_id, city_id, zone_id, channel,
-    fulfilment, scheduled_for,
     dropoff_label, dropoff_point, dropoff_note, delivery_context,
     stage, payment_method, payment_status,
     subtotal_cents, delivery_fee_cents, service_fee_cents,
     small_basket_fee_cents, cash_handling_cents, total_cents,
     commission_cents, commission_pct, currency, pricing_version_ids,
-    carry_requirements)
+    carry_requirements, client_request_id, fulfilment, scheduled_for)
   values (
     v_ref, v_guest.id, (q ->> 'merchant_id')::uuid, nullif(q ->> 'branch_id', '')::uuid,
     (q ->> 'city_id')::uuid, nullif(q ->> 'zone_id', '')::uuid, 'web',
-    (q ->> 'fulfilment')::public.order_fulfilment, nullif(q ->> 'scheduled_for', '')::timestamptz,
     v_label, v_point, nullif(trim(p_payload ->> 'dropoff_note'), ''), '{}'::jsonb,
     'placed', (q ->> 'payment_method')::public.order_payment_method, 'pending',
     (q ->> 'subtotal_cents')::bigint, (q ->> 'delivery_fee_cents')::bigint,
     (q ->> 'service_fee_cents')::bigint, (q ->> 'small_basket_fee_cents')::bigint,
     (q ->> 'cash_handling_cents')::bigint, (q ->> 'total_cents')::bigint,
     (q ->> 'commission_cents')::bigint, (q ->> 'commission_pct')::numeric,
-    'KES', q -> 'pricing_version_ids', v_needs)
+    'KES', q -> 'pricing_version_ids', v_needs, v_request::uuid,
+    coalesce(q ->> 'fulfilment', 'delivery')::public.order_fulfilment,
+    nullif(q ->> 'scheduled_for', '')::timestamptz)
   returning id into v_order;
 
-  insert into public.order_item (
-    order_id, catalogue_item_id, name, quantity, unit_price_cents, line_total_cents, note)
-  select v_order, (l ->> 'catalogue_item_id')::uuid, l ->> 'name',
-         (l ->> 'quantity')::integer, (l ->> 'unit_price_cents')::bigint,
-         (l ->> 'line_total_cents')::bigint, nullif(l ->> 'note', '')
-    from jsonb_array_elements(q -> 'lines') l;
+  /* The buyer's ID, apart from the order (the quote has checked it). */
+  if (q ->> 'needs_buyer_id')::boolean then
+    insert into public.order_buyer_id (order_id, id_type, id_number, issuing_country, full_name)
+    values (v_order, p_payload #>> '{buyer_id,type}',
+            upper(regexp_replace(p_payload #>> '{buyer_id,number}', '[\s-]', '', 'g')),
+            nullif(upper(trim(coalesce(p_payload #>> '{buyer_id,country}', ''))), ''),
+            trim(p_payload #>> '{buyer_id,name}'));
+  end if;
+
+  /* Each line, with its unit and the choices made on it (20270116000100). */
+  for v_line in select l from jsonb_array_elements(q -> 'lines') l loop
+    insert into public.order_item (
+      order_id, catalogue_item_id, name, quantity, unit_price_cents, line_total_cents, note,
+      unit_label, unit_step, variant_id, variant_label, message)
+    values (v_order, (v_line ->> 'catalogue_item_id')::uuid, v_line ->> 'name',
+            (v_line ->> 'quantity')::integer, (v_line ->> 'unit_price_cents')::bigint,
+            (v_line ->> 'line_total_cents')::bigint, nullif(v_line ->> 'note', ''),
+            case when v_line ->> 'sold_by' in ('weight', 'volume') then v_line ->> 'unit_label' end,
+            case when v_line ->> 'sold_by' in ('weight', 'volume') then (v_line ->> 'unit_step')::numeric end,
+            nullif(v_line ->> 'variant_id', '')::uuid, nullif(v_line ->> 'variant_label', ''),
+            nullif(v_line ->> 'message', ''))
+    returning id into v_item;
+
+    /* A counted version is set aside for this order; the last one can't be sold twice. */
+    if nullif(v_line ->> 'variant_id', '') is not null then
+      update public.catalogue_variant
+         set stock_count = stock_count - (v_line ->> 'quantity')::integer, updated_at = now()
+       where id = (v_line ->> 'variant_id')::uuid and stock_count is not null;
+      if exists (select 1 from public.catalogue_variant
+                  where id = (v_line ->> 'variant_id')::uuid and stock_count < 0) then
+        raise exception 'Not enough % (%) left. Lower the amount.', v_line ->> 'name', v_line ->> 'variant_label'
+          using hint = 'variant_sold_out';
+      end if;
+    end if;
+
+    insert into public.order_item_modifier (order_item_id, group_id, option_id, group_name, option_name, extra_cents)
+    select v_item, (c ->> 'group_id')::uuid, (c ->> 'option_id')::uuid,
+           c ->> 'group_name', c ->> 'option_name', (c ->> 'extra_cents')::bigint
+      from jsonb_array_elements(coalesce(v_line -> 'options', '[]'::jsonb)) c;
+  end loop;
 
   insert into public.order_event (order_id, kind, title, detail, actor_type, actor_id, payload)
   values (v_order, 'placed', 'Placed on the website',
           replace(q ->> 'payment_method', '_', ' '),
-          'guest', v_guest.id, jsonb_build_object('channel', 'web'));
+          'guest', v_guest.id,
+          jsonb_build_object('channel', 'web', 'temporary_session', v_temporary));
 
   perform audit.log(p_actor_type=>'guest'::public.actor_type,p_actor_id=>v_guest.id,p_module=>'orders',
     p_action=>'order.web_placed',p_target_type=>'order',p_target_id=>v_order,p_city_id=>(q->>'city_id')::uuid,
     p_after=>jsonb_build_object('channel','web','payment_method',q->>'payment_method',
+                                'temporary_session',v_temporary,
                                 'fulfilment',q->>'fulfilment','scheduled_for',q->'scheduled_for'));
 
   return jsonb_build_object(
@@ -493,97 +689,43 @@ begin
     'total_cents', (q ->> 'total_cents')::bigint,
     'payment_method', q ->> 'payment_method',
     'pay_online', (q ->> 'payment_method') in ('card', 'mpesa_stk', 'bank_transfer'),
+    'guest', v_temporary,
+    'repeat', false,
     'fulfilment', q ->> 'fulfilment',
     'scheduled_for', q -> 'scheduled_for');
 end;
 $$;
 
+comment on function public.rpc_order_place_web(jsonb) is
+  'Places an order for the signed-in account or a temporary (guest) session: delivered, collected at the shop (pickup) or, for a basket of codes, digital; now or at scheduled_for. Each line keeps its unit, choices and version. A repeated client_request_id returns the first order. Bookings and stay holds still need an account.';
+
 revoke execute on function public.rpc_order_place_web(jsonb) from public, anon;
 grant execute on function public.rpc_order_place_web(jsonb) to authenticated;
 
--- dispatch.rpc_job_start: 20261223000600, refusing a pickup order before
--- anything is written. The rest is unchanged.
-create or replace function dispatch.rpc_job_start(p_order_id uuid)
-returns jsonb
+-- A pickup order never gets a rider: a delivery job for it is refused, as
+-- #183 refuses one for a digital order (job_not_for_digital). This covers
+-- dispatch.rpc_job_start and the search that marking an order ready starts
+-- (20270109000300), which records "Rider search did not start" and leaves
+-- the order ready.
+create or replace function dispatch.tg_job_not_for_pickup()
+returns trigger
 language plpgsql
 security definer
 set search_path = ''
 as $$
-declare
-  o public.order;
-  v_job uuid;
-  v_radius numeric;
-  v_pickup extensions.geography;
-  v_needs text[];
 begin
-  select * into o from public.order where id = p_order_id;
-  if not found then raise exception 'No such order.'; end if;
-
-  /* Starting a rider search is live operations' call, in the order's city. */
-  if not (coalesce(auth.role(), '') = 'service_role' or authz.works_live_ops(o.city_id)) then
-    raise exception 'Only live operations in this order''s city can start dispatch.'
-      using errcode = '42501';
+  if exists (select 1 from public.order o where o.id = new.order_id and o.fulfilment = 'pickup') then
+    raise exception 'This order is collected by the customer; no rider is needed.'
+      using errcode = '22023', hint = 'pickup_order';
   end if;
-
-  /* The customer collects it at the shop: there is nobody to send. */
-  if o.fulfilment = 'pickup' then
-    raise exception 'This order is collected by the customer; no rider is needed.';
-  end if;
-
-  if exists (select 1 from dispatch.job j
-             where j.order_id = p_order_id and j.state not in ('cancelled', 'completed')) then
-    return jsonb_build_object('ok', true, 'already_running', true);
-  end if;
-
-  select extensions.st_setsrid(extensions.st_makepoint(b.longitude, b.latitude), 4326)::extensions.geography
-    into v_pickup
-    from public.merchant_branch b where b.id = o.branch_id;
-
-  v_radius := coalesce(settings.fn_num('dispatch.search_radius_km', o.city_id), 3);
-
-  /*
-   * Whatever the order declared, plus alcohol if it came from a
-   * bar. That one is a licence rather than a preference, so it is
-   * not left to whoever placed the order to remember.
-   */
-  v_needs := o.carry_requirements;
-  if exists (select 1 from public.merchant m
-              where m.id = o.merchant_id and m.category = 'bar_liquor')
-     and not ('alcohol' = any (v_needs)) then
-    /* Typed: an untyped literal on the right of text[] || is read as an
-       array, and 'alcohol' is not one. */
-    v_needs := v_needs || 'alcohol'::text;
-  end if;
-
-  insert into dispatch.job (
-    order_id, city_id, zone_id, pickup_point, dropoff_point,
-    pickup_label, dropoff_label, distance_km, vehicle_requirements,
-    state, round, radius_km, rule_version_ids)
-  values (
-    p_order_id, o.city_id, o.zone_id, v_pickup, o.dropoff_point,
-    coalesce((select coalesce(m.trading_name, m.legal_name) from public.merchant m
-               where m.id = o.merchant_id), 'Merchant'),
-    o.dropoff_label,
-    case when v_pickup is not null and o.dropoff_point is not null
-         then round((extensions.st_distance(v_pickup, o.dropoff_point) / 1000.0)::numeric, 2) end,
-    v_needs,
-    'queued', 0, v_radius,
-    /* Frozen: a job that started on a 20-second window is judged
-       against a 20-second window. */
-    jsonb_build_object(
-      'accept_window_s', settings.fn_get('dispatch.accept_window_s', 'city', o.city_id) ->> 'version_id',
-      'rounds', settings.fn_get('dispatch.rounds_before_boost', 'city', o.city_id) ->> 'version_id',
-      'radius', settings.fn_get('dispatch.search_radius_km', 'city', o.city_id) ->> 'version_id'))
-  returning id into v_job;
-
-  perform dispatch.fn_offer_round(v_job);
-
-  return jsonb_build_object('ok', true, 'job_id', v_job, 'needs', to_jsonb(v_needs));
+  return new;
 end;
 $$;
+revoke execute on function dispatch.tg_job_not_for_pickup() from public, anon, authenticated;
 
-revoke execute on function dispatch.rpc_job_start(uuid) from public, anon;
-grant execute on function dispatch.rpc_job_start(uuid) to authenticated, service_role;
+create trigger job_not_for_pickup
+before insert on dispatch.job
+for each row execute function dispatch.tg_job_not_for_pickup();
 
 -- ═══════════════════════════════════════════════════ 2. group orders
 
@@ -734,6 +876,7 @@ as $$
     'scheduled_for', grp.scheduled_for,
     'lat', p_payload -> 'lat',
     'lng', p_payload -> 'lng',
+    'buyer_id', p_payload -> 'buyer_id',
     'items', coalesce((
       select jsonb_agg(jsonb_build_object(
                'catalogue_item_id', gi.catalogue_item_id,

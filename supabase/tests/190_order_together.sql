@@ -1,4 +1,4 @@
--- Order together, and pickup and scheduled web orders (20270106000100).
+-- Order together, and pickup and scheduled web orders (20270130009000).
 
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -120,7 +120,7 @@ select is(
 select set_config('request.jwt.claims', '{"role":"service_role"}', true);
 select throws_ok(
   format($$select dispatch.rpc_job_start(%L::uuid)$$, current_setting('t.pickup')),
-  'P0001', 'This order is collected by the customer; no rider is needed.',
+  '22023', 'This order is collected by the customer; no rider is needed.',
   'Dispatch refuses a pickup order, even for the service role.');
 select is(
   (select count(*)::int from dispatch.job where order_id = current_setting('t.pickup')::uuid),
