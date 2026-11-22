@@ -257,15 +257,15 @@ export const EMAIL_PURPOSES: EmailPurpose[] = [
   },
   {
     key: 'merchant.live',
-    label: 'Business live',
+    label: 'Business live, with the signed agreement attached',
     area: 'Onboarding and verification',
     audience: M,
     tone: 'green',
     eyebrow: 'YOUR BUSINESS IS LIVE',
-    actionLabel: 'Open business workspace',
+    actionLabel: 'Open your dashboard',
     conceptId: '31-business-live',
     sender: 'outbox',
-    templates: ['bell_merchant.live'],
+    templates: ['partner_merchant_live', 'bell_merchant.live'],
   },
   {
     key: 'merchant.document_approved',
