@@ -286,6 +286,12 @@ export interface ActivityRow {
   reviewed_at: string | null;
   review_note: string | null;
   hash: string | null;
+  /** From audit.event_origin. Null unless the reader has full audit access. */
+  session_id: string | null;
+  device_id: string | null;
+  device_label: string | null;
+  ip: string | null;
+  surface: string | null;
 }
 
 export interface SignInRow {

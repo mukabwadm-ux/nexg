@@ -223,7 +223,7 @@ test('a subcategory page reads only its merchants and their items, with the publ
   const [page, itemsRead] = calls;
   assert.equal(page!.url.pathname, '/rest/v1/merchant_public');
   assert.deepEqual(Object.fromEntries(page!.url.searchParams), {
-    select: 'id,trading_name,category_key,subcategory,branch_address,branch_latitude,branch_longitude,accepting_orders,busy_mode_until,closed_today,opens_today,closes_today,featured,closed_early_at',
+    select: 'id,trading_name,category_key,subcategory,branch_address,branch_latitude,branch_longitude,accepting_orders,busy_mode_until,closed_today,opens_today,closes_today,featured,closed_early_at,cover_photo_path',
     category_key: 'eq.restaurants_food', subcategory: 'in.(cafes_bakeries_pastries)', order: 'featured.desc.nullslast,trading_name.asc,id.asc', limit: '2', offset: '0' });
   assert.equal(itemsRead!.url.pathname, '/rest/v1/catalogue_public');
   assert.equal(itemsRead!.url.searchParams.get('merchant_id'), `in.(${id('c1', 2)},${id('c1', 10)})`);

@@ -14,6 +14,7 @@ import {
   type RetentionRow,
   type SignInRow,
 } from '@/components/audit/shared';
+import { type DeviceDetail, type DeviceRow, DevicesTab } from '@/components/audit/devices';
 import {
   ActivityTab,
   DataAccessTab,
@@ -33,6 +34,7 @@ export const dynamic = 'force-dynamic';
 const TABS = [
   { key: 'activity', label: 'Activity' },
   { key: 'sign_ins', label: 'Sign-ins & security' },
+  { key: 'devices', label: 'Devices' },
   { key: 'money', label: 'Money trail' },
   { key: 'data_access', label: 'Data access' },
   { key: 'evidence', label: 'Evidence & retention' },
@@ -42,6 +44,8 @@ const SUBTITLE: Record<string, string> = {
   activity:
     'Every state change in the system, hash-chained · an event cannot be edited or deleted, by anybody',
   sign_ins: 'Who signed in, from where, on what · and every use of emergency access',
+  devices:
+    'Every browser that signed in to the console, its IP addresses and what was done from it · addresses kept 365 days',
   money: 'Every event that moved money, with the second approver where one was required',
   data_access: 'Who looked at whose personal details, and why · the value itself is never logged',
   evidence: 'The chain, retention, legal holds and the packs built for people outside',
@@ -68,7 +72,14 @@ const PAGE = 200;
 export default async function AuditPage({
   searchParams,
 }: {
-  searchParams?: { tab?: string; filter?: string; module?: string; event?: string };
+  searchParams?: {
+    tab?: string;
+    filter?: string;
+    module?: string;
+    event?: string;
+    device?: string;
+    ip?: string;
+  };
 }) {
   const staff = await requireStaff();
   requireModule(staff, 'audit');
@@ -131,8 +142,12 @@ export default async function AuditPage({
         />
 
         {tab === 'activity' &&
-          (await loadActivity(supabase, health, filter, moduleFilter, searchParams?.event))}
+          (await loadActivity(supabase, health, filter, moduleFilter, searchParams?.event, {
+            device: searchParams?.device ?? null,
+            ip: searchParams?.ip ?? null,
+          }))}
         {tab === 'sign_ins' && (await loadSignIns(supabase, health))}
+        {tab === 'devices' && (await loadDevices(supabase, searchParams?.device ?? null))}
         {tab === 'money' && (await loadMoney(supabase))}
         {tab === 'data_access' && (await loadDataAccess(supabase))}
         {tab === 'evidence' && (await loadEvidence(supabase, health))}
@@ -149,11 +164,15 @@ async function loadActivity(
   filter: string,
   moduleFilter: string | null,
   eventId: string | undefined,
+  origin: { device: string | null; ip: string | null },
 ) {
   /* Public wrappers — see the note in actions.ts. */
   const audit = supabase;
 
   let q = audit.from('audit_activity_v').select('*').order('id', { ascending: false }).limit(PAGE);
+
+  if (origin.device) q = q.eq('device_id', origin.device);
+  if (origin.ip) q = q.eq('ip', origin.ip);
 
   if (filter === 'needs_review') q = q.eq('review_state', 'needs_review');
   if (filter === 'high') q = q.eq('severity', 'high');
@@ -190,6 +209,25 @@ async function loadActivity(
       selected={selected}
       filter={filter}
       moduleFilter={moduleFilter}
+      origin={origin}
+    />
+  );
+}
+
+async function loadDevices(supabase: Supabase, device: string | null) {
+  const [list, detail] = await Promise.all([
+    supabase.rpc('rpc_audit_devices'),
+    device
+      ? supabase.rpc('rpc_audit_device_detail', { p_device_id: device })
+      : Promise.resolve(null),
+  ]);
+
+  return (
+    <DevicesTab
+      devices={(list.data as DeviceRow[] | null) ?? []}
+      selected={device}
+      detail={(detail?.data as DeviceDetail | null | undefined) ?? null}
+      error={list.error?.message ?? null}
     />
   );
 }
