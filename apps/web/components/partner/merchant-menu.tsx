@@ -8,7 +8,9 @@ import {
   addMenuItems,
   removeMenuItem,
   setItemAvailable,
+  setItemDigital,
   setItemMessage,
+  setItemRequiresBuyerId,
   setItemPrice,
   setMinOrder,
   setItemSoldOut,
@@ -47,6 +49,10 @@ export interface ItemRow {
   price_is_estimate?: boolean | null;
   /** Undefined until the database has the column; the switch stays hidden. */
   sold_out?: boolean;
+  /** Delivered as a code in the app; undefined until the database has it. */
+  digital?: boolean;
+  /** The buyer must give a passport or national ID (an eSIM); undefined until the database has it. */
+  requires_buyer_id?: boolean;
   /** Whether the item takes a message; undefined until the database has it. */
   message?: { label: string | null; maxLength: number };
 }
@@ -292,6 +298,42 @@ export function Menu({
                       }`}
                     >
                       {busy === `m${i.id}` ? '…' : 'Message'}
+                    </button>
+                  )}
+                  {i.digital !== undefined && (
+                    <button
+                      type="button"
+                      disabled={busy === `g${i.id}`}
+                      onClick={() => void run(`g${i.id}`, () => setItemDigital(i.id, !i.digital))}
+                      aria-pressed={i.digital}
+                      title="Digital: customers get a code in the app (an eSIM, a voucher), with no delivery."
+                      className={`rounded-lg px-3 py-2 text-[0.6875rem] font-extrabold transition-colors disabled:opacity-40 ${
+                        i.digital
+                          ? 'bg-success-bg text-success'
+                          : 'border-border-strong text-muted border'
+                      }`}
+                    >
+                      {busy === `g${i.id}` ? '…' : 'Digital'}
+                    </button>
+                  )}
+                  {i.requires_buyer_id !== undefined && (
+                    <button
+                      type="button"
+                      disabled={busy === `n${i.id}`}
+                      onClick={() =>
+                        void run(`n${i.id}`, () =>
+                          setItemRequiresBuyerId(i.id, !i.requires_buyer_id),
+                        )
+                      }
+                      aria-pressed={i.requires_buyer_id}
+                      title="Needs ID: checkout asks for the buyer's passport or national ID (an eSIM)."
+                      className={`rounded-lg px-3 py-2 text-[0.6875rem] font-extrabold transition-colors disabled:opacity-40 ${
+                        i.requires_buyer_id
+                          ? 'bg-success-bg text-success'
+                          : 'border-border-strong text-muted border'
+                      }`}
+                    >
+                      {busy === `n${i.id}` ? '…' : 'Needs ID'}
                     </button>
                   )}
                   <button
