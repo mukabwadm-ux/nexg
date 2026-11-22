@@ -287,6 +287,95 @@ test('customer bookings: reference and name only, prepaid, codes, check-in, eras
     assert.equal(mine.bookingCode, code, 'paid, the customer now sees the code');
   });
 
+  await t.test('a deposit confirms the booking, and the balance is paid later', async () => {
+    // Owner, 22 Nov 2026: "Deposits now". A business that asks a deposit keeps it.
+    const withDeposit = (await engine.addOffering(
+      owner,
+      {
+        ...base,
+        name: 'Braids with deposit',
+        paymentPolicyId: 'MANUAL_COLLECTION_V1',
+        reservationFee: {
+          mode: 'fixed',
+          amountMinor: 50000,
+          treatment: 'credited_to_total',
+          requiredBeforeConfirmation: true,
+          refundTerms: 'The deposit is kept if you do not come.',
+        },
+      },
+      key(),
+    )) as any;
+    const kamau: Identity = { ...owner, role: 'customer', userId: `account_${randomUUID()}` };
+    const held = (await engine.createBooking(
+      kamau,
+      {
+        offeringId: withDeposit.id,
+        startTime: '2030-01-06T15:00:00+03:00',
+        customer: { name: 'Kamau' },
+      },
+      key(),
+      true,
+    )) as any;
+    assert.equal(held.booking.status, 'held');
+    assert.equal(held.booking.pricing.dueNowMinor, 50000);
+    assert.equal(held.booking.pricing.balanceMinor, 100000);
+    assert.equal(held.booking.acceptedPolicies.paymentPolicyId, 'NEXG_PREPAID_V1');
+
+    await assert.rejects(
+      () =>
+        engine.settlePayment(
+          platform,
+          held.booking.id,
+          { provider: 'paystack', reference: 'DEP-0', amountMinor: 100000 },
+          key(),
+        ),
+      (e: any) => e.code === 'payment_amount_mismatch',
+      'only the deposit or the whole amount is taken',
+    );
+    const deposit = (await engine.settlePayment(
+      platform,
+      held.booking.id,
+      { provider: 'paystack', reference: 'DEP-1', amountMinor: 50000 },
+      key(),
+    )) as any;
+    assert.equal(deposit.status, 'confirmed', 'the deposit confirms the booking');
+    assert.equal(deposit.paidMinor, 50000);
+
+    // Later, past the old hold time: the balance is still taken.
+    now += 60 * 60 * 1000;
+    await assert.rejects(
+      () =>
+        engine.settlePayment(
+          platform,
+          held.booking.id,
+          { provider: 'paystack', reference: 'BAL-0', amountMinor: 50000 },
+          key(),
+        ),
+      (e: any) => e.code === 'payment_amount_mismatch',
+      'after the deposit, only the exact balance',
+    );
+    const balance = (await engine.settlePayment(
+      platform,
+      held.booking.id,
+      { provider: 'paystack', reference: 'BAL-1', amountMinor: 100000 },
+      key(),
+    )) as any;
+    assert.equal(balance.status, 'confirmed');
+    assert.equal(balance.paidMinor, 150000);
+    await assert.rejects(
+      () =>
+        engine.settlePayment(
+          platform,
+          held.booking.id,
+          { provider: 'paystack', reference: 'BAL-2', amountMinor: 1 },
+          key(),
+        ),
+      (e: any) => e.code === 'already_paid',
+      'nothing more is taken once paid in full',
+    );
+    now -= 60 * 60 * 1000;
+  });
+
   await t.test('check-in by code: the name must match, then it is recorded once', async () => {
     await assert.rejects(
       () => engine.arriveByCode(owner, code, { reservationName: 'Achieng' }, key()),
