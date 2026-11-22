@@ -11,7 +11,7 @@
 -- engine refuses (the hold ran out, or the amount no longer matches), the
 -- payment is marked for Finance to refund.
 --
--- Builds on 20270129000200 (collections) and 20270131000100 (saved cards).
+-- Builds on 20270129000200 (collections) and 20270202000100 (saved cards).
 -- Not here: posting booking money to the ledger (the settlement side).
 
 alter type public.payment_intent add value if not exists 'booking';
