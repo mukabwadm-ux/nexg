@@ -6,7 +6,7 @@
 --    sign-up answer (MINIMUM_ORDER_AMOUNT, min_order or min_basket), now and
 --    whenever the answers change while no minimum is set. The shop changes
 --    it with rpc_merchant_set_min_order.
--- 2. fn_web_order_quote (latest 20270129000300) refuses a basket whose items
+-- 2. fn_web_order_quote (latest 20270130000200) refuses a basket whose items
 --    come to less, after offers: "<shop> takes orders from KES X. Add KES Y
 --    more." rpc_order_place_web prices through it.
 --
@@ -23,7 +23,7 @@
 -- [{key, label, value}], only listed keys a shop has answered).
 --
 -- Rollback: restore merchant_public (20261101000000) and fn_web_order_quote
--- (20270129000300); drop rpc_merchant_set_min_order, the trigger,
+-- (20270130000200); drop rpc_merchant_set_min_order, the trigger,
 -- fn_min_order_from_answers, merchant_public_answer_key and
 -- merchant.min_order_kes; delete the audit action.
 
@@ -251,7 +251,7 @@ on conflict (key) do nothing;
 
 -- ═══════════════════════════════════════════════ checkout
 
--- fn_web_order_quote: 20270129000300, plus the shop's minimum order.
+-- fn_web_order_quote: 20270130000200, plus the shop's minimum order.
 create or replace function public.fn_web_order_quote(p_payload jsonb)
 returns jsonb
 language plpgsql
