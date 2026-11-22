@@ -17,6 +17,7 @@ import type {
 } from '../components/merchant/insights/types';
 import { createClient } from './supabase/server';
 import { MerchantAccessError, requireMerchantWorkspaceOperations } from './merchant-access';
+import { resolveCurrentBusiness } from './current-business';
 
 const MAX_ORDERS = 1000;
 const MAX_ITEMS_PER_BATCH = 1000;
@@ -132,7 +133,13 @@ export async function loadMerchantInsights(
   if (auth.error || !auth.data.user || auth.data.user.is_anonymous)
     throw new MerchantInsightsError('Sign in to open Insights.', 401);
   const home = await client.rpc('fn_partner_home');
-  const identity = home.data as unknown as { kind?: string; id?: string; name?: string } | null;
+  const identity = home.data
+    ? await resolveCurrentBusiness(
+        client,
+        auth.data.user.id,
+        home.data as unknown as { kind: string; id?: string; name?: string; home: string },
+      )
+    : null;
   if (home.error)
     throw new MerchantInsightsError('Your merchant reporting identity could not be read.', 503);
   if (identity?.kind !== 'merchant' || !identity.id)

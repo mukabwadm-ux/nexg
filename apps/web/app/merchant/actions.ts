@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { merchantActionClient, requireMerchantActionObject } from '@/lib/merchant-action-access';
 import { mediaPayload, type PromoMediaRef } from '@/lib/promo-media';
 import { checkMerchantMedia } from '@/lib/promo-media-server';
+import { requireMerchant } from '@/lib/partner';
 
 /**
  * What a merchant can do from their own dashboard.
@@ -949,9 +950,12 @@ export async function openTicket(input: {
   page: string;
 }): Promise<Outcome> {
   const { client } = await merchantActionClient({ access: 'support' });
+  // An owner of several businesses: say which one the ticket is about.
+  const me = await requireMerchant({ access: 'shell' });
+  const business = me.name ? `${me.name}, ` : '';
   const { data, error } = await client.rpc('rpc_support_ticket_create', {
     p_topic: input.topic as never,
-    p_body: `${input.body}\n\n— from ${input.page}`,
+    p_body: `${input.body}\n\n— from ${business}${input.page}`,
     p_source_form: 'merchant_portal',
   });
   return unwrap(data, error, ALL, 'Opened. You will see it in Your tickets below.');
@@ -1001,7 +1005,8 @@ export async function setPromotionStatus(
   promotionId: string,
   status: 'active' | 'paused' | 'ended',
 ): Promise<Outcome> {
-  const { client } = await merchantActionClient();
+  const { client, merchantId } = await merchantActionClient();
+  await requireMerchantActionObject(client, 'merchant_promotion', promotionId, merchantId);
   const { data, error } = await client.rpc(
     'rpc_merchant_promotion_set_status' as never,
     { p_promotion_id: promotionId, p_status: status } as never,

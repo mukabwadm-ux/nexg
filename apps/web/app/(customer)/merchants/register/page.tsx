@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application';
 import { ConnectedApplication } from '@/components/onboarding/connected-application';
 import { createClient } from '@/lib/supabase/server';
+import { resolveCurrentBusiness } from '@/lib/current-business';
 import { loadApplicationView } from '@/lib/merchant-application-load';
 import { OnboardingDemoEntry } from '@/components/onboarding/demo-entry';
 import { ApplicationSessionBootstrap } from '@/components/onboarding/application-session-bootstrap';
@@ -23,6 +24,8 @@ export default async function Registration({
     email?: string;
     category?: string;
     town?: string;
+    /* Add business: a signed-in owner starting another business. */
+    add?: string;
   };
 }) {
   if (process.env.MERCHANT_ONBOARDING_V1_ENABLED === 'false')
@@ -52,6 +55,8 @@ export default async function Registration({
         </main>
       </MerchantRegistrationPage>
     );
+  const adding = searchParams.add === '1' && !data.user.is_anonymous;
+  let ownerContact: ReturnType<typeof prefillFrom> | undefined;
   if (!searchParams.merchantId && !searchParams.operationId) {
     const existing = await client.rpc('fn_partner_home');
     if (existing.error)
@@ -83,7 +88,10 @@ export default async function Registration({
           </main>
         </MerchantRegistrationPage>
       );
-    if (home?.kind === 'merchant' && home.id) redirect('/merchant');
+    if (home?.kind === 'merchant' && home.id) {
+      if (!adding) redirect('/merchant');
+      ownerContact = await ownerContactFor(client, data.user.id, home, data.user.email);
+    }
   }
   let record: MerchantApplicationRecord | undefined;
   const rpc = client.rpc as unknown as (
@@ -120,9 +128,9 @@ export default async function Registration({
         includePayout: !data.user.is_anonymous,
       })
     : undefined;
-  const prefill = saved ? undefined : prefillFrom(searchParams);
+  const prefill = saved ? undefined : (ownerContact ?? prefillFrom(searchParams));
   return (
-    <MerchantRegistrationPage>
+    <MerchantRegistrationPage adding={!!ownerContact}>
       <ConnectedApplication
         key={`${data.user.id}:${saved?.record.merchant_id ?? 'new'}:${saved?.record.revision ?? 0}:${saved?.record.review.state ?? 'draft'}`}
         actorId={data.user.id}
@@ -159,4 +167,34 @@ function prefillFrom(params: Record<string, string | undefined>) {
     ...(/^[a-z_]+$/.test(categoryId) ? { categoryId } : {}),
     ...(town ? { location: { town } } : {}),
   };
+}
+
+/**
+ * Add business: the owner's own name, phone and email from the business they
+ * are working in, read on the server rather than carried in the URL.
+ * Everything about the new business itself is asked fresh.
+ */
+async function ownerContactFor(
+  client: ReturnType<typeof createClient>,
+  userId: string,
+  home: { kind?: string; id?: string },
+  accountEmail?: string,
+) {
+  const current = await resolveCurrentBusiness(client, userId, {
+    kind: home.kind ?? 'merchant',
+    id: home.id,
+    home: '/merchant',
+  });
+  if (!current.id) return undefined;
+  const { data } = await client
+    .from('merchant')
+    .select('contact_name, contact_phone, contact_email')
+    .eq('id', current.id)
+    .maybeSingle();
+  if (!data) return undefined;
+  return prefillFrom({
+    contact_name: data.contact_name ?? undefined,
+    phone: data.contact_phone ?? undefined,
+    email: data.contact_email ?? accountEmail ?? undefined,
+  });
 }
