@@ -27,8 +27,24 @@ export interface MerchantRow {
   branch_address: string | null; branch_latitude: number | null; branch_longitude: number | null;
   accepting_orders: boolean | null; busy_mode_until: string | null; closed_today: boolean | null;
   opens_today: string | null; closes_today: string | null;
+  /** The store banner's public URL, when the merchant uploaded one. */
+  cover_photo_path?: string | null;
 }
-export interface ItemRow { id: string; merchant_id: string; name: string; description: string | null; price_kes: number | null; sort: number | null }
+export interface ItemRow { id: string; merchant_id: string; name: string; description: string | null; price_kes: number | null; sort: number | null;
+  /** Storage path of the item's photo in catalogue-images, when it has one. */
+  photo_path?: string | null }
+
+/**
+ * A merchant's own photos. The banner is stored as a public https URL; an item photo is a private
+ * storage path, served at full quality by the website's /api/catalogue-photo route (live merchants only).
+ */
+export function storeBanner(value: string | null | undefined): string | undefined {
+  return typeof value === 'string' && /^https:\/\/[^\s\\]+$/.test(value) ? value : undefined;
+}
+export function itemPhoto(path: string | null | undefined): string | undefined {
+  return typeof path === 'string' && /^[0-9a-f-]{36}\/[A-Za-z0-9._/-]{1,200}\.(?:jpe?g|png|webp)$/i.test(path) && !path.includes('..')
+    ? `/api/catalogue-photo/${path}` : undefined;
+}
 export interface CatalogRows { merchants: MerchantRow[]; items: ItemRow[] }
 
 export type BridgeFetch = (url: string, init: { method: 'GET'; headers: Record<string, string>; redirect: 'error'; signal: AbortSignal }) => Promise<Response>;
@@ -167,9 +183,10 @@ export class CatalogBridge {
         ...(area ? { nairobiArea: area } : {}), ...(row.branch_address ? { address: row.branch_address } : {}),
         ...(row.branch_latitude !== null && row.branch_longitude !== null ? { latitude: row.branch_latitude, longitude: row.branch_longitude } : {}),
         ...(open !== undefined ? { isOpen: open } : {}),
-        ...(media?.heroImage ? { heroImage: media.heroImage } : {}), ...(media?.logoUrl ? { logoUrl: media.logoUrl } : {}),
+        ...((media?.heroImage ?? storeBanner(row.cover_photo_path)) ? { heroImage: media?.heroImage ?? storeBanner(row.cover_photo_path) } : {}),
+        ...(media?.logoUrl ? { logoUrl: media.logoUrl } : {}),
         items: (items.get(row.id) ?? []).sort((left, right) => (left.sort ?? 0) - (right.sort ?? 0) || left.id.localeCompare(right.id)).slice(0, DETAIL_ITEMS).map(item => {
-          const image = this.media.items.get(item.id);
+          const image = this.media.items.get(item.id) ?? itemPhoto(item.photo_path);
           return { id: item.id, merchantId: row.id, merchantName: row.trading_name, name: item.name,
             ...(item.description?.trim() ? { description: item.description } : {}),
             ...(item.price_kes !== null && Number.isInteger(item.price_kes) && item.price_kes > 0 ? { price: item.price_kes, currency: 'KES' } : {}),
