@@ -10,6 +10,7 @@ import {
   setItemAvailable,
   setItemMessage,
   setItemPrice,
+  setMinOrder,
   setItemSoldOut,
   type Outcome,
 } from '@/app/merchant/actions';
@@ -71,17 +72,24 @@ export function Menu({
   merchantId,
   sections,
   catalogueExample,
+  minOrderKes,
 }: {
   items: ItemRow[];
   available: number;
   merchantId: string;
   sections: SectionRow[];
   catalogueExample?: CatalogueExample;
+  /** Undefined until the database has the column; the field stays hidden. */
+  minOrderKes?: number | null;
 }) {
   const router = useRouter();
   const [busy, setBusy] = React.useState<string | null>(null);
   const [said, setSaid] = React.useState<Outcome | null>(null);
   const [edits, setEdits] = React.useState<Record<string, string>>({});
+  const [minOrder, setMinOrderDraft] = React.useState(
+    minOrderKes == null ? '' : String(minOrderKes),
+  );
+  const minOrderDirty = minOrder !== (minOrderKes == null ? '' : String(minOrderKes));
 
   const run = async (key: string, action: () => Promise<Outcome>) => {
     setBusy(key);
@@ -105,6 +113,38 @@ export function Menu({
           >
             {said.message}
           </p>
+        )}
+
+        {minOrderKes !== undefined && (
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <label
+              htmlFor="min-order"
+              className="text-muted text-[0.75rem] font-bold"
+              title="Customers cannot check out a basket below this, after offers and before delivery."
+            >
+              Minimum order · KES
+            </label>
+            <input
+              id="min-order"
+              inputMode="numeric"
+              placeholder="None"
+              className={`${input} w-28 text-right tabular-nums`}
+              value={minOrder}
+              onChange={(e) => setMinOrderDraft(e.target.value.replace(/\D/g, ''))}
+            />
+            {minOrderDirty && (
+              <button
+                type="button"
+                disabled={busy === 'min-order'}
+                onClick={() =>
+                  void run('min-order', () => setMinOrder(minOrder ? Number(minOrder) : null))
+                }
+                className="bg-gold text-ink rounded-lg px-3 py-2 text-[0.6875rem] font-extrabold disabled:opacity-40"
+              >
+                {busy === 'min-order' ? '…' : 'Save'}
+              </button>
+            )}
+          </div>
         )}
 
         <ul className="divide-border divide-y">

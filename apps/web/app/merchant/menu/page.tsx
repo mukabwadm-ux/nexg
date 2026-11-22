@@ -37,6 +37,7 @@ export default async function MerchantMenu() {
     { data: reviewData },
     { data: soldOutData },
     { data: messageData },
+    { data: minOrderData },
   ] = await Promise.all([
     supabase
       .from('catalogue_item')
@@ -82,6 +83,8 @@ export default async function MerchantMenu() {
       .from('catalogue_item')
       .select('id, message_label, message_max_length')
       .eq('merchant_id', me.id),
+    // And the minimum order (20270129000400).
+    supabase.from('merchant').select('min_order_kes').eq('id', me.id).maybeSingle(),
   ]);
 
   const itemRows = (data as ItemRow[] | null) ?? [];
@@ -185,6 +188,11 @@ export default async function MerchantMenu() {
         merchantId={me.id}
         sections={sections}
         catalogueExample={catalogueExample}
+        minOrderKes={
+          minOrderData
+            ? ((minOrderData as { min_order_kes: number | null }).min_order_kes ?? null)
+            : undefined
+        }
       />
       <ItemChoices groups={groups} items={choiceItems} />
     </div>

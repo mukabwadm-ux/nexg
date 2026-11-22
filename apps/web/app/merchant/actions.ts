@@ -268,6 +268,21 @@ export async function setItemSoldOut(itemId: string, soldOut: boolean): Promise<
   };
 }
 
+/** The smallest basket the shop takes, in whole shillings; null for none. */
+export async function setMinOrder(minOrderKes: number | null): Promise<Outcome> {
+  const { client, merchantId } = await merchantActionClient({ access: 'setup' });
+  if (minOrderKes !== null && (!Number.isInteger(minOrderKes) || minOrderKes < 1))
+    return { ok: false, message: 'Enter a whole amount in shillings, or leave it empty for none.' };
+  const { data, error } = await client.rpc('rpc_merchant_set_min_order', {
+    p_merchant_id: merchantId,
+    p_min_order_kes: minOrderKes ?? undefined,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/merchant/menu');
+  const reply = data as { message?: string } | null;
+  return { ok: true, message: reply?.message ?? 'Saved.' };
+}
+
 /**
  * Whether an item takes a message (a cake's writing, a card) and what
  * customers are asked. An empty label turns messages off.
