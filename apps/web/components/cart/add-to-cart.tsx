@@ -4,7 +4,9 @@ import { Minus, Plus, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { kes, useCart } from './cart-provider';
+import { Price } from '@/components/currency/price';
+
+import { useCart } from './cart-provider';
 
 /** The "Add to cart" button on a menu item, which becomes a quantity stepper once it is in the basket. */
 export function AddToCart({
@@ -105,7 +107,7 @@ export function CartBar() {
           </span>
           View cart
         </span>
-        <span className="text-sm font-extrabold text-white">{kes(cart.subtotalKes)}</span>
+        <Price kes={cart.subtotalKes} className="text-sm font-extrabold text-white" />
       </Link>
     </div>
   );

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 
 import {
   type ActivityRow,
@@ -25,6 +26,7 @@ import {
 import { PillTabs } from '@/components/console-kit';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
+import { DEVICE_COOKIE } from '@/lib/request-context';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -147,7 +149,8 @@ export default async function AuditPage({
             ip: searchParams?.ip ?? null,
           }))}
         {tab === 'sign_ins' && (await loadSignIns(supabase, health))}
-        {tab === 'devices' && (await loadDevices(supabase, searchParams?.device ?? null))}
+        {tab === 'devices' &&
+          (await loadDevices(supabase, searchParams?.device ?? null, staff.isSuperAdmin))}
         {tab === 'money' && (await loadMoney(supabase))}
         {tab === 'data_access' && (await loadDataAccess(supabase))}
         {tab === 'evidence' && (await loadEvidence(supabase, health))}
@@ -214,7 +217,7 @@ async function loadActivity(
   );
 }
 
-async function loadDevices(supabase: Supabase, device: string | null) {
+async function loadDevices(supabase: Supabase, device: string | null, canSignOut: boolean) {
   const [list, detail] = await Promise.all([
     supabase.rpc('rpc_audit_devices'),
     device
@@ -228,6 +231,8 @@ async function loadDevices(supabase: Supabase, device: string | null) {
       selected={device}
       detail={(detail?.data as DeviceDetail | null | undefined) ?? null}
       error={list.error?.message ?? null}
+      canSignOut={canSignOut}
+      currentDevice={cookies().get(DEVICE_COOKIE)?.value ?? null}
     />
   );
 }
