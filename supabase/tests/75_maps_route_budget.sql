@@ -30,7 +30,7 @@ select throws_ok($$ select public.rpc_maps_route_budget('day') $$,
   '42501', 'Sign in with your account to request a map route.', 'An absent or deleted Auth account cannot reserve quota.');
 select set_config('request.jwt.claims',
   '{"sub":"c0720000-0000-4000-8000-000000000003","role":"authenticated","is_anonymous":false}', true);
--- Since 20270130000800 (owner, 22 Nov 2026) a temporary session routes one
+-- Since 20270130009400 (owner, 22 Nov 2026) a temporary session routes one
 -- Explore plan, judged by the Auth record even when its token says otherwise.
 select is(public.rpc_maps_route_budget('day') ->> 'allowed', 'true',
   'An anonymous Auth user routes one plan as a guest.');
