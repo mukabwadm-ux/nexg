@@ -9,6 +9,9 @@ const { settleDuePrompts, sendQueuedPayouts, registerPaybillUrls, rpc } = vi.hoi
   rpc: vi.fn(),
 }));
 
+const { sweepPaystack } = vi.hoisted(() => ({ sweepPaystack: vi.fn() }));
+vi.mock('server-only', () => ({}));
+vi.mock('@/lib/order-payment', () => ({ sweepPaystack }));
 vi.mock('@/lib/mpesa-prompt', () => ({ settleDuePrompts }));
 vi.mock('@/lib/mpesa-payout', () => ({ sendQueuedPayouts }));
 vi.mock('@/lib/supabase/public', () => ({ createPublicClient: () => ({ rpc }) }));
@@ -78,5 +81,30 @@ describe('POST /api/payments/worker', () => {
       p_ok: true,
       p_message: 'Success',
     });
+  });
+
+  it('runs the Paystack sweep for a call signed with a Paystack key, Daraja or not', async () => {
+    const crypto = await import('node:crypto');
+    vi.stubEnv('PAYSTACK_TEST_SECRET_KEY', 'sk_test_ci_only_0123456789');
+    vi.stubEnv('DARAJA_CALLBACK_SECRET', '');
+    sweepPaystack.mockReset().mockResolvedValue({ checked: 2 });
+    const signed = crypto
+      .createHmac('sha256', 'sk_test_ci_only_0123456789')
+      .update(`paystack-sweep:${Math.floor(Date.now() / 60_000)}`)
+      .digest('hex');
+    const sweep = (header: string) =>
+      POST(
+        new Request('https://www.nexgapp.com/api/payments/worker', {
+          method: 'POST',
+          headers: { 'x-paystack-worker': header },
+          body: JSON.stringify({ action: 'paystack_sweep' }),
+        }),
+      );
+
+    expect((await sweep('ab'.repeat(32))).status).toBe(401);
+    expect(sweepPaystack).not.toHaveBeenCalled();
+    const res = await sweep(signed);
+    expect(await res.json()).toEqual({ ok: true, paystack: { checked: 2 } });
+    expect(settleDuePrompts).not.toHaveBeenCalled();
   });
 });
