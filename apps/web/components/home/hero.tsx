@@ -64,7 +64,7 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
         <div className="to-night absolute inset-0 bg-gradient-to-b from-black/55 via-black/70 lg:hidden" />
         {/* Desktop: dark on the left behind the text and search, easing to a
             lighter veil on the right so the clip still reads. */}
-        <div className="from-night/90 via-night/65 to-night/20 absolute inset-0 hidden bg-gradient-to-r via-40% lg:block" />
+        <div className="from-night/95 via-night/80 to-night/35 absolute inset-0 hidden bg-gradient-to-r via-50% lg:block" />
         <div className="from-night absolute inset-x-0 bottom-0 hidden h-40 bg-gradient-to-t to-transparent lg:block" />
       </div>
 
