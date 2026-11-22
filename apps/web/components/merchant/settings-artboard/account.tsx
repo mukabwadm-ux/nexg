@@ -16,7 +16,7 @@ import { useSettings } from './store';
 import { Action, Badge, Card, Empty, Field, Modal, Note, TextLink } from './ui';
 import s from './settings.module.css';
 
-export function AccountScreen() {
+export function AccountScreen({ extra }: { extra?: React.ReactNode } = {}) {
   const { state, identity, commit, busy, notify } = useSettings();
   const [dialog, setDialog] = React.useState<'profile' | 'signin' | 'factor' | 'activity' | null>(
     null,
@@ -146,6 +146,7 @@ export function AccountScreen() {
               </div>
             </div>
           </Card>
+          {extra}
         </div>
         <div className={s.stack}>
           <Card

@@ -7,8 +7,8 @@ import { useRef, type ReactNode } from 'react';
 import styles from './workspace.module.css';
 
 /** Saves text as a CSV file in the browser. */
-export function download(name: string, text: string) {
-  const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
+export function download(name: string, text: string, type = 'text/csv') {
+  const url = URL.createObjectURL(new Blob([text], { type: `${type};charset=utf-8` }));
   const anchor = document.createElement('a');
   anchor.href = url;
   anchor.download = name;

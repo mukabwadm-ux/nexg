@@ -22,13 +22,16 @@ import s from './settings.module.css';
 export function SettingsWorkspace({
   identity,
   routingEditor,
+  accountExtra,
 }: {
   identity: SettingsIdentity;
   routingEditor?: React.ReactNode;
+  /** Server-backed cards shown under Account (Suspend business). */
+  accountExtra?: React.ReactNode;
 }) {
   return (
     <SettingsProvider identity={identity}>
-      <Workspace routingEditor={routingEditor} />
+      <Workspace routingEditor={routingEditor} accountExtra={accountExtra} />
     </SettingsProvider>
   );
 }
@@ -41,7 +44,13 @@ function selectionFromParams(params: { get: (name: string) => string | null }) {
   return { section, routing: params.get('scope') === 'business' };
 }
 
-function Workspace({ routingEditor }: { routingEditor?: React.ReactNode }) {
+function Workspace({
+  routingEditor,
+  accountExtra,
+}: {
+  routingEditor?: React.ReactNode;
+  accountExtra?: React.ReactNode;
+}) {
   const { identity, state, message, dirty, setDirty, ready } = useSettings();
   const demoContext = useMerchantOnboardingDemoContext();
   const router = useRouter();
@@ -297,7 +306,7 @@ function Workspace({ routingEditor }: { routingEditor?: React.ReactNode }) {
           </div>
         ) : (
           <>
-            {section === 'account' && <AccountScreen />}
+            {section === 'account' && <AccountScreen extra={accountExtra} />}
             {section === 'notifications' && (
               <NotificationsScreen
                 key={routing ? 'business' : 'personal'}

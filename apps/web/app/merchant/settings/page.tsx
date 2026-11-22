@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 
 import { MerchantSettings } from '@/components/merchant/board-client';
 import type { SettingsIdentity } from '@/components/merchant/settings-artboard/model';
+import { SuspendBusiness } from '@/components/merchant/settings-artboard/suspend';
 import { SettingsWorkspace } from '@/components/merchant/settings-artboard/workspace';
 import { requireMerchant } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
@@ -52,6 +53,27 @@ export default async function SettingsPage() {
     );
   const settings = data as SettingsRow;
   const user = auth.data.user;
+  // Suspend business: shown once the self_suspended column exists in this database.
+  const [suspension, role] = await Promise.all([
+    supabase
+      .from('merchant')
+      .select('self_suspended' as '*')
+      .eq('id', merchant.id)
+      .maybeSingle(),
+    supabase
+      .from('merchant_user')
+      .select('role')
+      .eq('merchant_id', merchant.id)
+      .eq('user_id', user.id)
+      .maybeSingle(),
+  ]);
+  const suspended = suspension.error
+    ? undefined
+    : ((
+        suspension.data as {
+          self_suspended?: { at?: string; reason?: string | null } | null;
+        } | null
+      )?.self_suspended ?? null);
   const name = user.user_metadata?.full_name ?? user.user_metadata?.name;
   const identity: SettingsIdentity = {
     merchantId: merchant.id,
@@ -75,6 +97,17 @@ export default async function SettingsPage() {
     >
       <SettingsWorkspace
         identity={identity}
+        accountExtra={
+          suspended === undefined ? undefined : (
+            <SuspendBusiness
+              initial={{
+                suspendedAt: suspended?.at ?? null,
+                reason: suspended?.reason ?? null,
+                canChange: role.data?.role === 'owner',
+              }}
+            />
+          )
+        }
         routingEditor={
           <MerchantSettings
             merchantId={identity.merchantId}
