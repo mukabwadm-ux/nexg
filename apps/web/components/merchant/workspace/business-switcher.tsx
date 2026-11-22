@@ -78,7 +78,13 @@ export function BusinessSwitcher({
             const current = business.id === currentId;
             return (
               <li key={business.id}>
-                <form action={switchBusiness}>
+                <form
+                  action={switchBusiness}
+                  onSubmit={() => {
+                    // The workspace reopens on the same address, so close the menu here.
+                    if (details.current) details.current.open = false;
+                  }}
+                >
                   <input type="hidden" name="merchantId" value={business.id} />
                   <button
                     type="submit"

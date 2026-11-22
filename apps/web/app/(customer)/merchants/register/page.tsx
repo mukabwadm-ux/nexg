@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application';
 import { ConnectedApplication } from '@/components/onboarding/connected-application';
 import { createClient } from '@/lib/supabase/server';
-import { resolveCurrentBusiness } from '@/lib/current-business';
+import { isBusinessId, resolveCurrentBusiness } from '@/lib/current-business';
 import { loadApplicationView } from '@/lib/merchant-application-load';
 import { OnboardingDemoEntry } from '@/components/onboarding/demo-entry';
 import { ApplicationSessionBootstrap } from '@/components/onboarding/application-session-bootstrap';
@@ -75,7 +75,7 @@ export default async function Registration({
     if (
       !home ||
       !['guest', 'merchant', 'rider', 'host', 'staff'].includes(home.kind ?? '') ||
-      (home.kind === 'merchant' && (!home.id || !uuid.test(home.id)))
+      (home.kind === 'merchant' && !isBusinessId(home.id))
     )
       return (
         <MerchantRegistrationPage>

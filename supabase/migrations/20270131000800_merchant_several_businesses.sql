@@ -1,7 +1,8 @@
 -- One sign-in may own several businesses (merchant_user, one row each), and
--- the merchant portal now switches between them. A notification that says
--- "Your shop is paused" no longer says which shop, so the two merchant
--- notifications that did not name the business now do:
+-- the merchant portal now switches between them. Two things follow:
+--
+-- 1. Notifications name the business. "Your shop is paused" no longer says
+--    which shop, so the two merchant notifications that did not, now do:
 --
 --   * tg_notify_merchant_status: "<Business> is live on NexG", "… is paused" …
 --   * cron_holiday_reminders: "Is <Business> open on <holiday>?", and its bell
@@ -11,6 +12,9 @@
 -- The holiday body is production's (checked 2026-11-22) and the status trigger
 -- is 20270131000650's (merchant.resumed, true live body), each with only these
 -- changes. Run after 20270131000650.
+--
+-- 2. merchant.contact_email is no longer unique (at the end of this file), so
+--    a second business can carry the owner's own email.
 
 create or replace function public.tg_notify_merchant_status()
 returns trigger
@@ -154,3 +158,15 @@ $$;
 
 revoke execute on function public.cron_holiday_reminders() from public, anon, authenticated;
 grant execute on function public.cron_holiday_reminders() to service_role;
+
+-- ─────────────────────────── one owner, several businesses, one email
+
+-- merchant.contact_email was unique, so an owner adding a second business
+-- under the same sign-in could not give it their own email: the
+-- registration's first save failed (23505) with "The application changed".
+-- Nothing reads a merchant by its email (submitting already requires the
+-- email to be verified on the submitter's own sign-in), so the key only
+-- stopped an owner's second business, and let any draft hold an email
+-- against its real owner. It becomes a plain index.
+alter table public.merchant drop constraint if exists merchant_contact_email_key;
+create index if not exists merchant_contact_email_idx on public.merchant (contact_email);

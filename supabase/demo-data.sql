@@ -97,7 +97,9 @@ inserted as (
     d.featured, d.concierge_pick, true, true,
     true
   from demo d, city_ids c
-  on conflict (contact_email) do nothing
+  /* Once per demo business: contact_email is no longer unique (one owner may
+     run several businesses, 20270131000800), so check rather than conflict. */
+  where not exists (select 1 from public.merchant x where x.contact_email = d.contact_email)
   returning id, trading_name
 )
 insert into public.merchant_branch (merchant_id, name, address_text, is_primary)
