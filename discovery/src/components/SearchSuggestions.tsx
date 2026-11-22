@@ -2,6 +2,7 @@ import { LayoutGrid, Search, Store, UtensilsCrossed } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import type { SearchSuggestions } from '../providers/DiscoveryProvider';
 import { foldSearch, suggestionList, type Suggestion } from '../data/searchSuggestions';
+import { formatPrice } from '../lib/formatPrice';
 
 export type SuggestFetch = (search: string, signal: AbortSignal) => Promise<SearchSuggestions>;
 
@@ -89,7 +90,7 @@ export function useSearchSuggestions({ search, suggest, onChoose, enabled, listI
             <span className="search-suggest__label">{suggestion.kind === 'search' ? <>Search for “{suggestion.label}”</> : <Highlight text={suggestion.label} search={search} />}</span>
             {'context' in suggestion && suggestion.context && <span className="search-suggest__context">{suggestion.kind === 'item' ? `at ${suggestion.context}` : suggestion.context}</span>}
           </span>
-          {suggestion.kind === 'item' && suggestion.price ? <span className="search-suggest__price">KES {suggestion.price.toLocaleString('en-KE')}</span> : null}
+          {suggestion.kind === 'item' && suggestion.price ? <span className="search-suggest__price">{formatPrice({ price: suggestion.price, currency: 'KES' }, 'code')}</span> : null}
         </div>
       </div>;
     })}

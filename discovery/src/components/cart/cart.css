@@ -80,3 +80,4 @@
 @media (prefers-reduced-motion:reduce){
   .cart-sheet[open],.cart-sheet::backdrop,.cart-switch,.cart-switch::backdrop,.cart-sheet button,.cart-sheet__primary,.cart-switch button{transition:none}
 }
+.cart-sheet__approx{color:var(--muted);font-size:13px;font-weight:600}

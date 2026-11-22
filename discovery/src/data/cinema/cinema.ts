@@ -9,6 +9,7 @@
  */
 import type { Merchant } from '../../providers/DiscoveryProvider';
 import { subcategoryOf } from '../offeringKinds';
+import { convertedKes } from '../../lib/displayCurrency';
 
 export type SeatType = 'standard' | 'vip' | 'wheelchair';
 export const seatTypes: readonly SeatType[] = ['standard', 'vip', 'wheelchair'];
@@ -154,6 +155,8 @@ export function fromPrice(showings: readonly Showing[]): { amount: number; curre
   return best;
 }
 export function formatMoney(amount: number, currency: string): string {
+  const converted = currency === 'KES' ? convertedKes(amount) : undefined;
+  if (converted) return converted;
   try {
     return new Intl.NumberFormat('en-KE', { style: 'currency', currency, maximumFractionDigits: Number.isInteger(amount) ? 0 : 2 }).format(amount);
   } catch {

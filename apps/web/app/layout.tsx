@@ -4,6 +4,7 @@ import { ToastProvider } from '@nexg/ui';
 import type { Metadata, Viewport } from 'next';
 import { RegisterServiceWorker } from '@/components/notifications/register-sw';
 import { REVEAL_SCRIPT } from '@/components/reveal-script';
+import { LOCALE_SCRIPT } from '@/lib/i18n/script';
 import { THEME_SCRIPT } from '@/components/theme/script';
 import { ThemeSync } from '@/components/theme/theme-sync';
 
@@ -44,6 +45,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {/* Light or dark before the first paint: no flash for dark-mode visitors. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        {/* The chosen language and its direction (Arabic is right to left) before the first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: LOCALE_SCRIPT }} />
         {/* Homepage entrances: their items first appear through the animation. */}
         <script dangerouslySetInnerHTML={{ __html: REVEAL_SCRIPT }} />
         <link

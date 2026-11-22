@@ -4,6 +4,7 @@ import { NotificationBell } from './notifications/bell';
 import { Menu } from 'lucide-react';
 import Link from 'next/link';
 
+import { PreferencesPicker } from '@/components/preferences/preferences-picker';
 import { getTranslations } from '@/lib/i18n';
 
 import { AccountButton } from './account-button';
@@ -32,7 +33,7 @@ export interface SiteHeaderProps {
  * click into Explore is already placed.
  */
 export async function SiteHeader({ action, signIn, account: showAccount = true }: SiteHeaderProps) {
-  const { locale } = await getTranslations();
+  const { locale, t } = await getTranslations();
   /* /account sends a signed-out visitor to sign in and back again, so the
      icon needs no session check here (which would stop the header caching). */
   const account = signIn ?? { label: 'Your account', href: '/account' };
@@ -50,6 +51,15 @@ export async function SiteHeader({ action, signIn, account: showAccount = true }
             full width it would push the row past the screen edge. */}
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <DeliverToChip tone="dark" />
+          <PreferencesPicker
+            locale={locale}
+            labels={{
+              button: t('prefs.button'),
+              language: t('prefs.language'),
+              currency: t('prefs.currency'),
+              currencyNote: t('prefs.currencyNote'),
+            }}
+          />
           <NotificationBell tone="dark" />
           {showAccount && <AccountButton href={account.href} label={account.label} />}
 
