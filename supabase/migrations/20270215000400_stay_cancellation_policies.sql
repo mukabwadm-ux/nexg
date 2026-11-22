@@ -16,6 +16,8 @@
 --     already taken is still refunded in full (tg_payment_stay_settled).
 --   * The ledger takes back only the refunded share of the stay posting
 --     (fn_post_stay_refund_due), so the host keeps their share of the fee.
+-- The terms are kept in cancellation_terms; property.cancellation_policy
+-- (20270125000100) stays the host's own words about it, shown as they wrote it.
 -- A stay with no policy copied (made before this migration) refunds in full,
 -- as before. A host who sets nothing gets the flexible policy.
 --
@@ -25,18 +27,18 @@ insert into audit.action_registry (action, module, default_severity, money, desc
   ('stay.cancellation_policy_set', 'hotels', 'info', false, 'A host set a cancellation policy')
 on conflict (action) do nothing;
 
-alter table public.property add column if not exists cancellation_policy jsonb;
-alter table public.unit add column if not exists cancellation_policy jsonb;
+alter table public.property add column if not exists cancellation_terms jsonb;
+alter table public.unit add column if not exists cancellation_terms jsonb;
 alter table public.stay
-  add column if not exists cancellation_policy jsonb,
+  add column if not exists cancellation_terms jsonb,
   add column if not exists refund_amount_kes bigint check (refund_amount_kes is null or refund_amount_kes >= 0),
   add column if not exists cancellation_fee_kes bigint check (cancellation_fee_kes is null or cancellation_fee_kes >= 0);
 
-comment on column public.property.cancellation_policy is
+comment on column public.property.cancellation_terms is
   'The host''s cancellation policy for this property (fn_cancellation_policy). Null: flexible.';
-comment on column public.unit.cancellation_policy is
+comment on column public.unit.cancellation_terms is
   'A unit''s own cancellation policy, overriding the property''s. Null: the property''s.';
-comment on column public.stay.cancellation_policy is
+comment on column public.stay.cancellation_terms is
   'The policy in force when the stay was made, copied so later changes do not apply to it.';
 comment on column public.stay.refund_amount_kes is
   'On cancellation: what the guest gets back under the policy.';
@@ -158,10 +160,10 @@ security definer
 set search_path = ''
 as $$
 begin
-  if new.cancellation_policy is null then
-    new.cancellation_policy := public.fn_cancellation_policy(coalesce(
-      (select u.cancellation_policy from public.unit u where u.id = new.unit_id),
-      (select p.cancellation_policy from public.property p where p.id = new.property_id),
+  if new.cancellation_terms is null then
+    new.cancellation_terms := public.fn_cancellation_policy(coalesce(
+      (select u.cancellation_terms from public.unit u where u.id = new.unit_id),
+      (select p.cancellation_terms from public.property p where p.id = new.property_id),
       '{"preset":"flexible"}'::jsonb));
   end if;
   return new;
@@ -210,9 +212,9 @@ begin
   v_policy := case when p_policy is null then null else public.fn_cancellation_policy(p_policy) end;
 
   if p_unit_id is null then
-    update public.property set cancellation_policy = v_policy where id = p_property_id;
+    update public.property set cancellation_terms = v_policy where id = p_property_id;
   else
-    update public.unit set cancellation_policy = v_policy where id = p_unit_id;
+    update public.unit set cancellation_terms = v_policy where id = p_unit_id;
   end if;
 
   perform audit.log(
@@ -238,7 +240,7 @@ stable security definer
 set search_path = ''
 as $$
   select jsonb_build_object('policy', x.policy, 'text', public.fn_cancellation_policy_text(x.policy))
-    from (select public.fn_cancellation_policy(coalesce(u.cancellation_policy, p.cancellation_policy,
+    from (select public.fn_cancellation_policy(coalesce(u.cancellation_terms, p.cancellation_terms,
                                                         '{"preset":"flexible"}'::jsonb)) as policy
             from public.unit u join public.property p on p.id = u.property_id
            where u.id = p_unit_id) x
@@ -281,7 +283,7 @@ begin
 
   if v_paid then
     v_pct := case when coalesce(p_full_refund, false) then 100
-                  else public.fn_stay_refund_pct(v_stay.cancellation_policy, v_stay.check_in, now()) end;
+                  else public.fn_stay_refund_pct(v_stay.cancellation_terms, v_stay.check_in, now()) end;
     v_refund := floor(v_stay.paid_kes * v_pct / 100.0)::bigint;
   end if;
 

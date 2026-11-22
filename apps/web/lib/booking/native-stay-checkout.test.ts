@@ -155,16 +155,14 @@ describe('native stay checkout routes', () => {
     });
     vi.stubGlobal(
       'fetch',
-      vi
-        .fn()
-        .mockResolvedValue(
-          new Response(
-            JSON.stringify({
-              status: true,
-              data: { authorization_url: 'https://checkout.paystack.com/s1', access_code: 's1' },
-            }),
-          ),
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            status: true,
+            data: { authorization_url: 'https://checkout.paystack.com/s1', access_code: 's1' },
+          }),
         ),
+      ),
     );
     const response = await stayPayment(request({ method: 'card' }), quoteId);
     expect(await response.json()).toEqual({
