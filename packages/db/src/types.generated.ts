@@ -6358,6 +6358,99 @@ export type Database = {
           },
         ];
       };
+      catalogue_bundle_item: {
+        Row: {
+          component_item_id: string;
+          item_id: string;
+          quantity: number;
+          sort: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          component_item_id: string;
+          item_id: string;
+          quantity?: number;
+          sort?: number;
+        };
+        Update: {
+          component_item_id?: string;
+          item_id?: string;
+          quantity?: number;
+          sort?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'catalogue_bundle_item_component_item_id_fkey';
+            columns: ['component_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_bundle_item_component_item_id_fkey';
+            columns: ['component_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_bundle_item_component_item_id_fkey';
+            columns: ['component_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_bundle_item_component_item_id_fkey';
+            columns: ['component_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_bundle_item_component_item_id_fkey';
+            columns: ['component_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_bundle_item_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_bundle_item_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_bundle_item_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'catalogue_bundle_item_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_bundle_item_item_id_fkey';
+            columns: ['item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+        ];
+      };
       catalogue_edit_request: {
         Row: {
           catalogue_item_id: string | null;
@@ -6695,6 +6788,7 @@ export type Database = {
           created_at: string;
           description: string | null;
           dietary_labels: string[];
+          duration_minutes: number | null;
           handling_notes: string | null;
           highlighted: boolean;
           id: string;
@@ -6702,11 +6796,14 @@ export type Database = {
           kind: Database['public']['Enums']['catalogue_item_kind'];
           merchant_id: string;
           name: string;
+          party_max: number | null;
+          party_min: number | null;
           photo_path: string | null;
           portion_size: string | null;
           prep_time_minutes: number | null;
           price_is_estimate: boolean;
           price_kes: number | null;
+          price_per: string | null;
           section_id: string;
           sold_by: string;
           sold_out: boolean;
@@ -6728,6 +6825,7 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           dietary_labels?: string[];
+          duration_minutes?: number | null;
           handling_notes?: string | null;
           highlighted?: boolean;
           id?: string;
@@ -6735,11 +6833,14 @@ export type Database = {
           kind?: Database['public']['Enums']['catalogue_item_kind'];
           merchant_id: string;
           name: string;
+          party_max?: number | null;
+          party_min?: number | null;
           photo_path?: string | null;
           portion_size?: string | null;
           prep_time_minutes?: number | null;
           price_is_estimate?: boolean;
           price_kes?: number | null;
+          price_per?: string | null;
           section_id: string;
           sold_by?: string;
           sold_out?: boolean;
@@ -6760,6 +6861,7 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           dietary_labels?: string[];
+          duration_minutes?: number | null;
           handling_notes?: string | null;
           highlighted?: boolean;
           id?: string;
@@ -6767,11 +6869,14 @@ export type Database = {
           kind?: Database['public']['Enums']['catalogue_item_kind'];
           merchant_id?: string;
           name?: string;
+          party_max?: number | null;
+          party_min?: number | null;
           photo_path?: string | null;
           portion_size?: string | null;
           prep_time_minutes?: number | null;
           price_is_estimate?: boolean;
           price_kes?: number | null;
+          price_per?: string | null;
           section_id?: string;
           sold_by?: string;
           sold_out?: boolean;
@@ -24890,6 +24995,7 @@ export type Database = {
           kind: string;
           merchant_id: string;
           name: string;
+          setup_item_id: string | null;
           starts_at: string;
           status: string;
           updated_at: string;
@@ -24905,6 +25011,7 @@ export type Database = {
           kind: string;
           merchant_id: string;
           name: string;
+          setup_item_id?: string | null;
           starts_at?: string;
           status?: string;
           updated_at?: string;
@@ -24919,6 +25026,7 @@ export type Database = {
           kind?: string;
           merchant_id?: string;
           name?: string;
+          setup_item_id?: string | null;
           starts_at?: string;
           status?: string;
           updated_at?: string;
@@ -25057,6 +25165,41 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_setup_item_id_fkey';
+            columns: ['setup_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_setup_item_id_fkey';
+            columns: ['setup_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_setup_item_id_fkey';
+            columns: ['setup_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_setup_item_id_fkey';
+            columns: ['setup_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_setup_item_id_fkey';
+            columns: ['setup_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
           },
         ];
       };
@@ -42627,7 +42770,9 @@ export type Database = {
           age_restricted: boolean | null;
           available: boolean | null;
           booking_offering_id: string | null;
+          bundle_items: Json | null;
           description: string | null;
+          duration_minutes: number | null;
           gallery_paths: string[] | null;
           has_options: boolean | null;
           has_variants: boolean | null;
@@ -42636,9 +42781,16 @@ export type Database = {
           kind: string | null;
           merchant_id: string | null;
           name: string | null;
+          party_max: number | null;
+          party_min: number | null;
           photo_path: string | null;
+          prep_time_minutes: number | null;
           price_is_estimate: boolean | null;
           price_kes: number | null;
+          price_per: string | null;
+          promo_price_kes: number | null;
+          promotion_ends_at: string | null;
+          promotion_name: string | null;
           section_id: string | null;
           sold_by: string | null;
           sold_out: boolean | null;
