@@ -20,7 +20,7 @@
 -- 3. catalogue_menu_public gains message_label and message_max_length.
 --
 -- Rollback: restore fn_web_order_quote (20270129000100), rpc_order_place_web
--- (20270116000900) and catalogue_menu_public (20270129000200); drop the
+-- (20270116000900) and catalogue_menu_public (20270130000100); drop the
 -- trigger and fn_onboarding_choice_groups; drop the new columns. The groups
 -- already made are the shops' own from then on.
 
