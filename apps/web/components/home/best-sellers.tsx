@@ -8,6 +8,7 @@ import * as React from 'react';
 import { categoryIcon } from '@/components/explore/merchant-card';
 import type { BestSeller } from '@/lib/best-sellers';
 import { discoverCategoryHref } from '@/lib/discover-links';
+import { Price } from '@/components/currency/price';
 
 /**
  * Best sellers: a row of products from different merchants, scrolled with
@@ -134,12 +135,12 @@ export function BestSellers({
                 {item.deliveryKes !== null && (
                   <>
                     <Bike className="h-3.5 w-3.5" aria-hidden="true" />
-                    {item.deliveryKes === 0 ? 'Free delivery' : `KES ${item.deliveryKes}`}
+                    {item.deliveryKes === 0 ? 'Free delivery' : <Price kes={item.deliveryKes} />}
                     <span aria-hidden="true">·</span>
                   </>
                 )}
                 <span className="text-ink font-extrabold">
-                  KES {item.priceKes.toLocaleString('en-KE')}
+                  <Price kes={item.priceKes} />
                 </span>
                 {item.rating !== null && (
                   <>

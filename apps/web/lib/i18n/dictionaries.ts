@@ -1,3 +1,10 @@
+import { ar } from './locales/ar';
+import { de } from './locales/de';
+import { es } from './locales/es';
+import { fr } from './locales/fr';
+import { pt } from './locales/pt';
+import { zh } from './locales/zh';
+
 /**
  * What NexG says, in each language it says it in.
  *
@@ -34,7 +41,7 @@
 export type Locale = string;
 
 /** The languages with a dictionary written by a person in this file. */
-export const AUTHORED_LOCALES = ['en', 'sw'] as const;
+export const AUTHORED_LOCALES = ['en', 'sw', 'fr', 'ar', 'zh', 'es', 'de', 'pt'] as const;
 
 export type AuthoredLocale = (typeof AUTHORED_LOCALES)[number];
 
@@ -44,7 +51,25 @@ export const DEFAULT_LOCALE = 'en';
 export const LOCALE_NAMES: Record<string, string> = {
   en: 'English',
   sw: 'Kiswahili',
+  fr: 'Français',
+  ar: 'العربية',
+  zh: '中文',
+  es: 'Español',
+  de: 'Deutsch',
+  pt: 'Português',
 };
+
+/** Languages written right to left. The page gets dir="rtl" for these. */
+const RTL = new Set(['ar', 'he', 'fa', 'ur']);
+
+export function isRtl(locale: string | null | undefined): boolean {
+  return !!locale && RTL.has(locale.toLowerCase().split('-')[0] ?? '');
+}
+
+/** The <html dir> for a language. */
+export function dirFor(locale: string | null | undefined): 'rtl' | 'ltr' {
+  return isRtl(locale) ? 'rtl' : 'ltr';
+}
 
 /**
  * What a language calls itself, asked of the browser where we do not
@@ -224,6 +249,49 @@ const en: Dictionary = {
   'footer.riders': 'Riders',
   'footer.openings': 'View openings',
   'footer.soon': 'Soon',
+
+  // ── language and currency, in the header
+  'prefs.button': 'Language and currency',
+  'prefs.language': 'Language',
+  'prefs.currency': 'Currency',
+  'prefs.currencyNote':
+    'You always pay in Kenyan shillings (KES). Other currencies are shown at today’s exchange rate, as an approximate guide.',
+  'currency.chargedNote':
+    'You pay in Kenyan shillings (KES). {currency} amounts are approximate, at today’s exchange rate.',
+
+  // ── all categories (/categories)
+  'cats.eyebrow': 'All categories',
+  'cats.title': 'Everything you need,',
+  'cats.gold': 'in one place.',
+  'cats.lede':
+    '{count} kinds of business across Nairobi, from restaurants and pharmacies to car hire and days out. Pick one to see who serves where you are.',
+  'cats.searchPlaceholder': 'Try sushi, florist or safari',
+  'cats.searchLabel': 'Search categories',
+  'cats.clear': 'Clear search',
+  'cats.filterLabel': 'Filter by type',
+  'cats.kind.all': 'All',
+  'cats.kind.menu': 'Food & drink',
+  'cats.kind.products': 'Shopping',
+  'cats.kind.services': 'Services',
+  'cats.matchOne': '1 category matches “{query}”',
+  'cats.matchMany': '{count} categories match “{query}”',
+  'cats.summaryOne': '1 category · {types} types of shop and service',
+  'cats.summaryMany': '{count} categories · {types} types of shop and service',
+  'cats.empty.title': 'Nothing here matches “{query}” yet.',
+  'cats.empty.body':
+    'A concierge can still find it. Describe what you need and get a price and a time before anything is bought.',
+  'cats.askConcierge': 'Ask a concierge',
+  'cats.showAll': 'Show all categories',
+  'cats.cta.eyebrow': 'Not on the list?',
+  'cats.cta.title': 'Ask a concierge for anything.',
+  'cats.cta.body':
+    'Describe what you need. A concierge quotes a price and a time, and nothing is bought until you approve it.',
+  'cats.cta.list': 'List your business',
+  'cats.typeOne': '1 type',
+  'cats.typeMany': '{count} types',
+  'cats.matches': 'Matches {list}',
+  'cats.more': '+{count} more',
+  'cats.seeWho': 'See who serves you',
 
   // ── the experience front door
   'xp.eyebrow': 'A concierge is a message away',
@@ -413,6 +481,49 @@ const sw: Dictionary = {
   'footer.openings': 'Tazama nafasi za kazi',
   'footer.soon': 'Hivi karibuni',
 
+  // ── lugha na sarafu, kwenye kichwa
+  'prefs.button': 'Lugha na sarafu',
+  'prefs.language': 'Lugha',
+  'prefs.currency': 'Sarafu',
+  'prefs.currencyNote':
+    'Daima unalipa kwa shilingi za Kenya (KES). Sarafu nyingine zinaonyeshwa kwa kiwango cha leo, kama makadirio tu.',
+  'currency.chargedNote':
+    'Unalipa kwa shilingi za Kenya (KES). Kiasi cha {currency} ni makadirio, kwa kiwango cha leo.',
+
+  // ── kategoria zote (/categories)
+  'cats.eyebrow': 'Kategoria zote',
+  'cats.title': 'Kila unachohitaji,',
+  'cats.gold': 'mahali pamoja.',
+  'cats.lede':
+    'Aina {count} za biashara kote Nairobi, kuanzia migahawa na maduka ya dawa hadi kukodisha magari na matembezi ya siku. Chagua moja uone nani anahudumia ulipo.',
+  'cats.searchPlaceholder': 'Jaribu sushi, maua au safari',
+  'cats.searchLabel': 'Tafuta kategoria',
+  'cats.clear': 'Futa utafutaji',
+  'cats.filterLabel': 'Chuja kwa aina',
+  'cats.kind.all': 'Zote',
+  'cats.kind.menu': 'Chakula na vinywaji',
+  'cats.kind.products': 'Ununuzi',
+  'cats.kind.services': 'Huduma',
+  'cats.matchOne': 'Kategoria 1 inalingana na “{query}”',
+  'cats.matchMany': 'Kategoria {count} zinalingana na “{query}”',
+  'cats.summaryOne': 'Kategoria 1 · aina {types} za maduka na huduma',
+  'cats.summaryMany': 'Kategoria {count} · aina {types} za maduka na huduma',
+  'cats.empty.title': 'Hakuna kinacholingana na “{query}” bado.',
+  'cats.empty.body':
+    'Msaidizi bado anaweza kukipata. Eleza unachohitaji upate bei na muda kabla ya kitu chochote kununuliwa.',
+  'cats.askConcierge': 'Ongea na msaidizi',
+  'cats.showAll': 'Onyesha kategoria zote',
+  'cats.cta.eyebrow': 'Haipo kwenye orodha?',
+  'cats.cta.title': 'Muulize msaidizi kitu chochote.',
+  'cats.cta.body':
+    'Eleza unachohitaji. Msaidizi atakupa bei na muda, na hakuna kitu kinachonunuliwa hadi uidhinishe.',
+  'cats.cta.list': 'Orodhesha biashara yako',
+  'cats.typeOne': 'Aina 1',
+  'cats.typeMany': 'Aina {count}',
+  'cats.matches': 'Inalingana na {list}',
+  'cats.more': '+{count} zaidi',
+  'cats.seeWho': 'Ona anayekuhudumia',
+
   // ── mlango wa mbele
   'xp.eyebrow': 'Msaidizi yuko ujumbe mmoja tu',
   'xp.title': 'Panga siku yako.',
@@ -444,7 +555,10 @@ const sw: Dictionary = {
     'NexG haipandishi bei ya tikiti kamwe. Pale mwandaaji anaporuhusu tuzishike, tunazishika kwa bei yake halisi, na tunatoza kwa siku iliyojengwa kuizunguka.',
 };
 
-export const DICTIONARIES: Record<string, Dictionary> = { en, sw };
+export const DICTIONARIES: Record<string, Dictionary> = { en, sw, fr, ar, zh, es, de, pt };
+
+/** The English source, for the translation files and their tests. */
+export const ENGLISH: Dictionary = en;
 
 /** True where a person has written this language out by hand. */
 export function isAuthored(value: string | null | undefined): value is AuthoredLocale {

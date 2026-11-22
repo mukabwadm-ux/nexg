@@ -9,6 +9,7 @@ import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { getCityPreference, getTranslations } from '@/lib/i18n';
 import { createPublicClient } from '@/lib/supabase/public';
+import { Price } from '@/components/currency/price';
 
 export const metadata: Metadata = {
   title: 'Customize your experience',
@@ -229,9 +230,11 @@ export default async function ExperienceHome({
                       </p>
                       <p className="border-border mt-4 border-t pt-3 text-[0.8125rem] font-extrabold">
                         {t('xp.curated.from')}{' '}
-                        {day.price_per_person_kes === null
-                          ? 'KES [—]'
-                          : `KES ${day.price_per_person_kes.toLocaleString('en-KE')}`}
+                        {day.price_per_person_kes === null ? (
+                          'KES [—]'
+                        ) : (
+                          <Price kes={day.price_per_person_kes} />
+                        )}
                         <span className="text-muted-light ml-1 font-semibold">
                           {t('xp.curated.perPerson')}
                         </span>

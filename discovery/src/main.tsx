@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import App from './App';
+import { CURRENCY_EVENT, prepareDisplayCurrency } from './lib/displayCurrency';
 import { ROOT_ID } from './styleScope';
 import './styles.css';
 // One card family and one storefront frame for every page (owner, 8 Nov 2026).
@@ -29,9 +30,25 @@ function mount(container: HTMLElement) {
   unmount();
   container.id = ROOT_ID;
   const root = createRoot(container);
-  root.render(<StrictMode><App /></StrictMode>);
   current = { root, container };
+  // The display currency (and its rates, when it is not KES) is read before the first render, so prices never
+  // flash from KES to the converted amount. KES visitors wait for nothing; others for at most two seconds.
+  void prepareDisplayCurrency().then(() => {
+    if (current?.root === root) root.render(<StrictMode><App key={renders++} /></StrictMode>);
+  });
 }
+
+let renders = 0;
+
+// The website's header picker changed the currency: render again with the new one. A fresh App, because prices are
+// formatted during render all over Discovery and a plain re-render would leave memoised parts in the old currency.
+window.addEventListener(CURRENCY_EVENT, () => {
+  const mounted = current;
+  if (!mounted) return;
+  void prepareDisplayCurrency().then(() => {
+    if (current === mounted) mounted.root.render(<StrictMode><App key={renders++} /></StrictMode>);
+  });
+});
 
 /**
  * Takes Discovery off the page: the website calls this when the visitor moves to another page of the site without

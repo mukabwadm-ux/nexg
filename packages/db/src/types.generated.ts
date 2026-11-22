@@ -16696,6 +16696,56 @@ export type Database = {
           },
         ];
       };
+      fx_rate: {
+        Row: {
+          currency: string;
+          per_kes: number;
+          stored_at: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          currency: string;
+          per_kes: number;
+          stored_at?: string;
+          updated_at: string;
+        };
+        Update: {
+          currency?: string;
+          per_kes?: number;
+          stored_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      fx_rate_fetch: {
+        Row: {
+          detail: string | null;
+          finished_at: string | null;
+          id: number;
+          ok: boolean | null;
+          request_id: number;
+          requested_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          detail?: string | null;
+          finished_at?: string | null;
+          id?: never;
+          ok?: boolean | null;
+          request_id: number;
+          requested_at?: string;
+        };
+        Update: {
+          detail?: string | null;
+          finished_at?: string | null;
+          id?: never;
+          ok?: boolean | null;
+          request_id?: number;
+          requested_at?: string;
+        };
+        Relationships: [];
+      };
       geocode_cache: {
         Row: {
           address_line: string | null;
@@ -59215,6 +59265,7 @@ export type Database = {
       cron_featured_reconcile: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_fin_rebuild: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_finance_invariants: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_fx_rates: { Args: Record<PropertyKey, never>; Returns: string };
       cron_holiday_reminders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_merchant_deleted_retention: { Args: Record<PropertyKey, never>; Returns: number };
       cron_merchant_live_emails: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -59666,6 +59717,7 @@ export type Database = {
       fn_fraud_rider_label: { Args: { p_rider_id: string }; Returns: string };
       fn_fraud_staff_label: { Args: { p_staff_id: string }; Returns: string };
       fn_fraud_sweep: { Args: Record<PropertyKey, never>; Returns: Json };
+      fn_fx_rates: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_geo_cell: {
         Args: { p_lat: number; p_lng: number; p_precision?: number };
         Returns: string;
@@ -62421,6 +62473,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_developer_session: { Args: { p_activity?: boolean }; Returns: Json };
       rpc_dispatch_assign_manual: {
         Args: { p_job_id: string; p_reason: string; p_rider_id: string };
         Returns: Json;

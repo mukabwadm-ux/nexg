@@ -17,6 +17,13 @@ vi.mock('./theme/theme', () => ({
 vi.mock('./site-menu', () => ({
   SiteMenu: ({ children }: { children: React.ReactNode }) => children,
 }));
+vi.mock('@/components/preferences/preferences-picker', () => ({
+  PreferencesPicker: ({ labels }: { labels: { button: string } }) => (
+    <button type="button" aria-label={labels.button}>
+      EN · KES
+    </button>
+  ),
+}));
 vi.mock('./logo', () => ({ Logo: () => <span>NexG Concierge</span> }));
 /* The account button reads the session in the browser; signed out it is the plain link. */
 vi.mock('@/app/(customer)/sign-in/actions', () => ({ signOut: vi.fn() }));
@@ -37,5 +44,6 @@ describe('SiteHeader', () => {
     expect(html).toContain('Deliver to');
     expect(html).toContain('Switch theme');
     expect(html).toContain('aria-label="Open menu"');
+    expect(html).toContain('aria-label="prefs.button"');
   });
 });

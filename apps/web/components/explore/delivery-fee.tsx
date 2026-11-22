@@ -3,6 +3,7 @@
 import { useLocation } from '@nexg/location';
 
 import { deliveryQuote, type DeliveryRate } from '@/lib/delivery-fee';
+import { Price } from '@/components/currency/price';
 
 /**
  * "Delivery KES 130 · 2.1 km" on an Explore card, priced from the spot in the
@@ -31,7 +32,7 @@ export function DeliveryFee({
       ? { lat: place.lat, lng: place.lng }
       : null;
   const quote = deliveryQuote(rate, spot, { lat, lng });
-  const kes = (n: number) => `KES ${Math.round(n).toLocaleString('en-KE')}`;
+  const kes = (n: number) => <Price kes={n} />;
 
   if (quote.kind === 'too_far') {
     return <span className={className}>Too far to deliver · {quote.km} km</span>;

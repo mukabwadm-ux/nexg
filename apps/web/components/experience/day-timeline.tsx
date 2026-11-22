@@ -23,6 +23,7 @@ import {
   type PlanBlock,
   type PlanView,
 } from './types';
+import { Price } from '@/components/currency/price';
 
 /**
  * The right-hand column of the builder artboard: the black budget card and
@@ -266,7 +267,13 @@ function TimelineBlock({
                 </>
               ) : (
                 <>
-                  <p className="text-success text-[0.8125rem] font-extrabold">KES {kes(price)}</p>
+                  <p className="text-success text-[0.8125rem] font-extrabold">
+                    {price === null || price === undefined ? (
+                      `KES ${kes(price)}`
+                    ) : (
+                      <Price kes={price} />
+                    )}
+                  </p>
                   <p className="text-muted-light text-[0.5625rem] font-semibold">{partyLabel}</p>
                 </>
               )}
@@ -283,7 +290,12 @@ function TimelineBlock({
                 >
                   <span>{item.label}</span>
                   <span className="shrink-0">
-                    KES {kes(item.amount)} · {item.note ?? 'paid on the day'}
+                    {item.amount === null || item.amount === undefined ? (
+                      `KES ${kes(item.amount)}`
+                    ) : (
+                      <Price kes={item.amount} />
+                    )}{' '}
+                    · {item.note ?? 'paid on the day'}
                   </span>
                 </li>
               ))}

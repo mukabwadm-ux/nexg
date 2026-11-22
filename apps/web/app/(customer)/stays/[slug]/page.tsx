@@ -9,11 +9,12 @@ import {
   SampleChip,
   bedroomLabel,
   KIND_LABEL,
-  rateLabel,
+  RateLabel,
 } from '@/components/stays/listing';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
+import { Price } from '@/components/currency/price';
 
 export const dynamic = 'force-dynamic';
 // Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
@@ -242,9 +243,11 @@ export default async function PropertyPage({ params }: { params: { slug: string 
                         </div>
                         <div className="shrink-0 text-right">
                           <p className="text-[1rem] font-extrabold">
-                            {u.nightly_rate_kes === null
-                              ? 'On request'
-                              : `KES ${u.nightly_rate_kes.toLocaleString('en-KE')}`}
+                            {u.nightly_rate_kes === null ? (
+                              'On request'
+                            ) : (
+                              <Price kes={u.nightly_rate_kes} />
+                            )}
                           </p>
                           <p className="text-muted-light text-[0.625rem] font-semibold">
                             {u.nightly_rate_kes === null
@@ -325,7 +328,9 @@ export default async function PropertyPage({ params }: { params: { slug: string 
           {/* ───────────────────────────────────────── the rail */}
           <div className="lg:sticky lg:top-24">
             <Card className="p-5">
-              <p className="text-[1.25rem] font-extrabold">{rateLabel(p.from_rate_kes)}</p>
+              <p className="text-[1.25rem] font-extrabold">
+                <RateLabel kes={p.from_rate_kes} />
+              </p>
               {p.from_rate_kes !== null && (
                 <p className="text-muted-light text-[0.75rem] font-semibold">per night</p>
               )}
