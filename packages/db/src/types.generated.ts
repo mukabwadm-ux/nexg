@@ -21400,6 +21400,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -21500,6 +21501,7 @@ export type Database = {
           resume_token_expires_at?: string | null;
           resume_token_hash?: string | null;
           rider_parking?: string | null;
+          self_suspended?: Json | null;
           settlement_account?: Json | null;
           source_url?: string | null;
           status?: Database['public']['Enums']['partner_status'];
@@ -21599,6 +21601,7 @@ export type Database = {
           resume_token_expires_at?: string | null;
           resume_token_hash?: string | null;
           rider_parking?: string | null;
+          self_suspended?: Json | null;
           settlement_account?: Json | null;
           source_url?: string | null;
           status?: Database['public']['Enums']['partner_status'];
@@ -24965,6 +24968,176 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      merchant_live_email: {
+        Row: {
+          first_at: string;
+          last_at: string;
+          last_by: string | null;
+          merchant_id: string;
+          outbox_id: string | null;
+          reason: string | null;
+          recipient: string | null;
+          recipient_source: string | null;
+          sends: number;
+          signed_id: string;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          first_at?: string;
+          last_at?: string;
+          last_by?: string | null;
+          merchant_id: string;
+          outbox_id?: string | null;
+          reason?: string | null;
+          recipient?: string | null;
+          recipient_source?: string | null;
+          sends?: number;
+          signed_id: string;
+          status: string;
+        };
+        Update: {
+          first_at?: string;
+          last_at?: string;
+          last_by?: string | null;
+          merchant_id?: string;
+          outbox_id?: string | null;
+          reason?: string | null;
+          recipient?: string | null;
+          recipient_source?: string | null;
+          sends?: number;
+          signed_id?: string;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_live_email_last_by_fkey';
+            columns: ['last_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_outbox_id_fkey';
+            columns: ['outbox_id'];
+            isOneToOne: false;
+            referencedRelation: 'notification_outbox';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_outbox_id_fkey';
+            columns: ['outbox_id'];
+            isOneToOne: false;
+            referencedRelation: 'notification_outbox_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_signed_id_fkey';
+            columns: ['signed_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_agreement_signed';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -59044,6 +59217,7 @@ export type Database = {
       cron_finance_invariants: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_holiday_reminders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_merchant_deleted_retention: { Args: Record<PropertyKey, never>; Returns: number };
+      cron_merchant_live_emails: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_merchant_setup_reminders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_native_push_dispatch: { Args: Record<PropertyKey, never>; Returns: boolean };
       cron_notify_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -59729,6 +59903,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -59798,6 +59973,11 @@ export type Database = {
       fn_merchant_is_featured: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_is_live: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_liquor_licensed: { Args: { p_merchant_id: string }; Returns: boolean };
+      fn_merchant_live_email_queue: {
+        Args: { p_reason?: string; p_signed_id: string; p_staff?: string };
+        Returns: Json;
+      };
+      fn_merchant_live_next_steps: { Args: { p_merchant_id: string }; Returns: Json };
       fn_merchant_mine: { Args: { p_merchant_id: string }; Returns: string };
       fn_merchant_onboarding_category: { Args: { p_merchant_id: string }; Returns: string };
       fn_merchant_onboarding_date_error: {
@@ -64757,6 +64937,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -64879,6 +65060,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -65023,6 +65205,11 @@ export type Database = {
       };
       rpc_merchant_item_variants_save: {
         Args: { p_item_id: string; p_payload: Json };
+        Returns: Json;
+      };
+      rpc_merchant_live_email: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_live_email_resend: {
+        Args: { p_merchant_id: string; p_reason?: string };
         Returns: Json;
       };
       rpc_merchant_membership_remove: {
@@ -65246,6 +65433,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -65311,6 +65499,10 @@ export type Database = {
       };
       rpc_merchant_save_step: {
         Args: { p_merchant_id: string; p_patch?: Json; p_step: number };
+        Returns: Json;
+      };
+      rpc_merchant_self_suspend: {
+        Args: { p_merchant_id: string; p_reason?: string; p_suspend: boolean };
         Returns: Json;
       };
       rpc_merchant_session_activity: { Args: { p_merchant_id: string }; Returns: Json };
@@ -65423,6 +65615,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -65543,6 +65736,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -65651,6 +65845,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -65777,6 +65972,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];
@@ -65941,6 +66137,7 @@ export type Database = {
           resume_token_expires_at: string | null;
           resume_token_hash: string | null;
           rider_parking: string | null;
+          self_suspended: Json | null;
           settlement_account: Json | null;
           source_url: string | null;
           status: Database['public']['Enums']['partner_status'];

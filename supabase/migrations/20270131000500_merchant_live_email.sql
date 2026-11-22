@@ -10,6 +10,13 @@
 --
 --   * merchant_live_email: one row per signed agreement. Its primary key is
 --     what stops a second email on a retry, a second press or a reload.
+--   * Two triggers mark it due (one small insert, status pending): a signed
+--     agreement recorded for a live business, and a business with a signed
+--     agreement going live. Nothing else happens inside the signing or the
+--     going live, so neither can be slowed or stopped by the email.
+--   * cron_merchant_live_emails, every minute (job merchant-live-emails),
+--     writes and queues the emails due. A failure is kept on the row
+--     (status error), where staff see it and can send it again.
 --   * fn_merchant_live_next_steps: the next steps for the merchant's
 --     category, naming the dashboard sections the merchant has.
 --   * fn_merchant_live_email_queue: writes the email (plain text, and the
@@ -19,9 +26,6 @@
 --     "Business live"). The payload names the signed PDF and its SHA-256;
 --     notify-dispatch reads it from the private bucket, checks it and
 --     attaches it.
---   * Two triggers start it: a signed agreement recorded for a live merchant,
---     and a merchant with a signed agreement going live. Neither can stop the
---     signing or the going live; a failure is kept on the row instead.
 --   * rpc_merchant_live_email: what staff see on the merchant page.
 --   * rpc_merchant_live_email_resend: Send again, when the email did not go
 --     (skipped, failed after its retries, or never queued). Never after it
@@ -37,11 +41,12 @@
 -- already signed for a business not live yet sends when the business goes live.
 --
 -- Rollback:
+--   select cron.unschedule('merchant-live-emails');
 --   drop trigger merchant_agreement_signed_live_email on public.merchant_agreement_signed;
 --   drop trigger merchant_live_email_on_live on public.merchant;
 --   drop function public.rpc_merchant_live_email_resend(uuid, text),
 --     public.rpc_merchant_live_email(uuid), public.tg_merchant_live_email_on_live(),
---     public.tg_merchant_agreement_signed_live_email(), public.fn_merchant_live_email_try(uuid),
+--     public.tg_merchant_agreement_signed_live_email(), public.cron_merchant_live_emails(),
 --     public.fn_merchant_live_email_queue(uuid, uuid, text), public.fn_merchant_live_next_steps(uuid);
 --   drop table public.merchant_live_email;
 --   delete from audit.action_registry where action in
@@ -53,9 +58,10 @@ create table if not exists public.merchant_live_email (
   signed_id uuid primary key
     references public.merchant_agreement_signed (id) on delete cascade,
   merchant_id uuid not null references public.merchant (id) on delete cascade,
-  /* queued: in the outbox (its own status says sent, waiting or failed);
-     skipped: not queued, and why; error: queuing it failed, and why. */
-  status text not null check (status in ('queued', 'skipped', 'error')),
+  /* pending: due, the minute job writes and queues it; queued: in the outbox
+     (its own status says sent, waiting or failed); skipped: not queued, and
+     why; error: queuing it failed, and why. */
+  status text not null check (status in ('pending', 'queued', 'skipped', 'error')),
   reason text check (reason is null or length(reason) <= 500),
   recipient text,
   recipient_source text check (recipient_source in ('owner_sign_in', 'business_email')),
@@ -68,6 +74,8 @@ create table if not exists public.merchant_live_email (
 );
 create index if not exists merchant_live_email_merchant_idx
   on public.merchant_live_email (merchant_id);
+create index if not exists merchant_live_email_pending_idx
+  on public.merchant_live_email (first_at) where status = 'pending';
 
 comment on table public.merchant_live_email is
   'The "your business is live" email, with the signed merchant agreement attached: one row per signed agreement, so it goes once. Read by staff through rpc_merchant_live_email.';
@@ -239,9 +247,9 @@ grant execute on function public.fn_merchant_live_next_steps(uuid) to service_ro
 -- ═══════════════════════════════════════════════════════════ queuing it
 
 /*
- * Queues the email for one signed agreement, if its merchant is live and it
- * is the merchant's current agreement. Automatic calls (p_staff null) send
- * once: a row already there means it was dealt with. Send again
+ * Writes and queues the email for one signed agreement, if its business is
+ * live and it is the business's current agreement. The minute job (p_staff
+ * null) writes only what the triggers marked due; Send again
  * (rpc_merchant_live_email_resend) passes the staff member and may queue
  * again only when the last one did not go. Returns what happened.
  */
@@ -288,36 +296,44 @@ begin
   if g.id is null then
     return jsonb_build_object('status', 'none');
   end if;
-  select * into m from public.merchant where id = g.merchant_id;
-  if m.status::text <> 'live' or m.deleted_at is not null or m.deactivated_at is not null then
-    return jsonb_build_object('status', 'not_live');
-  end if;
-  v_current := public.fn_merchant_agreement_current_acceptance(m.id);
-  if v_current.id is distinct from g.acceptance_id then
-    return jsonb_build_object('status', 'not_current');
-  end if;
 
-  /* Claim the agreement's row first: a second caller waits here for the
-     first to finish, then finds the row and stops. */
-  insert into public.merchant_live_email (signed_id, merchant_id, status)
-  values (g.id, m.id, 'queued')
-  on conflict (signed_id) do nothing;
-  if not found then
-    if p_staff is null then
+  /* The agreement's row, held to the end of the transaction, so the minute
+     job and Send again can never both queue it. */
+  select * into v_row from public.merchant_live_email where signed_id = g.id for update;
+  if p_staff is null then
+    if v_row.signed_id is null or v_row.status <> 'pending' then
       return jsonb_build_object('status', 'already');
     end if;
-    select * into v_row from public.merchant_live_email where signed_id = g.id for update;
-    if v_row.status = 'queued' then
-      select * into v_outbox from public.notification_outbox where id = v_row.outbox_id;
-      if v_outbox.status = 'sent' then
-        raise exception 'The email was sent on %. One email goes out per signed agreement.',
-          to_char(v_outbox.sent_at at time zone 'Africa/Nairobi', 'DD Mon YYYY, HH24:MI')
-          using errcode = '23505';
-      elsif v_outbox.status = 'pending' or v_outbox.id is null then
-        raise exception 'The email is still waiting to go out. Try again if it fails.'
-          using errcode = '55000';
-      end if;
+  elsif v_row.status = 'pending' then
+    raise exception 'The email is about to go out by itself. If it fails, send it again then.'
+      using errcode = '55000';
+  elsif v_row.status = 'queued' then
+    select * into v_outbox from public.notification_outbox where id = v_row.outbox_id;
+    if v_outbox.status = 'sent' then
+      raise exception 'The email was sent on %. One email goes out per signed agreement.',
+        to_char(v_outbox.sent_at at time zone 'Africa/Nairobi', 'DD Mon YYYY, HH24:MI')
+        using errcode = '23505';
+    elsif v_outbox.status = 'pending' or v_outbox.id is null then
+      raise exception 'The email is still waiting to go out. Try again if it fails.'
+        using errcode = '55000';
     end if;
+  end if;
+
+  select * into m from public.merchant where id = g.merchant_id;
+  v_current := public.fn_merchant_agreement_current_acceptance(m.id);
+  if m.status::text <> 'live' or m.deleted_at is not null or m.deactivated_at is not null
+     or v_current.id is distinct from g.acceptance_id then
+    /* No longer true: forget it, so going live again marks it due again. */
+    if p_staff is null then
+      delete from public.merchant_live_email where signed_id = g.id and status = 'pending';
+    end if;
+    return jsonb_build_object('status',
+      case when v_current.id is distinct from g.acceptance_id then 'not_current' else 'not_live' end);
+  end if;
+
+  if v_row.signed_id is null then
+    insert into public.merchant_live_email (signed_id, merchant_id, status)
+    values (g.id, m.id, 'pending');
   end if;
 
   -- Who it goes to, and how they are greeted.
@@ -418,7 +434,8 @@ begin
          recipient = v_to,
          recipient_source = v_source,
          outbox_id = v_id,
-         sends = case when p_staff is null then sends else least(sends + 1, 50) end,
+         sends = case when p_staff is null or v_row.signed_id is null then sends
+                      else least(sends + 1, 50) end,
          last_at = now(),
          last_by = p_staff
    where signed_id = g.id;
@@ -445,57 +462,79 @@ revoke all on function public.fn_merchant_live_email_queue(uuid, uuid, text) fro
 grant execute on function public.fn_merchant_live_email_queue(uuid, uuid, text) to service_role;
 
 /*
- * The automatic send, which never fails what started it: signing an
- * agreement or taking a business live goes ahead whatever happens here.
- * A failure is kept on the agreement's row (status error), where staff see
- * it and can press Send again.
+ * Every minute: write and queue the emails marked due. One that fails is
+ * kept on its row (status error) for staff to see and send again, and never
+ * holds up the others.
  */
-create or replace function public.fn_merchant_live_email_try(p_signed_id uuid)
-returns void
+create or replace function public.cron_merchant_live_emails()
+returns jsonb
 language plpgsql
 security definer
 set search_path = ''
 as $$
 declare
-  v_merchant uuid;
-  v_city uuid;
+  r record;
+  v_status text;
   v_error text;
+  v_done jsonb := '{}'::jsonb;
+  v_failed integer := 0;
 begin
-  begin
-    perform public.fn_merchant_live_email_queue(p_signed_id);
-  exception when others then
-    v_error := left(sqlerrm, 500);
-    raise warning 'The live email for signed agreement % was not queued: %', p_signed_id, v_error;
+  for r in
+    select e.signed_id, e.merchant_id
+    from public.merchant_live_email e
+    where e.status = 'pending'
+    order by e.first_at
+    limit 50
+  loop
     begin
-      select g.merchant_id, m.city_id into v_merchant, v_city
-      from public.merchant_agreement_signed g
-      join public.merchant m on m.id = g.merchant_id
-      where g.id = p_signed_id;
-      insert into public.merchant_live_email (signed_id, merchant_id, status, reason)
-      values (p_signed_id, v_merchant, 'error', v_error)
-      on conflict (signed_id) do nothing;
-      perform audit.log(
-        p_actor_type => 'system'::public.actor_type,
-        p_module => 'merchants',
-        p_action => 'merchant.live_email_queued',
-        p_target_type => 'merchant',
-        p_target_id => v_merchant,
-        p_after => jsonb_build_object('status', 'error', 'reason', v_error),
-        p_severity => 'high'::public.audit_severity,
-        p_city_id => v_city);
+      v_status := public.fn_merchant_live_email_queue(r.signed_id) ->> 'status';
+      v_done := v_done || jsonb_build_object(v_status, coalesce((v_done ->> v_status)::integer, 0) + 1);
     exception when others then
-      raise warning 'Recording that failure failed too: %', sqlerrm;
+      v_error := left(sqlerrm, 500);
+      v_failed := v_failed + 1;
+      raise warning 'The live email for signed agreement % was not queued: %', r.signed_id, v_error;
+      begin
+        update public.merchant_live_email
+           set status = 'error', reason = v_error, last_at = now()
+         where signed_id = r.signed_id and status = 'pending';
+        perform audit.log(
+          p_actor_type => 'system'::public.actor_type,
+          p_module => 'merchants',
+          p_action => 'merchant.live_email_queued',
+          p_target_type => 'merchant',
+          p_target_id => r.merchant_id,
+          p_after => jsonb_build_object('status', 'error', 'reason', v_error),
+          p_severity => 'high'::public.audit_severity);
+      exception when others then
+        raise warning 'Recording that failure failed too: %', sqlerrm;
+      end;
     end;
-  end;
+  end loop;
+  return v_done || jsonb_build_object('failed', v_failed);
 end;
 $$;
 
-revoke all on function public.fn_merchant_live_email_try(uuid) from public, anon, authenticated;
-grant execute on function public.fn_merchant_live_email_try(uuid) to service_role;
+revoke all on function public.cron_merchant_live_emails() from public, anon, authenticated;
+grant execute on function public.cron_merchant_live_emails() to service_role;
+
+do $cron$
+begin
+  if not exists (select 1 from pg_extension where extname = 'pg_cron') then
+    raise notice 'pg_cron is not installed here; the live emails are not scheduled.';
+    return;
+  end if;
+  if exists (select 1 from cron.job where jobname = 'merchant-live-emails') then
+    perform cron.unschedule('merchant-live-emails');
+  end if;
+  perform cron.schedule('merchant-live-emails', '* * * * *',
+    $sched$select public.cron_merchant_live_emails()$sched$);
+end
+$cron$;
 
 -- ═══════════════════════════════════════════════════════════ what starts it
 
-/* An agreement signed for a business that is already live. */
+/* An agreement signed for a business that is already live: due. One small
+   insert, so the signing is never held up by the email. */
 create or replace function public.tg_merchant_agreement_signed_live_email()
 returns trigger
 language plpgsql
@@ -503,7 +542,15 @@ security definer
 set search_path = ''
 as $$
 begin
-  perform public.fn_merchant_live_email_try(new.id);
+  if exists (select 1 from public.merchant m
+             where m.id = new.merchant_id and m.status::text = 'live') then
+    insert into public.merchant_live_email (signed_id, merchant_id, status)
+    values (new.id, new.merchant_id, 'pending')
+    on conflict (signed_id) do nothing;
+  end if;
+  return null;
+exception when others then
+  raise warning 'The live email for signed agreement % was not marked due: %', new.id, sqlerrm;
   return null;
 end;
 $$;
@@ -516,24 +563,20 @@ create trigger merchant_agreement_signed_live_email
   for each row execute function public.tg_merchant_agreement_signed_live_email();
 
 /* A business going live (or live again) whose current agreement is signed
-   and has not had its email. */
+   and has not had its email: due. */
 create or replace function public.tg_merchant_live_email_on_live()
 returns trigger
 language plpgsql
 security definer
 set search_path = ''
 as $$
-declare
-  v_signed uuid;
 begin
-  select g.id into v_signed
+  insert into public.merchant_live_email (signed_id, merchant_id, status)
+  select g.id, g.merchant_id, 'pending'
   from public.merchant_agreement_signed g
   where g.merchant_id = new.id
     and g.acceptance_id = (public.fn_merchant_agreement_current_acceptance(new.id)).id
-    and not exists (select 1 from public.merchant_live_email e where e.signed_id = g.id);
-  if v_signed is not null then
-    perform public.fn_merchant_live_email_try(v_signed);
-  end if;
+  on conflict (signed_id) do nothing;
   return null;
 exception when others then
   raise warning 'The live email check for merchant % failed: %', new.id, sqlerrm;
@@ -597,6 +640,7 @@ begin
     when g.id is null then 'not_signed'
     when e.signed_id is null and not v_live then 'not_live'
     when e.signed_id is null then 'not_queued'
+    when e.status = 'pending' then 'waiting'
     when e.status <> 'queued' then e.status
     when o.status = 'sent' then 'sent'
     when o.status = 'pending' or o.id is null then 'waiting'

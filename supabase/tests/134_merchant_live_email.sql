@@ -1,12 +1,12 @@
 -- The owner hears that the business is live, with the signed agreement
 -- (20270131000500): one email per signed agreement, sent when the agreement
 -- is signed and the business is live, whichever comes last; next steps for
--- the merchant's category; Send again only when it did not go; and a failure
--- never stops the signing.
+-- the merchant's category; Send again only when it did not go; and the email
+-- never holds up or stops the signing.
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(42);
+select plan(51);
 
 create function pg_temp.as_user(p_sub text) returns void language sql as $f$
   select set_config('request.jwt.claims', json_build_object('sub', p_sub, 'role', 'authenticated')::text, true)
@@ -20,6 +20,9 @@ create function pg_temp.steps(p_merchant text) returns jsonb language sql as $f$
   where template = 'partner_merchant_live' and payload ->> 'merchant_id' = p_merchant
   order by created_at desc limit 1
 $f$;
+create function pg_temp.due(p_merchant text) returns text language sql as $f$
+  select string_agg(status, ',') from public.merchant_live_email where merchant_id = p_merchant::uuid
+$f$;
 
 -- ------------------------------------------------------------------ fixtures
 
@@ -31,7 +34,8 @@ from (values
   ('a1340000-0000-4000-8000-0000000000a3'::uuid, 'stranger134@test.local'),
   ('a1340000-0000-4000-8000-0000000000a4'::uuid, 'owner.salon134@test.local'),
   ('a1340000-0000-4000-8000-0000000000a5'::uuid, 'manager.salon134@test.local'),
-  ('a1340000-0000-4000-8000-0000000000a6'::uuid, 'owner.tours134@test.local')
+  ('a1340000-0000-4000-8000-0000000000a6'::uuid, 'owner.tours134@test.local'),
+  ('a1340000-0000-4000-8000-0000000000a7'::uuid, 'owner.florist134@test.local')
 ) as u (id, email);
 
 insert into public.staff_user (id, user_id, email, display_name) values
@@ -50,8 +54,9 @@ values ('a1340000-0000-4000-8000-0000000000e1', 'Amina CEO', 'Chief Executive', 
   '+254 700 000 000', 'www.nexg.test', 10, 'signer/a1340000-0000-4000-8000-0000000000e1.png',
   'image/png', repeat('b', 64));
 
-/* A live restaurant, a salon not live yet, a live tour operator (all three
-   applied through the form) and an older live shop with no owner account. */
+/* A live restaurant, a salon not live yet and a live tour operator (all
+   three applied through the form), an older live shop with no owner account
+   and an older live florist with one. */
 insert into public.merchant (id, legal_name, trading_name, category, contact_name, contact_phone,
   contact_email, city_id, status, went_live_at, explore_visible)
 select x.id, x.legal, x.trading, x.category::public.merchant_category, x.contact, x.phone, x.email,
@@ -65,7 +70,9 @@ from (values
   ('a1340000-0000-4000-8000-0000000000c3'::uuid, 'Duka Groceries Limited', 'Duka Groceries',
    'groceries_essentials', 'Kamau Owner', '+254712134003', 'shop134@shop.example', 'live'),
   ('a1340000-0000-4000-8000-0000000000c4'::uuid, 'Safari Trails Limited', 'Safari Trails',
-   'travel_tours', 'Wafula Owner', '+254712134004', 'tours134@shop.example', 'live')
+   'travel_tours', 'Wafula Owner', '+254712134004', 'tours134@shop.example', 'live'),
+  ('a1340000-0000-4000-8000-0000000000c5'::uuid, 'Petals Limited', 'Petals',
+   'flowers_gifts', 'Wairimu Owner', '+254712134005', 'petals134@shop.example', 'live')
 ) as x (id, legal, trading, category, contact, phone, email, status);
 
 update public.merchant set accepting_orders = true where id = 'a1340000-0000-4000-8000-0000000000c3';
@@ -74,7 +81,8 @@ insert into public.merchant_user (merchant_id, user_id, role) values
   ('a1340000-0000-4000-8000-0000000000c1', 'a1340000-0000-4000-8000-0000000000a1', 'owner'),
   ('a1340000-0000-4000-8000-0000000000c2', 'a1340000-0000-4000-8000-0000000000a5', 'manager'),
   ('a1340000-0000-4000-8000-0000000000c2', 'a1340000-0000-4000-8000-0000000000a4', 'owner'),
-  ('a1340000-0000-4000-8000-0000000000c4', 'a1340000-0000-4000-8000-0000000000a6', 'owner');
+  ('a1340000-0000-4000-8000-0000000000c4', 'a1340000-0000-4000-8000-0000000000a6', 'owner'),
+  ('a1340000-0000-4000-8000-0000000000c5', 'a1340000-0000-4000-8000-0000000000a7', 'owner');
 
 set local session_replication_role = replica;
 insert into public.merchant_application (merchant_id, revision, payload, review_state,
@@ -103,7 +111,9 @@ from (values
   ('a1340000-0000-4000-8000-0000000000d3'::uuid, 'a1340000-0000-4000-8000-0000000000c3'::uuid,
    'groceries_essentials', 'a1340000-0000-4000-8000-0000000000a2'::uuid),
   ('a1340000-0000-4000-8000-0000000000d4'::uuid, 'a1340000-0000-4000-8000-0000000000c4'::uuid,
-   'travel_tours', 'a1340000-0000-4000-8000-0000000000a6'::uuid)
+   'travel_tours', 'a1340000-0000-4000-8000-0000000000a6'::uuid),
+  ('a1340000-0000-4000-8000-0000000000d5'::uuid, 'a1340000-0000-4000-8000-0000000000c5'::uuid,
+   'flowers_gifts', 'a1340000-0000-4000-8000-0000000000a7'::uuid)
 ) as x (id, merchant, category, who)
 cross join lateral public.fn_merchant_agreement_for_category(x.category) a;
 
@@ -158,8 +168,14 @@ select ok(
   not has_function_privilege('anon', 'public.rpc_merchant_live_email_resend(uuid, text)', 'execute')
     and not has_function_privilege('anon', 'public.rpc_merchant_live_email(uuid)', 'execute')
     and not has_function_privilege('authenticated', 'public.fn_merchant_live_email_queue(uuid, uuid, text)', 'execute')
+    and not has_function_privilege('authenticated', 'public.cron_merchant_live_emails()', 'execute')
     and not has_function_privilege('authenticated', 'public.fn_merchant_live_next_steps(uuid)', 'execute'),
   'anon reaches neither RPC, and nobody signed in queues an email directly');
+
+select is(
+  (select schedule from cron.job where jobname = 'merchant-live-emails'),
+  '* * * * *',
+  'the minute job that writes and queues the emails is scheduled');
 
 -- ------------------------------------------------- signing a live business
 
@@ -174,14 +190,35 @@ select is(
   'NXG-MA-KITCHEN134',
   'merchant staff sign the live restaurant''s agreement');
 
+select is(
+  (select jsonb_build_object('state', s -> 'state', 'can_resend', s -> 'can_resend')
+   from public.rpc_merchant_live_email('a1340000-0000-4000-8000-0000000000c1') s),
+  '{"state": "waiting", "can_resend": false}'::jsonb,
+  'straight after signing, staff see the email waiting to go out');
+
+select throws_ok(
+  $$select public.rpc_merchant_live_email_resend('a1340000-0000-4000-8000-0000000000c1')$$,
+  '55000', 'The email is about to go out by itself. If it fails, send it again then.',
+  'and Send again is refused before it has even been written');
+
 reset role;
+
+select ok(
+  pg_temp.due('a1340000-0000-4000-8000-0000000000c1') = 'pending'
+    and pg_temp.emails('a1340000-0000-4000-8000-0000000000c1') = 0,
+  'the signing only marks the email due: nothing is written or queued inside it');
+
+select is(
+  public.cron_merchant_live_emails(),
+  '{"queued": 1, "failed": 0}'::jsonb,
+  'the minute job writes and queues it');
 
 select results_eq(
   $$select channel, recipient, template, subject, status from public.notification_outbox
     where payload ->> 'merchant_id' = 'a1340000-0000-4000-8000-0000000000c1'$$,
   $$values ('email', 'owner.kitchen134@test.local', 'partner_merchant_live',
             'Congratulations! Mama''s Kitchen is live on NexG', 'pending')$$,
-  'signing a live business''s agreement queues one email, to the owner''s sign-in address');
+  'one email, to the owner''s sign-in address');
 
 select is(
   (select payload -> 'attachments' from public.notification_outbox
@@ -247,14 +284,12 @@ select is(
 
 reset role;
 
-select is(pg_temp.emails('a1340000-0000-4000-8000-0000000000c1'), 1,
-  'and queues no second email');
-
 update public.merchant set status = 'paused' where id = 'a1340000-0000-4000-8000-0000000000c1';
 update public.merchant set status = 'live' where id = 'a1340000-0000-4000-8000-0000000000c1';
+select public.cron_merchant_live_emails();
 
 select is(pg_temp.emails('a1340000-0000-4000-8000-0000000000c1'), 1,
-  'pausing the business and taking it live again sends nothing more');
+  'signing again, pausing and going live again, and the job running again send nothing more');
 
 select is(
   public.fn_merchant_live_email_queue(
@@ -284,9 +319,12 @@ select throws_ok(
 reset role;
 select pg_temp.sign('a1340000-0000-4000-8000-0000000000c2', 'a1340000-0000-4000-8000-0000000000d2',
   'NXG-MA-SALON134');
+select public.cron_merchant_live_emails();
 
-select is(pg_temp.emails('a1340000-0000-4000-8000-0000000000c2'), 0,
-  'an agreement signed for a business that is not live yet sends nothing');
+select ok(
+  pg_temp.due('a1340000-0000-4000-8000-0000000000c2') is null
+    and pg_temp.emails('a1340000-0000-4000-8000-0000000000c2') = 0,
+  'an agreement signed for a business that is not live yet is not due, and nothing goes');
 
 set local role authenticated;
 select pg_temp.as_user('a1340000-0000-4000-8000-0000000000a2');
@@ -304,11 +342,25 @@ reset role;
 update public.merchant set status = 'live', went_live_at = now(), explore_visible = true
 where id = 'a1340000-0000-4000-8000-0000000000c2';
 
+select is(pg_temp.due('a1340000-0000-4000-8000-0000000000c2'), 'pending',
+  'going live marks it due');
+
+update public.merchant set status = 'paused' where id = 'a1340000-0000-4000-8000-0000000000c2';
+select public.cron_merchant_live_emails();
+
+select ok(
+  pg_temp.due('a1340000-0000-4000-8000-0000000000c2') is null
+    and pg_temp.emails('a1340000-0000-4000-8000-0000000000c2') = 0,
+  'paused again before the job ran: no longer true, so it is dropped and nothing goes');
+
+update public.merchant set status = 'live' where id = 'a1340000-0000-4000-8000-0000000000c2';
+select public.cron_merchant_live_emails();
+
 select results_eq(
   $$select recipient, template from public.notification_outbox
     where payload ->> 'merchant_id' = 'a1340000-0000-4000-8000-0000000000c2'$$,
   $$values ('owner.salon134@test.local', 'partner_merchant_live')$$,
-  'going live sends it then, once, to the owner and not the manager');
+  'live again, it goes, once, to the owner and not the manager');
 
 select is(
   pg_temp.steps('a1340000-0000-4000-8000-0000000000c2'),
@@ -337,7 +389,7 @@ select is(
 select is(
   public.rpc_merchant_live_email_resend('a1340000-0000-4000-8000-0000000000c2', 'Owner fixed their mailbox') ->> 'status',
   'queued',
-  'Send again queues it once more');
+  'Send again queues it once more, straight away');
 
 select throws_ok(
   $$select public.rpc_merchant_live_email_resend('a1340000-0000-4000-8000-0000000000c2')$$,
@@ -364,6 +416,7 @@ select is(
 update public.email_route set enabled = false where key = 'partner_updates';
 select pg_temp.sign('a1340000-0000-4000-8000-0000000000c3', 'a1340000-0000-4000-8000-0000000000d3',
   'NXG-MA-DUKA134');
+select public.cron_merchant_live_emails();
 
 select is(pg_temp.emails('a1340000-0000-4000-8000-0000000000c3'), 0,
   'with partner emails switched off nothing is queued');
@@ -406,26 +459,42 @@ select is(
   2::smallint,
   'the record counts both tries');
 
--- ------------------------------------------- a failure never stops the signing
+-- ------------------------------ a failure is kept, and holds up nothing else
 
 alter table public.notification_outbox
-  add constraint t134_refuse check (template <> 'partner_merchant_live') not valid;
+  add constraint t134_refuse check (recipient <> 'owner.tours134@test.local') not valid;
 
-select lives_ok(
-  $$select pg_temp.sign('a1340000-0000-4000-8000-0000000000c4', 'a1340000-0000-4000-8000-0000000000d4',
-    'NXG-MA-SAFARI134')$$,
-  'when queuing the email fails, the agreement is still signed');
+select pg_temp.sign('a1340000-0000-4000-8000-0000000000c4', 'a1340000-0000-4000-8000-0000000000d4',
+  'NXG-MA-SAFARI134');
+select pg_temp.sign('a1340000-0000-4000-8000-0000000000c5', 'a1340000-0000-4000-8000-0000000000d5',
+  'NXG-MA-PETALS134');
 
 select is(
   (select count(*)::int from public.merchant_agreement_signed
-    where merchant_id = 'a1340000-0000-4000-8000-0000000000c4'),
-  1,
-  'and the signed copy is on record');
+    where merchant_id in ('a1340000-0000-4000-8000-0000000000c4', 'a1340000-0000-4000-8000-0000000000c5')),
+  2,
+  'both agreements are signed');
+
+select is(
+  public.cron_merchant_live_emails(),
+  '{"queued": 1, "failed": 1}'::jsonb,
+  'when one email cannot be queued, the job still queues the other');
 
 select ok(
   (select status = 'error' and reason like '%t134_refuse%' from public.merchant_live_email
-    where merchant_id = 'a1340000-0000-4000-8000-0000000000c4'),
-  'the failure is kept on the email''s record');
+    where merchant_id = 'a1340000-0000-4000-8000-0000000000c4')
+    and pg_temp.emails('a1340000-0000-4000-8000-0000000000c5') = 1,
+  'the failure is kept on its record, and the florist''s email went');
+
+select is(
+  (select count(*)::int from audit.audit_event
+    where action = 'merchant.live_email_queued' and target_id = 'a1340000-0000-4000-8000-0000000000c4'
+      and after ->> 'status' = 'error' and severity = 'high'),
+  1,
+  'the failure is in the audit trail, flagged');
+
+select is(public.cron_merchant_live_emails(), '{"failed": 0}'::jsonb,
+  'the job does not retry a failure by itself');
 
 alter table public.notification_outbox drop constraint t134_refuse;
 
@@ -469,6 +538,11 @@ select throws_ok(
   $$select public.rpc_merchant_live_email_resend('a1340000-0000-4000-8000-0000000000c1')$$,
   '42501', 'Merchant staff only.',
   'nor can the merchant send it to itself again');
+
+select throws_ok(
+  $$select public.cron_merchant_live_emails()$$,
+  '42501', null,
+  'nor run the job');
 
 reset role;
 
