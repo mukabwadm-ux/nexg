@@ -29,7 +29,7 @@ from public.staff_user s where s.email = 'partners125@nexgapp.com';
 insert into public.host (id, kind, display_name, phone, city_id, status, verified_at, went_live_at)
 values ('d1251000-0000-4000-8000-00000000000a','multi_unit','[Host 125]','+254700012500',
         (select id from public.city where slug = 'nairobi'),'live', now(), now());
-insert into public.property (id, host_id, slug, name, kind, area, city_id, listed, listed_at, cancellation_policy)
+insert into public.property (id, host_id, slug, name, kind, area, city_id, listed, listed_at, cancellation_terms)
 values ('d1252000-0000-4000-8000-00000000000a','d1251000-0000-4000-8000-00000000000a',
         'block-125','[Block 125]','apartment_block','Kilimani',
         (select id from public.city where slug = 'nairobi'), true, now(),
@@ -90,7 +90,7 @@ select set_config('t.stay2', public.rpc_stay_hold('d1253000-0000-4000-8000-00000
 select set_config('t.pay2', public.rpc_payment_begin_stay(current_setting('t.stay2')::uuid) ->> 'reference', true);
 reset role;
 
-select is((select cancellation_policy ->> 'preset' from public.stay where id = current_setting('t.stay')::uuid),
+select is((select cancellation_terms ->> 'preset' from public.stay where id = current_setting('t.stay')::uuid),
   'strict', 'the policy in force is copied onto the stay');
 select pg_temp.settle(current_setting('t.pay'));
 select pg_temp.settle(current_setting('t.pay2'));
@@ -98,9 +98,9 @@ select is((select status::text from public.stay where id = current_setting('t.st
   'the stay is paid and booked');
 
 -- The host changes the policy later; the stay keeps the one it was made under.
-update public.property set cancellation_policy = public.fn_cancellation_policy('{"preset":"flexible"}')
+update public.property set cancellation_terms = public.fn_cancellation_policy('{"preset":"flexible"}')
  where id = 'd1252000-0000-4000-8000-00000000000a';
-select is((select cancellation_policy ->> 'preset' from public.stay where id = current_setting('t.stay')::uuid),
+select is((select cancellation_terms ->> 'preset' from public.stay where id = current_setting('t.stay')::uuid),
   'strict', 'a later change does not touch a stay already made');
 
 -- ── NexG cancels: strict, ten days before, half back
