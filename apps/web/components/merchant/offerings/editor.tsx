@@ -5,16 +5,20 @@ import Image from 'next/image';
 import {
   cloneElement,
   isValidElement,
+  useEffect,
   useId,
   useRef,
+  useState,
   type ReactElement,
   type ReactNode,
 } from 'react';
+import { bookingRequest } from '../booking/api';
 import { SchemaField } from '../booking/schema-field';
 import type { JsonSchema } from '../booking/types';
 import {
   capacityLabel,
   fulfilmentOptions,
+  isBookedSchema,
   priceLabel,
   discountLabel,
   type Issue,
@@ -53,6 +57,61 @@ export function Label({
     </label>
   );
 }
+/**
+ * Which of the shop's booking-engine offerings this item opens. Saved with the
+ * offering; the catalogue then shows the item as booked and the apps' Book
+ * button opens that booking (fn_offering_setup_project).
+ */
+function BookingLink({
+  value,
+  disabled,
+  onChange,
+}: {
+  value: string;
+  disabled: boolean;
+  onChange: (id: string) => void;
+}) {
+  // null while loading; 'none' when the shop has no booking setup to link to.
+  const [offerings, setOfferings] = useState<{ id: string; name: string }[] | 'none' | null>(null);
+  useEffect(() => {
+    let live = true;
+    bookingRequest<{ offerings?: { id: string; name: string }[] }>('/workspace')
+      .then((w) => {
+        if (live) setOfferings(w.offerings?.length ? w.offerings : 'none');
+      })
+      .catch(() => {
+        if (live) setOfferings('none');
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
+  return (
+    <Label
+      title="Booking it opens"
+      hint={
+        offerings === 'none'
+          ? 'Set up this booking on the Bookings page first, then choose it here.'
+          : 'Customers book this item through the booking you choose.'
+      }
+    >
+      <select
+        value={value}
+        disabled={disabled || !Array.isArray(offerings)}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        <option value="">{offerings === null ? 'Loading your bookings…' : 'Not linked yet'}</option>
+        {Array.isArray(offerings) &&
+          offerings.map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.name}
+            </option>
+          ))}
+      </select>
+    </Label>
+  );
+}
+
 export function Status({ value }: { value: string }) {
   return (
     <span className={`of-status of-status-${value}`}>
@@ -821,6 +880,13 @@ export function OfferingEditor({
               />
               Pause new purchases or bookings for this listing
             </label>
+            {isBookedSchema(item.schemaId) && (
+              <BookingLink
+                value={item.bookingOfferingId ?? ''}
+                disabled={lockedAvailability || busy || readOnly}
+                onChange={(id) => patch({ bookingOfferingId: id || undefined })}
+              />
+            )}
             <p>{schema.guidance}</p>
             <div className="of-availability-summary">
               <CalendarDays size={22} />
