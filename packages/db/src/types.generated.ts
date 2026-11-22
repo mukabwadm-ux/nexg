@@ -64806,6 +64806,7 @@ export type Database = {
           opens: string;
         }[];
       };
+      rpc_merchant_hours_on: { Args: { p_date?: string; p_merchant_ids: string[] }; Returns: Json };
       rpc_merchant_hours_override: {
         Args: {
           p_branch_id?: string;
