@@ -434,8 +434,6 @@ export default async function MerchantApplicationPage({
                     state={{
                       accepting_orders: !!merchant.accepting_orders,
                       explore_visible: !!merchant.explore_visible,
-                      pay_on_delivery: !!merchant.pay_on_delivery,
-                      pay_on_delivery_cap_kes: merchant.pay_on_delivery_cap_kes ?? null,
                       concierge_pick: !!merchant.concierge_pick,
                       accepting_orders_changed_at: merchant.accepting_orders_changed_at ?? null,
                     }}

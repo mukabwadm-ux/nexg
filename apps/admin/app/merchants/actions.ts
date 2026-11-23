@@ -113,7 +113,6 @@ export async function setFeatured(merchantId: string, featured: boolean): Promis
 export interface Controls {
   accepting_orders?: boolean;
   explore_visible?: boolean;
-  pay_on_delivery?: boolean;
   concierge_pick?: boolean;
 }
 
@@ -128,7 +127,6 @@ export async function setControls(merchantId: string, patch: Controls): Promise<
     p_merchant_id: merchantId,
     ...(patch.accepting_orders !== undefined ? { p_accepting_orders: patch.accepting_orders } : {}),
     ...(patch.explore_visible !== undefined ? { p_explore_visible: patch.explore_visible } : {}),
-    ...(patch.pay_on_delivery !== undefined ? { p_pay_on_delivery: patch.pay_on_delivery } : {}),
     ...(patch.concierge_pick !== undefined ? { p_concierge_pick: patch.concierge_pick } : {}),
   });
   if (error) return { ok: false, message: error.message };

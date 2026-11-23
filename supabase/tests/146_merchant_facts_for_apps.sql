@@ -21,7 +21,7 @@ values
   ('c1460000-0000-4000-8000-00000000000a', '[Legal 146] Ltd', '[Shop 146]', 'restaurant',
    '[Contact]', '+254700014600', 'shop146@example.test',
    (select id from public.city where slug = 'nairobi'), 'live', true, true, now() - interval '5 days',
-   true, '02:00', true),
+   false, '02:00', true),
   ('c1460000-0000-4000-8000-00000000000b', '[Legal 146b] Ltd', '[Quiet 146]', 'supermarket',
    '[Contact]', '+254700014601', 'quiet146@example.test',
    (select id from public.city where slug = 'nairobi'), 'live', true, true, now() - interval '90 days',
@@ -52,7 +52,7 @@ values
 set local role anon;
 select is(
   (select traits from public.merchant_traits_public where merchant_id = 'c1460000-0000-4000-8000-00000000000a'),
-  array['pay_on_delivery', 'open_late', 'own_riders', 'new', 'vegetarian_options', 'vegan_options', 'halal_options'],
+  array['open_late', 'own_riders', 'new', 'vegetarian_options', 'vegan_options', 'halal_options'],
   'A shop''s traits come from its settings and the items it has on sale (not items off sale).');
 select is(
   (select traits from public.merchant_traits_public where merchant_id = 'c1460000-0000-4000-8000-00000000000b'),

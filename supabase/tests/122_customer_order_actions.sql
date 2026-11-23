@@ -19,7 +19,7 @@ insert into public.merchant (id, legal_name, trading_name, category, contact_nam
 values
   ('c1100000-0000-4000-8000-00000000000a', '[Legal 110] Ltd', '[Shop 110]', 'restaurant',
    '[Contact]', '+254700011000', 'shop110@example.test',
-   (select id from public.city where slug = 'nairobi'), 'live', true, true, now() - interval '60 days', true),
+   (select id from public.city where slug = 'nairobi'), 'live', true, true, now() - interval '60 days', false),
   ('c1100000-0000-4000-8000-00000000000b', '[Legal 110b] Ltd', '[Laundry 110]', 'laundry',
    '[Contact]', '+254700011001', 'laundry110@example.test',
    (select id from public.city where slug = 'nairobi'), 'live', true, true, now() - interval '60 days', false);
@@ -57,8 +57,8 @@ select set_config('request.jwt.claims', '{"sub":"c1100000-0000-4000-8000-0000000
 select throws_ok(
   format($$select public.rpc_order_place_web(%L::jsonb)$$,
     pg_temp.order_for('c1100000-0000-4000-8000-00000000000a', 'c1100000-0000-4000-8000-0000000000c1', 'cash_on_delivery')::text),
-  '23514', 'Cash on delivery is not available. Pay with M-Pesa instead.',
-  'A customer order cannot be cash on delivery, even where the shop took cash.');
+  'P0001', '[Shop 110] does not take payment on delivery. Pay online instead.',
+  'A customer order cannot be cash on delivery.');
 
 insert into t110 select 'food', (public.rpc_order_place_web(
   pg_temp.order_for('c1100000-0000-4000-8000-00000000000a', 'c1100000-0000-4000-8000-0000000000c1', 'mpesa_stk')) ->> 'order_id')::uuid;

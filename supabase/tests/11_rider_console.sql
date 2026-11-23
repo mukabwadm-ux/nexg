@@ -40,7 +40,7 @@ insert into public.rider (id, user_id, first_name, last_name, phone, city_id,
 values ('cccc1111-0000-4000-8000-00000000000a','d3333333-3333-3333-3333-333333333333',
         '[First]','[Last]','+254700000017',
         (select id from public.city where slug='nairobi'),
-        'motorbike','[Plate]','active', now(), '+254700000017', true, 5000);
+        'motorbike','[Plate]','active', now(), '+254700000017', false, 5000);
 
 -- ═════════════════════════════════════════ the ledger
 
@@ -90,10 +90,10 @@ insert into public.cash_event (rider_id, kind, amount_kes)
 values ('cccc1111-0000-4000-8000-00000000000a', 'collected', 5000);
 
 select is(
-  (select pay_on_delivery_eligible from public.rider
-   where id = 'cccc1111-0000-4000-8000-00000000000a'),
-  false,
-  'at the cap the guard stops cash orders'
+  (select count(*)::int from public.notification
+   where rider_id = 'cccc1111-0000-4000-8000-00000000000a' and kind = 'offers_paused_over_cap'),
+  1,
+  'at the cap the rider is told to deposit'
 );
 
 select is(
@@ -114,10 +114,10 @@ insert into public.cash_event (rider_id, kind, amount_kes)
 values ('cccc1111-0000-4000-8000-00000000000a', 'deposit', -5000);
 
 select is(
-  (select pay_on_delivery_eligible from public.rider
+  (select offers_paused_reason from public.rider
    where id = 'cccc1111-0000-4000-8000-00000000000a'),
-  true,
-  'depositing restores cash orders automatically'
+  null,
+  'depositing clears the over-cap mark automatically'
 );
 
 /*

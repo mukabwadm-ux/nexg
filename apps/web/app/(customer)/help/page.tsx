@@ -39,7 +39,7 @@ const TOPICS = [
   {
     icon: Wallet,
     title: 'Payments',
-    body: 'M-Pesa, pay on delivery, charge to room, receipts',
+    body: 'M-Pesa, charge to room, receipts',
     anchor: 'payments',
   },
   {
@@ -109,7 +109,7 @@ const ANSWERS = [
   {
     group: 'payments',
     q: 'How will payment work?',
-    a: 'M-Pesa, and pay on delivery at participating merchants, with charge-to-room at partner hotels. None of it is switched on yet, and no price on this site is a real figure until it is.',
+    a: 'M-Pesa, with charge-to-room at partner hotels. You pay before the order goes to the merchant; there is no pay on delivery. None of it is switched on yet, and no price on this site is a real figure until it is.',
   },
   {
     group: 'refunds',

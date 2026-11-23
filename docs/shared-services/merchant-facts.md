@@ -16,7 +16,6 @@ A public view: the publishable key can read it. It has one row per listed shop (
 
 | Trait | When |
 | --- | --- |
-| `pay_on_delivery` | The shop takes payment on delivery |
 | `open_late` | The shop has late-night hours |
 | `own_riders` | The shop delivers with its own riders |
 | `new` | Live for less than 30 days |
@@ -31,7 +30,7 @@ const { data } = await supabase
   .in('merchant_id', ids);
 ```
 
-Treat a trait the app doesn't know as one it can ignore: new ones may be added.
+Treat a trait the app doesn't know as one it can ignore: new ones may be added. `pay_on_delivery` was removed on 23 Nov 2026 with pay on delivery itself (`20270301000100`).
 
 ## The customer's recent categories: `rpc_my_recent_categories(p_limit)`
 

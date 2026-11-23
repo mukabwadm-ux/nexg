@@ -19,7 +19,7 @@ const FIRST_RESPONSE = `{
         "tier": "core",
         "eta_min": 20,
         "eta_max": 30,
-        "cod_allowed": true,
+        "cod_allowed": false,
         "…": "and the zone's bounding box"
       }
     ],

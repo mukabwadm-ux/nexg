@@ -31,7 +31,7 @@ const STEPS = [
   {
     icon: Wallet,
     title: 'Pay the way that suits you',
-    body: 'M-Pesa, pay on delivery where the merchant offers it, or charge it to your room at partner hotels. Checkout only shows the options that are switched on.',
+    body: 'M-Pesa, or charge it to your room at partner hotels. There is no pay on delivery: you pay before the order goes to the merchant. Checkout only shows the options that are switched on.',
   },
   {
     icon: Bike,

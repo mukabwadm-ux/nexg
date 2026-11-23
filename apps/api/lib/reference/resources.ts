@@ -87,13 +87,14 @@ export const MERCHANT_FIELDS: FieldDoc[] = [
     name: 'pay_on_delivery_enabled',
     type: 'boolean',
     nullable: true,
-    description: 'Whether guests may pay cash on delivery.',
+    description:
+      'Always false: pay on delivery was removed on 23 Nov 2026. Kept so existing clients do not break.',
   },
   {
     name: 'pay_on_delivery_cap_kes',
     type: 'integer',
     nullable: true,
-    description: 'The largest order, in whole shillings, that can be paid on delivery.',
+    description: 'Always null: pay on delivery was removed on 23 Nov 2026.',
   },
   {
     name: 'prep_minutes',
@@ -191,7 +192,8 @@ export const ZONE_FIELDS: FieldDoc[] = [
     name: 'cod_allowed',
     type: 'boolean',
     nullable: true,
-    description: 'Whether cash on delivery is offered in the zone.',
+    description:
+      'Always false: pay on delivery was removed on 23 Nov 2026. Kept so existing clients do not break.',
   },
   { name: 'west', type: 'number', nullable: true, description: 'Bounding box: western longitude.' },
   {
@@ -473,7 +475,8 @@ export const ORDER_FIELDS: FieldDoc[] = [
   {
     name: 'payment_method',
     type: 'string',
-    description: 'mpesa_stk, card, bank_transfer, cash_on_delivery, charge_to_room or on_account.',
+    description:
+      'mpesa_stk, card, bank_transfer, charge_to_room or on_account. Older orders may show cash_on_delivery, which is no longer offered.',
   },
   {
     name: 'payment_status',

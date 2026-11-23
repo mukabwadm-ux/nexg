@@ -9,8 +9,6 @@ import type { Controls } from '@/app/merchants/actions';
 export interface ControlState {
   accepting_orders: boolean;
   explore_visible: boolean;
-  pay_on_delivery: boolean;
-  pay_on_delivery_cap_kes: number | null;
   concierge_pick: boolean;
   accepting_orders_changed_at: string | null;
 }
@@ -19,8 +17,8 @@ export interface ControlState {
  * "Status & controls" from the Merchants artboard.
  *
  * Each switch saves on its own. They are independent facts about the
- * business, not a form: turning off pay-on-delivery should not wait behind a
- * decision about Discovery visibility, and there is no Save button on the
+ * business, not a form: pausing orders should not wait behind a decision
+ * about Discovery visibility, and there is no Save button on the
  * artboard because there is nothing to batch.
  */
 export function MerchantControls({
@@ -80,21 +78,6 @@ export function MerchantControls({
         loading={busy === 'explore_visible'}
         checked={state.explore_visible}
         onCheckedChange={(next) => save('explore_visible', next)}
-      />
-
-      <Switch
-        id={`pod_${merchantId}`}
-        label="Pay on delivery"
-        /* The ceiling is a business number nobody has agreed, so it renders
-           bracketed rather than as a figure someone might quote. */
-        description={
-          state.pay_on_delivery
-            ? `Allowed up to KES ${state.pay_on_delivery_cap_kes ?? '[—]'}`
-            : 'M-Pesa only'
-        }
-        loading={busy === 'pay_on_delivery'}
-        checked={state.pay_on_delivery}
-        onCheckedChange={(next) => save('pay_on_delivery', next)}
       />
 
       <Switch
