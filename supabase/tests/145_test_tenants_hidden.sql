@@ -1,4 +1,4 @@
--- Test tenants (20270225000700): a shop or home marked accepts_test_payments
+-- Test tenants (20270227000500): a shop or home marked accepts_test_payments
 -- is seen and used only by payment_reviewer accounts and staff, and never
 -- takes live money.
 begin;
