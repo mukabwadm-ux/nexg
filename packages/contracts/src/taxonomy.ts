@@ -91,6 +91,12 @@ const CATEGORY_CATALOGUE_EXAMPLES: Record<string, CatalogueExample> = {
     pricePlaceholder: 'e.g. 25,000',
     photoHint: 'Show the venue, vehicle, or experience guests can expect.',
   },
+  pets: {
+    name: 'Adult dry dog food · 15 kg',
+    description: 'Add the brand, the pet and its age, the pack size, and what is inside.',
+    pricePlaceholder: 'e.g. 6,500',
+    photoHint: 'Show the pack, the product, or the service at your shop.',
+  },
   adults_only: {
     name: 'Discreet wellness product',
     description: 'Add the product type, size, and useful details for the guest.',

@@ -44,6 +44,8 @@ export type WorkRecord = {
   reference?: string;
   statusLabel?: string;
   additionalActions?: { id: string; label: string }[];
+  /* An order the shop has not started: it may decline it, with a reason (rpc_merchant_order_decline). */
+  declinable?: boolean;
   manageHref?: string;
   workflowId: WorkflowId;
   customer: string;

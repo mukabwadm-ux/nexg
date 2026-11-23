@@ -85,6 +85,10 @@
       "id": "marketplace",
       "icon": "00_Main_Category_Icons/09_marketplace.png"
     },
+    "pets": {
+      "id": "pets",
+      "icon": "09_Marketplace/09_05_Pet_Supplies.png"
+    },
     "tech_electronics": {
       "id": "tech-electronics",
       "icon": "00_Main_Category_Icons/14_tech_electronics.png"
@@ -171,7 +175,7 @@
     "personal_assistance": "16_Concierge_Services/16_02_Personal_Assistance.png",
     "personal_training": "05_Beauty_And_Wellness/05_05_Personal_Training.png",
     "personalized_gifts": "08_Flowers_And_Gifts/08_05_Personalized_Gifts.png",
-    "pet_supplies": "09_Marketplace/09_05_Pet_Supplies.png",
+    "pet_shop_supplies": "09_Marketplace/09_05_Pet_Supplies.png",
     "playstation_xbox": "14_Tech_And_Electronics/14_04_Gaming.png",
     "prescription_otc_medication": "13_Health_And_Pharmacy/13_01_Pharmacy.png",
     "private_jet_charters": "18_Flights/18_04_Private_Charters.png",
@@ -311,10 +315,12 @@
     "ladies_salons": "APPOINTMENT",
     "manicure_pedicure": "APPOINTMENT",
     "mens_haircuts": "APPOINTMENT",
+    "pet_grooming": "APPOINTMENT",
     "private_jet_charters": "SERVICE",
     "shaving": "APPOINTMENT",
     "skin_fades": "APPOINTMENT",
     "soft_energy_drinks": "PURCHASE",
+    "vet_clinics": "APPOINTMENT",
     "video_online_gaming": "TICKET",
     "visa_assistance": "REQUEST",
     "water_beverage_delivery": "PURCHASE",
@@ -419,6 +425,7 @@
     "marketplace:books-stationery": "marketplace:books",
     "marketplace:general-retail": "marketplace:home-living",
     "marketplace:hardware-diy": "marketplace:home-living",
+    "marketplace:pet-supplies": "pets:pet-shop-supplies",
     "play:arcade-timed-play": "games-sports:video-online-gaming",
     "play:bowling": "games-sports:board-games",
     "play:escape-rooms": "games-sports:board-games",
@@ -578,6 +585,9 @@
       "marketplace_furniture",
       "marketplace_general-retail",
       "marketplace_hardware-diy"
+    ],
+    "pets/pet_shop_supplies": [
+      "marketplace_pet-supplies"
     ],
     "pharmacy/healthcare_products": [
       "health_clinics",

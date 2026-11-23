@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1",
-  "authority": "Derived pins for the master release: NexG’s 21 categories and 214 subcategories as the owner set them on 16 November 2026 (packages/contracts/src/data/category-master.json, generated into docs/discovery/MASTER_NAVIGATION.json), and the 256 px WebP copy of each icon it names. Regenerate with scripts/pin-web-icons.mjs.",
+  "authority": "Derived pins for the master release: NexG’s 22 categories and 221 subcategories as the owner set them on 16 November 2026, Pets added 23 November 2026 (packages/contracts/src/data/category-master.json, generated into docs/discovery/MASTER_NAVIGATION.json), and the 256 px WebP copy of each icon it names. Regenerate with scripts/pin-web-icons.mjs.",
   "files": [
     {
       "path": "assets/icons-web/00_Main_Category_Icons/01_adults_only.webp",
@@ -388,7 +388,7 @@
     },
     {
       "path": "docs/discovery/MASTER_NAVIGATION.json",
-      "sha256": "ec8f0fccf6ce2679606efee5dda1458d4d8d9d7f1b9b043e6eb7edf3f9d87822"
+      "sha256": "17731c3329f70fa77739c3d713fe7034d6c87d3b7cae7efbd66accbedc3f772d"
     }
   ]
 }

@@ -20,7 +20,7 @@ test('the navigation file is what the master list and the overlay produce today'
   assert.equal(run.status, 0, run.stderr);
 });
 
-test('Discovery shows the 21 master categories in master order, with their names and their subcategories', () => {
+test('Discovery shows the 22 master categories in master order, with their names and their subcategories', () => {
   assert.deepEqual(categories.map((category) => [category.supabaseKey, category.label]), master.categories.map((category) => [category.id, category.name]));
   assert.deepEqual(homepageCategories.map((category) => category.id), categories.map((category) => category.id));
   for (const [index, category] of categories.entries()) {
@@ -56,6 +56,8 @@ test('old Discovery ids still open the page their stores moved to', () => {
   assert.deepEqual(currentTaxonomyIds('play'), { categoryId: 'games-sports', subcategoryId: undefined });
   assert.deepEqual(currentTaxonomyIds('beauty-wellness', 'beauty-wellness:massage'), { categoryId: 'wellness', subcategoryId: 'wellness:swedish-massage' });
   assert.deepEqual(currentTaxonomyIds('restaurants-food', 'restaurants-food:caf'), { categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:cafes-bakeries-pastries' });
+  // Marketplace › Pet Supplies moved to Pets (23 Nov 2026).
+  assert.deepEqual(currentTaxonomyIds('marketplace', 'marketplace:pet-supplies'), { categoryId: 'pets', subcategoryId: 'pets:pet-shop-supplies' });
   assert.deepEqual(currentTaxonomyIds('restaurants-food', 'restaurants-food:catering'), { categoryId: 'restaurants-food', subcategoryId: 'restaurants-food:catering' });
   // Every category the master list retired has a Discovery page to land on.
   for (const target of Object.values(master.retiredCategories)) assert.ok(categories.some((category) => category.supabaseKey === target), target);

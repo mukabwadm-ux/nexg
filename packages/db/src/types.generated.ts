@@ -65803,6 +65803,10 @@ export type Database = {
         Returns: Json;
       };
       rpc_merchant_order_buyer_id: { Args: { p_order_id: string }; Returns: Json };
+      rpc_merchant_order_decline: {
+        Args: { p_note?: string; p_order_id: string; p_reason: string };
+        Returns: Json;
+      };
       rpc_merchant_order_send_codes: { Args: { p_codes: Json; p_order_id: string }; Returns: Json };
       rpc_merchant_order_step: { Args: { p_order_id: string; p_step: string }; Returns: Json };
       rpc_merchant_payout_name_check: { Args: { p_merchant_id: string }; Returns: Json };
@@ -70426,7 +70430,8 @@ export type Database = {
         | 'flights'
         | 'games_sports'
         | 'movers_relocation'
-        | 'premium_services';
+        | 'premium_services'
+        | 'pets';
       merchant_control_source: 'merchant' | 'staff' | 'system';
       merchant_user_role: 'owner' | 'manager' | 'cashier';
       mood: 'wild' | 'taste' | 'night' | 'slow' | 'stay' | 'events';
@@ -72237,6 +72242,7 @@ export const Constants = {
         'games_sports',
         'movers_relocation',
         'premium_services',
+        'pets',
       ],
       merchant_control_source: ['merchant', 'staff', 'system'],
       merchant_user_role: ['owner', 'manager', 'cashier'],

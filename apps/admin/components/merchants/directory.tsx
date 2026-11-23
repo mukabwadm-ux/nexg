@@ -14,6 +14,7 @@ import {
   Package,
   PartyPopper,
   PauseCircle,
+  PawPrint,
   Pill,
   Plane,
   Scale,
@@ -105,7 +106,7 @@ function Avatar({ name }: { name: string | null }) {
   );
 }
 
-/** Icons for the 21 categories, by current category id. */
+/** Icons for the 22 categories, by current category id. */
 const ICON_BY_CATEGORY: Record<string, LucideIcon> = {
   restaurants_food: UtensilsCrossed,
   alcohol_beverages: Wine,
@@ -125,6 +126,7 @@ const ICON_BY_CATEGORY: Record<string, LucideIcon> = {
   fashion_apparel: Shirt,
   groceries_essentials: ShoppingCart,
   marketplace: Store,
+  pets: PawPrint,
   tech_electronics: Laptop,
   flowers_gifts: Flower2,
   logistics_shipping: Package,

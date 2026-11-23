@@ -34,6 +34,7 @@ const SHORT: Record<string, string> = {
   groceries_essentials: 'Groceries',
   supermarket: 'Groceries',
   marketplace: 'Marketplace',
+  pets: 'Pets',
   tech_electronics: 'Electronics',
   flowers_gifts: 'Flowers',
   florist: 'Flowers',
