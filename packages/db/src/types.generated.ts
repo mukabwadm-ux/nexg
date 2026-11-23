@@ -37619,6 +37619,115 @@ export type Database = {
           },
         ];
       };
+      rider_points: {
+        Row: {
+          created_at: string;
+          earned_at: string;
+          id: string;
+          points: number;
+          reason: string;
+          rider_id: string;
+          source_ref: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          earned_at: string;
+          id?: string;
+          points: number;
+          reason: string;
+          rider_id: string;
+          source_ref: string;
+        };
+        Update: {
+          created_at?: string;
+          earned_at?: string;
+          id?: string;
+          points?: number;
+          reason?: string;
+          rider_id?: string;
+          source_ref?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'rider_points_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_rider_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_points_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_points_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_points_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_fleet_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_points_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_points_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_app_me_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_points_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_cash_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_points_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_home_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_points_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_points_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_points_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
+        ];
+      };
       rider_presence_event: {
         Row: {
           at: string;
@@ -61047,6 +61156,7 @@ export type Database = {
       };
       fn_rider_kit_require_paid: { Args: { p_rider_id: string }; Returns: undefined };
       fn_rider_mine: { Args: { p_rider_id: string }; Returns: string };
+      fn_rider_points_sync: { Args: { p_rider_id: string }; Returns: number };
       fn_rider_proof_ok: {
         Args: { p_order_id: string; p_path: string; p_rider_id: string };
         Returns: boolean;
@@ -68353,6 +68463,7 @@ export type Database = {
         Returns: Json;
       };
       rpc_rider_map_share_stop: { Args: { p_share_id: string }; Returns: Json };
+      rpc_rider_message_reply: { Args: { p_body: string }; Returns: Json };
       rpc_rider_message_send: {
         Args: { p_body: string; p_channel: string; p_rider_id: string; p_subject?: string };
         Returns: {
@@ -68375,6 +68486,7 @@ export type Database = {
         };
       };
       rpc_rider_messages_read: { Args: { p_ids?: string[] }; Returns: Json };
+      rpc_rider_offers: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_rider_order_step: {
         Args: {
           p_code?: string;
@@ -68520,6 +68632,7 @@ export type Database = {
         Args: { p_lat?: number; p_lng?: number; p_order_reference: string; p_unit_id: string };
         Returns: Json;
       };
+      rpc_rider_rewards: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_rider_save_step: {
         Args: { p_patch?: Json; p_rider_id: string; p_step: number };
         Returns: Json;
