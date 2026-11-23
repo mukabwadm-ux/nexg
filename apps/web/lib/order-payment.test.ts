@@ -405,3 +405,43 @@ describe('saved cards', () => {
     );
   });
 });
+
+describe('review accounts', () => {
+  it('pay with the test keys even once NexG is live', async () => {
+    vi.stubEnv('PAYSTACK_LIVE_SECRET_KEY', 'sk_live_ci_only_0123456789');
+    vi.stubEnv('NEXG_PAYSTACK_LIVE', '1');
+    stub.rpc.mockImplementation(async (fn: string) => {
+      if (fn === 'rpc_payment_i_review') return { data: true, error: null };
+      if (fn === 'rpc_order_payment_state') return { data: { status: 'unpaid' }, error: null };
+      if (fn === 'rpc_payment_begin_order')
+        return { data: { reference: 'NXP-R', amount_cents: 1000 }, error: null };
+      if (fn === 'rpc_payment_paystack_attempt')
+        return {
+          data: {
+            attempt_reference: 'NXP-R-1',
+            channel: 'card',
+            amount_cents: 1000,
+            is_test: true,
+            reused: false,
+          },
+          error: null,
+        };
+      return { data: { ok: true }, error: null };
+    });
+    const fetch = vi
+      .fn()
+      .mockResolvedValue(
+        paystackOk({ authorization_url: 'https://checkout.paystack.com/r', access_code: 'r' }),
+      );
+    vi.stubGlobal('fetch', fetch);
+    await startOrderPayment(request({ method: 'card' }), ORDER);
+    expect(stub.rpc).toHaveBeenCalledWith(
+      'rpc_payment_paystack_attempt',
+      expect.objectContaining({ p_proof: TEST }),
+    );
+    expect(
+      ((fetch.mock.calls[0] as [string, RequestInit])[1].headers as Record<string, string>)
+        .Authorization,
+    ).toBe(`Bearer ${TEST}`);
+  });
+});

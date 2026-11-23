@@ -32360,6 +32360,25 @@ export type Database = {
           },
         ];
       };
+      payment_reviewer: {
+        Row: {
+          added_at: string;
+          note: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          added_at?: string;
+          note: string;
+          user_id: string;
+        };
+        Update: {
+          added_at?: string;
+          note?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       payout_plan: {
         Row: {
           key: string;
@@ -66983,6 +67002,7 @@ export type Database = {
         Args: { p_ok: boolean; p_proof: string; p_reference: string; p_refusal: string };
         Returns: Json;
       };
+      rpc_payment_i_review: { Args: Record<PropertyKey, never>; Returns: boolean };
       rpc_payment_method_toggle: {
         Args: { p_enabled: boolean; p_key: string; p_reason: string };
         Returns: Json;

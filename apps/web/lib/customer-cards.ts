@@ -2,7 +2,8 @@ import 'server-only';
 
 import { z } from 'zod';
 
-import { deactivateSavedCard, paystackMode, paystackProof } from '@/lib/paystack';
+import { customerMode } from '@/lib/order-payment';
+import { deactivateSavedCard, paystackProof } from '@/lib/paystack';
 import { customerApiClient } from '@/lib/supabase/customer-api';
 
 /**
@@ -67,7 +68,7 @@ export async function listCards(request: Request) {
   try {
     const supabase = await account(request);
     if (supabase instanceof Response) return supabase;
-    const mode = paystackMode();
+    const mode = await customerMode(supabase);
     if (!mode) return Response.json({ cards: [] }, { headers });
 
     const result = await rpc(supabase, 'rpc_my_cards');
@@ -96,7 +97,7 @@ export async function removeCard(request: Request, rawId: string) {
     if (!id.success) return problem(404, 'NOT_FOUND', 'That card is no longer saved.');
     const supabase = await account(request);
     if (supabase instanceof Response) return supabase;
-    const mode = paystackMode();
+    const mode = await customerMode(supabase);
     const proof = mode ? paystackProof(mode) : null;
     if (!mode || !proof) return unavailable();
 
