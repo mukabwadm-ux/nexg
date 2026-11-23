@@ -172,6 +172,8 @@ function orderRecord(order: OrderRow & { id: string }, digital?: DigitalOrder): 
     nextAction: digital
       ? digitalNextAction(order, digital)
       : (orderNextAction(order) ?? orderHandoverAction(order)),
+    /* Before the shop starts it, it may decline it (20270222000100). */
+    declinable: order.stage === 'placed' || order.stage === 'confirmed',
   };
 }
 
@@ -354,6 +356,38 @@ export async function advanceMerchantOrder(
     revalidatePath('/merchant/orders');
     const row = sent?.id ? sent : data;
     return { ok: true, record: orderRecord({ ...row, id: row.id ?? id }, after.get(id)) };
+  }
+  if (action.startsWith('decline:')) {
+    if (data.stage !== 'placed' && data.stage !== 'confirmed')
+      return { ok: false, message: 'This order has been started. Ask NexG support to cancel it.' };
+    const [, reason = '', rawNote = ''] = action.split(':');
+    let note = '';
+    try {
+      note = decodeURIComponent(rawNote).trim().slice(0, 300);
+    } catch {
+      return { ok: false, message: 'That note could not be read. Type it again.' };
+    }
+    const { error: declineError } = await (client as unknown as SupabaseClient).rpc(
+      'rpc_merchant_order_decline',
+      { p_order_id: id, p_reason: reason, p_note: note || null },
+    );
+    if (declineError)
+      return {
+        ok: false,
+        message:
+          declineError.hint === 'prompt_open'
+            ? 'The customer is paying right now. Wait a minute, then decline.'
+            : declineError.hint === 'wrong_stage'
+              ? 'This order has been started. Ask NexG support to cancel it.'
+              : declineError.hint === 'note_needed' || declineError.hint === 'bad_reason'
+                ? declineError.message
+                : 'Could not decline the order. Reload it before trying again.',
+      };
+    const { data: declined } = await load();
+    revalidatePath('/merchant/work');
+    revalidatePath('/merchant/orders');
+    const row = declined?.id ? declined : data;
+    return { ok: true, record: orderRecord({ ...row, id: row.id ?? id }) };
   }
   /* A digital order is offered only send_code; the database refuses it a rider. */
   if (action.startsWith('handover:')) {

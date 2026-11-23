@@ -6,7 +6,7 @@ For the Consumer app, the merchant tools, the Rider app and the website. Migrati
 
 `placed` → `preparing` → `ready` → `picked_up` → `arriving` → `delivered`, plus `cancelled` and `refunded`. A pickup order goes from `ready` straight to `delivered` when the shop enters the customer's code. A digital order goes to `delivered` when the shop has sent its codes. `confirmed` and `disputed` exist but nothing writes them today.
 
-Paying confirms an order (owner, 18 Nov 2026). There is no separate "accept" step: the shop's first step is to start preparing a paid order.
+Paying confirms an order (owner, 18 Nov 2026). There is no separate "accept" step: the shop's first step is to start preparing a paid order, or to decline it (owner, 22 Nov: before starting, with a reason, refunded in full automatically). A declined order has `cancel_reason_code = 'merchant_declined'`.
 
 ## Who does what
 
@@ -16,6 +16,7 @@ The full list is the table `public.order_step_rule`, readable by anyone. In shor
 | --- | --- | --- | --- | --- |
 | Customer | `cancel` | placed, nothing paid | cancelled | `rpc_order_cancel_mine(p_order_id, p_reason)` |
 | Shop | `start` | placed (paid, if paid online) | preparing | `rpc_merchant_order_step(p_order_id, 'start')` |
+| Shop | `decline` | placed, before starting it | cancelled | `rpc_merchant_order_decline(p_order_id, p_reason, p_note)`. Reason: `out_of_stock`, `closing`, `too_busy`, `cannot_deliver` or `other` (note required). A paid order is refunded in full at once; the customer is told why. |
 | Shop | `ready` | preparing | ready | `rpc_merchant_order_step(p_order_id, 'ready')`; a delivery's rider search starts by itself |
 | Shop | `rider_code` | ready (delivery) | picked_up | `rpc_merchant_handover_code_enter(p_order_id, p_code)` |
 | Shop | `customer_code` | ready (pickup) | delivered | `rpc_merchant_handover_code_enter(p_order_id, p_code)` |
