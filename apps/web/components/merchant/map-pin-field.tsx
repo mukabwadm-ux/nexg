@@ -32,7 +32,13 @@ export function formatPin(at: { lat: number; lng: number }): string {
  * map to draw (a drawn one would mislead), so the dialog offers the phone's
  * own location instead. The text stays editable for anyone pasting
  * coordinates.
+ *
+ * Given the address the merchant already typed (`searchText`), the map opens
+ * with the pin on the best match from the app's address search, so the
+ * merchant only confirms it or moves it to the door.
  */
+type Found = { label: string; address_line?: string | null; lat: number; lng: number };
+
 export function MapPinField({
   id,
   value,
@@ -40,6 +46,7 @@ export function MapPinField({
   placeholder,
   className,
   onChange,
+  searchText,
 }: {
   id: string;
   value: string;
@@ -47,28 +54,73 @@ export function MapPinField({
   placeholder?: string;
   className: string;
   onChange: (value: string) => void;
+  searchText?: string;
 }) {
   const maps = React.useMemo(() => mapsCapability(), []);
   const [open, setOpen] = React.useState(false);
   const [picked, setPicked] = React.useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = React.useState(false);
   const [problem, setProblem] = React.useState<string | null>(null);
+  const [query, setQuery] = React.useState('');
+  const [found, setFound] = React.useState<Found[]>([]);
+  const [searching, setSearching] = React.useState(false);
+  /* The map is built once; a new key rebuilds it on a point chosen here. */
+  const [mapKey, setMapKey] = React.useState(0);
+
+  const moveTo = (at: { lat: number; lng: number }) => {
+    setPicked(at);
+    setMapKey((key) => key + 1);
+  };
+
+  const search = async (text: string, pickFirst: boolean) => {
+    const q = text.trim();
+    if (q.length < 3) return;
+    setSearching(true);
+    setProblem(null);
+    try {
+      const response = await fetch(`/api/location/search?q=${encodeURIComponent(q)}`);
+      const body = (await response.json()) as { results?: Found[]; reason?: string };
+      const results = (body.results ?? []).filter(
+        (r) => Number.isFinite(r.lat) && Number.isFinite(r.lng),
+      );
+      setFound(results);
+      if (results[0] && pickFirst) moveTo({ lat: results[0].lat, lng: results[0].lng });
+      if (!results.length)
+        setProblem(
+          body.reason ??
+            'No match for that address. Try the building or estate name, or move the pin.',
+        );
+    } catch {
+      setProblem('The address search did not answer. Move the pin instead.');
+    } finally {
+      setSearching(false);
+    }
+  };
 
   const show = () => {
     if (disabled) return;
-    setPicked(parsePin(value));
+    const current = parsePin(value);
+    const text = searchText?.trim() ?? '';
+    setPicked(current);
     setProblem(null);
+    setFound([]);
+    setQuery(text);
     setOpen(true);
+    if (!current && text.length >= 3) void search(text, true);
   };
 
-  /* Escape closes the map, like any dialog. */
+  /* Escape closes the map, like any dialog, and only the map: it is caught
+     first (on the window, while capturing), so a drawer or dialog the field
+     sits in stays open with what was typed. */
   React.useEffect(() => {
     if (!open) return;
     const close = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
+      if (event.key !== 'Escape') return;
+      event.stopPropagation();
+      setOpen(false);
     };
-    window.addEventListener('keydown', close);
-    return () => window.removeEventListener('keydown', close);
+    window.addEventListener('keydown', close, true);
+    return () => window.removeEventListener('keydown', close, true);
   }, [open]);
 
   /* Read inside the click, through the one sanctioned geolocation helper. */
@@ -77,7 +129,7 @@ export function MapPinField({
     setProblem(null);
     const result = await readPositionOnce({ highAccuracy: true });
     setLocating(false);
-    if (result.ok) setPicked({ lat: result.fix.lat, lng: result.fix.lng });
+    if (result.ok) moveTo({ lat: result.fix.lat, lng: result.fix.lng });
     else setProblem(result.message);
   };
 
@@ -119,9 +171,51 @@ export function MapPinField({
                 ? 'Tap the map or drag the pin onto your door. Riders are sent to this spot.'
                 : 'Use your current location while you are at the business.'}
             </p>
+            <div className="mt-3 flex gap-2">
+              <input
+                type="search"
+                aria-label="Search for the address"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key !== 'Enter') return;
+                  event.preventDefault();
+                  void search(query, true);
+                }}
+                placeholder="Street, building or estate"
+                className="border-border w-full rounded-xl border px-3 py-2 text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => void search(query, true)}
+                disabled={searching}
+                className="border-border shrink-0 rounded-xl border px-3 text-sm font-bold"
+              >
+                {searching ? 'Finding…' : 'Find'}
+              </button>
+            </div>
+            {found.length > 1 ? (
+              <ul className="border-border mt-2 max-h-36 overflow-y-auto rounded-xl border">
+                {found.map((r, index) => (
+                  <li key={`${r.lat},${r.lng},${index}`}>
+                    <button
+                      type="button"
+                      onClick={() => moveTo({ lat: r.lat, lng: r.lng })}
+                      className="w-full px-3 py-2 text-left text-sm"
+                    >
+                      <span className="font-bold">{r.label}</span>
+                      {r.address_line ? (
+                        <span className="text-muted block text-xs">{r.address_line}</span>
+                      ) : null}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
             {maps.live ? (
               <div className="mt-3">
                 <StoreMap
+                  key={mapKey}
                   apiKey={maps.key}
                   mapId={maps.mapId}
                   value={picked}
