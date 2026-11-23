@@ -4876,6 +4876,204 @@ export type Database = {
           },
         ];
       };
+      basket: {
+        Row: {
+          merchant_id: string;
+          updated_at: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          merchant_id: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          merchant_id?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      basket_line: {
+        Row: {
+          catalogue_item_id: string;
+          id: string;
+          message: string | null;
+          note: string | null;
+          options: Json | null;
+          position: number;
+          quantity: number;
+          user_id: string;
+          variant_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          catalogue_item_id: string;
+          id?: string;
+          message?: string | null;
+          note?: string | null;
+          options?: Json | null;
+          position: number;
+          quantity: number;
+          user_id: string;
+          variant_id?: string | null;
+        };
+        Update: {
+          catalogue_item_id?: string;
+          id?: string;
+          message?: string | null;
+          note?: string | null;
+          options?: Json | null;
+          position?: number;
+          quantity?: number;
+          user_id?: string;
+          variant_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'basket_line_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_line_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_line_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_line_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'basket_line_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
+            foreignKeyName: 'basket_line_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'basket';
+            referencedColumns: ['user_id'];
+          },
+        ];
+      };
       bookable_resource: {
         Row: {
           active: boolean;
@@ -31524,6 +31722,40 @@ export type Database = {
             referencedColumns: ['rider_id'];
           },
         ];
+      };
+      order_step_rule: {
+        Row: {
+          actor: string;
+          args: NonNullable<Json>;
+          call: string;
+          from_stages: Database['public']['Enums']['order_stage'][];
+          fulfilment: string[] | null;
+          needs: string | null;
+          step: string;
+          to_stage: Database['public']['Enums']['order_stage'] | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          actor: string;
+          args?: NonNullable<Json>;
+          call: string;
+          from_stages: Database['public']['Enums']['order_stage'][];
+          fulfilment?: string[] | null;
+          needs?: string | null;
+          step: string;
+          to_stage?: Database['public']['Enums']['order_stage'] | null;
+        };
+        Update: {
+          actor?: string;
+          args?: NonNullable<Json>;
+          call?: string;
+          from_stages?: Database['public']['Enums']['order_stage'][];
+          fulfilment?: string[] | null;
+          needs?: string | null;
+          step?: string;
+          to_stage?: Database['public']['Enums']['order_stage'] | null;
+        };
+        Relationships: [];
       };
       package_order: {
         Row: {
@@ -59639,6 +59871,8 @@ export type Database = {
           title: string;
         }[];
       };
+      fn_basket_clean_lines: { Args: { p_lines: Json; p_merchant_id: string }; Returns: Json };
+      fn_basket_read: { Args: { p_user_id: string }; Returns: Json };
       fn_block_time: {
         Args: {
           p_earliest: string;
@@ -60536,6 +60770,13 @@ export type Database = {
       fn_order_schedule_refusal: { Args: { p_at: string; p_merchant_id: string }; Returns: string };
       fn_order_split: { Args: { p_order_id: string }; Returns: Json };
       fn_order_split_corrected: { Args: { p_order_id: string }; Returns: Json };
+      fn_order_stage_move_allowed: {
+        Args: {
+          p_from: Database['public']['Enums']['order_stage'];
+          p_to: Database['public']['Enums']['order_stage'];
+        };
+        Returns: boolean;
+      };
       fn_outbound_blocked: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_partner_home: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_partner_recompute_status: {
@@ -60558,6 +60799,13 @@ export type Database = {
       };
       fn_phone_country_code: { Args: { p_phone: string }; Returns: string };
       fn_pick_concierge: { Args: { p_city_id: string }; Returns: string };
+      fn_pin_from_text: {
+        Args: { p_text: string };
+        Returns: {
+          latitude: number;
+          longitude: number;
+        }[];
+      };
       fn_plan_flags: { Args: { p_plan_id: string }; Returns: Json };
       fn_plan_totals: {
         Args: { p_plan_id: string };
@@ -60938,6 +61186,10 @@ export type Database = {
       fn_tax_issue_order_compliant: { Args: { p_order_id: string }; Returns: number };
       fn_tax_next_number: { Args: { p_at?: string }; Returns: string };
       fn_translations: { Args: { p_locale: string }; Returns: Json };
+      fn_unit_default_property: {
+        Args: { p_area?: string; p_building?: string; p_city_id?: string; p_host_id: string };
+        Returns: string;
+      };
       fn_unit_listing_missing: { Args: { p_unit_id: string }; Returns: string[] };
       fn_unit_listing_ready: { Args: { p_unit_id: string }; Returns: boolean };
       fn_unit_readiness: { Args: { p_unit_id: string }; Returns: Json };
@@ -61467,6 +61719,10 @@ export type Database = {
       };
       rpc_audit_sign_out_device: { Args: { p_device_id: string; p_reason: string }; Returns: Json };
       rpc_audit_verify_chain: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_basket_clear: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_basket_get: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_basket_merge: { Args: { p_lines: Json; p_merchant_id: string }; Returns: Json };
+      rpc_basket_put: { Args: { p_lines: Json; p_merchant_id: string }; Returns: Json };
       rpc_best_sellers: {
         Args: { p_city_slug?: string; p_limit?: number };
         Returns: {
@@ -66309,6 +66565,8 @@ export type Database = {
           p_branch_id: string;
           p_contact: string;
           p_expected_updated_at: string;
+          p_latitude?: number;
+          p_longitude?: number;
           p_merchant_id: string;
           p_name: string;
           p_place_type: string;
@@ -66828,6 +67086,7 @@ export type Database = {
         Args: { p_detail?: Json; p_event: string; p_order_id: string; p_reason: string };
         Returns: Json;
       };
+      rpc_order_next_steps: { Args: { p_order_id: string }; Returns: Json };
       rpc_order_payment_state: { Args: { p_order_id: string }; Returns: Json };
       rpc_order_place_api: {
         Args: { p_api_key: string; p_idempotency_key: string; p_payload: Json };

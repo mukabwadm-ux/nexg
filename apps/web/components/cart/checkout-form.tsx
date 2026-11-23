@@ -8,8 +8,10 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { ChargedInKesNote, ChargedPrice, Price } from '@/components/currency/price';
+import { payOrder } from '@/lib/pay-order';
 import { createClient } from '@/lib/supabase/client';
 
+import { lineKey, toBasketLines } from './basket-sync';
 import { kesFromCents, useCart } from './cart-provider';
 import { type Method, methodOptions, PaymentMethods } from './payment-methods';
 import { discoverMerchantHref } from '@/lib/discover-links';
@@ -109,10 +111,7 @@ export function CheckoutForm({
       Promise.resolve(supabase.rpc(fn as never, args as never))) as unknown as LooseRpc;
   }, []);
 
-  const items = React.useMemo(
-    () => cart.lines.map((l) => ({ catalogue_item_id: l.id, quantity: l.quantity })),
-    [cart.lines],
-  );
+  const items = React.useMemo(() => toBasketLines(cart.lines), [cart.lines]);
 
   const payload = React.useMemo(
     () => ({
@@ -245,12 +244,7 @@ export function CheckoutForm({
       }
 
       if (method === 'mpesa_stk') {
-        const stk = await fetch('/api/payments/mpesa/start', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ orderId: result.order_id, phone }),
-        });
-        const sent = (await stk.json()) as { ok: boolean; message?: string; reference?: string };
+        const sent = await payOrder(result.order_id, { method: 'mpesa_stk', phone });
         if (!sent.ok) {
           cart.clear();
           /* The order and its payment are saved: the pay page shows where it
@@ -270,20 +264,10 @@ export function CheckoutForm({
       }
 
       if (method === 'bank_transfer') {
-        const started = await fetch('/api/payments/bank/start', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ orderId: result.order_id }),
-        });
-        const bank = (await started.json()) as {
-          ok: boolean;
-          message?: string;
-          reference?: string;
-          authorization_url?: string;
-        };
+        const bank = await payOrder(result.order_id, { method: 'bank_transfer' });
         cart.clear();
-        if (bank.ok && bank.authorization_url) {
-          window.location.href = bank.authorization_url;
+        if (bank.ok && bank.url) {
+          window.location.href = bank.url;
           return;
         }
         /* The order and its payment are saved: the pay page says where it
@@ -334,7 +318,7 @@ export function CheckoutForm({
           </div>
           <ul className="divide-border mt-3 divide-y">
             {cart.lines.map((line) => (
-              <li key={line.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3">
+              <li key={lineKey(line)} className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3">
                 <div className="min-w-0 flex-1 basis-40">
                   <p className="truncate text-sm font-extrabold">{line.name}</p>
                   <p className="text-muted text-xs font-semibold">
@@ -345,7 +329,7 @@ export function CheckoutForm({
                   <button
                     type="button"
                     aria-label={`Remove one ${line.name}`}
-                    onClick={() => cart.setQuantity(line.id, line.quantity - 1)}
+                    onClick={() => cart.setQuantity(lineKey(line), line.quantity - 1)}
                     className="flex h-8 w-8 items-center justify-center"
                   >
                     <Minus className="h-3.5 w-3.5" />
@@ -356,7 +340,7 @@ export function CheckoutForm({
                   <button
                     type="button"
                     aria-label={`Add one more ${line.name}`}
-                    onClick={() => cart.setQuantity(line.id, line.quantity + 1)}
+                    onClick={() => cart.setQuantity(lineKey(line), line.quantity + 1)}
                     className="flex h-8 w-8 items-center justify-center"
                   >
                     <Plus className="h-3.5 w-3.5" />
@@ -368,7 +352,7 @@ export function CheckoutForm({
                 <button
                   type="button"
                   aria-label={`Remove ${line.name}`}
-                  onClick={() => cart.setQuantity(line.id, 0)}
+                  onClick={() => cart.setQuantity(lineKey(line), 0)}
                   className="text-muted hover:text-danger"
                 >
                   <Trash2 className="h-4 w-4" />

@@ -76,8 +76,9 @@ guest pays                     refund
 ──────────                     ──────
 rpc_payment_begin_order        rpc_order_refund      (approved, not sent)
   → payment row, pending         → refunds_to_issue_v
-/api/payments/mpesa/start      Finance sends the money back
-  → STK prompt to the phone      by M-Pesa or bank transfer
+/api/customer/checkout/        Finance sends the money back
+  orders/{id}/payment          by M-Pesa or bank transfer
+  → STK prompt to the phone
 guest enters their PIN         order panel → reference recorded
   ↓ Safaricom callback           → rpc_refund_issued
 rpc_payment_mpesa_callback       → order partially_refunded / refunded

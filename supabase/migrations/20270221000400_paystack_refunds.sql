@@ -14,7 +14,7 @@
 -- trigger posts it). A failed or needs-attention refund is left for Finance,
 -- with a high-severity audit entry.
 --
--- Builds on 20270215000400 (stay cancellation policies).
+-- Builds on 20270221000300 (stay cancellation policies).
 
 insert into audit.action_registry (action, module, default_severity, money, description) values
   ('payment.paystack_refund_started', 'orders', 'notice', true, 'A refund was sent to Paystack'),

@@ -4,6 +4,8 @@ import { Landmark, Loader2, RotateCw, Smartphone } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
+import { payOrder } from '@/lib/pay-order';
+
 /**
  * Pay an order again, or send the M-Pesa prompt again, from /pay.
  *
@@ -48,12 +50,7 @@ export function RetryPayment({
     }
     setBusy('mpesa');
     try {
-      const res = await fetch('/api/payments/mpesa/start', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ orderId, phone }),
-      });
-      const body = (await res.json()) as { ok: boolean; message?: string; reference?: string };
+      const body = await payOrder(orderId, { method: 'mpesa_stk', phone });
       if (!body.ok) {
         setMessage(body.message ?? 'The prompt could not be sent. Try again in a moment.');
         if (body.reference) router.refresh();
@@ -72,19 +69,9 @@ export function RetryPayment({
     setMessage(null);
     setBusy('bank');
     try {
-      const res = await fetch('/api/payments/bank/start', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ orderId }),
-      });
-      const body = (await res.json()) as {
-        ok: boolean;
-        message?: string;
-        reference?: string;
-        authorization_url?: string;
-      };
-      if (body.ok && body.authorization_url) {
-        window.location.href = body.authorization_url;
+      const body = await payOrder(orderId, { method: 'bank_transfer' });
+      if (body.ok && body.url) {
+        window.location.href = body.url;
         return;
       }
       if (body.ok && body.reference) {

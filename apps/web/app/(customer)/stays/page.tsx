@@ -2,7 +2,7 @@ import { Card } from '@nexg/ui';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 
-import { PropertyCard, type PropertyCardRow } from '@/components/stays/listing';
+import { PropertyCard, type PropertyCardRow, type UnitCardRow } from '@/components/stays/listing';
 import midnight from '@/components/stays/midnight.module.css';
 import { TailorForm } from '@/components/stays/tailor-form';
 import { SiteFooter } from '@/components/site-footer';
@@ -36,6 +36,26 @@ export default async function StaysPage() {
     .order('from_rate_kes', { nullsFirst: false });
 
   const rows = (properties as PropertyCardRow[] | null) ?? [];
+
+  /* Every unit sits in one apartment: the grid shows the apartments, each
+     with its own units listed under it. */
+  const { data: unitRows } = rows.length
+    ? await supabase
+        .from('property_unit_public')
+        .select(
+          'id, property_id, label_public, name, bedrooms, max_guests, nightly_rate_kes, photos',
+        )
+        .in(
+          'property_id',
+          rows.map((p) => p.id),
+        )
+        .order('nightly_rate_kes', { nullsFirst: false })
+    : { data: [] };
+  const unitsByProperty = new Map<string, UnitCardRow[]>();
+  for (const unit of (unitRows as UnitCardRow[] | null) ?? []) {
+    unitsByProperty.set(unit.property_id, [...(unitsByProperty.get(unit.property_id) ?? []), unit]);
+  }
+  const unitCount = rows.reduce((sum, p) => sum + p.units_available, 0);
   const areas = [...new Set(rows.map((p) => p.area).filter(Boolean))] as string[];
 
   return (
@@ -133,12 +153,13 @@ export default async function StaysPage() {
                 <h2 className="text-ink mt-2 text-[1.875rem] font-extrabold tracking-[-0.02em] sm:text-[2.375rem]">
                   {rows.length === 0
                     ? 'Nothing listed yet.'
-                    : `${rows.length} ${rows.length === 1 ? 'place' : 'places'}, each with its units.`}
+                    : `${rows.length} ${rows.length === 1 ? 'apartment' : 'apartments'}, ${unitCount} ${unitCount === 1 ? 'unit' : 'units'}.`}
                 </h2>
               </div>
               {rows.length > 0 && (
                 <p className="text-muted-light max-w-[26rem] text-[0.8125rem] font-semibold leading-relaxed sm:text-right">
-                  Open one to see the individual flats, what each sleeps and what it costs.
+                  Every unit is listed under the apartment it sits in. Open one to see all its
+                  units, what each sleeps and what it costs.
                 </p>
               )}
             </div>
@@ -155,7 +176,7 @@ export default async function StaysPage() {
             ) : (
               <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {rows.map((p) => (
-                  <PropertyCard key={p.id} property={p} />
+                  <PropertyCard key={p.id} property={p} units={unitsByProperty.get(p.id) ?? []} />
                 ))}
               </div>
             )}

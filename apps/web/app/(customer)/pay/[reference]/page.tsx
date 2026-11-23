@@ -12,7 +12,7 @@ import {
 import { PaybillOption } from '@/components/pay/paybill-option';
 import { RetryPayment } from '@/components/pay/retry-payment';
 import { SiteHeader } from '@/components/site-header';
-import { bankCheckoutEnabled } from '@/lib/bank';
+import { offers } from '@/lib/payment-methods';
 import { paybillNumber } from '@/lib/daraja';
 import { reconcileBankPayment } from '@/lib/bank/payments';
 import { reconcileMpesaPrompts } from '@/lib/mpesa-prompt';
@@ -72,7 +72,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
     }
   }
 
-  const bankEnabled = bankCheckoutEnabled();
+  const bankEnabled = offers('bank_transfer');
 
   /* Pay-on-delivery orders have no payment yet: checkout sends the guest here
      with the order reference. Row security only returns the guest's own. */

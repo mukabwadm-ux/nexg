@@ -6,13 +6,13 @@
 --     keys, even once NexG is live. The owner adds the review account here
 --     (its sign-in is made by the owner; no chat handles a password).
 --   * Test keys are refused for every shop and property not marked as a test
---     one (accepts_test_payments, 20270129000200 and 20270215000300), so the
+--     one (accepts_test_payments, 20270129000200 and 20270221000200), so the
 --     reviewer can only pay at the review shops and test property.
 --   * A test-paid order never offers a job to a real rider: dispatch.fn_job_start
 --     answers "test order" instead of opening the rider search. Staff finish
 --     it from the console. Its money is already kept out of the ledger.
 --
--- Builds on 20270215000500 (refunds).
+-- Builds on 20270221000400 (refunds).
 
 create table public.payment_reviewer (
   user_id uuid primary key references auth.users (id) on delete cascade,
@@ -57,7 +57,7 @@ begin
   select * into o from public.order where id = p_order_id;
   if not found then raise exception 'No such order.'; end if;
 
-  -- Paid with Paystack test keys (a review or test order, 20270215000600): no
+  -- Paid with Paystack test keys (a review or test order, 20270221000500): no
   -- real rider is offered it. Staff finish it by hand (rpc_order_mark).
   if exists (select 1 from public.payment p
               where p.order_id = p_order_id and p.is_test and p.state = 'paid') then

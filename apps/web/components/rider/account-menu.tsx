@@ -17,7 +17,6 @@ import { signOut } from '@/app/(customer)/sign-in/actions';
 export function RiderAccountMenu({
   personName,
   riderCode,
-  vehicle,
   active,
 }: {
   personName: string;
@@ -57,7 +56,7 @@ export function RiderAccountMenu({
   }, [open]);
 
   const role = active ? 'Rider' : 'Applicant';
-  const subtitle = vehicle ? `${role} · ${riderCode} · ${vehicle}` : `${role} · ${riderCode}`;
+  const subtitle = `${role} ID: ${riderCode}`;
 
   return (
     <div ref={box} className="border-border relative border-l pl-3">
