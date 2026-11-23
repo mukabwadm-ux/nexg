@@ -40,10 +40,10 @@ const requestSchema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('sign-out') }),
 ]);
 
-export async function GET() {
+export async function GET(request: Request) {
   if (!hostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
   try {
-    return hostWorkspaceJson(await readHostWorkspace(await hostWorkspaceAccess()));
+    return hostWorkspaceJson(await readHostWorkspace(await hostWorkspaceAccess(request)));
   } catch (error) {
     return hostWorkspaceError(error);
   }
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     requireWorkspaceOrigin(request);
     if (!request.headers.get('content-type')?.startsWith('application/json'))
       throw new HostWorkspaceError(400, 'Enter valid workspace details.');
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     const maxBytes = 370_000;
     if (Number(request.headers.get('content-length')) > maxBytes)
       throw new HostWorkspaceError(413, 'The workspace update is too large.');
