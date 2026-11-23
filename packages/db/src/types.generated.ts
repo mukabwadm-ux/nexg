@@ -4877,10 +4877,22 @@ export type Database = {
         ];
       };
       basket: {
-        Row: { merchant_id: string; updated_at: string; user_id: string };
+        Row: {
+          merchant_id: string;
+          updated_at: string;
+          user_id: string;
+        };
         ComputedFields: never;
-        Insert: { merchant_id: string; updated_at?: string; user_id: string };
-        Update: { merchant_id?: string; updated_at?: string; user_id?: string };
+        Insert: {
+          merchant_id: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          merchant_id?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
         Relationships: [
           {
             foreignKeyName: 'basket_merchant_id_fkey';
@@ -31710,6 +31722,40 @@ export type Database = {
             referencedColumns: ['rider_id'];
           },
         ];
+      };
+      order_step_rule: {
+        Row: {
+          actor: string;
+          args: NonNullable<Json>;
+          call: string;
+          from_stages: Database['public']['Enums']['order_stage'][];
+          fulfilment: string[] | null;
+          needs: string | null;
+          step: string;
+          to_stage: Database['public']['Enums']['order_stage'] | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          actor: string;
+          args?: NonNullable<Json>;
+          call: string;
+          from_stages: Database['public']['Enums']['order_stage'][];
+          fulfilment?: string[] | null;
+          needs?: string | null;
+          step: string;
+          to_stage?: Database['public']['Enums']['order_stage'] | null;
+        };
+        Update: {
+          actor?: string;
+          args?: NonNullable<Json>;
+          call?: string;
+          from_stages?: Database['public']['Enums']['order_stage'][];
+          fulfilment?: string[] | null;
+          needs?: string | null;
+          step?: string;
+          to_stage?: Database['public']['Enums']['order_stage'] | null;
+        };
+        Relationships: [];
       };
       package_order: {
         Row: {
@@ -60571,6 +60617,13 @@ export type Database = {
       fn_order_schedule_refusal: { Args: { p_at: string; p_merchant_id: string }; Returns: string };
       fn_order_split: { Args: { p_order_id: string }; Returns: Json };
       fn_order_split_corrected: { Args: { p_order_id: string }; Returns: Json };
+      fn_order_stage_move_allowed: {
+        Args: {
+          p_from: Database['public']['Enums']['order_stage'];
+          p_to: Database['public']['Enums']['order_stage'];
+        };
+        Returns: boolean;
+      };
       fn_outbound_blocked: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_partner_home: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_partner_recompute_status: {
@@ -60972,6 +61025,10 @@ export type Database = {
       fn_tax_issue_order_compliant: { Args: { p_order_id: string }; Returns: number };
       fn_tax_next_number: { Args: { p_at?: string }; Returns: string };
       fn_translations: { Args: { p_locale: string }; Returns: Json };
+      fn_unit_default_property: {
+        Args: { p_area?: string; p_building?: string; p_city_id?: string; p_host_id: string };
+        Returns: string;
+      };
       fn_unit_listing_missing: { Args: { p_unit_id: string }; Returns: string[] };
       fn_unit_listing_ready: { Args: { p_unit_id: string }; Returns: boolean };
       fn_unit_readiness: { Args: { p_unit_id: string }; Returns: Json };
@@ -66863,6 +66920,7 @@ export type Database = {
         Args: { p_detail?: Json; p_event: string; p_order_id: string; p_reason: string };
         Returns: Json;
       };
+      rpc_order_next_steps: { Args: { p_order_id: string }; Returns: Json };
       rpc_order_payment_state: { Args: { p_order_id: string }; Returns: Json };
       rpc_order_place_api: {
         Args: { p_api_key: string; p_idempotency_key: string; p_payload: Json };
