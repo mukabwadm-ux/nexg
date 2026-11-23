@@ -17,7 +17,7 @@
 -- Not here: cancellation fees by the host's policy (slice 4b) and refunds
 -- through Paystack (slice 6).
 --
--- Builds on 20270221000100 (bookings).
+-- Builds on 20270222000100 (bookings).
 
 alter table public.property
   add column if not exists accepts_test_payments boolean not null default false;

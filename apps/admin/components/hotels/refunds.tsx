@@ -24,7 +24,7 @@ export interface StayRefundRow {
   refund_reference: string | null;
   refund_note: string | null;
   refunded_by: string | null;
-  /** What to send back under the stay's cancellation policy (20270221000300). */
+  /** What to send back under the stay's cancellation policy (20270222000300). */
   refund_kes: number | null;
   /** What the policy keeps, the host's less NexG's commission. */
   cancellation_fee_kes: number | null;

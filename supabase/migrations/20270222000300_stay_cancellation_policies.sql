@@ -21,7 +21,7 @@
 -- A stay with no policy copied (made before this migration) refunds in full,
 -- as before. A host who sets nothing gets the flexible policy.
 --
--- Builds on 20270221000200 (stays through Paystack).
+-- Builds on 20270222000200 (stays through Paystack).
 
 insert into audit.action_registry (action, module, default_severity, money, description) values
   ('stay.cancellation_policy_set', 'hotels', 'info', false, 'A host set a cancellation policy')
