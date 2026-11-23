@@ -215,7 +215,8 @@ begin
     select * into x from public.paystack_transfer where transfer_code = v_code for update;
   end if;
   if x.id is null then
-    return jsonb_build_object('ok', false, 'reason', 'unknown_transfer');
+    /* Not one NexG opened (one sent by hand from the dashboard): nothing to change. */
+    return jsonb_build_object('ok', true, 'ignored', true, 'reason', 'unknown_transfer');
   end if;
   if x.is_test <> (p_mode = 'test') then
     return jsonb_build_object('ok', false, 'reason', 'mode_mismatch');
