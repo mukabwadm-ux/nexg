@@ -1,14 +1,13 @@
 'use client';
 
-import { Bell, ChevronRight, CircleHelp, Lock, TriangleAlert } from 'lucide-react';
+import { Bell, Lock, MapPin, TriangleAlert } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import { WorkspaceMobileNavigation } from '@/components/merchant/workspace/mobile-navigation';
-import { WorkspaceFrame } from '@/components/merchant/workspace/workspace-frame';
-import styles from '@/components/merchant/workspace/workspace.module.css';
 
+import styles from './portal.module.css';
 import type { RiderNavItem } from './shell';
 
 function isOn(pathname: string, href: string): boolean {
@@ -16,43 +15,35 @@ function isOn(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function initialsOf(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  const letters = (parts[0]?.[0] ?? '') + (parts.length > 1 ? (parts.at(-1)?.[0] ?? '') : '');
-  return (letters || 'R').toUpperCase();
-}
-
 /**
- * The rider portal in the merchant dashboard's frame: the same dark sidebar,
- * top bar, breadcrumb and phone drawer (components/merchant/workspace), with
- * the rider's own sections, badges and controls.
+ * The rider portal frame: the NexG mark and "Rider Portal", the sections
+ * with a yellow pill on the open one, an SOS card and the rider's
+ * availability at the foot of the sidebar; city, SOS, messages and the
+ * account in the top bar. On a phone the sections open from a drawer.
  *
- * SOS stays in the top bar on every screen and in every state. A rider in
- * trouble does not first become activated.
+ * SOS is on screen in every state. A rider in trouble does not first
+ * become activated.
  */
 export function RiderWorkspaceShell({
   personName,
-  riderCode,
-  statusLabel,
+  city,
+  presenceLabel,
+  presenceTone,
   nav,
   unreadCount,
-  presenceControl,
   accountMenu,
   children,
 }: {
   personName: string;
-  riderCode: string;
-  statusLabel: string;
+  city: string | null;
+  presenceLabel: string;
+  presenceTone: 'online' | 'offline' | 'pending';
   nav: RiderNavItem[];
   unreadCount: number;
-  presenceControl: ReactNode;
   accountMenu: ReactNode;
   children: ReactNode;
 }) {
   const pathname = usePathname() ?? '/rider';
-  const current = nav.find((item) => isOn(pathname, item.href));
-  const activeLabel = current?.label ?? 'Dashboard';
-  const initials = initialsOf(personName);
 
   const navigation = (
     <nav aria-label="Rider portal navigation" className={styles.nav}>
@@ -66,18 +57,18 @@ export function RiderWorkspaceShell({
             className={styles.navLink}
             aria-current={on ? 'page' : undefined}
           >
-            <span aria-hidden="true" className="flex shrink-0 [&_svg]:h-[18px] [&_svg]:w-[18px]">
+            <span aria-hidden="true" className="flex shrink-0 [&_svg]:h-5 [&_svg]:w-5">
               {item.icon}
             </span>
             <span className={styles.navLabel}>{item.label}</span>
             {item.badge ? (
               <span
-                className={`h-[1.15rem] min-w-[1.15rem] shrink-0 rounded-full px-1 text-center text-[0.625rem] font-extrabold leading-[1.15rem] ${
+                className={`flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full px-1.5 text-[12px] font-extrabold ${
                   item.tone === 'danger'
-                    ? 'bg-danger text-white'
+                    ? 'bg-red-600 text-white'
                     : on
-                      ? 'bg-ink text-white'
-                      : 'bg-gold text-ink'
+                      ? 'bg-[#141a2a] text-white'
+                      : 'bg-gold text-[color:var(--rider-ink)]'
                 }`}
               >
                 {item.badge}
@@ -85,7 +76,7 @@ export function RiderWorkspaceShell({
             ) : null}
             {item.locked ? (
               <>
-                <Lock size={13} aria-hidden="true" />
+                <Lock size={13} aria-hidden="true" className="opacity-60" />
                 <span className="sr-only">, not available until you are active</span>
               </>
             ) : null}
@@ -95,101 +86,91 @@ export function RiderWorkspaceShell({
     </nav>
   );
 
+  const dot =
+    presenceTone === 'online'
+      ? 'bg-green-500'
+      : presenceTone === 'pending'
+        ? 'bg-gold'
+        : 'bg-slate-400';
+
   return (
-    <WorkspaceFrame
-      activeLabel={activeLabel}
-      businessName={personName}
-      accountInitials={initials}
-      navigation={navigation}
-      sidebarHome={
-        <Link
-          href="/rider"
-          prefetch={false}
-          className={styles.sidebarContext}
-          aria-label={`${personName}, rider Dashboard`}
-          title={personName}
-        >
-          <span className={styles.businessAvatar} aria-hidden="true">
-            {initials}
+    <div className={styles.shell} data-rider-portal>
+      <aside className={styles.sidebar} aria-label="Rider portal sidebar">
+        <Link href="/rider" prefetch={false} className={styles.brand}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/nexg-logo-on-dark.png" alt="" />
+          <span>
+            <strong>NEXGAPP</strong>
+            <small>Rider Portal</small>
           </span>
-          <div>
-            <strong>{personName}</strong>
-            <small>Rider · {riderCode}</small>
-          </div>
         </Link>
-      }
-      sidebarFooter={
-        <>
-          <strong>NEXG rider portal</strong>
-          <span>Nairobi · East Africa Time</span>
-        </>
-      }
-      headerStart={
-        <>
+        {navigation}
+        <div className={styles.sidebarFoot}>
+          <div className={styles.sosCard}>
+            <p>
+              In trouble on the road?
+              <br />
+              <span>SOS reaches rider ops straight away.</span>
+            </p>
+            <Link
+              href="/rider/incidents"
+              prefetch={false}
+              className="flex items-center justify-center gap-1.5 rounded-lg bg-red-600 px-3 py-2 text-[13px] font-extrabold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            >
+              <TriangleAlert className="h-4 w-4" aria-hidden="true" />
+              SOS
+            </Link>
+          </div>
+          <p className={styles.presence}>
+            <span className={`h-2.5 w-2.5 rounded-full ${dot}`} aria-hidden="true" />
+            {presenceLabel}
+          </p>
+        </div>
+      </aside>
+
+      <div className={styles.frame}>
+        <header className={styles.header}>
           <WorkspaceMobileNavigation homeHref="/rider" title={personName}>
             {navigation}
           </WorkspaceMobileNavigation>
-          <div className={styles.breadcrumb} aria-label="Breadcrumb">
-            <Link href="/rider" prefetch={false}>
-              Rider portal
-            </Link>
-            <ChevronRight size={13} aria-hidden="true" />
-            <span>{activeLabel}</span>
-          </div>
-          <span className="hidden sm:inline-flex">{presenceControl}</span>
-        </>
-      }
-      headerMiddle={
-        <span className={`${styles.workspaceStatus} hidden sm:block`} role="note">
-          {statusLabel}
-        </span>
-      }
-      headerEnd={
-        <>
+          <span className={styles.city}>
+            <MapPin className="text-gold-text h-5 w-5" aria-hidden="true" />
+            {city ?? 'Zone not set'}
+          </span>
+          <span className="flex-1" />
           {/* Never hidden, never disabled, in any state. */}
           <Link
             href="/rider/incidents"
             prefetch={false}
-            className="bg-danger flex items-center gap-1.5 rounded-lg px-3 py-2 text-[0.8125rem] font-extrabold text-white"
+            className="flex items-center gap-1.5 rounded-xl bg-red-600 px-3 py-2 text-[13px] font-extrabold text-white lg:hidden"
           >
-            <TriangleAlert className="h-3.5 w-3.5" aria-hidden="true" />
+            <TriangleAlert className="h-4 w-4" aria-hidden="true" />
             SOS
           </Link>
           <Link
             href="/rider/messages"
             prefetch={false}
-            className={`${styles.iconButton} relative`}
+            className={styles.iconButton}
             aria-label={
               unreadCount > 0 ? `Messages, ${unreadCount} unread` : 'Messages, nothing new'
             }
           >
-            <Bell size={18} aria-hidden="true" />
+            <Bell size={19} aria-hidden="true" />
             {unreadCount > 0 ? (
-              <span className="bg-danger absolute -right-0.5 -top-0.5 flex h-[1rem] min-w-[1rem] items-center justify-center rounded-full px-1 text-[0.5625rem] font-extrabold text-white">
+              <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-extrabold text-white">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             ) : null}
           </Link>
-          <Link
-            href="/rider/support"
-            prefetch={false}
-            className={styles.helpButton}
-            aria-label="Help"
-          >
-            <CircleHelp size={18} aria-hidden="true" />
-            <span>Help</span>
-          </Link>
+          <span className={`${styles.divider} hidden sm:block`} aria-hidden="true" />
           {accountMenu}
-        </>
-      }
-    >
-      {/* On a phone the presence switch sits under the bar, where a thumb reaches it. */}
-      <div className="border-border bg-surface flex items-center gap-2 border-b px-4 py-2 sm:hidden">
-        {presenceControl}
+        </header>
+        <div className={styles.body}>
+          {/* Every rider page's landmark. Pages render a plain div inside it,
+              never their own main (e2e/web/portal-chrome.spec.ts reads this). */}
+          <main id="main">{children}</main>
+        </div>
       </div>
-      {/* Every rider page's landmark. Pages render a plain div inside it,
-          never their own main (e2e/web/portal-chrome.spec.ts reads this). */}
-      <main id="main">{children}</main>
-    </WorkspaceFrame>
+    </div>
   );
 }
