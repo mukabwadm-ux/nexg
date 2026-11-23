@@ -8,7 +8,7 @@ import type * as T from './types.js';
  * The plain types in types.ts must stay equal to the API's schemas. These
  * checks run in the type check (tsc), which CI runs: when a schema in
  * @nexg/contracts changes, it fails until
- * `pnpm --filter @nexg/api-client generate` writes the types again.
+ * `pnpm --filter @nexg-org/api-client generate` writes the types again.
  */
 it('matches the schemas the API uses', () => {
   expectTypeOf<T.ApiOrder>().toEqualTypeOf<C.ApiOrder>();

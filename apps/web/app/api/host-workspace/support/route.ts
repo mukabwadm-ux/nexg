@@ -36,7 +36,7 @@ export async function GET(request: Request) {
   if (!hostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
   try {
     const params = new URL(request.url).searchParams;
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     const thread = params.get('thread');
     if (thread === null) return hostWorkspaceJson(await readSupportInbox(access));
     const beforeParam = params.get('before');
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     ) {
       throw new HostWorkspaceError(400, 'Enter a valid message.');
     }
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     const parsed = actionSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) throw new HostWorkspaceError(400, 'Check the message and try again.');
     const action = parsed.data;

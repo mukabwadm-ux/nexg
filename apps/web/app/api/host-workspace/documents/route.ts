@@ -130,10 +130,10 @@ function respond(error: unknown) {
   return hostWorkspaceError(error);
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   if (!hostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
   try {
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     return await view(access);
   } catch (error) {
     return respond(error);
@@ -151,7 +151,7 @@ export async function POST(request: Request) {
     )
       throw new HostWorkspaceError(400, 'Upload a PDF or photo up to 10 MB.');
 
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     fullAccess(access);
     const form = await request.formData();
     const kind = z.enum(KINDS).parse(form.get('kind'));
@@ -195,7 +195,7 @@ export async function PATCH(request: Request) {
   if (!hostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
   try {
     requireWorkspaceOrigin(request);
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     fullAccess(access);
     const { error } = await (access.db as unknown as Loose).rpc('rpc_host_documents_submit', {
       p_host_id: access.hostId,

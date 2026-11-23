@@ -30,7 +30,7 @@ Also decided since 12 Nov: guests may order delivery on a temporary (anonymous) 
 
 **The phone apps' repositories** are not reachable from the shared-services machine, so each shared piece ships as the backend plus a written contract in `docs/shared-services/` for the app teams.
 
-**Order of the remaining work:** D6 sign-in, then R3, R8 and R9. Also open: a merchant health score is not computed anywhere yet (`merchant_health_snapshot` has no writer), so shop declines are recorded (`cancel_reason_code = 'merchant_declined'`) but not yet scored.
+**Order of the remaining work:** the owner's provider setup for D6; R8 and R9 are done. Also open: a merchant health score is not computed anywhere yet (`merchant_health_snapshot` has no writer), so shop declines are recorded (`cancel_reason_code = 'merchant_declined'`) but not yet scored.
 
 For whoever continues the shared-services work. The owner sends the private parts separately:
 
@@ -176,8 +176,8 @@ These are also needed before launch:
 - **R5:** a host API on Supabase, replacing the Stays app's local host service (D7).
 - **R6:** an App Review demo account for host features, after R4 and R5.
 - **R7:** public merchant ratings and customer order ratings (D11).
-- **R8:** merchant traits, a staff-only place ID per branch, a popularity band from 0 to 3, and the customer's recent categories.
-- **R9:** `plan_block.merchant_id`.
+- **R8:** done 23 Nov on the plan's defaults (`20270227000100`): `merchant_traits_public` (traits and a popularity band 0–3), the staff-only `merchant_branch_place` (Google place ID per branch), and `rpc_my_recent_categories`. Contract: `docs/shared-services/merchant-facts.md`.
+- **R9:** done 23 Nov (`20270227000200`): `plan_block.merchant_id`, filled from a component's partner when there is one, and returned by `fn_plan_view` with the shop's name.
 - **R10:** films, showings and ticket prices for cinemas (D9).
 - **R11:** Play, Flights and Cinemas categories. Paused by the owner on 12 Nov; see below.
 
