@@ -74,6 +74,9 @@ psql_q -c "select version || '_' || name from supabase_migrations.schema_migrati
 diff -u "$OUT/history-1111.txt" "$OUT/history-undone.txt" || fail "after the undo the history is not live's 11 Nov history"
 bash -euo pipefail "$OUT/repairs.sh"
 
+say "Before the push: switch off live's extra category"
+psql_q -f - < supabase/live-history/rollout-pre-push.sql | tee "$OUT/pre-push.txt"
+
 say "Dry run"
 supabase db push --db-url "$DB_URL" --include-all --dry-run 2>&1 | tee "$OUT/dry-run.txt"
 grep -oE '[0-9]{14}_[a-z0-9_]+\.sql' "$OUT/dry-run.txt" | sed 's/\.sql$//' > "$OUT/dry-run-list.txt" || true
@@ -96,6 +99,9 @@ echo "history equals main's $(wc -l < "$OUT/main-files.txt") files: nothing unap
 say "Checks"
 psql_q -f - < supabase/live-history/rollout-post-checks.sql | tee "$OUT/post-checks.txt"
 if grep -q '^FAIL' "$OUT/post-checks.txt"; then fail "a post-push check failed (see above)"; fi
+# Main's own release gate (supabase/tests/26_wiring_check.sql), shown here so a
+# red database job on main can be traced to its finding. It does not fail this job.
+psql_q -c "select severity || '  ' || rule || '  ' || coalesce(finding, '') from public.fn_wiring_check() where severity = 'critical'" | tee "$OUT/wiring-critical.txt" || true
 psql_q -f - < supabase/live-history/rollout-pause-jobs.sql | tee "$OUT/paused.txt"
 paused=$(wc -l < "$OUT/paused.txt")
 [ "$paused" -eq 10 ] || fail "rollout-pause-jobs.sql paused $paused jobs, not the 10 it names (a job was renamed or not created)"

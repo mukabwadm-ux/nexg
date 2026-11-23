@@ -1586,4 +1586,5 @@ union all select 'merchants (master_categories may move their category)', count(
 union all select 'listed units (host_listing_details_and_publish publishes them)', count(*) from public.unit where listed
 union all select 'fraud signals (fraud_checks changes the kind column and backfills)', count(*) from public.fraud_signal
 union all select 'branches with a pin (precise_branch_locations re-measures their area)', count(*) from public.merchant_branch where latitude is not null
-union all select 'live shops', count(*) from public.merchant where status::text = 'live';
+union all select 'live shops', count(*) from public.merchant where status::text = 'live'
+union all select 'merchants on activities_games_sports (rollout-pre-push.sql switches that category off)', count(*) from public.merchant where category::text = 'activities_games_sports' or category_key = 'activities_games_sports';

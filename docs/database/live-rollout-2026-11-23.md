@@ -196,6 +196,7 @@ Each step waits for the owner's yes, typed in the rollout chat.
 | 2 | **Read.** In the SQL editor, run `supabase/live-history/rollout-readonly-queries.sql`, parts K, G, H, I and J; paste the results to the rollout chat. | K differs; I says `connector_foundation_ran` = true; G or H show any version outside `20261113000200`–`001000` |
 | 3 | **Rehearse on a copy** (details below). | any step fails |
 | 4 | **Repair** (details below). | either command errors |
+| 4b | **Switch off live's extra category.** Run `supabase/live-history/rollout-pre-push.sql` in the SQL editor: it returns one row, `activities_games_sports` with `false`. Without it the push stops at `20261226000200_master_categories` (found by the CI rehearsal). It moves no merchant; section 7 says who decides where they go. | Derrick and the owner have not answered section 7's question |
 | 5 | **Dry run** (details below). | the list differs in any line: run the undo (section 3) and stop |
 | 6 | **Decide the jobs.** Section 4, once. | |
 | 7 | **Push.** `supabase db push --linked --include-all` (it lists the migrations again and asks y/N). Then, at once, run `supabase/live-history/rollout-pause-jobs.sql` in the SQL editor: it must return 10 rows, unless step 6 changed the list. | a migration fails: the CLI stops there, the ones before it stay applied. Fix forward in a new PR, or roll back (step 10) |
@@ -266,14 +267,21 @@ The revert in section 3 cleans only the history table. These changes stay on liv
 
 | Live version | What stays live | Main |
 |---|---|---|
-| `20261111000000`, `000100`, `001600` | the `activities_games_sports` category (enum value, `category_config` row, business-types question) | uses `games_sports`; `master_categories` does not retire `activities_games_sports`, so it stays an extra active category |
+| `20261111000000`, `000100`, `001600` | the `activities_games_sports` category (enum value, `category_config` row, business-types question). Step 4b switches the row off, because `master_categories` refuses to run while it is active | uses `games_sports` |
 | `20261111000600` | `authz.owns_merchant_offering_media`, and the two `merchant-offering-media` storage policies that call it | the original policies |
 | `20261111001400` | `fn_fin_kpi_for` with VAT in gross | the older body without the VAT fix |
 | `20261111001500` | `console_module` row `api` | no row |
 
 CI's rehearsal prints the full schema difference between live after the rollout and a database built from main, and fails on any difference not listed in `supabase/live-history/rollout-expected-schema-diff.json`.
 
-Derrick decides, for each row, whether to:
+**One question has to be answered before the live run.** Where do merchants saved with `activities_games_sports` go? The local copy has 65 of them, and query J counts live's.
+
+- After step 4b, they keep the category, but it is switched off.
+- A new migration (new id) could move them to `games_sports`, mapping each subcategory (bowling, arcade and the rest) to one of its subcategories.
+
+That mapping is Derrick's and the owner's call; nothing here guesses it.
+
+For the rest, Derrick decides, row by row, whether to:
 
 - add it to main in a new migration (a new id, never these), or
 - remove it from live in one.
@@ -294,7 +302,7 @@ Cinema and every other new migration go through it too.
 
 1. builds live's 11 Nov state (280 versions, names checked against the archive);
 2. applies the repairs, undoes them, checks, and applies them again;
-3. checks that the dry run equals `expected`;
+3. runs the pre-push step, then checks that the dry run equals `expected`;
 4. pushes with `--include-all`;
 5. checks that the history equals main's files exactly;
 6. runs the post-checks and the job pause;

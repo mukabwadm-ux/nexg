@@ -327,23 +327,15 @@
           "id": "couples_experiences",
           "name": "Couples' Experiences",
           "base": "recreation",
-          "addFields": [
-            "age_gate_method"
-          ],
-          "addQuestions": [
-            "Q_AGE_GATE_METHOD"
-          ]
+          "addFields": ["age_gate_method"],
+          "addQuestions": ["Q_AGE_GATE_METHOD"]
         },
         {
           "id": "romantic_getaways",
           "name": "Romantic Getaways",
           "base": "travel_packages",
-          "addFields": [
-            "age_gate_method"
-          ],
-          "addQuestions": [
-            "Q_AGE_GATE_METHOD"
-          ]
+          "addFields": ["age_gate_method"],
+          "addQuestions": ["Q_AGE_GATE_METHOD"]
         },
         {
           "id": "sexual_health_products",
@@ -354,23 +346,15 @@
           "id": "intimacy_relationship_education",
           "name": "Intimacy & Relationship Education",
           "base": "workshops",
-          "addFields": [
-            "age_gate_method"
-          ],
-          "addQuestions": [
-            "Q_AGE_GATE_METHOD"
-          ]
+          "addFields": ["age_gate_method"],
+          "addQuestions": ["Q_AGE_GATE_METHOD"]
         },
         {
           "id": "adult_lifestyle_experiences",
           "name": "Adult Lifestyle Experiences",
           "base": "recreation",
-          "addFields": [
-            "age_gate_method"
-          ],
-          "addQuestions": [
-            "Q_AGE_GATE_METHOD"
-          ]
+          "addFields": ["age_gate_method"],
+          "addQuestions": ["Q_AGE_GATE_METHOD"]
         }
       ]
     },
