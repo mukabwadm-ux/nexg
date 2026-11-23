@@ -284,3 +284,49 @@ describe('keys', () => {
     expect(() => new NexgClient({ fetch: fakeFetch().fetch })).not.toThrow();
   });
 });
+
+describe('cancelling a booking', () => {
+  it('posts to the cancel path, with the reason when given', async () => {
+    const answer = {
+      order: { status: 'cancelled' },
+      cancelled: true,
+      previous_status: 'requested',
+    };
+    const { fetch, calls } = fakeFetch(ok(answer), ok({ ...answer, cancelled: false }));
+    const nexg = new NexgClient({ apiKey: 'k', fetch });
+
+    expect(await nexg.orders.cancel('o1', { reason: 'Flight moved.' })).toEqual(answer);
+    expect(calls[0]).toMatchObject({
+      url: 'https://api.nexgapp.com/v1/orders/o1/cancel',
+      method: 'POST',
+    });
+    expect(JSON.parse(calls[0]?.body ?? '')).toEqual({ reason: 'Flight moved.' });
+
+    await nexg.orders.cancel('o1');
+    expect(calls[1]?.body).toBeUndefined();
+  });
+
+  it('throws conflict once a rider has the booking', async () => {
+    const { fetch, calls } = fakeFetch(
+      apiError(
+        409,
+        'conflict',
+        'A rider has taken this booking, so it can no longer be cancelled through the API. Contact NexG support.',
+      ),
+    );
+    const error = await new NexgClient({ apiKey: 'k', fetch }).orders
+      .cancel('o1')
+      .catch((e: unknown) => e);
+    expect(error).toMatchObject({ status: 409, code: 'conflict' });
+    expect(calls).toHaveLength(1);
+  });
+
+  it('is retried after a server error, because cancelling twice answers the same', async () => {
+    const { fetch, calls } = fakeFetch(
+      apiError(503, 'internal_error', 'Busy.'),
+      ok({ order: {}, cancelled: true, previous_status: 'requested' }),
+    );
+    await new NexgClient({ apiKey: 'k', fetch }).orders.cancel('o1');
+    expect(calls).toHaveLength(2);
+  });
+});

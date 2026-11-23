@@ -6,8 +6,10 @@ import { notFound, redirect } from 'next/navigation';
 import {
   deleteMerchant,
   goLive,
+  setApiBookingAccess,
   setControls,
   setMerchantDeactivated,
+  type ApiBookingAccess,
 } from '@/app/merchants/actions';
 import { sendFeaturedPitch, unfeatureMerchant } from '@/app/featured/actions';
 import { ActivatePanel } from '@/components/activate-panel';
@@ -19,6 +21,7 @@ import { MerchantLifecycleActions } from '@/components/merchant-lifecycle-action
 import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
 import { applicationAnswerGroups } from '@/lib/application-answers';
+import { ApiBookingsCard } from '@/components/merchants/api-bookings-card';
 import { ApplicationReviewUnavailable } from '@/components/merchants/application-review-view';
 import { MerchantActivityLog } from '@/components/merchants/activity-log';
 import { BookingReadiness } from '@/components/merchants/booking-readiness';
@@ -204,6 +207,14 @@ export default async function MerchantApplicationPage({
   const city = merchant.city as { name: string } | null;
   const primary = branches?.[0];
   const canManageLifecycle = staff.isSuperAdmin || staff.roles.includes('merchant_ops');
+  // Live API bookings are Finance's call (rpc_api_booking_access_set). The read
+  // answers nothing until 20270302000200 is in the database, and the card stays away.
+  const canApproveApiBookings =
+    staff.isSuperAdmin || staff.roles.includes('finance') || staff.roles.includes('finance_lead');
+  const apiBookings = canApproveApiBookings
+    ? ((await supabase.rpc('rpc_api_booking_access_read', { p_merchant_id: params.id }))
+        .data as ApiBookingAccess | null)
+    : null;
   const performance = summarise(
     (performanceOrders as PerformanceOrder[] | null) ?? [],
     (performanceRatings as PerformanceRating[] | null) ?? [],
@@ -444,6 +455,18 @@ export default async function MerchantApplicationPage({
                   />
                 </div>
               </Card>
+            )}
+
+            {apiBookings && (
+              <ApiBookingsCard
+                merchantId={params.id}
+                live={merchant.status === 'live'}
+                state={apiBookings}
+                onSave={async (enabled, monthlyLimitKes, note) => {
+                  'use server';
+                  return setApiBookingAccess(params.id, enabled, monthlyLimitKes, note);
+                }}
+              />
             )}
 
             {canManageLifecycle && (

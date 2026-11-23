@@ -230,6 +230,21 @@ export class NexgClient {
         headers: { 'Idempotency-Key': options.idempotencyKey ?? crypto.randomUUID() },
         retry: 'safe',
       }),
+    /**
+     * POST /v1/orders/{id}/cancel: cancel one of your API bookings, free of
+     * charge, until a rider is assigned. After that NexG answers 409
+     * (NexgApiError with code `conflict`) and support handles it. Cancelling
+     * twice answers the same (cancelled: false), so it is retried like a read.
+     */
+    cancel: (id: string, options: { reason?: string } = {}) =>
+      this.call<{ order: ApiOrder; cancelled: boolean; previous_status: BookingStatus }>(
+        'POST',
+        `/v1/orders/${encodeURIComponent(id)}/cancel`,
+        {
+          ...(options.reason === undefined ? {} : { body: { reason: options.reason } }),
+          retry: 'safe',
+        },
+      ),
   };
 
   /** Moving test bookings, with a test key. Nothing is dispatched or charged. */

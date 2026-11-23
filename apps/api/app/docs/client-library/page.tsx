@@ -138,7 +138,7 @@ export default function ClientLibraryPage() {
         <li>
           after a <C>5xx</C>, a dropped connection or a timeout, with backoff, but only where{' '}
           <A href="/docs/idempotency">sending again is safe</A>: reads, the delivery check,
-          catalogue changes, and bookings, whose <C>Idempotency-Key</C> stays the same across
+          catalogue changes, cancellations (<C>orders.cancel</C>), and bookings, whose <C>Idempotency-Key</C> stays the same across
           retries. Pass your own key to <C>orders.create</C>, kept with your booking, so a retry
           after a crash is safe too.
         </li>

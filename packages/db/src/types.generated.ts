@@ -3415,6 +3415,147 @@ export type Database = {
         };
         Relationships: [];
       };
+      api_booking_access: {
+        Row: {
+          changed_at: string;
+          changed_by: string | null;
+          enabled: boolean;
+          merchant_id: string;
+          monthly_limit_cents: number;
+          note: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          changed_at?: string;
+          changed_by?: string | null;
+          enabled?: boolean;
+          merchant_id: string;
+          monthly_limit_cents: number;
+          note?: string | null;
+        };
+        Update: {
+          changed_at?: string;
+          changed_by?: string | null;
+          enabled?: boolean;
+          merchant_id?: string;
+          monthly_limit_cents?: number;
+          note?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_booking_access_changed_by_fkey';
+            columns: ['changed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
       api_connection: {
         Row: {
           auth_header: string | null;
@@ -62855,6 +62996,19 @@ export type Database = {
       };
       fn_plan_view: { Args: { p_plan_id: string }; Returns: Json };
       fn_plate_matches: { Args: { p_plate: string; p_read: string }; Returns: boolean };
+      fn_price_api_booking: {
+        Args: {
+          p_at?: string;
+          p_city_id: string;
+          p_payload: Json;
+          p_quantity: number;
+          p_service: Omit<
+            Database['public']['Tables']['api_service']['Row'],
+            Database['public']['Tables']['api_service']['ComputedFields']
+          >;
+        };
+        Returns: Json;
+      };
       fn_price_api_service: {
         Args: {
           p_at?: string;
@@ -63438,6 +63592,16 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_api_booking_access_read: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_api_booking_access_set: {
+        Args: {
+          p_enabled: boolean;
+          p_merchant_id: string;
+          p_monthly_limit_kes: number;
+          p_note?: string;
+        };
+        Returns: Json;
       };
       rpc_api_connection_clear_secret: { Args: { p_id: string; p_kind: string }; Returns: Json };
       rpc_api_connection_save: { Args: { p: Json }; Returns: Json };
@@ -69130,6 +69294,10 @@ export type Database = {
         Returns: Json;
       };
       rpc_order_breakdown: { Args: { p_order_id: string }; Returns: Json };
+      rpc_order_cancel_api: {
+        Args: { p_api_key: string; p_order_id: string; p_reason?: string };
+        Returns: Json;
+      };
       rpc_order_cancel_mine: { Args: { p_order_id: string; p_reason?: string }; Returns: Json };
       rpc_order_contact: {
         Args: { p_channel: string; p_order_id: string; p_party: string; p_reveal?: boolean };

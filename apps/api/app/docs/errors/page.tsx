@@ -59,9 +59,9 @@ export default function ErrorsPage() {
       </P>
       <CodeBlock className="mt-6" code={SHAPE} language="http" title="Response" />
       <P>
-        Two answers come from the web server instead and have no JSON body: a <C>404</C> for a
-        path that does not exist, and a <C>405</C> for a method a path does not take. Check the
-        status before you parse.
+        Two answers come from the web server instead and have no JSON body: a <C>404</C> for a path
+        that does not exist, and a <C>405</C> for a method a path does not take. Check the status
+        before you parse.
       </P>
       <P>
         JSON errors are never cached, and a <C>429</C> carries <C>Retry-After</C>, in seconds. Each
@@ -83,6 +83,11 @@ export default function ErrorsPage() {
             <C key="c">not_found</C>,
             'Something does not exist, or is not yours. A refused key (401) and a missing scope (403) also use this code, so nobody can tell which keys exist.',
             'Read the status: 401, replace the key; 403, check its scopes; 404, the record is not there.',
+          ],
+          [
+            <C key="c">conflict</C>,
+            'The request is fine, but the record’s state does not allow it now: for example, cancelling a booking a rider has already taken.',
+            'Read the message. Sending it again gets the same answer until the state changes.',
           ],
           [
             <C key="c">rate_limited</C>,
@@ -116,9 +121,18 @@ export default function ErrorsPage() {
             'method_not_allowed: the path exists but not for that method. Allow lists the methods it accepts.',
             'No',
           ],
+          [
+            '409',
+            'conflict: the record’s state does not allow this now, such as cancelling a booking a rider has.',
+            'No',
+          ],
           ['429', 'rate_limited.', 'Yes, after Retry-After'],
           ['500', 'internal_error. NexG logs the request id.', 'Yes, with backoff'],
-          ['503', 'internal_error: NexG could not check the key or the limit.', 'Yes, with backoff'],
+          [
+            '503',
+            'internal_error: NexG could not check the key or the limit.',
+            'Yes, with backoff',
+          ],
         ]}
       />
 
