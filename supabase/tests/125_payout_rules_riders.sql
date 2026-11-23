@@ -33,6 +33,17 @@ values ('c1250000-0000-4000-8000-000000000031', 'c1250000-0000-4000-8000-0000000
 insert into public.rider_earning (rider_id, order_reference, base_kes, total_kes, earned_at)
 values ('c1250000-0000-4000-8000-000000000031', '[RULES-125-1]', 500, 500, now()),
        ('c1250000-0000-4000-8000-000000000031', '[RULES-125-2]', 400, 400, now());
+/* What the run pays comes from the ledger: the same 900 owed to the rider
+   (earnings without a real order post nothing there). */
+select ledger.post(
+  p_kind => 'rider_pay_recognised',
+  p_idempotency_key => 'rider_pay:[RULES-125]',
+  p_entries => jsonb_build_array(
+    jsonb_build_object('account', 'expense.rider_pay', 'debit', 90000),
+    jsonb_build_object('account', 'payable.rider', 'party_type', 'rider',
+      'party_id', 'c1250000-0000-4000-8000-000000000031', 'credit', 90000, 'memo', '[RULES-125]')),
+  p_city_id => (select id from public.city where slug = 'nairobi'),
+  p_actor_label => '[Test]');
 
 create function pg_temp.as_user(p_uid text) returns void
 language sql as $$
