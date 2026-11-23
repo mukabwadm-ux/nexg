@@ -2,7 +2,7 @@
 // zod schemas in @nexg/contracts, so the published package needs neither the
 // contracts nor zod. src/types.test.ts checks they still match.
 //
-// Run: pnpm --filter @nexg/api-client generate
+// Run: pnpm --filter @nexg-org/api-client generate
 import { writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -149,7 +149,7 @@ writeFileSync(
     ' * Generated from @nexg/contracts by scripts/generate-types.mjs: the',
     " * API's own schemas, written as plain TypeScript so this package needs",
     ' * neither the contracts nor zod. Do not edit by hand: run',
-    ' * `pnpm --filter @nexg/api-client generate`. src/types.test.ts fails',
+    ' * `pnpm --filter @nexg-org/api-client generate`. src/types.test.ts fails',
     ' * when these no longer match the schemas.',
     ' */',
     '',

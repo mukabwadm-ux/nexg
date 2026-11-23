@@ -137,6 +137,7 @@ export const CONSOLE_NAV: NavGroup[] = [
         module: 'finance',
         home: true,
       },
+      { label: 'Payout rules', href: '/finance/payout-rules', module: 'finance' },
       { label: 'Reconciliations', href: '/finance/reconciliation', module: 'finance', home: true },
       { label: 'Invoices', href: '/finance/invoices', module: 'finance', home: true },
       { label: 'Reports', href: '/finance/reports', module: 'finance', home: true },
