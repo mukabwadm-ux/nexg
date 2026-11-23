@@ -45,7 +45,7 @@ test('ineligible and unknown facts never earn relevance credit; unjudged refs an
 });
 test('every released category/subcategory/option and language remains present even without positive judgments', () => {
   const report = evaluate(bundleControl(), release);
-  assert.equal(report.macro.categoriesTotal, 21); assert.equal(report.macro.subcategoriesTotal, 214); assert.equal(report.macro.subcategoriesScored, 1);
+  assert.equal(report.macro.categoriesTotal, 22); assert.equal(report.macro.subcategoriesTotal, 221); assert.equal(report.macro.subcategoriesScored, 1);
   assert.equal(report.slices.length, release.nodes.length + 3);
   const missing = report.slices.find(row => row.id === 'pharmacy:healthcare-products')!;
   assert.equal(missing.queries, 0); assert.equal(missing.ndcg10, null); assert.equal(report.slices.find(row => row.id === 'sw')!.scored, 0);

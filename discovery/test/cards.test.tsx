@@ -26,8 +26,8 @@ test('every subcategory gets a card kind from its journey, and restaurant purcha
     assert.equal(offeringKind({ subcategoryId: subcategory.id }), kind, subcategory.id);
     counts[kind] = (counts[kind] ?? 0) + 1;
   }
-  // The master category list (16 Nov 2026): 214 subcategories.
-  assert.deepEqual(counts, { product: 76, dish: 9, service: 37, activity: 29, task: 50, vehicle: 13 });
+  // The master category list (16 Nov 2026; Pets added 23 Nov 2026): 221 subcategories.
+  assert.deepEqual(counts, { product: 78, dish: 9, service: 40, activity: 29, task: 52, vehicle: 13 });
   assert.equal(offeringKind({ subcategoryId: 'restaurants-food_restaurant' }), 'dish');
   assert.equal(offeringKind({ subcategoryId: 'restaurants-food_catering' }), 'task');
   assert.equal(offeringKind({ subcategoryId: 'wellness:swedish-massage' }), 'service');

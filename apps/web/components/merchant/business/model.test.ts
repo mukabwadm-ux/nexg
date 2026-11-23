@@ -31,8 +31,8 @@ const memory = () => {
 describe('Business frontend configuration', () => {
   it('validates representative configured samples and every source question for every specialty', () => {
     expect(profiles).toHaveLength(PROFILE_COUNT);
-    // 21 listed categories plus Health, Financial and Vehicle Services, whose profiles stay valid.
-    expect(new Set(profiles.map((p) => p.categoryId)).size).toBe(24);
+    // 22 listed categories plus Health, Financial and Vehicle Services, whose profiles stay valid.
+    expect(new Set(profiles.map((p) => p.categoryId)).size).toBe(25);
     for (const profile of profiles) {
       expect(validateBusiness(seedBusiness(profile.id)), profile.id).toEqual([]);
       for (const id of profile.questions) expect(fields[id], id).toBeDefined();

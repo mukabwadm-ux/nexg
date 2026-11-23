@@ -10,6 +10,7 @@ import {
   Laptop,
   Package,
   PartyPopper,
+  PawPrint,
   Pill,
   Plane,
   ShieldAlert,
@@ -36,7 +37,7 @@ export function categoryLabel(key: string | null | undefined): string | undefine
   return key === 'other' ? 'Other' : categoryName(key);
 }
 
-/** Icons for NexG's 21 categories, by current category id. */
+/** Icons for NexG's 22 categories, by current category id. */
 const ICON_BY_CATEGORY: Record<string, typeof Store> = {
   restaurants_food: UtensilsCrossed,
   alcohol_beverages: Wine,
@@ -56,6 +57,7 @@ const ICON_BY_CATEGORY: Record<string, typeof Store> = {
   fashion_apparel: Shirt,
   groceries_essentials: ShoppingCart,
   marketplace: Store,
+  pets: PawPrint,
   tech_electronics: Laptop,
   flowers_gifts: Flower2,
   logistics_shipping: Package,
@@ -77,6 +79,7 @@ export const CATEGORY_ICON_BY_NAME: Record<string, typeof Store> = {
   Laptop,
   Package,
   PartyPopper,
+  PawPrint,
   Pill,
   Plane,
   ShieldAlert,
@@ -110,6 +113,7 @@ const CTA: Record<string, string> = {
   fashion_apparel: 'Shop collection',
   groceries_essentials: 'Shop groceries',
   marketplace: 'Shop store',
+  pets: 'Shop pets',
   tech_electronics: 'Shop tech',
   flowers_gifts: 'Order gifts',
   logistics_shipping: 'Send a parcel',

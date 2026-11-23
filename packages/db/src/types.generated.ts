@@ -70430,7 +70430,8 @@ export type Database = {
         | 'flights'
         | 'games_sports'
         | 'movers_relocation'
-        | 'premium_services';
+        | 'premium_services'
+        | 'pets';
       merchant_control_source: 'merchant' | 'staff' | 'system';
       merchant_user_role: 'owner' | 'manager' | 'cashier';
       mood: 'wild' | 'taste' | 'night' | 'slow' | 'stay' | 'events';
@@ -72241,6 +72242,7 @@ export const Constants = {
         'games_sports',
         'movers_relocation',
         'premium_services',
+        'pets',
       ],
       merchant_control_source: ['merchant', 'staff', 'system'],
       merchant_user_role: ['owner', 'manager', 'cashier'],

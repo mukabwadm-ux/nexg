@@ -290,8 +290,21 @@
         "sports_fitness_equipment",
         "automotive_accessories",
         "books",
-        "pet_supplies",
         "arts_crafts_gifts"
+      ]
+    },
+    {
+      "id": "pets",
+      "name": "Pets",
+      "subcategoryIds": [
+        "pet_shop_supplies",
+        "pet_food",
+        "veterinary_products",
+        "vet_clinics",
+        "pet_grooming",
+        "pet_boarding_daycare",
+        "pet_training",
+        "pet_sitting_walking"
       ]
     },
     {
@@ -1692,6 +1705,62 @@
       "categoryId": "logistics_shipping",
       "baseSubcategoryId": "road_freight",
       "specialtyNeeds": "Measured load, compatible truck/driver and accepted pickup/delivery windows; fleet-size bands are not individual truck capacity."
+    },
+    {
+      "subcategoryId": "pet_shop_supplies",
+      "name": "Pet Shop & Supplies",
+      "categoryId": "pets",
+      "baseSubcategoryId": "general_retail",
+      "specialtyNeeds": "Declared product, condition and stock authority with optional delivery/collection promise; no generic appointment fallback."
+    },
+    {
+      "subcategoryId": "pet_food",
+      "name": "Pet Food",
+      "categoryId": "pets",
+      "baseSubcategoryId": "general_retail",
+      "specialtyNeeds": "Declared product, condition and stock authority with optional delivery/collection promise; no generic appointment fallback."
+    },
+    {
+      "subcategoryId": "veterinary_products",
+      "name": "Veterinary Products & Medicines",
+      "categoryId": "pets",
+      "baseSubcategoryId": "pharmacy_retail",
+      "specialtyNeeds": "Pharmacy order and declared pharmacist/cold-chain/prescription fulfilment gates; do not put prescription details in calendar titles."
+    },
+    {
+      "subcategoryId": "vet_clinics",
+      "name": "Vet Clinics",
+      "categoryId": "pets",
+      "baseSubcategoryId": "clinics",
+      "specialtyNeeds": "Administrative clinic slot with eligible staff/room; explicitly distinguish appointment booking, walk-in queue and home visit."
+    },
+    {
+      "subcategoryId": "pet_grooming",
+      "name": "Pet Grooming",
+      "categoryId": "pets",
+      "baseSubcategoryId": "haircare",
+      "specialtyNeeds": "Stylist/chair/service-duration resources, walk-in versus booked intake and home visits; product retail can coexist."
+    },
+    {
+      "subcategoryId": "pet_boarding_daycare",
+      "name": "Pet Boarding & Daycare",
+      "categoryId": "pets",
+      "baseSubcategoryId": "reservations",
+      "specialtyNeeds": "Concierge request for a venue reservation; external venue acceptance/reference is needed before confirming it to the customer."
+    },
+    {
+      "subcategoryId": "pet_training",
+      "name": "Pet Training",
+      "categoryId": "pets",
+      "baseSubcategoryId": "personal_training",
+      "specialtyNeeds": "Trainer duration and chosen gym/client/online location; group places and travel dependencies only for enabled methods."
+    },
+    {
+      "subcategoryId": "pet_sitting_walking",
+      "name": "Pet Sitting & Walking",
+      "categoryId": "pets",
+      "baseSubcategoryId": "home_cleaning",
+      "specialtyNeeds": "Household visit duration, eligible crew/equipment, customer address/service area and travel; recurrence separate from paid subscription."
     }
   ]
 }

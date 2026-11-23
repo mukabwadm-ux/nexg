@@ -171,6 +171,7 @@ export const CATEGORY_AGREEMENT: Readonly<Record<string, string>> = {
   games_sports: 'experiences',
   movers_relocation: 'logistics-and-shipping',
   premium_services: 'marketplace',
+  pets: 'marketplace',
 };
 
 /**
@@ -178,7 +179,8 @@ export const CATEGORY_AGREEMENT: Readonly<Record<string, string>> = {
  * Car Hire & Vehicle Services (vehicle_rentals) → Vehicle Services, Health →
  * Wellness, Concierge Services → Marketplace, and the three categories added
  * on 16 Nov 2026: Games & Sports → Experiences, Movers & Relocation →
- * Logistics & Shipping, Premium Services & Reservations → Marketplace.
+ * Logistics & Shipping, Premium Services & Reservations → Marketplace; and Pets (23 Nov 2026) →
+ * Marketplace.
  *
  * Health, Financial Services and Vehicle Services are retired categories;
  * they keep their agreement for merchants who accepted it before.
@@ -190,6 +192,7 @@ export const INTERIM: ReadonlySet<string> = new Set([
   'games_sports',
   'movers_relocation',
   'premium_services',
+  'pets',
 ]);
 
 const byId = new Map(MERCHANT_AGREEMENTS.map((agreement) => [agreement.id, agreement]));

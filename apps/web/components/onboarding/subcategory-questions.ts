@@ -7,6 +7,9 @@ const yesNo = [option('yes', 'Yes'), option('no', 'No')];
 
 const booleanFields = new Set([
   'accommodation_included',
+  'cold_chain_meds',
+  'pharmacist_on_duty',
+  'prescription_delivery',
   'appointment_booking',
   'authenticity_guarantee',
   'available_24hr',
@@ -685,6 +688,9 @@ const multiChoiceFields: Record<string, QuestionOption[]> = {
 };
 
 const labels: Record<string, string> = {
+  cold_chain_meds: 'Do you keep cold-chain medicines refrigerated?',
+  pharmacist_on_duty: 'Is a qualified pharmacist or vet on duty?',
+  prescription_delivery: 'Do you deliver prescription medicines?',
   advance_booking_hrs: 'How far ahead should customers book?',
   advance_booking_days: 'How far ahead should customers book?',
   available_24hr: 'Are you available 24 hours a day?',

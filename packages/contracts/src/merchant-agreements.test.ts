@@ -21,7 +21,7 @@ const publicDir = resolve(__dirname, '../../../apps/web/public');
 describe('merchant agreements', () => {
   it('gives every merchant category exactly one known agreement', () => {
     const categories = MERCHANT_TAXONOMY.map((category) => category.id).sort();
-    // The 21 listed categories plus the retired ones, kept for past acceptances.
+    // The 22 listed categories plus the retired ones, kept for past acceptances.
     expect(Object.keys(CATEGORY_AGREEMENT).sort()).toEqual(
       [...categories, 'financial_services', 'health', 'vehicle_services'].sort(),
     );
@@ -30,7 +30,7 @@ describe('merchant agreements', () => {
     expect(agreementForCategory(null)).toBeUndefined();
   });
 
-  it('uses each of the 18 agreements, with six interim categories', () => {
+  it('uses each of the 18 agreements, with seven interim categories', () => {
     expect(MERCHANT_AGREEMENTS).toHaveLength(18);
     expect(new Set(Object.values(CATEGORY_AGREEMENT)).size).toBe(18);
     expect([...INTERIM].sort()).toEqual([
@@ -38,6 +38,7 @@ describe('merchant agreements', () => {
       'games_sports',
       'health',
       'movers_relocation',
+      'pets',
       'premium_services',
       'vehicle_rentals',
     ]);
