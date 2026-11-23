@@ -44,7 +44,7 @@ export async function POST(request: Request) {
   if (!hostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Guide unavailable.' }, 404);
   try {
     requireWorkspaceOrigin(request);
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     const params = new URL(request.url).searchParams;
     const unitId = z.string().uuid().parse(params.get('unit'));
     const kind = z.enum(['plan', 'model']).parse(params.get('kind'));

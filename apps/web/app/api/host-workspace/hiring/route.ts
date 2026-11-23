@@ -66,7 +66,7 @@ function boardChanged(id: string) {
 export async function GET(request: Request) {
   if (!hostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
   try {
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     const job = new URL(request.url).searchParams.get('job');
     if (job === null) return hostWorkspaceJson(await readHiring(access));
     if (!uuid.safeParse(job).success) throw new HostWorkspaceError(400, 'Choose a valid job.');
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     ) {
       throw new HostWorkspaceError(400, 'Check the job and try again.');
     }
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     const parsed = actionSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) throw new HostWorkspaceError(400, 'Check the job and try again.');
     const action = parsed.data;

@@ -117,7 +117,7 @@ export async function GET(request: Request) {
   if (!hostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
   try {
     const target = targetFrom(request);
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     return await view(access, target, await gallery(access, target));
   } catch (error) {
     return respond(error);
@@ -135,7 +135,7 @@ export async function POST(request: Request) {
       throw new HostWorkspaceError(400, 'Choose a PNG, JPEG or WebP photo up to 10 MB.');
 
     const target = targetFrom(request);
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     const form = await request.formData();
     const operationId = z.string().uuid().parse(form.get('operationId'));
     const file = form.get('file');
@@ -190,7 +190,7 @@ export async function PATCH(request: Request) {
   try {
     requireWorkspaceOrigin(request);
     const target = targetFrom(request);
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     const body = await request.text();
     if (body.length > 20_000) throw new HostWorkspaceError(400, 'The gallery update is too large.');
     const update = z
