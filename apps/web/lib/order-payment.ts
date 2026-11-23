@@ -286,9 +286,11 @@ function checkoutPage(value: unknown): string | undefined {
 export async function startPayment(
   request: Request,
   target: (s: Session) => Promise<PaymentTarget | Response>,
+  /* The apps sign in with a bearer token; the website passes its cookie session. */
+  session_: (request: Request) => Promise<Session | Response> = signedIn,
 ) {
   try {
-    const session = await signedIn(request);
+    const session = await session_(request);
     if (session instanceof Response) return session;
 
     let body: unknown;
@@ -508,15 +510,46 @@ export function readOrderPayment(request: Request, rawOrderId: string) {
   return readPayment(request, orderTarget(rawOrderId));
 }
 
-export async function startOrderPayment(request: Request, rawOrderId: string) {
+export async function startOrderPayment(
+  request: Request,
+  rawOrderId: string,
+  session_?: (request: Request) => Promise<Session | Response>,
+) {
   if (!orderId.safeParse(rawOrderId).success) return problem(404, 'NOT_FOUND', 'No such order.');
   /* An order already paid answers paid without starting anything. */
-  return startPayment(request, async (session) => {
-    const target = await orderTarget(rawOrderId)(session);
-    if (target instanceof Response) return target;
-    const current = await target.readState();
-    if (!(current instanceof Response) && current.status === 'paid')
-      return Response.json(view(current), { headers });
-    return target;
-  });
+  return startPayment(
+    request,
+    async (session) => {
+      const target = await orderTarget(rawOrderId)(session);
+      if (target instanceof Response) return target;
+      const current = await target.readState();
+      if (!(current instanceof Response) && current.status === 'paid')
+        return Response.json(view(current), { headers });
+      return target;
+    },
+    session_,
+  );
+}
+
+/**
+ * The website's pay page, server side: the order's payment state, after asking
+ * Paystack about a try that is taking long (the same rule as the apps' GET).
+ */
+export async function orderPaymentForPage(
+  supabase: Client,
+  id: string,
+): Promise<PaymentState | null> {
+  const state = stateFrom(await rpc(supabase, 'rpc_order_payment_state', { p_order_id: id }));
+  if (state instanceof Response) return null;
+  if (
+    state.status === 'pending' &&
+    state.attempt_reference &&
+    (state.opened_seconds_ago ?? 0) >= 10 &&
+    (state.checked_seconds_ago == null || state.checked_seconds_ago >= 10)
+  ) {
+    await checkWithPaystack(supabase, state.attempt_reference, state.is_test ? 'test' : 'live');
+    const again = stateFrom(await rpc(supabase, 'rpc_order_payment_state', { p_order_id: id }));
+    return again instanceof Response ? state : again;
+  }
+  return state;
 }
