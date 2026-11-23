@@ -251,8 +251,6 @@ export interface PaymentTarget {
   afterPaid?: () => Promise<void>;
   /** Extra fields for the read answer (a booking says what is due now). */
   describe?: (state: PaymentState) => Promise<Record<string, unknown>>;
-  /** An order: bank transfer, and M-Pesa through Safaricom until Paystack is live. */
-  orderId?: string;
 }
 export type Session = { supabase: Client; email: string | null; name?: string | null };
 
@@ -321,6 +319,8 @@ function checkoutPage(value: unknown): string | undefined {
 export async function startPayment(
   request: Request,
   target: (s: Session) => Promise<PaymentTarget | Response>,
+  /** An order: also bank transfer, and M-Pesa through Safaricom until Paystack is live. */
+  order?: { id: string },
 ) {
   try {
     const session = await signedIn(request);
@@ -343,23 +343,20 @@ export async function startPayment(
 
     const choice = input.data;
     const { supabase } = session;
-    /* The target answers for itself when there is nothing to start (an order already paid). */
-    const found = await target(session);
-    if (found instanceof Response) return found;
-
     if (choice.method === 'bank_transfer') {
-      if (!found.orderId) {
-        return problem(422, 'INVALID_REQUEST', 'Choose card, M-Pesa or Airtel Money.');
-      }
-      return startBank(request, session, found.orderId);
+      if (!order) return problem(422, 'INVALID_REQUEST', 'Choose card, M-Pesa or Airtel Money.');
+      return startBank(request, session, order.id);
     }
-    if (found.orderId && choice.method === 'mpesa_stk' && mpesaProvider(paymentSetup()) === 'daraja') {
-      return startDaraja(request, supabase, found.orderId, choice.phone);
+    if (order && choice.method === 'mpesa_stk' && mpesaProvider(paymentSetup()) === 'daraja') {
+      return startDaraja(request, supabase, order.id, choice.phone);
     }
 
     const mode = await customerMode(supabase);
     const proof = mode ? paystackProof(mode) : null;
     if (!mode || !proof) return paymentUnavailable();
+    /* The target answers for itself when there is nothing to start (an order already paid). */
+    const found = await target(session);
+    if (found instanceof Response) return found;
 
     const payment = await found.begin(choice, proof);
     if (payment instanceof Response) return payment;
@@ -545,7 +542,6 @@ function orderTarget(rawOrderId: string) {
         return begun.data as { reference: string; amount_cents: number };
       },
       metadata: { order_id: id },
-      orderId: id,
     };
   };
 }
@@ -559,14 +555,18 @@ export function readOrderPayment(request: Request, rawOrderId: string) {
 export async function startOrderPayment(request: Request, rawOrderId: string) {
   if (!orderId.safeParse(rawOrderId).success) return problem(404, 'NOT_FOUND', 'No such order.');
   /* An order already paid answers paid without starting anything. */
-  return startPayment(request, async (session) => {
-    const target = await orderTarget(rawOrderId)(session);
-    if (target instanceof Response) return target;
-    const current = await target.readState();
-    if (!(current instanceof Response) && current.status === 'paid')
-      return Response.json(view(current), { headers });
-    return target;
-  });
+  return startPayment(
+    request,
+    async (session) => {
+      const target = await orderTarget(rawOrderId)(session);
+      if (target instanceof Response) return target;
+      const current = await target.readState();
+      if (!(current instanceof Response) && current.status === 'paid')
+        return Response.json(view(current), { headers });
+      return target;
+    },
+    { id: rawOrderId },
+  );
 }
 
 // ─────────────────────────────────────────── M-Pesa by Safaricom, and the bank
@@ -631,11 +631,7 @@ async function startDaraja(request: Request, supabase: Client, id: string, phone
 }
 
 /** A bank transfer: the bank's page, where the customer approves it. The bank's signed event marks it paid. */
-async function startBank(
-  request: Request,
-  session: Session,
-  id: string,
-) {
+async function startBank(request: Request, session: Session, id: string) {
   const origin =
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, '') ?? new URL(request.url).origin;
   const result = await startBankPayment(session.supabase, {
