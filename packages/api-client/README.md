@@ -1,17 +1,17 @@
-# @nexg/api-client
+# @nexg-org/api-client
 
 A typed TypeScript client for the NexG API (`https://api.nexgapp.com`), and the check for the order events NexG posts to your endpoints. No runtime dependencies: it needs `fetch` and Web Crypto, so it runs on Node 20 or later, Deno, Bun and edge runtimes.
 
 ```bash
-npm install @nexg/api-client
+npm install @nexg-org/api-client
 ```
 
-Inside this repository, depend on it as `"@nexg/api-client": "workspace:*"`. MIT licensed.
+Inside this repository, depend on it as `"@nexg-org/api-client": "workspace:*"`. MIT licensed.
 
 ## Calls
 
 ```ts
-import { NexgClient, NexgApiError } from '@nexg/api-client';
+import { NexgClient, NexgApiError } from '@nexg-org/api-client';
 
 const nexg = new NexgClient({ apiKey: process.env.NEXG_API_KEY });
 
@@ -47,7 +47,7 @@ const { booking } = await nexg.orders.create(
 for await (const order of nexg.orders.listAll()) console.log(order.reference, order.status);
 ```
 
-Every method returns the `data` of the answer, typed as the [reference](https://api.nexgapp.com/docs/reference) documents it. The types in `src/types.ts` are generated from `@nexg/contracts`, the schemas the API itself uses, as plain TypeScript, so the package needs neither the contracts nor zod. `src/types.test.ts` fails the type check when they no longer match; `pnpm --filter @nexg/api-client generate` writes them again.
+Every method returns the `data` of the answer, typed as the [reference](https://api.nexgapp.com/docs/reference) documents it. The types in `src/types.ts` are generated from `@nexg/contracts`, the schemas the API itself uses, as plain TypeScript, so the package needs neither the contracts nor zod. `src/types.test.ts` fails the type check when they no longer match; `pnpm --filter @nexg-org/api-client generate` writes them again.
 
 | Group         | Methods                                                       |
 | ------------- | ------------------------------------------------------------- |
@@ -75,7 +75,7 @@ A key is refused in a browser, where anyone could read it. Call NexG from your s
 ## Order events
 
 ```ts
-import { verifyWebhook, NexgWebhookError } from '@nexg/api-client';
+import { verifyWebhook, NexgWebhookError } from '@nexg-org/api-client';
 
 // A Next.js route handler. Read the raw body: parsing and serialising again
 // changes the spacing and breaks the signature.
@@ -100,21 +100,18 @@ export async function POST(request: Request) {
 
 ## Tests
 
-`pnpm --filter @nexg/api-client test` runs the unit tests against a fake `fetch`. To run the same calls against a real API with a test key (skipped otherwise, so CI never runs it):
+`pnpm --filter @nexg-org/api-client test` runs the unit tests against a fake `fetch`. To run the same calls against a real API with a test key (skipped otherwise, so CI never runs it):
 
 ```bash
-NEXG_SANDBOX_BASE_URL=https://api.nexgapp.com NEXG_SANDBOX_KEY=nexg_test_… pnpm --filter @nexg/api-client test
+NEXG_SANDBOX_BASE_URL=https://api.nexgapp.com NEXG_SANDBOX_KEY=nexg_test_… pnpm --filter @nexg-org/api-client test
 ```
 
 The key needs `merchant_read`, `merchant_write` and `catalogue_write`. Only a test key is accepted: it books in the sandbox and saves no catalogue change.
 
 ## Publishing
 
-Inside this repository the package is used as TypeScript source. Packed for npm, it builds itself first (`prepack` runs `tsc -p tsconfig.build.json` into `dist/`), and `publishConfig` points `main`, `types` and `exports` at `dist/`: ES modules and declarations, with no dependencies. `pnpm --filter @nexg/api-client pack` shows exactly what would be published.
+Inside this repository the package is used as TypeScript source. Packed for npm, it builds itself first (`prepack` runs `tsc -p tsconfig.build.json` into `dist/`), and `publishConfig` points `main`, `types` and `exports` at `dist/`: ES modules and declarations, with no dependencies. `pnpm --filter @nexg-org/api-client pack` shows exactly what would be published.
 
-To publish:
-
-1. The first time, create the `nexg` organisation on npmjs.com. If that name is taken, rename the package to the organisation you get.
-2. From a clean checkout of `main` (the repository's `.npmrc` sets `publish-branch=main`), run `npm login`, then `pnpm --filter @nexg/api-client publish --access public`.
+It is published under the `nexg-org` organisation on npm. To publish a version, as a member of that organisation, from a clean checkout of `main` (the repository's `.npmrc` sets `publish-branch=main`): run `npm login`, then `pnpm --filter @nexg-org/api-client publish --access public`.
 
 After a schema change in `@nexg/contracts`: run `generate`, raise the version, and publish again.

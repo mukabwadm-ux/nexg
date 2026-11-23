@@ -2,7 +2,7 @@
  * Generated from @nexg/contracts by scripts/generate-types.mjs: the
  * API's own schemas, written as plain TypeScript so this package needs
  * neither the contracts nor zod. Do not edit by hand: run
- * `pnpm --filter @nexg/api-client generate`. src/types.test.ts fails
+ * `pnpm --filter @nexg-org/api-client generate`. src/types.test.ts fails
  * when these no longer match the schemas.
  */
 
