@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
 
 import { CategoryExplorer } from '@/components/categories/category-explorer';
+import { CATEGORY_STRING_KEYS } from '@/components/categories/strings';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import { getTranslations } from '@/lib/i18n';
+import { catalogueTerm } from '@/lib/i18n/catalogue';
 import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata: Metadata = {
@@ -18,6 +21,9 @@ export const fetchCache = 'force-no-store';
  * category as a photograph card (components/categories/category-explorer).
  */
 export default async function CategoriesPage() {
+  const { locale, t } = await getTranslations();
+  /* Category words in the visitor's language; the English stays searchable. */
+  const tr = (english: string) => catalogueTerm(locale, english);
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from('category_config')
@@ -31,8 +37,8 @@ export default async function CategoriesPage() {
 
   const categories = (data ?? []).map((category) => ({
     id: category.category,
-    name: category.label,
-    desc: category.description ?? '',
+    name: tr(category.label),
+    desc: category.description ? tr(category.description) : '',
     icon: category.icon,
     cardKind: category.card_kind,
     sort: category.sort,
@@ -48,8 +54,11 @@ export default async function CategoriesPage() {
           return [
             {
               id: subcategory.id,
-              name: subcategory.name,
-              ...(typeof subcategory.group === 'string' ? { group: subcategory.group } : {}),
+              name: tr(subcategory.name),
+              english: subcategory.name,
+              ...(typeof subcategory.group === 'string'
+                ? { group: tr(subcategory.group), englishGroup: subcategory.group }
+                : {}),
               fields: Array.isArray(subcategory.fields)
                 ? subcategory.fields.filter((field): field is string => typeof field === 'string')
                 : [],
@@ -59,13 +68,15 @@ export default async function CategoriesPage() {
           ];
         })
       : [],
+    english: [category.label, category.description ?? ''].join(' '),
   }));
+  const strings = Object.fromEntries(CATEGORY_STRING_KEYS.map((key) => [key, t(key)]));
 
   return (
     <>
       <SiteHeader />
       <main>
-        <CategoryExplorer categories={categories} />
+        <CategoryExplorer categories={categories} strings={strings} />
       </main>
       <SiteFooter />
     </>

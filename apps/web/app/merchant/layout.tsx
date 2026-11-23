@@ -10,6 +10,9 @@ import {
   type MerchantWorkspaceNavItem,
 } from '@/components/merchant/workspace/merchant-workspace-shell';
 import { SignOut } from '@/components/partner/sign-out';
+import { BusinessSwitcher } from '@/components/merchant/workspace/business-switcher';
+import { listBusinesses } from '@/lib/current-business';
+import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: { default: 'Your business', template: '%s · NexG' },
@@ -82,6 +85,13 @@ export default async function MerchantLayout({ children }: { children: React.Rea
      session with no merchant row has nothing to frame. */
   if (!m) redirect('/merchants/apply');
 
+  /* The other businesses this sign-in owns or manages. An unverified draft
+     account cannot add or switch, so it gets no switcher. */
+  const businesses = me.isAnonymous ? null : await listBusinesses(createClient(), me.userId);
+  const switcher = businesses ? (
+    <BusinessSwitcher businesses={businesses} currentId={me.id} />
+  ) : null;
+
   if (me.access.state !== 'legacy') {
     const destinations: MerchantWorkspaceNavItem[] = [
       { label: 'Home', href: '/merchant' },
@@ -111,6 +121,8 @@ export default async function MerchantLayout({ children }: { children: React.Rea
       >
         <MerchantWorkspaceShell
           businessName={m.name}
+          businesses={businesses ?? undefined}
+          currentBusinessId={businesses ? me.id : undefined}
           approvalLabel={approvalLabel}
           setupDestinations={
             me.access.setup
@@ -171,6 +183,7 @@ export default async function MerchantLayout({ children }: { children: React.Rea
         unreadCount={m.unread_messages ?? 0}
         nav={nav}
         operationsAllowed={me.access.operations}
+        businessSwitcher={switcher}
         stateControl={
           <StateControl
             live={live}

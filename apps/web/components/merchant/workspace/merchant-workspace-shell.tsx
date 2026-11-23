@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 
+import { BusinessSwitcher, type WorkspaceBusiness } from './business-switcher';
 import { businessInitials } from './business-initials';
 import { WorkspaceMobileNavigation } from './mobile-navigation';
 import { workspaceNavIcon, type MerchantWorkspaceNavLabel } from './navigation';
@@ -28,6 +29,12 @@ export interface MerchantWorkspaceShellProps {
   approvalLabel: string;
   /** The authenticated layout supplies account/sign-out controls. */
   headerEnd?: ReactNode;
+  /**
+   * The businesses this sign-in can switch between, with the current one
+   * marked. Omitted (an unverified draft account): no switcher, no Add business.
+   */
+  businesses?: readonly WorkspaceBusiness[];
+  currentBusinessId?: string;
   children: ReactNode;
 }
 
@@ -43,6 +50,8 @@ export function MerchantWorkspaceShell({
   setupDestinations = [],
   approvalLabel,
   headerEnd,
+  businesses,
+  currentBusinessId,
   children,
 }: MerchantWorkspaceShellProps) {
   const pathname = usePathname() ?? '/merchant';
@@ -64,6 +73,10 @@ export function MerchantWorkspaceShell({
   );
   const lockedItem = selectedLock ?? (currentItem?.locked && !setupRoute ? currentItem : undefined);
   const activeLabel = lockedItem?.label ?? currentItem?.label ?? 'Home';
+  const switcher =
+    businesses && currentBusinessId ? (
+      <BusinessSwitcher businesses={businesses} currentId={currentBusinessId} />
+    ) : null;
   const navigation = (
     <nav aria-label="Merchant workspace navigation" className={styles.nav}>
       {nav.map((item) => {
@@ -116,26 +129,30 @@ export function MerchantWorkspaceShell({
       accountInitials={initials}
       navigation={navigation}
       sidebarHome={
-        <Link
-          href="/merchant"
-          prefetch={false}
-          className={styles.sidebarContext}
-          aria-label={`${displayName}, workspace Home`}
-          title={displayName}
-          onClick={() => setLockSelection(null)}
-        >
-          <span className={styles.businessAvatar} aria-hidden="true">
-            {initials}
-          </span>
-          <div>
-            <strong>{displayName}</strong>
-            <small>Merchant workspace</small>
-          </div>
-        </Link>
+        <>
+          <Link
+            href="/merchant"
+            prefetch={false}
+            className={styles.sidebarContext}
+            aria-label={`${displayName}, workspace Home`}
+            title={displayName}
+            onClick={() => setLockSelection(null)}
+          >
+            <span className={styles.businessAvatar} aria-hidden="true">
+              {initials}
+            </span>
+            <div>
+              <strong>{displayName}</strong>
+              <small>Merchant workspace</small>
+            </div>
+          </Link>
+          {switcher}
+        </>
       }
       headerStart={
         <>
           <WorkspaceMobileNavigation homeHref="/merchant" title={displayName}>
+            {switcher}
             {navigation}
           </WorkspaceMobileNavigation>
           <div className={styles.breadcrumb} aria-label="Breadcrumb">
