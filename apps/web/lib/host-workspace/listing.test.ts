@@ -196,3 +196,54 @@ describe('the publish switch', () => {
     expect(rpc).not.toHaveBeenCalled();
   });
 });
+
+describe('saving a unit', () => {
+  it('saves an existing unit whose capacity and rate came back as 0', async () => {
+    const { access: a, rpc } = access({ data: {}, error: null });
+    await expect(
+      runHostCommand(a, {
+        type: 'save',
+        collection: 'units',
+        id: UNIT,
+        record: { name: 'A', capacity: 0, rateKes: 0, bedrooms: 0, sizeSqm: 0, minNights: 1 },
+      }),
+    ).resolves.toEqual({ message: 'Unit saved.' });
+    const unit = (rpc.mock.calls[0] as unknown as [string, { p_unit: Record<string, unknown> }])[1]
+      .p_unit;
+    expect(unit.max_guests).toBeUndefined();
+    expect(unit.nightly_rate_kes).toBeUndefined();
+    expect(unit.size_sqm).toBeUndefined();
+    expect(unit.bedrooms).toBe(0);
+  });
+
+  it('adds a unit with no property chosen and leaves the property to the database', async () => {
+    const { access: a, rpc } = access({ data: {}, error: null });
+    await runHostCommand(a, { type: 'save', collection: 'units', record: { name: 'Studio 2' } });
+    expect(rpc).toHaveBeenCalledWith(
+      'rpc_unit_upsert_guarded',
+      expect.objectContaining({
+        p_unit_id: undefined,
+        p_unit: expect.objectContaining({ name: 'Studio 2' }),
+      }),
+    );
+  });
+
+  it('tells a host under review why the unit was not saved', async () => {
+    const review =
+      'Your account is under review. You can add or change properties and units once NexG approves your documents.';
+    const { access: a } = access({ data: null, error: { code: '42501', message: review } });
+    await expect(
+      runHostCommand(a, { type: 'save', collection: 'units', id: UNIT, record: { name: 'A' } }),
+    ).rejects.toThrow(review);
+  });
+
+  it('keeps Postgres permission errors generic', async () => {
+    const { access: a } = access({
+      data: null,
+      error: { code: '42501', message: 'permission denied for table unit' },
+    });
+    await expect(
+      runHostCommand(a, { type: 'save', collection: 'units', id: UNIT, record: { name: 'A' } }),
+    ).rejects.toThrow('outside your workspace access');
+  });
+});
