@@ -7,6 +7,7 @@ import {
   saveSetupLocation,
   type SetupLocation,
 } from '@/app/merchant/location-setup-actions';
+import { MapPinField, parsePin } from '@/components/merchant/map-pin-field';
 import { LocationEditor } from './editors';
 import type { Location } from './model';
 import styles from './workspace.module.css';
@@ -19,7 +20,11 @@ const blank = (): SetupLocation => ({
   contact: '',
   activityIds: [],
   updatedAt: null,
+  pin: '',
 });
+
+/* A place riders and customers go to, or a base a service leaves from. */
+const needsPin = (location: SetupLocation) => location.type !== 'digital_operation';
 
 /** The workspace's own location editor, backed by the merchant's branch records. */
 export function SetupLocationEditor({
@@ -81,6 +86,10 @@ export function SetupLocationEditor({
     setMessage('');
   }
   async function save() {
+    if (needsPin(draft) && !parsePin(draft.pin)) {
+      setMessage('Pin this location on the map: riders and customers are sent to that exact spot.');
+      return;
+    }
     setSaving(true);
     setMessage('');
     const result = await saveSetupLocation(draft);
@@ -95,7 +104,15 @@ export function SetupLocationEditor({
     ]);
     setDraft(result.location);
     setBaseline(result.location);
-    setMessage('Location saved.');
+    setMessage(
+      !needsPin(result.location)
+        ? 'Location saved.'
+        : result.location.area
+          ? `Location saved, in the ${result.location.area} area.`
+          : result.location.inServiceArea === false
+            ? 'Location saved. This pin is outside the areas NexG serves today, so customers will not find it on the map yet.'
+            : 'Location saved.',
+    );
     onSaved();
   }
   const value: Location = {
@@ -166,10 +183,35 @@ export function SetupLocationEditor({
                         activities: activities.map((activity) => ({ ...activity, enabled: true })),
                       }}
                     />
-                    <p className="text-sm">
-                      A map pin and service coverage can be added separately. Changing the address
-                      clears an existing pin and zone so they can be confirmed again.
-                    </p>
+                    {needsPin(draft) && (
+                      <div>
+                        <label htmlFor="setup-location-pin" className="block font-bold">
+                          Exact location on the map
+                        </label>
+                        <p className="text-sm">
+                          Riders and customers are sent to this pin, and it decides which area your
+                          shop shows in. Pin your door, not the street.
+                        </p>
+                        <MapPinField
+                          id="setup-location-pin"
+                          value={draft.pin}
+                          disabled={saving}
+                          placeholder="Pin on the map, or paste latitude, longitude"
+                          className="block w-full rounded border p-2"
+                          onChange={(pin) => setDraft((current) => ({ ...current, pin }))}
+                          searchText={draft.address}
+                        />
+                        {draft.pin !== '' && draft.pin === baseline.pin && (
+                          <p className="text-sm font-bold" role="status">
+                            {draft.area
+                              ? `This location is in the ${draft.area} area. Move the pin if it is not on your door.`
+                              : draft.inServiceArea === false
+                                ? 'This pin is outside the areas NexG serves today, so customers will not find it on the map yet.'
+                                : ''}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </>
                 )
               )}

@@ -55,7 +55,11 @@ export default async function StoresPage() {
     .eq('merchant_id', me.id)
     .order('is_primary', { ascending: false })
     .order('name');
-  const branches = (detail as BranchRow[] | null) ?? [];
+  /* The drawer edits the pin, which the view does not carry. */
+  const branches = ((detail as BranchRow[] | null) ?? []).map((b) => {
+    const row = rows.find((r) => r.id === b.id);
+    return { ...b, latitude: row?.latitude ?? null, longitude: row?.longitude ?? null };
+  });
 
   /*
    * Where a new pin starts: their existing main store if they have
