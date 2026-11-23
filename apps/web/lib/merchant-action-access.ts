@@ -27,7 +27,17 @@ export function isMissingWorkspaceSetupRpc(error: { code?: string } | null): boo
 /** Bind object-only RPC arguments to the already authorized current workspace. */
 export async function requireMerchantActionObject(
   client: ReturnType<typeof createClient>,
-  table: 'merchant_branch' | 'featured_booking' | 'merchant_invite' | 'order_rating' | 'dispute',
+  table:
+    | 'merchant_branch'
+    | 'featured_booking'
+    | 'merchant_invite'
+    | 'order_rating'
+    | 'dispute'
+    | 'merchant_promotion'
+    | 'catalogue_item'
+    | 'catalogue_setup_review'
+    | 'merchant_import_batch'
+    | 'vacancy',
   id: string,
   merchantId: string,
 ) {
@@ -39,4 +49,21 @@ export async function requireMerchantActionObject(
     .maybeSingle();
   if (error) throw new MerchantAccessError('The workspace record could not be checked.', 503);
   if (!data) throw new MerchantAccessError('This record is not in your current workspace.', 403);
+}
+
+/** A job application, through the vacancy it answers, must be the current business's. */
+export async function requireMerchantApplicant(
+  client: ReturnType<typeof createClient>,
+  applicationId: string,
+  merchantId: string,
+): Promise<string> {
+  const { data, error } = await client
+    .from('vacancy_application')
+    .select('vacancy_id')
+    .eq('id', applicationId)
+    .maybeSingle();
+  if (error) throw new MerchantAccessError('The workspace record could not be checked.', 503);
+  if (!data) throw new MerchantAccessError('This record is not in your current workspace.', 403);
+  await requireMerchantActionObject(client, 'vacancy', data.vacancy_id, merchantId);
+  return data.vacancy_id;
 }

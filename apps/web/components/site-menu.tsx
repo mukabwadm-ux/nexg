@@ -21,6 +21,7 @@ import * as React from 'react';
 import { DEFAULT_LOCALE, translator, type Locale } from '@/lib/i18n/dictionaries';
 
 import { Logo } from './logo';
+import { CurrencyPill, LanguagePill } from './preferences/preference-selects';
 
 /**
  * The menu from the `MenuOpen` artboard.
@@ -318,21 +319,30 @@ export function SiteMenu({
             </div>
 
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="bg-surface text-ink flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-bold">
-                <svg viewBox="0 0 24 24" className="text-gold h-3.5 w-3.5" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <path
-                    d="M3 12h18M12 3c3 3.5 3 14 0 18-3-4-3-14.5 0-18Z"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                </svg>
-                English
-              </span>
-              <span className="bg-surface text-ink whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-bold">
-                Kenya · KES
-              </span>
+              {/* Dropdowns, the same two as the header's globe (owner, 22 Nov 2026). */}
+              <LanguagePill
+                locale={locale}
+                label={t('prefs.language')}
+                icon={
+                  <svg viewBox="0 0 24 24" className="text-gold h-3.5 w-3.5" aria-hidden="true">
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="9"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    />
+                    <path
+                      d="M3 12h18M12 3c3 3.5 3 14 0 18-3-4-3-14.5 0-18Z"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                }
+              />
+              <CurrencyPill label={t('prefs.currency')} />
 
               <ul className="ml-auto flex items-center gap-1.5 sm:gap-2">
                 {SOCIALS.map((social) => {

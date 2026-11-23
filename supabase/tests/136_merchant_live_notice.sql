@@ -61,8 +61,8 @@ where id = 'a1360000-0000-4000-8000-0000000000c1';
 select results_eq(
   $$select kind, title, body from t_bells order by user_id$$,
   $$values
-    ('merchant.live', 'You are live on NexG', 'Start taking orders from your dashboard Home when you are ready.'),
-    ('merchant.live', 'You are live on NexG', 'Start taking orders from your dashboard Home when you are ready.')$$,
+    ('merchant.live', 'Notice Test is live on NexG', 'Start taking orders from your dashboard Home when you are ready.'),
+    ('merchant.live', 'Notice Test is live on NexG', 'Start taking orders from your dashboard Home when you are ready.')$$,
   'going live rings every member''s bell, saying how to start taking orders (they are off)');
 
 select is(pg_temp.emails('bell_merchant.live'), 0,
@@ -81,7 +81,7 @@ update public.merchant set status = 'live' where id = 'a1360000-0000-4000-8000-0
 
 select results_eq(
   $$select kind, title from t_bells order by user_id$$,
-  $$values ('merchant.resumed', 'You are live on NexG again'), ('merchant.resumed', 'You are live on NexG again')$$,
+  $$values ('merchant.resumed', 'Notice Test is live on NexG again'), ('merchant.resumed', 'Notice Test is live on NexG again')$$,
   'coming back after a pause rings the bell as live again');
 
 select is(pg_temp.emails('bell_merchant.resumed'), 2,

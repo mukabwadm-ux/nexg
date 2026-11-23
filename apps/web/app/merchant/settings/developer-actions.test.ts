@@ -41,6 +41,12 @@ const { createClient, state } = vi.hoisted(() => {
   return { createClient, state };
 });
 vi.mock('@/lib/supabase/server', () => ({ createClient }));
+const guard = vi.hoisted(() =>
+  vi.fn(async (options: { merchantId?: string }) => ({
+    merchantId: options.merchantId,
+  })),
+);
+vi.mock('@/lib/merchant-action-access', () => ({ merchantActionClient: guard }));
 
 import { loadDeveloperAccess, revokeDeveloperKey } from './developer-actions';
 
@@ -119,6 +125,11 @@ beforeEach(() => {
 });
 
 describe('loading developer access for Settings', () => {
+  it('answers only for the current business', async () => {
+    await loadDeveloperAccess(MERCHANT);
+    expect(guard).toHaveBeenCalledWith({ access: 'support', merchantId: MERCHANT });
+  });
+
   it('reads this business’s keys and endpoints, never a key hash', async () => {
     const access = await loadDeveloperAccess(MERCHANT);
     expect(access).toMatchObject({

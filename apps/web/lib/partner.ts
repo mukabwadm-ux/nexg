@@ -8,6 +8,7 @@ import {
   type MerchantWorkspaceAccess,
 } from './merchant-access';
 import { perRequest } from './per-request';
+import { resolveCurrentBusiness } from './current-business';
 import { PORTALS } from '@/lib/auth-portals';
 
 export interface PartnerHome {
@@ -57,9 +58,11 @@ const signedIn = perRequest(async (): Promise<{ user: User | null; home: Partner
   if (auth.error || !auth.data.user)
     return { user: null, home: { kind: 'anonymous', home: '/sign-in' } };
   if (error) throw new Error('Your account could not be loaded. Please retry.');
+  const home = (data as unknown as PartnerHome) ?? { kind: 'anonymous', home: '/sign-in' };
+  // An owner of several businesses works on the one they chose last.
   return {
     user: auth.data.user,
-    home: (data as unknown as PartnerHome) ?? { kind: 'anonymous', home: '/sign-in' },
+    home: await resolveCurrentBusiness(client, auth.data.user.id, home),
   };
 });
 

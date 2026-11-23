@@ -20,6 +20,7 @@ import {
   type Section,
 } from '@/components/merchant/business/model';
 import { BusinessWorkspace } from '@/components/merchant/business/workspace';
+import { ADD_BUSINESS_HREF } from '@/components/merchant/workspace/add-business';
 import { InviteMember, MemberActions } from '@/components/merchant/team-client';
 import { loadApplicationView } from '@/lib/merchant-application-load';
 import { requireMerchant } from '@/lib/partner';
@@ -292,11 +293,26 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
       liveDocuments={evidence?.ok ? evidence : null}
       liveBrand={mayChangeBrand ? { merchantId: me.id } : null}
       liveTools={{
-        profile: record ? (
-          <Link className={manage} href={`/merchants/register?merchantId=${record.merchant_id}`}>
-            Review registration details
-          </Link>
-        ) : undefined,
+        profile:
+          record || !me.isAnonymous ? (
+            <div className="flex flex-wrap gap-4">
+              {record ? (
+                <Link
+                  className={manage}
+                  href={`/merchants/register?merchantId=${record.merchant_id}`}
+                >
+                  Review registration details
+                </Link>
+              ) : null}
+              {/* Another, separate business under this sign-in. A new location of
+                  this one is a branch, under Locations. */}
+              {!me.isAnonymous ? (
+                <Link className={manage} href={ADD_BUSINESS_HREF} prefetch={false}>
+                  Add business
+                </Link>
+              ) : null}
+            </div>
+          ) : undefined,
         activities: (
           <div className="flex flex-wrap gap-4">
             <Link className={manage} href="/merchant/offerings">
