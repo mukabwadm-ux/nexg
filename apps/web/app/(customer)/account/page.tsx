@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { AccountHome } from '@/components/account/account-home';
+import { PhoneConfirm } from '@/components/account/phone-confirm';
 import { MyBookings } from '@/components/booking/my-bookings';
 import {
   MyApplications,
@@ -106,6 +107,12 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
       <main id="main" className="mx-auto max-w-[56rem] px-4 pb-16 pt-8 sm:px-8">
         <p className="text-muted text-[0.75rem] font-bold">{user.email}</p>
         <h1 className="mt-1 text-[1.75rem] font-extrabold tracking-[-0.02em]">My account</h1>
+        <PhoneConfirm
+          confirmed={user.phone && user.phone_confirmed_at ? user.phone : null}
+          suggested={
+            typeof user.user_metadata?.phone === 'string' ? user.user_metadata.phone : null
+          }
+        />
 
         <nav
           className="border-border mt-6 flex gap-6 overflow-x-auto whitespace-nowrap border-b"
