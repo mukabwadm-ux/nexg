@@ -33107,9 +33107,11 @@ export type Database = {
       };
       property: {
         Row: {
+          accepts_test_payments: boolean;
           amenities: string[];
           area: string | null;
           cancellation_policy: string | null;
+          cancellation_terms: Json | null;
           check_in_from: string | null;
           check_out_by: string | null;
           city_id: string | null;
@@ -33137,9 +33139,11 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          accepts_test_payments?: boolean;
           amenities?: string[];
           area?: string | null;
           cancellation_policy?: string | null;
+          cancellation_terms?: Json | null;
           check_in_from?: string | null;
           check_out_by?: string | null;
           city_id?: string | null;
@@ -33166,9 +33170,11 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          accepts_test_payments?: boolean;
           amenities?: string[];
           area?: string | null;
           cancellation_policy?: string | null;
+          cancellation_terms?: Json | null;
           check_in_from?: string | null;
           check_out_by?: string | null;
           city_id?: string | null;
@@ -39263,6 +39269,8 @@ export type Database = {
       };
       stay: {
         Row: {
+          cancellation_fee_kes: number | null;
+          cancellation_terms: Json | null;
           check_in: string;
           check_out: string;
           checked_in_at: string | null;
@@ -39289,6 +39297,7 @@ export type Database = {
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_amount_kes: number | null;
           refund_due_at: string | null;
           refund_note: string | null;
           refund_reference: string | null;
@@ -39301,6 +39310,8 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          cancellation_fee_kes?: number | null;
+          cancellation_terms?: Json | null;
           check_in: string;
           check_out: string;
           checked_in_at?: string | null;
@@ -39327,6 +39338,7 @@ export type Database = {
           qr_link_sent_at?: string | null;
           quote_total_kes?: number | null;
           rate_kes?: number | null;
+          refund_amount_kes?: number | null;
           refund_due_at?: string | null;
           refund_note?: string | null;
           refund_reference?: string | null;
@@ -39338,6 +39350,8 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          cancellation_fee_kes?: number | null;
+          cancellation_terms?: Json | null;
           check_in?: string;
           check_out?: string;
           checked_in_at?: string | null;
@@ -39364,6 +39378,7 @@ export type Database = {
           qr_link_sent_at?: string | null;
           quote_total_kes?: number | null;
           rate_kes?: number | null;
+          refund_amount_kes?: number | null;
           refund_due_at?: string | null;
           refund_note?: string | null;
           refund_reference?: string | null;
@@ -40446,6 +40461,7 @@ export type Database = {
           bed_setup: string | null;
           bedrooms: number | null;
           building: string | null;
+          cancellation_terms: Json | null;
           caretaker_confirmed_at: string | null;
           caretaker_name: string | null;
           caretaker_phone_encrypted: string | null;
@@ -40499,6 +40515,7 @@ export type Database = {
           bed_setup?: string | null;
           bedrooms?: number | null;
           building?: string | null;
+          cancellation_terms?: Json | null;
           caretaker_confirmed_at?: string | null;
           caretaker_name?: string | null;
           caretaker_phone_encrypted?: string | null;
@@ -40551,6 +40568,7 @@ export type Database = {
           bed_setup?: string | null;
           bedrooms?: number | null;
           building?: string | null;
+          cancellation_terms?: Json | null;
           caretaker_confirmed_at?: string | null;
           caretaker_name?: string | null;
           caretaker_phone_encrypted?: string | null;
@@ -59527,6 +59545,8 @@ export type Database = {
       fn_booking_release_stale: { Args: { p_resource_id?: string }; Returns: number };
       fn_build_plan: { Args: { p_plan_id: string }; Returns: undefined };
       fn_buyer_id_ok: { Args: { p: Json }; Returns: boolean };
+      fn_cancellation_policy: { Args: { p_policy: Json }; Returns: Json };
+      fn_cancellation_policy_text: { Args: { p_policy: Json }; Returns: string };
       fn_capability: { Args: { p_key: string }; Returns: Json };
       fn_card_brand: { Args: { p_value: string }; Returns: string };
       fn_cash_guard: { Args: { p_rider_id: string }; Returns: undefined };
@@ -60775,6 +60795,10 @@ export type Database = {
         Returns: undefined;
       };
       fn_stay_occupies: { Args: { p_hold_expires_at: string; p_status: string }; Returns: boolean };
+      fn_stay_refund_pct: {
+        Args: { p_at: string; p_check_in: string; p_policy: Json };
+        Returns: number;
+      };
       fn_stay_release_expired_holds: { Args: { p_unit_id?: string }; Returns: number };
       fn_stay_window: {
         Args: { p_check_in: string; p_check_out: string; p_unit_id: string };
@@ -64188,6 +64212,10 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_host_set_cancellation_policy: {
+        Args: { p_policy: Json; p_property_id: string; p_unit_id: string };
+        Returns: Json;
+      };
       rpc_host_settings_update: {
         Args: { p_host_id: string; p_patch: Json };
         Returns: {
@@ -67044,9 +67072,11 @@ export type Database = {
       rpc_property_photos_set: {
         Args: { p_photos: Json; p_property_id: string };
         Returns: {
+          accepts_test_payments: boolean;
           amenities: string[];
           area: string | null;
           cancellation_policy: string | null;
+          cancellation_terms: Json | null;
           check_in_from: string | null;
           check_out_by: string | null;
           city_id: string | null;
@@ -67082,9 +67112,11 @@ export type Database = {
       rpc_property_set_listed: {
         Args: { p_listed: boolean; p_property_id: string };
         Returns: {
+          accepts_test_payments: boolean;
           amenities: string[];
           area: string | null;
           cancellation_policy: string | null;
+          cancellation_terms: Json | null;
           check_in_from: string | null;
           check_out_by: string | null;
           city_id: string | null;
@@ -67120,9 +67152,11 @@ export type Database = {
       rpc_property_upsert: {
         Args: { p_host_id: string; p_property: Json; p_property_id?: string };
         Returns: {
+          accepts_test_payments: boolean;
           amenities: string[];
           area: string | null;
           cancellation_policy: string | null;
+          cancellation_terms: Json | null;
           check_in_from: string | null;
           check_out_by: string | null;
           city_id: string | null;
@@ -68708,6 +68742,8 @@ export type Database = {
           p_unit_id: string;
         };
         Returns: {
+          cancellation_fee_kes: number | null;
+          cancellation_terms: Json | null;
           check_in: string;
           check_out: string;
           checked_in_at: string | null;
@@ -68734,6 +68770,7 @@ export type Database = {
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_amount_kes: number | null;
           refund_due_at: string | null;
           refund_note: string | null;
           refund_reference: string | null;
@@ -68752,8 +68789,10 @@ export type Database = {
         };
       };
       rpc_stay_cancel: {
-        Args: { p_reason?: string; p_stay_id: string };
+        Args: { p_full_refund?: boolean; p_reason?: string; p_stay_id: string };
         Returns: {
+          cancellation_fee_kes: number | null;
+          cancellation_terms: Json | null;
           check_in: string;
           check_out: string;
           checked_in_at: string | null;
@@ -68780,6 +68819,7 @@ export type Database = {
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_amount_kes: number | null;
           refund_due_at: string | null;
           refund_note: string | null;
           refund_reference: string | null;
@@ -68797,10 +68837,13 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_stay_cancellation_policy: { Args: { p_unit_id: string }; Returns: Json };
       rpc_stay_checkout_status: { Args: { p_stay_id: string }; Returns: Json };
       rpc_stay_confirm: {
         Args: { p_reference?: string; p_stay_id: string };
         Returns: {
+          cancellation_fee_kes: number | null;
+          cancellation_terms: Json | null;
           check_in: string;
           check_out: string;
           checked_in_at: string | null;
@@ -68827,6 +68870,7 @@ export type Database = {
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_amount_kes: number | null;
           refund_due_at: string | null;
           refund_note: string | null;
           refund_reference: string | null;
@@ -68852,6 +68896,8 @@ export type Database = {
       rpc_stay_hold_release: {
         Args: { p_stay_id: string };
         Returns: {
+          cancellation_fee_kes: number | null;
+          cancellation_terms: Json | null;
           check_in: string;
           check_out: string;
           checked_in_at: string | null;
@@ -68878,6 +68924,7 @@ export type Database = {
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_amount_kes: number | null;
           refund_due_at: string | null;
           refund_note: string | null;
           refund_reference: string | null;
@@ -68898,6 +68945,8 @@ export type Database = {
       rpc_stay_host_hold: {
         Args: { p_host_id: string; p_hours: number; p_stay: Json };
         Returns: {
+          cancellation_fee_kes: number | null;
+          cancellation_terms: Json | null;
           check_in: string;
           check_out: string;
           checked_in_at: string | null;
@@ -68924,6 +68973,7 @@ export type Database = {
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_amount_kes: number | null;
           refund_due_at: string | null;
           refund_note: string | null;
           refund_reference: string | null;
@@ -68941,9 +68991,12 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_stay_payment_state: { Args: { p_stay_id: string }; Returns: Json };
       rpc_stay_refund_record: {
         Args: { p_note?: string; p_reference: string; p_stay_id: string };
         Returns: {
+          cancellation_fee_kes: number | null;
+          cancellation_terms: Json | null;
           check_in: string;
           check_out: string;
           checked_in_at: string | null;
@@ -68970,6 +69023,7 @@ export type Database = {
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_amount_kes: number | null;
           refund_due_at: string | null;
           refund_note: string | null;
           refund_reference: string | null;
@@ -68990,6 +69044,7 @@ export type Database = {
       rpc_stay_refunds: {
         Args: { p_show?: string };
         Returns: {
+          cancellation_fee_kes: number;
           check_in: string;
           check_out: string;
           guest_email: string;
@@ -69002,6 +69057,7 @@ export type Database = {
           property: string;
           reason: string;
           refund_due_at: string;
+          refund_kes: number;
           refund_note: string;
           refund_reference: string;
           refunded_at: string;
@@ -69096,6 +69152,8 @@ export type Database = {
       rpc_stay_upsert: {
         Args: { p_host_id: string; p_stay: Json; p_stay_id?: string };
         Returns: {
+          cancellation_fee_kes: number | null;
+          cancellation_terms: Json | null;
           check_in: string;
           check_out: string;
           checked_in_at: string | null;
@@ -69122,6 +69180,7 @@ export type Database = {
           qr_link_sent_at: string | null;
           quote_total_kes: number | null;
           rate_kes: number | null;
+          refund_amount_kes: number | null;
           refund_due_at: string | null;
           refund_note: string | null;
           refund_reference: string | null;
@@ -69281,6 +69340,7 @@ export type Database = {
           bed_setup: string | null;
           bedrooms: number | null;
           building: string | null;
+          cancellation_terms: Json | null;
           caretaker_confirmed_at: string | null;
           caretaker_name: string | null;
           caretaker_phone_encrypted: string | null;
@@ -69347,6 +69407,7 @@ export type Database = {
           bed_setup: string | null;
           bedrooms: number | null;
           building: string | null;
+          cancellation_terms: Json | null;
           caretaker_confirmed_at: string | null;
           caretaker_name: string | null;
           caretaker_phone_encrypted: string | null;
@@ -69408,6 +69469,7 @@ export type Database = {
           bed_setup: string | null;
           bedrooms: number | null;
           building: string | null;
+          cancellation_terms: Json | null;
           caretaker_confirmed_at: string | null;
           caretaker_name: string | null;
           caretaker_phone_encrypted: string | null;
