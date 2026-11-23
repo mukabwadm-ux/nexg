@@ -20,9 +20,9 @@ import { customerApiClient } from '@/lib/supabase/customer-api';
 import { createClient as cookieClient } from '@/lib/supabase/server';
 
 /**
- * The one way to pay for an order, for the website and every app (shared
- * services, payments). The caller signs in with a Supabase bearer token (the
- * apps, guest sessions included) or the website's own session cookie:
+ * The one way to pay, for the website and every app (shared services,
+ * payments). The caller signs in with a Supabase bearer token (the apps, guest
+ * sessions included) or the website's own session cookie:
  *
  *   GET  /api/customer/checkout/orders/{orderId}/payment
  *   POST /api/customer/checkout/orders/{orderId}/payment
@@ -30,20 +30,24 @@ import { createClient as cookieClient } from '@/lib/supabase/server';
  *        {"method":"card", "saveCard"?: true} | {"method":"saved_card", "cardId"}
  *        {"method":"bank_transfer"}
  *
- * Both answer {status: unpaid|pending|failed|paid, reference?, retryAfterSeconds?,
- * url?, test?}. `url` is a page to open: Paystack's checkout for a card, or the
+ * Bookings and stays use the same start and read (lib/booking-payment.ts,
+ * lib/booking/native-stay-checkout.ts), through Paystack only. Both answer
+ * {status: unpaid|pending|failed|paid, reference?, retryAfterSeconds?, url?,
+ * test?}. `url` is a page to open: Paystack's checkout for a card, or the
  * bank's page for a bank transfer. Coming back from it never counts as paid:
  * only the provider's signed callback, or an answer this server fetched, marks
- * the order paid. Which methods are on offer: lib/payment-methods.ts, served at
+ * it paid. Which methods are on offer: lib/payment-methods.ts, served at
  * GET /api/customer/checkout/payment-methods.
  */
 
 const headers = { 'Cache-Control': 'private, no-store' };
 const orderId = z.string().uuid();
+/* payInFull: bookings only, to pay the whole amount instead of the deposit. */
+const extra = { payInFull: z.boolean().optional() };
 const startInput = z.discriminatedUnion('method', [
   /* saveCard: keep the card for next time (accounts only; ignored for a guest). */
-  z.object({ method: z.literal('card'), saveCard: z.boolean().optional() }).strict(),
-  z.object({ method: z.literal('saved_card'), cardId: z.string().uuid() }).strict(),
+  z.object({ method: z.literal('card'), saveCard: z.boolean().optional(), ...extra }).strict(),
+  z.object({ method: z.literal('saved_card'), cardId: z.string().uuid(), ...extra }).strict(),
   z
     .object({
       method: z.enum(['mpesa_stk', 'airtel_money']),
@@ -53,16 +57,19 @@ const startInput = z.discriminatedUnion('method', [
         .max(20)
         .transform((v) => normalisePhone(v))
         .refine((v): v is string => v !== null),
+      ...extra,
     })
     .strict(),
+  /* Orders only. */
   z.object({ method: z.literal('bank_transfer') }).strict(),
 ]);
+export type StartInput = z.infer<typeof startInput>;
 
-type Client = ReturnType<typeof customerApiClient>;
+export type Client = ReturnType<typeof customerApiClient>;
 type RpcResult = { data: unknown; error: { code?: string; message: string } | null };
 type Rpc = (fn: string, args: Record<string, unknown>) => PromiseLike<RpcResult>;
 
-function rpc(client: Client, fn: string, args: Record<string, unknown>) {
+export function rpc(client: Client, fn: string, args: Record<string, unknown> = {}) {
   /* Called through the client so `this` stays bound. These functions are newer
      than the generated types. */
   return (client as unknown as { rpc: Rpc }).rpc(fn, args);
@@ -76,7 +83,7 @@ export interface OrderPaymentView {
   test?: boolean;
 }
 
-interface PaymentState {
+export interface PaymentState {
   status: OrderPaymentView['status'];
   reference?: string;
   attempt_reference?: string;
@@ -94,9 +101,10 @@ type Code =
   | 'NOT_FOUND'
   | 'PAYMENT_UNAVAILABLE'
   | 'PAYMENT_REFUSED'
+  | 'NOTHING_TO_PAY'
   | 'SERVICE_UNAVAILABLE';
 
-function problem(
+export function problem(
   status: number,
   code: Code,
   title: string,
@@ -109,13 +117,13 @@ function problem(
 }
 
 const signIn = () => problem(401, 'AUTH_REQUIRED', 'Sign in, or continue as a guest, to pay.');
-const unavailable = () =>
+export const unavailable = () =>
   problem(503, 'SERVICE_UNAVAILABLE', 'Payment is unavailable right now. Try again shortly.');
 const paymentUnavailable = () =>
   problem(503, 'PAYMENT_UNAVAILABLE', 'Paying in the app is not switched on yet.');
 
 /** A database refusal, in the customer's words where the database gave some. */
-function refused(error: { code?: string; message: string }) {
+export function refused(error: { code?: string; message: string }) {
   if (error.code === '42501') return signIn();
   if (error.code === 'P0001' && /No such order/i.test(error.message)) {
     return problem(404, 'NOT_FOUND', 'No such order.');
@@ -126,13 +134,13 @@ function refused(error: { code?: string; message: string }) {
   return unavailable();
 }
 
-async function signedIn(request: Request) {
+async function signedIn(request: Request): Promise<Session | Response> {
   const header = request.headers.get('authorization');
   const token = /^Bearer ([\w.-]{1,4096})$/i.exec(header ?? '')?.[1];
   /* An app sends its session as a bearer token; the website's own pages send
      their session cookie. */
   if (header && !token) return signIn();
-  const supabase = token ? customerApiClient(token) : cookieClient();
+  const supabase = token ? customerApiClient(token) : (cookieClient() as unknown as Client);
   const {
     data: { user },
     error,
@@ -150,7 +158,7 @@ async function signedIn(request: Request) {
   };
 }
 
-function view(state: PaymentState): OrderPaymentView {
+export function view(state: PaymentState): OrderPaymentView {
   return {
     status: state.status,
     ...(state.reference ? { reference: state.reference } : {}),
@@ -164,8 +172,7 @@ function view(state: PaymentState): OrderPaymentView {
   };
 }
 
-async function readState(supabase: Client, id: string): Promise<PaymentState | Response> {
-  const result = await rpc(supabase, 'rpc_order_payment_state', { p_order_id: id });
+export function stateFrom(result: RpcResult): PaymentState | Response {
   if (result.error) return refused(result.error);
   const state = result.data as PaymentState | null;
   if (!state || !['unpaid', 'pending', 'failed', 'paid'].includes(state.status)) {
@@ -216,16 +223,50 @@ export async function sweepPaystack(
   return { checked };
 }
 
-export async function readOrderPayment(request: Request, rawOrderId: string) {
+/**
+ * The mode this customer pays in. A review account (payment_reviewer, such as
+ * Apple's) pays with the test keys even once NexG is live, so no real money
+ * moves; it can then only pay at the test shops and property.
+ */
+export async function customerMode(supabase: Client): Promise<PaystackMode | null> {
+  const mode = paystackMode();
+  if (mode !== 'live' || !paystackProof('test')) return mode;
+  const reviewer = await rpc(supabase, 'rpc_payment_i_review');
+  return reviewer.data === true ? 'test' : mode;
+}
+
+/**
+ * What is being paid for. `readState` is the customer's view of its latest
+ * payment; `begin` opens or reuses the live payment and says its reference and
+ * amount (or answers with a refusal).
+ */
+export interface PaymentTarget {
+  readState: () => Promise<PaymentState | Response>;
+  begin: (
+    input: StartInput,
+    proof: string,
+  ) => Promise<{ reference: string; amount_cents: number } | Response>;
+  metadata: Record<string, unknown>;
+  /** Runs after any check that may have marked it paid (bookings settle in the engine). */
+  afterPaid?: () => Promise<void>;
+  /** Extra fields for the read answer (a booking says what is due now). */
+  describe?: (state: PaymentState) => Promise<Record<string, unknown>>;
+}
+export type Session = { supabase: Client; email: string | null; name?: string | null };
+
+/** GET: the state, after asking Paystack about a try that is taking long. */
+export async function readPayment(
+  request: Request,
+  target: (s: Session) => Promise<PaymentTarget | Response>,
+) {
   try {
-    const parsedId = orderId.safeParse(rawOrderId);
-    if (!parsedId.success) return problem(404, 'NOT_FOUND', 'No such order.');
     const session = await signedIn(request);
     if (session instanceof Response) return session;
+    const found = await target(session);
+    if (found instanceof Response) return found;
 
-    let state = await readState(session.supabase, parsedId.data);
+    let state = await found.readState();
     if (state instanceof Response) return state;
-
     if (
       state.status === 'pending' &&
       state.attempt_reference &&
@@ -237,10 +278,12 @@ export async function readOrderPayment(request: Request, rawOrderId: string) {
         state.attempt_reference,
         state.is_test ? 'test' : 'live',
       );
-      const again = await readState(session.supabase, parsedId.data);
+      const again = await found.readState();
       if (!(again instanceof Response)) state = again;
     }
-    return Response.json(view(state), { headers });
+    if (state.status === 'paid') await found.afterPaid?.();
+    const more = found.describe ? await found.describe(state) : {};
+    return Response.json({ ...view(state), ...more }, { headers });
   } catch {
     return unavailable();
   }
@@ -272,10 +315,14 @@ function checkoutPage(value: unknown): string | undefined {
   }
 }
 
-export async function startOrderPayment(request: Request, rawOrderId: string) {
+/** POST: start paying, by a prompt, Paystack's card page or a saved card. */
+export async function startPayment(
+  request: Request,
+  target: (s: Session) => Promise<PaymentTarget | Response>,
+  /** An order: also bank transfer, and M-Pesa through Safaricom until Paystack is live. */
+  order?: { id: string },
+) {
   try {
-    const parsedId = orderId.safeParse(rawOrderId);
-    if (!parsedId.success) return problem(404, 'NOT_FOUND', 'No such order.');
     const session = await signedIn(request);
     if (session instanceof Response) return session;
 
@@ -295,25 +342,24 @@ export async function startOrderPayment(request: Request, rawOrderId: string) {
     }
 
     const choice = input.data;
+    const { supabase } = session;
     if (choice.method === 'bank_transfer') {
-      return startBank(request, session, parsedId.data);
+      if (!order) return problem(422, 'INVALID_REQUEST', 'Choose card, M-Pesa or Airtel Money.');
+      return startBank(request, session, order.id);
     }
-    if (choice.method === 'mpesa_stk' && mpesaProvider(paymentSetup()) === 'daraja') {
-      return startDaraja(request, session.supabase, parsedId.data, choice.phone);
+    if (order && choice.method === 'mpesa_stk' && mpesaProvider(paymentSetup()) === 'daraja') {
+      return startDaraja(request, supabase, order.id, choice.phone);
     }
 
-    const mode = paystackMode();
+    const mode = await customerMode(supabase);
     const proof = mode ? paystackProof(mode) : null;
     if (!mode || !proof) return paymentUnavailable();
-    const { supabase } = session;
+    /* The target answers for itself when there is nothing to start (an order already paid). */
+    const found = await target(session);
+    if (found instanceof Response) return found;
 
-    const current = await readState(supabase, parsedId.data);
-    if (current instanceof Response) return current;
-    if (current.status === 'paid') return Response.json(view(current), { headers });
-
-    const begun = await rpc(supabase, 'rpc_payment_begin_order', { p_order_id: parsedId.data });
-    if (begun.error) return refused(begun.error);
-    const payment = begun.data as { reference: string; amount_cents: number };
+    const payment = await found.begin(choice, proof);
+    if (payment instanceof Response) return payment;
 
     const channel =
       choice.method === 'card'
@@ -353,13 +399,13 @@ export async function startOrderPayment(request: Request, rawOrderId: string) {
     }
 
     const email = payerEmail(session.email, payment.reference);
-    const metadata = { order_id: parsedId.data, payment_reference: payment.reference };
+    const metadata = { ...found.metadata, payment_reference: payment.reference };
     const site = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || new URL(request.url).origin).replace(
       /\/+$/,
       '',
     );
     if (channel === 'saved_card') {
-      return chargeSaved(supabase, parsedId.data, payment.reference, attempt, mode, proof);
+      return chargeSaved(supabase, found, metadata, attempt, mode, proof);
     }
 
     const answer =
@@ -426,6 +472,106 @@ export async function startOrderPayment(request: Request, rawOrderId: string) {
 }
 
 /**
+ * A saved card: charged from here, with no page. Paystack's answer is then
+ * checked through verify and the database decides, so the customer usually
+ * sees "paid" straight away. If the bank wants the customer (a code), the
+ * answer carries Paystack's page for that step.
+ */
+async function chargeSaved(
+  supabase: Client,
+  target: PaymentTarget,
+  metadata: Record<string, unknown>,
+  attempt: Attempt,
+  mode: PaystackMode,
+  proof: string,
+) {
+  if (!attempt.authorization_code || !attempt.email) return unavailable();
+  const answer = await chargeSavedCard(mode, {
+    reference: attempt.attempt_reference,
+    amountCents: attempt.amount_cents,
+    email: attempt.email,
+    authorizationCode: attempt.authorization_code,
+    metadata,
+  });
+  if (answer.refused || (answer.ok && answer.data?.status === 'failed')) {
+    await rpc(supabase, 'rpc_payment_paystack_opened', {
+      p_attempt_reference: attempt.attempt_reference,
+      p_access_code: null,
+      p_authorization_url: null,
+      p_failure: answer.message || 'The card was declined.',
+      p_proof: proof,
+    });
+    return problem(409, 'PAYMENT_REFUSED', 'The card was declined. Try another way to pay.');
+  }
+
+  /* Recorded as tried even when Paystack did not answer in time, so the sweep asks later. */
+  const opened = await rpc(supabase, 'rpc_payment_paystack_opened', {
+    p_attempt_reference: attempt.attempt_reference,
+    p_access_code: null,
+    p_authorization_url: null,
+    p_failure: null,
+    p_proof: proof,
+  });
+  if (opened.error) return refused(opened.error);
+
+  if (answer.ok) await checkWithPaystack(supabase, attempt.attempt_reference, mode);
+  const state = await target.readState();
+  if (state instanceof Response) return state;
+  if (state.status === 'paid') await target.afterPaid?.();
+  const page =
+    state.status === 'pending' ? checkoutPage(answer.data?.authorization_url) : undefined;
+  return Response.json(
+    { ...view(state), ...(page ? { url: page } : {}) } satisfies OrderPaymentView,
+    { headers },
+  );
+}
+
+// ───────────────────────────────────────────────────────────────── orders
+
+function orderTarget(rawOrderId: string) {
+  return async ({ supabase }: Session): Promise<PaymentTarget | Response> => {
+    const parsed = orderId.safeParse(rawOrderId);
+    if (!parsed.success) return problem(404, 'NOT_FOUND', 'No such order.');
+    const id = parsed.data;
+    return {
+      readState: async () =>
+        stateFrom(await rpc(supabase, 'rpc_order_payment_state', { p_order_id: id })),
+      begin: async () => {
+        const begun = await rpc(supabase, 'rpc_payment_begin_order', { p_order_id: id });
+        if (begun.error) return refused(begun.error);
+        return begun.data as { reference: string; amount_cents: number };
+      },
+      metadata: { order_id: id },
+    };
+  };
+}
+
+export function readOrderPayment(request: Request, rawOrderId: string) {
+  if (!orderId.safeParse(rawOrderId).success)
+    return Promise.resolve(problem(404, 'NOT_FOUND', 'No such order.'));
+  return readPayment(request, orderTarget(rawOrderId));
+}
+
+export async function startOrderPayment(request: Request, rawOrderId: string) {
+  if (!orderId.safeParse(rawOrderId).success) return problem(404, 'NOT_FOUND', 'No such order.');
+  /* An order already paid answers paid without starting anything. */
+  return startPayment(
+    request,
+    async (session) => {
+      const target = await orderTarget(rawOrderId)(session);
+      if (target instanceof Response) return target;
+      const current = await target.readState();
+      if (!(current instanceof Response) && current.status === 'paid')
+        return Response.json(view(current), { headers });
+      return target;
+    },
+    { id: rawOrderId },
+  );
+}
+
+// ─────────────────────────────────────────── M-Pesa by Safaricom, and the bank
+
+/**
  * M-Pesa straight to Safaricom (Daraja), while Paystack is not live. The same
  * steps the website's own prompt route took: the amount comes from the
  * database, a second prompt waits a minute, and every prompt is recorded, so
@@ -485,18 +631,14 @@ async function startDaraja(request: Request, supabase: Client, id: string, phone
 }
 
 /** A bank transfer: the bank's page, where the customer approves it. The bank's signed event marks it paid. */
-async function startBank(
-  request: Request,
-  session: { supabase: Client; email: string | null; name: string | null },
-  id: string,
-) {
+async function startBank(request: Request, session: Session, id: string) {
   const origin =
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, '') ?? new URL(request.url).origin;
   const result = await startBankPayment(session.supabase, {
     orderId: id,
     origin,
     email: session.email,
-    name: session.name,
+    name: session.name ?? null,
   });
   if (!result.ok) {
     const extra = result.reference ? { reference: result.reference } : {};
@@ -519,60 +661,6 @@ async function startBank(
         ? { url: result.authorization_url }
         : {}),
     } satisfies OrderPaymentView,
-    { headers },
-  );
-}
-
-/**
- * A saved card: charged from here, with no page. Paystack's answer is then
- * checked through verify and the database decides, so the customer usually
- * sees "paid" straight away. If the bank wants the customer (a code), the
- * answer carries Paystack's page for that step.
- */
-async function chargeSaved(
-  supabase: Client,
-  id: string,
-  reference: string,
-  attempt: Attempt,
-  mode: PaystackMode,
-  proof: string,
-) {
-  if (!attempt.authorization_code || !attempt.email) return unavailable();
-  const answer = await chargeSavedCard(mode, {
-    reference: attempt.attempt_reference,
-    amountCents: attempt.amount_cents,
-    email: attempt.email,
-    authorizationCode: attempt.authorization_code,
-    metadata: { order_id: id, payment_reference: reference },
-  });
-  if (answer.refused || (answer.ok && answer.data?.status === 'failed')) {
-    await rpc(supabase, 'rpc_payment_paystack_opened', {
-      p_attempt_reference: attempt.attempt_reference,
-      p_access_code: null,
-      p_authorization_url: null,
-      p_failure: answer.message || 'The card was declined.',
-      p_proof: proof,
-    });
-    return problem(409, 'PAYMENT_REFUSED', 'The card was declined. Try another way to pay.');
-  }
-
-  /* Recorded as tried even when Paystack did not answer in time, so the sweep asks later. */
-  const opened = await rpc(supabase, 'rpc_payment_paystack_opened', {
-    p_attempt_reference: attempt.attempt_reference,
-    p_access_code: null,
-    p_authorization_url: null,
-    p_failure: null,
-    p_proof: proof,
-  });
-  if (opened.error) return refused(opened.error);
-
-  if (answer.ok) await checkWithPaystack(supabase, attempt.attempt_reference, mode);
-  const state = await readState(supabase, id);
-  if (state instanceof Response) return state;
-  const page =
-    state.status === 'pending' ? checkoutPage(answer.data?.authorization_url) : undefined;
-  return Response.json(
-    { ...view(state), ...(page ? { url: page } : {}) } satisfies OrderPaymentView,
     { headers },
   );
 }

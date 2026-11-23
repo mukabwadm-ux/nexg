@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { callbackOrigin, callbackSecretValid, registerPaybillUrls } from '@/lib/daraja';
 import { settleDuePrompts } from '@/lib/mpesa-prompt';
 import { sendQueuedPayouts } from '@/lib/mpesa-payout';
+import { settleBookings } from '@/lib/booking-payment';
 import { sweepPaystack } from '@/lib/order-payment';
 import { sweepSignatureValid } from '@/lib/paystack';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -31,10 +32,11 @@ export async function POST(request: Request) {
     if (!sweepSignatureValid(paystackSweep)) {
       return NextResponse.json({ ok: false, message: 'Not allowed.' }, { status: 401 });
     }
-    const paystack = await sweepPaystack(
-      createPublicClient() as unknown as Parameters<typeof sweepPaystack>[0],
-    );
-    return NextResponse.json({ ok: true, paystack });
+    const client = createPublicClient() as unknown as Parameters<typeof sweepPaystack>[0];
+    const paystack = await sweepPaystack(client);
+    /* Paid bookings are then settled in the booking engine. */
+    const bookings = await settleBookings(client);
+    return NextResponse.json({ ok: true, paystack, bookings });
   }
 
   if (!callbackSecretValid(request.headers.get('x-payments-secret'))) {

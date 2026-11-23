@@ -5,6 +5,7 @@ const stub = vi.hoisted(() => ({
   rpc: vi.fn(),
 }));
 
+vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/customer-api', () => ({
   customerApiClient: () => ({ auth: { getUser: stub.getUser }, rpc: stub.rpc }),
 }));
@@ -119,21 +120,70 @@ describe('native stay checkout routes', () => {
     expect(stub.rpc).toHaveBeenCalledWith('rpc_native_stay_status', { p_operation_id: quoteId });
   });
 
-  it('keeps payment closed until it is switched on, without touching the hold', async () => {
+  it('keeps payment closed until Paystack is switched on, without touching the hold', async () => {
+    vi.stubEnv('PAYSTACK_TEST_SECRET_KEY', '');
     stub.rpc.mockResolvedValue({ data: hold, error: null });
     const response = await stayPayment(
-      request({ method: 'mpesa_stk', phone: '0712000000' }),
+      request({ method: 'mpesa_stk', phone: '+254712000000' }),
       quoteId,
     );
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({ code: 'PAYMENT_UNAVAILABLE' });
-    expect(stub.rpc.mock.calls.map(([name]) => name)).toEqual(['rpc_native_stay_status']);
-    stub.rpc.mockResolvedValue({
-      data: { ...hold, status: 'booked', paymentStatus: 'paid' },
+    expect(stub.rpc).not.toHaveBeenCalled();
+    vi.unstubAllEnvs();
+  });
+
+  it('pays a held stay through Paystack, for the total the backend holds', async () => {
+    vi.stubEnv('PAYSTACK_TEST_SECRET_KEY', 'sk_test_ci_only_0123456789');
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://www.nexgapp.com');
+    stub.rpc.mockImplementation(async (fn: string) => {
+      if (fn === 'rpc_native_stay_status') return { data: hold, error: null };
+      if (fn === 'rpc_payment_begin_stay')
+        return { data: { reference: 'NXP-S', amount_cents: 1400000 }, error: null };
+      if (fn === 'rpc_payment_paystack_attempt')
+        return {
+          data: {
+            attempt_reference: 'NXP-S-1',
+            channel: 'card',
+            amount_cents: 1400000,
+            is_test: true,
+            reused: false,
+          },
+          error: null,
+        };
+      return { data: { ok: true }, error: null };
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            status: true,
+            data: { authorization_url: 'https://checkout.paystack.com/s1', access_code: 's1' },
+          }),
+        ),
+      ),
+    );
+    const response = await stayPayment(request({ method: 'card' }), quoteId);
+    expect(await response.json()).toEqual({
+      status: 'pending',
+      reference: 'NXP-S',
+      url: 'https://checkout.paystack.com/s1',
+      test: true,
+    });
+    expect(stub.rpc).toHaveBeenCalledWith('rpc_payment_begin_stay', { p_stay_id: stayId });
+
+    // Already paid: says so, starts nothing.
+    stub.rpc.mockReset().mockResolvedValue({
+      data: { ...hold, status: 'booked', paymentStatus: 'paid', reference: 'NXP-S' },
       error: null,
     });
-    expect(await (await stayPayment(request({}), quoteId)).json()).toMatchObject({
-      paymentStatus: 'paid',
+    expect(await (await stayPayment(request({ method: 'card' }), quoteId)).json()).toEqual({
+      status: 'paid',
+      reference: 'NXP-S',
     });
+    expect(stub.rpc).toHaveBeenCalledTimes(1);
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
   });
 });

@@ -1,5 +1,7 @@
 import { Card } from '@nexg/ui';
 
+import { PaystackRefundButton } from '@/components/refunds/paystack-refund-button';
+
 import { RecordRefund } from './record-refund';
 import { Chip, DASH, EmptyRow, kes, Pill, Tile, when } from './shared';
 
@@ -22,7 +24,14 @@ export interface StayRefundRow {
   refund_reference: string | null;
   refund_note: string | null;
   refunded_by: string | null;
+  /** What to send back under the stay's cancellation policy (20270222000300). */
+  refund_kes: number | null;
+  /** What the policy keeps, the host's less NexG's commission. */
+  cancellation_fee_kes: number | null;
 }
+
+/** What goes back to the guest: the policy's refund, or the whole payment. */
+const toRefund = (r: StayRefundRow) => r.refund_kes ?? r.paid_kes;
 
 const REASON: Record<StayRefundRow['reason'], string> = {
   late_payment: 'Paid after the dates were taken',
@@ -54,7 +63,7 @@ export function RefundsTab({
   const due = rows.filter((r) => !r.refunded_at);
   const refunded = rows.filter((r) => r.refunded_at);
   const visible = filter === 'refunded' ? refunded : filter === 'all' ? rows : due;
-  const owed = due.reduce((sum, r) => sum + (r.paid_kes ?? 0), 0);
+  const owed = due.reduce((sum, r) => sum + (toRefund(r) ?? 0), 0);
   const oldest = due.length
     ? Math.max(...due.map((r) => Date.now() - Date.parse(r.refund_due_at)))
     : 0;
@@ -127,7 +136,14 @@ export function RefundsTab({
                     {REASON[r.reason] ?? r.reason}
                   </Pill>
                 </td>
-                <td className="px-4 py-3 text-[0.8125rem] font-extrabold">{kes(r.paid_kes)}</td>
+                <td className="px-4 py-3 text-[0.8125rem] font-extrabold">
+                  {kes(toRefund(r))}
+                  {r.cancellation_fee_kes ? (
+                    <p className="text-muted mt-0.5 text-[0.6875rem] font-semibold">
+                      of {kes(r.paid_kes)} paid; {kes(r.cancellation_fee_kes)} kept by the policy
+                    </p>
+                  ) : null}
+                </td>
                 <td className="text-muted px-4 py-3 text-[0.6875rem] font-semibold">
                   <p className="text-ink font-extrabold">{r.mpesa_receipt ?? DASH}</p>
                   <p className="mt-0.5">{r.payer_phone ?? DASH}</p>
@@ -149,7 +165,14 @@ export function RefundsTab({
                       {r.refund_note && <p className="text-muted mt-0.5">{r.refund_note}</p>}
                     </div>
                   ) : canRecord ? (
-                    <RecordRefund stayId={r.stay_id} amount={kes(r.paid_kes)} />
+                    <div className="space-y-2">
+                      <PaystackRefundButton
+                        kind="stay"
+                        targetId={r.stay_id}
+                        amount={kes(toRefund(r))}
+                      />
+                      <RecordRefund stayId={r.stay_id} amount={kes(toRefund(r))} />
+                    </div>
                   ) : (
                     <span className="text-muted text-[0.6875rem] font-semibold">Due</span>
                   )}
