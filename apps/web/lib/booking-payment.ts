@@ -178,7 +178,7 @@ function bookingTarget(rawId: string) {
       begin: async (input, proof) => {
         const booking = await engineBooking(row);
         if (!booking) return unavailable();
-        const step = stepFor(booking, input.payInFull === true);
+        const step = stepFor(booking, 'payInFull' in input && input.payInFull === true);
         if (step === 'nothing') return problem(409, 'NOTHING_TO_PAY', 'This booking is paid.');
         if (step === 'closed')
           return problem(409, 'NOTHING_TO_PAY', 'This booking can no longer be paid. Book again.');
