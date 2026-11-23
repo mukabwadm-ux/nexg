@@ -28,7 +28,11 @@ import {
 } from '@/components/merchant/offerings/csv';
 import { profiles } from '@/components/merchant/offerings/model';
 import { isCatalogueFormat, toImportCsv, type CatalogueFormat } from '@/lib/catalogue-formats';
-import { isMissingWorkspaceSetupRpc, merchantActionClient } from '@/lib/merchant-action-access';
+import {
+  isMissingWorkspaceSetupRpc,
+  merchantActionClient,
+  requireMerchantActionObject,
+} from '@/lib/merchant-action-access';
 import { merchantCatalogueRows } from '@/lib/merchant-catalogue-rows';
 
 /** A planned row as the preview shows it: everything but the saved offering. */
@@ -378,7 +382,8 @@ export async function listImportBatches(): Promise<ImportBatch[]> {
 
 export async function undoImportBatch(batchId: string): Promise<{ ok: boolean; message: string }> {
   try {
-    const { client } = await merchantActionClient({ access: 'workspace-setup' });
+    const { client, merchantId } = await merchantActionClient({ access: 'workspace-setup' });
+    await requireMerchantActionObject(client, 'merchant_import_batch', batchId, merchantId);
     const { data, error } = await client.rpc('rpc_merchant_import_batch_undo', {
       p_batch_id: batchId,
     });

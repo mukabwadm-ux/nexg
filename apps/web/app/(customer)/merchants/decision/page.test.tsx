@@ -21,6 +21,7 @@ let state: {
   accessError: unknown;
   requests: { name: string; args: unknown }[];
   reads: string[];
+  memberships: unknown[];
 };
 beforeEach(() => {
   state = {
@@ -40,6 +41,7 @@ beforeEach(() => {
     accessError: null,
     requests: [],
     reads: [],
+    memberships: [],
   };
   mocks.createClient.mockImplementation(() => ({
     auth: { getUser: async () => ({ data: { user: state.user }, error: state.authError }) },
@@ -50,6 +52,13 @@ beforeEach(() => {
         : { data: state.access, error: state.accessError };
     },
     from: (table: string) => {
+      // The list of this account's other businesses is the one read allowed.
+      if (table === 'merchant_user')
+        return {
+          select: () => ({
+            eq: async () => ({ data: state.memberships, error: null }),
+          }),
+        };
       state.reads.push(table);
       throw new Error('No section read is allowed.');
     },
@@ -69,6 +78,50 @@ const expectRecovery = (html: string) => {
 };
 
 describe('merchant application decision recovery', () => {
+  it("offers a way back to the owner's other businesses, never the current one", async () => {
+    const otherId = 'a1b2c3d4-0000-4000-8000-000000000001';
+    state.memberships = [
+      {
+        role: 'owner',
+        merchant: {
+          id: merchantId,
+          trading_name: 'Private company',
+          legal_name: null,
+          status: 'under_review',
+          submitted_at: '2026-11-01',
+        },
+      },
+      {
+        role: 'owner',
+        merchant: {
+          id: otherId,
+          trading_name: 'Mama Grill',
+          legal_name: null,
+          status: 'live',
+          submitted_at: '2026-01-01',
+        },
+      },
+      {
+        role: 'cashier',
+        merchant: {
+          id: 'a1b2c3d4-0000-4000-8000-000000000002',
+          trading_name: 'Not mine to open',
+          legal_name: null,
+          status: 'live',
+          submitted_at: null,
+        },
+      },
+    ];
+    const html = await render();
+    expect(html).toContain('Your other businesses');
+    expect(html).toContain('Mama Grill');
+    expect(html).toContain('Live');
+    expect(html).toContain(otherId);
+    expect(html).not.toContain('Not mine to open');
+    expect(html).not.toContain('Private company');
+    expect(html).not.toContain(merchantId);
+  });
+
   it('shows a current rejected decision with recovery and no workspace grant or private fields', async () => {
     const html = await render();
     expect(html).toContain('Application not approved');

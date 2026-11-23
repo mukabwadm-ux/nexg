@@ -177,13 +177,14 @@ export class CatalogBridge {
       const area = areaFromAddress(row.branch_address);
       const open = openState(row, now);
       const media = this.media.merchants.get(row.id);
+      const heroImage = media?.heroImage ?? storeBanner(row.cover_photo_path);
       const merchant: BridgeMerchant = {
         id: row.id, name: row.trading_name,
         ...(map ? { categoryId: map.demoCategoryId, category: map.demoCategoryLabel, subcategoryId: map.demoSubcategoryId, subcategory: map.demoLabel } : {}),
         ...(area ? { nairobiArea: area } : {}), ...(row.branch_address ? { address: row.branch_address } : {}),
         ...(row.branch_latitude !== null && row.branch_longitude !== null ? { latitude: row.branch_latitude, longitude: row.branch_longitude } : {}),
         ...(open !== undefined ? { isOpen: open } : {}),
-        ...((media?.heroImage ?? storeBanner(row.cover_photo_path)) ? { heroImage: media?.heroImage ?? storeBanner(row.cover_photo_path) } : {}),
+        ...(heroImage ? { heroImage } : {}),
         ...(media?.logoUrl ? { logoUrl: media.logoUrl } : {}),
         items: (items.get(row.id) ?? []).sort((left, right) => (left.sort ?? 0) - (right.sort ?? 0) || left.id.localeCompare(right.id)).slice(0, DETAIL_ITEMS).map(item => {
           const image = this.media.items.get(item.id) ?? itemPhoto(item.photo_path);

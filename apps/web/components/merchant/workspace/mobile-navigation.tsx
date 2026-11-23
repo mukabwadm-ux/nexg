@@ -59,10 +59,15 @@ export function WorkspaceMobileNavigation({
               if (event.key === 'Escape') setOpen(false);
             }}
             onClick={(event) => {
-              if (
-                (event.target as HTMLElement).closest('a, button[data-workspace-navigation-action]')
-              )
-                setOpen(false);
+              const target = (event.target as HTMLElement).closest(
+                'a, button[data-workspace-navigation-action]',
+              );
+              if (!target) return;
+              // A form button (Switch business) must submit before the drawer
+              // unmounts its form, so close it once the click has finished.
+              if (target instanceof HTMLButtonElement && target.type === 'submit')
+                setTimeout(() => setOpen(false), 0);
+              else setOpen(false);
             }}
           >
             {children}
