@@ -4876,6 +4876,192 @@ export type Database = {
           },
         ];
       };
+      basket: {
+        Row: { merchant_id: string; updated_at: string; user_id: string };
+        ComputedFields: never;
+        Insert: { merchant_id: string; updated_at?: string; user_id: string };
+        Update: { merchant_id?: string; updated_at?: string; user_id?: string };
+        Relationships: [
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      basket_line: {
+        Row: {
+          catalogue_item_id: string;
+          id: string;
+          message: string | null;
+          note: string | null;
+          options: Json | null;
+          position: number;
+          quantity: number;
+          user_id: string;
+          variant_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          catalogue_item_id: string;
+          id?: string;
+          message?: string | null;
+          note?: string | null;
+          options?: Json | null;
+          position: number;
+          quantity: number;
+          user_id: string;
+          variant_id?: string | null;
+        };
+        Update: {
+          catalogue_item_id?: string;
+          id?: string;
+          message?: string | null;
+          note?: string | null;
+          options?: Json | null;
+          position?: number;
+          quantity?: number;
+          user_id?: string;
+          variant_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'basket_line_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_line_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_menu_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_line_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'basket_line_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'catalogue_variant_public';
+            referencedColumns: ['item_id'];
+          },
+          {
+            foreignKeyName: 'basket_line_catalogue_item_id_fkey';
+            columns: ['catalogue_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'featured_live_v';
+            referencedColumns: ['pinned_item_id'];
+          },
+          {
+            foreignKeyName: 'basket_line_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'basket';
+            referencedColumns: ['user_id'];
+          },
+        ];
+      };
       bookable_resource: {
         Row: {
           active: boolean;
@@ -59420,6 +59606,8 @@ export type Database = {
           title: string;
         }[];
       };
+      fn_basket_clean_lines: { Args: { p_lines: Json; p_merchant_id: string }; Returns: Json };
+      fn_basket_read: { Args: { p_user_id: string }; Returns: Json };
       fn_block_time: {
         Args: {
           p_earliest: string;
@@ -61237,6 +61425,10 @@ export type Database = {
       };
       rpc_audit_sign_out_device: { Args: { p_device_id: string; p_reason: string }; Returns: Json };
       rpc_audit_verify_chain: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_basket_clear: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_basket_get: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_basket_merge: { Args: { p_lines: Json; p_merchant_id: string }; Returns: Json };
+      rpc_basket_put: { Args: { p_lines: Json; p_merchant_id: string }; Returns: Json };
       rpc_best_sellers: {
         Args: { p_city_slug?: string; p_limit?: number };
         Returns: {

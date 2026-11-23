@@ -1,6 +1,36 @@
-# Shared services handoff, 12 November 2026 (updated 18 November)
+# Shared services handoff, 12 November 2026 (updated 22 November)
 
 > **Rider sign-in belongs to another developer.** Do not design or change it, and check with them before any rider work.
+
+## Where it stands on 22 November
+
+The owner, 22 Nov 2026: "proceed, as long as they are using one shared backend for everything, even on the app it should be functional once all this is fixed." Asked whether the later decisions on payments and bookings replace D1 to D3, the owner kept them.
+
+**Decided:**
+
+| #   | Outcome                                                                                                                                                                                                                 |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | **Bookings stay in the booking engine.** Apps book through the website's bridge (`20270116000300_app_bookings`), paid by Paystack with deposits (#190). Supabase `customer_booking` is not the booking system for apps. |
+| D2  | **One payment route for every client:** `GET`/`POST /api/customer/checkout/orders/{orderId}/payment` on the website (#178). Not an Edge Function.                                                                       |
+| D3  | **Paystack:** card, M-Pesa and Airtel through one company account (owner, 21 Nov), plus bank transfer and cash on delivery where the shop allows it. Test mode until the owner switches it live.                        |
+| D4  | A basket saved to the account; a signed-out basket merges in at sign-in. Being built here.                                                                                                                              |
+| D5  | As recommended below.                                                                                                                                                                                                   |
+| D6  | One Supabase sign-in, as recommended below. Rider sign-in is not touched.                                                                                                                                               |
+
+Also decided since 12 Nov: guests may order delivery on a temporary (anonymous) session (18 Nov, `20270109000100_guest_orders`); bookings and stay holds still need an account. Order together (group baskets) is `20270130009000`.
+
+**The open PRs below were rebuilt on `main` by langs4u and closed:**
+
+| PR                             | Now on `main`                                                                                                                                                 |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #132 customer account controls | `20270116000200_customer_account_deletion` (the business-account blocker covers riders, hosts and hotel staff) and `20270116000700_customer_account_controls` |
+| #148 native stay checkout      | `20270123000100_native_stay_checkout`, `docs/booking-engine/native-stay-checkout.md`                                                                          |
+| #150 rider courier sharing     | `20270109000200_maps_rider_sharing`                                                                                                                           |
+| #151 native push (D8)          | `20270120000100_native_push`, `docs/handoff/sessions/2026-11-19-native-push.md`                                                                               |
+
+**The phone apps' repositories** are not reachable from the shared-services machine, so each shared piece ships as the backend plus a written contract in `docs/shared-services/` for the app teams.
+
+**Order of the remaining work:** D4 basket, D5 order steps, the payments contract, D6 sign-in, then R3, R8 and R9.
 
 For whoever continues the shared-services work. The owner sends the private parts separately:
 
@@ -36,15 +66,15 @@ Also fixed while merging on 15 Nov:
 - **Holidays.** `fn_merchant_open_for_orders` now counts a public-holiday answer as hours. Before, a shop with no weekly hours that closed for a holiday still took orders while its store page showed it closed. Test 84 covers it.
 - **Discovery's contract copy.** `discovery/src/providers/engineContract` matches the engine's contract again, with the new optional viewport fields.
 
-| Migration        | Change                                                                                                                                                                                                                   |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `20261223000100` | Drops `rpc_payment_authorised` and its `wiring_anon_allow` row. Nothing has called it since Paystack was removed.                                                                                                        |
-| `20261223000200` | `rpc_order_place_web` no longer attaches an existing customer record by phone. A number already on file is refused (hint `phone_on_file`), and support links it.                                                        |
-| `20261223000300` | A privacy request links only the signed-in requester's own record. Staff verification links by exact phone or account email.                                                                                             |
-| `20261223000400` | `fn_web_order_quote` applies the liquor-licence rule. It also refuses orders while a shop is closed by its hours or has closed early.                                                                                    |
+| Migration        | Change                                                                                                                                                                                                                                               |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20261223000100` | Drops `rpc_payment_authorised` and its `wiring_anon_allow` row. Nothing has called it since Paystack was removed.                                                                                                                                    |
+| `20261223000200` | `rpc_order_place_web` no longer attaches an existing customer record by phone. A number already on file is refused (hint `phone_on_file`), and support links it.                                                                                     |
+| `20261223000300` | A privacy request links only the signed-in requester's own record. Staff verification links by exact phone or account email.                                                                                                                         |
+| `20261223000400` | `fn_web_order_quote` applies the liquor-licence rule. It also refuses orders while a shop is closed by its hours or has closed early.                                                                                                                |
 | `20261223000500` | Ordering, booking and stay holds need a real account, not an anonymous session. Pending bookings are released after 24 hours, or at their start time (`fn_booking_release_stale`, pg_cron every 5 minutes, setting `booking.pending_release_hours`). |
-| `20261223000600` | `dispatch.rpc_job_start` needs live ops in the order's city, or the service role. `rpc_offer_respond` locks the job first and answers `already_taken`, `job_closed` or `duplicate`. Bar orders no longer fail dispatch. |
-| `20261223000700` | `authz.is_host_member` now means a member with access to every unit. Staff limited to some units are checked per unit.                                                                                                   |
+| `20261223000600` | `dispatch.rpc_job_start` needs live ops in the order's city, or the service role. `rpc_offer_respond` locks the job first and answers `already_taken`, `job_closed` or `duplicate`. Bar orders no longer fail dispatch.                              |
+| `20261223000700` | `authz.is_host_member` now means a member with access to every unit. Staff limited to some units are checked per unit.                                                                                                                               |
 
 Also in the PR:
 
@@ -83,23 +113,23 @@ Checked again on 18 Nov:
 
 These turned up while checking the shared services. All four are on `main` and in production.
 
-| Problem | Fix |
-| --- | --- |
-| Saved delivery places never reached a signed-in customer's account. The website's location actions used the signed-out client, so `rpc_place_list`, `rpc_place_confirm` and `rpc_place_delete` were refused for everyone. | The actions use the visitor's session and skip the call when nobody is signed in. "Just this once" pins stay off the account (`f53c884`). Saving still needs a manual test with a real account. |
-| The nightly document-expiry job failed every night. Pausing a live merchant that was taking orders broke `merchant_not_live_takes_no_orders`, and the job's single transaction then expired nothing. | `fn_partner_recompute_status` turns orders and the concierge pick off when it pauses a merchant, and `fn_expire_documents` expires each document in its own subtransaction (`20270101000200`). The first successful run was on 17 Nov. |
-| `rpc_merchant_membership_update` failed on every call, because it wrote text into the `merchant_user_role` enum. | The role is validated and cast, only an owner can change the team, and a blank role no longer trips the last-owner check. `cashier` is now a role (`20270101000300` and `0400`). |
-| The 21-category master list dropped the Adult age check on four specialties and stranded merchants on retired subcategories. | `20270102120100` and `20270102120200`. |
+| Problem                                                                                                                                                                                                                   | Fix                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Saved delivery places never reached a signed-in customer's account. The website's location actions used the signed-out client, so `rpc_place_list`, `rpc_place_confirm` and `rpc_place_delete` were refused for everyone. | The actions use the visitor's session and skip the call when nobody is signed in. "Just this once" pins stay off the account (`f53c884`). Saving still needs a manual test with a real account.                                        |
+| The nightly document-expiry job failed every night. Pausing a live merchant that was taking orders broke `merchant_not_live_takes_no_orders`, and the job's single transaction then expired nothing.                      | `fn_partner_recompute_status` turns orders and the concierge pick off when it pauses a merchant, and `fn_expire_documents` expires each document in its own subtransaction (`20270101000200`). The first successful run was on 17 Nov. |
+| `rpc_merchant_membership_update` failed on every call, because it wrote text into the `merchant_user_role` enum.                                                                                                          | The role is validated and cast, only an owner can change the team, and a blank role no longer trips the last-owner check. `cashier` is now a role (`20270101000300` and `0400`).                                                       |
+| The 21-category master list dropped the Adult age check on four specialties and stranded merchants on retired subcategories.                                                                                              | `20270102120100` and `20270102120200`.                                                                                                                                                                                                 |
 
 ## Decisions waiting for the owner
 
-| #   | Decision                                                                                                                 | Recommendation                                                                                                                                                         |
-| --- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D1  | One booking system: Supabase bookings, or the separate booking engine (`apps/booking-engine`). Today they share nothing. | Supabase bookings, linked to orders and payments. Retire the engine, or make it a screen over Supabase.                                                                |
-| D2  | How apps start a payment. Today only the website's server routes can.                                                    | Supabase Edge Functions: one path for the website and every app.                                                                                                       |
-| D3  | Payment methods                                                                                                          | M-Pesa, bank, and cash on delivery where the shop allows it. No card until a provider exists. One list that every app reads.                                         |
-| D4  | Basket                                                                                                                   | A basket saved to the account. A signed-out basket merges in at sign-in.                                                                                               |
+| #   | Decision                                                                                                                 | Recommendation                                                                                                                                                                                                 |
+| --- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | One booking system: Supabase bookings, or the separate booking engine (`apps/booking-engine`). Today they share nothing. | Supabase bookings, linked to orders and payments. Retire the engine, or make it a screen over Supabase.                                                                                                        |
+| D2  | How apps start a payment. Today only the website's server routes can.                                                    | Supabase Edge Functions: one path for the website and every app.                                                                                                                                               |
+| D3  | Payment methods                                                                                                          | M-Pesa, bank, and cash on delivery where the shop allows it. No card until a provider exists. One list that every app reads.                                                                                   |
+| D4  | Basket                                                                                                                   | A basket saved to the account. A signed-out basket merges in at sign-in.                                                                                                                                       |
 | D5  | Who moves an order through its steps                                                                                     | The merchant accepts or declines, then marks ready. The rider marks picked up, arriving, delivered (with proof) and cash collected. The customer can cancel until the merchant accepts. Staff can do any step. |
-| D6  | One sign-in                                                                                                              | Every app on the one Supabase account, with Google and Apple sign-in and the phone confirmed by SMS code. For rider sign-in, ask its developer first.                  |
+| D6  | One sign-in                                                                                                              | Every app on the one Supabase account, with Google and Apple sign-in and the phone confirmed by SMS code. For rider sign-in, ask its developer first.                                                          |
 
 These are also needed before launch:
 
@@ -186,10 +216,12 @@ What a build needs:
   - Before redefining a function, find its latest body with a case-insensitive search. `20260101017700_every_action_is_accounted_for.sql` uses uppercase `CREATE OR REPLACE`.
   - `create or replace` keeps grants.
 - **The wiring check** (`fn_wiring_check`, test 26) fails CI in two cases:
+
   - an `rpc_*` writes without calling `audit.log`, unless it is in `wiring_audit_exempt`;
   - a SECURITY DEFINER function that writes is executable by anon without a `wiring_anon_allow` row.
 
   Anonymous sessions still count as `authenticated`.
+
 - **Local tests:**
   1. Copy `supabase/` and change `project_id` and every port, so you don't touch anyone else's stack.
   2. Start it without the optional services.
