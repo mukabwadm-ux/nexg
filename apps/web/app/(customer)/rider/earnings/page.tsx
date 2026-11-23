@@ -183,7 +183,7 @@ export default async function RiderEarnings({
         <KpiCard
           icon={<Star />}
           tone="amber"
-          value={average == null ? DASH : kes(average)}
+          value={average == null ? '—' : kes(average)}
           label="Average per job"
           change={average == null ? null : { now: average, before: averageBefore }}
         />
