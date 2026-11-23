@@ -1498,6 +1498,8 @@ td small {
 .record-form {
   display: flex;
   flex-direction: column;
+  /* Fills the dialog under the heading, so the fields scroll and the footer stays put. */
+  flex: 1 1 auto;
   min-height: 0;
 }
 .form-progress {
@@ -1518,8 +1520,15 @@ td small {
   padding: 20px 24px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
   gap: 18px 20px;
   min-height: 0;
+  /* A step with the map pin and the amenity list is taller than most screens. The dialog
+     clips at the screen edge, so the fields scroll here, between the heading and the
+     Back / Next / Save footer, which stay in view. */
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .field {
   display: flex;
@@ -1587,6 +1596,9 @@ td small {
 .record-detail-body {
   padding: 20px 24px;
   min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .detail-grid {
   display: grid;
