@@ -20,7 +20,8 @@ function isOn(pathname: string, href: string): boolean {
 /** Extra words a rider might type for each place in the portal. */
 const SEARCH_WORDS: Record<string, string> = {
   '/rider/jobs': 'jobs deliveries orders trips offers',
-  '/rider/earnings': 'earnings pay payout cashout cash out money statement friday',
+  '/rider/earnings': 'earnings pay money statement friday chart',
+  '/rider/cashout': 'cashout cash out withdraw payout mpesa m-pesa balance',
   '/rider/cash': 'cash on hand deposit remit collected',
   '/rider/receipts': 'receipts',
   '/rider/shifts': 'shifts schedule hours availability',
@@ -29,7 +30,7 @@ const SEARCH_WORDS: Record<string, string> = {
   '/rider/documents': 'documents id licence insurance police clearance upload',
   '/rider/kit': 'kit helmet bag jacket',
   '/rider/incidents': 'sos incident accident safety emergency',
-  '/rider/refer': 'refer referral rewards friend',
+  '/rider/refer': 'refer referral rewards points badges achievements friend',
   '/rider/profile': 'account profile phone mpesa m-pesa payout number motorbike plate zone',
   '/rider/support': 'help support question ticket contact',
 };

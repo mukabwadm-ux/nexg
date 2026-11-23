@@ -588,7 +588,7 @@ export function RiderHomeView({
               {(active
                 ? [
                     { href: '/rider/earnings', label: 'View earnings', icon: <BarChart3 /> },
-                    { href: '/rider/earnings', label: 'Request cashout', icon: <Wallet /> },
+                    { href: '/rider/cashout', label: 'Request cashout', icon: <Wallet /> },
                     { href: '/rider/shifts', label: 'View shifts', icon: <CalendarDays /> },
                     { href: '/rider/profile', label: 'Update profile', icon: <User /> },
                   ]

@@ -11,8 +11,9 @@ import {
   ReceiptText,
   Settings,
   TriangleAlert,
-  UserPlus,
   Wallet,
+  HandCoins,
+  Trophy,
 } from 'lucide-react';
 import * as React from 'react';
 
@@ -68,6 +69,7 @@ export function riderNav({
       badge: active && openJobs > 0 ? openJobs : null,
     },
     { href: '/rider/earnings', label: 'Earnings', icon: i(<Wallet />) },
+    { href: '/rider/cashout', label: 'Cashout', icon: i(<HandCoins />) },
     {
       href: '/rider/cash',
       label: 'Cash',
@@ -103,7 +105,7 @@ export function riderNav({
       label: 'Safety & SOS',
       icon: i(<TriangleAlert />),
     },
-    { href: '/rider/refer', label: 'Refer & rewards', icon: i(<UserPlus />) },
+    { href: '/rider/refer', label: 'Rewards', icon: i(<Trophy />) },
     { href: '/rider/profile', label: 'Account', icon: i(<Settings />) },
     { href: '/rider/support', label: 'Help & support', icon: i(<HelpCircle />) },
   ];

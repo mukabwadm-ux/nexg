@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type FocusEvent, type TransitionEvent } from 'react';
-import { Binoculars, CarFront, ChevronLeft, ChevronRight, ConciergeBell, Crown, Flower2, Package, Pause, Pill, Plane, Play, Shirt, ShoppingBasket, Smartphone,
+import { Binoculars, CarFront, ChevronLeft, ChevronRight, ConciergeBell, Crown, Flower2, Package, PawPrint, Pause, Pill, Plane, Play, Shirt, ShoppingBasket, Smartphone,
   Sparkles, Store, Ticket, Trophy, Truck, UtensilsCrossed, WashingMachine, Wine, type LucideIcon } from 'lucide-react';
 import { homepageFeatures } from '../data/homepageFeatures';
 import './homepage.css';
@@ -32,6 +32,7 @@ const iconByCategory: Record<string, LucideIcon> = {
   'fashion-apparel': Shirt,
   'groceries-essentials': ShoppingBasket,
   marketplace: Store,
+  pets: PawPrint,
   'tech-electronics': Smartphone,
   'flowers-gifts': Flower2,
   'courier-services': Package,

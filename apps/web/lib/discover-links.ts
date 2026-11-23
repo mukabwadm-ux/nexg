@@ -7,7 +7,7 @@
 export const DISCOVER_PATH = '/discover';
 
 /**
- * Supabase category keys to Discovery's category ids: the 21 categories of the master list (owner, 16 Nov 2026),
+ * Supabase category keys to Discovery's category ids: the 22 categories of the master list (owner, 16 Nov 2026; Pets added 23 Nov 2026),
  * the keys it retired (where their merchants moved), and the original merchant_category enum values.
  * `discover-links.test.ts` checks this against Discovery's reviewed subcategory map.
  */
@@ -30,6 +30,7 @@ export const DISCOVERY_CATEGORY: Record<string, string> = {
   fashion_apparel: 'fashion-apparel',
   groceries_essentials: 'groceries-essentials',
   marketplace: 'marketplace',
+  pets: 'pets',
   tech_electronics: 'tech-electronics',
   flowers_gifts: 'flowers-gifts',
   logistics_shipping: 'courier-services',
@@ -40,6 +41,8 @@ export const DISCOVERY_CATEGORY: Record<string, string> = {
   flights: 'travel-tours',
   other: 'marketplace',
   activities_games_sports: 'games-sports',
+  // Subcategory keys the master list moved into a new category: old links land there.
+  pet_supplies: 'pets',
   // Original merchant_category enum values.
   restaurant: 'restaurants-food',
   bar_liquor: 'alcohol-beverages',
