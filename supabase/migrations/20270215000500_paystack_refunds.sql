@@ -182,12 +182,15 @@ declare
   v_id text := nullif(p_data->>'id', '');
   v_ref text := coalesce(nullif(p_data->>'refund_reference', ''), nullif(p_data->>'reference', ''));
 begin
-  select * into x from public.paystack_refund
-   where (v_ref is not null and reference = v_ref)
-      or (v_id is not null and paystack_refund_id = v_id)
-   order by created_at desc limit 1
-   for update;
-  if not found then
+  -- Our own reference decides; Paystack's refund id only when the message
+  -- carries no reference of ours, so one refund's answer never lands on another.
+  if v_ref is not null then
+    select * into x from public.paystack_refund where reference = v_ref for update;
+  elsif v_id is not null then
+    select * into x from public.paystack_refund where paystack_refund_id = v_id
+     order by created_at desc limit 1 for update;
+  end if;
+  if x.id is null then
     return jsonb_build_object('ok', false, 'reason', 'unknown_refund');
   end if;
   if x.is_test <> (p_mode = 'test') then
