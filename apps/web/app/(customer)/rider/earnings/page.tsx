@@ -58,6 +58,7 @@ export default async function RiderEarnings() {
   const payout = (payoutOverview ?? {}) as {
     availableKes?: number;
     minimumKes?: number;
+    earlyCashout?: boolean;
     payoutPhone?: string | null;
     requests?: {
       id: string;
@@ -147,12 +148,18 @@ export default async function RiderEarnings() {
       </Panel>
 
       <Panel title="Need it before the weekly run?" note="Early payout">
-        <EarlyPayout
-          availableKes={payout.availableKes ?? 0}
-          minimumKes={payout.minimumKes ?? 100}
-          payoutPhone={payout.payoutPhone ?? null}
-          requests={payout.requests ?? []}
-        />
+        {payout.earlyCashout === false ? (
+          <p className="text-muted text-[0.8125rem] font-semibold">
+            Early payouts are not open right now. You are paid in the next weekly run.
+          </p>
+        ) : (
+          <EarlyPayout
+            availableKes={payout.availableKes ?? 0}
+            minimumKes={payout.minimumKes ?? 100}
+            payoutPhone={payout.payoutPhone ?? null}
+            requests={payout.requests ?? []}
+          />
+        )}
       </Panel>
 
       <Panel title="Settlements" note={settled.length > 0 ? 'Weekly' : undefined}>
