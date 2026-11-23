@@ -165,7 +165,10 @@ as $$
                          'name', i.name,
                          'price_kes', i.price_kes,
                          'photo_path', i.photo_path))
-                         || jsonb_build_object('available', i.available and not i.sold_out)
+                         /* sold_out comes from 20270129000100; read through
+                            to_jsonb so this file runs with or without it. */
+                         || jsonb_build_object('available', i.available
+                              and not coalesce((to_jsonb(i) ->> 'sold_out')::boolean, false))
                          order by bl.position)
                   from public.basket_line bl
                   join public.catalogue_item i on i.id = bl.catalogue_item_id

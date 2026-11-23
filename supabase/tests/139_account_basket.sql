@@ -3,7 +3,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(23);
+select plan(24);
 
 insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, is_anonymous, created_at, updated_at)
 values
@@ -165,6 +165,11 @@ select public.rpc_order_place_web(jsonb_build_object(
 select is(jsonb_array_length(public.rpc_basket_get() -> 'lines'), 1,
   'An order from another shop leaves the basket alone.');
 reset role;
+
+-- A sold-out item stays in the basket, marked unavailable.
+update public.catalogue_item set sold_out = true where id = 'c1390000-0000-4000-8000-0000000000c1';
+select is((public.fn_basket_read('c1390000-0000-4000-8000-000000000003') #>> '{lines,0,available}')::boolean,
+  false, 'A sold-out item stays in the basket, marked unavailable.');
 
 -- Deleting the sign-in deletes its basket.
 select is((select count(*)::int from public.basket
