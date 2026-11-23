@@ -1,4 +1,4 @@
--- A shop declines an order it cannot take (20270222000100): before starting
+-- A shop declines an order it cannot take (20270223000100): before starting
 -- it, with a reason; a paid order is refunded in full at once.
 
 begin;

@@ -172,7 +172,7 @@ function orderRecord(order: OrderRow & { id: string }, digital?: DigitalOrder): 
     nextAction: digital
       ? digitalNextAction(order, digital)
       : (orderNextAction(order) ?? orderHandoverAction(order)),
-    /* Before the shop starts it, it may decline it (20270222000100). */
+    /* Before the shop starts it, it may decline it (20270223000100). */
     declinable: order.stage === 'placed' || order.stage === 'confirmed',
   };
 }
