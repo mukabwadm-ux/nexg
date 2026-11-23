@@ -1,6 +1,6 @@
 'use client';
 
-import { Landmark, Loader2, RotateCw, Smartphone } from 'lucide-react';
+import { CreditCard, Landmark, Loader2, RotateCw, Smartphone } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
@@ -24,20 +24,24 @@ export function RetryPayment({
   mode,
   defaultPhone,
   bankEnabled = false,
+  paystack = false,
 }: {
   orderId: string;
   mode: 'waiting' | 'expired' | 'failed' | 'start';
   defaultPhone?: string | null;
   /** Offer paying from a bank account (when a bank is connected). */
   bankEnabled?: boolean;
+  /** Pay through Paystack: M-Pesa prompts go through it, and a card on its page (owner, 22 Nov 2026). */
+  paystack?: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = React.useState(mode !== 'waiting');
   const [phone, setPhone] = React.useState(defaultPhone ?? '');
-  const [busy, setBusy] = React.useState<'mpesa' | 'bank' | null>(null);
+  const [busy, setBusy] = React.useState<'mpesa' | 'bank' | 'card' | null>(null);
   const [message, setMessage] = React.useState<string | null>(null);
 
   const offerBank = mode !== 'waiting' && bankEnabled;
+  const offerCard = mode !== 'waiting' && paystack;
 
   async function mpesa(event: React.FormEvent) {
     event.preventDefault();
@@ -47,6 +51,16 @@ export function RetryPayment({
       return;
     }
     setBusy('mpesa');
+    if (paystack) {
+      const e164 = kenyanNumber(phone);
+      if (!e164) {
+        setBusy(null);
+        setMessage('Enter your M-Pesa number, like 0712 345 678.');
+        return;
+      }
+      await throughPaystack({ method: 'mpesa_stk', phone: e164 });
+      return;
+    }
     try {
       const res = await fetch('/api/payments/mpesa/start', {
         method: 'POST',
@@ -61,6 +75,45 @@ export function RetryPayment({
       }
       router.push(`/pay/${body.reference}`);
       router.refresh();
+    } catch {
+      setMessage('No connection. Check your internet and try again; nothing was charged.');
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  /* Paystack: a card goes to Paystack's page and comes back to /pay; M-Pesa sends a prompt. */
+  async function throughPaystack(
+    body: { method: 'card' } | { method: 'mpesa_stk'; phone: string },
+  ) {
+    setMessage(null);
+    setBusy(body.method === 'card' ? 'card' : 'mpesa');
+    try {
+      const res = await fetch(`/api/payments/paystack/orders/${orderId}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const answer = (await res.json().catch(() => null)) as {
+        status?: string;
+        reference?: string;
+        url?: string;
+        title?: string;
+      } | null;
+      if (res.ok && answer?.url && body.method === 'card') {
+        window.location.href = answer.url;
+        return;
+      }
+      if (res.ok && answer?.reference) {
+        router.push(`/pay/${answer.reference}`);
+        router.refresh();
+        return;
+      }
+      setMessage(
+        res.status === 503
+          ? 'Paystack is unavailable at the moment.'
+          : (answer?.title ?? 'The payment could not start. Try again in a moment.'),
+      );
     } catch {
       setMessage('No connection. Check your internet and try again; nothing was charged.');
     } finally {
@@ -154,23 +207,40 @@ export function RetryPayment({
         </button>
       </form>
 
-      {offerBank && (
+      {(offerBank || offerCard) && (
         <div className="mt-5">
           <p className="text-[0.8125rem] font-extrabold">Or pay another way</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            <button
-              type="button"
-              disabled={busy !== null}
-              onClick={() => void bank()}
-              className={outline}
-            >
-              {busy === 'bank' ? (
-                <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
-              ) : (
-                <Landmark aria-hidden="true" className="h-4 w-4" />
-              )}
-              Pay from your bank
-            </button>
+            {offerCard && (
+              <button
+                type="button"
+                disabled={busy !== null}
+                onClick={() => void throughPaystack({ method: 'card' })}
+                className={outline}
+              >
+                {busy === 'card' ? (
+                  <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CreditCard aria-hidden="true" className="h-4 w-4" />
+                )}
+                Pay by card
+              </button>
+            )}
+            {offerBank && (
+              <button
+                type="button"
+                disabled={busy !== null}
+                onClick={() => void bank()}
+                className={outline}
+              >
+                {busy === 'bank' ? (
+                  <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Landmark aria-hidden="true" className="h-4 w-4" />
+                )}
+                Pay from your bank
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -182,4 +252,15 @@ export function RetryPayment({
       )}
     </div>
   );
+}
+
+/** 0712 345 678, 712345678 or +254 712 345 678 → +254712345678; null otherwise. */
+function kenyanNumber(value: string): string | null {
+  const digits = value.replace(/[\s().-]/g, '').replace(/^\+/, '');
+  const national = digits.startsWith('254')
+    ? digits.slice(3)
+    : digits.startsWith('0')
+      ? digits.slice(1)
+      : digits;
+  return /^[17]\d{8}$/.test(national) ? `+254${national}` : null;
 }

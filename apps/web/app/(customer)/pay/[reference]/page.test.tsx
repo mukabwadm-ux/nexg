@@ -15,6 +15,8 @@ vi.mock('@/lib/supabase/server', () => ({ createClient: () => ({ from }) }));
 vi.mock('@/lib/mpesa-prompt', () => ({ reconcileMpesaPrompts: async () => false }));
 vi.mock('@/lib/bank/payments', () => ({ reconcileBankPayment: async () => false }));
 vi.mock('@/lib/bank', () => ({ bankCheckoutEnabled: () => false }));
+vi.mock('@/lib/order-payment', () => ({ orderPaymentForPage: async () => null }));
+vi.mock('@/lib/paystack', () => ({ paystackMode: () => null }));
 vi.mock('@/components/site-header', () => ({ SiteHeader: () => null }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: () => undefined, push: () => undefined }),

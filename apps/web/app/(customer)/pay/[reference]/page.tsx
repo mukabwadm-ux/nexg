@@ -1,4 +1,4 @@
-import { Check, CircleSlash, Landmark, Search, Smartphone, X } from 'lucide-react';
+import { Check, CircleSlash, CreditCard, Landmark, Search, Smartphone, X } from 'lucide-react';
 import type { Metadata } from 'next';
 
 import { AutoRefresh } from '@/components/pay/auto-refresh';
@@ -17,6 +17,8 @@ import { paybillNumber } from '@/lib/daraja';
 import { reconcileBankPayment } from '@/lib/bank/payments';
 import { reconcileMpesaPrompts } from '@/lib/mpesa-prompt';
 import { failureCopy, failureKind, PROMPT_EXPIRES_AFTER_SECONDS } from '@/lib/payment-outcome';
+import { orderPaymentForPage, type Client, type PaymentState } from '@/lib/order-payment';
+import { paystackMode } from '@/lib/paystack';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
@@ -72,7 +74,21 @@ export default async function PaymentReturn({ params }: { params: { reference: s
     }
   }
 
+  /* Waiting on Paystack: ask Paystack about a try taking long, in case its
+     webhook is late (the same rule as the apps). */
+  let paystackState: PaymentState | null = null;
+  if (
+    payment?.provider === 'paystack' &&
+    payment.order_id &&
+    (payment.state === 'pending' || payment.state === 'authorised')
+  ) {
+    paystackState = await orderPaymentForPage(supabase as unknown as Client, payment.order_id);
+    payment = ((await read()).data as Payment | null) ?? payment;
+  }
+
   const bankEnabled = bankCheckoutEnabled();
+  /* Paystack takes cards, M-Pesa and Airtel Money (owner, 22 Nov 2026). */
+  const paystack = paystackMode() !== null;
 
   /* Pay-on-delivery orders have no payment yet: checkout sends the guest here
      with the order reference. Row security only returns the guest's own. */
@@ -156,7 +172,12 @@ export default async function PaymentReturn({ params }: { params: { reference: s
                 ]}
               />
             ) : (
-              <RetryPayment orderId={placed.id} mode="start" bankEnabled={bankEnabled} />
+              <RetryPayment
+                orderId={placed.id}
+                mode="start"
+                bankEnabled={bankEnabled}
+                paystack={paystack}
+              />
             )}
           </PaymentStatusLayout>
         </>
@@ -376,6 +397,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
               mode="failed"
               defaultPhone={phone}
               bankEnabled={bankEnabled}
+              paystack={paystack}
             />
           )}
           {paybillOption}
@@ -403,6 +425,44 @@ export default async function PaymentReturn({ params }: { params: { reference: s
               actions={[
                 { label: 'Continue at your bank', href: payment.authorization_url, external: true },
               ]}
+            />
+          )}
+        </PaymentStatusLayout>
+      </>
+    );
+  }
+
+  /* ─────────────────────────────────────────── waiting on Paystack */
+  if (payment.provider === 'paystack' && payment.state === 'authorised') {
+    const card = paystackState?.channel === 'card' || paystackState?.channel === 'saved_card';
+    return (
+      <>
+        <SiteHeader />
+        <AutoRefresh seconds={5} />
+        <PaymentStatusLayout
+          tone="waiting"
+          icon={card ? CreditCard : Smartphone}
+          title={card ? 'Finish paying by card' : 'Check your phone'}
+          message={
+            card
+              ? `${amount} is waiting on Paystack's secure card page. Finish there and this page updates by itself.`
+              : `We sent a prompt for ${amount}${phone ? ` to ${phone}` : ''}. Approve it on your phone; this page updates by itself.`
+          }
+          aside={summary}
+        >
+          {progress('current')}
+          {card && paystackState?.authorization_url && (
+            <ActionRow
+              actions={[{ label: 'Continue to Paystack', href: paystackState.authorization_url }]}
+            />
+          )}
+          {orderOpen && (
+            <RetryPayment
+              orderId={payment.order_id!}
+              mode="expired"
+              defaultPhone={phone}
+              bankEnabled={bankEnabled}
+              paystack={paystack}
             />
           )}
         </PaymentStatusLayout>
@@ -439,6 +499,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
               mode={unanswered ? 'expired' : 'waiting'}
               defaultPhone={phone}
               bankEnabled={bankEnabled}
+              paystack={paystack}
             />
           )}
           {unanswered && paybillOption}
@@ -472,6 +533,7 @@ export default async function PaymentReturn({ params }: { params: { reference: s
             mode="start"
             defaultPhone={phone}
             bankEnabled={bankEnabled}
+            paystack={paystack}
           />
         )}
         {notStarted && paybillOption}
