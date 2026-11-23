@@ -10,7 +10,7 @@ import { MasterReleaseReader } from '../src/releases/masterReleaseReader.js';
 import { release as master, workspace } from './helpers.js';
 
 /* The icon-pack baseline (18 categories, 115 subcategories) stays importable and pinned as history; the
-   engine publishes the master release (21/214) since 16 Nov 2026. These tests check the baseline. */
+   engine publishes the master release (22/221) since 16 Nov 2026. These tests check the baseline. */
 const release = await new BaselineReleaseReader(workspace).resolvePublishedRelease();
 function releaseWithUnmappedSubcategory(nodeId = 'beauty-wellness:salon-barber') {
   const parts = structuredClone(release) as ReleaseParts;
@@ -114,12 +114,12 @@ test('asset paths reject traversal, absolute paths and alternate separators', ()
   assert.deepEqual(['../icon.png', '/icon.png', 'C:/icon.png', 'ICONS/../icon.png', 'ICONS\\icon.png'].map(safeRelativePath), [false, false, false, false, false]);
 });
 
-test('the master release carries the 21 NexG categories and 214 subcategories, with the ids the site uses', async () => {
+test('the master release carries the 22 NexG categories and 221 subcategories, with the ids the site uses', async () => {
   const navigation = JSON.parse(await readFile(join(workspace, 'docs/discovery/MASTER_NAVIGATION.json'), 'utf8')) as {
     categories: { discovery_key: string; category: string; subcategories: { discovery_key: string; name: string; source_subcategory_ids: string[] }[] }[];
   };
   assert.match(master.releaseId, /^master-[a-f0-9]{64}$/);
-  assert.deepEqual(master.declaredCounts, { categories: 21, subcategories: 214, options: 0 });
+  assert.deepEqual(master.declaredCounts, { categories: 22, subcategories: 221, options: 0 });
   assert.deepEqual(master.nodes.filter(node => node.kind === 'category').map(node => node.id), navigation.categories.map(category => category.discovery_key));
   for (const category of navigation.categories) for (const sub of category.subcategories) {
     const node = master.nodes.find(entry => entry.id === sub.discovery_key);

@@ -6,7 +6,7 @@
 >
 > - **Stores with no subcategory** are listed under their category (most live stores have none yet). On a category
 >   page they're on the last rail, "More stores", or "All stores" when no type has a rail of its own.
-> - **Navigation is NexG's master category list** (owner, 16 Nov 2026): 21 categories in the master order, with the
+> - **Navigation is NexG's master category list** (owner, 16 Nov 2026; Pets added 23 Nov 2026): 22 categories in the master order, with the
 >   master names and subcategories (Wellness under its group headings in the Category menu). `scripts/taxonomy/build.mjs`
 >   generates `docs/discovery/MASTER_NAVIGATION.json` from `packages/contracts/src/data/category-master.json` and
 >   `docs/discovery/MASTER_CATEGORIES_OVERLAY.json` (Discovery ids, pack icons, journeys, old ids); `npm test` fails when it

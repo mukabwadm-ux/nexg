@@ -20,6 +20,9 @@ describe('Discovery links', () => {
     expect(discoverCategoryHref('travel-tours')).toBe('/discover?category=travel-tours');
     expect(discoverCategoryHref('logistics_shipping')).toBe('/discover?category=courier-services');
     expect(discoverCategoryHref('games_sports')).toBe('/discover?category=games-sports');
+    expect(discoverCategoryHref('pets')).toBe('/discover?category=pets');
+    // Marketplace › Pet Supplies moved to Pets (23 Nov 2026): old links open Pets.
+    expect(discoverCategoryHref('pet_supplies')).toBe('/discover?category=pets');
     // Keys the master category list retired (16 Nov 2026) open where their merchants moved.
     expect(discoverCategoryHref('health')).toBe('/discover?category=pharmacy');
     expect(discoverCategoryHref('financial_services')).toBe(
@@ -46,7 +49,7 @@ describe('Discovery links', () => {
         row.discovery.categoryId,
       ]);
     }
-    // The map has a row for every subcategory of the master list, so all 21 categories are covered.
-    expect(new Set(map.subcategories.map((row) => row.supabase.category)).size).toBe(21);
+    // The map has a row for every subcategory of the master list, so all 22 categories are covered.
+    expect(new Set(map.subcategories.map((row) => row.supabase.category)).size).toBe(22);
   });
 });

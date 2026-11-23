@@ -18,6 +18,7 @@ const categoriesWithTailoredSetup = new Set([
   'concierge_services',
   'movers_relocation',
   'premium_services',
+  'pets',
   'laundry_cleaning',
 ]);
 

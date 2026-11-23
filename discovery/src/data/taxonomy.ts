@@ -78,7 +78,7 @@ export function iconUrl(reference: string | null | undefined): string | undefine
 
 /**
  * Navigation is NexG's master category list (owner, 16 Nov 2026), generated into the docs by
- * scripts/taxonomy/build.mjs: 21 categories in the master order, with the master names.
+ * scripts/taxonomy/build.mjs: 22 categories in the master order, with the master names.
  */
 export const categories: DiscoveryCategory[] = config.map((category) => {
   const categoryIcon = iconUrl(category.icon_reference);

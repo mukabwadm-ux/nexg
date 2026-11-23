@@ -327,15 +327,23 @@
           "id": "couples_experiences",
           "name": "Couples' Experiences",
           "base": "recreation",
-          "addFields": ["age_gate_method"],
-          "addQuestions": ["Q_AGE_GATE_METHOD"]
+          "addFields": [
+            "age_gate_method"
+          ],
+          "addQuestions": [
+            "Q_AGE_GATE_METHOD"
+          ]
         },
         {
           "id": "romantic_getaways",
           "name": "Romantic Getaways",
           "base": "travel_packages",
-          "addFields": ["age_gate_method"],
-          "addQuestions": ["Q_AGE_GATE_METHOD"]
+          "addFields": [
+            "age_gate_method"
+          ],
+          "addQuestions": [
+            "Q_AGE_GATE_METHOD"
+          ]
         },
         {
           "id": "sexual_health_products",
@@ -346,15 +354,23 @@
           "id": "intimacy_relationship_education",
           "name": "Intimacy & Relationship Education",
           "base": "workshops",
-          "addFields": ["age_gate_method"],
-          "addQuestions": ["Q_AGE_GATE_METHOD"]
+          "addFields": [
+            "age_gate_method"
+          ],
+          "addQuestions": [
+            "Q_AGE_GATE_METHOD"
+          ]
         },
         {
           "id": "adult_lifestyle_experiences",
           "name": "Adult Lifestyle Experiences",
           "base": "recreation",
-          "addFields": ["age_gate_method"],
-          "addQuestions": ["Q_AGE_GATE_METHOD"]
+          "addFields": [
+            "age_gate_method"
+          ],
+          "addQuestions": [
+            "Q_AGE_GATE_METHOD"
+          ]
         }
       ]
     },
@@ -1068,7 +1084,7 @@
     {
       "id": "marketplace",
       "name": "Marketplace",
-      "desc": "Electronics, home, kitchen, baby, pets, books and gifts",
+      "desc": "Electronics, home, kitchen, baby, books and gifts",
       "subcategories": [
         {
           "id": "electronics_gadgets",
@@ -1116,14 +1132,64 @@
           "base": "books"
         },
         {
-          "id": "pet_supplies",
-          "name": "Pet Supplies",
-          "base": "general_retail"
-        },
-        {
           "id": "arts_crafts_gifts",
           "name": "Arts, Crafts & Gifts",
           "base": "decor"
+        }
+      ]
+    },
+    {
+      "id": "pets",
+      "name": "Pets",
+      "new": {
+        "icon": "PawPrint",
+        "color": "#ea580c",
+        "bg": "#fff7ed",
+        "image": "marketplace",
+        "cardKind": "products",
+        "etaStyle": "minutes"
+      },
+      "desc": "Pet shops, food, vet care, grooming, boarding and training",
+      "subcategories": [
+        {
+          "id": "pet_shop_supplies",
+          "name": "Pet Shop & Supplies",
+          "base": "general_retail"
+        },
+        {
+          "id": "pet_food",
+          "name": "Pet Food",
+          "base": "general_retail"
+        },
+        {
+          "id": "veterinary_products",
+          "name": "Veterinary Products & Medicines",
+          "base": "pharmacy_retail"
+        },
+        {
+          "id": "vet_clinics",
+          "name": "Vet Clinics",
+          "base": "clinics"
+        },
+        {
+          "id": "pet_grooming",
+          "name": "Pet Grooming",
+          "base": "haircare"
+        },
+        {
+          "id": "pet_boarding_daycare",
+          "name": "Pet Boarding & Daycare",
+          "base": "reservations"
+        },
+        {
+          "id": "pet_training",
+          "name": "Pet Training",
+          "base": "personal_training"
+        },
+        {
+          "id": "pet_sitting_walking",
+          "name": "Pet Sitting & Walking",
+          "base": "home_cleaning"
         }
       ]
     },
@@ -1406,7 +1472,8 @@
     "helicopter_charters": "private_jet_charters",
     "private_charters": "private_jet_charters",
     "scenic_flights": "flight_hotel_bookings",
-    "safari_flights": "flight_hotel_bookings"
+    "safari_flights": "flight_hotel_bookings",
+    "pet_supplies": "pet_shop_supplies"
   },
   "merchantOverrides": {
     "Sokoni Grill House": "seafood_grill",
