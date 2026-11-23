@@ -1,4 +1,4 @@
-import { refused, rpc, startPayment, stateFrom } from '@/lib/order-payment';
+import { refused, rpc, startPayment, stateFrom, type PaymentTarget } from '@/lib/order-payment';
 import { paystackMode } from '@/lib/paystack';
 import { customerApiClient } from '@/lib/supabase/customer-api';
 import { z } from 'zod';
@@ -256,16 +256,43 @@ export async function stayPayment(request: Request, operationId: string) {
       );
     if (current.refundDue || current.status !== 'held')
       return problem(409, 'PAYMENT_UNAVAILABLE', 'This stay cannot be paid now. Check its status.');
-    const stayId = current.stayId;
-    return {
-      readState: async () =>
-        stateFrom(await rpc(supabase, 'rpc_stay_payment_state', { p_stay_id: stayId })),
-      begin: async () => {
-        const begun = await rpc(supabase, 'rpc_payment_begin_stay', { p_stay_id: stayId });
-        if (begun.error) return refused(begun.error);
-        return begun.data as { reference: string; amount_cents: number };
-      },
-      metadata: { stay_id: stayId },
-    };
+    return stayTarget(supabase, current.stayId);
   });
+}
+
+/**
+ * One held stay, however it was held (the apps' operation or the website's
+ * stay): Paystack once it is switched on, and M-Pesa straight to Safaricom
+ * until Paystack is live. The amount always comes from the hold.
+ */
+function stayTarget(supabase: Client, stayId: string): PaymentTarget {
+  const begin = async () => {
+    const begun = await rpc(supabase, 'rpc_payment_begin_stay', { p_stay_id: stayId });
+    if (begun.error) return refused(begun.error);
+    return begun.data as { reference: string; amount_cents: number; expires_at?: string };
+  };
+  return {
+    readState: async () =>
+      stateFrom(await rpc(supabase, 'rpc_stay_payment_state', { p_stay_id: stayId })),
+    begin,
+    metadata: { stay_id: stayId },
+    daraja: {
+      begin,
+      description: 'NexG stay',
+      notReady:
+        'M-Pesa payments are not switched on yet. Your dates are held; send us an enquiry and we will finish the booking with you.',
+    },
+  };
+}
+
+/*
+ * The website's stay checkout holds a stay by its own id (rpc_stay_hold) and
+ * pays it here: POST /api/customer/checkout/stays/{stayId}/payment, the same
+ * body and answer as the apps' route. The database refuses a stay that is not
+ * the caller's, or not held.
+ */
+export async function stayPaymentById(request: Request, rawStayId: string) {
+  const id = uuid.safeParse(rawStayId);
+  if (!id.success) return invalid('Check the stay ID.');
+  return startPayment(request, async ({ supabase }) => stayTarget(supabase, id.data));
 }

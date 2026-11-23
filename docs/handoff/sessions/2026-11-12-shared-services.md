@@ -30,7 +30,7 @@ Also decided since 12 Nov: guests may order delivery on a temporary (anonymous) 
 
 **The phone apps' repositories** are not reachable from the shared-services machine, so each shared piece ships as the backend plus a written contract in `docs/shared-services/` for the app teams.
 
-**Order of the remaining work:** D6 sign-in, then R3, R8 and R9. Also open: the website's stay checkout still starts M-Pesa through `/api/payments/mpesa/stay`; a merchant health score is not computed anywhere yet (`merchant_health_snapshot` has no writer), so shop declines are recorded (`cancel_reason_code = 'merchant_declined'`) but not yet scored.
+**Order of the remaining work:** D6 sign-in, then R3, R8 and R9. Also open: a merchant health score is not computed anywhere yet (`merchant_health_snapshot` has no writer), so shop declines are recorded (`cancel_reason_code = 'merchant_declined'`) but not yet scored.
 
 For whoever continues the shared-services work. The owner sends the private parts separately:
 
