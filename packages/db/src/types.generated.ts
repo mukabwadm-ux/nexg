@@ -32751,6 +32751,61 @@ export type Database = {
           },
         ];
       };
+      paystack_recipient: {
+        Row: {
+          created_at: string;
+          destination: string;
+          id: string;
+          is_test: boolean;
+          party_id: string;
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
+          recipient_code: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          destination: string;
+          id?: string;
+          is_test: boolean;
+          party_id: string;
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
+          recipient_code: string;
+        };
+        Update: {
+          created_at?: string;
+          destination?: string;
+          id?: string;
+          is_test?: boolean;
+          party_id?: string;
+          party_type?:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
+          recipient_code?: string;
+        };
+        Relationships: [];
+      };
       paystack_refund: {
         Row: {
           amount_cents: number;
@@ -32842,6 +32897,105 @@ export type Database = {
             columns: ['stay_id'];
             isOneToOne: false;
             referencedRelation: 'stay';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      paystack_transfer: {
+        Row: {
+          account_name: string | null;
+          amount_cents: number;
+          completed_at: string | null;
+          created_at: string;
+          created_by: string | null;
+          destination: string;
+          failure_reason: string | null;
+          id: string;
+          is_test: boolean;
+          kind: string;
+          party_id: string;
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
+          recipient_code: string | null;
+          reference: string;
+          sent_txn: string | null;
+          source_id: string;
+          state: string;
+          transfer_code: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          account_name?: string | null;
+          amount_cents: number;
+          completed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          destination: string;
+          failure_reason?: string | null;
+          id?: string;
+          is_test: boolean;
+          kind: string;
+          party_id: string;
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
+          recipient_code?: string | null;
+          reference: string;
+          sent_txn?: string | null;
+          source_id: string;
+          state?: string;
+          transfer_code?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          account_name?: string | null;
+          amount_cents?: number;
+          completed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          destination?: string;
+          failure_reason?: string | null;
+          id?: string;
+          is_test?: boolean;
+          kind?: string;
+          party_id?: string;
+          party_type?:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
+          recipient_code?: string | null;
+          reference?: string;
+          sent_txn?: string | null;
+          source_id?: string;
+          state?: string;
+          transfer_code?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'paystack_transfer_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
             referencedColumns: ['id'];
           },
         ];
@@ -35775,6 +35929,7 @@ export type Database = {
       };
       rider: {
         Row: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -35855,6 +36010,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          accepts_test_payouts?: boolean;
           activated_at?: string | null;
           activated_by?: string | null;
           alcohol_eligible?: boolean;
@@ -35934,6 +36090,7 @@ export type Database = {
           years_riding?: string | null;
         };
         Update: {
+          accepts_test_payouts?: boolean;
           activated_at?: string | null;
           activated_by?: string | null;
           alcohol_eligible?: boolean;
@@ -55777,6 +55934,88 @@ export type Database = {
           },
         ];
       };
+      paystack_transfer_v: {
+        Row: {
+          amount_cents: number | null;
+          completed_at: string | null;
+          created_at: string | null;
+          destination: string | null;
+          failure_reason: string | null;
+          id: string | null;
+          is_test: boolean | null;
+          kind: string | null;
+          party_id: string | null;
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner'
+            | null;
+          reference: string | null;
+          source_id: string | null;
+          state: string | null;
+          transfer_code: string | null;
+          updated_at: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_cents?: number | null;
+          completed_at?: string | null;
+          created_at?: string | null;
+          destination?: string | null;
+          failure_reason?: string | null;
+          id?: string | null;
+          is_test?: boolean | null;
+          kind?: string | null;
+          party_id?: string | null;
+          party_type?:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner'
+            | null;
+          reference?: string | null;
+          source_id?: string | null;
+          state?: string | null;
+          transfer_code?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          amount_cents?: number | null;
+          completed_at?: string | null;
+          created_at?: string | null;
+          destination?: string | null;
+          failure_reason?: string | null;
+          id?: string | null;
+          is_test?: boolean | null;
+          kind?: string | null;
+          party_id?: string | null;
+          party_type?:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner'
+            | null;
+          reference?: string | null;
+          source_id?: string | null;
+          state?: string | null;
+          transfer_code?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
       promotion_banner_v: {
         Row: {
           catalogue_item_id: string | null;
@@ -60910,6 +61149,10 @@ export type Database = {
         Args: { p_data: Json; p_mode: string; p_source: string };
         Returns: Json;
       };
+      fn_paystack_transfer_apply: {
+        Args: { p_data: Json; p_mode: string; p_source: string };
+        Returns: Json;
+      };
       fn_phone_country_code: { Args: { p_phone: string }; Returns: string };
       fn_phone_key: { Args: { p_phone: string }; Returns: string };
       fn_pick_concierge: { Args: { p_city_id: string }; Returns: string };
@@ -61074,6 +61317,7 @@ export type Database = {
       fn_rider_draft_for_write: {
         Args: { p_rider_id: string };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -61337,6 +61581,7 @@ export type Database = {
       rpc_activate_rider: {
         Args: { p_reason?: string; p_rider_id: string };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -67503,6 +67748,14 @@ export type Database = {
         Args: { p_kind: string; p_proof: string; p_target: string };
         Returns: Json;
       };
+      rpc_paystack_transfer_answered: {
+        Args: { p_answer: string; p_proof: string; p_reference: string; p_step: string };
+        Returns: Json;
+      };
+      rpc_paystack_transfer_open: {
+        Args: { p_kind: string; p_proof: string; p_source: string };
+        Returns: Json;
+      };
       rpc_place_confirm: { Args: { p_payload: Json }; Returns: Json };
       rpc_place_delete: { Args: { p_id: string }; Returns: Json };
       rpc_place_list: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -68139,6 +68392,7 @@ export type Database = {
       rpc_rider_cooldown: {
         Args: { p_hours: number; p_reason: string; p_rider_id: string };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -68227,6 +68481,7 @@ export type Database = {
       rpc_rider_cooldown_clear: {
         Args: { p_reason?: string; p_rider_id: string };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -68333,6 +68588,7 @@ export type Database = {
         | {
             Args: { p_deposit_kes?: number; p_rider_id: string };
             Returns: {
+              accepts_test_payouts: boolean;
               activated_at: string | null;
               activated_by: string | null;
               alcohol_eligible: boolean;
@@ -68545,6 +68801,7 @@ export type Database = {
       rpc_rider_reinstate: {
         Args: { p_reason: string; p_rider_id: string };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -68651,6 +68908,7 @@ export type Database = {
           p_value: Json;
         };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -68812,6 +69070,7 @@ export type Database = {
       rpc_rider_two_person_approve: {
         Args: { p_request_id: string };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
