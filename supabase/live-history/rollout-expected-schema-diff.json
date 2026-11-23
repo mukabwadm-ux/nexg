@@ -1,0 +1,5 @@
+{
+  "about": "Schema differences between live after the 23 Nov 2026 rollout and a database built fresh from main. Filled from the first CI rehearsal; each must be a known live-only change (docs/database/live-rollout-2026-11-23.md, section 7).",
+  "onlyLive": [],
+  "onlyMain": []
+}

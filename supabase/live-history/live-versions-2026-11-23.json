@@ -1,0 +1,1122 @@
+[
+  {
+    "name": "extensions_and_schemas",
+    "version": "20260101000100"
+  },
+  {
+    "name": "enums",
+    "version": "20260101000200"
+  },
+  {
+    "name": "city_and_waitlist",
+    "version": "20260101000300"
+  },
+  {
+    "name": "staff_roles_and_authz",
+    "version": "20260101000400"
+  },
+  {
+    "name": "rider",
+    "version": "20260101000500"
+  },
+  {
+    "name": "merchant",
+    "version": "20260101000600"
+  },
+  {
+    "name": "documents",
+    "version": "20260101000700"
+  },
+  {
+    "name": "setting",
+    "version": "20260101000800"
+  },
+  {
+    "name": "audit",
+    "version": "20260101000900"
+  },
+  {
+    "name": "status_functions",
+    "version": "20260101001000"
+  },
+  {
+    "name": "activation_rpcs",
+    "version": "20260101001100"
+  },
+  {
+    "name": "merchant_public_view",
+    "version": "20260101001200"
+  },
+  {
+    "name": "rls",
+    "version": "20260101001300"
+  },
+  {
+    "name": "storage",
+    "version": "20260101001400"
+  },
+  {
+    "name": "expiry_and_cron",
+    "version": "20260101001500"
+  },
+  {
+    "name": "application_rpcs",
+    "version": "20260101001600"
+  },
+  {
+    "name": "application_claim",
+    "version": "20260101001700"
+  },
+  {
+    "name": "document_submit",
+    "version": "20260101001800"
+  },
+  {
+    "name": "merchant_branch_rpc",
+    "version": "20260101001900"
+  },
+  {
+    "name": "merchant_feature",
+    "version": "20260101002000"
+  },
+  {
+    "name": "merchant_public_listed_at",
+    "version": "20260101002100"
+  },
+  {
+    "name": "merchant_controls",
+    "version": "20260101002200"
+  },
+  {
+    "name": "partner_status_suspended",
+    "version": "20260101002300"
+  },
+  {
+    "name": "approvals_and_suspension",
+    "version": "20260101002400"
+  },
+  {
+    "name": "legal_acceptance",
+    "version": "20260101002500"
+  },
+  {
+    "name": "went_live_at_is_history",
+    "version": "20260101002600"
+  },
+  {
+    "name": "audit_read",
+    "version": "20260101002700"
+  },
+  {
+    "name": "apply_cannot_overwrite",
+    "version": "20260101002800"
+  },
+  {
+    "name": "job_application",
+    "version": "20260101002900"
+  },
+  {
+    "name": "support_tickets",
+    "version": "20260101003000"
+  },
+  {
+    "name": "ticket_notifications",
+    "version": "20260101003100"
+  },
+  {
+    "name": "catalogue",
+    "version": "20260101003200"
+  },
+  {
+    "name": "catalogue_visibility_fix",
+    "version": "20260101003300"
+  },
+  {
+    "name": "zones",
+    "version": "20260101003400"
+  },
+  {
+    "name": "category_config",
+    "version": "20260101003500"
+  },
+  {
+    "name": "merchant_onboarding",
+    "version": "20260101003600"
+  },
+  {
+    "name": "onboarding_functions",
+    "version": "20260101003700"
+  },
+  {
+    "name": "merchant_write_guard",
+    "version": "20260101003800"
+  },
+  {
+    "name": "onboarding_rpcs",
+    "version": "20260101003900"
+  },
+  {
+    "name": "merchant_phone_code",
+    "version": "20260101004000"
+  },
+  {
+    "name": "zone_bounds",
+    "version": "20260101004100"
+  },
+  {
+    "name": "onboarding_rpcs_2",
+    "version": "20260101004200"
+  },
+  {
+    "name": "verified_phone_claims_draft",
+    "version": "20260101004300"
+  },
+  {
+    "name": "rider_onboarding",
+    "version": "20260101004400"
+  },
+  {
+    "name": "rider_functions",
+    "version": "20260101004500"
+  },
+  {
+    "name": "rider_rpcs",
+    "version": "20260101004600"
+  },
+  {
+    "name": "rider_rpcs_2",
+    "version": "20260101004700"
+  },
+  {
+    "name": "rider_write_guard",
+    "version": "20260101004800"
+  },
+  {
+    "name": "rider_readiness_and_activation",
+    "version": "20260101004900"
+  },
+  {
+    "name": "document_side_and_rider_chase",
+    "version": "20260101005000"
+  },
+  {
+    "name": "staff_admin",
+    "version": "20260101005100"
+  },
+  {
+    "name": "role_grant_approvals",
+    "version": "20260101005200"
+  },
+  {
+    "name": "role_grant_approval_rpcs",
+    "version": "20260101005300"
+  },
+  {
+    "name": "staff_roles_and_modules",
+    "version": "20260101005400"
+  },
+  {
+    "name": "staff_directory",
+    "version": "20260101005500"
+  },
+  {
+    "name": "support_and_tickets_module",
+    "version": "20260101005600"
+  },
+  {
+    "name": "experience_catalogue",
+    "version": "20260101005700"
+  },
+  {
+    "name": "experiences_module_and_shifts",
+    "version": "20260101005800"
+  },
+  {
+    "name": "experience_plan",
+    "version": "20260101005900"
+  },
+  {
+    "name": "experience_allocator",
+    "version": "20260101006000"
+  },
+  {
+    "name": "experience_desk",
+    "version": "20260101006100"
+  },
+  {
+    "name": "experience_desk_rpcs",
+    "version": "20260101006200"
+  },
+  {
+    "name": "experience_reviews",
+    "version": "20260101006300"
+  },
+  {
+    "name": "experience_money_and_catalogue",
+    "version": "20260101006400"
+  },
+  {
+    "name": "experience_partner_documents",
+    "version": "20260101006500"
+  },
+  {
+    "name": "experience_plan_view",
+    "version": "20260101006600"
+  },
+  {
+    "name": "experience_console_reads",
+    "version": "20260101006700"
+  },
+  {
+    "name": "experience_assignment_fixes",
+    "version": "20260101006800"
+  },
+  {
+    "name": "console_module_icons",
+    "version": "20260101006900"
+  },
+  {
+    "name": "city_centre_and_locate",
+    "version": "20260101007000"
+  },
+  {
+    "name": "translations",
+    "version": "20260101007100"
+  },
+  {
+    "name": "merchant_console_schema",
+    "version": "20260101007200"
+  },
+  {
+    "name": "merchant_console_contracts",
+    "version": "20260101007300"
+  },
+  {
+    "name": "merchant_console_rpcs",
+    "version": "20260101007400"
+  },
+  {
+    "name": "merchant_console_rls",
+    "version": "20260101007500"
+  },
+  {
+    "name": "rider_console_schema",
+    "version": "20260101007600"
+  },
+  {
+    "name": "rider_console_contracts",
+    "version": "20260101007700"
+  },
+  {
+    "name": "rider_console_rpcs",
+    "version": "20260101007800"
+  },
+  {
+    "name": "hospitality_schema",
+    "version": "20260101007900"
+  },
+  {
+    "name": "hospitality_rls",
+    "version": "20260101008000"
+  },
+  {
+    "name": "hospitality_contracts",
+    "version": "20260101008100"
+  },
+  {
+    "name": "hospitality_rpcs",
+    "version": "20260101008200"
+  },
+  {
+    "name": "mask_phone_fix",
+    "version": "20260101008300"
+  },
+  {
+    "name": "stays_and_listings",
+    "version": "20260101008400"
+  },
+  {
+    "name": "featured_slots_schema",
+    "version": "20260101008500"
+  },
+  {
+    "name": "featured_slots_contracts",
+    "version": "20260101008600"
+  },
+  {
+    "name": "featured_slots_rpcs",
+    "version": "20260101008700"
+  },
+  {
+    "name": "featured_slot_release",
+    "version": "20260101008800"
+  },
+  {
+    "name": "careers_ats_schema",
+    "version": "20260101008900"
+  },
+  {
+    "name": "careers_ats_contracts",
+    "version": "20260101009000"
+  },
+  {
+    "name": "careers_ats_rpcs",
+    "version": "20260101009100"
+  },
+  {
+    "name": "careers_view_grants",
+    "version": "20260101009200"
+  },
+  {
+    "name": "job_manager_not_a_constraint",
+    "version": "20260101009300"
+  },
+  {
+    "name": "careers_public_notice",
+    "version": "20260101009400"
+  },
+  {
+    "name": "careers_public_api",
+    "version": "20260101009500"
+  },
+  {
+    "name": "audit_event_v2",
+    "version": "20260101009600"
+  },
+  {
+    "name": "audit_console_schema",
+    "version": "20260101009700"
+  },
+  {
+    "name": "audit_console_contracts",
+    "version": "20260101009800"
+  },
+  {
+    "name": "audit_action_reconciliation",
+    "version": "20260101009900"
+  },
+  {
+    "name": "audit_console_rpcs",
+    "version": "20260101010000"
+  },
+  {
+    "name": "audit_console_nav",
+    "version": "20260101010100"
+  },
+  {
+    "name": "alert_rule_hours",
+    "version": "20260101010200"
+  },
+  {
+    "name": "break_glass_survives_offboarding",
+    "version": "20260101010300"
+  },
+  {
+    "name": "audit_crons",
+    "version": "20260101010400"
+  },
+  {
+    "name": "audit_level_matches_the_console",
+    "version": "20260101010500"
+  },
+  {
+    "name": "property_qr",
+    "version": "20260101010600"
+  },
+  {
+    "name": "property_qr_rpcs",
+    "version": "20260101010700"
+  },
+  {
+    "name": "qr_reports",
+    "version": "20260101010800"
+  },
+  {
+    "name": "qr_crons",
+    "version": "20260101010900"
+  },
+  {
+    "name": "settings_core",
+    "version": "20260101011000"
+  },
+  {
+    "name": "settings_domain",
+    "version": "20260101011100"
+  },
+  {
+    "name": "settings_resolution",
+    "version": "20260101011200"
+  },
+  {
+    "name": "settings_registry",
+    "version": "20260101011300"
+  },
+  {
+    "name": "settings_rpcs",
+    "version": "20260101011400"
+  },
+  {
+    "name": "settings_rollback_exception",
+    "version": "20260101011500"
+  },
+  {
+    "name": "settings_nav",
+    "version": "20260101011600"
+  },
+  {
+    "name": "integration_view_scope",
+    "version": "20260101011700"
+  },
+  {
+    "name": "settings_public_api",
+    "version": "20260101011800"
+  },
+  {
+    "name": "payment_method_toggle",
+    "version": "20260101011900"
+  },
+  {
+    "name": "settings_audit_actions",
+    "version": "20260101012100"
+  },
+  {
+    "name": "audit_actor_is_named",
+    "version": "20260101012200"
+  },
+  {
+    "name": "sign_in_recording",
+    "version": "20260101012300"
+  },
+  {
+    "name": "audit_identifies_by_email",
+    "version": "20260101012400"
+  },
+  {
+    "name": "audit_names_deleted_subjects",
+    "version": "20260101012500"
+  },
+  {
+    "name": "featured_placement_and_expiry",
+    "version": "20260101012600"
+  },
+  {
+    "name": "merchant_featured_is_a_booking",
+    "version": "20260101012700"
+  },
+  {
+    "name": "document_reminders",
+    "version": "20260101012800"
+  },
+  {
+    "name": "pitch_and_staff_upload",
+    "version": "20260101012900"
+  },
+  {
+    "name": "featured_pitch_template",
+    "version": "20260101013000"
+  },
+  {
+    "name": "orders",
+    "version": "20260101013100"
+  },
+  {
+    "name": "dispatch",
+    "version": "20260101013200"
+  },
+  {
+    "name": "dispatch_cascade",
+    "version": "20260101013300"
+  },
+  {
+    "name": "cancel_can_need_two_people",
+    "version": "20260101013350"
+  },
+  {
+    "name": "dispatch_actions",
+    "version": "20260101013400"
+  },
+  {
+    "name": "more_reasons_to_skip_a_rider",
+    "version": "20260101013450"
+  },
+  {
+    "name": "presence_has_one_home",
+    "version": "20260101013500"
+  },
+  {
+    "name": "an_order_says_what_it_needs",
+    "version": "20260101013550"
+  },
+  {
+    "name": "live_ops_contracts",
+    "version": "20260101013600"
+  },
+  {
+    "name": "dispatch_interventions",
+    "version": "20260101013700"
+  },
+  {
+    "name": "order_service",
+    "version": "20260101013800"
+  },
+  {
+    "name": "needs_action_and_detail",
+    "version": "20260101013900"
+  },
+  {
+    "name": "live_ops_crons",
+    "version": "20260101014000"
+  },
+  {
+    "name": "live_ops_public_api",
+    "version": "20260101014100"
+  },
+  {
+    "name": "rules_carry_the_thresholds",
+    "version": "20260101014200"
+  },
+  {
+    "name": "reprice_by_version_not_by_clock",
+    "version": "20260101014300"
+  },
+  {
+    "name": "a_refund_has_three_routes",
+    "version": "20260101014400"
+  },
+  {
+    "name": "partners_can_see_their_own_work",
+    "version": "20260101014500"
+  },
+  {
+    "name": "what_a_partner_can_change",
+    "version": "20260101014600"
+  },
+  {
+    "name": "cash_is_in_shillings",
+    "version": "20260101014700"
+  },
+  {
+    "name": "money_moves",
+    "version": "20260101014800"
+  },
+  {
+    "name": "live_without_a_refresh",
+    "version": "20260101014900"
+  },
+  {
+    "name": "dispatch_rings_a_bell",
+    "version": "20260101015000"
+  },
+  {
+    "name": "the_money_tables_are_not_public",
+    "version": "20260101015100"
+  },
+  {
+    "name": "only_yours_to_pay_for",
+    "version": "20260101015200"
+  },
+  {
+    "name": "anonymous_cannot_run_the_crons",
+    "version": "20260101015300"
+  },
+  {
+    "name": "the_ledger",
+    "version": "20260101015400"
+  },
+  {
+    "name": "every_shilling_is_a_ledger_line",
+    "version": "20260101015500"
+  },
+  {
+    "name": "the_settlement_run",
+    "version": "20260101015600"
+  },
+  {
+    "name": "nine_invariants",
+    "version": "20260101015700"
+  },
+  {
+    "name": "bringing_the_history_across",
+    "version": "20260101015800"
+  },
+  {
+    "name": "what_the_screens_read",
+    "version": "20260101015900"
+  },
+  {
+    "name": "finance_has_a_door",
+    "version": "20260101016000"
+  },
+  {
+    "name": "verify_what_is_on_the_screen",
+    "version": "20260101016100"
+  },
+  {
+    "name": "featured_says_one_thing",
+    "version": "20260101016200"
+  },
+  {
+    "name": "masking_must_not_change_the_country",
+    "version": "20260101016300"
+  },
+  {
+    "name": "a_place_before_a_price",
+    "version": "20260101016400"
+  },
+  {
+    "name": "one_conversation_model",
+    "version": "20260101016500"
+  },
+  {
+    "name": "the_desk_can_act",
+    "version": "20260101016600"
+  },
+  {
+    "name": "what_the_desk_reads",
+    "version": "20260101016700"
+  },
+  {
+    "name": "messaging_has_a_door",
+    "version": "20260101016800"
+  },
+  {
+    "name": "five_inboxes_become_one",
+    "version": "20260101016900"
+  },
+  {
+    "name": "support_becomes_messaging",
+    "version": "20260101017000"
+  },
+  {
+    "name": "escalation_is_not_a_module_grant",
+    "version": "20260101017100"
+  },
+  {
+    "name": "the_website_writes_to_the_inbox",
+    "version": "20260101017200"
+  },
+  {
+    "name": "wiring_check",
+    "version": "20260101017300"
+  },
+  {
+    "name": "closing_what_the_check_found",
+    "version": "20260101017400"
+  },
+  {
+    "name": "a_partition_is_a_table",
+    "version": "20260101017500"
+  },
+  {
+    "name": "the_caretaker_link_gets_its_token",
+    "version": "20260101017600"
+  },
+  {
+    "name": "every_action_is_accounted_for",
+    "version": "20260101017700"
+  },
+  {
+    "name": "support_comes_back",
+    "version": "20260101017800"
+  },
+  {
+    "name": "a_bell_for_every_user",
+    "version": "20260101017900"
+  },
+  {
+    "name": "the_push_actually_goes_out",
+    "version": "20260101018000"
+  },
+  {
+    "name": "the_other_five_tabs",
+    "version": "20260101018100"
+  },
+  {
+    "name": "somebody_can_see_the_waitlist",
+    "version": "20260101018200"
+  },
+  {
+    "name": "the_outbox",
+    "version": "20260101018300"
+  },
+  {
+    "name": "the_code_goes_in_the_envelope",
+    "version": "20260101018400"
+  },
+  {
+    "name": "the_other_four_tabs",
+    "version": "20260101018500"
+  },
+  {
+    "name": "whatsapp_comes_in_and_goes_out",
+    "version": "20260101018600"
+  },
+  {
+    "name": "a_signup_with_no_address",
+    "version": "20260101018700"
+  },
+  {
+    "name": "the_host_portal_reads",
+    "version": "20260101018800"
+  },
+  {
+    "name": "a_unit_with_no_public_name",
+    "version": "20260101018900"
+  },
+  {
+    "name": "what_the_merchant_dashboard_reads",
+    "version": "20260101019000"
+  },
+  {
+    "name": "what_the_rider_dashboard_reads",
+    "version": "20260101019100"
+  },
+  {
+    "name": "the_rider_device",
+    "version": "20260101019200"
+  },
+  {
+    "name": "the_setup_dashboard_is_the_destination",
+    "version": "20260101019300"
+  },
+  {
+    "name": "the_host_modules",
+    "version": "20260101019400"
+  },
+  {
+    "name": "the_host_portal_can_write",
+    "version": "20260101019500"
+  },
+  {
+    "name": "host_money_on_the_ledger",
+    "version": "20260101019600"
+  },
+  {
+    "name": "a_photo_and_a_card_you_can_look_at",
+    "version": "20260101019700"
+  },
+  {
+    "name": "a_code_you_can_actually_print",
+    "version": "20260101019800"
+  },
+  {
+    "name": "a_host_can_write_to_us",
+    "version": "20260101019900"
+  },
+  {
+    "name": "a_submission_reaches_a_person",
+    "version": "20260101020000"
+  },
+  {
+    "name": "branches_and_team_can_be_managed",
+    "version": "20260101020100"
+  },
+  {
+    "name": "the_tables_that_were_missing",
+    "version": "20260101020200"
+  },
+  {
+    "name": "what_the_merchant_boards_read",
+    "version": "20260101020300"
+  },
+  {
+    "name": "the_new_actions_are_registered",
+    "version": "20260101020400"
+  },
+  {
+    "name": "the_boards_that_were_only_designed",
+    "version": "20260101020500"
+  },
+  {
+    "name": "deliver_wherever_the_guest_is",
+    "version": "20260101020600"
+  },
+  {
+    "name": "more_of_nairobi",
+    "version": "20260101020700"
+  },
+  {
+    "name": "experience_catalogue_console",
+    "version": "20260101020900"
+  },
+  {
+    "name": "merchant_taxonomy_enum",
+    "version": "20260101021000"
+  },
+  {
+    "name": "merchant_taxonomy_data",
+    "version": "20260101021001"
+  },
+  {
+    "name": "merchant_taxonomy_onboarding_rules",
+    "version": "20260101021002"
+  },
+  {
+    "name": "subcategory_readiness",
+    "version": "20260101021003"
+  },
+  {
+    "name": "experience_builder_completion",
+    "version": "20260101021100"
+  },
+  {
+    "name": "public_featured_view_permissions",
+    "version": "20260101021200"
+  },
+  {
+    "name": "explore_zone_filter",
+    "version": "20260101021300"
+  },
+  {
+    "name": "list_all_live_merchants",
+    "version": "20260101021400"
+  },
+  {
+    "name": "guest_web_checkout",
+    "version": "20260101021500"
+  },
+  {
+    "name": "order_breakdown",
+    "version": "20260101021600"
+  },
+  {
+    "name": "mpesa_daraja",
+    "version": "20260101021700"
+  },
+  {
+    "name": "staff_self_service_profile",
+    "version": "20260101021900"
+  },
+  {
+    "name": "avatar_set_no_storage_delete",
+    "version": "20260101022000"
+  },
+  {
+    "name": "demo_experience_catalogue",
+    "version": "20260101022100"
+  },
+  {
+    "name": "pricing_rules",
+    "version": "20260101022200"
+  },
+  {
+    "name": "vat_in_the_split_and_ledger",
+    "version": "20260101022300"
+  },
+  {
+    "name": "nexg_tax_module",
+    "version": "20260101022400"
+  },
+  {
+    "name": "one_notification_system",
+    "version": "20260101022500"
+  },
+  {
+    "name": "form_alerts_to_info",
+    "version": "20260101022600"
+  },
+  {
+    "name": "email_routing",
+    "version": "20260101022700"
+  },
+  {
+    "name": "a_host_application_is_a_ticket",
+    "version": "20260101022800"
+  },
+  {
+    "name": "api_authentication",
+    "version": "20260101022900"
+  },
+  {
+    "name": "merchant_service_orders",
+    "version": "20260101023000"
+  },
+  {
+    "name": "api_order_reads",
+    "version": "20260101023100"
+  },
+  {
+    "name": "finance_rules_compliance",
+    "version": "20261026000000"
+  },
+  {
+    "name": "category_specific_catalogue_images",
+    "version": "20261027000000"
+  },
+  {
+    "name": "merchant_admin_lifecycle",
+    "version": "20261028000000"
+  },
+  {
+    "name": "guard_deactivated_merchant",
+    "version": "20261029000000"
+  },
+  {
+    "name": "register_subcategory_audit_action",
+    "version": "20261030000000"
+  },
+  {
+    "name": "merchant_deleted_retention",
+    "version": "20261031000000"
+  },
+  {
+    "name": "admin_category_management",
+    "version": "20261101000000"
+  },
+  {
+    "name": "food_restaurant_onboarding_workflow",
+    "version": "20261102000000"
+  },
+  {
+    "name": "merchant_application",
+    "version": "20261102000100"
+  },
+  {
+    "name": "merchant_integration_security",
+    "version": "20261102000200"
+  },
+  {
+    "name": "merchant_application_admin_review",
+    "version": "20261102000300"
+  },
+  {
+    "name": "merchant_anonymous_intake",
+    "version": "20261102000400"
+  },
+  {
+    "name": "merchant_setup_offerings",
+    "version": "20261102000500"
+  },
+  {
+    "name": "merchant_setup_offering_review_lock",
+    "version": "20261102000600"
+  },
+  {
+    "name": "merchant_setup_offering_approved_drafts",
+    "version": "20261102000700"
+  },
+  {
+    "name": "merchant_setup_locations",
+    "version": "20261102001000"
+  },
+  {
+    "name": "merchant_setup_weekly_hours",
+    "version": "20261102002000"
+  },
+  {
+    "name": "merchant_offering_media",
+    "version": "20261102004000"
+  },
+  {
+    "name": "merchant_setup_existing_catalogue",
+    "version": "20261102004100"
+  },
+  {
+    "name": "merchant_setup_legacy_save",
+    "version": "20261102004200"
+  },
+  {
+    "name": "fix_public_setting_view_access",
+    "version": "20261103000000"
+  },
+  {
+    "name": "expand_adult_food_onboarding_questions",
+    "version": "20261104000000"
+  },
+  {
+    "name": "laundry_multi_specialty_onboarding",
+    "version": "20261105000000"
+  },
+  {
+    "name": "business_types_multi_for_all_categories",
+    "version": "20261106000000"
+  },
+  {
+    "name": "documents_optional_at_submit",
+    "version": "20261107000000"
+  },
+  {
+    "name": "category_operating_model_questions",
+    "version": "20261108000000"
+  },
+  {
+    "name": "booking_engine",
+    "version": "20261109000000"
+  },
+  {
+    "name": "remove_age_gate_method_onboarding",
+    "version": "20261110000000"
+  },
+  {
+    "name": "activities_games_sports_enum",
+    "version": "20261111000000"
+  },
+  {
+    "name": "activities_games_sports_config",
+    "version": "20261111000100"
+  },
+  {
+    "name": "host_unit_portfolio_save",
+    "version": "20261111000200"
+  },
+  {
+    "name": "host_manual_finance",
+    "version": "20261111000300"
+  },
+  {
+    "name": "host_workspace_preferences",
+    "version": "20261111000400"
+  },
+  {
+    "name": "host_workspace_gallery",
+    "version": "20261111000500"
+  },
+  {
+    "name": "scope_merchant_media_policy_check",
+    "version": "20261111000600"
+  },
+  {
+    "name": "host_workspace_cancel_placement",
+    "version": "20261111000700"
+  },
+  {
+    "name": "retire_packages_with_valid_status",
+    "version": "20261111000800"
+  },
+  {
+    "name": "host_scoped_privacy_status",
+    "version": "20261111000900"
+  },
+  {
+    "name": "host_workspace_tasks",
+    "version": "20261111001000"
+  },
+  {
+    "name": "host_workspace_guides",
+    "version": "20261111001100"
+  },
+  {
+    "name": "unit_save_respects_unit_scope",
+    "version": "20261111001200"
+  },
+  {
+    "name": "host_workspace_writes_are_audited",
+    "version": "20261111001300"
+  },
+  {
+    "name": "gross_includes_vat",
+    "version": "20261111001400"
+  },
+  {
+    "name": "api_console_module",
+    "version": "20261111001500"
+  },
+  {
+    "name": "business_types_for_activities",
+    "version": "20261111001600"
+  },
+  {
+    "name": "payment_callbacks_and_audit_wiring",
+    "version": "20261111001700"
+  }
+]

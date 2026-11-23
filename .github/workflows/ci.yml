@@ -50,6 +50,13 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
         run: node scripts/check-migration-ids.mjs ${BASE_REF:+origin/$BASE_REF}
 
+      # Compares by what the SQL does: no two migrations with the same statements,
+      # none that only repeats what already ran (on main or on the live database),
+      # no id the live database ran under another name, and no "already applied"
+      # repair without a content match (supabase/live-history).
+      - name: Migrations do not repeat each other or what live already ran
+        run: node scripts/check-migration-repeats.mjs --report
+
       - name: Install
         run: pnpm install --frozen-lockfile
 
@@ -165,6 +172,49 @@ jobs:
           name: types-generated
           path: packages/db/src/types.generated.ts
           retention-days: 7
+
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop --no-backup
+
+  # Builds a database at the live database's recorded state (11 Nov 2026: main's
+  # files plus the archived 20261111 block), applies the rollout's repairs, checks
+  # the dry run lists exactly the plan, pushes with --include-all as the owner
+  # will on live, and compares the result with a database built fresh from main.
+  # No secrets: only the local stack. See docs/database/live-rollout-2026-11-23.md.
+  live-rollout:
+    name: Live rollout rehearsal (live's 11 Nov state to main)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up the Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Rehearse the rollout
+        env:
+          REHEARSAL_OUT: ${{ runner.temp }}/live-rollout
+        run: bash scripts/live-rollout-rehearsal.sh
+
+      - name: Upload the rehearsal's lists and schema diff
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-rollout-rehearsal
+          path: |
+            ${{ runner.temp }}/live-rollout/*.txt
+            ${{ runner.temp }}/live-rollout/*.sql
+            ${{ runner.temp }}/live-rollout/repairs.sh
+          retention-days: 14
 
       - name: Stop Supabase
         if: always()
