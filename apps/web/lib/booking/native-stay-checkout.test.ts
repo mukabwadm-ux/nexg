@@ -3,13 +3,35 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const stub = vi.hoisted(() => ({
   getUser: vi.fn(),
   rpc: vi.fn(),
+  prompt: vi.fn(),
 }));
 
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/customer-api', () => ({
   customerApiClient: () => ({ auth: { getUser: stub.getUser }, rpc: stub.rpc }),
 }));
-import { stayHold, stayPayment, stayQuote, stayStatus } from './native-stay-checkout';
+vi.mock('@/lib/mpesa-prompt', () => ({ sendMpesaPrompt: stub.prompt }));
+import {
+  stayHold,
+  stayPayment,
+  stayPaymentById,
+  stayQuote,
+  stayStatus,
+} from './native-stay-checkout';
+
+/* Safaricom connected and Paystack not live: production on 23 Nov 2026. */
+function darajaOnly() {
+  vi.stubEnv('PAYSTACK_TEST_SECRET_KEY', '');
+  vi.stubEnv('PAYSTACK_LIVE_SECRET_KEY', '');
+  for (const [k, v] of Object.entries({
+    DARAJA_CONSUMER_KEY: 'k',
+    DARAJA_CONSUMER_SECRET: 's',
+    DARAJA_SHORTCODE: '174379',
+    DARAJA_PASSKEY: 'p',
+    DARAJA_CALLBACK_SECRET: 'c',
+  }))
+    vi.stubEnv(k, v);
+}
 
 const quoteId = '01a12345-168a-4456-8b79-012345678910';
 const stayId = '01a12345-168a-4456-8b79-012345678911';
@@ -185,5 +207,81 @@ describe('native stay checkout routes', () => {
     expect(stub.rpc).toHaveBeenCalledTimes(1);
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();
+  });
+
+  it('the website pays a held stay by its id: M-Pesa straight to Safaricom while Paystack is off', async () => {
+    darajaOnly();
+    stub.rpc.mockImplementation(async (fn: string) =>
+      fn === 'rpc_payment_begin_stay'
+        ? {
+            data: { reference: 'NXS-1', amount_cents: 1400000, expires_at: expiresAt },
+            error: null,
+          }
+        : { data: null, error: { code: 'XX000', message: 'unexpected ' + fn } },
+    );
+    stub.prompt.mockResolvedValue({ ok: true, message: 'Check your phone.' });
+    const response = await stayPaymentById(
+      request({ method: 'mpesa_stk', phone: '0712 000 000' }),
+      stayId,
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      status: 'pending',
+      reference: 'NXS-1',
+      retryAfterSeconds: 60,
+      expiresAt,
+    });
+    expect(stub.prompt).toHaveBeenCalledWith(
+      expect.objectContaining({
+        reference: 'NXS-1',
+        amountCents: 1400000,
+        phone: '254712000000',
+        description: 'NexG stay',
+      }),
+    );
+    vi.unstubAllEnvs();
+  });
+
+  it("the apps' operation route takes the same Safaricom path for its stay", async () => {
+    darajaOnly();
+    stub.rpc.mockImplementation(async (fn: string) =>
+      fn === 'rpc_native_stay_status'
+        ? { data: hold, error: null }
+        : fn === 'rpc_payment_begin_stay'
+          ? { data: { reference: 'NXS-2', amount_cents: 1400000 }, error: null }
+          : { data: null, error: { code: 'XX000', message: 'unexpected ' + fn } },
+    );
+    stub.prompt.mockResolvedValue({ ok: true, message: 'Check your phone.' });
+    const response = await stayPayment(
+      request({ method: 'mpesa_stk', phone: '+254712000000' }),
+      quoteId,
+    );
+    expect(await response.json()).toEqual({
+      status: 'pending',
+      reference: 'NXS-2',
+      retryAfterSeconds: 60,
+    });
+    expect(stub.rpc).toHaveBeenCalledWith('rpc_payment_begin_stay', { p_stay_id: stayId });
+    vi.unstubAllEnvs();
+  });
+
+  it("a stay that is not the caller's is refused by the database", async () => {
+    darajaOnly();
+    stub.rpc.mockResolvedValue({ data: null, error: { code: 'P0001', message: 'No such order.' } });
+    const response = await stayPaymentById(
+      request({ method: 'mpesa_stk', phone: '0712000000' }),
+      stayId,
+    );
+    expect(response.status).toBe(404);
+    expect(stub.prompt).not.toHaveBeenCalled();
+    vi.unstubAllEnvs();
+  });
+
+  it('refuses a malformed stay id', async () => {
+    const response = await stayPaymentById(
+      request({ method: 'mpesa_stk', phone: '0712000000' }),
+      'x',
+    );
+    expect(response.status).toBe(422);
   });
 });

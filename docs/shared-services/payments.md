@@ -83,4 +83,4 @@ No sign-in. It answers:
 
 This page covers orders. Bookings are paid through the booking engine's bridge, and stays in the apps through `/api/customer/checkout/stays/holds/{operationId}/payment`. Both use Paystack and are documented with langs4u's Paystack work.
 
-The website's own stay checkout still sends M-Pesa through `/api/payments/mpesa/stay`. Moving it onto the stays route is not done yet.
+Stays use the same payment code. The apps pay a held stay with `POST /api/customer/checkout/stays/holds/{operationId}/payment`; the website pays the stay it held with `POST /api/customer/checkout/stays/{stayId}/payment`. Both take the same body as orders (`{"method":"mpesa_stk","phone":"…"}` and the Paystack methods), and both send M-Pesa straight to Safaricom until Paystack is live. A held stay's answer also carries `expiresAt`, when the hold runs out. The website's own `/api/payments/mpesa/stay` is gone.

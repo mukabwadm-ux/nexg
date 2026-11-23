@@ -185,18 +185,21 @@ export function StayCheckout({
     setError('');
     setBusyAction(true);
     try {
-      const response = await fetch('/api/payments/mpesa/stay', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stayId, phone }),
-      });
-      const body = (await response.json()) as {
-        ok: boolean;
-        message?: string;
+      /* The same payment code as the apps (lib/booking/native-stay-checkout). */
+      const response = await fetch(
+        `/api/customer/checkout/stays/${encodeURIComponent(stayId)}/payment`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ method: 'mpesa_stk', phone }),
+        },
+      );
+      const body = (await response.json().catch(() => ({}))) as {
+        title?: string;
         expiresAt?: string;
       };
-      if (!body.ok) {
-        setError(body.message ?? 'The M-Pesa prompt could not be sent. Try again.');
+      if (!response.ok) {
+        setError(body.title ?? 'The M-Pesa prompt could not be sent. Try again.');
         return;
       }
       if (body.expiresAt) setExpiresAt(body.expiresAt);
