@@ -1,9 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mock = vi.hoisted(() => ({ rpc: vi.fn(), update: vi.fn() }));
+const mock = vi.hoisted(() => ({ rpc: vi.fn(), update: vi.fn(), bound: vi.fn() }));
 
 vi.mock('next/cache', () => ({ revalidatePath() {} }));
 vi.mock('@/lib/merchant-action-access', () => ({
+  async requireMerchantActionObject(
+    _client: unknown,
+    table: string,
+    id: string,
+    merchantId: string,
+  ) {
+    mock.bound(table, id, merchantId);
+  },
   async merchantActionClient() {
     const query = {
       update: (values: unknown) => {
@@ -30,6 +38,14 @@ const item = '11111111-2222-4333-8444-555555555555';
 beforeEach(() => {
   mock.rpc.mockReset().mockResolvedValue({ data: { ok: true }, error: null });
   mock.update.mockReset();
+  mock.bound.mockReset();
+});
+
+describe('the current business only', () => {
+  it("checks the item is the current business's before changing it", async () => {
+    await setItemOptionGroups(item, []);
+    expect(mock.bound).toHaveBeenCalledWith('catalogue_item', item, 'merchant-1');
+  });
 });
 
 describe('Menu choices and units', () => {

@@ -4,7 +4,11 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 
 import { CAREERS_BOARD_TAG } from '@/lib/careers/load';
 import { zonedToInstant } from '@/lib/careers/zoned';
-import { merchantActionClient } from '@/lib/merchant-action-access';
+import {
+  merchantActionClient,
+  requireMerchantActionObject,
+  requireMerchantApplicant,
+} from '@/lib/merchant-action-access';
 
 /**
  * Hiring, from the business's own dashboard.
@@ -87,7 +91,8 @@ export async function setVacancyStatus(
   vacancyId: string,
   status: 'open' | 'closed',
 ): Promise<HiringOutcome> {
-  const { client } = await merchantActionClient();
+  const { client, merchantId } = await merchantActionClient();
+  await requireMerchantActionObject(client, 'vacancy', vacancyId, merchantId);
   const { error } = await client.rpc('rpc_vacancy_set_status', {
     p_vacancy_id: vacancyId,
     p_status: status,
@@ -108,7 +113,10 @@ export async function moveApplicant(input: {
   interviewLocal?: string;
   timeZone: string;
 }): Promise<HiringOutcome> {
-  const { client } = await merchantActionClient();
+  const { client, merchantId } = await merchantActionClient();
+  const vacancyId = await requireMerchantApplicant(client, input.applicationId, merchantId);
+  if (vacancyId !== input.vacancyId)
+    return { ok: false, message: 'This applicant is not on that job.' };
   const interviewAt =
     input.status === 'interview' && input.interviewLocal
       ? zonedToInstant(input.interviewLocal, input.timeZone)
@@ -127,7 +135,8 @@ export async function moveApplicant(input: {
 
 /** A link to the applicant's CV, good for two minutes, saved under the name they gave it. */
 export async function cvLink(applicationId: string): Promise<HiringOutcome & { url?: string }> {
-  const { client } = await merchantActionClient();
+  const { client, merchantId } = await merchantActionClient();
+  await requireMerchantApplicant(client, applicationId, merchantId);
   const { data } = await client
     .from('vacancy_application')
     .select('cv_path, cv_name')

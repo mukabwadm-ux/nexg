@@ -11,6 +11,7 @@ import { ConsoleShell } from '@/components/console-shell';
 import { DocumentReview, type ReviewDocument } from '@/components/document-review';
 import { RiderRecordPanel, type RiderRecord } from '@/components/rider-record';
 import { RiderKitPanel, type RiderKitStatus } from '@/components/riders/rider-kit-panel';
+import { RiderStagePanel } from '@/components/riders/rider-stage-panel';
 import { requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -31,7 +32,50 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
   // and "not yours" are deliberately the same answer.
   if (!rider) notFound();
 
-  const { data: kit } = await supabase.rpc('rpc_rider_kit_status', { p_rider_id: params.id });
+  const [{ data: kit }, { data: trainingRows }, { data: trips }, { data: suspensions }] =
+    await Promise.all([
+      supabase.rpc('rpc_rider_kit_status', { p_rider_id: params.id }),
+      supabase.from('rider_training').select('module, passed').eq('rider_id', params.id),
+      supabase
+        .from('rider_test_trip')
+        .select('outcome, created_at, notes')
+        .eq('rider_id', params.id)
+        .order('created_at', { ascending: false })
+        .limit(1),
+      supabase
+        .from('approval_request')
+        .select('id, reason, created_at, requested_by')
+        .eq('kind', 'rider_suspension')
+        .eq('target_id', params.id)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .limit(1),
+    ]);
+  const background = (rider.background_check ?? {}) as Record<string, unknown>;
+  const pending = (suspensions ?? [])[0] as
+    | { id: string; reason: string | null; created_at: string; requested_by: string | null }
+    | undefined;
+  const stageState = {
+    status: rider.status as string,
+    background: {
+      status: typeof background.status === 'string' ? background.status : null,
+      note: typeof background.note === 'string' ? background.note : null,
+      checked_at: typeof background.checked_at === 'string' ? background.checked_at : null,
+    },
+    trainingPassed: (trainingRows ?? []).some((t) => t.module === 'basics' && t.passed),
+    testTrip:
+      ((trips ?? [])[0] as
+        | { outcome: string; created_at: string; notes: string | null }
+        | undefined) ?? null,
+    pendingSuspension: pending
+      ? {
+          id: pending.id,
+          reason: pending.reason,
+          created_at: pending.created_at,
+          mine: pending.requested_by === staff.staffId,
+        }
+      : null,
+  };
 
   const [{ data: requirements }, { data: documents }, { data: readiness }, { data: employer }] =
     await Promise.all([
@@ -198,6 +242,8 @@ export default async function RiderApplicationPage({ params }: { params: { id: s
                 ))}
               </dl>
             </Card>
+
+            <RiderStagePanel riderId={params.id} state={stageState} />
 
             <RiderKitPanel riderId={params.id} status={kit as unknown as RiderKitStatus | null} />
 

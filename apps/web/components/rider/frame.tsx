@@ -85,9 +85,10 @@ export function RiderPageHead({
   );
 }
 
-/** The padding a rider board sits in. Full width, with a gutter. */
+/** The padding a rider board sits in. Full width, with a gutter. It is the
+    page's main landmark: the workspace frame has none (as on merchant pages). */
 export function RiderBoard({ children }: { children: React.ReactNode }) {
-  return <div className="space-y-6 px-4 py-6 sm:px-6 lg:px-7">{children}</div>;
+  return <main className="space-y-6 px-4 py-6 sm:px-6 lg:px-7">{children}</main>;
 }
 
 /**

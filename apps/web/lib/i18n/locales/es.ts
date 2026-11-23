@@ -199,4 +199,38 @@ export const es: Dictionary = {
   'xp.events.buildAround': 'Arma un día en torno a ello →',
   'xp.events.noMarkup':
     'NexG nunca encarece una entrada. Cuando un organizador nos deja reservarlas, lo hacemos a su precio original, y cobramos por el día armado en torno a ella.',
+
+  // ── all categories (/categories)
+  'cats.eyebrow': 'Todas las categorías',
+  'cats.title': 'Todo lo que necesitas,',
+  'cats.gold': 'en un solo lugar.',
+  'cats.lede':
+    '{count} tipos de negocio en Nairobi, desde restaurantes y farmacias hasta alquiler de coches y planes para el día. Elige uno para ver quién te atiende donde estás.',
+  'cats.searchPlaceholder': 'Prueba sushi, floristería o safari',
+  'cats.searchLabel': 'Buscar categorías',
+  'cats.clear': 'Borrar búsqueda',
+  'cats.filterLabel': 'Filtrar por tipo',
+  'cats.kind.all': 'Todo',
+  'cats.kind.menu': 'Comida y bebida',
+  'cats.kind.products': 'Compras',
+  'cats.kind.services': 'Servicios',
+  'cats.matchOne': '1 categoría coincide con “{query}”',
+  'cats.matchMany': '{count} categorías coinciden con “{query}”',
+  'cats.summaryOne': '1 categoría · {types} tipos de tienda y servicio',
+  'cats.summaryMany': '{count} categorías · {types} tipos de tienda y servicio',
+  'cats.empty.title': 'Todavía no hay nada que coincida con “{query}”.',
+  'cats.empty.body':
+    'Un conserje aún puede encontrarlo. Describe lo que necesitas y recibe un precio y una hora antes de comprar nada.',
+  'cats.askConcierge': 'Pregunta a un conserje',
+  'cats.showAll': 'Ver todas las categorías',
+  'cats.cta.eyebrow': '¿No está en la lista?',
+  'cats.cta.title': 'Pide lo que sea a un conserje.',
+  'cats.cta.body':
+    'Describe lo que necesitas. Un conserje te da un precio y una hora, y no se compra nada hasta que lo apruebes.',
+  'cats.cta.list': 'Registra tu negocio',
+  'cats.typeOne': '1 tipo',
+  'cats.typeMany': '{count} tipos',
+  'cats.matches': 'Coincide con {list}',
+  'cats.more': '+{count} más',
+  'cats.seeWho': 'Ver quién te atiende',
 };

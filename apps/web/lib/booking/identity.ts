@@ -2,6 +2,7 @@ import { createClient } from '../supabase/server';
 import { requireMerchantWorkspaceOperations } from '../merchant-access';
 
 import type { BookingIdentity } from './bridge';
+import { resolveCurrentBusiness } from '@/lib/current-business';
 
 // These flags authorize this proxy request only. They are never signed into
 // the booking-engine identity header or copied into application capture.
@@ -36,7 +37,13 @@ export async function merchantBookingIdentity(): Promise<BookingIdentity | null>
   const { data: auth, error: authError } = await client.auth.getUser();
   if (authError || !auth.user || auth.user.is_anonymous) return null;
   const { data: home, error: homeError } = await client.rpc('fn_partner_home');
-  const partner = home as unknown as { kind?: string; id?: string; name?: string } | null;
+  const partner = home
+    ? await resolveCurrentBusiness(
+        client,
+        auth.user.id,
+        home as unknown as { kind: string; id?: string; name?: string; home: string },
+      )
+    : null;
   if (homeError || partner?.kind !== 'merchant' || !partner.id) return null;
   const access = await requireMerchantWorkspaceOperations(client, partner.id);
   const { data: membership, error: membershipError } = await client
