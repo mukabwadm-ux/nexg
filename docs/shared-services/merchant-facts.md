@@ -35,18 +35,26 @@ Treat a trait the app doesn't know as one it can ignore: new ones may be added.
 
 ## The customer's recent categories: `rpc_my_recent_categories(p_limit)`
 
-For a signed-in session, including a guest's temporary one. It returns the categories of the caller's own orders in the last 180 days, most recent first, leaving out cancelled orders:
+For a signed-in session, including a guest's temporary one. It returns the categories the caller has used in the last 180 days, most recent first. It counts:
+
+- **orders**, under the shop's category;
+- **bookings**, on the website or in the apps through the booking engine, under the shop's category;
+- **stays**, under `stays`.
+
+Cancelled ones don't count, and neither do forgotten app bookings.
 
 ```json
 [
-  { "category": "supermarket", "last_ordered_at": "2026-11-23T10:02:11Z", "orders": 1 },
-  { "category": "restaurant", "last_ordered_at": "2026-11-22T18:40:03Z", "orders": 5 }
+  { "category": "stays", "last_at": "2026-11-23T11:02:11Z", "count": 1, "orders": 0, "bookings": 0, "stays": 1, "last_ordered_at": null },
+  { "category": "restaurant", "last_at": "2026-11-22T18:40:03Z", "count": 5, "orders": 5, "bookings": 0, "stays": 0, "last_ordered_at": "2026-11-22T18:40:03Z" }
 ]
 ```
 
+- **`last_at` and `count`** cover everything in the category.
+- **`orders`, `bookings` and `stays`** split the count by kind.
+- **`last_ordered_at`** is the newest order's time, or `null` when the category has only bookings or stays.
 - **`p_limit`:** defaults to 5, between 1 and 20.
-- **Empty:** `[]` when the caller has no orders. The publishable key alone gets `42501`.
-- **Orders only:** bookings and stays aren't counted yet.
+- **Empty:** `[]` when the caller has none of these. The publishable key alone gets `42501`.
 
 ## A branch's Google place ID (staff and server only)
 
