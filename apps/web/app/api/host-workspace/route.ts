@@ -13,6 +13,28 @@ import { readHostWorkspace } from '@/lib/host-workspace/read';
 
 export const dynamic = 'force-dynamic';
 
+/* Field names as the form shows them, so an error says which box to fix. */
+const fieldLabels: Record<string, string> = {
+  capacity: 'guest capacity',
+  bedrooms: 'bedrooms',
+  bathrooms: 'bathrooms',
+  rateKes: 'nightly rate',
+  sizeSqm: 'size',
+  minNights: 'minimum nights',
+  checkInFrom: 'check-in time',
+  checkOutBy: 'check-out time',
+  deliveryFrom: 'delivery from',
+  deliveryTo: 'delivery until',
+  unitNumber: 'unit number',
+  addressLine: 'street address',
+  labelPublic: 'guest-facing label',
+  handoffNote: 'handoff instructions',
+  bedSetup: 'bed setup',
+  propertyId: 'property',
+  lat: 'map pin',
+  lng: 'map pin',
+};
+
 const requestSchema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('command'), command: z.unknown() }),
   z.object({ action: z.literal('sign-out') }),
@@ -52,7 +74,9 @@ export async function POST(request: Request) {
       const field = error.issues[0]?.path.at(-1);
       return hostWorkspaceJson(
         {
-          error: field ? 'Check the ' + String(field) + ' field.' : 'Check the workspace details.',
+          error: field
+            ? 'Check the ' + (fieldLabels[String(field)] ?? String(field)) + ' field.'
+            : 'Check the workspace details.',
         },
         400,
       );
