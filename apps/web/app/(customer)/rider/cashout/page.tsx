@@ -20,6 +20,8 @@ const LABEL: Record<string, string> = {
 interface PayoutOverview {
   availableKes?: number;
   minimumKes?: number;
+  /** Off when Finance has closed early cash-out (Payout rules). */
+  earlyCashout?: boolean;
   payoutPhone?: string | null;
   requests?: {
     id: string;
@@ -102,12 +104,21 @@ export default async function RiderCashout() {
       <PageHead title="Cashout" lead="Withdraw your earnings before the weekly payout" />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
-        <CashoutCard
-          availableKes={payout.availableKes ?? 0}
-          minimumKes={payout.minimumKes ?? 100}
-          payoutPhone={payout.payoutPhone ?? null}
-          open={open}
-        />
+        {payout.earlyCashout === false ? (
+          <section className={panel}>
+            <PanelTitle title="Cashout is closed" />
+            <p className="text-[13px] font-semibold text-slate-600">
+              Early cashout is not open right now. You are paid in the next weekly payout.
+            </p>
+          </section>
+        ) : (
+          <CashoutCard
+            availableKes={payout.availableKes ?? 0}
+            minimumKes={payout.minimumKes ?? 100}
+            payoutPhone={payout.payoutPhone ?? null}
+            open={open}
+          />
+        )}
 
         <div className="space-y-4">
           <section className={panel}>
