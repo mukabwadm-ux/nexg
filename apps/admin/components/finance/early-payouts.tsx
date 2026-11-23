@@ -153,7 +153,7 @@ function Item({ row, canDecide }: { row: EarlyPayoutRow; canDecide: boolean }) {
       {row.transfer_state === 'failed' || row.transfer_state === 'reversed' ? (
         <p className="text-danger mt-1 text-[0.75rem] font-bold">
           The last Paystack payout {row.transfer_state === 'reversed' ? 'was reversed' : 'failed'}
-          {row.transfer_failure ? `: ${row.transfer_failure}` : ''}. The money is the rider's again;
+          {row.transfer_failure ? `: ${row.transfer_failure}` : ''}. The money is the rider&apos;s again;
           try once more.
         </p>
       ) : null}
