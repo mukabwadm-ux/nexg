@@ -32500,6 +32500,101 @@ export type Database = {
           },
         ];
       };
+      paystack_refund: {
+        Row: {
+          amount_cents: number;
+          created_at: string;
+          created_by: string | null;
+          failure_reason: string | null;
+          id: string;
+          is_test: boolean;
+          kind: string;
+          payment_id: string;
+          paystack_refund_id: string | null;
+          reference: string;
+          refund_id: string | null;
+          state: string;
+          stay_id: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_cents: number;
+          created_at?: string;
+          created_by?: string | null;
+          failure_reason?: string | null;
+          id?: string;
+          is_test: boolean;
+          kind: string;
+          payment_id: string;
+          paystack_refund_id?: string | null;
+          reference: string;
+          refund_id?: string | null;
+          state?: string;
+          stay_id?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          amount_cents?: number;
+          created_at?: string;
+          created_by?: string | null;
+          failure_reason?: string | null;
+          id?: string;
+          is_test?: boolean;
+          kind?: string;
+          payment_id?: string;
+          paystack_refund_id?: string | null;
+          reference?: string;
+          refund_id?: string | null;
+          state?: string;
+          stay_id?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'paystack_refund_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'paystack_refund_payment_id_fkey';
+            columns: ['payment_id'];
+            isOneToOne: false;
+            referencedRelation: 'payment';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'paystack_refund_refund_id_fkey';
+            columns: ['refund_id'];
+            isOneToOne: false;
+            referencedRelation: 'refund';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'paystack_refund_refund_id_fkey';
+            columns: ['refund_id'];
+            isOneToOne: false;
+            referencedRelation: 'refunds_to_issue_v';
+            referencedColumns: ['refund_id'];
+          },
+          {
+            foreignKeyName: 'paystack_refund_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_stay_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'paystack_refund_stay_id_fkey';
+            columns: ['stay_id'];
+            isOneToOne: false;
+            referencedRelation: 'stay';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       plan: {
         Row: {
           answers: NonNullable<Json>;
@@ -60438,6 +60533,10 @@ export type Database = {
         Args: { p_data: Json; p_event: string; p_mode: string; p_payload: Json };
         Returns: Json;
       };
+      fn_paystack_refund_apply: {
+        Args: { p_data: Json; p_mode: string; p_source: string };
+        Returns: Json;
+      };
       fn_phone_country_code: { Args: { p_phone: string }; Returns: string };
       fn_pick_concierge: { Args: { p_city_id: string }; Returns: string };
       fn_plan_flags: { Args: { p_plan_id: string }; Returns: Json };
@@ -66996,6 +67095,14 @@ export type Database = {
           p_reference: string;
           p_signature_ok: boolean;
         };
+        Returns: Json;
+      };
+      rpc_paystack_refund_answered: {
+        Args: { p_answer: string; p_proof: string; p_reference: string };
+        Returns: Json;
+      };
+      rpc_paystack_refund_open: {
+        Args: { p_kind: string; p_proof: string; p_target: string };
         Returns: Json;
       };
       rpc_place_confirm: { Args: { p_payload: Json }; Returns: Json };
