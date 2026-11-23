@@ -73,6 +73,12 @@ const KINDS = new Set(['staff', 'asset', 'vehicle', 'room', 'space', 'equipment'
 const BLOCKING = new Set(['held', 'confirmed']);
 const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const hash = (s: string) => createHash('sha256').update(s).digest('hex');
+/**
+ * The business asks a deposit before confirming: a reservation fee due now that
+ * is less than the whole. The customer pays it to confirm, and the balance later.
+ */
+const hasDeposit = (pricing: { dueNowMinor?: number; totalDueMinor?: number }) =>
+  (pricing.dueNowMinor ?? 0) > 0 && (pricing.dueNowMinor ?? 0) < (pricing.totalDueMinor ?? 0);
 const publicId = () => {
   const b = randomBytes(16);
   b.writeUIntBE(Date.now(), 0, 6);
@@ -1095,9 +1101,11 @@ export class BookingEngine {
       !this.externalReservations(b.configuration ?? {});
     return {
       ...pricing,
-      ...(prepaid && pricing.totalDueMinor > 0
-        ? { dueNowMinor: pricing.totalDueMinor, balanceMinor: 0, paymentPolicyId: PREPAID_POLICY }
+      // A deposit the business asks stays the amount due now (owner, 22 Nov 2026).
+      ...(prepaid && pricing.totalDueMinor > 0 && !hasDeposit(pricing)
+        ? { dueNowMinor: pricing.totalDueMinor, balanceMinor: 0 }
         : {}),
+      ...(prepaid && pricing.totalDueMinor > 0 ? { paymentPolicyId: PREPAID_POLICY } : {}),
       ticketTypeId: ticket?.id,
       binding: !sourceRequired && !pricing.indicative,
       sourceRequired,
@@ -2111,11 +2119,13 @@ export class BookingEngine {
           'price_changed',
         );
       this.validateBookingDetails(service, input);
-      // Every customer booking is paid in full before it is confirmed
-      // (owner, 19 Nov 2026). Free bookings have nothing to pay.
+      // Every customer booking is paid through NexG before it is confirmed
+      // (owner, 19 Nov 2026): in full, or the business's deposit now and the
+      // balance later (owner, 22 Nov 2026: "Deposits now"). Free bookings have
+      // nothing to pay.
       const prepaid =
         publicOnly && !requestOnly && !pricing.indicative && pricing.totalDueMinor > 0;
-      if (prepaid) {
+      if (prepaid && !hasDeposit(pricing)) {
         pricing.dueNowMinor = pricing.totalDueMinor;
         pricing.balanceMinor = 0;
       }
@@ -3278,9 +3288,11 @@ export class BookingEngine {
     );
   }
   /**
-   * NexG's payment side: a customer booking was paid in full. Confirms the
-   * held booking. A payment that lands after the hold ran out is refused, so
-   * the payment side refunds it instead of a booking appearing unannounced.
+   * NexG's payment side: a customer booking was paid, in full or by its
+   * deposit. Confirms the held booking; for a confirmed booking with a deposit
+   * paid, records the balance. A payment that lands after the hold ran out is
+   * refused, so the payment side refunds it instead of a booking appearing
+   * unannounced.
    */
   async settlePayment(identity: Identity, id: string, input: Doc, key?: string) {
     requirePlatform(identity);
@@ -3299,22 +3311,36 @@ export class BookingEngine {
         simulated = provider === 'simulated';
       if (simulated && !this.options.simulatedPayments)
         throw new BookingError(403, 'Test payments are switched off.', 'simulated_payments_off');
-      const due = (n.pricing?.totalDueMinor ?? n.priceMinor) - (n.paidMinor ?? 0);
-      // A test payment is always for exactly the amount due.
-      const amountMinor = simulated ? due : integer(input.amountMinor, 'Paid amount', 1);
+      const paidBefore = n.paidMinor ?? 0;
+      const due = (n.pricing?.totalDueMinor ?? n.priceMinor) - paidBefore;
+      // Deposits (owner, 22 Nov 2026): a held booking is confirmed by its
+      // deposit or by the whole amount; a confirmed booking with a deposit paid
+      // then takes exactly the balance, whenever it is paid.
+      const deposit =
+        doc.status === 'held' && paidBefore === 0 && n.pricing && hasDeposit(n.pricing)
+          ? n.pricing.dueNowMinor
+          : null;
+      const balanceStep =
+        doc.status === 'confirmed' && paidBefore > 0 && due > 0 && !this.isExpiredHold(doc);
+      // A test payment is for what is due now: the deposit when there is one.
+      const amountMinor = simulated
+        ? (deposit ?? due)
+        : integer(input.amountMinor, 'Paid amount', 1);
       if (
         (n.paymentEvidence ?? []).some(
           (e: any) => e.provider === provider && e.reference === reference,
         )
       )
         return this.bookingView(doc);
-      if (this.isExpiredHold(doc) || doc.status !== 'held')
+      if (!balanceStep && (this.isExpiredHold(doc) || doc.status !== 'held'))
         throw new BookingError(
           409,
-          'This booking is no longer held. Refund the payment.',
-          'hold_expired',
+          due > 0
+            ? 'This booking is no longer held. Refund the payment.'
+            : 'This booking is already paid. Refund the payment.',
+          due > 0 ? 'hold_expired' : 'already_paid',
         );
-      if (amountMinor !== due)
+      if (amountMinor !== due && amountMinor !== deposit)
         throw new BookingError(
           422,
           'The amount paid does not match the amount due.',
@@ -3329,7 +3355,7 @@ export class BookingEngine {
           nexg: {
             ...n,
             status: 'confirmed',
-            paidMinor: (n.paidMinor ?? 0) + amountMinor,
+            paidMinor: paidBefore + amountMinor,
             paymentState: simulated ? 'simulated' : 'provider_verified',
             paymentEvidence: [
               ...(n.paymentEvidence ?? []),
@@ -3344,7 +3370,7 @@ export class BookingEngine {
               },
             ],
             expiresAt: null,
-            confirmedAt: at,
+            confirmedAt: balanceStep ? (n.confirmedAt ?? at) : at,
             version: n.version + 1,
           },
         },
@@ -3353,6 +3379,11 @@ export class BookingEngine {
       );
       await this.audit(identity, req, simulated ? 'booking.paid_simulated' : 'booking.paid', id, {
         version: result.nexg?.version,
+        step: balanceStep
+          ? 'balance'
+          : amountMinor === deposit && deposit !== due
+            ? 'deposit'
+            : 'full',
       });
       return this.bookingView(result);
     });

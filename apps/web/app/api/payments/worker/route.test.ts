@@ -9,9 +9,13 @@ const { settleDuePrompts, sendQueuedPayouts, registerPaybillUrls, rpc } = vi.hoi
   rpc: vi.fn(),
 }));
 
-const { sweepPaystack } = vi.hoisted(() => ({ sweepPaystack: vi.fn() }));
+const { sweepPaystack, settleBookings } = vi.hoisted(() => ({
+  sweepPaystack: vi.fn(),
+  settleBookings: vi.fn(),
+}));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/order-payment', () => ({ sweepPaystack }));
+vi.mock('@/lib/booking-payment', () => ({ settleBookings }));
 vi.mock('@/lib/mpesa-prompt', () => ({ settleDuePrompts }));
 vi.mock('@/lib/mpesa-payout', () => ({ sendQueuedPayouts }));
 vi.mock('@/lib/supabase/public', () => ({ createPublicClient: () => ({ rpc }) }));
@@ -88,6 +92,7 @@ describe('POST /api/payments/worker', () => {
     vi.stubEnv('PAYSTACK_TEST_SECRET_KEY', 'sk_test_ci_only_0123456789');
     vi.stubEnv('DARAJA_CALLBACK_SECRET', '');
     sweepPaystack.mockReset().mockResolvedValue({ checked: 2 });
+    settleBookings.mockReset().mockResolvedValue({ settled: 1, refused: 0 });
     const signed = crypto
       .createHmac('sha256', 'sk_test_ci_only_0123456789')
       .update(`paystack-sweep:${Math.floor(Date.now() / 60_000)}`)
@@ -104,7 +109,11 @@ describe('POST /api/payments/worker', () => {
     expect((await sweep('ab'.repeat(32))).status).toBe(401);
     expect(sweepPaystack).not.toHaveBeenCalled();
     const res = await sweep(signed);
-    expect(await res.json()).toEqual({ ok: true, paystack: { checked: 2 } });
+    expect(await res.json()).toEqual({
+      ok: true,
+      paystack: { checked: 2 },
+      bookings: { settled: 1, refused: 0 },
+    });
     expect(settleDuePrompts).not.toHaveBeenCalled();
   });
 });
