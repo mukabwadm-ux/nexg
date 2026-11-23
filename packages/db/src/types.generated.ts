@@ -56550,6 +56550,25 @@ export type Database = {
           },
         ];
       };
+      payout_rules_v: {
+        Row: {
+          city_id: string | null;
+          city_name: string | null;
+          constraints: Json | null;
+          group: string | null;
+          help: string | null;
+          key: string | null;
+          label: string | null;
+          party: string | null;
+          scope_kind: string | null;
+          sort: number | null;
+          unit: string | null;
+          value: Json | null;
+          value_type: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
       paystack_transfer_v: {
         Row: {
           amount_cents: number | null;
@@ -56630,25 +56649,6 @@ export type Database = {
           transfer_code?: string | null;
           updated_at?: string | null;
         };
-        Relationships: [];
-      };
-      payout_rules_v: {
-        Row: {
-          city_id: string | null;
-          city_name: string | null;
-          constraints: Json | null;
-          group: string | null;
-          help: string | null;
-          key: string | null;
-          label: string | null;
-          party: string | null;
-          scope_kind: string | null;
-          sort: number | null;
-          unit: string | null;
-          value: Json | null;
-          value_type: string | null;
-        };
-        ComputedFields: never;
         Relationships: [];
       };
       promotion_banner_v: {
