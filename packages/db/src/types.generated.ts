@@ -61060,6 +61060,10 @@ export type Database = {
       fn_ledger_backfill: { Args: { p_limit?: number }; Returns: Json };
       fn_line_options: { Args: { p_item_id: string; p_options: Json }; Returns: Json };
       fn_line_variant: { Args: { p_item_id: string; p_variant: string }; Returns: Json };
+      fn_link_guest_by_confirmed_phone: {
+        Args: { p_phone: string; p_user_id: string };
+        Returns: Json;
+      };
       fn_listing_sync: { Args: { p_unit_id: string }; Returns: undefined };
       fn_load_available: { Args: { p_plan_id: string }; Returns: undefined };
       fn_mask_phone: { Args: { p_phone: string }; Returns: string };
@@ -61647,6 +61651,7 @@ export type Database = {
         Returns: Json;
       };
       fn_phone_country_code: { Args: { p_phone: string }; Returns: string };
+      fn_phone_key: { Args: { p_phone: string }; Returns: string };
       fn_pick_concierge: { Args: { p_city_id: string }; Returns: string };
       fn_pin_from_text: {
         Args: { p_text: string };
