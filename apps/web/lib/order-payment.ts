@@ -12,20 +12,30 @@ import {
   verify,
   type PaystackMode,
 } from '@/lib/paystack';
+import { startBankPayment } from '@/lib/bank/payments';
+import { callbackOrigin, normalisePhone } from '@/lib/daraja';
+import { sendMpesaPrompt } from '@/lib/mpesa-prompt';
+import { mpesaProvider, paymentSetup } from '@/lib/payment-methods';
 import { customerApiClient } from '@/lib/supabase/customer-api';
+import { createClient as cookieClient } from '@/lib/supabase/server';
 
 /**
- * Paying for an order from the phone apps (and anything else holding a
- * Supabase bearer token, guest sessions included):
+ * The one way to pay for an order, for the website and every app (shared
+ * services, payments). The caller signs in with a Supabase bearer token (the
+ * apps, guest sessions included) or the website's own session cookie:
  *
  *   GET  /api/customer/checkout/orders/{orderId}/payment
  *   POST /api/customer/checkout/orders/{orderId}/payment
- *        {"method":"mpesa_stk"|"airtel_money"|"card", "phone"?: "+2547…"}
+ *        {"method":"mpesa_stk"|"airtel_money", "phone":"0712 345 678"}
+ *        {"method":"card", "saveCard"?: true} | {"method":"saved_card", "cardId"}
+ *        {"method":"bank_transfer"}
  *
  * Both answer {status: unpaid|pending|failed|paid, reference?, retryAfterSeconds?,
- * url?, test?}. `url` is Paystack's checkout page for a card; the app opens it
- * and never treats coming back from it as paid. Only Paystack's webhook, or a
- * verify answer this server fetched, marks the order paid.
+ * url?, test?}. `url` is a page to open: Paystack's checkout for a card, or the
+ * bank's page for a bank transfer. Coming back from it never counts as paid:
+ * only the provider's signed callback, or an answer this server fetched, marks
+ * the order paid. Which methods are on offer: lib/payment-methods.ts, served at
+ * GET /api/customer/checkout/payment-methods.
  */
 
 const headers = { 'Cache-Control': 'private, no-store' };
@@ -37,9 +47,15 @@ const startInput = z.discriminatedUnion('method', [
   z
     .object({
       method: z.enum(['mpesa_stk', 'airtel_money']),
-      phone: z.string().regex(/^\+254[17]\d{8}$/),
+      /* +254712345678, 254712345678 or 0712 345 678: normalised below. */
+      phone: z
+        .string()
+        .max(20)
+        .transform((v) => normalisePhone(v))
+        .refine((v): v is string => v !== null),
     })
     .strict(),
+  z.object({ method: z.literal('bank_transfer') }).strict(),
 ]);
 
 type Client = ReturnType<typeof customerApiClient>;
@@ -80,9 +96,14 @@ type Code =
   | 'PAYMENT_REFUSED'
   | 'SERVICE_UNAVAILABLE';
 
-function problem(status: number, code: Code, title: string) {
+function problem(
+  status: number,
+  code: Code,
+  title: string,
+  extra: { reference?: string; retryAfterSeconds?: number } = {},
+) {
   return Response.json(
-    { type: 'about:blank', title, status, code },
+    { type: 'about:blank', title, status, code, ...extra },
     { status, headers: { ...headers, 'Content-Type': 'application/problem+json' } },
   );
 }
@@ -106,16 +127,27 @@ function refused(error: { code?: string; message: string }) {
 }
 
 async function signedIn(request: Request) {
-  const token = /^Bearer ([\w.-]{1,4096})$/i.exec(request.headers.get('authorization') ?? '')?.[1];
-  if (!token) return signIn();
-  const supabase = customerApiClient(token);
+  const header = request.headers.get('authorization');
+  const token = /^Bearer ([\w.-]{1,4096})$/i.exec(header ?? '')?.[1];
+  /* An app sends its session as a bearer token; the website's own pages send
+     their session cookie. */
+  if (header && !token) return signIn();
+  const supabase = token ? customerApiClient(token) : cookieClient();
   const {
     data: { user },
     error,
-  } = await supabase.auth.getUser(token);
-  if (error) return [400, 401, 403].includes(error.status ?? 0) ? signIn() : unavailable();
+  } = token ? await supabase.auth.getUser(token) : await supabase.auth.getUser();
+  if (error) {
+    if (!token && error.name === 'AuthSessionMissingError') return signIn();
+    return [400, 401, 403].includes(error.status ?? 0) ? signIn() : unavailable();
+  }
   if (!user) return signIn();
-  return { supabase, email: user.email ?? null };
+  const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  return {
+    supabase,
+    email: user.email ?? null,
+    name: typeof meta.full_name === 'string' ? meta.full_name : null,
+  };
 }
 
 function view(state: PaymentState): OrderPaymentView {
@@ -262,6 +294,14 @@ export async function startOrderPayment(request: Request, rawOrderId: string) {
       );
     }
 
+    const choice = input.data;
+    if (choice.method === 'bank_transfer') {
+      return startBank(request, session, parsedId.data);
+    }
+    if (choice.method === 'mpesa_stk' && mpesaProvider(paymentSetup()) === 'daraja') {
+      return startDaraja(request, session.supabase, parsedId.data, choice.phone);
+    }
+
     const mode = paystackMode();
     const proof = mode ? paystackProof(mode) : null;
     if (!mode || !proof) return paymentUnavailable();
@@ -275,7 +315,6 @@ export async function startOrderPayment(request: Request, rawOrderId: string) {
     if (begun.error) return refused(begun.error);
     const payment = begun.data as { reference: string; amount_cents: number };
 
-    const choice = input.data;
     const channel =
       choice.method === 'card'
         ? 'card'
@@ -284,8 +323,9 @@ export async function startOrderPayment(request: Request, rawOrderId: string) {
           : choice.method === 'mpesa_stk'
             ? 'mpesa'
             : 'airtel';
+    /* Paystack takes the number as +254…. */
     const phone =
-      choice.method === 'mpesa_stk' || choice.method === 'airtel_money' ? choice.phone : null;
+      choice.method === 'mpesa_stk' || choice.method === 'airtel_money' ? `+${choice.phone}` : null;
     const tried = await rpc(supabase, 'rpc_payment_paystack_attempt', {
       p_payment_reference: payment.reference,
       p_channel: channel,
@@ -383,6 +423,104 @@ export async function startOrderPayment(request: Request, rawOrderId: string) {
   } catch {
     return unavailable();
   }
+}
+
+/**
+ * M-Pesa straight to Safaricom (Daraja), while Paystack is not live. The same
+ * steps the website's own prompt route took: the amount comes from the
+ * database, a second prompt waits a minute, and every prompt is recorded, so
+ * whichever one the customer answers is the one that counts. Safaricom's
+ * callback marks the order paid.
+ */
+async function startDaraja(request: Request, supabase: Client, id: string, phone: string) {
+  const begun = await rpc(supabase, 'rpc_payment_begin_order', { p_order_id: id });
+  if (begun.error) return refused(begun.error);
+  const payment = begun.data as { reference: string; amount_cents: number };
+
+  /* The order number, without dashes, names the payment in the customer's
+     M-Pesa SMS. It is also the Paybill account number for this order, so a
+     Paybill report of the same money finds the order. */
+  const { data: placed } = await supabase
+    .from('order')
+    .select('reference')
+    .eq('id', id)
+    .maybeSingle();
+  const accountReference = placed?.reference
+    ? placed.reference
+        .replace(/[^A-Za-z0-9]/g, '')
+        .toUpperCase()
+        .slice(0, 12)
+    : undefined;
+
+  const sent = await sendMpesaPrompt({
+    supabase,
+    reference: payment.reference,
+    accountReference,
+    amountCents: payment.amount_cents,
+    phone,
+    origin: callbackOrigin(request),
+    description: 'NexG order',
+    notReadyMessage:
+      'M-Pesa is not connected yet. Your order is saved and the amount owed is recorded.',
+  });
+  if (!sent.ok) {
+    const extra = {
+      reference: payment.reference,
+      ...(sent.waitSeconds ? { retryAfterSeconds: sent.waitSeconds } : {}),
+    };
+    if (sent.status === 503) {
+      return problem(503, 'PAYMENT_UNAVAILABLE', sent.message, extra);
+    }
+    if (sent.status === 429) return problem(429, 'PAYMENT_REFUSED', sent.message, extra);
+    return problem(sent.status >= 500 ? 502 : 409, 'PAYMENT_REFUSED', sent.message, extra);
+  }
+  return Response.json(
+    {
+      status: 'pending',
+      reference: payment.reference,
+      retryAfterSeconds: 60,
+    } satisfies OrderPaymentView,
+    { headers },
+  );
+}
+
+/** A bank transfer: the bank's page, where the customer approves it. The bank's signed event marks it paid. */
+async function startBank(
+  request: Request,
+  session: { supabase: Client; email: string | null; name: string | null },
+  id: string,
+) {
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, '') ?? new URL(request.url).origin;
+  const result = await startBankPayment(session.supabase, {
+    orderId: id,
+    origin,
+    email: session.email,
+    name: session.name,
+  });
+  if (!result.ok) {
+    const extra = result.reference ? { reference: result.reference } : {};
+    if (result.status === 503) return problem(503, 'PAYMENT_UNAVAILABLE', result.message, extra);
+    return problem(result.status >= 500 ? 502 : 409, 'PAYMENT_REFUSED', result.message, extra);
+  }
+  if ('paid' in result && result.paid) {
+    return Response.json(
+      { status: 'paid', reference: result.reference } satisfies OrderPaymentView,
+      {
+        headers,
+      },
+    );
+  }
+  return Response.json(
+    {
+      status: 'pending',
+      reference: result.reference,
+      ...('authorization_url' in result && result.authorization_url
+        ? { url: result.authorization_url }
+        : {}),
+    } satisfies OrderPaymentView,
+    { headers },
+  );
 }
 
 /**

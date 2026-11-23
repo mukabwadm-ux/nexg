@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { ChargedInKesNote, ChargedPrice, Price } from '@/components/currency/price';
+import { payOrder } from '@/lib/pay-order';
 import { createClient } from '@/lib/supabase/client';
 
 import { lineKey, toBasketLines } from './basket-sync';
@@ -243,12 +244,7 @@ export function CheckoutForm({
       }
 
       if (method === 'mpesa_stk') {
-        const stk = await fetch('/api/payments/mpesa/start', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ orderId: result.order_id, phone }),
-        });
-        const sent = (await stk.json()) as { ok: boolean; message?: string; reference?: string };
+        const sent = await payOrder(result.order_id, { method: 'mpesa_stk', phone });
         if (!sent.ok) {
           cart.clear();
           /* The order and its payment are saved: the pay page shows where it
@@ -268,20 +264,10 @@ export function CheckoutForm({
       }
 
       if (method === 'bank_transfer') {
-        const started = await fetch('/api/payments/bank/start', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ orderId: result.order_id }),
-        });
-        const bank = (await started.json()) as {
-          ok: boolean;
-          message?: string;
-          reference?: string;
-          authorization_url?: string;
-        };
+        const bank = await payOrder(result.order_id, { method: 'bank_transfer' });
         cart.clear();
-        if (bank.ok && bank.authorization_url) {
-          window.location.href = bank.authorization_url;
+        if (bank.ok && bank.url) {
+          window.location.href = bank.url;
           return;
         }
         /* The order and its payment are saved: the pay page says where it

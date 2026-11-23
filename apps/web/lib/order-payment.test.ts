@@ -2,10 +2,32 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
 
-const stub = vi.hoisted(() => ({ getUser: vi.fn(), rpc: vi.fn() }));
-vi.mock('@/lib/supabase/customer-api', () => ({
-  customerApiClient: () => ({ auth: { getUser: stub.getUser }, rpc: stub.rpc }),
+const stub = vi.hoisted(() => ({
+  getUser: vi.fn(),
+  cookieUser: vi.fn(),
+  rpc: vi.fn(),
+  prompt: vi.fn(),
+  bank: vi.fn(),
+  /* The order's own row: what the M-Pesa SMS names. */
+  from: () => ({
+    select: () => ({
+      eq: () => ({ maybeSingle: async () => ({ data: { reference: 'NX-26-0001' } }) }),
+    }),
+  }),
 }));
+vi.mock('@/lib/supabase/customer-api', () => ({
+  customerApiClient: () => ({ auth: { getUser: stub.getUser }, rpc: stub.rpc, from: stub.from }),
+}));
+/* The website's own pages sign in with their session cookie. */
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: () => ({
+    auth: { getUser: stub.cookieUser },
+    rpc: stub.rpc,
+    from: stub.from,
+  }),
+}));
+vi.mock('@/lib/mpesa-prompt', () => ({ sendMpesaPrompt: stub.prompt }));
+vi.mock('@/lib/bank/payments', () => ({ startBankPayment: stub.bank }));
 
 import { readOrderPayment, startOrderPayment } from './order-payment';
 
@@ -38,6 +60,7 @@ beforeEach(() => {
   vi.stubEnv('PAYSTACK_LIVE_SECRET_KEY', '');
   vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://www.nexgapp.com');
   stub.getUser.mockResolvedValue({ data: { user: { id: 'guest', email: null } }, error: null });
+  stub.cookieUser.mockResolvedValue({ data: { user: null }, error: null });
 });
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -55,9 +78,76 @@ describe('order payment route', () => {
     expect((await readOrderPayment(request(), 'not-a-uuid')).status).toBe(404);
     expect((await startOrderPayment(request({ method: 'cash' }), ORDER)).status).toBe(422);
     expect(
-      (await startOrderPayment(request({ method: 'mpesa_stk', phone: '0712345678' }), ORDER))
-        .status,
+      (await startOrderPayment(request({ method: 'mpesa_stk', phone: '12345' }), ORDER)).status,
     ).toBe(422);
+  });
+
+  it('takes the website session cookie when there is no bearer token', async () => {
+    stub.cookieUser.mockResolvedValue({
+      data: { user: { id: 'u1', email: 'a@example.test', user_metadata: {} } },
+      error: null,
+    });
+    stub.bank.mockResolvedValue({
+      ok: true,
+      reference: 'NXP-9',
+      authorization_url: 'https://bank.example/pay/1',
+    });
+    const response = await startOrderPayment(request({ method: 'bank_transfer' }, ''), ORDER);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      status: 'pending',
+      reference: 'NXP-9',
+      url: 'https://bank.example/pay/1',
+    });
+    expect(stub.bank).toHaveBeenCalledWith(expect.anything(), {
+      orderId: ORDER,
+      origin: 'https://www.nexgapp.com',
+      email: 'a@example.test',
+      name: null,
+    });
+  });
+
+  it('says when the bank is not connected, keeping the reference', async () => {
+    stub.bank.mockResolvedValue({
+      ok: false,
+      status: 503,
+      message: 'Paying by bank is not available right now.',
+    });
+    const response = await startOrderPayment(request({ method: 'bank_transfer' }), ORDER);
+    expect(response.status).toBe(503);
+    expect((await response.json()).code).toBe('PAYMENT_UNAVAILABLE');
+  });
+
+  it('sends M-Pesa straight to Safaricom while Paystack is not live', async () => {
+    for (const [k, v] of Object.entries({
+      DARAJA_CONSUMER_KEY: 'k',
+      DARAJA_CONSUMER_SECRET: 's',
+      DARAJA_SHORTCODE: '174379',
+      DARAJA_PASSKEY: 'p',
+      DARAJA_CALLBACK_SECRET: 'c',
+    })) {
+      vi.stubEnv(k, v);
+    }
+    answer({ rpc_payment_begin_order: { data: { reference: 'NXP-2', amount_cents: 99000 } } });
+    stub.prompt.mockResolvedValue({ ok: true, message: 'Check your phone.' });
+    const response = await startOrderPayment(
+      request({ method: 'mpesa_stk', phone: '0712 345 678' }),
+      ORDER,
+    );
+    expect(await response.json()).toEqual({
+      status: 'pending',
+      reference: 'NXP-2',
+      retryAfterSeconds: 60,
+    });
+    expect(stub.prompt).toHaveBeenCalledWith(
+      expect.objectContaining({
+        reference: 'NXP-2',
+        amountCents: 99000,
+        phone: '254712345678',
+        accountReference: 'NX260001',
+      }),
+    );
+    expect(stub.rpc).not.toHaveBeenCalledWith('rpc_payment_paystack_attempt', expect.anything());
   });
 
   it('says payment is unavailable with no Paystack key, and charges nothing', async () => {
