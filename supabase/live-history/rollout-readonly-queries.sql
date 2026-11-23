@@ -1543,7 +1543,10 @@ from (values
   ('20270224000100', 'public.rpc_rider_message_reply', '85b19837b430297f59b2add6246ee480', '91675bd28a3543e75258db73ab4dac00'),
   ('20270224000100', 'public.fn_rider_points_sync', '78f968d2aad9436f1f4fa3b4d98155a4', 'b13dc267cc33a0c6385d8cf4f2871607'),
   ('20270224000100', 'public.rpc_rider_rewards', 'e317b8a04d64c94181dbfea067231b76', '4681695123eee9933499be000a79b5eb'),
-  ('20270224100100', 'public.rpc_host_workspace_guide_asset', 'fdb68cb7738368f9e47edf4da297bedb', '42d6fa5d4b3e941980bdcf5599a3dc67')
+  ('20270225000100', 'public.fn_phone_key', '2e83b031a10e6810f67c6523c74a447e', '92294e36224d25ccf132c9c19860c30d'),
+  ('20270225000100', 'public.fn_link_guest_by_confirmed_phone', '36931585cab4a6d6e4fc9346ce32c4fb', 'd4dbdeeb1d0d4e1d8c6290d3fa7a0a19'),
+  ('20270225000100', 'public.tg_users_link_guest_by_phone', '0fdeff966a659f72484a163ef631d152', '8cb2f8353bc1f8fb962eb79151ca7e4c'),
+  ('20270225000500', 'public.rpc_host_workspace_guide_asset', 'fdb68cb7738368f9e47edf4da297bedb', '42d6fa5d4b3e941980bdcf5599a3dc67')
 ) as v(version, fn, md5_lf, md5_crlf)
 left join lateral (
   select v.fn, bool_or(md5(p.prosrc) in (v.md5_lf, v.md5_crlf)) as same

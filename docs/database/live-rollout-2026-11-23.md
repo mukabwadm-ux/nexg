@@ -54,7 +54,7 @@ If it differs, stop: run K2, and compare each version's `sql_md5` with section 3
 | `20261111000800` | `retire_packages_with_valid_status` | `20261113000700`, 2/2 |
 | `20261111000900` | `host_scoped_privacy_status` | `20261113000800`, 9/9 |
 | `20261111001000` | `host_workspace_tasks` | `20261113000900`, 8/9: main gives `rpc_host_workspace_task_save` parameter defaults, and `20261114000100` re-creates it with them |
-| `20261111001100` | `host_workspace_guides` | `20261113001000`, 20/21: main gives `rpc_host_workspace_guide_asset` `p_code default null`, which **`20270224100100` (this PR) adds** |
+| `20261111001100` | `host_workspace_guides` | `20261113001000`, 20/21: main gives `rpc_host_workspace_guide_asset` `p_code default null`, which **`20270225000500` (this PR) adds** |
 | `20261111001200` | `unit_save_respects_unit_scope` | none. Later main files replace the function |
 | `20261111001300` | `host_workspace_writes_are_audited` | none. `20261114000100` replaces both functions |
 | `20261111001400` | `gross_includes_vat` | none (section 7) |
@@ -68,19 +68,19 @@ If it differs, stop: run K2, and compare each version's `sql_md5` with section 3
 
 ## 2. The count
 
-Main at `6325110f` has 199 migrations live never recorded, plus the 3 hidden under shared numbers. This PR adds 2. That makes 204, and each has a row in section 9.
+All counts in this document are as of main at `3d8f5edf`. Main has 200 migrations live never recorded, plus the 3 hidden under shared numbers. This PR adds 2. That makes 205, and each has a row in section 9.
 
 | Class | Count | What happens |
 |---|---|---|
-| New: nothing like it is live | 177 | runs |
-| New, this PR | 2 | runs. `20270224100100` adds the one parameter default live's early copy lacks. `20270224100200` adds the `merchant_application_session_gate` policy to `connector_connection`, which live would otherwise miss because the connector tables arrive late there |
+| New: nothing like it is live | 178 | runs |
+| New, this PR | 2 | runs. `20270225000500` adds the one parameter default live's early copy lacks. `20270225000600` adds the `merchant_application_session_gate` policy to `connector_connection`, which live would otherwise miss because the connector tables arrive late there |
 | Repeat of a live version under another number | 9 | marked applied by repair, with proof (section 3). Seven of them would stop the push with "already exists" if run |
 | Never ran, hidden by a shared number | 3 | `20261111000000`, `000200`, `000300`: live's rows are reverted, then the push runs main's files. All three are safe late: an insert that does nothing on conflict, a grant, and create or replace |
 | Superseded by a later file | 11 | runs; harmless, the later file wins |
 | Unknown until query I answers | 2 | `20260101021800` (create or replace: harmless either way); `20261102000050` (fails only if the connector tables already exist; query I says) |
 | Repeat of another file on main | 0 | proven in CI: no two files share statements, no file only repeats earlier ones, ids unique |
 
-**`db push --include-all` runs 195 migrations.** That is 204 minus the 9 marked applied. `node scripts/live-rollout-2026-11-23.mjs expected` prints them in order. The dry run must print exactly that list.
+**`db push --include-all` runs 196 migrations.** That is 205 minus the 9 marked applied. `node scripts/live-rollout-2026-11-23.mjs expected` prints them in order. The dry run must print exactly that list.
 
 Main moves daily. Fetch it, then recount with that command, before the push; any new migration after the live head is simply new.
 
@@ -247,7 +247,7 @@ Its list must equal, line for line and in order:
 node scripts/live-rollout-2026-11-23.mjs expected
 ```
 
-That is 195 lines at `6325110f` plus this PR.
+That is 196 lines at `3d8f5edf` plus this PR.
 
 ### Step 8: check
 
@@ -274,7 +274,7 @@ The revert in section 3 cleans only the history table. These changes stay on liv
 
 CI's rehearsal compares live after the rollout with a database built fresh from main, statement by statement. The only differences are the rows above: the enum, the media owner check and its two policies, and `fn_fin_kpi_for`. Each is listed with its reason in `supabase/live-history/rollout-expected-schema-diff.json`. The job fails on any other difference, and on any listed one that disappears.
 
-The first rehearsal found one more, the other way round: `connector_connection` would have lacked a security policy every other merchant table has. `20270224100200` (this PR) adds it.
+The first rehearsal found one more, the other way round: `connector_connection` would have lacked a security policy every other merchant table has. `20270225000600` (this PR) adds it.
 
 **One question has to be answered before the live run.** Where do merchants saved with `activities_games_sports` go? The local copy has 65 of them, and query J counts live's.
 
@@ -522,5 +522,6 @@ After the live push, add the new live versions to `live-versions-*.json`, so ids
 | 200 | `20270223100100_pets_category_enum` | Pets becomes NexG's 22nd merchant category (owner, 23 Nov 2026). | New | none | run |
 | 201 | `20270223100200_pets_category` | Pets: NexG's 22nd merchant category (owner, 23 Nov 2026). | New | config rows: category_config, document_requirement, merchant_application_registry | run |
 | 202 | `20270224000100_rider_portal_offers_replies_points` | Rider portal, second round of mockups: what the new screens need from | New | none | run |
-| 203 | `20270224100100_host_guide_asset_code_optional` | A guide's plan or model can be opened without a share code, as main has always defined it. | New, this PR: the default live lacks | none | run |
-| 204 | `20270224100200_connector_connection_session_gate` | connector_connection gets the merchant application session gate on live too. | New, this PR: the policy live would lack | none | run |
+| 203 | `20270225000100_link_guest_orders_by_phone` | A customer who confirms their phone by SMS code gets the orders they placed | New | config rows: action_registry | run |
+| 204 | `20270225000500_host_guide_asset_code_optional` | A guide's plan or model can be opened without a share code, as main has always defined it. | New, this PR: the default live lacks | none | run |
+| 205 | `20270225000600_connector_connection_session_gate` | connector_connection gets the merchant application session gate on live too. | New, this PR: the policy live would lack | none | run |

@@ -165,7 +165,7 @@
       "differences": [
         {
           "object": "public.rpc_host_workspace_guide_asset(",
-          "why": "Main's file gives p_code a default of null; live's copy has none. 20270224100100_host_guide_asset_code_optional adds it."
+          "why": "Main's file gives p_code a default of null; live's copy has none. 20270225000500_host_guide_asset_code_optional adds it."
         }
       ]
     }
