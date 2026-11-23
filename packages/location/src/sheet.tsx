@@ -3,6 +3,7 @@
 import { Search } from 'lucide-react';
 import * as React from 'react';
 
+import { Panel } from './panel';
 import { UseMyLocation } from './use-my-location';
 import { useLocation } from './store';
 
@@ -23,8 +24,17 @@ export function LocationSheet({
   /** Open by itself on a first visit. Off where the page asks in its own way. */
   autoOpen = true,
 }: { autoOpen?: boolean } = {}) {
-  const { sheetOpen, closeSheet, setPanelOpen, place, openSheet, asked, ready, step } =
-    useLocation();
+  const { sheetOpen, closeSheet, place, openSheet, asked, ready, step } = useLocation();
+  /*
+   * "Search an address or place" opens the search here, inside the
+   * sheet. It used to close the sheet and open the panel under the
+   * header's location chip, which is not on every page (the homepage
+   * hero has its own pill), so on those pages the sheet just vanished.
+   */
+  const [searching, setSearching] = React.useState(false);
+  React.useEffect(() => {
+    if (!sheetOpen) setSearching(false);
+  }, [sheetOpen]);
 
   /*
    * Once per visit, on the first page that needs a place, and
@@ -85,31 +95,43 @@ export function LocationSheet({
           Where should we deliver?
         </h2>
 
-        <div className="mt-4">
-          <UseMyLocation variant="sheet" onDone={() => closeSheet('confirmed')} />
-        </div>
+        {searching ? (
+          <div className="mt-4">
+            <Panel inline onDone={() => closeSheet('confirmed')} />
+            <button
+              type="button"
+              onClick={() => setSearching(false)}
+              className="text-muted hover:text-ink mx-auto mt-3 block text-sm font-extrabold transition-colors"
+            >
+              Back
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="mt-4">
+              <UseMyLocation variant="sheet" onDone={() => closeSheet('confirmed')} />
+            </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            closeSheet('dismissed');
-            setTimeout(() => setPanelOpen(true), 50);
-          }}
-          className="border-border hover:border-ink mt-3 flex w-full items-center gap-2 rounded-xl border px-4 py-3 text-left transition-colors"
-        >
-          <Search className="text-muted-light h-4 w-4 shrink-0" aria-hidden="true" />
-          <span className="text-muted-light flex-1 truncate text-sm font-semibold">
-            Search an address or place
-          </span>
-        </button>
+            <button
+              type="button"
+              onClick={() => setSearching(true)}
+              className="border-border hover:border-ink mt-3 flex w-full items-center gap-2 rounded-xl border px-4 py-3 text-left transition-colors"
+            >
+              <Search className="text-muted-light h-4 w-4 shrink-0" aria-hidden="true" />
+              <span className="text-muted-light flex-1 truncate text-sm font-semibold">
+                Search an address or place
+              </span>
+            </button>
 
-        <button
-          type="button"
-          onClick={() => closeSheet('skipped')}
-          className="text-muted hover:text-ink mx-auto mt-4 block text-sm font-extrabold transition-colors"
-        >
-          Skip for now
-        </button>
+            <button
+              type="button"
+              onClick={() => closeSheet('skipped')}
+              className="text-muted hover:text-ink mx-auto mt-4 block text-sm font-extrabold transition-colors"
+            >
+              Skip for now
+            </button>
+          </>
+        )}
 
         <p className="text-muted-light mt-3 text-center text-[0.6875rem] font-semibold">
           We only keep the spot you confirm.{' '}
