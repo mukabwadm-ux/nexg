@@ -1,5 +1,10 @@
+import { refused, rpc, startPayment, stateFrom } from '@/lib/order-payment';
+import { paystackMode } from '@/lib/paystack';
 import { customerApiClient } from '@/lib/supabase/customer-api';
 import { z } from 'zod';
+
+/* Paystack takes M-Pesa and Airtel Money up to KES 150,000 a payment. */
+const MPESA_LIMIT_MINOR = 15_000_000;
 
 const headers = { 'Cache-Control': 'private, no-store' };
 const uuid = z
@@ -72,13 +77,6 @@ const unavailable = () =>
 const invalid = (title: string) => problem(422, 'INVALID_REQUEST', title);
 // Paying in the app is being switched on with Paystack; until then a hold waits
 // for payment like every other booking.
-const paymentUnavailable = () =>
-  problem(
-    503,
-    'PAYMENT_UNAVAILABLE',
-    'Paying in the app is not switched on yet. Your dates stay held while the hold lasts.',
-  );
-
 function rpcError(error: DatabaseError, stage: 'quote' | 'hold' | 'status' | 'payment') {
   switch (error.code) {
     case '42501':
@@ -167,15 +165,32 @@ export async function stayQuote(request: Request) {
     )
       return unavailable();
 
+    /* The host's cancellation policy, which the stay is held to once made. */
+    const policy = await rpc(supabase, 'rpc_stay_cancellation_policy', { p_unit_id: input.unitId });
+    const policyText =
+      !policy.error && typeof (policy.data as { text?: unknown } | null)?.text === 'string'
+        ? (policy.data as { text: string }).text
+        : null;
+
     return Response.json(
       {
         ...quote,
-        // Empty until payment is switched on; both apps show no payment button then.
-        paymentMethods: [],
+        // The apps read one method here, M-Pesa; empty while Paystack is off, or
+        // above M-Pesa's KES 150,000 a payment. paystackMethods is the full list
+        // for apps that take a card too.
+        paymentMethods:
+          paystackMode() && quote.totalMinor <= MPESA_LIMIT_MINOR ? ['mpesa_stk'] : [],
+        paystackMethods: paystackMode()
+          ? [
+              ...(quote.totalMinor <= MPESA_LIMIT_MINOR ? ['mpesa_stk', 'airtel_money'] : []),
+              'card',
+            ]
+          : [],
         termsText:
           'You get a 15-minute hold while you pay. Your stay is confirmed once NexG has your payment.',
-        cancellationText:
-          'Unpaid holds expire automatically. Contact NexG about changing or cancelling a confirmed stay and any refund that applies.',
+        cancellationText: policyText
+          ? `Unpaid holds expire automatically. If a paid stay is cancelled: ${policyText.charAt(0).toLowerCase()}${policyText.slice(1)} NexG handles the cancellation.`
+          : 'Unpaid holds expire automatically. Contact NexG about changing or cancelling a confirmed stay and any refund that applies.',
       },
       { headers },
     );
@@ -221,21 +236,36 @@ export async function stayStatus(request: Request, operationId: string) {
   }
 }
 
+/*
+ * Paying for a held stay through Paystack (owner, 22 Nov 2026: stays paid in
+ * full at booking). The body and the answer are the order route's:
+ * {method:'mpesa_stk'|'airtel_money', phone} | {method:'card', saveCard?} |
+ * {method:'saved_card', cardId} → {status, reference?, url?, retryAfterSeconds?,
+ * test?}. GET /holds/{operationId} stays the proof that the stay is booked.
+ */
 export async function stayPayment(request: Request, operationId: string) {
-  try {
-    const supabase = await signedIn(request);
-    if (supabase instanceof Response) return supabase;
-    const id = uuid.safeParse(operationId);
-    if (!id.success) return invalid('Check the stay checkout ID.');
+  const id = uuid.safeParse(operationId);
+  if (!id.success) return invalid('Check the stay checkout ID.');
+  return startPayment(request, async ({ supabase }) => {
     const current = await readStatus(supabase, id.data);
     if (current instanceof Response) return current;
-    if (current.refundDue || ['pending', 'paid'].includes(current.paymentStatus))
-      return response(current);
-    if (current.status !== 'held') {
+    if (current.paymentStatus === 'paid' && !current.refundDue)
+      return Response.json(
+        { status: 'paid', ...(current.reference ? { reference: current.reference } : {}) },
+        { headers },
+      );
+    if (current.refundDue || current.status !== 'held')
       return problem(409, 'PAYMENT_UNAVAILABLE', 'This stay cannot be paid now. Check its status.');
-    }
-    return paymentUnavailable();
-  } catch {
-    return unavailable();
-  }
+    const stayId = current.stayId;
+    return {
+      readState: async () =>
+        stateFrom(await rpc(supabase, 'rpc_stay_payment_state', { p_stay_id: stayId })),
+      begin: async () => {
+        const begun = await rpc(supabase, 'rpc_payment_begin_stay', { p_stay_id: stayId });
+        if (begun.error) return refused(begun.error);
+        return begun.data as { reference: string; amount_cents: number };
+      },
+      metadata: { stay_id: stayId },
+    };
+  });
 }
