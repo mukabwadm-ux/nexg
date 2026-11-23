@@ -31,6 +31,7 @@ import {
   type ZoneRow,
 } from '@/components/riders/tabs';
 import { requireModule, requireStaff } from '@/lib/staff';
+import { RateCardEditor, type DraftCard } from '@/components/riders/rate-card-editor';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { title: 'Riders' };
@@ -116,7 +117,7 @@ export default async function RidersPage({
 
         {tab === 'cash' && (await loadCash(supabase, rows, badges, selected))}
 
-        {tab === 'settlement' && (await loadSettlement(supabase))}
+        {tab === 'settlement' && (await loadSettlement(supabase, staff.staffId))}
 
         {tab === 'supply' && (await loadSupply(supabase, badges))}
 
@@ -273,7 +274,7 @@ async function loadCash(
   );
 }
 
-async function loadSettlement(supabase: Supabase) {
+async function loadSettlement(supabase: Supabase, staffId: string) {
   const { data: runs } = await supabase
     .from('rider_settlement_run')
     .select('*')
@@ -282,16 +283,24 @@ async function loadSettlement(supabase: Supabase) {
 
   const run = ((runs as RunRow[] | null) ?? [])[0] ?? null;
 
-  const [{ data: lines }, { data: cards }, { data: bonuses }] = await Promise.all([
-    run
-      ? supabase
-          .from('rider_settlement_line')
-          .select('*, rider:rider_id(first_name, last_name, status)')
-          .eq('run_id', run.id)
-      : Promise.resolve({ data: [] as unknown[] }),
-    supabase.from('rider_rate_card').select('*').eq('status', 'current').limit(1),
-    supabase.from('rider_bonus_rule').select('id, key, enabled, params'),
-  ]);
+  const [{ data: lines }, { data: cards }, { data: bonuses }, { data: drafts }, { data: cities }] =
+    await Promise.all([
+      run
+        ? supabase
+            .from('rider_settlement_line')
+            .select('*, rider:rider_id(first_name, last_name, status)')
+            .eq('run_id', run.id)
+        : Promise.resolve({ data: [] as unknown[] }),
+      supabase.from('rider_rate_card').select('*').eq('status', 'current').limit(1),
+      supabase.from('rider_bonus_rule').select('id, key, enabled, params'),
+      supabase
+        .from('rider_rate_card')
+        .select('*')
+        .eq('status', 'draft')
+        .order('created_at', { ascending: false })
+        .limit(1),
+      supabase.from('city').select('id, name').order('name'),
+    ]);
 
   return (
     <SettlementTab
@@ -299,6 +308,14 @@ async function loadSettlement(supabase: Supabase) {
       lines={(lines as SettlementLineRow[] | null) ?? []}
       rateCard={((cards as RateCardRow[] | null) ?? [])[0] ?? null}
       bonuses={(bonuses as BonusRuleRow[] | null) ?? []}
+      editor={
+        <RateCardEditor
+          cities={(cities as { id: string; name: string }[] | null) ?? []}
+          current={((cards as RateCardRow[] | null) ?? [])[0] ?? null}
+          draft={((drafts as DraftCard[] | null) ?? [])[0] ?? null}
+          staffId={staffId}
+        />
+      }
     />
   );
 }

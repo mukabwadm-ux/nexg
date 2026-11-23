@@ -216,3 +216,67 @@ export async function reinstateRider(riderId: string, reason: string): Promise<R
   if (error) return { ok: false, message: error.message };
   return done(riderId, 'Rider reinstated.');
 }
+
+// ─────────────────────────────────────────────── rider rate card
+
+export interface RateCardInput {
+  cityId: string;
+  version: string;
+  effectiveFrom: string;
+  basePerTrip: number;
+  perKmAfter2km: number;
+  paidWaitingPer5min: number | null;
+  secondPickupBonus: number | null;
+  peakBonusDinner: number | null;
+  peakBonusRain: number | null;
+  cancellationAfterPickup: number | null;
+  tipsPassThroughPct: number;
+}
+
+/**
+ * Save the city's draft rate card (rpc_rate_card_draft_save). Any change
+ * clears a first approval, so the second person approves what goes live.
+ */
+export async function saveRateCardDraft(input: RateCardInput): Promise<ReviewResult> {
+  const { error } = await createClient().rpc('rpc_rate_card_draft_save', {
+    p_city_id: input.cityId,
+    p_version: input.version,
+    p_effective_from: input.effectiveFrom,
+    p_base_per_trip_kes: input.basePerTrip,
+    p_per_km_after_2km_kes: input.perKmAfter2km,
+    p_paid_waiting_per_5min_kes: input.paidWaitingPer5min ?? undefined,
+    p_second_pickup_bonus_kes: input.secondPickupBonus ?? undefined,
+    p_peak_bonus_dinner_kes: input.peakBonusDinner ?? undefined,
+    p_peak_bonus_rain_kes: input.peakBonusRain ?? undefined,
+    p_cancellation_after_pickup_kes: input.cancellationAfterPickup ?? undefined,
+    p_guest_tips_pass_through_pct: input.tipsPassThroughPct,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/riders');
+  return { ok: true, message: 'Draft saved. It needs two different people to approve it.' };
+}
+
+/** First press approves; a second, different person's press publishes it. */
+export async function publishRateCard(cardId: string): Promise<ReviewResult> {
+  const { data, error } = await createClient().rpc('rpc_rate_card_publish', {
+    p_card_id: cardId,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/riders');
+  const live = (data as { status?: string } | null)?.status === 'current';
+  return {
+    ok: true,
+    message: live
+      ? 'Published. Trips delivered from now on are paid on this card.'
+      : 'Approved. A second person now publishes it.',
+  };
+}
+
+export async function discardRateCardDraft(cardId: string): Promise<ReviewResult> {
+  const { error } = await createClient().rpc('rpc_rate_card_draft_discard', {
+    p_card_id: cardId,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/riders');
+  return { ok: true, message: 'Draft discarded.' };
+}

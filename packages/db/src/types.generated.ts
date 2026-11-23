@@ -67862,6 +67862,46 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_rate_card_draft_discard: { Args: { p_card_id: string }; Returns: Json };
+      rpc_rate_card_draft_save: {
+        Args: {
+          p_base_per_trip_kes: number;
+          p_cancellation_after_pickup_kes?: number;
+          p_city_id: string;
+          p_effective_from: string;
+          p_guest_tips_pass_through_pct?: number;
+          p_paid_waiting_per_5min_kes?: number;
+          p_peak_bonus_dinner_kes?: number;
+          p_peak_bonus_rain_kes?: number;
+          p_per_km_after_2km_kes: number;
+          p_second_pickup_bonus_kes?: number;
+          p_version: string;
+        };
+        Returns: {
+          approved_by: string | null;
+          base_per_trip_kes: number | null;
+          cancellation_after_pickup_kes: number | null;
+          city_id: string;
+          created_at: string;
+          effective_from: string;
+          guest_tips_pass_through_pct: number;
+          id: string;
+          paid_waiting_per_5min_kes: number | null;
+          peak_bonus_dinner_kes: number | null;
+          peak_bonus_rain_kes: number | null;
+          per_km_after_2km_kes: number | null;
+          second_approver_id: string | null;
+          second_pickup_bonus_kes: number | null;
+          status: string;
+          version: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'rider_rate_card';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_rate_card_publish: {
         Args: { p_card_id: string };
         Returns: {

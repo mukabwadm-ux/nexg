@@ -1,5 +1,6 @@
 import { Card } from '@nexg/ui';
 import Link from 'next/link';
+import type * as React from 'react';
 
 import {
   CashBar,
@@ -736,11 +737,14 @@ export function SettlementTab({
   lines,
   rateCard,
   bonuses,
+  editor,
 }: {
   run: RunRow | null;
   lines: SettlementLineRow[];
   rateCard: RateCardRow | null;
   bonuses: BonusRuleRow[];
+  /** The rate card editor (client), under the published card. */
+  editor?: React.ReactNode;
 }) {
   return (
     <>
@@ -903,6 +907,8 @@ export function SettlementTab({
               Shown to riders in the app before they accept. Changes need Ops manager + Finance.
             </p>
           </Card>
+
+          {editor}
 
           <Card className="p-5">
             <p className="text-[0.9375rem] font-extrabold">Bonus rules</p>
