@@ -171,7 +171,7 @@ These are also needed before launch:
 
 - **R1:** public privacy-policy and support pages, which the app stores require.
 - **R2:** the Discovery engine at a public https origin. This is hosting (D13).
-- **R3:** an approximate point per property in `property_public` and `property_unit_public`. Decide how coarse it should be.
+- **R3:** settled 22 Nov: no change. The owner kept the exact pin public (decided 20 Nov, `20270125000100`), so `property_public` and `property_unit_public` already give the apps each property's and unit's `latitude` and `longitude` for a map.
 - **R4:** account deletion for Stays accounts. #132 covers customers.
 - **R5:** a host API on Supabase, replacing the Stays app's local host service (D7).
 - **R6:** an App Review demo account for host features, after R4 and R5.
