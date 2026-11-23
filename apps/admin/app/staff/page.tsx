@@ -61,7 +61,7 @@ export default async function StaffPage({
       .select('id, kind, target_id, reason, payload, status, requested_by, created_at')
       .eq('status', 'pending')
       .order('created_at', { ascending: false }),
-    supabase.from('setting').select('key, value').in('key', ['super_admin_min', 'super_admin_max']),
+    supabase.from('setting').select('key, value').in('key', ['super_admin_min']),
   ]);
 
   const rows = (directory as StaffRow[] | null) ?? [];
@@ -111,7 +111,6 @@ export default async function StaffPage({
         cities={(cities as { id: string; name: string }[] | null) ?? []}
         approvals={pending}
         superAdminMin={limits['super_admin_min'] ?? null}
-        superAdminMax={limits['super_admin_max'] ?? null}
       />
     </ConsoleShell>
   );

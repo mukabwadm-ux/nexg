@@ -152,11 +152,7 @@ export function RolesTab({
         <Card className="p-5">
           <h3 className="text-sm font-extrabold uppercase tracking-wide">Two-person actions</h3>
           <dl className="mt-3 space-y-2 text-[0.8125rem]">
-            <TwoPerson
-              action="New super admin or finance role"
-              who="Proposer + the recipient"
-              live
-            />
+            <TwoPerson action="New finance role" who="Proposer + the recipient" live />
             <TwoPerson action="Suspend a merchant" who="Requester + a second ops manager" live />
             <TwoPerson action="Refund above the cap" who="Ops manager" />
             <TwoPerson action="Weekly settlement release" who="Finance + ops manager" />

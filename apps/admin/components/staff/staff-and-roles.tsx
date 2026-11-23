@@ -45,7 +45,6 @@ export function StaffAndRoles({
   cities,
   approvals,
   superAdminMin,
-  superAdminMax,
 }: {
   me: { staffId: string; isSuperAdmin: boolean };
   tab: string;
@@ -57,7 +56,6 @@ export function StaffAndRoles({
   cities: { id: string; name: string }[];
   approvals: ApprovalRow[];
   superAdminMin: number | null;
-  superAdminMax: number | null;
 }) {
   const router = useRouter();
   const person = rows.find((r) => r.staff_id === selected) ?? null;
@@ -107,7 +105,6 @@ export function StaffAndRoles({
           cities={cities}
           roles={roles}
           superAdminMin={superAdminMin}
-          superAdminMax={superAdminMax}
           onSelect={(id) => go({ person: id })}
         />
       )}
@@ -169,7 +166,6 @@ function StaffTab({
   cities,
   roles,
   superAdminMin,
-  superAdminMax,
   onSelect,
 }: {
   me: { staffId: string; isSuperAdmin: boolean };
@@ -178,7 +174,6 @@ function StaffTab({
   cities: { id: string; name: string }[];
   roles: RoleRow[];
   superAdminMin: number | null;
-  superAdminMax: number | null;
   onSelect: (id: string) => void;
 }) {
   const [filter, setFilter] = React.useState<string>('all');
@@ -243,7 +238,7 @@ function StaffTab({
         </Tile>
         <Tile label="Super admins" value={String(superAdmins.length)}>
           {superAdmins.map((s) => s.display_name).join(', ') || 'none'} · minimum{' '}
-          {superAdminMin ?? '[—]'}, maximum {superAdminMax ?? '[—]'}
+          {superAdminMin ?? '[—]'}, no maximum
         </Tile>
         <Tile label="Access expiring ≤ 30 d" value={String(expiring.length)}>
           {expiring.length > 0
