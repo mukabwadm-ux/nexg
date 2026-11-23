@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+// The categories the dropdown lists: the master list, so adding a category
+// never needs this test changed.
+import master from '../../packages/contracts/src/data/category-master.json';
+
 /**
  * The /ask page after its 17 Nov 2026 redesign: the site's current look, and
  * the request form in the merchant and rider forms' style (numbered sections,
@@ -26,8 +30,8 @@ for (const width of WIDTHS) {
     // 1. What you need: a category, and the request in their own words.
     const category = page.getByLabel(/^Category/);
     await expect(category).toHaveAttribute('required', '');
-    // NexG's 21 categories, after the "Choose a category" placeholder.
-    await expect(category.locator('option')).toHaveCount(22);
+    // Every category in the master list, after the "Choose a category" placeholder.
+    await expect(category.locator('option')).toHaveCount(master.categories.length + 1);
     await category.selectOption('airport_transfers');
     await page.getByLabel(/Tell us more/).fill('KQ 101 lands at 6am, two bags');
     await page.getByRole('button', { name: 'Continue' }).click();
