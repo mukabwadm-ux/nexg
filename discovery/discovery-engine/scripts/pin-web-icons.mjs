@@ -91,13 +91,14 @@ for (const path of pinned) {
 files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
 const approval = JSON.stringify({ schemaVersion: '1', authority, assetBindings: bindings, files }, null, 2) + '\n';
 
-/* The master release (NexG's 21 categories since 16 Nov 2026): MASTER_NAVIGATION.json and each icon
-   copy it names. A subcategory with no icon of its own draws its category's, so icons may repeat. */
+/* The master release (NexG's categories since 16 Nov 2026, 22 since Pets on 23 Nov): MASTER_NAVIGATION.json
+   and each icon copy it names. A subcategory with no icon of its own draws its category's, so icons may repeat. */
 const masterPath = 'docs/discovery/MASTER_NAVIGATION.json';
 const masterApprovalPath = 'discovery-engine/config/master-approval.v1.json';
 const masterAuthority =
-  'Derived pins for the master release: NexG’s 21 categories and 214 subcategories as the owner set them ' +
-  'on 16 November 2026 (packages/contracts/src/data/category-master.json, generated into ' +
+  'Derived pins for the master release: NexG’s 22 categories and 221 subcategories as the owner set them ' +
+  'on 16 November 2026, Pets added 23 November 2026 ' +
+  '(packages/contracts/src/data/category-master.json, generated into ' +
   'docs/discovery/MASTER_NAVIGATION.json), and the 256 px WebP copy of each icon it names. Regenerate ' +
   'with scripts/pin-web-icons.mjs.';
 const master = await readJson(masterPath);

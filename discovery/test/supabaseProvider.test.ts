@@ -301,7 +301,7 @@ test('with no subcategories at all, as in production today, every store is liste
 });
 
 test('the master list replaces Play and Flights: Games & Sports and Premium Services show their stores, an empty type stays available', async () => {
-  assert.equal(categories.length, 21);
+  assert.equal(categories.length, 22);
   assert.ok(!findCategory('play') && !findCategory('flights') && !findCategory('health-pharmacy') && !findCategory('beauty-wellness'));
   const bowling = merchant(id('c1', 31), 'Strike Arena', 'games_sports', 'outdoor_sports', 'Westlands, Nairobi');
   const charter = merchant(id('c1', 32), 'Charter Operator', 'premium_services', 'private_jet_charters', 'Westlands, Nairobi');

@@ -53,7 +53,7 @@ test('old demo keys move the way the migration moves live merchants', () => {
 
 test('the committed map has one row per master subcategory and places every seeded demo merchant', () => {
   assert.deepEqual({ ...committed.summary, discoverySubcategoriesWithoutDemo: committed.summary.discoverySubcategoriesWithoutDemo.length },
-    { subcategories: 214, withDemoMerchants: 85, demoGroups: 150, merchants: 715, items: 15360, discoverySubcategoriesWithoutDemo: 129,
+    { subcategories: 221, withDemoMerchants: 85, demoGroups: 150, merchants: 715, items: 15360, discoverySubcategoriesWithoutDemo: 136,
       demoGroupsLeftOut: ['banking', 'business-services', 'forex', 'insurance', 'payments', 'remittance', 'sacco-services'].map(key => `financial-services_${key}`) });
   const discovery = configuration.categories.flatMap(category => category.subcategories.map(subcategory => subcategory.discovery_key));
   assert.deepEqual(committed.subcategories.map(row => row.discovery?.subcategoryId), discovery);

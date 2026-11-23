@@ -136,10 +136,10 @@ describe('parse shapes the error for a response', () => {
 });
 
 describe('merchant taxonomy', () => {
-  it("has the 21 master categories and 214 subcategories, in the owner's order", async () => {
+  it("has the 22 master categories and 221 subcategories, in the owner's order", async () => {
     const { ALL_CATEGORIES, ALL_SUBCATEGORIES } = await import('./taxonomy');
-    expect(ALL_CATEGORIES.length).toBe(21);
-    expect(ALL_SUBCATEGORIES.length).toBe(214);
+    expect(ALL_CATEGORIES.length).toBe(22);
+    expect(ALL_SUBCATEGORIES.length).toBe(221);
     expect(ALL_CATEGORIES.map((category) => category.name)).toEqual([
       'Food & Restaurant',
       'Alcohol & Beverages',
@@ -159,11 +159,12 @@ describe('merchant taxonomy', () => {
       'Apparels & Clothing',
       'Green & Groceries',
       'Marketplace',
+      'Pets',
       'Electronics & Technology',
       'Flowers & Gifts',
       'Courier Services',
     ]);
-    expect(new Set(ALL_SUBCATEGORIES.map((sub) => sub.id)).size).toBe(214);
+    expect(new Set(ALL_SUBCATEGORIES.map((sub) => sub.id)).size).toBe(221);
     for (const category of ALL_CATEGORIES)
       for (const sub of category.subcategories) expect(sub.categoryId).toBe(category.id);
   });
@@ -223,9 +224,9 @@ describe('merchant taxonomy', () => {
     expect(res.categories.some((c) => c.id === 'travel_tours')).toBe(true);
   });
 
-  it('provides a unique image for all 21 categories', async () => {
+  it('provides a image for all 22 categories', async () => {
     const { ALL_CATEGORIES, getCategoryImage } = await import('./taxonomy');
-    expect(ALL_CATEGORIES.length).toBe(21);
+    expect(ALL_CATEGORIES.length).toBe(22);
     for (const cat of ALL_CATEGORIES) {
       expect(cat.image).toBeDefined();
       expect(cat.image?.startsWith('/images/categories/')).toBe(true);

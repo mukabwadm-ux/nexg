@@ -5,7 +5,7 @@
  *   node scripts/taxonomy/build.mjs --check   write nothing; exit 1 if it is out of date
  *
  * Inputs, both hand-maintained:
- *   ../packages/contracts/src/data/category-master.json   the 21 categories, their subcategories, names and order
+ *   ../packages/contracts/src/data/category-master.json   the 22 categories, their subcategories, names and order
  *   docs/discovery/MASTER_CATEGORIES_OVERLAY.json         what Discovery adds: ids, pack icons, journeys, old ids
  *
  * Discovery ids: a category's id is set in the overlay (kept from the icon-pack taxonomy where the category kept

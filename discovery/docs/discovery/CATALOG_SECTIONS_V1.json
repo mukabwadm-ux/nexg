@@ -3295,7 +3295,8 @@
     {
       "id": "home",
       "categories": [
-        "marketplace"
+        "marketplace",
+        "pets"
       ],
       "allTitle": "All products",
       "departments": [

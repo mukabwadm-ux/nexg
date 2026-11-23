@@ -6,8 +6,8 @@
   "key_policy": "A category id is kept from the icon-pack taxonomy where the category kept its meaning. A subcategory id is <category id>:<Supabase subcategory key in kebab-case>. A source subcategory id is <Supabase category>_<Supabase subcategory>, kebab-case: the id the bridge map (demo-seed/subcategory-map.json) gives that Supabase pair; the demo API's older group ids that now land there follow it. legacy_discovery_keys are old Discovery ids that still open this entry.",
   "icon_policy": "Icons come from the original NexG Discovery icon pack. A subcategory whose icon_reference is null draws its category's icon; no artwork was made for the master list.",
   "history": "Before 16 Nov 2026 Discovery had its own taxonomy from the icon pack (TAXONOMY_V1.1.json and DISCOVERY_CONFIGURATION_V1.1.json: 18 categories, 115 subcategories, among them Health And Pharmacy, Play and Flights). Those files are history, kept for the Discovery Engine's pinned baseline release.",
-  "main_category_count": 21,
-  "subcategory_count": 214,
+  "main_category_count": 22,
+  "subcategory_count": 221,
   "homepage_category_order": [
     "restaurants-food",
     "alcohol-beverages",
@@ -27,6 +27,7 @@
     "fashion-apparel",
     "groceries-essentials",
     "marketplace",
+    "pets",
     "tech-electronics",
     "flowers-gifts",
     "courier-services"
@@ -3458,7 +3459,7 @@
       "category": "Marketplace",
       "discovery_key": "marketplace",
       "supabase_category": "marketplace",
-      "customer_task": "Electronics, home, kitchen, baby, pets, books and gifts",
+      "customer_task": "Electronics, home, kitchen, baby, books and gifts",
       "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/00_Main_Category_Icons/09_marketplace.png",
       "source_category_ids": [
         "marketplace"
@@ -3632,23 +3633,6 @@
         },
         {
           "position": 10,
-          "name": "Pet Supplies",
-          "discovery_key": "marketplace:pet-supplies",
-          "supabase": {
-            "category": "marketplace",
-            "subcategory": "pet_supplies"
-          },
-          "base": "general_retail",
-          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/09_Marketplace/09_05_Pet_Supplies.png",
-          "source_subcategory_ids": [
-            "marketplace_pet-supplies"
-          ],
-          "nested_option_candidates": [],
-          "journey": "PURCHASE",
-          "legacy_discovery_keys": []
-        },
-        {
-          "position": 11,
           "name": "Arts, Crafts & Gifts",
           "discovery_key": "marketplace:arts-crafts-gifts",
           "supabase": {
@@ -3668,6 +3652,159 @@
     },
     {
       "position": 19,
+      "category": "Pets",
+      "discovery_key": "pets",
+      "supabase_category": "pets",
+      "customer_task": "Pet shops, food, vet care, grooming, boarding and training",
+      "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/09_Marketplace/09_05_Pet_Supplies.png",
+      "source_category_ids": [
+        "pets"
+      ],
+      "legacy_discovery_keys": [],
+      "subcategories": [
+        {
+          "position": 1,
+          "name": "Pet Shop & Supplies",
+          "discovery_key": "pets:pet-shop-supplies",
+          "supabase": {
+            "category": "pets",
+            "subcategory": "pet_shop_supplies"
+          },
+          "base": "general_retail",
+          "icon_reference": "references/icons-v1.1/NexG_Discovery_Icons/09_Marketplace/09_05_Pet_Supplies.png",
+          "source_subcategory_ids": [
+            "pets_pet-shop-supplies",
+            "marketplace_pet-supplies"
+          ],
+          "nested_option_candidates": [],
+          "journey": "PURCHASE",
+          "legacy_discovery_keys": [
+            "marketplace:pet-supplies"
+          ]
+        },
+        {
+          "position": 2,
+          "name": "Pet Food",
+          "discovery_key": "pets:pet-food",
+          "supabase": {
+            "category": "pets",
+            "subcategory": "pet_food"
+          },
+          "base": "general_retail",
+          "icon_reference": null,
+          "source_subcategory_ids": [
+            "pets_pet-food"
+          ],
+          "nested_option_candidates": [],
+          "journey": "PURCHASE",
+          "legacy_discovery_keys": []
+        },
+        {
+          "position": 3,
+          "name": "Veterinary Products & Medicines",
+          "discovery_key": "pets:veterinary-products",
+          "supabase": {
+            "category": "pets",
+            "subcategory": "veterinary_products"
+          },
+          "base": "pharmacy_retail",
+          "icon_reference": null,
+          "source_subcategory_ids": [
+            "pets_veterinary-products"
+          ],
+          "nested_option_candidates": [],
+          "journey": "RESTRICTED_PURCHASE",
+          "legacy_discovery_keys": []
+        },
+        {
+          "position": 4,
+          "name": "Vet Clinics",
+          "discovery_key": "pets:vet-clinics",
+          "supabase": {
+            "category": "pets",
+            "subcategory": "vet_clinics"
+          },
+          "base": "clinics",
+          "icon_reference": null,
+          "source_subcategory_ids": [
+            "pets_vet-clinics"
+          ],
+          "nested_option_candidates": [],
+          "journey": "APPOINTMENT",
+          "legacy_discovery_keys": []
+        },
+        {
+          "position": 5,
+          "name": "Pet Grooming",
+          "discovery_key": "pets:pet-grooming",
+          "supabase": {
+            "category": "pets",
+            "subcategory": "pet_grooming"
+          },
+          "base": "haircare",
+          "icon_reference": null,
+          "source_subcategory_ids": [
+            "pets_pet-grooming"
+          ],
+          "nested_option_candidates": [],
+          "journey": "APPOINTMENT",
+          "legacy_discovery_keys": []
+        },
+        {
+          "position": 6,
+          "name": "Pet Boarding & Daycare",
+          "discovery_key": "pets:pet-boarding-daycare",
+          "supabase": {
+            "category": "pets",
+            "subcategory": "pet_boarding_daycare"
+          },
+          "base": "reservations",
+          "icon_reference": null,
+          "source_subcategory_ids": [
+            "pets_pet-boarding-daycare"
+          ],
+          "nested_option_candidates": [],
+          "journey": "REQUEST",
+          "legacy_discovery_keys": []
+        },
+        {
+          "position": 7,
+          "name": "Pet Training",
+          "discovery_key": "pets:pet-training",
+          "supabase": {
+            "category": "pets",
+            "subcategory": "pet_training"
+          },
+          "base": "personal_training",
+          "icon_reference": null,
+          "source_subcategory_ids": [
+            "pets_pet-training"
+          ],
+          "nested_option_candidates": [],
+          "journey": "APPOINTMENT",
+          "legacy_discovery_keys": []
+        },
+        {
+          "position": 8,
+          "name": "Pet Sitting & Walking",
+          "discovery_key": "pets:pet-sitting-walking",
+          "supabase": {
+            "category": "pets",
+            "subcategory": "pet_sitting_walking"
+          },
+          "base": "home_cleaning",
+          "icon_reference": null,
+          "source_subcategory_ids": [
+            "pets_pet-sitting-walking"
+          ],
+          "nested_option_candidates": [],
+          "journey": "SERVICE",
+          "legacy_discovery_keys": []
+        }
+      ]
+    },
+    {
+      "position": 20,
       "category": "Electronics & Technology",
       "discovery_key": "tech-electronics",
       "supabase_category": "tech_electronics",
@@ -3857,7 +3994,7 @@
       ]
     },
     {
-      "position": 20,
+      "position": 21,
       "category": "Flowers & Gifts",
       "discovery_key": "flowers-gifts",
       "supabase_category": "flowers_gifts",
@@ -4061,7 +4198,7 @@
       ]
     },
     {
-      "position": 21,
+      "position": 22,
       "category": "Courier Services",
       "discovery_key": "courier-services",
       "supabase_category": "logistics_shipping",

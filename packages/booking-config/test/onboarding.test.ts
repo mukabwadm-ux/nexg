@@ -11,9 +11,9 @@ const signedIn = { otpVerified: true, signedIn: true };
 const capturing = { otpVerified: false, signedIn: false };
 
 describe('compiled onboarding inventory', () => {
-  it('lists the 21 master categories, each listed subcategory backed by a registry profile', () => {
+  it('lists the 22 master categories, each listed subcategory backed by a registry profile', () => {
     const categories = listOnboardingCategories();
-    expect(categories).toHaveLength(21);
+    expect(categories).toHaveLength(22);
     expect(categories.map((category) => category.id)).toEqual(
       LISTED_CATEGORIES.map((category) => category.id),
     );
@@ -25,7 +25,7 @@ describe('compiled onboarding inventory', () => {
         name: subcategory.name,
       })),
     );
-    expect(listed).toHaveLength(214);
+    expect(listed).toHaveLength(221);
     const byId = new Map(registry.profiles.map((profile) => [profile.subcategoryId, profile]));
     for (const entry of listed) {
       const profile = byId.get(entry.subcategoryId)!;

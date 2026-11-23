@@ -70,6 +70,7 @@ const CATEGORY_SEARCH_TERMS: Record<string, string[]> = {
   beauty: ['beauty', 'makeup', 'nails', 'skincare', 'perfume', 'cosmetics'],
   wellness: ['massage', 'spa', 'salon', 'barber', 'gym', 'fitness', 'yoga', 'nutrition'],
   concierge_services: ['concierge', 'errand', 'personal assistant', 'shopping'],
+  pets: ['pet', 'pets', 'dog', 'cat', 'vet', 'grooming', 'pet food'],
   movers_relocation: ['movers', 'moving', 'relocation', 'packing', 'storage'],
   premium_services: ['vip', 'luxury', 'yacht', 'private jet', 'butler', 'premium'],
   vehicle_rentals: ['car hire', 'car rental', 'rent a car', 'van', 'chauffeur', 'detailing'],
