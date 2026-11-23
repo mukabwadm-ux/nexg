@@ -2,7 +2,7 @@
 
 For the Consumer app, the Stays app and anything else that sells from a shop's catalogue. The website uses the same functions (`apps/web/components/cart/cart-provider.tsx`).
 
-Migration: `supabase/migrations/20270216000100_account_basket.sql`. Tests: `supabase/tests/139_account_basket.sql`.
+Migration: `supabase/migrations/20270216000100_account_basket.sql`. Tests: `supabase/tests/140_account_basket.sql`.
 
 ## The rules
 
