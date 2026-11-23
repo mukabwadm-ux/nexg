@@ -20,6 +20,9 @@ import { CATEGORY_IMAGE_MAP, getCategoryImage } from '@nexg/contracts';
 import { PageHero } from '@/components/company/page-hero';
 import { Reveal } from '@/components/reveal';
 import { discoverCategoryHref } from '@/lib/discover-links';
+import { translator } from '@/lib/i18n/dictionaries';
+
+import { type CATEGORY_STRING_KEYS } from './strings';
 
 export interface ExplorerCategory {
   id: string;
@@ -31,11 +34,15 @@ export interface ExplorerCategory {
   color: string | null;
   image?: string;
   imageUrl?: string | null;
+  /** The English name and description, still searchable when shown translated. */
+  english?: string;
   subcategories: {
     id: string;
     name: string;
+    english?: string;
     /** The heading it sits under (Wellness: "Spa & Massage"). */
     group?: string;
+    englishGroup?: string;
     fields?: string[];
     fulfillmentHint?: string;
   }[];
@@ -45,12 +52,24 @@ type Kind = 'all' | 'menu' | 'products' | 'services';
 type Subcategory = ExplorerCategory['subcategories'][number];
 
 /** How a category's merchants are ordered from (category_config.card_kind). */
-const KINDS: readonly { key: Kind; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'menu', label: 'Food & drink' },
-  { key: 'products', label: 'Shopping' },
-  { key: 'services', label: 'Services' },
-];
+const KINDS: readonly Kind[] = ['all', 'menu', 'products', 'services'];
+
+export type CategoryStrings = Record<string, string>;
+type Say = (
+  key: (typeof CATEGORY_STRING_KEYS)[number],
+  vars?: Record<string, string | number>,
+) => string;
+
+/* English when a string was not passed (tests, or a page that did not translate). */
+function sayer(strings: CategoryStrings): Say {
+  return (key, vars) => {
+    let text = strings[key] ?? translator('en')(key);
+    for (const [name, value] of Object.entries(vars ?? {})) {
+      text = text.split(`{${name}}`).join(String(value));
+    }
+    return text;
+  };
+}
 
 /* Marks for a category with no photograph of its own (category_config.icon). */
 const FALLBACK_ICON: Record<string, LucideIcon> = { Compass, Gift, Plane, Ticket };
@@ -60,7 +79,9 @@ const has = (text: string | undefined, query: string) =>
 
 const subcategoryMatches = (sub: Subcategory, query: string) =>
   has(sub.name, query) ||
+  has(sub.english, query) ||
   has(sub.group, query) ||
+  has(sub.englishGroup, query) ||
   Boolean(sub.fields?.some((field) => has(field, query))) ||
   has(sub.fulfillmentHint, query);
 
@@ -71,6 +92,7 @@ const label = (sub: Subcategory, withGroup: boolean) =>
 const categoryMatches = (category: ExplorerCategory, query: string) =>
   has(category.name, query) ||
   has(category.desc, query) ||
+  has(category.english, query) ||
   has(category.id, query) ||
   category.subcategories.some((sub) => subcategoryMatches(sub, query));
 
@@ -82,7 +104,14 @@ const categoryMatches = (category: ExplorerCategory, query: string) =>
  * Discovery for that category; the subcategories on it are labels, not
  * links, because they all led to the same place.
  */
-export function CategoryExplorer({ categories }: { categories: ExplorerCategory[] }) {
+export function CategoryExplorer({
+  categories,
+  strings = {},
+}: {
+  categories: ExplorerCategory[];
+  strings?: CategoryStrings;
+}) {
+  const say = React.useMemo(() => sayer(strings), [strings]);
   const router = useRouter();
   const [query, setQuery] = React.useState('');
   const [kind, setKind] = React.useState<Kind>('all');
@@ -119,11 +148,11 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
   return (
     <>
       <PageHero
-        eyebrow="All categories"
+        eyebrow={say('cats.eyebrow')}
         compact
-        title="Everything you need,"
-        gold="in one place."
-        lede={`${categories.length} kinds of business across Nairobi, from restaurants and pharmacies to car hire and days out. Pick one to see who serves where you are.`}
+        title={say('cats.title')}
+        gold={say('cats.gold')}
+        lede={say('cats.lede', { count: categories.length })}
       >
         <form
           role="search"
@@ -142,8 +171,8 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Try sushi, florist or safari"
-            aria-label="Search categories"
+            placeholder={say('cats.searchPlaceholder')}
+            aria-label={say('cats.searchLabel')}
             autoComplete="off"
             enterKeyHint="search"
             className="h-12 min-w-0 flex-1 appearance-none rounded-none border-0 bg-transparent px-3 text-base text-[#141414] shadow-none placeholder:text-[#6b6560] focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 [&::-webkit-search-cancel-button]:hidden"
@@ -152,7 +181,7 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
             <button
               type="button"
               onClick={() => setQuery('')}
-              aria-label="Clear search"
+              aria-label={say('cats.clear')}
               className="focus-visible:ring-gold flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#141414] transition-colors hover:bg-[#f1ece1] focus-visible:outline-none focus-visible:ring-2"
             >
               <X className="h-4 w-4" aria-hidden="true" />
@@ -160,25 +189,27 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
           )}
         </form>
 
-        <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Filter by type">
+        <div
+          className="mt-5 flex flex-wrap gap-2"
+          role="group"
+          aria-label={say('cats.filterLabel')}
+        >
           {KINDS.map((option) => {
-            const active = kind === option.key;
+            const active = kind === option;
             return (
               <button
-                key={option.key}
+                key={option}
                 type="button"
                 aria-pressed={active}
-                onClick={() => setKind(option.key)}
+                onClick={() => setKind(option)}
                 className={`focus-visible:ring-gold inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 ${
                   active
                     ? 'bg-gold text-ink'
                     : 'border border-white/20 text-white/80 hover:bg-white/10 hover:text-white'
                 }`}
               >
-                {option.label}
-                <span className={active ? 'text-ink/60' : 'text-white/45'}>
-                  {counts[option.key]}
-                </span>
+                {say(`cats.kind.${option}`)}
+                <span className={active ? 'text-ink/60' : 'text-white/45'}>{counts[option]}</span>
               </button>
             );
           })}
@@ -189,32 +220,37 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
         <Reveal variant="gallery" speed={1.4}>
           <p data-reveal-head aria-live="polite" className="text-muted text-sm font-semibold">
             {term
-              ? `${visible.length} ${visible.length === 1 ? 'category matches' : 'categories match'} “${query.trim()}”`
-              : `${visible.length} ${visible.length === 1 ? 'category' : 'categories'} · ${types} types of shop and service`}
+              ? say(visible.length === 1 ? 'cats.matchOne' : 'cats.matchMany', {
+                  count: visible.length,
+                  query: query.trim(),
+                })
+              : say(visible.length === 1 ? 'cats.summaryOne' : 'cats.summaryMany', {
+                  count: visible.length,
+                  types,
+                })}
           </p>
 
           {visible.length === 0 ? (
             <div className="border-border bg-surface mt-6 rounded-[1.75rem] border px-6 py-12 text-center sm:px-12">
               <p className="text-ink text-xl font-extrabold tracking-tight sm:text-2xl">
-                Nothing here matches “{query.trim()}” yet.
+                {say('cats.empty.title', { query: query.trim() })}
               </p>
               <p className="text-muted mx-auto mt-3 max-w-xl text-[0.9375rem] font-semibold leading-[1.75]">
-                A concierge can still find it. Describe what you need and get a price and a time
-                before anything is bought.
+                {say('cats.empty.body')}
               </p>
               <div className="mt-7 flex flex-wrap justify-center gap-3">
                 <Link
                   href="/ask"
                   className="bg-gold text-ink hover:bg-gold/90 focus-visible:ring-gold inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                 >
-                  Ask a concierge <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  {say('cats.askConcierge')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
                 <button
                   type="button"
                   onClick={reset}
                   className="border-border-strong text-ink hover:bg-bg focus-visible:ring-gold inline-flex h-12 items-center rounded-full border px-6 text-sm font-bold focus-visible:outline-none focus-visible:ring-2"
                 >
-                  Show all categories
+                  {say('cats.showAll')}
                 </button>
               </div>
             </div>
@@ -224,6 +260,7 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
                 <CategoryCard
                   key={category.id}
                   category={category}
+                  say={say}
                   term={term}
                   wide={index === 0}
                   priority={index < 4}
@@ -249,14 +286,13 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
           />
           <div className="relative max-w-2xl">
             <p className="text-ink/70 text-xs font-extrabold uppercase tracking-[0.2em]">
-              Not on the list?
+              {say('cats.cta.eyebrow')}
             </p>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.75rem]">
-              Ask a concierge for anything.
+              {say('cats.cta.title')}
             </h2>
             <p className="text-ink/75 mt-3 text-base font-semibold leading-[1.75]">
-              Describe what you need. A concierge quotes a price and a time, and nothing is bought
-              until you approve it.
+              {say('cats.cta.body')}
             </p>
           </div>
           <div className="relative mt-8 flex flex-wrap gap-3 lg:mt-0 lg:shrink-0">
@@ -264,13 +300,13 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
               href="/ask"
               className="bg-ink focus-visible:ring-ink inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-bold text-white transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FDD128]"
             >
-              Ask a concierge <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              {say('cats.askConcierge')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <Link
               href="/merchants"
               className="border-ink/25 focus-visible:ring-ink inline-flex h-12 items-center rounded-full border px-6 text-sm font-bold transition-colors hover:bg-white/30 focus-visible:outline-none focus-visible:ring-2"
             >
-              List your business
+              {say('cats.cta.list')}
             </Link>
           </div>
         </div>
@@ -288,12 +324,14 @@ export function CategoryExplorer({ categories }: { categories: ExplorerCategory[
  */
 function CategoryCard({
   category,
+  say,
   term,
   wide,
   priority,
   reveal,
 }: {
   category: ExplorerCategory;
+  say: Say;
   term: string;
   wide: boolean;
   priority: boolean;
@@ -321,10 +359,11 @@ function CategoryCard({
   });
   const shown = chips.slice(0, wide ? 7 : 3);
   const more = chips.length - shown.length;
-  const count = `${subs.length} ${subs.length === 1 ? 'type' : 'types'}`;
+  const count =
+    subs.length === 1 ? say('cats.typeOne') : say('cats.typeMany', { count: subs.length });
   /* Under the chips' breakpoint the gold line names the first few types. */
   const meta = hits.length
-    ? `Matches ${hits.map((sub) => label(sub, true)).join(', ')}`
+    ? say('cats.matches', { list: hits.map((sub) => label(sub, true)).join(', ') })
     : chips
         .slice(0, 3)
         .map((chip) => chip.label)
@@ -413,7 +452,9 @@ function CategoryCard({
                 </span>
               ))}
               {more > 0 && (
-                <span className="px-1 py-1 text-xs font-bold text-white/60">+{more} more</span>
+                <span className="px-1 py-1 text-xs font-bold text-white/60">
+                  {say('cats.more', { count: more })}
+                </span>
               )}
             </span>
           )}
@@ -422,7 +463,7 @@ function CategoryCard({
               wide ? 'sm:max-w-xs' : ''
             }`}
           >
-            See who serves you
+            {say('cats.seeWho')}
             <span className="bg-gold text-ink flex h-8 w-8 items-center justify-center rounded-full transition-transform group-hover:translate-x-0.5">
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </span>

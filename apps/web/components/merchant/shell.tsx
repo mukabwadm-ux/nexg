@@ -149,6 +149,7 @@ export function MerchantShell({
   nav,
   guestPreview = false,
   operationsAllowed = true,
+  businessSwitcher = null,
   children,
 }: {
   businessName: string;
@@ -161,6 +162,8 @@ export function MerchantShell({
   nav: MerchantNavItem[];
   guestPreview?: boolean;
   operationsAllowed?: boolean;
+  /** Switch business / Add business, under the logo and in the phone drawer. */
+  businessSwitcher?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const homeHref = guestPreview ? '/merchant-preview/dashboard' : '/merchant';
@@ -174,6 +177,7 @@ export function MerchantShell({
         <Link href={homeHref} className="block px-5 py-5">
           <Logo className="h-16 w-auto" onDark priority />
         </Link>
+        {businessSwitcher}
 
         <MerchantSideNav nav={nav} />
 
@@ -210,6 +214,7 @@ export function MerchantShell({
         <header className="border-border bg-surface sticky top-0 z-30 border-b">
           <div className="flex flex-wrap items-center gap-3 px-4 py-3 sm:px-5">
             <WorkspaceMobileNavigation homeHref={homeHref}>
+              {businessSwitcher}
               <MerchantSideNav nav={nav} />
             </WorkspaceMobileNavigation>
             <Link href={homeHref} className="lg:hidden">
