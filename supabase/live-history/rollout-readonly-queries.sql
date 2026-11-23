@@ -1546,6 +1546,10 @@ from (values
   ('20270225000100', 'public.fn_phone_key', '2e83b031a10e6810f67c6523c74a447e', '92294e36224d25ccf132c9c19860c30d'),
   ('20270225000100', 'public.fn_link_guest_by_confirmed_phone', '36931585cab4a6d6e4fc9346ce32c4fb', 'd4dbdeeb1d0d4e1d8c6290d3fa7a0a19'),
   ('20270225000100', 'public.tg_users_link_guest_by_phone', '0fdeff966a659f72484a163ef631d152', '8cb2f8353bc1f8fb962eb79151ca7e4c'),
+  ('20270225000300', 'public.fn_rider_early_cashout_on', '2e3b106ca03c74b06819c1216fa05224', '2e3b106ca03c74b06819c1216fa05224'),
+  ('20270225000300', 'public.rpc_rider_payout_overview', 'e9ffbf3d27efe1e577b21f3429b3a64d', 'a04537b7b1005801f22d7e920465fc3e'),
+  ('20270225000300', 'public.rpc_rider_payout_request', 'a7ca1ece2e56b2c2a0c6c99e74081577', 'd729a92745942a089d57684ce595d346'),
+  ('20270225000300', 'public.rpc_settlement_build', '5da48cbec98baf4d88f55a78f3013da3', '16c0447c25d132856130c92cbd7acb02'),
   ('20270225000500', 'public.rpc_host_workspace_guide_asset', 'fdb68cb7738368f9e47edf4da297bedb', '42d6fa5d4b3e941980bdcf5599a3dc67')
 ) as v(version, fn, md5_lf, md5_crlf)
 left join lateral (
