@@ -10468,6 +10468,61 @@ export type Database = {
           },
         ];
       };
+      customer_card: {
+        Row: {
+          authorization_code: string;
+          bank: string | null;
+          brand: string;
+          created_at: string;
+          email: string;
+          exp_month: number;
+          exp_year: number;
+          id: string;
+          is_test: boolean;
+          last_used_at: string | null;
+          last4: string;
+          provider: string;
+          removed_at: string | null;
+          signature: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          authorization_code: string;
+          bank?: string | null;
+          brand: string;
+          created_at?: string;
+          email: string;
+          exp_month: number;
+          exp_year: number;
+          id?: string;
+          is_test: boolean;
+          last_used_at?: string | null;
+          last4: string;
+          provider?: string;
+          removed_at?: string | null;
+          signature: string;
+          user_id: string;
+        };
+        Update: {
+          authorization_code?: string;
+          bank?: string | null;
+          brand?: string;
+          created_at?: string;
+          email?: string;
+          exp_month?: number;
+          exp_year?: number;
+          id?: string;
+          is_test?: boolean;
+          last_used_at?: string | null;
+          last4?: string;
+          provider?: string;
+          removed_at?: string | null;
+          signature?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       customer_engine_booking: {
         Row: {
           amount_due_cents: number | null;
@@ -32359,6 +32414,7 @@ export type Database = {
           checked_at: string | null;
           created_at: string;
           created_by: string | null;
+          customer_card_id: string | null;
           failure_reason: string | null;
           id: string;
           is_test: boolean;
@@ -32367,6 +32423,7 @@ export type Database = {
           payment_id: string;
           phone: string | null;
           reference: string;
+          save_card: boolean;
         };
         ComputedFields: never;
         Insert: {
@@ -32377,6 +32434,7 @@ export type Database = {
           checked_at?: string | null;
           created_at?: string;
           created_by?: string | null;
+          customer_card_id?: string | null;
           failure_reason?: string | null;
           id?: string;
           is_test: boolean;
@@ -32385,6 +32443,7 @@ export type Database = {
           payment_id: string;
           phone?: string | null;
           reference: string;
+          save_card?: boolean;
         };
         Update: {
           access_code?: string | null;
@@ -32394,6 +32453,7 @@ export type Database = {
           checked_at?: string | null;
           created_at?: string;
           created_by?: string | null;
+          customer_card_id?: string | null;
           failure_reason?: string | null;
           id?: string;
           is_test?: boolean;
@@ -32402,8 +32462,16 @@ export type Database = {
           payment_id?: string;
           phone?: string | null;
           reference?: string;
+          save_card?: boolean;
         };
         Relationships: [
+          {
+            foreignKeyName: 'paystack_attempt_customer_card_id_fkey';
+            columns: ['customer_card_id'];
+            isOneToOne: false;
+            referencedRelation: 'customer_card';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'paystack_attempt_payment_id_fkey';
             columns: ['payment_id'];
@@ -59441,6 +59509,7 @@ export type Database = {
       fn_build_plan: { Args: { p_plan_id: string }; Returns: undefined };
       fn_buyer_id_ok: { Args: { p: Json }; Returns: boolean };
       fn_capability: { Args: { p_key: string }; Returns: Json };
+      fn_card_brand: { Args: { p_value: string }; Returns: string };
       fn_cash_guard: { Args: { p_rider_id: string }; Returns: undefined };
       fn_catalogue_edit_needs_review: {
         Args: { p_current_price: number; p_kind: string; p_payload: Json };
@@ -66379,6 +66448,8 @@ export type Database = {
       rpc_my_account_deletion_request: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_booking_code: { Args: { p_booking_id: string }; Returns: string };
       rpc_my_bookings: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_my_card_remove: { Args: { p_card_id: string; p_proof: string }; Returns: Json };
+      rpc_my_cards: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_data_export_request: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_data_requests: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_engine_booking_code: {
@@ -66806,7 +66877,14 @@ export type Database = {
         Returns: Json;
       };
       rpc_payment_paystack_attempt: {
-        Args: { p_channel: string; p_payment_reference: string; p_phone: string; p_proof: string };
+        Args: {
+          p_card_id?: string;
+          p_channel: string;
+          p_payment_reference: string;
+          p_phone: string;
+          p_proof: string;
+          p_save_card?: boolean;
+        };
         Returns: Json;
       };
       rpc_payment_paystack_due: {
