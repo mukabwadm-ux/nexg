@@ -201,4 +201,38 @@ export const de: Dictionary = {
   'xp.events.buildAround': 'Einen Tag darum herum gestalten →',
   'xp.events.noMarkup':
     'NexG schlägt nie etwas auf ein Ticket auf. Wo ein Veranstalter uns Tickets reservieren lässt, tun wir das zum Nennwert, und wir berechnen den darum gestalteten Tag.',
+
+  // ── all categories (/categories)
+  'cats.eyebrow': 'Alle Kategorien',
+  'cats.title': 'Alles, was Sie brauchen,',
+  'cats.gold': 'an einem Ort.',
+  'cats.lede':
+    '{count} Arten von Unternehmen in Nairobi, von Restaurants und Apotheken bis zu Autovermietung und Tagesausflügen. Wählen Sie eine aus und sehen Sie, wer an Ihrem Standort liefert.',
+  'cats.searchPlaceholder': 'Probieren Sie Sushi, Florist oder Safari',
+  'cats.searchLabel': 'Kategorien durchsuchen',
+  'cats.clear': 'Suche löschen',
+  'cats.filterLabel': 'Nach Art filtern',
+  'cats.kind.all': 'Alle',
+  'cats.kind.menu': 'Essen & Trinken',
+  'cats.kind.products': 'Einkaufen',
+  'cats.kind.services': 'Services',
+  'cats.matchOne': '1 Kategorie passt zu „{query}“',
+  'cats.matchMany': '{count} Kategorien passen zu „{query}“',
+  'cats.summaryOne': '1 Kategorie · {types} Arten von Geschäften und Services',
+  'cats.summaryMany': '{count} Kategorien · {types} Arten von Geschäften und Services',
+  'cats.empty.title': 'Zu „{query}“ gibt es noch nichts.',
+  'cats.empty.body':
+    'Ein Concierge kann es trotzdem finden. Beschreiben Sie, was Sie brauchen, und erhalten Sie Preis und Zeitpunkt, bevor etwas gekauft wird.',
+  'cats.askConcierge': 'Einen Concierge fragen',
+  'cats.showAll': 'Alle Kategorien anzeigen',
+  'cats.cta.eyebrow': 'Nicht in der Liste?',
+  'cats.cta.title': 'Bitten Sie einen Concierge um alles.',
+  'cats.cta.body':
+    'Beschreiben Sie, was Sie brauchen. Ein Concierge nennt Preis und Zeitpunkt, und nichts wird gekauft, bevor Sie zustimmen.',
+  'cats.cta.list': 'Ihr Unternehmen eintragen',
+  'cats.typeOne': '1 Art',
+  'cats.typeMany': '{count} Arten',
+  'cats.matches': 'Passt zu {list}',
+  'cats.more': '+{count} weitere',
+  'cats.seeWho': 'Sehen, wer Sie beliefert',
 };

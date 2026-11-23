@@ -143,7 +143,7 @@ select results_eq(
     from public.user_notification n
     where n.user_id = '70000000-0000-0000-0000-0000000000a2'
       and n.object_id = '70000000-0000-0000-0000-000000000f01'$$,
-  $$values ('merchant.holiday_reminder'::text, 'Are you open on Founders Day?'::text,
+  $$values ('merchant.holiday_reminder'::text, 'Is Alpha open on Founders Day?'::text,
             '/merchant/hours'::text, 'warning'::text)$$,
   'a manager is rung too, and a legacy account is sent to the Hours board'
 );

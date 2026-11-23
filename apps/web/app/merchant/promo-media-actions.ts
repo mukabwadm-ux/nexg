@@ -71,6 +71,7 @@ export async function savePromotionMedia(input: {
   media: PromoMediaRef;
 }): Promise<Outcome> {
   const { client, merchantId } = await merchantActionClient();
+  await requireMerchantActionObject(client, 'merchant_promotion', input.promotionId, merchantId);
   const refused = await checkMerchantMedia(client, merchantId, input.media);
   if (refused) return { ok: false, message: refused };
   const { data, error } = await client.rpc(
@@ -82,7 +83,8 @@ export async function savePromotionMedia(input: {
 
 /** Take a promotion's picture or video down, approved or waiting. */
 export async function withdrawPromotionMedia(promotionId: string): Promise<Outcome> {
-  const { client } = await merchantActionClient();
+  const { client, merchantId } = await merchantActionClient();
+  await requireMerchantActionObject(client, 'merchant_promotion', promotionId, merchantId);
   const { data, error } = await client.rpc(
     'rpc_merchant_promotion_media_withdraw' as never,
     { p_promotion_id: promotionId } as never,

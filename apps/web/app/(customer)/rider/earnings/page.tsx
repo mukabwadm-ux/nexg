@@ -74,7 +74,7 @@ export default async function RiderEarnings() {
   const settled = (settlements as Settlement[] | null) ?? [];
 
   return (
-    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+    <main className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
       <RiderPageHead
         title="Earnings"
         lead="What you made, per trip and per week, and when it reaches you. Every figure here comes from the same statement rows Finance pays from."
@@ -194,7 +194,7 @@ export default async function RiderEarnings() {
           </ul>
         )}
       </Panel>
-    </div>
+    </main>
   );
 }
 

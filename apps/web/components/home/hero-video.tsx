@@ -3,12 +3,17 @@
 import { cn } from '@nexg/ui';
 import * as React from 'react';
 
-/** Played in this order, then round again. */
-const CLIPS = ['/videos/hero/hero-1.mp4', '/videos/hero/hero-2.mp4', '/videos/hero/hero-3.mp4'];
+/** Played in this order, then round again. The gentleman clip opens (owner, 22 Nov 2026). */
+const CLIPS = [
+  '/videos/hero/hero-gentleman.mp4',
+  '/videos/hero/hero-1.mp4',
+  '/videos/hero/hero-2.mp4',
+  '/videos/hero/hero-3.mp4',
+];
 const POSTER = '/videos/hero/hero-poster.jpg';
 
 /**
- * The homepage hero's background: three short clips, one after another, on
+ * The homepage hero's background: four short clips, one after another, on
  * a loop. Each clip has its own <video> stacked on the others, and the next
  * one fades in as the current one ends, so there is no black frame between
  * them. Only the clip on screen plays; the next one is preloaded.

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { developerSession, IDLE_SIGN_IN } from '@/lib/developer-session';
 import { listConsoleKeys } from '@/lib/keys';
 import { createClient } from '@/lib/session';
 import { listDeveloperMerchants } from '@/lib/merchants';
@@ -10,6 +11,7 @@ import { listWebhookEndpoints, rpcCaller } from '@/lib/webhooks';
 
 import { ApiKeys } from './api-keys';
 import { DeveloperConsole } from './developer-console';
+import { SessionKeeper } from './session-keeper';
 import { TestBookings } from './test-bookings';
 import { Webhooks } from './webhooks';
 
@@ -40,6 +42,17 @@ export default async function DevelopersPage() {
     redirect('/sign-in?next=/developers');
   }
 
+  /*
+   * Opening the console is activity. A merchant's developer idle past the
+   * limit has lapsed: row-level security would already hide their merchants,
+   * keys and webhooks, so say so at the sign-in instead of showing an empty
+   * console (20270203000500).
+   */
+  const session = await developerSession(supabase, true);
+  if (session.state === 'lapsed') {
+    redirect(IDLE_SIGN_IN);
+  }
+
   const merchants = await listDeveloperMerchants(supabase);
   const [keys, webhooks, testBookings, services] = await Promise.all([
     listConsoleKeys(
@@ -56,6 +69,7 @@ export default async function DevelopersPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
+      <SessionKeeper expiresAt={session.state === 'current' ? session.expiresAt : null} />
       <header className="mb-8">
         <h1 className="mb-2 text-3xl font-extrabold tracking-tight">Developer console</h1>
         <p className="text-ink/70">

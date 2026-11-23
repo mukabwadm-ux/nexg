@@ -110,3 +110,109 @@ export async function acknowledgeSos(formData: FormData): Promise<void> {
   revalidatePath('/riders');
   revalidatePath(`/riders/incidents/${id}`);
 }
+
+/* ── Pipeline stages and standing ─────────────────────────────────────────
+ * Background check, training and the test delivery move an applicant along
+ * the Riders board; suspension takes two people (one asks, another
+ * approves) and reinstating needs a reason. The rules live in the RPCs. */
+
+function done(riderId: string, message: string): ReviewResult {
+  revalidatePath(`/riders/${riderId}`);
+  revalidatePath('/riders');
+  return { ok: true, message };
+}
+
+export async function recordBackgroundCheck(
+  riderId: string,
+  status: 'clear' | 'flagged',
+  note: string,
+): Promise<ReviewResult> {
+  const supabase = createClient();
+  const { error } = await (
+    supabase.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ error: { message: string } | null }>
+  )('rpc_rider_background_check_set', {
+    p_rider_id: riderId,
+    p_status: status,
+    p_note: note.trim() || null,
+  });
+  if (error) return { ok: false, message: error.message };
+  return done(
+    riderId,
+    status === 'clear' ? 'Background check recorded as clear.' : 'Flag recorded.',
+  );
+}
+
+export async function recordTraining(riderId: string, passed: boolean): Promise<ReviewResult> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc('rpc_rider_training_record', {
+    p_rider_id: riderId,
+    p_module: 'basics',
+    p_score: passed ? 100 : 0,
+    p_passed: passed,
+  });
+  if (error) return { ok: false, message: error.message };
+  return done(
+    riderId,
+    passed ? 'Training recorded as passed.' : 'Training recorded as not passed.',
+  );
+}
+
+export async function recordTestTrip(
+  riderId: string,
+  passed: boolean,
+  orderReference: string,
+  notes: string,
+): Promise<ReviewResult> {
+  const supabase = createClient();
+  const { error } = await (
+    supabase.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ error: { message: string } | null }>
+  )('rpc_rider_test_trip_record', {
+    p_rider_id: riderId,
+    p_passed: passed,
+    p_order_reference: orderReference.trim() || null,
+    p_notes: notes.trim() || null,
+  });
+  if (error) return { ok: false, message: error.message };
+  return done(riderId, passed ? 'Test delivery passed.' : 'Test delivery recorded as failed.');
+}
+
+export async function requestSuspension(riderId: string, reason: string): Promise<ReviewResult> {
+  if (!reason.trim()) return { ok: false, message: 'Say why. The rider is told this.' };
+  const supabase = createClient();
+  const { error } = await supabase.rpc('rpc_rider_two_person_request', {
+    p_rider_id: riderId,
+    p_kind: 'rider_suspension',
+    p_reason: reason.trim(),
+  });
+  if (error) return { ok: false, message: error.message };
+  return done(riderId, 'Suspension requested. A second person must approve it.');
+}
+
+export async function approveRiderRequest(
+  riderId: string,
+  requestId: string,
+): Promise<ReviewResult> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc('rpc_rider_two_person_approve', {
+    p_request_id: requestId,
+  });
+  if (error) return { ok: false, message: error.message };
+  return done(riderId, 'Approved.');
+}
+
+export async function reinstateRider(riderId: string, reason: string): Promise<ReviewResult> {
+  if (!reason.trim()) return { ok: false, message: 'Say why they are coming back.' };
+  const supabase = createClient();
+  const { error } = await supabase.rpc('rpc_rider_reinstate', {
+    p_rider_id: riderId,
+    p_reason: reason.trim(),
+  });
+  if (error) return { ok: false, message: error.message };
+  return done(riderId, 'Rider reinstated.');
+}

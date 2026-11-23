@@ -1,11 +1,9 @@
-import { DashboardActive } from '@/components/rider/dashboard-active';
-import { DashboardPending } from '@/components/rider/dashboard-pending';
+import { RiderHomeView } from '@/components/rider/home';
 import { riderContext } from '@/components/rider/frame';
 import type {
   RiderAttentionRow,
   RiderJob,
   RiderProgress,
-  WeekBar,
   WeekEarnings,
 } from '@/components/rider/types';
 
@@ -47,7 +45,7 @@ export default async function RiderDashboard() {
   /* One batch, where there used to be two in a row. The active half reads
      three more things; an applicant pays for none of them. */
   const none = Promise.resolve({ data: null });
-  const [progressRes, attentionRes, jobRes, weekRes, barRes] = await Promise.all([
+  const [progressRes, attentionRes, jobRes, weekRes] = await Promise.all([
     supabase.from('rider_setup_progress_v').select('*').eq('rider_id', me.id).maybeSingle(),
     supabase.from('rider_attention_v').select('*').eq('rider_id', me.id).order('sort'),
     /*
@@ -70,27 +68,17 @@ export default async function RiderDashboard() {
     active
       ? supabase.from('rider_week_earnings_v').select('*').eq('rider_id', me.id).maybeSingle()
       : none,
-    active
-      ? supabase.from('rider_week_bars_v').select('*').eq('rider_id', me.id).order('day')
-      : none,
   ]);
 
-  const progress = progressRes.data as RiderProgress | null;
-  const attention = (attentionRes.data as RiderAttentionRow[] | null) ?? [];
-
+  /* The merchant workspace Home's layout, with the rider's content (components/rider/home.tsx). */
   return (
-    <>
-      {active ? (
-        <DashboardActive
-          h={h}
-          jobs={(jobRes.data as RiderJob[] | null) ?? []}
-          attention={attention}
-          week={weekRes.data as WeekEarnings | null}
-          bars={(barRes.data as WeekBar[] | null) ?? []}
-        />
-      ) : progress ? (
-        <DashboardPending h={h} progress={progress} attention={attention} />
-      ) : null}
-    </>
+    <RiderHomeView
+      h={h}
+      active={active}
+      progress={progressRes.data as RiderProgress | null}
+      attention={(attentionRes.data as RiderAttentionRow[] | null) ?? []}
+      jobs={(jobRes.data as RiderJob[] | null) ?? []}
+      week={weekRes.data as WeekEarnings | null}
+    />
   );
 }

@@ -1,5 +1,6 @@
 import { applicationHandler } from '@/lib/merchant-application-http';
 import { MerchantApplicationRecord } from '@nexg/contracts/merchant-application';
+import { isBusinessId, rememberBusiness } from '@/lib/current-business';
 import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
@@ -23,7 +24,17 @@ async function route(request: Request) {
         error: null | { code?: string; message?: string; hint?: string };
       }>;
     };
-    return await invoke.call(activeClient, name, args).abortSignal(signal);
+    const result = await invoke.call(activeClient, name, args).abortSignal(signal);
+    // A business this account just started or submitted becomes its current one,
+    // so an owner adding a second business lands in that business afterwards.
+    const started = (result.data as { merchant_id?: unknown } | null)?.merchant_id;
+    if (
+      !result.error &&
+      (name === 'rpc_merchant_application_start' || name === 'rpc_merchant_application_submit') &&
+      isBusinessId(started)
+    )
+      rememberBusiness(started.toLowerCase());
+    return result;
   };
   return applicationHandler({
     enabled: process.env.MERCHANT_ONBOARDING_V1_ENABLED !== 'false',

@@ -201,4 +201,38 @@ export const pt: Dictionary = {
   'xp.events.buildAround': 'Monte um dia em torno disso →',
   'xp.events.noMarkup':
     'O NexG nunca aumenta o preço de um ingresso. Quando um organizador nos deixa reservá-los, reservamos pelo valor de face, e cobramos pelo dia montado em torno dele.',
+
+  // ── all categories (/categories)
+  'cats.eyebrow': 'Todas as categorias',
+  'cats.title': 'Tudo o que você precisa,',
+  'cats.gold': 'em um só lugar.',
+  'cats.lede':
+    '{count} tipos de negócio em Nairóbi, de restaurantes e farmácias a aluguel de carros e passeios. Escolha um para ver quem atende onde você está.',
+  'cats.searchPlaceholder': 'Experimente sushi, floricultura ou safári',
+  'cats.searchLabel': 'Buscar categorias',
+  'cats.clear': 'Limpar busca',
+  'cats.filterLabel': 'Filtrar por tipo',
+  'cats.kind.all': 'Todos',
+  'cats.kind.menu': 'Comida e bebida',
+  'cats.kind.products': 'Compras',
+  'cats.kind.services': 'Serviços',
+  'cats.matchOne': '1 categoria corresponde a “{query}”',
+  'cats.matchMany': '{count} categorias correspondem a “{query}”',
+  'cats.summaryOne': '1 categoria · {types} tipos de loja e serviço',
+  'cats.summaryMany': '{count} categorias · {types} tipos de loja e serviço',
+  'cats.empty.title': 'Nada aqui corresponde a “{query}” ainda.',
+  'cats.empty.body':
+    'Um concierge ainda pode encontrar. Descreva o que você precisa e receba um preço e um horário antes de qualquer compra.',
+  'cats.askConcierge': 'Falar com um concierge',
+  'cats.showAll': 'Ver todas as categorias',
+  'cats.cta.eyebrow': 'Não está na lista?',
+  'cats.cta.title': 'Peça qualquer coisa a um concierge.',
+  'cats.cta.body':
+    'Descreva o que você precisa. Um concierge informa um preço e um horário, e nada é comprado até você aprovar.',
+  'cats.cta.list': 'Cadastre o seu negócio',
+  'cats.typeOne': '1 tipo',
+  'cats.typeMany': '{count} tipos',
+  'cats.matches': 'Corresponde a {list}',
+  'cats.more': '+{count} a mais',
+  'cats.seeWho': 'Veja quem atende você',
 };
