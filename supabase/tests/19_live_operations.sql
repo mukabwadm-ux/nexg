@@ -18,6 +18,8 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
+-- Fixtures below set order stages directly; the stage guard (20270221000100) allows that only when asked.
+select set_config('nexg.order_stage_any', 'on', true);
 select plan(52);
 
 create temp table t (k text primary key, v text);

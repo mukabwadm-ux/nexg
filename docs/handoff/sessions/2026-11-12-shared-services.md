@@ -12,9 +12,9 @@ The owner, 22 Nov 2026: "proceed, as long as they are using one shared backend f
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | D1  | **Bookings stay in the booking engine.** Apps book through the website's bridge (`20270116000300_app_bookings`), paid by Paystack with deposits (#190). Supabase `customer_booking` is not the booking system for apps. |
 | D2  | **One payment route for every client:** `GET`/`POST /api/customer/checkout/orders/{orderId}/payment` on the website (#178). Not an Edge Function.                                                                       |
-| D3  | **Paystack:** card, M-Pesa and Airtel through one company account (owner, 21 Nov), plus bank transfer and cash on delivery where the shop allows it. Test mode until the owner switches it live.                        |
-| D4  | A basket saved to the account; a signed-out basket merges in at sign-in. Being built here.                                                                                                                              |
-| D5  | As recommended below.                                                                                                                                                                                                   |
+| D3  | **Paystack:** card, M-Pesa and Airtel through one company account (owner, 21 Nov), plus bank transfer. Cash on delivery is no longer offered on customer orders (owner, 20 Nov; `20270128000100`); staff may still place cash orders. Test mode until the owner switches it live. |
+| D4  | **Done.** A basket saved to the account; a signed-out basket merges in at sign-in (`20270216000100`, live 22 Nov). Contract: `docs/shared-services/basket.md`. |
+| D5  | **Paying confirms the order** (owner, 18 Nov), so the shop starts and readies it with no separate accept; rider and customer steps as recommended. Each step was already built (`20270109000300`, `20270115000400`, `20270115000600`, `20270128000100`). `20270221000100` adds one table of the steps (`order_step_rule`), a guard that refuses any other stage change, and `rpc_order_next_steps` for every app's buttons. Contract: `docs/shared-services/order-steps.md`. |
 | D6  | One Supabase sign-in, as recommended below. Rider sign-in is not touched.                                                                                                                                               |
 
 Also decided since 12 Nov: guests may order delivery on a temporary (anonymous) session (18 Nov, `20270109000100_guest_orders`); bookings and stay holds still need an account. Order together (group baskets) is `20270130009000`.
@@ -30,7 +30,7 @@ Also decided since 12 Nov: guests may order delivery on a temporary (anonymous) 
 
 **The phone apps' repositories** are not reachable from the shared-services machine, so each shared piece ships as the backend plus a written contract in `docs/shared-services/` for the app teams.
 
-**Order of the remaining work:** D4 basket, D5 order steps, the payments contract, D6 sign-in, then R3, R8 and R9.
+**Order of the remaining work:** the payments contract, D6 sign-in, then R3, R8 and R9.
 
 For whoever continues the shared-services work. The owner sends the private parts separately:
 
