@@ -251,6 +251,16 @@ export interface PaymentTarget {
   afterPaid?: () => Promise<void>;
   /** Extra fields for the read answer (a booking says what is due now). */
   describe?: (state: PaymentState) => Promise<Record<string, unknown>>;
+  /** M-Pesa straight to Safaricom while Paystack is not live (lib/payment-methods). */
+  daraja?: DarajaTarget;
+}
+
+export interface DarajaTarget {
+  begin: () => Promise<{ reference: string; amount_cents: number; expires_at?: string } | Response>;
+  /** What the customer's M-Pesa SMS names; the payment reference when absent. */
+  accountReference?: () => Promise<string | undefined>;
+  description: string;
+  notReady: string;
 }
 export type Session = { supabase: Client; email: string | null; name?: string | null };
 
@@ -347,8 +357,11 @@ export async function startPayment(
       if (!order) return problem(422, 'INVALID_REQUEST', 'Choose card, M-Pesa or Airtel Money.');
       return startBank(request, session, order.id);
     }
-    if (order && choice.method === 'mpesa_stk' && mpesaProvider(paymentSetup()) === 'daraja') {
-      return startDaraja(request, supabase, order.id, choice.phone);
+    if (choice.method === 'mpesa_stk' && mpesaProvider(paymentSetup()) === 'daraja') {
+      if (order) return startDaraja(request, supabase, order.id, choice.phone);
+      const found = await target(session);
+      if (found instanceof Response) return found;
+      if (found.daraja) return sendDaraja(request, supabase, found.daraja, choice.phone);
     }
 
     const mode = await customerMode(supabase);
@@ -579,35 +592,52 @@ export async function startOrderPayment(request: Request, rawOrderId: string) {
  * callback marks the order paid.
  */
 async function startDaraja(request: Request, supabase: Client, id: string, phone: string) {
-  const begun = await rpc(supabase, 'rpc_payment_begin_order', { p_order_id: id });
-  if (begun.error) return refused(begun.error);
-  const payment = begun.data as { reference: string; amount_cents: number };
+  return sendDaraja(
+    request,
+    supabase,
+    {
+      begin: async () => {
+        const begun = await rpc(supabase, 'rpc_payment_begin_order', { p_order_id: id });
+        if (begun.error) return refused(begun.error);
+        return begun.data as { reference: string; amount_cents: number };
+      },
+      /* The order number, without dashes, names the payment in the customer's
+         M-Pesa SMS. It is also the Paybill account number for this order, so a
+         Paybill report of the same money finds the order. */
+      accountReference: async () => {
+        const { data: placed } = await supabase
+          .from('order')
+          .select('reference')
+          .eq('id', id)
+          .maybeSingle();
+        return placed?.reference
+          ? placed.reference
+              .replace(/[^A-Za-z0-9]/g, '')
+              .toUpperCase()
+              .slice(0, 12)
+          : undefined;
+      },
+      description: 'NexG order',
+      notReady: 'M-Pesa is not connected yet. Your order is saved and the amount owed is recorded.',
+    },
+    phone,
+  );
+}
 
-  /* The order number, without dashes, names the payment in the customer's
-     M-Pesa SMS. It is also the Paybill account number for this order, so a
-     Paybill report of the same money finds the order. */
-  const { data: placed } = await supabase
-    .from('order')
-    .select('reference')
-    .eq('id', id)
-    .maybeSingle();
-  const accountReference = placed?.reference
-    ? placed.reference
-        .replace(/[^A-Za-z0-9]/g, '')
-        .toUpperCase()
-        .slice(0, 12)
-    : undefined;
+/** Sends the Safaricom prompt for whatever the target begins: an order or a held stay. */
+async function sendDaraja(request: Request, supabase: Client, target: DarajaTarget, phone: string) {
+  const payment = await target.begin();
+  if (payment instanceof Response) return payment;
 
   const sent = await sendMpesaPrompt({
     supabase,
     reference: payment.reference,
-    accountReference,
+    accountReference: target.accountReference ? await target.accountReference() : undefined,
     amountCents: payment.amount_cents,
     phone,
     origin: callbackOrigin(request),
-    description: 'NexG order',
-    notReadyMessage:
-      'M-Pesa is not connected yet. Your order is saved and the amount owed is recorded.',
+    description: target.description,
+    notReadyMessage: target.notReady,
   });
   if (!sent.ok) {
     const extra = {
@@ -625,7 +655,9 @@ async function startDaraja(request: Request, supabase: Client, id: string, phone
       status: 'pending',
       reference: payment.reference,
       retryAfterSeconds: 60,
-    } satisfies OrderPaymentView,
+      /* A held stay: when the hold runs out, so the page can count down. */
+      ...(payment.expires_at ? { expiresAt: payment.expires_at } : {}),
+    },
     { headers },
   );
 }
