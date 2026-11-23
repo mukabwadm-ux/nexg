@@ -161,6 +161,46 @@ export function sendPrompt(mode: PaystackMode, input: PromptInput) {
   });
 }
 
+export interface SavedCardInput {
+  reference: string;
+  amountCents: number;
+  /** The email the card was saved under; Paystack ties the authorization to it. */
+  email: string;
+  authorizationCode: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Charges a saved card (a reusable authorization) with no page. The bank may
+ * still want the customer: then Paystack's answer is not "success", and the
+ * webhook, or a later check, decides.
+ */
+export function chargeSavedCard(mode: PaystackMode, input: SavedCardInput) {
+  return call<{ status: string; reference: string; paused?: boolean; authorization_url?: string }>(
+    mode,
+    '/transaction/charge_authorization',
+    {
+      method: 'POST',
+      body: {
+        reference: input.reference,
+        amount: input.amountCents,
+        email: input.email,
+        currency: 'KES',
+        authorization_code: input.authorizationCode,
+        metadata: input.metadata ?? {},
+      },
+    },
+  );
+}
+
+/** Switches a removed card's authorization off at Paystack. Best effort. */
+export function deactivateSavedCard(mode: PaystackMode, authorizationCode: string) {
+  return call<unknown>(mode, '/customer/authorization/deactivate', {
+    method: 'POST',
+    body: { authorization_code: authorizationCode },
+  });
+}
+
 /** Asks Paystack what happened to an attempt. The raw answer goes to the database. */
 export function verify(mode: PaystackMode, reference: string) {
   return call<{ status: string; reference: string }>(

@@ -17,8 +17,17 @@ import type { SavedPlace } from './types';
  * location" is the convenience, not the primary path, and the
  * layout says so by where it sits.
  */
-export function Panel() {
+export function Panel({
+  inline = false,
+  onDone,
+}: {
+  /** Shown inside the "Where should we deliver?" sheet rather than under the chip. */
+  inline?: boolean;
+  /** Called once a place is chosen. Defaults to closing the chip's panel. */
+  onDone?: () => void;
+} = {}) {
   const { savedPlaces, place, setPanelOpen, setPlace, actions } = useLocation();
+  const finish = onDone ?? (() => setPanelOpen(false));
   const [query, setQuery] = React.useState('');
   const [results, setResults] = React.useState<SavedPlace[]>([]);
   const [searching, setSearching] = React.useState(false);
@@ -52,14 +61,18 @@ export function Panel() {
   async function choose(candidate: SavedPlace) {
     const cover = await actions.coverage(candidate.lat, candidate.lng);
     await setPlace({ ...candidate, ...cover } as SavedPlace, 'search');
-    setPanelOpen(false);
+    finish();
   }
 
   return (
     <div
       role="dialog"
       aria-label="Choose where to deliver"
-      className="border-border bg-surface absolute left-0 right-auto top-[calc(100%+0.5rem)] z-50 w-[min(34rem,calc(100vw-2rem))] rounded-2xl border p-4 shadow-2xl sm:p-5"
+      className={
+        inline
+          ? 'w-full'
+          : 'border-border bg-surface absolute left-0 right-auto top-[calc(100%+0.5rem)] z-50 w-[min(34rem,calc(100vw-2rem))] rounded-2xl border p-4 shadow-2xl sm:p-5'
+      }
     >
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 className="text-base font-extrabold tracking-tight">Deliver to</h2>
@@ -118,7 +131,7 @@ export function Panel() {
         </div>
       ) : null}
 
-      <UseMyLocation onDone={() => setPanelOpen(false)} />
+      <UseMyLocation onDone={finish} />
 
       {savedPlaces.length > 0 ? (
         <>

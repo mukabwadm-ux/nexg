@@ -59,53 +59,53 @@ export function riderNav({
 }): RiderNavItem[] {
   const i = (n: React.ReactNode) => n;
   return [
-    { href: '/rider', label: 'Dashboard', icon: i(<LayoutDashboard className="h-4 w-4" />) },
+    { href: '/rider', label: 'Dashboard', icon: i(<LayoutDashboard />) },
     {
       href: '/rider/jobs',
       label: 'Jobs',
-      icon: i(<Bike className="h-4 w-4" />),
+      icon: i(<Bike />),
       locked: !active,
       badge: active && openJobs > 0 ? openJobs : null,
     },
-    { href: '/rider/earnings', label: 'Earnings', icon: i(<Wallet className="h-4 w-4" />) },
+    { href: '/rider/earnings', label: 'Earnings', icon: i(<Wallet />) },
     {
       href: '/rider/cash',
       label: 'Cash',
-      icon: i(<Banknote className="h-4 w-4" />),
+      icon: i(<Banknote />),
       locked: !active,
       badge: active && cashDue ? 1 : null,
       tone: 'danger',
     },
-    { href: '/rider/receipts', label: 'Receipts', icon: i(<ReceiptText className="h-4 w-4" />) },
+    { href: '/rider/receipts', label: 'Receipts', icon: i(<ReceiptText />) },
     {
       href: '/rider/shifts',
-      label: 'Shifts',
-      icon: i(<Calendar className="h-4 w-4" />),
+      label: 'Schedule shifts',
+      icon: i(<Calendar />),
       locked: !active,
     },
     {
       href: '/rider/messages',
       label: 'Messages',
-      icon: i(<MessageSquare className="h-4 w-4" />),
+      icon: i(<MessageSquare />),
       badge: unreadMessages > 0 ? unreadMessages : null,
     },
-    { href: '/rider/health', label: 'Health', icon: i(<Heart className="h-4 w-4" />) },
+    { href: '/rider/health', label: 'Health & training', icon: i(<Heart />) },
     {
       href: '/rider/documents',
       label: 'Documents',
-      icon: i(<FileText className="h-4 w-4" />),
+      icon: i(<FileText />),
       badge: documentsToDo > 0 ? documentsToDo : null,
       tone: 'danger',
     },
-    { href: '/rider/kit', label: 'Rider kit', icon: i(<Package className="h-4 w-4" />) },
+    { href: '/rider/kit', label: 'Rider kit', icon: i(<Package />) },
     {
       href: '/rider/incidents',
-      label: 'Incidents',
-      icon: i(<TriangleAlert className="h-4 w-4" />),
+      label: 'Safety & SOS',
+      icon: i(<TriangleAlert />),
     },
-    { href: '/rider/refer', label: 'Refer a rider', icon: i(<UserPlus className="h-4 w-4" />) },
-    { href: '/rider/profile', label: 'Account', icon: i(<Settings className="h-4 w-4" />) },
-    { href: '/rider/support', label: 'Support', icon: i(<HelpCircle className="h-4 w-4" />) },
+    { href: '/rider/refer', label: 'Refer & rewards', icon: i(<UserPlus />) },
+    { href: '/rider/profile', label: 'Account', icon: i(<Settings />) },
+    { href: '/rider/support', label: 'Help & support', icon: i(<HelpCircle />) },
   ];
 }
 
@@ -114,8 +114,8 @@ export function RiderShell({
   riderCode,
   vehicle,
   active,
-  zoneLine,
-  presenceControl,
+  online,
+  city,
   unreadCount,
   nav,
   children,
@@ -124,21 +124,21 @@ export function RiderShell({
   riderCode: string;
   vehicle: string | null;
   active: boolean;
-  zoneLine: string;
-  presenceControl: React.ReactNode;
+  online: boolean;
+  city: string | null;
   unreadCount: number;
   nav: RiderNavItem[];
   children: React.ReactNode;
 }) {
-  /* The merchant dashboard's frame, with the rider's content (workspace-shell.tsx). */
+  /* The rider portal frame (workspace-shell.tsx). */
   return (
     <RiderWorkspaceShell
       personName={personName}
-      riderCode={riderCode}
-      statusLabel={active ? zoneLine : 'Application · not active yet'}
+      city={city}
+      active={active}
+      online={online}
       nav={nav}
       unreadCount={unreadCount}
-      presenceControl={presenceControl}
       accountMenu={
         <RiderAccountMenu
           personName={personName}

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { riderContext } from '@/components/rider/frame';
-import { PresenceControl, RiderShell } from '@/components/rider/shell';
+import { RiderShell } from '@/components/rider/shell';
 
 export const metadata = {
   title: { default: 'Your account', template: '%s · NexG' },
@@ -77,16 +77,10 @@ export default async function RiderLayout({ children }: { children: React.ReactN
       riderCode={h.rider_id.slice(0, 8).toUpperCase()}
       vehicle={h.vehicle}
       active={active}
-      zoneLine={h.city ? `${h.city} · your home zone` : 'Zone not set'}
+      online={h.presence === 'online'}
+      city={h.city}
       unreadCount={h.unread_messages ?? 0}
       nav={nav}
-      presenceControl={
-        <PresenceControl
-          active={active}
-          online={h.presence === 'online'}
-          reason={h.offers_paused_reason}
-        />
-      }
     >
       {children}
     </RiderShell>

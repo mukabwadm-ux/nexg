@@ -16,8 +16,23 @@ const locationSchema = z.object({
   contact: z.string().max(100),
   activityIds: z.array(z.string().min(1).max(100)).max(128),
   updatedAt: z.string().nullable(),
+  /* "latitude, longitude" from the map pin field; '' while unpinned. */
+  pin: z.string().trim().max(60).default(''),
+  /* Read only: whether the pin is inside an area NexG serves. */
+  inServiceArea: z.boolean().optional(),
+  /* Read only: the NexG area (zone) the pin is in, if any. */
+  area: z.string().nullable().optional(),
 });
 export type SetupLocation = z.infer<typeof locationSchema>;
+
+/* The same "lat, lng" the pin field writes (a client module, so not imported here). */
+function pinPoint(pin: string): { lat: number; lng: number } | null {
+  const match = pin.match(/^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/);
+  if (!match) return null;
+  const lat = Number(match[1]);
+  const lng = Number(match[2]);
+  return Math.abs(lat) <= 90 && Math.abs(lng) <= 180 ? { lat, lng } : null;
+}
 type RpcResult = { data: unknown; error: { message: string; code?: string } | null };
 type SetupRpc = (name: string, args: Record<string, unknown>) => PromiseLike<RpcResult>;
 
@@ -52,8 +67,11 @@ export async function saveSetupLocation(
   try {
     const { client, merchantId } = await merchantActionClient({ access: 'workspace-setup' });
     const value = parsed.data;
+    const point = pinPoint(value.pin);
+    if (value.pin !== '' && !point)
+      return { ok: false, message: 'That map pin is not a real place. Pin it on the map again.' };
     const rpc = client.rpc.bind(client) as unknown as SetupRpc;
-    const { data, error } = await rpc('rpc_merchant_setup_location_save', {
+    const args = {
       p_merchant_id: merchantId,
       p_branch_id: value.id,
       p_name: value.name,
@@ -62,14 +80,24 @@ export async function saveSetupLocation(
       p_contact: value.contact,
       p_activity_ids: value.activityIds,
       p_expected_updated_at: value.updatedAt,
+    };
+    let { data, error } = await rpc('rpc_merchant_setup_location_save', {
+      ...args,
+      p_latitude: point?.lat ?? null,
+      p_longitude: point?.lng ?? null,
     });
+    /* Until 20270203009700 is on the database the save has no pin arguments. */
+    if (error?.code === 'PGRST202')
+      ({ data, error } = await rpc('rpc_merchant_setup_location_save', args));
     if (error)
       return {
         ok: false,
         message:
           error.code === '40001'
             ? 'This location changed elsewhere. Reopen it to load the latest details.'
-            : 'Could not save this location. Your changes are still open.',
+            : error.code === '22023'
+              ? error.message
+              : 'Could not save this location. Your changes are still open.',
       };
     const result = locationSchema.safeParse(data);
     if (!result.success)

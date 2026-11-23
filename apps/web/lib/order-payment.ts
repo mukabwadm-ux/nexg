@@ -3,6 +3,7 @@ import 'server-only';
 import { z } from 'zod';
 
 import {
+  chargeSavedCard,
   openCheckout,
   payerEmail,
   paystackMode,
@@ -30,7 +31,9 @@ import { customerApiClient } from '@/lib/supabase/customer-api';
 const headers = { 'Cache-Control': 'private, no-store' };
 const orderId = z.string().uuid();
 const startInput = z.discriminatedUnion('method', [
-  z.object({ method: z.literal('card') }).strict(),
+  /* saveCard: keep the card for next time (accounts only; ignored for a guest). */
+  z.object({ method: z.literal('card'), saveCard: z.boolean().optional() }).strict(),
+  z.object({ method: z.literal('saved_card'), cardId: z.string().uuid() }).strict(),
   z
     .object({
       method: z.enum(['mpesa_stk', 'airtel_money']),
@@ -213,12 +216,28 @@ export async function readOrderPayment(request: Request, rawOrderId: string) {
 
 interface Attempt {
   attempt_reference: string;
-  channel: 'card' | 'mpesa' | 'airtel';
+  channel: 'card' | 'mpesa' | 'airtel' | 'saved_card';
   amount_cents: number;
   is_test: boolean;
   reused: boolean;
   authorization_url?: string;
   retry_after_seconds?: number;
+  /* Saved card only: what the server charges. Never sent on to the phone. */
+  authorization_code?: string;
+  email?: string;
+}
+
+/** Paystack's own checkout pages only. */
+function checkoutPage(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && url.hostname === 'checkout.paystack.com'
+      ? url.toString()
+      : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export async function startOrderPayment(request: Request, rawOrderId: string) {
@@ -256,18 +275,24 @@ export async function startOrderPayment(request: Request, rawOrderId: string) {
     if (begun.error) return refused(begun.error);
     const payment = begun.data as { reference: string; amount_cents: number };
 
+    const choice = input.data;
     const channel =
-      input.data.method === 'card'
+      choice.method === 'card'
         ? 'card'
-        : input.data.method === 'mpesa_stk'
-          ? 'mpesa'
-          : 'airtel';
-    const phone = input.data.method === 'card' ? null : input.data.phone;
+        : choice.method === 'saved_card'
+          ? 'saved_card'
+          : choice.method === 'mpesa_stk'
+            ? 'mpesa'
+            : 'airtel';
+    const phone =
+      choice.method === 'mpesa_stk' || choice.method === 'airtel_money' ? choice.phone : null;
     const tried = await rpc(supabase, 'rpc_payment_paystack_attempt', {
       p_payment_reference: payment.reference,
       p_channel: channel,
       p_phone: phone,
       p_proof: proof,
+      p_save_card: choice.method === 'card' ? choice.saveCard === true : false,
+      p_card_id: choice.method === 'saved_card' ? choice.cardId : null,
     });
     if (tried.error) return refused(tried.error);
     const attempt = tried.data as Attempt;
@@ -293,6 +318,10 @@ export async function startOrderPayment(request: Request, rawOrderId: string) {
       /\/+$/,
       '',
     );
+    if (channel === 'saved_card') {
+      return chargeSaved(supabase, parsedId.data, payment.reference, attempt, mode, proof);
+    }
+
     const answer =
       channel === 'card'
         ? await openCheckout(mode, {
@@ -354,4 +383,58 @@ export async function startOrderPayment(request: Request, rawOrderId: string) {
   } catch {
     return unavailable();
   }
+}
+
+/**
+ * A saved card: charged from here, with no page. Paystack's answer is then
+ * checked through verify and the database decides, so the customer usually
+ * sees "paid" straight away. If the bank wants the customer (a code), the
+ * answer carries Paystack's page for that step.
+ */
+async function chargeSaved(
+  supabase: Client,
+  id: string,
+  reference: string,
+  attempt: Attempt,
+  mode: PaystackMode,
+  proof: string,
+) {
+  if (!attempt.authorization_code || !attempt.email) return unavailable();
+  const answer = await chargeSavedCard(mode, {
+    reference: attempt.attempt_reference,
+    amountCents: attempt.amount_cents,
+    email: attempt.email,
+    authorizationCode: attempt.authorization_code,
+    metadata: { order_id: id, payment_reference: reference },
+  });
+  if (answer.refused || (answer.ok && answer.data?.status === 'failed')) {
+    await rpc(supabase, 'rpc_payment_paystack_opened', {
+      p_attempt_reference: attempt.attempt_reference,
+      p_access_code: null,
+      p_authorization_url: null,
+      p_failure: answer.message || 'The card was declined.',
+      p_proof: proof,
+    });
+    return problem(409, 'PAYMENT_REFUSED', 'The card was declined. Try another way to pay.');
+  }
+
+  /* Recorded as tried even when Paystack did not answer in time, so the sweep asks later. */
+  const opened = await rpc(supabase, 'rpc_payment_paystack_opened', {
+    p_attempt_reference: attempt.attempt_reference,
+    p_access_code: null,
+    p_authorization_url: null,
+    p_failure: null,
+    p_proof: proof,
+  });
+  if (opened.error) return refused(opened.error);
+
+  if (answer.ok) await checkWithPaystack(supabase, attempt.attempt_reference, mode);
+  const state = await readState(supabase, id);
+  if (state instanceof Response) return state;
+  const page =
+    state.status === 'pending' ? checkoutPage(answer.data?.authorization_url) : undefined;
+  return Response.json(
+    { ...view(state), ...(page ? { url: page } : {}) } satisfies OrderPaymentView,
+    { headers },
+  );
 }

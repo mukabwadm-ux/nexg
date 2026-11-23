@@ -10,11 +10,13 @@ import {
   Drawer,
   Field,
   Grid,
+  type Outcome,
   Said,
   Submit,
   Text,
   useAction,
 } from '@/components/partner/form';
+import { formatPin, MapPinField, parsePin } from '@/components/merchant/map-pin-field';
 
 export interface BranchRow {
   id: string;
@@ -30,7 +32,15 @@ export interface BranchRow {
   prep_avg_minutes: number | null;
   orders_30d: number;
   rating: number | null;
+  /* From merchant_branch: the view does not carry the pin. */
+  latitude?: number | null;
+  longitude?: number | null;
 }
+
+const pinOf = (branch?: BranchRow) =>
+  branch?.latitude != null && branch?.longitude != null
+    ? formatPin({ lat: branch.latitude, lng: branch.longitude })
+    : '';
 
 /**
  * Opening a branch and changing it.
@@ -55,9 +65,11 @@ export function BranchDrawer({
     addressText: branch?.address_text ?? '',
     pickupInstructions: branch?.pickup_instructions ?? '',
     riderPhone: branch?.rider_phone ?? '',
+    pin: pinOf(branch),
   });
   const [pauseReason, setPauseReason] = React.useState('');
   const save = useAction();
+  const [missingPin, setMissingPin] = React.useState<Outcome | null>(null);
   const pause = useAction();
   const del = useAction();
   const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
@@ -115,17 +127,67 @@ export function BranchDrawer({
                 placeholder="Side counter on the left, not the front door. Ask for the order number."
               />
             </Field>
+            {/* Not inside a Field: that is a <label>, and a click on the map
+                inside a label would be passed to the pin's text box. */}
+            <div className="sm:col-span-2">
+              <label
+                htmlFor={`branch-pin-${branch?.id ?? 'new'}`}
+                className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-wide"
+              >
+                Exact location
+              </label>
+              <MapPinField
+                id={`branch-pin-${branch?.id ?? 'new'}`}
+                value={form.pin}
+                disabled={save.pending}
+                placeholder="Pin on the map, or paste latitude, longitude"
+                className="border-border-strong bg-bg focus:border-ink w-full rounded-lg border px-3 py-2 text-[0.875rem] font-semibold outline-none transition-colors"
+                onChange={set('pin')}
+                searchText={form.addressText}
+              />
+              <span className="text-muted-light mt-1 block text-[0.6875rem] font-semibold leading-[1.5]">
+                Riders and customers are sent to this pin, and it decides which area the branch
+                shows in.
+                {branch && form.pin && form.pin === pinOf(branch)
+                  ? branch.zone_name
+                    ? ` This branch is in the ${branch.zone_name} area.`
+                    : ' This pin is outside the areas NexG serves today.'
+                  : ''}
+              </span>
+            </div>
           </Grid>
 
-          <Said outcome={save.outcome} />
+          <Said outcome={missingPin ?? save.outcome} />
 
           <Actions>
             <Submit
               type="button"
               pending={save.pending}
-              onClick={() =>
+              onClick={() => {
+                const point = parsePin(form.pin);
+                if (!point) {
+                  setMissingPin({
+                    ok: false,
+                    message:
+                      form.pin === ''
+                        ? 'Pin this branch on the map: riders and customers are sent to that exact spot.'
+                        : 'That map pin is not a real place. Pin it on the map again.',
+                  });
+                  return;
+                }
+                setMissingPin(null);
                 save.run(
-                  () => saveBranch({ merchantId, branchId: branch?.id ?? null, ...form }),
+                  () =>
+                    saveBranch({
+                      merchantId,
+                      branchId: branch?.id ?? null,
+                      name: form.name,
+                      addressText: form.addressText,
+                      pickupInstructions: form.pickupInstructions,
+                      riderPhone: form.riderPhone,
+                      latitude: String(point.lat),
+                      longitude: String(point.lng),
+                    }),
                   (o) => {
                     if (o.ok && !branch) {
                       setForm({
@@ -133,11 +195,12 @@ export function BranchDrawer({
                         addressText: '',
                         pickupInstructions: form.pickupInstructions,
                         riderPhone: '',
+                        pin: '',
                       });
                     }
                   },
-                )
-              }
+                );
+              }}
             >
               {branch ? 'Save changes' : 'Add branch'}
             </Submit>

@@ -112,6 +112,8 @@ describe('order payment route', () => {
       p_channel: 'card',
       p_phone: null,
       p_proof: TEST,
+      p_save_card: false,
+      p_card_id: null,
     });
     expect(stub.rpc).toHaveBeenCalledWith(
       'rpc_payment_paystack_opened',
@@ -289,5 +291,117 @@ describe('order payment route', () => {
       test: true,
     });
     expect(fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe('saved cards', () => {
+  const CARD = '01a12345-168a-4456-8b79-0123456789aa';
+  const savedAttempt = {
+    attempt_reference: 'NXP-7-2',
+    channel: 'saved_card',
+    amount_cents: 120000,
+    is_test: true,
+    reused: false,
+    authorization_code: 'AUTH_secret',
+    email: 'owner@example.com',
+  };
+
+  it('asks to keep the card when the customer ticks Save', async () => {
+    answer({
+      rpc_order_payment_state: { data: { status: 'unpaid' } },
+      rpc_payment_begin_order: { data: { reference: 'NXP-7', amount_cents: 120000 } },
+      rpc_payment_paystack_attempt: {
+        data: {
+          attempt_reference: 'NXP-7-1',
+          channel: 'card',
+          amount_cents: 120000,
+          is_test: true,
+          reused: false,
+        },
+      },
+      rpc_payment_paystack_opened: { data: { ok: true } },
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValue(
+          paystackOk({ authorization_url: 'https://checkout.paystack.com/s', access_code: 's' }),
+        ),
+    );
+    await startOrderPayment(request({ method: 'card', saveCard: true }), ORDER);
+    expect(stub.rpc).toHaveBeenCalledWith(
+      'rpc_payment_paystack_attempt',
+      expect.objectContaining({ p_channel: 'card', p_save_card: true, p_card_id: null }),
+    );
+  });
+
+  it('charges a saved card with no page, checks with Paystack, and never returns the authorization', async () => {
+    const states = [{ status: 'unpaid' }, { status: 'paid', reference: 'NXP-7', is_test: true }];
+    stub.rpc.mockImplementation(async (fn: string) => {
+      if (fn === 'rpc_order_payment_state') return { data: states.shift(), error: null };
+      if (fn === 'rpc_payment_begin_order')
+        return { data: { reference: 'NXP-7', amount_cents: 120000 }, error: null };
+      if (fn === 'rpc_payment_paystack_attempt') return { data: savedAttempt, error: null };
+      return { data: { ok: true }, error: null };
+    });
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(paystackOk({ status: 'success', reference: 'NXP-7-2' }))
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ status: true, data: { reference: 'NXP-7-2', status: 'success' } }),
+        ),
+      );
+    vi.stubGlobal('fetch', fetch);
+
+    const response = await startOrderPayment(
+      request({ method: 'saved_card', cardId: CARD }),
+      ORDER,
+    );
+    const body = await response.json();
+    expect(body).toEqual({ status: 'paid', reference: 'NXP-7', test: true });
+    expect(JSON.stringify(body)).not.toContain('AUTH_secret');
+    const [url, init] = fetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('https://api.paystack.co/transaction/charge_authorization');
+    expect(JSON.parse(init.body as string)).toMatchObject({
+      reference: 'NXP-7-2',
+      amount: 120000,
+      email: 'owner@example.com',
+      authorization_code: 'AUTH_secret',
+    });
+    expect((fetch.mock.calls[1] as [string])[0]).toBe(
+      'https://api.paystack.co/transaction/verify/NXP-7-2',
+    );
+    expect(stub.rpc).toHaveBeenCalledWith(
+      'rpc_payment_paystack_attempt',
+      expect.objectContaining({ p_channel: 'saved_card', p_card_id: CARD }),
+    );
+  });
+
+  it('says the card was declined, and records it', async () => {
+    answer({
+      rpc_order_payment_state: { data: { status: 'unpaid' } },
+      rpc_payment_begin_order: { data: { reference: 'NXP-8', amount_cents: 120000 } },
+      rpc_payment_paystack_attempt: { data: { ...savedAttempt, attempt_reference: 'NXP-8-1' } },
+      rpc_payment_paystack_opened: { data: { ok: true, outcome: 'failed' } },
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(JSON.stringify({ status: false, message: 'Declined' }), { status: 400 }),
+        ),
+    );
+    const response = await startOrderPayment(
+      request({ method: 'saved_card', cardId: CARD }),
+      ORDER,
+    );
+    expect(response.status).toBe(409);
+    expect(stub.rpc).toHaveBeenCalledWith(
+      'rpc_payment_paystack_opened',
+      expect.objectContaining({ p_attempt_reference: 'NXP-8-1', p_failure: 'Declined' }),
+    );
   });
 });

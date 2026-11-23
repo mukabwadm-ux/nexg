@@ -1,14 +1,15 @@
 'use client';
 
-import { Bell, ChevronRight, CircleHelp, Lock, TriangleAlert } from 'lucide-react';
+import { Bell, Lock, MapPin, Search, TriangleAlert } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import * as React from 'react';
 import type { ReactNode } from 'react';
 
 import { WorkspaceMobileNavigation } from '@/components/merchant/workspace/mobile-navigation';
-import { WorkspaceFrame } from '@/components/merchant/workspace/workspace-frame';
-import styles from '@/components/merchant/workspace/workspace.module.css';
 
+import { OnlineSwitch } from './online-switch';
+import styles from './portal.module.css';
 import type { RiderNavItem } from './shell';
 
 function isOn(pathname: string, href: string): boolean {
@@ -16,43 +17,123 @@ function isOn(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function initialsOf(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  const letters = (parts[0]?.[0] ?? '') + (parts.length > 1 ? (parts.at(-1)?.[0] ?? '') : '');
-  return (letters || 'R').toUpperCase();
+/** Extra words a rider might type for each place in the portal. */
+const SEARCH_WORDS: Record<string, string> = {
+  '/rider/jobs': 'jobs deliveries orders trips offers',
+  '/rider/earnings': 'earnings pay payout cashout cash out money statement friday',
+  '/rider/cash': 'cash on hand deposit remit collected',
+  '/rider/receipts': 'receipts',
+  '/rider/shifts': 'shifts schedule hours availability',
+  '/rider/messages': 'messages inbox notifications',
+  '/rider/health': 'health score rating acceptance strikes training',
+  '/rider/documents': 'documents id licence insurance police clearance upload',
+  '/rider/kit': 'kit helmet bag jacket',
+  '/rider/incidents': 'sos incident accident safety emergency',
+  '/rider/refer': 'refer referral rewards friend',
+  '/rider/profile': 'account profile phone mpesa m-pesa payout number motorbike plate zone',
+  '/rider/support': 'help support question ticket contact',
+};
+
+function RiderSearch({ nav }: { nav: RiderNavItem[] }) {
+  const router = useRouter();
+  const [query, setQuery] = React.useState('');
+  const [open, setOpen] = React.useState(false);
+  const q = query.trim().toLowerCase();
+  const results = q
+    ? nav.filter((item) =>
+        `${item.label} ${SEARCH_WORDS[item.href] ?? ''}`.toLowerCase().includes(q),
+      )
+    : [];
+
+  return (
+    <form
+      role="search"
+      className="relative hidden w-full max-w-[26rem] md:block"
+      onSubmit={(event) => {
+        event.preventDefault();
+        const first = results[0];
+        if (first) {
+          router.push(first.href);
+          setQuery('');
+          setOpen(false);
+        }
+      }}
+    >
+      <Search
+        className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500"
+        aria-hidden="true"
+      />
+      <input
+        type="search"
+        value={query}
+        onChange={(event) => {
+          setQuery(event.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        placeholder="Search jobs, earnings, or help…"
+        aria-label="Search the rider portal"
+        className="h-11 w-full rounded-2xl border border-[#e3e7f0] bg-white pl-11 pr-4 text-[14px] font-semibold outline-none focus:border-[#fdd128] focus:ring-2 focus:ring-[#fdd128]/40"
+      />
+      {open && q ? (
+        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-xl border border-[#e3e7f0] bg-white shadow-lg">
+          {results.length === 0 ? (
+            <p className="px-4 py-3 text-[13px] font-semibold text-slate-500">
+              Nothing matches. Try “pay”, “documents” or “help”.
+            </p>
+          ) : (
+            results.slice(0, 6).map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                prefetch={false}
+                className="flex items-center gap-3 px-4 py-2.5 text-[14px] font-bold hover:bg-[#f6f7fb] [&_svg]:h-4 [&_svg]:w-4"
+                onClick={() => {
+                  setQuery('');
+                  setOpen(false);
+                }}
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            ))
+          )}
+        </div>
+      ) : null}
+    </form>
+  );
 }
 
 /**
- * The rider portal in the merchant dashboard's frame: the same dark sidebar,
- * top bar, breadcrumb and phone drawer (components/merchant/workspace), with
- * the rider's own sections, badges and controls.
+ * The rider portal frame: the NexG mark and "Rider Portal", the sections
+ * with a yellow pill on the open one, an SOS card and the online switch at
+ * the foot of the sidebar; city, search, messages and the account in the
+ * top bar. On a phone the sections open from a drawer.
  *
- * SOS stays in the top bar on every screen and in every state. A rider in
- * trouble does not first become activated.
+ * SOS is on screen in every state. A rider in trouble does not first
+ * become activated.
  */
 export function RiderWorkspaceShell({
   personName,
-  riderCode,
-  statusLabel,
+  city,
+  active,
+  online,
   nav,
   unreadCount,
-  presenceControl,
   accountMenu,
   children,
 }: {
   personName: string;
-  riderCode: string;
-  statusLabel: string;
+  city: string | null;
+  active: boolean;
+  online: boolean;
   nav: RiderNavItem[];
   unreadCount: number;
-  presenceControl: ReactNode;
   accountMenu: ReactNode;
   children: ReactNode;
 }) {
   const pathname = usePathname() ?? '/rider';
-  const current = nav.find((item) => isOn(pathname, item.href));
-  const activeLabel = current?.label ?? 'Dashboard';
-  const initials = initialsOf(personName);
 
   const navigation = (
     <nav aria-label="Rider portal navigation" className={styles.nav}>
@@ -66,26 +147,18 @@ export function RiderWorkspaceShell({
             className={styles.navLink}
             aria-current={on ? 'page' : undefined}
           >
-            <span aria-hidden="true" className="flex shrink-0 [&_svg]:h-[18px] [&_svg]:w-[18px]">
+            <span aria-hidden="true" className="flex shrink-0 [&_svg]:h-5 [&_svg]:w-5">
               {item.icon}
             </span>
             <span className={styles.navLabel}>{item.label}</span>
             {item.badge ? (
-              <span
-                className={`h-[1.15rem] min-w-[1.15rem] shrink-0 rounded-full px-1 text-center text-[0.625rem] font-extrabold leading-[1.15rem] ${
-                  item.tone === 'danger'
-                    ? 'bg-danger text-white'
-                    : on
-                      ? 'bg-ink text-white'
-                      : 'bg-gold text-ink'
-                }`}
-              >
+              <span className="flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full bg-red-600 px-1.5 text-[12px] font-extrabold text-white">
                 {item.badge}
               </span>
             ) : null}
             {item.locked ? (
               <>
-                <Lock size={13} aria-hidden="true" />
+                <Lock size={13} aria-hidden="true" className="opacity-60" />
                 <span className="sr-only">, not available until you are active</span>
               </>
             ) : null}
@@ -96,100 +169,90 @@ export function RiderWorkspaceShell({
   );
 
   return (
-    <WorkspaceFrame
-      activeLabel={activeLabel}
-      businessName={personName}
-      accountInitials={initials}
-      navigation={navigation}
-      sidebarHome={
-        <Link
-          href="/rider"
-          prefetch={false}
-          className={styles.sidebarContext}
-          aria-label={`${personName}, rider Dashboard`}
-          title={personName}
-        >
-          <span className={styles.businessAvatar} aria-hidden="true">
-            {initials}
+    <div className={styles.shell} data-rider-portal>
+      <aside className={styles.sidebar} aria-label="Rider portal sidebar">
+        <Link href="/rider" prefetch={false} className={styles.brand}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/nexg-logo-on-dark.png" alt="" />
+          <span>
+            <strong>NEXGAPP</strong>
+            <small>Rider Portal</small>
           </span>
-          <div>
-            <strong>{personName}</strong>
-            <small>Rider · {riderCode}</small>
-          </div>
         </Link>
-      }
-      sidebarFooter={
-        <>
-          <strong>NEXG rider portal</strong>
-          <span>Nairobi · East Africa Time</span>
-        </>
-      }
-      headerStart={
-        <>
+        {navigation}
+        <div className={styles.sidebarFoot}>
+          <div className={styles.sosCard}>
+            <p>
+              In trouble on the road?
+              <br />
+              <span>SOS reaches rider ops straight away.</span>
+            </p>
+            <Link
+              href="/rider/incidents"
+              prefetch={false}
+              className="flex items-center justify-center gap-1.5 rounded-lg bg-red-600 px-3 py-2 text-[13px] font-extrabold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            >
+              <TriangleAlert className="h-4 w-4" aria-hidden="true" />
+              SOS
+            </Link>
+          </div>
+          <div className={styles.presence}>
+            {active ? (
+              <OnlineSwitch online={online} />
+            ) : (
+              <>
+                <span className="bg-gold h-2.5 w-2.5 rounded-full" aria-hidden="true" />
+                Not active yet
+              </>
+            )}
+          </div>
+        </div>
+      </aside>
+
+      <div className={styles.frame}>
+        <header className={styles.header}>
           <WorkspaceMobileNavigation homeHref="/rider" title={personName}>
             {navigation}
           </WorkspaceMobileNavigation>
-          <div className={styles.breadcrumb} aria-label="Breadcrumb">
-            <Link href="/rider" prefetch={false}>
-              Rider portal
-            </Link>
-            <ChevronRight size={13} aria-hidden="true" />
-            <span>{activeLabel}</span>
-          </div>
-          <span className="hidden sm:inline-flex">{presenceControl}</span>
-        </>
-      }
-      headerMiddle={
-        <span className={`${styles.workspaceStatus} hidden sm:block`} role="note">
-          {statusLabel}
-        </span>
-      }
-      headerEnd={
-        <>
+          <span className={styles.city}>
+            <MapPin className="text-gold-text h-5 w-5" aria-hidden="true" />
+            {city ?? 'Zone not set'}
+          </span>
+          <span className={`${styles.divider} hidden md:block`} aria-hidden="true" />
+          <RiderSearch nav={nav} />
+          <span className="flex-1" />
           {/* Never hidden, never disabled, in any state. */}
           <Link
             href="/rider/incidents"
             prefetch={false}
-            className="bg-danger flex items-center gap-1.5 rounded-lg px-3 py-2 text-[0.8125rem] font-extrabold text-white"
+            className="flex items-center gap-1.5 rounded-xl bg-red-600 px-3 py-2 text-[13px] font-extrabold text-white lg:hidden"
           >
-            <TriangleAlert className="h-3.5 w-3.5" aria-hidden="true" />
+            <TriangleAlert className="h-4 w-4" aria-hidden="true" />
             SOS
           </Link>
           <Link
             href="/rider/messages"
             prefetch={false}
-            className={`${styles.iconButton} relative`}
+            className={styles.iconButton}
             aria-label={
               unreadCount > 0 ? `Messages, ${unreadCount} unread` : 'Messages, nothing new'
             }
           >
-            <Bell size={18} aria-hidden="true" />
+            <Bell size={19} aria-hidden="true" />
             {unreadCount > 0 ? (
-              <span className="bg-danger absolute -right-0.5 -top-0.5 flex h-[1rem] min-w-[1rem] items-center justify-center rounded-full px-1 text-[0.5625rem] font-extrabold text-white">
+              <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-extrabold text-white">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             ) : null}
           </Link>
-          <Link
-            href="/rider/support"
-            prefetch={false}
-            className={styles.helpButton}
-            aria-label="Help"
-          >
-            <CircleHelp size={18} aria-hidden="true" />
-            <span>Help</span>
-          </Link>
           {accountMenu}
-        </>
-      }
-    >
-      {/* On a phone the presence switch sits under the bar, where a thumb reaches it. */}
-      <div className="border-border bg-surface flex items-center gap-2 border-b px-4 py-2 sm:hidden">
-        {presenceControl}
+        </header>
+        <div className={styles.body}>
+          {/* Every rider page's landmark. Pages render a plain div inside it,
+              never their own main (e2e/web/portal-chrome.spec.ts reads this). */}
+          <main id="main">{children}</main>
+        </div>
       </div>
-      {/* Every rider page's landmark. Pages render a plain div inside it,
-          never their own main (e2e/web/portal-chrome.spec.ts reads this). */}
-      <main id="main">{children}</main>
-    </WorkspaceFrame>
+    </div>
   );
 }
