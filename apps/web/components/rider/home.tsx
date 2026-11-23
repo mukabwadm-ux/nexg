@@ -1,14 +1,16 @@
 import {
   AlertCircle,
   ArrowRight,
+  ArrowUpRight,
+  BarChart3,
   Banknote,
   Bike,
   CalendarDays,
   CheckCircle2,
-  ClipboardList,
+  Clock,
   FileText,
+  GraduationCap,
   Headphones,
-  HeartPulse,
   ListChecks,
   MapPin,
   MessageSquare,
@@ -16,8 +18,11 @@ import {
   Package,
   Rocket,
   ShieldCheck,
+  Siren,
   Smartphone,
+  Star,
   Sun,
+  TrendingUp,
   User,
   Wallet,
   Zap,
@@ -26,6 +31,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 
+import { OnlineSwitch } from './online-switch';
 import type {
   RiderAttentionRow,
   RiderHome as RiderLayoutHome,
@@ -36,7 +42,7 @@ import type {
 
 /*
  * The rider's Home: a greeting banner with the rider's status, four figure
- * cards, Needs attention, Today at a glance, Getting started (or Today's
+ * cards, Needs attention, Your performance, the earnings trend, Getting started (or Today's
  * jobs once active), help and quick actions.
  *
  * Figures are only ever real ones. Where a number is not known it says so,
@@ -122,9 +128,24 @@ function accountState(h: RiderLayoutHome, active: boolean): { value: string; not
   return { value: 'Applied', note: 'Finish the steps below to get on the road.' };
 }
 
-const panel = 'min-w-0 rounded-[18px] border border-[#e6e9f2] bg-white p-4 sm:p-5';
+const panel = 'min-w-0 rounded-[20px] border border-[#e6e9f2] bg-white p-4 sm:p-5';
 const ring =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141a2a]';
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+/** Read on the Home page from rider_health_v, the payout overview and rider_earning. */
+export interface RiderPerformance {
+  acceptancePct: number | null;
+  onTimePct: number | null;
+  rating: number | null;
+  trips30d: number | null;
+  /** Health score, oldest first. */
+  trend: number[];
+  /** This week's pay per day, Monday first. */
+  days: number[];
+  lastWeekTotal: number;
+  availableKes: number | null;
+}
 
 export function RiderHomeView({
   h,
@@ -133,6 +154,7 @@ export function RiderHomeView({
   attention,
   jobs,
   week,
+  performance,
 }: {
   h: RiderLayoutHome;
   active: boolean;
@@ -140,22 +162,23 @@ export function RiderHomeView({
   attention: RiderAttentionRow[];
   jobs: RiderJob[];
   week: WeekEarnings | null;
+  performance: RiderPerformance;
 }) {
   const name = h.first_name ?? h.name?.split(' ')[0] ?? 'there';
   const account = accountState(h, active);
   const done = progress ? STEPS.filter((step) => progress[step.key]).length : 0;
   const total = STEPS.length;
-  const pct = h.readiness_pct ?? Math.round((done / total) * 100);
   const online = h.presence === 'online';
   const agreementWaiting = (h as { agreement_to_accept?: boolean }).agreement_to_accept === true;
   const docsToDo = (h.documents_missing ?? 0) + (h.documents_to_fix ?? 0);
   const nextStep = STEPS.find((step) => !progress?.[step.key]);
   const time = partOfDay();
+  const weekTotal = performance.days.reduce((sum, value) => sum + value, 0);
 
   return (
     <div className="mx-auto w-full max-w-[112rem] space-y-5 px-3 pb-10 pt-1 sm:px-6">
       {/* Greeting banner */}
-      <section className="relative isolate overflow-hidden rounded-[22px] bg-[#0b1d4a] text-white">
+      <section className="relative isolate overflow-hidden rounded-[24px] bg-[#0b1d4a] text-white">
         <Image
           src="/images/join/rider.jpg"
           alt=""
@@ -168,30 +191,35 @@ export function RiderHomeView({
           aria-hidden="true"
           className="absolute inset-0 -z-10 bg-gradient-to-r from-[#0b1d4a] via-[#0b1d4a]/[0.9] to-[#0b1d4a]/30 sm:via-[#0b1d4a]/60 sm:via-40% sm:to-transparent"
         />
-        <div className="flex flex-col gap-5 p-5 sm:p-7 md:flex-row md:items-center md:justify-between">
+        {/* The gold sweep along the bottom left, as drawn. */}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 600 120"
+          preserveAspectRatio="none"
+          className="absolute bottom-0 left-0 -z-10 h-16 w-[60%] sm:h-20"
+        >
+          <path d="M0 120 L0 70 C 120 40, 260 110, 600 120 Z" fill="#fdd128" opacity="0.9" />
+          <path d="M0 120 L0 95 C 160 70, 300 118, 520 120 Z" fill="#f5b400" opacity="0.9" />
+        </svg>
+        <div className="flex flex-col gap-5 p-5 pb-12 sm:p-7 sm:pb-14 md:flex-row md:items-center md:justify-between">
           <div className="flex min-w-0 items-start gap-4">
-            <span
-              aria-hidden="true"
-              className="hidden h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/15 sm:flex"
-            >
+            <span aria-hidden="true" className="hidden shrink-0 sm:block">
               {time === 'evening' ? (
-                <Moon className="text-gold h-9 w-9" />
+                <Moon className="text-gold h-16 w-16" strokeWidth={1.6} />
               ) : (
-                <Sun className="text-gold h-9 w-9" />
+                <Sun className="text-gold h-16 w-16" strokeWidth={1.6} />
               )}
             </span>
             <div className="min-w-0">
-              <h1 className="text-[26px] font-extrabold leading-tight tracking-tight sm:text-[34px]">
+              <h1 className="text-[26px] font-extrabold leading-tight tracking-tight sm:text-[36px]">
                 Good {time}, <span className="text-gold">{name}!</span>
               </h1>
-              <p className="mt-1 text-[15px] font-semibold text-white/85 sm:text-[17px]">
-                {active
-                  ? 'Here’s your day on the road.'
-                  : 'Here’s where your rider application stands.'}
+              <p className="mt-1 text-[16px] font-bold text-white/90 sm:text-[20px]">
+                {active ? 'Ride smart. Earn more.' : 'Let’s get you on the road.'}
               </p>
               <Link
                 href={active ? '/rider/jobs' : (nextStep?.href ?? '/rider/documents')}
-                className={`bg-gold mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-[14px] font-extrabold text-[color:var(--rider-ink)] ${ring}`}
+                className={`bg-gold mt-4 inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-[15px] font-extrabold text-[color:var(--rider-ink)] shadow-[0_8px_20px_-10px_#fdd128] ${ring}`}
               >
                 {active ? 'View today’s jobs' : 'Continue setup'}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -199,26 +227,28 @@ export function RiderHomeView({
             </div>
           </div>
 
-          <div className="w-full shrink-0 rounded-2xl border border-white/15 bg-[#0d1120]/75 p-4 backdrop-blur md:w-[270px]">
-            <p className="text-[13px] font-bold text-white/80">Your status</p>
-            <p className="mt-1.5 flex items-center gap-2 text-[20px] font-extrabold">
-              <span
-                aria-hidden="true"
-                className={`h-3 w-3 rounded-full ${
-                  !active ? 'bg-gold' : online ? 'bg-green-400' : 'bg-slate-400'
-                }`}
-              />
-              <span className={!active ? 'text-gold' : online ? 'text-green-400' : 'text-white'}>
-                {!active ? account.value : online ? 'Online' : 'Offline'}
-              </span>
-            </p>
-            <p className="mt-2 flex items-start gap-2 text-[13px] font-semibold text-white/85">
-              <Zap className="text-gold mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-              {!active
-                ? account.note
-                : (h.offers_paused_reason ??
-                  (online ? 'Ready to accept jobs.' : 'Go online in the rider app to get offers.'))}
-            </p>
+          <div className="w-full shrink-0 rounded-2xl border border-white/15 bg-[#0d1120]/75 p-4 backdrop-blur md:w-[280px]">
+            {active ? (
+              <>
+                <OnlineSwitch online={online} />
+                <p className="mt-2 text-[13px] font-semibold text-white/80">
+                  {h.offers_paused_reason ??
+                    (online ? 'Ready to accept jobs.' : 'Switch on to receive delivery offers.')}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-[13px] font-bold text-white/80">Your status</p>
+                <p className="text-gold mt-1.5 flex items-center gap-2 text-[20px] font-extrabold">
+                  <span aria-hidden="true" className="bg-gold h-3 w-3 rounded-full" />
+                  {account.value}
+                </p>
+                <p className="mt-2 flex items-start gap-2 text-[13px] font-semibold text-white/85">
+                  <Zap className="text-gold mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                  {account.note}
+                </p>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -238,21 +268,21 @@ export function RiderHomeView({
               tone="green"
               href="/rider/earnings"
               icon={<Wallet />}
-              value={kes(h.earned_today_kes ?? 0)}
-              label="Earned today"
+              value={kes(performance.availableKes)}
+              label="Current balance"
             />
             <Kpi
               tone="purple"
               href="/rider/earnings"
-              icon={<CalendarDays />}
-              value={kes(h.earned_week_kes ?? 0)}
-              label="This week"
+              icon={<BarChart3 />}
+              value={kes(h.earned_today_kes ?? 0)}
+              label="Today’s earnings"
             />
             <Kpi
-              tone="peach"
+              tone="orange"
               href="/rider/cash"
               icon={<Banknote />}
-              value={kes(h.cash_on_hand)}
+              value={kes(h.cash_on_hand ?? 0)}
               label={
                 h.cash_cap != null ? `Cash on hand · limit ${kes(h.cash_cap)}` : 'Cash on hand'
               }
@@ -282,7 +312,7 @@ export function RiderHomeView({
               label="M-Pesa payout number"
             />
             <Kpi
-              tone="peach"
+              tone="orange"
               href="/rider/profile"
               icon={<MapPin />}
               value={h.city ?? 'Not set'}
@@ -292,289 +322,273 @@ export function RiderHomeView({
         )}
       </section>
 
-      <div className="grid items-start gap-5 lg:grid-cols-2">
-        <div className="space-y-5">
-          {/* Needs attention */}
-          <section className={panel}>
-            <PanelHead
-              icon={<AlertCircle />}
-              iconTone="bg-red-100 text-red-600"
-              title="Needs attention"
-              href="/rider/messages"
-              link="View all"
-            />
-            {attention.length === 0 && docsToDo === 0 && !agreementWaiting ? (
-              <p className="mt-4 rounded-xl bg-[#f6f7fb] px-4 py-5 text-[14px] font-semibold text-slate-600">
-                Nothing needs you right now.
-              </p>
-            ) : (
-              <div className="mt-4 divide-y divide-red-100 rounded-xl bg-red-50/70 px-4">
-                {agreementWaiting ? (
-                  <AttentionRow
-                    icon={<FileText />}
-                    title="Rider Agreement"
-                    detail="A new version of the Rider Agreement is waiting for you."
-                    href="/rider/profile"
-                    button="Review"
-                    urgent
-                  />
-                ) : null}
-                {attention.map((item) => (
+      <div className="grid items-stretch gap-5 xl:grid-cols-[1.12fr_1fr]">
+        {/* Needs attention */}
+        <section className={panel}>
+          <PanelHead
+            icon={<AlertCircle />}
+            iconTone="bg-red-600 text-white rounded-full"
+            title="Needs attention"
+            href="/rider/messages"
+            link="View all"
+          />
+          {attention.length === 0 && docsToDo === 0 && !agreementWaiting ? (
+            <p className="mt-4 rounded-xl bg-[#f6f7fb] px-4 py-5 text-[14px] font-semibold text-slate-600">
+              Nothing needs you right now.
+            </p>
+          ) : (
+            <div className="mt-4 space-y-2">
+              {agreementWaiting ? (
+                <AttentionRow
+                  icon={<FileText />}
+                  title="Rider Agreement"
+                  detail="A new version of the Rider Agreement is waiting for you."
+                  href="/rider/profile"
+                  button="Review"
+                  tone="red"
+                />
+              ) : null}
+              {docsToDo > 0 &&
+              !attention.some((item) => item.href.startsWith('/rider/documents')) ? (
+                <AttentionRow
+                  icon={<FileText />}
+                  title={`${docsToDo} ${docsToDo === 1 ? 'document needed' : 'documents needed'}`}
+                  detail="Photos from your phone are fine. Rider ops checks them."
+                  href="/rider/documents"
+                  button="Upload now"
+                  tone="red"
+                />
+              ) : null}
+              {attention.map((item) => {
+                const training = /training|module/i.test(item.title);
+                const documents = item.href.startsWith('/rider/documents');
+                return (
                   <AttentionRow
                     key={item.kind}
-                    icon={<AlertCircle />}
+                    icon={training ? <GraduationCap /> : documents ? <FileText /> : <AlertCircle />}
                     title={item.title}
                     detail={item.body}
                     href={item.href}
                     button={item.action}
-                    urgent={item.tone === 'danger'}
+                    tone={documents || item.tone === 'danger' ? 'red' : 'blue'}
                   />
-                ))}
-                {docsToDo > 0 &&
-                !attention.some((item) => item.href.startsWith('/rider/documents')) ? (
-                  <AttentionRow
-                    icon={<FileText />}
-                    title={`${docsToDo} ${docsToDo === 1 ? 'document needed' : 'documents needed'}`}
-                    detail="Photos from your phone are fine. Rider ops checks them."
-                    href="/rider/documents"
-                    button="Upload now"
-                    urgent
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* Your performance */}
+        <section className={panel}>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2.5 text-[20px] font-extrabold">
+              <BarChart3 className="h-6 w-6" aria-hidden="true" />
+              Your performance
+            </h2>
+            <span className="rounded-xl bg-[#f3f5fa] px-3 py-1.5 text-[13px] font-bold text-slate-600">
+              Last 30 days
+            </span>
+          </div>
+          {performance.trips30d ? (
+            <div className="mt-4 grid items-center gap-4 sm:grid-cols-[auto_1fr]">
+              <Gauge pct={performance.acceptancePct} label="Acceptance rate" />
+              <div className="min-w-0">
+                <div className="grid grid-cols-3 divide-x divide-[#e6e9f2] text-center">
+                  <Stat
+                    icon={<CheckCircle2 className="fill-green-500 text-white" />}
+                    value={String(performance.trips30d)}
+                    label="Completed jobs"
                   />
-                ) : null}
+                  <Stat
+                    icon={<Star className="fill-amber-400 text-amber-400" />}
+                    value={performance.rating != null ? performance.rating.toFixed(1) : '—'}
+                    label="Rider rating"
+                  />
+                  <Stat
+                    icon={<Clock className="text-blue-600" />}
+                    value={
+                      performance.onTimePct != null ? `${Math.round(performance.onTimePct)}%` : '—'
+                    }
+                    label="On time"
+                  />
+                </div>
+                <Sparkline values={performance.trend} />
               </div>
+            </div>
+          ) : (
+            <p className="mt-4 rounded-xl bg-[#f6f7fb] px-4 py-6 text-[14px] font-semibold text-slate-600">
+              Your acceptance rate, rating and on-time record show here after your first deliveries.
+            </p>
+          )}
+        </section>
+      </div>
+
+      <div className="grid items-stretch gap-5 xl:grid-cols-3">
+        {/* Earnings trend */}
+        <section className="min-w-0 rounded-[20px] bg-gradient-to-b from-[#121829] to-[#0b0f1c] p-5 text-white">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-[18px] font-extrabold">
+              <TrendingUp className="text-gold h-5 w-5" aria-hidden="true" />
+              Your earnings trend
+            </h2>
+            <span className="rounded-xl border border-white/15 px-3 py-1 text-[12.5px] font-bold text-white/80">
+              This week
+            </span>
+          </div>
+          <p className="mt-4 flex flex-wrap items-baseline gap-x-3 text-[32px] font-extrabold tabular-nums tracking-tight">
+            {kes(weekTotal)}
+            {performance.lastWeekTotal > 0 ? (
+              <Change now={weekTotal} before={performance.lastWeekTotal} />
+            ) : null}
+          </p>
+          <p className="text-[14px] font-semibold text-white/75">
+            {performance.lastWeekTotal > 0
+              ? `vs ${kes(performance.lastWeekTotal)} last week`
+              : `${week?.deliveries ?? 0} deliveries since Monday · paid every Friday`}
+          </p>
+          <Bars days={performance.days} />
+        </section>
+
+        {active ? (
+          <section className={panel}>
+            <PanelHead
+              icon={<Bike />}
+              iconTone="bg-blue-100 text-blue-700"
+              title="Today’s jobs"
+              subtitle={`${jobs.length} ${jobs.length === 1 ? 'job' : 'jobs'} today`}
+              href="/rider/jobs"
+              link="View jobs"
+            />
+            {jobs.length === 0 ? (
+              <p className="mt-4 rounded-xl bg-[#f6f7fb] px-4 py-5 text-[14px] font-semibold text-slate-600">
+                No jobs yet today. Go online to receive offers.
+              </p>
+            ) : (
+              <ul className="mt-3 divide-y divide-[#eef0f5]">
+                {jobs.slice(0, 5).map((job) => (
+                  <li key={job.id} className="flex min-h-[56px] items-center gap-3 py-2">
+                    <Bubble tone={job.delivered_at ? 'green' : 'orange'}>
+                      <Package />
+                    </Bubble>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[14px] font-extrabold">
+                        {job.reference}
+                        {job.merchant ? ` · ${job.merchant}` : ''}
+                      </p>
+                      <p className="truncate text-[13px] text-slate-500">
+                        {job.dropoff ?? job.pickup ?? 'Address on the job'}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-[#f1f3f8] px-3 py-1 text-[12px] font-bold capitalize text-slate-600">
+                      {job.delivered_at ? 'Delivered' : job.stage.replaceAll('_', ' ')}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             )}
           </section>
-
-          {active ? (
-            <>
-              <section className={panel}>
-                <PanelHead
-                  icon={<Bike />}
-                  iconTone="bg-blue-100 text-blue-700"
-                  title="Today’s jobs"
-                  subtitle={`${jobs.length} ${jobs.length === 1 ? 'job' : 'jobs'} today`}
-                  href="/rider/jobs"
-                  link="View jobs"
-                />
-                {jobs.length === 0 ? (
-                  <p className="mt-4 rounded-xl bg-[#f6f7fb] px-4 py-5 text-[14px] font-semibold text-slate-600">
-                    No jobs yet today. Go online to receive offers.
+        ) : (
+          <section className={panel} aria-labelledby="getting-started">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex min-w-0 items-start gap-3">
+                <Rocket className="mt-1 h-7 w-7 shrink-0" aria-hidden="true" />
+                <div className="min-w-0">
+                  <h2 id="getting-started" className="text-[20px] font-extrabold">
+                    Getting started
+                  </h2>
+                  <p className="text-[14px] font-semibold text-slate-600">
+                    {done} of {total} steps complete
                   </p>
-                ) : (
-                  <ul className="mt-3 divide-y divide-[#eef0f5]">
-                    {jobs.slice(0, 5).map((job) => (
-                      <li key={job.id} className="flex min-h-[56px] items-center gap-3 py-2">
-                        <Bubble tone={job.delivered_at ? 'green' : 'orange'}>
-                          <Package />
-                        </Bubble>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[14px] font-extrabold">
-                            {job.reference}
-                            {job.merchant ? ` · ${job.merchant}` : ''}
-                          </p>
-                          <p className="truncate text-[13px] text-slate-500">
-                            {job.dropoff ?? job.pickup ?? 'Address on the job'}
-                          </p>
-                        </div>
-                        <span className="rounded-full bg-[#f1f3f8] px-3 py-1 text-[12px] font-bold capitalize text-slate-600">
-                          {job.delivered_at ? 'Delivered' : job.stage.replaceAll('_', ' ')}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-
-              <section className={panel}>
-                <PanelHead
-                  icon={<Banknote />}
-                  iconTone="bg-green-100 text-green-700"
-                  title="This week’s pay"
-                  subtitle={`${week?.deliveries ?? 0} deliveries since Monday · paid every Friday`}
-                  href="/rider/earnings"
-                  link="Earnings"
-                />
-                <dl className="mt-3 divide-y divide-[#eef0f5] text-[14px]">
-                  {[
-                    ['Delivery fees', (week?.base_kes ?? 0) + (week?.distance_kes ?? 0)],
-                    ['Bonuses', week?.bonus_kes ?? 0],
-                    ['Tips', week?.tip_kes ?? 0],
-                    ['Deductions', -(week?.penalty_kes ?? 0)],
-                  ].map(([label, value]) => (
-                    <div key={label as string} className="flex justify-between py-2">
-                      <dt className="text-slate-500">{label}</dt>
-                      <dd className="font-bold tabular-nums">{kes(value as number)}</dd>
-                    </div>
-                  ))}
-                  <div className="flex justify-between py-2">
-                    <dt className="font-extrabold">Total</dt>
-                    <dd className="font-extrabold tabular-nums">{kes(week?.total_kes ?? 0)}</dd>
-                  </div>
-                </dl>
-              </section>
-            </>
-          ) : (
-            <section className={panel} aria-labelledby="getting-started">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="flex min-w-0 items-start gap-3">
-                  <Rocket className="mt-1 h-6 w-6 shrink-0 text-blue-600" aria-hidden="true" />
-                  <div className="min-w-0">
-                    <h2 id="getting-started" className="text-[19px] font-extrabold">
-                      Getting started
-                    </h2>
-                    <p className="text-[13.5px] text-slate-600">
-                      Finish these, then rider ops activates you after a test delivery.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className="h-2.5 w-28 overflow-hidden rounded-full bg-[#e9ecf3]"
-                    role="progressbar"
-                    aria-valuenow={done}
-                    aria-valuemin={0}
-                    aria-valuemax={total}
-                    aria-label="Setup steps done"
-                  >
-                    <span
-                      className="block h-full rounded-full bg-green-500"
-                      style={{ width: `${Math.round((done / total) * 100)}%` }}
-                    />
-                  </span>
-                  <span className="rounded-lg bg-[#f1f3f8] px-2 py-1 text-[12px] font-extrabold tabular-nums">
-                    {done}/{total}
-                  </span>
                 </div>
               </div>
-              <ol className="mt-3 divide-y divide-[#eef0f5]">
-                {STEPS.map((step, index) => {
-                  const finished = Boolean(progress?.[step.key]);
-                  const next = step.key === nextStep?.key;
-                  return (
-                    <li key={step.key} className="flex min-h-[58px] items-center gap-3 py-2">
+              <Link
+                href={nextStep?.href ?? '/rider/documents'}
+                aria-label="Open the next step"
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f3f5fa] ${ring}`}
+              >
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+            <span
+              className="mt-3 block h-2 overflow-hidden rounded-full bg-[#e9ecf3]"
+              role="progressbar"
+              aria-valuenow={done}
+              aria-valuemin={0}
+              aria-valuemax={total}
+              aria-label="Setup steps done"
+            >
+              <span
+                className="block h-full rounded-full bg-green-500"
+                style={{ width: `${Math.round((done / total) * 100)}%` }}
+              />
+            </span>
+            <ol className="mt-3 space-y-1">
+              {STEPS.map((step, index) => {
+                const finished = Boolean(progress?.[step.key]);
+                const next = step.key === nextStep?.key;
+                return (
+                  <li key={step.key}>
+                    <Link
+                      href={step.href}
+                      className={`flex min-h-[40px] items-center gap-3 rounded-lg px-1 text-[14px] font-bold hover:bg-[#f6f7fb] ${ring}`}
+                    >
                       {finished ? (
                         <CheckCircle2
                           className="h-7 w-7 shrink-0 fill-green-500 text-white"
                           aria-label="Done"
                         />
                       ) : (
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#f1f3f8] text-[12px] font-extrabold">
+                        <span
+                          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-extrabold ${
+                            next ? 'bg-gold' : 'bg-[#eef0f5]'
+                          }`}
+                        >
                           {index + 1}
                         </span>
                       )}
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[14px] font-extrabold">{step.title}</p>
-                        <p className="text-[12.5px] leading-snug text-slate-500">{step.body}</p>
-                      </div>
-                      {finished ? (
-                        <span className="shrink-0 rounded-lg bg-green-100 px-3 py-1.5 text-[12px] font-extrabold text-green-800">
-                          Completed
-                        </span>
-                      ) : (
-                        <Link
-                          href={step.href}
-                          className={`${next ? 'bg-gold text-[color:var(--rider-ink)]' : 'bg-[#f1f3f8] text-[color:var(--rider-ink)]'} inline-flex h-9 w-[112px] shrink-0 items-center justify-center whitespace-nowrap rounded-lg px-2 text-[12.5px] font-extrabold ${ring}`}
-                        >
-                          {step.button}
-                        </Link>
-                      )}
-                    </li>
-                  );
-                })}
-              </ol>
-            </section>
-          )}
-        </div>
+                      <span className={finished ? 'text-slate-500' : ''}>{step.title}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        )}
 
-        <div className="space-y-5">
-          {/* Today at a glance */}
-          <section className={panel}>
-            <PanelHead
-              icon={<ClipboardList />}
-              iconTone="bg-[#eef1f8] text-[color:var(--rider-ink)]"
-              title="Today at a glance"
-              href={active ? '/rider/earnings' : '/rider/documents'}
-              link="View details"
-            />
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <Glance
-                href="/rider/documents"
-                icon={<FileText />}
-                label="Documents to do"
-                value={String(docsToDo)}
-              />
-              <Glance
-                href="/rider/messages"
-                icon={<MessageSquare />}
-                label="Unread messages"
-                value={String(h.unread_messages ?? 0)}
-              />
-              {active ? (
-                <Glance
-                  href="/rider/health"
-                  icon={<HeartPulse />}
-                  label="Health"
-                  value={h.health_band ? h.health_band.replaceAll('_', ' ') : 'Not rated yet'}
-                />
-              ) : (
-                <Glance href="/rider/kit" icon={<Package />} label="Rider kit" value="View" />
-              )}
+        <div className="flex min-w-0 flex-col gap-5">
+          {/* Help, with SOS beside it */}
+          <section className="relative isolate flex items-center gap-4 overflow-hidden rounded-[20px] bg-gradient-to-r from-[#10162a] to-[#1c2747] p-4 text-white">
+            <Headphones className="text-gold h-14 w-14 shrink-0" aria-hidden="true" />
+            <div className="min-w-0 flex-1">
+              <h2 className="text-[18px] font-extrabold">Need help?</h2>
+              <p className="text-[13px] text-white/80">Message rider support about a job or pay.</p>
               <Link
-                href="/rider/profile"
-                className={`flex min-h-[96px] items-center gap-3 rounded-xl bg-[#f6f7fb] p-3 ${ring}`}
+                href="/rider/support"
+                className={`bg-gold mt-2.5 inline-flex items-center gap-2 rounded-xl px-4 py-2 text-[13.5px] font-extrabold text-[color:var(--rider-ink)] ${ring}`}
               >
-                <SetupRing pct={pct} />
-                <span className="min-w-0">
-                  <span className="block text-[13px] font-semibold text-slate-600">Setup</span>
-                  <span className="block text-[20px] font-extrabold tabular-nums">{pct}%</span>
-                </span>
+                Contact support <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
-          </section>
-
-          {/* Help */}
-          <section className="relative isolate overflow-hidden rounded-[18px] bg-gradient-to-r from-[#10162a] to-[#1c2747] p-5 text-white">
-            <div className="flex items-center gap-4">
-              <span
-                aria-hidden="true"
-                className="bg-gold/15 flex h-16 w-16 shrink-0 items-center justify-center rounded-full"
-              >
-                <Headphones className="text-gold h-9 w-9" />
-              </span>
-              <div className="min-w-0">
-                <h2 className="text-[20px] font-extrabold">Need help?</h2>
-                <p className="text-[14px] text-white/80">
-                  Message rider support about a job or pay. For danger on the road, use SOS.
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Link
-                    href="/rider/support"
-                    className={`bg-gold inline-flex items-center gap-2 rounded-xl px-4 py-2 text-[14px] font-extrabold text-[color:var(--rider-ink)] ${ring}`}
-                  >
-                    Contact support <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                  <Link
-                    href="/rider/incidents"
-                    className={`inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-[14px] font-extrabold text-white ${ring}`}
-                  >
-                    SOS & incidents
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <Link
+              href="/rider/incidents"
+              className={`flex h-[88px] w-[88px] shrink-0 flex-col items-center justify-center gap-1 rounded-2xl bg-gradient-to-b from-red-500 to-red-700 text-[18px] font-extrabold text-white shadow-[0_10px_24px_-12px_#dc2626] ${ring}`}
+            >
+              <Siren className="h-8 w-8" aria-hidden="true" />
+              SOS
+            </Link>
           </section>
 
           {/* Quick actions */}
-          <section className={panel}>
+          <section className={`${panel} flex-1`}>
             <h2 className="flex items-center gap-2 text-[17px] font-extrabold">
               <Zap className="text-gold h-5 w-5 fill-current" aria-hidden="true" />
               Quick actions
             </h2>
-            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-2 2xl:grid-cols-4">
               {(active
                 ? [
-                    { href: '/rider/earnings', label: 'View earnings', icon: <Wallet /> },
-                    { href: '/rider/cash', label: 'Cash', icon: <Banknote /> },
+                    { href: '/rider/earnings', label: 'View earnings', icon: <BarChart3 /> },
+                    { href: '/rider/earnings', label: 'Request cashout', icon: <Wallet /> },
                     { href: '/rider/shifts', label: 'View shifts', icon: <CalendarDays /> },
                     { href: '/rider/profile', label: 'Update profile', icon: <User /> },
                   ]
@@ -588,7 +602,7 @@ export function RiderHomeView({
                 <Link
                   key={item.label}
                   href={item.href}
-                  className={`flex min-h-[84px] flex-col items-center justify-center gap-2 rounded-xl border border-[#e6e9f2] px-2 text-center text-[13px] font-bold transition-colors hover:bg-[#f6f7fb] ${ring} [&>svg]:h-6 [&>svg]:w-6`}
+                  className={`flex min-h-[80px] flex-col items-center justify-center gap-2 rounded-xl border border-[#e6e9f2] px-2 text-center text-[13px] font-bold transition-colors hover:bg-[#f6f7fb] ${ring} [&>svg]:h-6 [&>svg]:w-6`}
                 >
                   {item.icon}
                   {item.label}
@@ -603,30 +617,10 @@ export function RiderHomeView({
 }
 
 const KPI_TONES = {
-  blue: {
-    card: 'bg-gradient-to-br from-[#2563eb] to-[#4f8bff] text-white',
-    icon: 'bg-white/20',
-    arrow: 'bg-white/25',
-    note: 'text-white/85',
-  },
-  green: {
-    card: 'bg-gradient-to-br from-[#16a34a] to-[#3fd07f] text-white',
-    icon: 'bg-white/20',
-    arrow: 'bg-white/25',
-    note: 'text-white/85',
-  },
-  purple: {
-    card: 'bg-gradient-to-br from-[#7c3aed] to-[#a66bff] text-white',
-    icon: 'bg-white/20',
-    arrow: 'bg-white/25',
-    note: 'text-white/85',
-  },
-  peach: {
-    card: 'bg-gradient-to-br from-[#ffe4d1] to-[#fff4ec] text-[color:var(--rider-ink)]',
-    icon: 'bg-white text-orange-600',
-    arrow: 'bg-white/80',
-    note: 'text-slate-700',
-  },
+  blue: 'from-[#1d4ed8] to-[#3b82f6]',
+  green: 'from-[#15803d] to-[#22c55e]',
+  purple: 'from-[#6d28d9] to-[#a855f7]',
+  orange: 'from-[#f97316] to-[#fbbf24]',
 };
 
 function Kpi({
@@ -642,27 +636,44 @@ function Kpi({
   value: string;
   label: string;
 }) {
-  const t = KPI_TONES[tone];
   return (
     <Link
       href={href}
-      className={`${t.card} flex min-h-[108px] items-center gap-4 rounded-[18px] p-4 shadow-[0_10px_24px_-16px_rgba(20,26,42,0.55)] ${ring}`}
+      className={`relative isolate flex min-h-[112px] items-center gap-4 overflow-hidden rounded-[20px] bg-gradient-to-br ${KPI_TONES[tone]} p-4 text-white shadow-[0_12px_26px_-16px_rgba(20,26,42,0.6)] ${ring}`}
     >
+      {/* Decorative bars in the corner. */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 80 40"
+        className="absolute bottom-0 right-3 -z-10 h-12 w-24 opacity-25"
+      >
+        {[8, 14, 11, 20, 26, 34].map((height, index) => (
+          <rect
+            key={index}
+            x={index * 13}
+            y={40 - height}
+            width="8"
+            height={height}
+            rx="2"
+            fill="#fff"
+          />
+        ))}
+      </svg>
       <span
         aria-hidden="true"
-        className={`${t.icon} flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl [&>svg]:h-7 [&>svg]:w-7`}
+        className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/20 [&>svg]:h-7 [&>svg]:w-7"
       >
         {icon}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[22px] font-extrabold tabular-nums leading-tight tracking-tight [overflow-wrap:anywhere]">
+        <span className="block text-[22px] font-extrabold tabular-nums leading-tight tracking-tight [hyphens:auto] [overflow-wrap:break-word]">
           {value}
         </span>
-        <span className={`${t.note} block text-[13.5px] font-semibold leading-snug`}>{label}</span>
+        <span className="block text-[14px] font-semibold leading-snug text-white/90">{label}</span>
       </span>
       <span
         aria-hidden="true"
-        className={`${t.arrow} flex h-9 w-9 shrink-0 items-center justify-center rounded-full`}
+        className="flex h-9 w-9 shrink-0 items-center justify-center self-start rounded-full bg-white/25"
       >
         <ArrowRight className="h-4 w-4" />
       </span>
@@ -695,13 +706,13 @@ function PanelHead({
           {icon}
         </span>
         <div className="min-w-0">
-          <h2 className="text-[19px] font-extrabold leading-tight">{title}</h2>
+          <h2 className="text-[20px] font-extrabold leading-tight">{title}</h2>
           {subtitle ? <p className="text-[13px] text-slate-500">{subtitle}</p> : null}
         </div>
       </div>
       <Link
         href={href}
-        className={`inline-flex shrink-0 items-center gap-1 pt-2 text-[13.5px] font-bold hover:underline ${ring}`}
+        className={`inline-flex shrink-0 items-center gap-1 rounded-xl bg-[#f3f5fa] px-3 py-1.5 text-[13.5px] font-bold ${ring}`}
       >
         {link} <ArrowRight className="h-4 w-4" aria-hidden="true" />
       </Link>
@@ -715,20 +726,22 @@ function AttentionRow({
   detail,
   href,
   button,
-  urgent,
+  tone,
 }: {
   icon: React.ReactNode;
   title: string;
   detail: string;
   href: string;
   button: string;
-  urgent?: boolean;
+  tone: 'red' | 'blue';
 }) {
   return (
-    <div className="flex min-h-[72px] flex-wrap items-center gap-3 py-3 sm:flex-nowrap">
+    <div
+      className={`${tone === 'red' ? 'bg-red-50' : 'bg-white'} flex min-h-[72px] flex-wrap items-center gap-3 rounded-xl px-3 py-3 sm:flex-nowrap`}
+    >
       <span
         aria-hidden="true"
-        className={`${urgent ? 'text-red-600' : 'text-amber-700'} flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white [&>svg]:h-5 [&>svg]:w-5`}
+        className={`${tone === 'red' ? 'bg-white text-red-600' : 'bg-blue-50 text-blue-700'} flex h-11 w-11 shrink-0 items-center justify-center rounded-xl [&>svg]:h-6 [&>svg]:w-6`}
       >
         {icon}
       </span>
@@ -738,7 +751,7 @@ function AttentionRow({
       </div>
       <Link
         href={href}
-        className={`${urgent ? 'bg-red-600 text-white' : 'bg-gold text-[color:var(--rider-ink)]'} inline-flex h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-xl px-4 text-[13.5px] font-extrabold ${ring}`}
+        className={`${tone === 'red' ? 'bg-red-600' : 'bg-blue-600'} inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-xl px-5 text-[14px] font-extrabold text-white ${ring}`}
       >
         {button}
       </Link>
@@ -746,56 +759,120 @@ function AttentionRow({
   );
 }
 
-function Glance({
-  href,
-  icon,
-  label,
-  value,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) {
+function Gauge({ pct, label }: { pct: number | null; label: string }) {
+  const r = 52;
+  const c = 2 * Math.PI * r;
+  const value = pct == null ? 0 : Math.max(0, Math.min(100, pct));
   return (
-    <Link
-      href={href}
-      className={`flex min-h-[96px] min-w-0 items-center gap-2.5 rounded-xl bg-[#f6f7fb] p-3 ${ring}`}
-    >
-      <span
-        aria-hidden="true"
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-blue-700 [&>svg]:h-5 [&>svg]:w-5"
-      >
-        {icon}
-      </span>
-      <span className="min-w-0">
-        <span className="block text-[13px] font-semibold leading-snug text-slate-600">{label}</span>
-        <span className="block truncate text-[20px] font-extrabold capitalize tabular-nums">
-          {value}
+    <div className="relative mx-auto h-36 w-36">
+      <svg viewBox="0 0 128 128" className="h-full w-full -rotate-90" aria-hidden="true">
+        <circle cx="64" cy="64" r={r} fill="none" stroke="#e9ecf3" strokeWidth="10" />
+        <circle
+          cx="64"
+          cy="64"
+          r={r}
+          fill="none"
+          stroke="#16a34a"
+          strokeWidth="10"
+          strokeLinecap="round"
+          strokeDasharray={`${(value / 100) * c} ${c}`}
+        />
+      </svg>
+      <span className="absolute inset-0 flex flex-col items-center justify-center text-center">
+        <span className="text-[28px] font-extrabold tabular-nums text-green-700">
+          {pct == null ? '—' : `${Math.round(pct)}%`}
         </span>
+        <span className="text-[12.5px] font-semibold leading-tight text-slate-600">{label}</span>
       </span>
-    </Link>
+    </div>
   );
 }
 
-function SetupRing({ pct }: { pct: number }) {
-  const r = 17;
-  const c = 2 * Math.PI * r;
-  const clamped = Math.max(0, Math.min(100, pct));
+function Stat({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
   return (
-    <svg viewBox="0 0 44 44" className="h-11 w-11 shrink-0 -rotate-90" aria-hidden="true">
-      <circle cx="22" cy="22" r={r} fill="none" stroke="#e3e7f0" strokeWidth="5" />
-      <circle
-        cx="22"
-        cy="22"
-        r={r}
-        fill="none"
-        stroke="#22c55e"
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeDasharray={`${(clamped / 100) * c} ${c}`}
-      />
-    </svg>
+    <div className="px-2">
+      <span aria-hidden="true" className="mx-auto flex justify-center [&>svg]:h-5 [&>svg]:w-5">
+        {icon}
+      </span>
+      <p className="mt-1 text-[22px] font-extrabold tabular-nums">{value}</p>
+      <p className="text-[12.5px] font-semibold leading-tight text-slate-500">{label}</p>
+    </div>
+  );
+}
+
+/** The health score over time, as a small green line. */
+function Sparkline({ values }: { values: number[] }) {
+  if (values.length < 2) return null;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const points = values.map((value, index) => [
+    (index / (values.length - 1)) * 300,
+    56 - ((value - min) / span) * 46,
+  ]);
+  const line = points.map(([x, y]) => `${x},${y}`).join(' ');
+  return (
+    <figure className="mt-3">
+      <svg
+        viewBox="0 0 300 64"
+        className="h-16 w-full"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <polygon points={`0,64 ${line} 300,64`} fill="#22c55e" opacity="0.12" />
+        <polyline
+          points={line}
+          fill="none"
+          stroke="#16a34a"
+          strokeWidth="2.5"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+      <figcaption className="text-[12px] font-semibold text-slate-500">
+        Health score, now {values[values.length - 1]}
+      </figcaption>
+    </figure>
+  );
+}
+
+function Change({ now, before }: { now: number; before: number }) {
+  const change = Math.round(((now - before) / before) * 100);
+  const up = change >= 0;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 text-[18px] font-extrabold ${up ? 'text-green-400' : 'text-red-400'}`}
+    >
+      <ArrowUpRight className={`h-5 w-5 ${up ? '' : 'rotate-90'}`} aria-hidden="true" />
+      {Math.abs(change)}%
+    </span>
+  );
+}
+
+function Bars({ days }: { days: number[] }) {
+  const max = Math.max(...days, 1);
+  const today = (new Date().getDay() + 6) % 7;
+  return (
+    <figure className="mt-5">
+      <div className="grid h-36 grid-cols-7 items-end gap-2 border-b border-white/15 pb-1">
+        {days.map((value, index) => (
+          <div key={DAYS[index]} className="flex h-full items-end justify-center">
+            <span
+              className={`w-full max-w-[34px] rounded-t-md ${index === today ? 'bg-gradient-to-t from-amber-500 to-yellow-200' : 'bg-gradient-to-t from-amber-600 to-amber-400'}`}
+              style={{ height: `${Math.max(4, (value / max) * 100)}%` }}
+              title={`${DAYS[index]}: ${kes(value)}`}
+            />
+          </div>
+        ))}
+      </div>
+      <figcaption className="mt-1.5 grid grid-cols-7 gap-2">
+        {DAYS.map((day, index) => (
+          <span key={day} className="text-center text-[12.5px] font-semibold text-white/80">
+            {day}
+            <span className="sr-only">: {kes(days[index] ?? 0)}</span>
+          </span>
+        ))}
+      </figcaption>
+    </figure>
   );
 }
 

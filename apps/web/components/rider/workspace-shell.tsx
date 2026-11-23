@@ -1,12 +1,14 @@
 'use client';
 
-import { Bell, Lock, MapPin, TriangleAlert } from 'lucide-react';
+import { Bell, Lock, MapPin, Search, TriangleAlert } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import * as React from 'react';
 import type { ReactNode } from 'react';
 
 import { WorkspaceMobileNavigation } from '@/components/merchant/workspace/mobile-navigation';
 
+import { OnlineSwitch } from './online-switch';
 import styles from './portal.module.css';
 import type { RiderNavItem } from './shell';
 
@@ -15,11 +17,99 @@ function isOn(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+/** Extra words a rider might type for each place in the portal. */
+const SEARCH_WORDS: Record<string, string> = {
+  '/rider/jobs': 'jobs deliveries orders trips offers',
+  '/rider/earnings': 'earnings pay payout cashout cash out money statement friday',
+  '/rider/cash': 'cash on hand deposit remit collected',
+  '/rider/receipts': 'receipts',
+  '/rider/shifts': 'shifts schedule hours availability',
+  '/rider/messages': 'messages inbox notifications',
+  '/rider/health': 'health score rating acceptance strikes training',
+  '/rider/documents': 'documents id licence insurance police clearance upload',
+  '/rider/kit': 'kit helmet bag jacket',
+  '/rider/incidents': 'sos incident accident safety emergency',
+  '/rider/refer': 'refer referral rewards friend',
+  '/rider/profile': 'account profile phone mpesa m-pesa payout number motorbike plate zone',
+  '/rider/support': 'help support question ticket contact',
+};
+
+function RiderSearch({ nav }: { nav: RiderNavItem[] }) {
+  const router = useRouter();
+  const [query, setQuery] = React.useState('');
+  const [open, setOpen] = React.useState(false);
+  const q = query.trim().toLowerCase();
+  const results = q
+    ? nav.filter((item) =>
+        `${item.label} ${SEARCH_WORDS[item.href] ?? ''}`.toLowerCase().includes(q),
+      )
+    : [];
+
+  return (
+    <form
+      role="search"
+      className="relative hidden w-full max-w-[26rem] md:block"
+      onSubmit={(event) => {
+        event.preventDefault();
+        const first = results[0];
+        if (first) {
+          router.push(first.href);
+          setQuery('');
+          setOpen(false);
+        }
+      }}
+    >
+      <Search
+        className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500"
+        aria-hidden="true"
+      />
+      <input
+        type="search"
+        value={query}
+        onChange={(event) => {
+          setQuery(event.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        placeholder="Search jobs, earnings, or help…"
+        aria-label="Search the rider portal"
+        className="h-11 w-full rounded-2xl border border-[#e3e7f0] bg-white pl-11 pr-4 text-[14px] font-semibold outline-none focus:border-[#fdd128] focus:ring-2 focus:ring-[#fdd128]/40"
+      />
+      {open && q ? (
+        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-xl border border-[#e3e7f0] bg-white shadow-lg">
+          {results.length === 0 ? (
+            <p className="px-4 py-3 text-[13px] font-semibold text-slate-500">
+              Nothing matches. Try “pay”, “documents” or “help”.
+            </p>
+          ) : (
+            results.slice(0, 6).map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                prefetch={false}
+                className="flex items-center gap-3 px-4 py-2.5 text-[14px] font-bold hover:bg-[#f6f7fb] [&_svg]:h-4 [&_svg]:w-4"
+                onClick={() => {
+                  setQuery('');
+                  setOpen(false);
+                }}
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            ))
+          )}
+        </div>
+      ) : null}
+    </form>
+  );
+}
+
 /**
  * The rider portal frame: the NexG mark and "Rider Portal", the sections
- * with a yellow pill on the open one, an SOS card and the rider's
- * availability at the foot of the sidebar; city, SOS, messages and the
- * account in the top bar. On a phone the sections open from a drawer.
+ * with a yellow pill on the open one, an SOS card and the online switch at
+ * the foot of the sidebar; city, search, messages and the account in the
+ * top bar. On a phone the sections open from a drawer.
  *
  * SOS is on screen in every state. A rider in trouble does not first
  * become activated.
@@ -27,8 +117,8 @@ function isOn(pathname: string, href: string): boolean {
 export function RiderWorkspaceShell({
   personName,
   city,
-  presenceLabel,
-  presenceTone,
+  active,
+  online,
   nav,
   unreadCount,
   accountMenu,
@@ -36,8 +126,8 @@ export function RiderWorkspaceShell({
 }: {
   personName: string;
   city: string | null;
-  presenceLabel: string;
-  presenceTone: 'online' | 'offline' | 'pending';
+  active: boolean;
+  online: boolean;
   nav: RiderNavItem[];
   unreadCount: number;
   accountMenu: ReactNode;
@@ -62,15 +152,7 @@ export function RiderWorkspaceShell({
             </span>
             <span className={styles.navLabel}>{item.label}</span>
             {item.badge ? (
-              <span
-                className={`flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full px-1.5 text-[12px] font-extrabold ${
-                  item.tone === 'danger'
-                    ? 'bg-red-600 text-white'
-                    : on
-                      ? 'bg-[#141a2a] text-white'
-                      : 'bg-gold text-[color:var(--rider-ink)]'
-                }`}
-              >
+              <span className="flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full bg-red-600 px-1.5 text-[12px] font-extrabold text-white">
                 {item.badge}
               </span>
             ) : null}
@@ -85,13 +167,6 @@ export function RiderWorkspaceShell({
       })}
     </nav>
   );
-
-  const dot =
-    presenceTone === 'online'
-      ? 'bg-green-500'
-      : presenceTone === 'pending'
-        ? 'bg-gold'
-        : 'bg-slate-400';
 
   return (
     <div className={styles.shell} data-rider-portal>
@@ -121,10 +196,16 @@ export function RiderWorkspaceShell({
               SOS
             </Link>
           </div>
-          <p className={styles.presence}>
-            <span className={`h-2.5 w-2.5 rounded-full ${dot}`} aria-hidden="true" />
-            {presenceLabel}
-          </p>
+          <div className={styles.presence}>
+            {active ? (
+              <OnlineSwitch online={online} />
+            ) : (
+              <>
+                <span className="bg-gold h-2.5 w-2.5 rounded-full" aria-hidden="true" />
+                Not active yet
+              </>
+            )}
+          </div>
         </div>
       </aside>
 
@@ -137,6 +218,8 @@ export function RiderWorkspaceShell({
             <MapPin className="text-gold-text h-5 w-5" aria-hidden="true" />
             {city ?? 'Zone not set'}
           </span>
+          <span className={`${styles.divider} hidden md:block`} aria-hidden="true" />
+          <RiderSearch nav={nav} />
           <span className="flex-1" />
           {/* Never hidden, never disabled, in any state. */}
           <Link
@@ -162,7 +245,6 @@ export function RiderWorkspaceShell({
               </span>
             ) : null}
           </Link>
-          <span className={`${styles.divider} hidden sm:block`} aria-hidden="true" />
           {accountMenu}
         </header>
         <div className={styles.body}>

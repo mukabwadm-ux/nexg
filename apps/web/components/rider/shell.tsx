@@ -79,7 +79,7 @@ export function riderNav({
     { href: '/rider/receipts', label: 'Receipts', icon: i(<ReceiptText />) },
     {
       href: '/rider/shifts',
-      label: 'Shifts',
+      label: 'Schedule shifts',
       icon: i(<Calendar />),
       locked: !active,
     },
@@ -89,7 +89,7 @@ export function riderNav({
       icon: i(<MessageSquare />),
       badge: unreadMessages > 0 ? unreadMessages : null,
     },
-    { href: '/rider/health', label: 'Health', icon: i(<Heart />) },
+    { href: '/rider/health', label: 'Health & training', icon: i(<Heart />) },
     {
       href: '/rider/documents',
       label: 'Documents',
@@ -100,12 +100,12 @@ export function riderNav({
     { href: '/rider/kit', label: 'Rider kit', icon: i(<Package />) },
     {
       href: '/rider/incidents',
-      label: 'Incidents',
+      label: 'Safety & SOS',
       icon: i(<TriangleAlert />),
     },
-    { href: '/rider/refer', label: 'Refer a rider', icon: i(<UserPlus />) },
+    { href: '/rider/refer', label: 'Refer & rewards', icon: i(<UserPlus />) },
     { href: '/rider/profile', label: 'Account', icon: i(<Settings />) },
-    { href: '/rider/support', label: 'Support', icon: i(<HelpCircle />) },
+    { href: '/rider/support', label: 'Help & support', icon: i(<HelpCircle />) },
   ];
 }
 
@@ -135,8 +135,8 @@ export function RiderShell({
     <RiderWorkspaceShell
       personName={personName}
       city={city}
-      presenceLabel={!active ? 'Not active yet' : online ? 'Online' : 'Offline'}
-      presenceTone={!active ? 'pending' : online ? 'online' : 'offline'}
+      active={active}
+      online={online}
       nav={nav}
       unreadCount={unreadCount}
       accountMenu={
