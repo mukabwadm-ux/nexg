@@ -56135,6 +56135,7 @@ export type Database = {
           featured: boolean | null;
           health_badge: string | null;
           id: string | null;
+          is_test: boolean | null;
           listed_at: string | null;
           min_order_kes: number | null;
           opens_today: string | null;
@@ -57998,6 +57999,7 @@ export type Database = {
           house_rules: string | null;
           id: string | null;
           is_sample: boolean | null;
+          is_test: boolean | null;
           kind: Database['public']['Enums']['property_kind'] | null;
           latitude: number | null;
           longitude: number | null;
@@ -58103,6 +58105,7 @@ export type Database = {
           handoff_arranged: boolean | null;
           id: string | null;
           is_sample: boolean | null;
+          is_test: boolean | null;
           label_public: string | null;
           latitude: number | null;
           longitude: number | null;
@@ -70937,6 +70940,7 @@ export type Database = {
       };
       rpc_saved_add: { Args: { p_item_id?: string; p_merchant_id: string }; Returns: Json };
       rpc_saved_remove: { Args: { p_saved_id: string }; Returns: Json };
+      rpc_sees_test_tenants: { Args: Record<PropertyKey, never>; Returns: boolean };
       rpc_send_plan: {
         Args: { p_guest_name?: string; p_guest_phone?: string; p_plan_id: string };
         Returns: {
