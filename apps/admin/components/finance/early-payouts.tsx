@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
+import { payEarlyThroughPaystack } from '@/app/finance/paystack-transfers';
 import { decideEarlyPayout } from '@/app/finance/settlements/actions';
 
 export interface EarlyPayoutRow {
@@ -15,11 +16,15 @@ export interface EarlyPayoutRow {
   status: string;
   requested_at: string;
   payout_msisdn_changed_at: string | null;
+  /** The latest Paystack transfer for this request, if one was sent. */
+  transfer_state?: string | null;
+  transfer_failure?: string | null;
 }
 
 /**
  * Riders' special requests to be paid before the weekly run. Approve, then
- * pay by M-Pesa and record the reference; the next weekly run takes it off.
+ * pay through Paystack (paid once Paystack confirms), or pay by M-Pesa and
+ * record the reference; the next weekly run takes it off either way.
  */
 export function EarlyPayouts({ rows, canDecide }: { rows: EarlyPayoutRow[]; canDecide: boolean }) {
   if (rows.length === 0) return null;
@@ -43,6 +48,19 @@ function Item({ row, canDecide }: { row: EarlyPayoutRow; canDecide: boolean }) {
   const [note, setNote] = React.useState('');
   const [ref, setRef] = React.useState('');
   const [msg, setMsg] = React.useState<string | null>(null);
+  const [info, setInfo] = React.useState<string | null>(null);
+  const sending =
+    row.transfer_state === 'opened' ||
+    row.transfer_state === 'pending' ||
+    row.transfer_state === 'otp';
+  const payByPaystack = async () => {
+    setBusy(true);
+    const r = await payEarlyThroughPaystack(row.id);
+    setBusy(false);
+    setMsg(r.ok ? null : r.message);
+    setInfo(r.ok ? r.message : null);
+    router.refresh();
+  };
   const recent =
     row.payout_msisdn_changed_at !== null &&
     Date.now() - new Date(row.payout_msisdn_changed_at).getTime() < 7 * 86400000;
@@ -60,7 +78,11 @@ function Item({ row, canDecide }: { row: EarlyPayoutRow; canDecide: boolean }) {
         KES {row.amount_kes.toLocaleString('en-KE')} · {row.rider_name ?? 'Rider'} · to{' '}
         {row.payout_msisdn}
         <span className="text-muted ml-2 font-semibold">
-          {row.status === 'approved' ? 'approved, to pay' : 'waiting'}
+          {sending
+            ? 'sent through Paystack, waiting for it to confirm'
+            : row.status === 'approved'
+              ? 'approved, to pay'
+              : 'waiting'}
         </span>
       </p>
       {row.reason && <p className="text-muted mt-0.5 text-[0.75rem] font-semibold">{row.reason}</p>}
@@ -98,8 +120,17 @@ function Item({ row, canDecide }: { row: EarlyPayoutRow; canDecide: boolean }) {
                 Reject
               </button>
             </>
-          ) : (
+          ) : sending ? null : (
             <>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => void payByPaystack()}
+                className="bg-gold text-ink rounded-lg px-3 py-1.5 text-[0.75rem] font-extrabold disabled:opacity-40"
+              >
+                Pay through Paystack
+              </button>
+              <span className="text-muted self-center text-[0.6875rem] font-semibold">or</span>
               <input
                 aria-label="M-Pesa reference"
                 value={ref}
@@ -119,6 +150,14 @@ function Item({ row, canDecide }: { row: EarlyPayoutRow; canDecide: boolean }) {
           )}
         </div>
       )}
+      {row.transfer_state === 'failed' || row.transfer_state === 'reversed' ? (
+        <p className="text-danger mt-1 text-[0.75rem] font-bold">
+          The last Paystack payout {row.transfer_state === 'reversed' ? 'was reversed' : 'failed'}
+          {row.transfer_failure ? `: ${row.transfer_failure}` : ''}. The money is the rider's again;
+          try once more.
+        </p>
+      ) : null}
+      {info && <p className="text-success mt-1 text-[0.75rem] font-bold">{info}</p>}
       {msg && <p className="text-danger mt-1 text-[0.75rem] font-bold">{msg}</p>}
     </li>
   );

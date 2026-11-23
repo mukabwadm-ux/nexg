@@ -131,7 +131,34 @@ export default async function SettlementsPage({
     .in('status', ['pending', 'approved'])
     .order('requested_at')
     .limit(50);
-  const earlyPayouts = (earlyRows ?? []) as EarlyPayoutRow[];
+  const earlyBase = (earlyRows ?? []) as EarlyPayoutRow[];
+  /* Each request's latest Paystack payout, if one was sent. Missing before the
+     transfers update is applied, in which case there is simply none. */
+  const { data: transferRows } =
+    earlyBase.length > 0
+      ? await supabase
+          .from('paystack_transfer_v' as never)
+          .select('source_id, state, failure_reason, created_at')
+          .eq('kind', 'rider_early')
+          .in(
+            'source_id',
+            earlyBase.map((r) => r.id),
+          )
+          .order('created_at', { ascending: false })
+      : { data: [] };
+  const latestTransfer = new Map<string, { state: string; failure_reason: string | null }>();
+  for (const t of (transferRows ?? []) as unknown as {
+    source_id: string;
+    state: string;
+    failure_reason: string | null;
+  }[]) {
+    if (!latestTransfer.has(t.source_id)) latestTransfer.set(t.source_id, t);
+  }
+  const earlyPayouts: EarlyPayoutRow[] = earlyBase.map((r) => ({
+    ...r,
+    transfer_state: latestTransfer.get(r.id)?.state ?? null,
+    transfer_failure: latestTransfer.get(r.id)?.failure_reason ?? null,
+  }));
 
   const [runsRes, owedRes, calendarRes] = await Promise.all([
     supabase
