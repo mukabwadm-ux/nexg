@@ -51,13 +51,9 @@ export function OffersBoard({
   const [picked, setPicked] = React.useState<string | null>(offers[0]?.offerId ?? null);
   const [busy, setBusy] = React.useState<string | null>(null);
   const [said, setSaid] = React.useState<{ ok: boolean; message?: string } | null>(null);
-  const [answered, setAnswered] = React.useState<string[]>([]);
   const now = useNow();
 
-  /* An answered offer leaves the list at once, before the refresh lands. */
-  const live = offers.filter(
-    (o) => !answered.includes(o.offerId) && (!o.expiresAt || new Date(o.expiresAt).getTime() > now),
-  );
+  const live = offers.filter((o) => !o.expiresAt || new Date(o.expiresAt).getTime() > now);
   const shown = live.filter((o) =>
     filter === 'all' ? true : filter === 'scheduled' ? !!o.scheduledFor : !o.scheduledFor,
   );
@@ -73,7 +69,6 @@ export function OffersBoard({
     setSaid(null);
     const result = await answerOffer(offer.offerId, accept);
     setBusy(null);
-    if (result.ok) setAnswered((a) => [...a, offer.offerId]);
     setSaid(
       result.ok
         ? {
@@ -205,7 +200,6 @@ export function OffersBoard({
                       </span>
                       {left != null ? (
                         <span
-                          suppressHydrationWarning
                           className={`mt-0.5 inline-flex items-center gap-1 text-[12px] font-bold ${left < 15 ? 'text-red-700' : 'text-slate-500'}`}
                         >
                           <Clock className="h-3.5 w-3.5" aria-hidden="true" />

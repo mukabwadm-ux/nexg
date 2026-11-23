@@ -1,5 +1,4 @@
 import { DASH, Pill, clock, day, kesWhole, plural } from '@/components/partner/bits';
-import { CurrentTrips, type RiderTrip } from '@/components/rider/current-trip';
 import { riderContext } from '@/components/rider/frame';
 import { OffersBoard, type RiderOffer } from '@/components/rider/offers';
 import { Nothing, PageHead, PanelTitle, PillTabs, RiderPage, panel } from '@/components/rider/ui';
@@ -29,11 +28,7 @@ const WORD: Record<string, string> = {
  * earned. On a cash order those are two different numbers and confusing
  * them is how a rider's float goes wrong.
  */
-export default async function RiderJobs({
-  searchParams,
-}: {
-  searchParams?: { show?: string; done?: string };
-}) {
+export default async function RiderJobs({ searchParams }: { searchParams?: { show?: string } }) {
   const { me, supabase, h, active } = await riderContext();
   const show = searchParams?.show === 'all' ? 'all' : 'live';
 
@@ -45,12 +40,10 @@ export default async function RiderJobs({
     .limit(200);
   if (show === 'live') q = q.not('what_now', 'in', '("done","closed")');
 
-  const [{ data, error }, offersRead, tripsRead] = await Promise.all([
+  const [{ data, error }, offersRead] = await Promise.all([
     q,
     active ? supabase.rpc('rpc_rider_offers', {}) : Promise.resolve(null),
-    active ? supabase.rpc('rpc_my_rider_jobs', {}) : Promise.resolve(null),
   ]);
-  const trips = ((tripsRead?.data as { jobs?: RiderTrip[] } | null)?.jobs ?? []) as RiderTrip[];
   const rows = (data as Row[] | null) ?? [];
   const offerData = (offersRead?.data ?? null) as {
     rider?: { lat: number; lng: number } | null;
@@ -63,18 +56,6 @@ export default async function RiderJobs({
   return (
     <RiderPage>
       <PageHead title="Available Jobs" lead="Find and accept nearby jobs" />
-
-      {searchParams?.done ? (
-        <p
-          role="status"
-          className="rounded-xl bg-green-50 px-4 py-3 text-[14px] font-bold text-green-800"
-        >
-          Delivered {searchParams.done.slice(0, 40)}. It is recorded, and your pay for this trip
-          appears on the Earnings page.
-        </p>
-      ) : null}
-
-      {active ? <CurrentTrips trips={trips} riderId={me.id} /> : null}
 
       {!active ? (
         <section className={panel}>
@@ -90,7 +71,7 @@ export default async function RiderJobs({
       ) : (
         <OffersBoard
           offers={offerData?.offers ?? []}
-          online={h?.presence === 'online' || h?.presence === 'on_trip'}
+          online={h?.presence === 'online'}
           rider={offerData?.rider ?? null}
           maps={{
             key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '',

@@ -77,7 +77,7 @@ export default async function RiderLayout({ children }: { children: React.ReactN
       riderCode={h.rider_id.slice(0, 8).toUpperCase()}
       vehicle={h.vehicle}
       active={active}
-      online={h.presence === 'online' || h.presence === 'on_trip'}
+      online={h.presence === 'online'}
       city={h.city}
       unreadCount={h.unread_messages ?? 0}
       nav={nav}

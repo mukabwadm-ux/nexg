@@ -8,7 +8,6 @@ import type { ReactNode } from 'react';
 
 import { WorkspaceMobileNavigation } from '@/components/merchant/workspace/mobile-navigation';
 
-import { LocationSharer } from './location-sharer';
 import { OnlineSwitch } from './online-switch';
 import styles from './portal.module.css';
 import type { RiderNavItem } from './shell';
@@ -252,7 +251,6 @@ export function RiderWorkspaceShell({
         <div className={styles.body}>
           {/* Every rider page's landmark. Pages render a plain div inside it,
               never their own main (e2e/web/portal-chrome.spec.ts reads this). */}
-          {active && online ? <LocationSharer /> : null}
           <main id="main">{children}</main>
         </div>
       </div>
