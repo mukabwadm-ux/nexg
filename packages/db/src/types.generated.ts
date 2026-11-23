@@ -67462,6 +67462,10 @@ export type Database = {
         };
         Returns: string;
       };
+      rpc_rider_background_check_set: {
+        Args: { p_note?: string; p_rider_id: string; p_status: string };
+        Returns: Json;
+      };
       rpc_rider_cash_collected: {
         Args: { p_amount_cents: number; p_order_id: string };
         Returns: Json;
@@ -68101,6 +68105,29 @@ export type Database = {
         };
       };
       rpc_rider_submit: { Args: { p_rider_id: string }; Returns: Json };
+      rpc_rider_test_trip_record: {
+        Args: {
+          p_notes?: string;
+          p_order_reference?: string;
+          p_passed: boolean;
+          p_rider_id: string;
+        };
+        Returns: {
+          assessor_id: string | null;
+          created_at: string;
+          id: string;
+          notes: string | null;
+          order_reference: string | null;
+          outcome: string | null;
+          rider_id: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'rider_test_trip';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_rider_training_record: {
         Args: { p_module: string; p_passed: boolean; p_rider_id: string; p_score: number };
         Returns: {

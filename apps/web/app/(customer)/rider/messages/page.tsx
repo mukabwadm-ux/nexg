@@ -25,7 +25,7 @@ export default async function RiderMessages() {
   }
 
   return (
-    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+    <main className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
       <RiderPageHead
         title="Messages"
         lead="Threads with rider ops, the concierge desk and the merchants on your active trips. Guests never message you directly."
@@ -70,7 +70,7 @@ export default async function RiderMessages() {
           down — call the rider line on your kit card.
         </p>
       </Panel>
-    </div>
+    </main>
   );
 }
 
