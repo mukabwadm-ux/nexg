@@ -11,11 +11,11 @@ from (values
    exists (select 1 from public.wiring_audit_exempt where function_name = 'rpc_connector_outbox_claim')),
   ('staff reset function exists (20260101021800)',
    exists (select 1 from pg_proc where proname = 'rpc_staff_reset_credentials')),
-  ('rpc_host_workspace_guide_asset takes p_code default null (20270225000500)',
+  ('rpc_host_workspace_guide_asset takes p_code default null (20270228000100)',
    coalesce((select pronargdefaults from pg_proc where proname = 'rpc_host_workspace_guide_asset'), 0) = 1),
   ('rpc_host_workspace_task_save has its two defaults (20261114000100)',
    coalesce((select max(pronargdefaults) from pg_proc where proname = 'rpc_host_workspace_task_save'), 0) = 2),
-  ('connector_connection has the merchant application session gate (20270225000600)',
+  ('connector_connection has the merchant application session gate (20270228000200)',
    exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'connector_connection'
            and policyname = 'merchant_application_session_gate')),
   ('Paystack review ran (20270222000500): table public.payment_reviewer',

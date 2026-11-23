@@ -591,7 +591,20 @@ from (values
   ('20270222000400', 'index', 'public.paystack_refund_one_live'),
   ('20270222000400', 'table', 'public.paystack_refund'),
   ('20270222000500', 'function', 'public.rpc_payment_i_review'),
-  ('20270222000500', 'table', 'public.payment_reviewer')
+  ('20270222000500', 'table', 'public.payment_reviewer'),
+  ('20270225000400', 'function', 'public.fn_paystack_transfer_apply'),
+  ('20270225000400', 'function', 'public.rpc_paystack_transfer_answered'),
+  ('20270225000400', 'function', 'public.rpc_paystack_transfer_open'),
+  ('20270225000400', 'index', 'public.paystack_transfer_by_party'),
+  ('20270225000400', 'index', 'public.paystack_transfer_one_live'),
+  ('20270225000400', 'table', 'public.paystack_recipient'),
+  ('20270225000400', 'table', 'public.paystack_transfer'),
+  ('20270225000400', 'view', 'public.paystack_transfer_v'),
+  ('20270227000100', 'policy', 'public.merchant_branch_place/merchant_branch_place_staff_read'),
+  ('20270227000100', 'table', 'public.merchant_branch_place'),
+  ('20270227000200', 'column', 'public.plan_block.merchant_id'),
+  ('20270227000200', 'index', 'public.plan_block_merchant_idx'),
+  ('20270227000200', 'trigger', 'public.plan_block/plan_block_merchant_from_component')
 ) as v(version, kind, obj)
 where case v.kind
   when 'table'    then to_regclass(v.obj) is not null
@@ -1550,7 +1563,24 @@ from (values
   ('20270225000300', 'public.rpc_rider_payout_overview', 'e9ffbf3d27efe1e577b21f3429b3a64d', 'a04537b7b1005801f22d7e920465fc3e'),
   ('20270225000300', 'public.rpc_rider_payout_request', 'a7ca1ece2e56b2c2a0c6c99e74081577', 'd729a92745942a089d57684ce595d346'),
   ('20270225000300', 'public.rpc_settlement_build', '5da48cbec98baf4d88f55a78f3013da3', '16c0447c25d132856130c92cbd7acb02'),
-  ('20270225000500', 'public.rpc_host_workspace_guide_asset', 'fdb68cb7738368f9e47edf4da297bedb', '42d6fa5d4b3e941980bdcf5599a3dc67')
+  ('20270225000400', 'public.rpc_paystack_transfer_open', '18fce1a2a1d16bddc10d2490955b94ef', '6dbf851598f65bd9f601134715199387'),
+  ('20270225000400', 'public.fn_paystack_transfer_apply', '886327770a78496a451f46b130f46a67', '78a7280dd4b5426e73213dc349bf4139'),
+  ('20270225000400', 'public.rpc_paystack_transfer_answered', '869766029ca79a7ea0519220611f20b1', '83110df6511fbdeb8ce9f6ecca91b003'),
+  ('20270225000400', 'public.rpc_payment_paystack_webhook', '2747016eaf67167e1c64fe47da9c2375', '0f845b50401da420144cdf44bd966f9c'),
+  ('20270227000100', 'public.fn_merchant_sells_alcohol', '0d9442418ebbe8ec440a9c8da59477f6', '241a3f644d38297b75fd65f7e9eeba19'),
+  ('20270227000100', 'public.rpc_staff_branch_place_set', '0b5b420b52c427153d132992e7676d8f', 'c95ca394922ee6f6d5ed735071cc8aff'),
+  ('20270227000100', 'public.rpc_my_recent_categories', '006c02b0bffea2d9ed60426c2ced17e7', '2c25a543413fc1352ea1b886f80fbc21'),
+  ('20270227000200', 'public.tg_plan_block_merchant_from_component', 'f28a8cd115f69ba653c09bef836caafb', '355f2a47a5a5fa6ccb7e20ca9b832602'),
+  ('20270227000200', 'public.fn_plan_view', '0c141c07d9eb1d5462792076cd26bd07', '0510cf1aec557d0bf894619a1a336528'),
+  ('20270227000300', 'public.rpc_my_recent_categories', '8d403dfb7cea6e9340489124955d4235', '0a690462af00313a2e517486c1c0400e'),
+  ('20270227000400', 'app_email.for_receipt', '69d442cdcf5ae0269ea4e2d3eb59dd26', '39d832f1c50990409bf88952c26a18d1'),
+  ('20270227000400', 'hr.rpc_candidate_respond_offer', '93890fd244e6e17b575f8c14736ff392', 'e223b0001db89457432862f17c93b335'),
+  ('20270227000400', 'hr.rpc_offer_approve', 'd4977e7d0444fec26544b45889c0f458', '1aeaf039b9e4598fe4338ef6ea45b2c0'),
+  ('20270227000400', 'public.rpc_reconciliation_import', '36efd7d19f68d434ce57ba3498cdc5c9', '07442441a8887b342675b7ca3e91f19f'),
+  ('20270227000400', 'public.rpc_connector_transition', '3b67473ee9a6338ed7b56d9ac9961c4e', '38d5345c2c6e9ec3e55d75367b3c8cce'),
+  ('20270227000400', 'public.fn_featured_rollup', '49190ace71251fd4eb0d8f0a5add2296', '8206a7b1d10b1978872587e3fdc60b7b'),
+  ('20270227000400', 'public.fn_match_deposit', '03644a692759ebc456b179c65f326df5', 'fbcf7b9c13efa0c4b48c1feadaceac5a'),
+  ('20270228000100', 'public.rpc_host_workspace_guide_asset', 'fdb68cb7738368f9e47edf4da297bedb', '42d6fa5d4b3e941980bdcf5599a3dc67')
 ) as v(version, fn, md5_lf, md5_crlf)
 left join lateral (
   select v.fn, bool_or(md5(p.prosrc) in (v.md5_lf, v.md5_crlf)) as same
