@@ -10,6 +10,7 @@ import {
   bedroomLabel,
   KIND_LABEL,
   RateLabel,
+  unitHref,
 } from '@/components/stays/listing';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
@@ -214,10 +215,10 @@ export default async function PropertyPage({ params }: { params: { slug: string 
 
             {/* ─────────────────────────────────────── the units */}
             <h2 className="mt-10 text-[1.375rem] font-extrabold tracking-[-0.01em]">
-              {list.length === 1 ? 'The unit' : `Choose your unit (${list.length})`}
+              {list.length === 1 ? `The unit in ${p.name}` : `Units in ${p.name} (${list.length})`}
             </h2>
             <p className="text-muted-light mt-1.5 text-[0.75rem] font-semibold">
-              Each one is let separately and serviced between stays.
+              Each one is let separately and serviced between stays. Open a unit for its own page.
             </p>
 
             <ul className="mt-5 space-y-4">
@@ -234,7 +235,11 @@ export default async function PropertyPage({ params }: { params: { slug: string 
                     <div className="p-4 pt-0 sm:py-4 sm:pl-0 sm:pr-5">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="text-[1rem] font-extrabold">{u.label_public ?? u.name}</p>
+                          <p className="text-[1rem] font-extrabold">
+                            <Link href={unitHref(p.slug, u.id)} className="hover:underline">
+                              {u.label_public ?? u.name}
+                            </Link>
+                          </p>
                           {u.unit_summary && (
                             <p className="text-muted mt-1 text-[0.8125rem] font-semibold leading-[1.6]">
                               {u.unit_summary}
@@ -303,6 +308,9 @@ export default async function PropertyPage({ params }: { params: { slug: string 
                       )}
 
                       <div className="mt-4 flex flex-wrap gap-2">
+                        <Button asChild size="sm" variant="outline">
+                          <Link href={unitHref(p.slug, u.id)}>See this unit</Link>
+                        </Button>
                         {!sample && u.nightly_rate_kes !== null && (
                           <Button asChild size="sm">
                             <Link href={`/stays/${p.slug}/book?unit=${u.id}`}>Book this unit</Link>

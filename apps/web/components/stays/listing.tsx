@@ -128,8 +128,11 @@ export function PhotoSlot({
 export function PropertyCard({
   property,
   tone = 'light',
+  units = [],
 }: {
   property: PropertyCardRow;
+  /** The apartment's listed units, shown as rows under its facts. */
+  units?: UnitCardRow[];
   /** `midnight` is the dark card used on the /stays page. */
   tone?: 'light' | 'midnight';
 }) {
@@ -179,6 +182,8 @@ export function PropertyCard({
               {property.units_available} unit{property.units_available === 1 ? '' : 's'}
             </span>
           </span>
+
+          <CardUnitRows units={units} />
 
           <span className="border-border mt-3 flex items-center justify-between gap-2 border-t pt-3">
             <span className="text-[0.875rem] font-extrabold">
@@ -257,6 +262,116 @@ function MidnightPropertyCard({ property }: { property: PropertyCardRow }) {
         </span>
       </span>
     </Link>
+  );
+}
+
+/** One unit as the listing shows it: enough for a row or a small card. */
+export interface UnitCardRow {
+  id: string;
+  property_id: string;
+  label_public: string | null;
+  name: string;
+  bedrooms: number | null;
+  max_guests: number | null;
+  nightly_rate_kes: number | null;
+  photos: { caption?: string; src?: string }[];
+}
+
+export function unitTitle(unit: Pick<UnitCardRow, 'label_public' | 'name'>): string {
+  return unit.label_public ?? unit.name;
+}
+
+/** Every unit has its own page under the apartment it sits in. */
+export function unitHref(propertySlug: string, unitId: string): string {
+  return `/stays/${propertySlug}/units/${unitId}`;
+}
+
+export function unitBedsLabel(bedrooms: number | null): string {
+  if (bedrooms === null) return '— beds';
+  return bedrooms === 0 ? 'Studio' : `${bedrooms} bed${bedrooms === 1 ? '' : 's'}`;
+}
+
+/**
+ * The units inside one apartment, as rows on its listing card, so the
+ * Stays page reads as buildings with their flats rather than loose flats.
+ * Plain text: the whole card is already the link to the apartment.
+ */
+function CardUnitRows({ units, max = 3 }: { units: UnitCardRow[]; max?: number }) {
+  if (units.length === 0) return null;
+  const shown = units.slice(0, max);
+  return (
+    <span className="border-border mt-3 block border-t pt-2.5">
+      <span className="text-muted-light block text-[0.625rem] font-extrabold uppercase tracking-wide">
+        Units in this apartment
+      </span>
+      <span className="mt-1.5 block space-y-1.5">
+        {shown.map((u) => (
+          <span key={u.id} className="block text-[0.75rem] leading-snug">
+            <span className="flex items-baseline justify-between gap-2">
+              <span className="text-ink min-w-0 truncate font-bold">{unitTitle(u)}</span>
+              <span className="text-ink shrink-0 font-extrabold">
+                {u.nightly_rate_kes === null ? 'On request' : <Price kes={u.nightly_rate_kes} />}
+              </span>
+            </span>
+            <span className="text-muted-light block text-[0.6875rem] font-semibold">
+              {unitBedsLabel(u.bedrooms)} · sleeps {u.max_guests ?? '—'}
+            </span>
+          </span>
+        ))}
+        {units.length > max && (
+          <span className="text-muted-light block text-[0.6875rem] font-bold">
+            + {units.length - max} more
+          </span>
+        )}
+      </span>
+    </span>
+  );
+}
+
+/** A small card for one unit: "More units in this apartment". */
+export function UnitMiniCard({ propertySlug, unit }: { propertySlug: string; unit: UnitCardRow }) {
+  return (
+    <Card className="text-ink group overflow-hidden p-0 transition-shadow hover:shadow-md">
+      <Link href={unitHref(propertySlug, unit.id)} className="block">
+        <PhotoSlot
+          seed={unit.id}
+          caption={unit.photos[0]?.caption}
+          src={unit.photos[0]?.src}
+          sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 100vw"
+          className="h-32 w-full"
+        />
+        <span className="block p-3.5">
+          <span className="block text-[0.9375rem] font-extrabold leading-tight">
+            {unitTitle(unit)}
+          </span>
+          <span className="text-muted-light mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.6875rem] font-bold">
+            <span className="inline-flex items-center gap-1">
+              <BedDouble aria-hidden="true" className="h-3.5 w-3.5" />
+              {unitBedsLabel(unit.bedrooms)}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Users aria-hidden="true" className="h-3.5 w-3.5" />
+              sleeps {unit.max_guests ?? '—'}
+            </span>
+          </span>
+          <span className="mt-2 flex items-center justify-between gap-2">
+            <span className="text-[0.8125rem] font-extrabold">
+              {unit.nightly_rate_kes === null ? (
+                'Price on request'
+              ) : (
+                <>
+                  <Price kes={unit.nightly_rate_kes} />
+                  <span className="text-muted-light text-[0.625rem] font-semibold"> / night</span>
+                </>
+              )}
+            </span>
+            <span className="text-gold-text text-[0.6875rem] font-extrabold group-hover:underline">
+              View →
+            </span>
+          </span>
+        </span>
+      </Link>
+    </Card>
   );
 }
 
