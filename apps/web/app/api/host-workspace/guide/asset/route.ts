@@ -24,7 +24,7 @@ export async function GET(request: Request) {
   if (!id.success || (code !== null && !guideCode.test(code)))
     return hostWorkspaceJson({ error: 'Guide file unavailable.' }, 404);
   try {
-    const db = code ? createClient() : (await hostWorkspaceAccess()).db;
+    const db = code ? createClient() : (await hostWorkspaceAccess(request)).db;
     const { data, error } = await db.rpc('rpc_host_workspace_guide_asset', {
       p_id: id.data,
       p_code: code ?? undefined,
