@@ -1,5 +1,5 @@
 -- Confirming a phone by SMS links the guest record with that number
--- (20270224000100): only from nobody or a temporary session, never from
+-- (20270225000100): only from nobody or a temporary session, never from
 -- another full account, and never merging two records that both have history.
 
 begin;

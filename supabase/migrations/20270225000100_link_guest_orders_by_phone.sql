@@ -34,9 +34,9 @@
 --     ('customer.phone_linked', 'customer.phone_link_needs_support');
 
 insert into audit.action_registry (action, module, default_severity, description) values
-  ('customer.phone_linked', 'customers', 'notice',
+  ('customer.phone_linked', 'support', 'notice',
    'An account confirmed its phone by SMS and took over the customer record with that number'),
-  ('customer.phone_link_needs_support', 'customers', 'high',
+  ('customer.phone_link_needs_support', 'support', 'high',
    'An account confirmed a phone whose customer record could not be linked automatically')
 on conflict (action) do nothing;
 
@@ -127,7 +127,7 @@ begin
 
   if v_outcome is not null then
     perform audit.log(
-      p_actor_type => 'system'::public.actor_type, p_module => 'customers',
+      p_actor_type => 'system'::public.actor_type, p_module => 'support',
       p_action => 'customer.phone_link_needs_support',
       p_target_type => 'guest', p_target_id => v_phone_guest.id,
       p_reason => v_outcome,
@@ -138,7 +138,7 @@ begin
   update public.guest set user_id = p_user_id, updated_at = now() where id = v_phone_guest.id;
 
   perform audit.log(
-    p_actor_type => 'system'::public.actor_type, p_module => 'customers',
+    p_actor_type => 'system'::public.actor_type, p_module => 'support',
     p_action => 'customer.phone_linked',
     p_target_type => 'guest', p_target_id => v_phone_guest.id,
     p_before => jsonb_build_object('user_id', v_phone_guest.user_id),
