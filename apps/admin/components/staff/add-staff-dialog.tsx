@@ -128,8 +128,9 @@ export function AddStaffDialog({ roles, onClose }: { roles: RoleRow[]; onClose: 
                 })}
               </div>
               <p className="text-muted-light mt-3 text-xs font-semibold leading-[1.7]">
-                Super admin and Finance are not here. Those two are proposed from someone&rsquo;s
-                profile and need a second person to accept, so they cannot be handed out on a form.
+                Super admin and Finance are not here. Super admin is given with Make admin on
+                someone&rsquo;s profile; Finance is proposed there and needs a second person to
+                accept.
               </p>
             </fieldset>
 

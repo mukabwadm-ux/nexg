@@ -133,6 +133,30 @@ export async function requestRole(
   return { ok: true, message: 'Proposed. It needs a second person to accept it.' };
 }
 
+/**
+ * Make admin: Super admin in one step, no second person. The RPC refuses
+ * anyone but an active super admin, refuses making yourself admin, writes
+ * the audit trail (with device and IP) and emails the other super admins.
+ */
+export async function makeSuperAdmin(staffId: string, reason: string): Promise<ActionResult> {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('rpc_staff_make_super_admin', {
+    p_staff_id: staffId,
+    p_reason: reason.trim() || undefined,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/staff');
+  const notified = (data as { notified?: number } | null)?.notified ?? 0;
+  return {
+    ok: true,
+    message:
+      'Now a super admin. It takes effect on their next sign-in.' +
+      (notified > 0
+        ? ` ${notified} other super admin${notified === 1 ? ' was' : 's were'} emailed.`
+        : ''),
+  };
+}
+
 export async function decideApproval(
   requestId: string,
   approve: boolean,

@@ -6,6 +6,7 @@ import * as React from 'react';
 
 import type { RoleRow } from '@/app/staff/page';
 import {
+  makeSuperAdmin,
   requestRole,
   resetStaffCredentials,
   setRoles,
@@ -53,7 +54,8 @@ export function PersonPanel({
   const [expires, setExpires] = React.useState<string>(
     person.access_expires_at ? person.access_expires_at.slice(0, 10) : '',
   );
-  const [proposing, setProposing] = React.useState<'super_admin' | 'finance' | null>(null);
+  const [proposing, setProposing] = React.useState<'finance' | null>(null);
+  const [makingAdmin, setMakingAdmin] = React.useState(false);
   const [resetIssued, setResetIssued] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -127,8 +129,7 @@ export function PersonPanel({
 
         {person.roles.includes('super_admin') && (
           <p className="text-muted-light mt-3 text-xs font-semibold">
-            Also holds <strong>Super admin</strong>, which is not changed here — it was
-            countersigned.
+            Also holds <strong>Super admin</strong>, which is not changed here.
           </p>
         )}
 
@@ -194,29 +195,37 @@ export function PersonPanel({
         )}
       </div>
 
-      {/* ───────────────────────────────────── the two that need two people */}
+      {/* ─────────────────────────────────── admin, and finance (two people) */}
       {me.isSuperAdmin && (
         <div className="border-border mt-5 border-t pt-4">
-          <p className="text-[0.8125rem] font-extrabold">Roles that need a second person</p>
+          <p className="text-[0.8125rem] font-extrabold">Admin and Finance</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {(['super_admin', 'finance'] as const).map((role) =>
-              person.roles.includes(role) ? (
-                <span
-                  key={role}
-                  className="bg-success-bg text-success rounded-full px-3 py-1.5 text-xs font-extrabold"
-                >
-                  Holds {role === 'super_admin' ? 'Super admin' : 'Finance'}
-                </span>
-              ) : (
-                <Button key={role} size="sm" variant="outline" onClick={() => setProposing(role)}>
-                  Propose {role === 'super_admin' ? 'Super admin' : 'Finance'}
-                </Button>
-              ),
+            {person.roles.includes('super_admin') ? (
+              <span className="bg-success-bg text-success rounded-full px-3 py-1.5 text-xs font-extrabold">
+                Holds Super admin
+              </span>
+            ) : (
+              <Button
+                size="sm"
+                disabled={isSelf || person.status !== 'active'}
+                onClick={() => setMakingAdmin(true)}
+              >
+                Make admin
+              </Button>
+            )}
+            {person.roles.includes('finance') ? (
+              <span className="bg-success-bg text-success rounded-full px-3 py-1.5 text-xs font-extrabold">
+                Holds Finance
+              </span>
+            ) : (
+              <Button size="sm" variant="outline" onClick={() => setProposing('finance')}>
+                Propose Finance
+              </Button>
             )}
           </div>
           <p className="text-muted-light mt-2 text-xs font-semibold leading-[1.6]">
-            You propose; someone else accepts. Nobody can promote themselves, and nobody can promote
-            another person without that person agreeing.
+            Make admin gives Super admin at once; the other super admins are emailed. Finance needs
+            a second person to accept. Nobody can promote themselves.
           </p>
         </div>
       )}
@@ -327,6 +336,17 @@ export function PersonPanel({
         />
       )}
 
+      {makingAdmin && (
+        <MakeAdminDialog
+          person={person}
+          onClose={() => setMakingAdmin(false)}
+          onDone={() => {
+            setMakingAdmin(false);
+            router.refresh();
+          }}
+        />
+      )}
+
       {resetIssued && (
         <ResetCredentialsDialog
           person={person}
@@ -406,13 +426,87 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
+/**
+ * The confirm step before Make admin. The grant is immediate and nobody else
+ * has to agree, so this says so, and says who will hear about it.
+ */
+function MakeAdminDialog({
+  person,
+  onClose,
+  onDone,
+}: {
+  person: StaffRow;
+  onClose: () => void;
+  onDone: () => void;
+}) {
+  const { toast } = useToast();
+  const [reason, setReason] = React.useState('');
+  const [busy, setBusy] = React.useState(false);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="bg-ink/40 absolute inset-0"
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="make-admin-title"
+        className="border-border bg-surface relative w-full max-w-lg rounded-2xl border p-6"
+      >
+        <h2 id="make-admin-title" className="text-xl font-extrabold tracking-tight">
+          Make {person.display_name} a super admin?
+        </h2>
+        <p className="text-muted mt-2 text-[0.9375rem] leading-[1.8]">
+          They get full admin rights at once — every module, every city, and the power to make other
+          admins. Nobody else has to agree. The other super admins are emailed, and the audit trail
+          records it with your device and IP.
+        </p>
+        <label className="mt-4 block">
+          <span className="text-muted-light text-xs font-semibold">Why (optional)</span>
+          <textarea
+            rows={2}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            className="border-border-strong bg-bg mt-1 w-full rounded-xl border px-3 py-2 text-[0.875rem] font-semibold"
+          />
+        </label>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Button
+            loading={busy}
+            onClick={async () => {
+              setBusy(true);
+              const r = await makeSuperAdmin(person.staff_id, reason);
+              setBusy(false);
+              toast({
+                title: r.ok ? 'Done' : 'Not allowed',
+                description: r.message,
+                tone: r.ok ? 'success' : 'danger',
+              });
+              if (r.ok) onDone();
+            }}
+          >
+            Yes, make admin
+          </Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProposeDialog({
   role,
   person,
   onClose,
   onDone,
 }: {
-  role: 'super_admin' | 'finance';
+  role: 'finance';
   person: StaffRow;
   onClose: () => void;
   onDone: () => void;
@@ -431,7 +525,7 @@ function ProposeDialog({
       />
       <div className="border-border bg-surface relative w-full max-w-lg rounded-2xl border p-6">
         <h2 className="text-xl font-extrabold tracking-tight">
-          Propose {role === 'super_admin' ? 'Super admin' : 'Finance'} for {person.display_name}
+          Propose Finance for {person.display_name}
         </h2>
         <p className="text-muted mt-2 text-[0.9375rem] leading-[1.8]">
           This writes a request, not the role. {person.display_name} — or another super admin — has
