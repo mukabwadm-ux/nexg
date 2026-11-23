@@ -8,7 +8,7 @@ For the Consumer app, the Stays app, the merchant tools and the website. **Not f
 - **Ways in:** email (code or password, as today), Google, Apple, and a phone number confirmed by an SMS code.
 - **Guests:** a guest uses a temporary (anonymous) Supabase session. It can order delivery, keep a basket and pay. Bookings and stay holds still need a full account (`20261223000500`).
 - **Turning a guest into an account keeps everything:** link an email, phone, Google or Apple to the anonymous session instead of signing in again. The user id stays the same, so the guest's orders, basket and payments stay on the account.
-- **A guest signing in to an existing account** gets a different user id. Merge the basket (`rpc_basket_merge`, see `basket.md`). Past guest orders stay with the guest session. Support can link them, and once phones are confirmed by SMS this can be automatic.
+- **A guest signing in to an existing account** gets a different user id. Merge the basket (`rpc_basket_merge`, see `basket.md`). Past guest orders follow when the account confirms the phone they were placed with: when Supabase confirms an account's phone by SMS code, the customer record with that number joins the account, with its orders, payments and saved places (`20270224000100`). It never takes a record from another full account. If the account already has a customer record with its own history, the two are not merged automatically: support is told (audit `customer.phone_link_needs_support`) and links them.
 
 ## What's switched on (22 Nov 2026)
 
@@ -62,5 +62,4 @@ Send numbers as `+254…`. The account's `phone` and `phone_confirmed_at` on the
 
 ## Not done yet
 
-- **Automatic linking of past guest orders** when a phone is confirmed. It waits on SMS codes being switched on.
 - **The SMS provider.** Africa's Talking needs a small Supabase "send SMS" hook, written once the owner chooses it. Twilio works in Supabase as it is.
