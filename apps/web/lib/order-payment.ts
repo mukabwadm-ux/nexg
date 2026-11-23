@@ -191,6 +191,18 @@ export async function sweepPaystack(
 }
 
 /**
+ * The mode this customer pays in. A review account (payment_reviewer, such as
+ * Apple's) pays with the test keys even once NexG is live, so no real money
+ * moves; it can then only pay at the test shops and property.
+ */
+export async function customerMode(supabase: Client): Promise<PaystackMode | null> {
+  const mode = paystackMode();
+  if (mode !== 'live' || !paystackProof('test')) return mode;
+  const reviewer = await rpc(supabase, 'rpc_payment_i_review');
+  return reviewer.data === true ? 'test' : mode;
+}
+
+/**
  * What is being paid for. `readState` is the customer's view of its latest
  * payment; `begin` opens or reuses the live payment and says its reference and
  * amount (or answers with a refusal).
@@ -294,7 +306,7 @@ export async function startPayment(
       );
     }
 
-    const mode = paystackMode();
+    const mode = await customerMode(session.supabase);
     const proof = mode ? paystackProof(mode) : null;
     if (!mode || !proof) return paymentUnavailable();
     const { supabase } = session;
