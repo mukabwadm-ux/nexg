@@ -25,6 +25,10 @@ const note = z.string().trim().max(4000);
 const time = z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/);
 const day = z.string().date();
 const positiveInt = z.number().int().positive().max(1_000_000);
+/* A 0 the form fills in for an empty number (or an old record's missing value)
+   means "not set": the field is left as it is rather than the whole save failing. */
+const unsetZero = <T extends z.ZodTypeAny>(schema: T) =>
+  z.preprocess((value) => (value === 0 ? undefined : value), schema.optional());
 /* What a guest reads. An empty string clears the field. */
 const listingText = z.string().trim().max(LISTING_TEXT_MAX);
 const amenities = z.array(z.string().trim().min(1).max(80)).max(40);
@@ -41,7 +45,12 @@ const invalid = (message: string) => new HostWorkspaceError(400, message);
 function checked(result: { error: { code: string; message: string } | null }, message: string) {
   const { error } = result;
   if (!error) return { message };
-  if (error.code === '42501') throw scopeError();
+  /* Our functions raise 42501 with a sentence for the host (an account still
+     under review, say); Postgres's own "permission denied" stays generic. */
+  if (error.code === '42501')
+    throw /^permission denied/i.test(error.message) || !error.message
+      ? scopeError()
+      : new HostWorkspaceError(403, error.message);
   if (['22023', '23505', '23P01'].includes(error.code)) throw invalid(error.message);
   throw new HostWorkspaceError(503, 'Saving could not be confirmed. Refresh before trying again.');
 }
@@ -490,10 +499,10 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
       .object({
         name,
         propertyId: uuid.optional(),
-        capacity: positiveInt.max(100).optional(),
+        capacity: unsetZero(positiveInt.max(100)),
         bedrooms: z.number().int().min(0).max(100).optional(),
         bathrooms: z.number().min(0).max(100).optional(),
-        rateKes: positiveInt.optional(),
+        rateKes: unsetZero(positiveInt),
         labelPublic: z.string().max(160).optional(),
         floor: z.string().max(40).optional(),
         addressLine: z.string().max(240).optional(),
@@ -512,13 +521,14 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
         ...pin,
         amenities: amenities.optional(),
         bedSetup: z.string().trim().max(200).optional(),
-        sizeSqm: z.number().int().min(1).max(100_000).optional(),
+        sizeSqm: unsetZero(z.number().int().min(1).max(100_000)),
         summary: listingText.optional(),
-        minNights: z.number().int().min(1).max(365).optional(),
+        minNights: unsetZero(z.number().int().min(1).max(365)),
       })
       .refine(pinComplete, { message: 'Place the map pin again.', path: ['lat'] })
       .parse(record);
-    if (!id && !unit.propertyId) throw invalid('Choose a property for the unit.');
+    /* No property chosen: the database puts the unit in the host's property
+       named like its building, else the host's first (unit_property_guard). */
     if (Boolean(unit.deliveryFrom) !== Boolean(unit.deliveryTo))
       throw invalid('Enter both delivery hours.');
     return checked(

@@ -13,15 +13,37 @@ import { readHostWorkspace } from '@/lib/host-workspace/read';
 
 export const dynamic = 'force-dynamic';
 
+/* Field names as the form shows them, so an error says which box to fix. */
+const fieldLabels: Record<string, string> = {
+  capacity: 'guest capacity',
+  bedrooms: 'bedrooms',
+  bathrooms: 'bathrooms',
+  rateKes: 'nightly rate',
+  sizeSqm: 'size',
+  minNights: 'minimum nights',
+  checkInFrom: 'check-in time',
+  checkOutBy: 'check-out time',
+  deliveryFrom: 'delivery from',
+  deliveryTo: 'delivery until',
+  unitNumber: 'unit number',
+  addressLine: 'street address',
+  labelPublic: 'guest-facing label',
+  handoffNote: 'handoff instructions',
+  bedSetup: 'bed setup',
+  propertyId: 'property',
+  lat: 'map pin',
+  lng: 'map pin',
+};
+
 const requestSchema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('command'), command: z.unknown() }),
   z.object({ action: z.literal('sign-out') }),
 ]);
 
-export async function GET() {
+export async function GET(request: Request) {
   if (!hostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
   try {
-    return hostWorkspaceJson(await readHostWorkspace(await hostWorkspaceAccess()));
+    return hostWorkspaceJson(await readHostWorkspace(await hostWorkspaceAccess(request)));
   } catch (error) {
     return hostWorkspaceError(error);
   }
@@ -33,7 +55,7 @@ export async function POST(request: Request) {
     requireWorkspaceOrigin(request);
     if (!request.headers.get('content-type')?.startsWith('application/json'))
       throw new HostWorkspaceError(400, 'Enter valid workspace details.');
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     const maxBytes = 370_000;
     if (Number(request.headers.get('content-length')) > maxBytes)
       throw new HostWorkspaceError(413, 'The workspace update is too large.');
@@ -52,7 +74,9 @@ export async function POST(request: Request) {
       const field = error.issues[0]?.path.at(-1);
       return hostWorkspaceJson(
         {
-          error: field ? 'Check the ' + String(field) + ' field.' : 'Check the workspace details.',
+          error: field
+            ? 'Check the ' + (fieldLabels[String(field)] ?? String(field)) + ' field.'
+            : 'Check the workspace details.',
         },
         400,
       );

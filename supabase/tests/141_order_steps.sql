@@ -76,9 +76,9 @@ select set_config('request.jwt.claims',
 select set_config('t.steps', public.rpc_order_next_steps(current_setting('t.order')::uuid)::text, true);
 select is(current_setting('t.steps')::jsonb -> 'you', '["merchant"]'::jsonb,
   'The shop owner is recognised as the shop.');
-select is(current_setting('t.steps')::jsonb #>> '{steps,0,step}', 'start',
+select ok((select bool_or(s ->> 'step' = 'start') from jsonb_array_elements(current_setting('t.steps')::jsonb -> 'steps') s),
   'The shop''s next step is to start the order.');
-select is(current_setting('t.steps')::jsonb #>> '{steps,0,waiting_for}', 'payment',
+select is((select s ->> 'waiting_for' from jsonb_array_elements(current_setting('t.steps')::jsonb -> 'steps') s where s ->> 'step' = 'start'), 'payment',
   'An M-Pesa order waits for payment before it can be started.');
 
 -- Somebody else.
@@ -100,7 +100,7 @@ select is(public.rpc_order_next_steps(current_setting('t.order')::uuid) -> 'step
 
 select set_config('request.jwt.claims',
   '{"sub":"c1410000-0000-4000-8000-000000000002","role":"authenticated"}', true);
-select is(public.rpc_order_next_steps(current_setting('t.order')::uuid) #>> '{steps,0,waiting_for}', null,
+select is((select s ->> 'waiting_for' from jsonb_array_elements(public.rpc_order_next_steps(current_setting('t.order')::uuid) -> 'steps') s where s ->> 'step' = 'start'), null,
   'Once paid, the shop can start it.');
 select public.rpc_merchant_order_step(current_setting('t.order')::uuid, 'start');
 select public.rpc_merchant_order_step(current_setting('t.order')::uuid, 'ready');

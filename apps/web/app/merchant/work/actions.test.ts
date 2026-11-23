@@ -157,4 +157,50 @@ describe('Work page orders', () => {
       message: 'Wait for the customer’s payment before starting this order.',
     });
   });
+
+  it.each([
+    ['placed', true],
+    ['confirmed', true],
+    ['preparing', false],
+    ['ready', false],
+  ])('an order at %s may be declined: %s', async (stage, declinable) => {
+    mock.rows = [order(stage === 'preparing' ? 'cooking' : 'to_cook', stage)];
+    const result = await loadMerchantWork('WF_ORDER');
+    expect(result.ok && Boolean(result.records[0]?.declinable)).toBe(declinable);
+  });
+
+  it('declines through rpc_merchant_order_decline, with the reason and note', async () => {
+    mock.rows = [order('to_cook', 'placed')];
+    mock.rpc.mockResolvedValue({ data: { ok: true }, error: null });
+    const result = await advanceMerchantOrder(
+      id,
+      `decline:out_of_stock:${encodeURIComponent('No pilau: sorry')}`,
+    );
+    expect(result.ok).toBe(true);
+    expect(mock.rpc).toHaveBeenCalledWith('rpc_merchant_order_decline', {
+      p_order_id: id,
+      p_reason: 'out_of_stock',
+      p_note: 'No pilau: sorry',
+    });
+  });
+
+  it('will not decline an order already started', async () => {
+    mock.rows = [order('cooking', 'preparing')];
+    const result = await advanceMerchantOrder(id, 'decline:too_busy:');
+    expect(result).toEqual({
+      ok: false,
+      message: 'This order has been started. Ask NexG support to cancel it.',
+    });
+    expect(mock.rpc).not.toHaveBeenCalled();
+  });
+
+  it('says to wait while the customer is paying', async () => {
+    mock.rows = [order('to_cook', 'placed')];
+    mock.rpc.mockResolvedValue({ data: null, error: { hint: 'prompt_open', message: 'x' } });
+    const result = await advanceMerchantOrder(id, 'decline:closing:');
+    expect(result).toEqual({
+      ok: false,
+      message: 'The customer is paying right now. Wait a minute, then decline.',
+    });
+  });
 });

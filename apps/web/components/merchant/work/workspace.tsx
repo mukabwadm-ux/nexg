@@ -189,6 +189,9 @@ export function WorkWorkspace({
   }
   const [handoverCode, setHandoverCode] = useState('');
   const [sendText, setSendText] = useState('');
+  const [declining, setDeclining] = useState(false);
+  const [declineReason, setDeclineReason] = useState('');
+  const [declineNote, setDeclineNote] = useState('');
   async function advance(action = selected?.nextAction) {
     if (!selected || !action || pending) return;
     if (action.id === 'cancelled' && !window.confirm('Cancel this booking?')) return;
@@ -744,6 +747,86 @@ export function WorkWorkspace({
                         {action.label}
                       </button>
                     ))}
+                    {selected.declinable && !preview && !declining && (
+                      <button
+                        type="button"
+                        disabled={pending}
+                        className="mt-2 rounded-md border px-3 py-2 text-sm font-semibold text-[#8a2a1f]"
+                        onClick={() => setDeclining(true)}
+                      >
+                        Decline order
+                      </button>
+                    )}
+                    {selected.declinable && !preview && declining && (
+                      <form
+                        className="mt-3 flex flex-col gap-2 rounded-md border p-3"
+                        onSubmit={(event) => {
+                          event.preventDefault();
+                          if (!declineReason || (declineReason === 'other' && !declineNote.trim()))
+                            return;
+                          void advance({
+                            id: `decline:${declineReason}:${encodeURIComponent(declineNote.trim())}`,
+                            label: 'Decline order',
+                          }).then(() => {
+                            setDeclining(false);
+                            setDeclineReason('');
+                            setDeclineNote('');
+                          });
+                        }}
+                      >
+                        <label className="text-sm font-bold" htmlFor="work-decline-reason">
+                          Why can you not take this order?
+                        </label>
+                        <select
+                          id="work-decline-reason"
+                          value={declineReason}
+                          onChange={(event) => setDeclineReason(event.target.value)}
+                          className="rounded-md border px-3 py-2 text-sm"
+                        >
+                          <option value="">Choose a reason</option>
+                          <option value="out_of_stock">Something in it has run out</option>
+                          <option value="closing">We are closing</option>
+                          <option value="too_busy">We are too busy right now</option>
+                          <option value="cannot_deliver">We cannot serve this address</option>
+                          <option value="other">Other</option>
+                        </select>
+                        <input
+                          aria-label="A note for the customer"
+                          maxLength={300}
+                          value={declineNote}
+                          onChange={(event) => setDeclineNote(event.target.value)}
+                          placeholder={
+                            declineReason === 'other'
+                              ? 'Say why (the customer sees this)'
+                              : 'A note for the customer (optional)'
+                          }
+                          className="rounded-md border px-3 py-2 text-sm"
+                        />
+                        <p className="text-xs text-[#72808e]">
+                          The customer is told at once. If they have paid, they get a full refund.
+                        </p>
+                        <div className="flex gap-2">
+                          <button
+                            type="submit"
+                            disabled={
+                              pending ||
+                              !declineReason ||
+                              (declineReason === 'other' && !declineNote.trim())
+                            }
+                            className="rounded-md bg-[#8a2a1f] px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+                          >
+                            {pending ? 'Declining…' : 'Decline order'}
+                          </button>
+                          <button
+                            type="button"
+                            className="rounded-md border px-3 py-2 text-sm font-semibold"
+                            onClick={() => setDeclining(false)}
+                          >
+                            Keep it
+                          </button>
+                        </div>
+                      </form>
+                    )}
                     {notice && (
                       <p role="status" className="mt-3 text-sm text-[#536779]">
                         {notice}
