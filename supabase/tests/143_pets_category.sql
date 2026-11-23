@@ -1,4 +1,4 @@
--- Pets, NexG's 22nd category (20270223000100/0200): its specialties, the
+-- Pets, NexG's 22nd category (20270223100100/0200): its specialties, the
 -- retired Marketplace › Pet Supplies, the agreement, the registry and the VMD
 -- licence every Pets merchant needs to go live.
 begin;

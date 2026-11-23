@@ -111,7 +111,7 @@ writeFileSync(
    The 21-category list went to the database through 20261226000100_master_categories_enum.sql and
    20261226000200_master_categories.sql, which this script generated and which are applied. It no longer
    writes them, so later edits to the master list cannot rewrite an applied migration. Each change since
-   gets its own hand-written migration: Pets is 20270223000100 (enum) and 20270223000200 (data). */
+   gets its own hand-written migration: Pets is 20270223100100 (enum) and 20270223100200 (data). */
 const total = listed.size;
 
 console.log(
