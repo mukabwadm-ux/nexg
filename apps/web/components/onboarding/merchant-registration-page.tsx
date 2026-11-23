@@ -10,7 +10,14 @@ export function MerchantRegistrationFormFrame({ children }: { children: React.Re
   return <div className={`${styles.embedded} ${styles.form}`}>{children}</div>;
 }
 
-export function MerchantRegistrationPage({ children }: { children: React.ReactNode }) {
+export function MerchantRegistrationPage({
+  children,
+  adding = false,
+}: {
+  children: React.ReactNode;
+  /** A signed-in owner adding another business to their account. */
+  adding?: boolean;
+}) {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
@@ -29,13 +36,29 @@ export function MerchantRegistrationPage({ children }: { children: React.ReactNo
 
       <section className={styles.hero} aria-labelledby="merchant-page-title">
         <div className={styles.registrationColumn}>
-          <div className={styles.intro}>
-            <h1 id="merchant-page-title">Bring your business to NexG.</h1>
-            <p>
-              Create your merchant profile, introduce the products or services you offer, and set up
-              your workspace at your own pace.
-            </p>
-          </div>
+          {adding ? (
+            <div className={styles.intro}>
+              <h1 id="merchant-page-title">Add another business.</h1>
+              <p>
+                A separate business under the same sign-in, with its own category, location, hours,
+                documents and payout account. NexG reviews it on its own; your other businesses keep
+                running as they are.
+              </p>
+              <p>
+                Another location of a business you already run is a branch, not a new business: add
+                it from <Link href="/merchant/business?tab=locations">Business → Locations</Link>{' '}
+                instead.
+              </p>
+            </div>
+          ) : (
+            <div className={styles.intro}>
+              <h1 id="merchant-page-title">Bring your business to NexG.</h1>
+              <p>
+                Create your merchant profile, introduce the products or services you offer, and set
+                up your workspace at your own pace.
+              </p>
+            </div>
+          )}
           <div id="merchant-registration" className={styles.form}>
             {children}
           </div>

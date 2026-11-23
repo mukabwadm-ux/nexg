@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 
 import type { Outcome } from '@/app/merchant/actions';
 import { ITEM_KINDS, type ItemKind } from '@/lib/catalogue-kinds';
-import { merchantActionClient } from '@/lib/merchant-action-access';
+import { merchantActionClient, requireMerchantActionObject } from '@/lib/merchant-action-access';
 
 /**
  * Choices, add-ons and units on the Menu page.
@@ -84,9 +84,10 @@ export async function saveOptionGroup(group: OptionGroupInput): Promise<Outcome>
 }
 
 export async function setItemOptionGroups(itemId: string, groupIds: string[]): Promise<Outcome> {
-  const { client } = await merchantActionClient({ access: 'setup' });
+  const { client, merchantId } = await merchantActionClient({ access: 'setup' });
   if (!uuid.test(itemId) || groupIds.some((id) => !uuid.test(id)))
     return { ok: false, message: 'Choose a valid item and groups.' };
+  await requireMerchantActionObject(client, 'catalogue_item', itemId, merchantId);
   const { error } = await client.rpc('rpc_merchant_item_option_groups_set', {
     p_item_id: itemId,
     p_group_ids: groupIds,
@@ -185,8 +186,9 @@ export interface VariantGridInput {
 
 /** Save an item's versions (rpc_merchant_item_variants_save, 20270116000800). */
 export async function saveItemVariants(itemId: string, grid: VariantGridInput): Promise<Outcome> {
-  const { client } = await merchantActionClient({ access: 'setup' });
+  const { client, merchantId } = await merchantActionClient({ access: 'setup' });
   if (!uuid.test(itemId)) return { ok: false, message: 'Choose a valid item.' };
+  await requireMerchantActionObject(client, 'catalogue_item', itemId, merchantId);
   const attributes = (grid.attributes ?? [])
     .map((a) => ({
       name: a.name?.trim() ?? '',
@@ -231,8 +233,9 @@ export async function saveItemVariants(itemId: string, grid: VariantGridInput): 
 
 /** Clear a line the earlier setup left to finish (rpc_merchant_setup_review_dismiss, 20270121000100). */
 export async function dismissSetupReview(reviewId: string): Promise<Outcome> {
-  const { client } = await merchantActionClient({ access: 'setup' });
+  const { client, merchantId } = await merchantActionClient({ access: 'setup' });
   if (!uuid.test(reviewId)) return { ok: false, message: 'Choose a valid line.' };
+  await requireMerchantActionObject(client, 'catalogue_setup_review', reviewId, merchantId);
   const { error } = await client.rpc('rpc_merchant_setup_review_dismiss', {
     p_review_id: reviewId,
   });

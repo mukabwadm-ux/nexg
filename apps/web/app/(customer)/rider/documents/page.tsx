@@ -40,7 +40,7 @@ export default async function RiderDocuments() {
   }
 
   return (
-    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+    <main className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
       <RiderPageHead
         title="Documents"
         lead="What NexG needs before you can take trips, the review state of each, and when any of them expire."
@@ -52,6 +52,6 @@ export default async function RiderDocuments() {
         onFile={(docs as OnFile[] | null) ?? []}
         asked={(asked as Asked[] | null) ?? []}
       />
-    </div>
+    </main>
   );
 }

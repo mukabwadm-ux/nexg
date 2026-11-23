@@ -44,7 +44,7 @@ export default async function RiderJobs({ searchParams }: { searchParams?: { sho
   const rows = (data as Row[] | null) ?? [];
 
   return (
-    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+    <main className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
       <RiderPageHead
         title="Jobs"
         lead="Offers waiting on you and the trips you have run. Accept within the countdown; the guest and the merchant are told the moment you do."
@@ -113,7 +113,7 @@ export default async function RiderJobs({ searchParams }: { searchParams?: { sho
           </ul>
         )}
       </Panel>
-    </div>
+    </main>
   );
 }
 

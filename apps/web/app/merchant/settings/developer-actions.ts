@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 
+import { merchantActionClient } from '@/lib/merchant-action-access';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -73,6 +74,8 @@ export async function loadDeveloperAccess(merchantId: string): Promise<Developer
     return { ok: false, message: 'Developer access could not be loaded.' };
   }
   const supabase = createClient();
+  // Only the current business: an owner of several sees one at a time.
+  await merchantActionClient({ access: 'support', merchantId });
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -160,6 +163,14 @@ export async function revokeDeveloperKey(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, message: 'Sign in again to revoke a key.' };
+  await merchantActionClient({ access: 'support', merchantId });
+  const { data: key, error: keyError } = await supabase
+    .from('api_key')
+    .select('id')
+    .eq('id', keyId)
+    .eq('merchant_id', merchantId)
+    .maybeSingle();
+  if (keyError || !key) return { ok: false, message: 'No such key.' };
 
   const why = reason?.trim().slice(0, 200);
   const { data, error } = await supabase.rpc('rpc_api_key_revoke', {
