@@ -1,10 +1,23 @@
-import { DASH, Empty, Panel, Pill, Stat, day, kesWhole, plural } from '@/components/partner/bits';
-import { EarlyPayout } from '@/components/rider/rider-actions';
-import { RiderPageHead } from '@/components/rider/frame';
+import { ArrowRight, CheckCircle2, Star, Wallet } from 'lucide-react';
+import Link from 'next/link';
+
+import { DASH, Pill, day, kesWhole, plural } from '@/components/partner/bits';
+import {
+  AreaChart,
+  Donut,
+  KpiCard,
+  Nothing,
+  PageHead,
+  PanelTitle,
+  PillTabs,
+  RiderPage,
+  SumLine,
+  kes,
+  panel,
+  ring,
+} from '@/components/rider/ui';
 import { requireRider } from '@/lib/partner';
 import { createClient } from '@/lib/supabase/server';
-
-import type { RiderHome } from '../layout';
 
 export const metadata = { title: 'Earnings' };
 export const dynamic = 'force-dynamic';
@@ -16,212 +29,314 @@ const TONE: Record<string, string> = {
   held: 'bg-gold-soft text-gold-text',
 };
 
+const RANGES = [
+  { days: 7, label: '7 Days' },
+  { days: 30, label: '30 Days' },
+  { days: 90, label: '3 Months' },
+] as const;
+
+const TZ = 'Africa/Nairobi';
+const DAY_MS = 86_400_000;
+const dateKey = (d: Date) => d.toLocaleDateString('en-CA', { timeZone: TZ });
+const fmt = (d: Date, o: Intl.DateTimeFormatOptions) =>
+  d.toLocaleDateString('en-GB', { ...o, timeZone: TZ });
+
 /**
- * Earnings.
+ * Earnings overview.
  *
- * Broken down per trip, because "you earned 2,400 this week" is a
- * number nobody can check. Base, distance, waiting, bonuses and
- * anything taken off each get their own line, and they add up on
- * the page.
+ * The totals, the chart and the breakdown all come from the same
+ * `rider_earning` rows Finance pays from, for the range picked in the
+ * URL (7 days, 30 days or 3 months), compared with the range before it.
+ * The breakdown splits pay by what it was for, because NexG riders only
+ * deliver: trip pay, distance, bonuses and tips.
  *
- * Cash collected sits apart from money earned. On a cash order
- * they are different numbers, and the settlement nets one against
- * the other — a rider who thinks the cash in their pocket is
- * theirs is in for a bad Friday.
+ * Every trip is still listed with its parts, so a rider can check any
+ * figure, and cash collected stays apart from money earned.
  */
-export default async function RiderEarnings() {
+export default async function RiderEarnings({
+  searchParams,
+}: {
+  searchParams: { range?: string };
+}) {
   const me = await requireRider();
   const supabase = createClient();
+  const range = RANGES.find((r) => String(r.days) === searchParams.range) ?? RANGES[0];
 
-  const [
-    { data: home },
-    { data: earnings, error },
-    { data: settlements },
-    { data: payoutOverview },
-  ] = await Promise.all([
-    supabase.from('rider_home_v').select('*').eq('rider_id', me.id).maybeSingle(),
+  const now = new Date();
+  const since = new Date(now.getTime() - range.days * 2 * DAY_MS);
+
+  const [{ data: earnings, error }, { data: settlements }] = await Promise.all([
     supabase
       .from('rider_earning')
       .select('*')
       .eq('rider_id', me.id)
       .eq('is_test', false)
+      .gte('earned_at', since.toISOString())
       .order('earned_at', { ascending: false })
-      .limit(60),
+      .limit(5000),
     supabase
       .from('rider_settlement_line')
       .select('*')
       .eq('rider_id', me.id)
       .order('paid_at', { ascending: false, nullsFirst: true })
-      .limit(8),
-    supabase.rpc('rpc_rider_payout_overview', {}),
+      .limit(6),
   ]);
-  const payout = (payoutOverview ?? {}) as {
-    availableKes?: number;
-    minimumKes?: number;
-    payoutPhone?: string | null;
-    requests?: {
-      id: string;
-      amountKes: number;
-      status: string;
-      requestedAt: string;
-      note?: string | null;
-      providerRef?: string | null;
-    }[];
-  };
 
-  const r = home as RiderHome | null;
-  const rows = (earnings as Earning[] | null) ?? [];
+  const all = (earnings as Earning[] | null) ?? [];
   const settled = (settlements as Settlement[] | null) ?? [];
 
+  /* The buckets: one per day, or one per week for three months. */
+  const perWeek = range.days > 31;
+  const span = perWeek ? 7 : 1;
+  const buckets: { label: string; long: string; value: number }[] = [];
+  const bucketOf = new Map<string, number>();
+  const count = Math.ceil(range.days / span);
+  for (let i = count - 1; i >= 0; i -= 1) {
+    const start = new Date(now.getTime() - (i * span + span - 1) * DAY_MS);
+    const label =
+      range.days <= 7
+        ? fmt(start, { weekday: 'short' })
+        : fmt(start, { day: 'numeric', month: 'short' });
+    const long = perWeek
+      ? `Week from ${label}`
+      : fmt(start, { weekday: 'short', day: 'numeric', month: 'short' });
+    for (let d = 0; d < span; d += 1) {
+      bucketOf.set(dateKey(new Date(start.getTime() + d * DAY_MS)), buckets.length);
+    }
+    buckets.push({ label, long, value: 0 });
+  }
+
+  const cut = now.getTime() - range.days * DAY_MS;
+  const current = all.filter((e) => new Date(e.earned_at).getTime() >= cut);
+  const before = all.filter((e) => new Date(e.earned_at).getTime() < cut);
+  for (const e of current) {
+    const index = bucketOf.get(dateKey(new Date(e.earned_at)));
+    const bucket = index == null ? undefined : buckets[index];
+    if (bucket) bucket.value += Number(e.total_kes) || 0;
+  }
+
+  const sum = (rows: Earning[], pick: (e: Earning) => number) =>
+    rows.reduce((total, e) => total + (Number(pick(e)) || 0), 0);
+  const total = sum(current, (e) => e.total_kes);
+  const totalBefore = sum(before, (e) => e.total_kes);
+  const jobs = current.length;
+  const average = jobs > 0 ? total / jobs : null;
+  const averageBefore = before.length > 0 ? totalBefore / before.length : 0;
+  const penalties = sum(current, (e) => e.penalty_kes);
+  const cashCollected = sum(current, (e) => e.cash_collected_kes);
+
+  const parts = [
+    {
+      label: 'Trip pay',
+      value: sum(current, (e) => e.base_kes + e.waiting_kes),
+      colour: '#2563eb',
+    },
+    { label: 'Distance', value: sum(current, (e) => e.distance_kes), colour: '#16a34a' },
+    {
+      label: 'Bonuses',
+      value: sum(current, (e) => e.pickup_bonus_kes + e.peak_bonus_kes),
+      colour: '#f5b800',
+    },
+    { label: 'Tips', value: sum(current, (e) => e.tip_kes), colour: '#9333ea' },
+  ];
+
+  const word = range.days === 7 ? 'in 7 days' : range.days === 30 ? 'in 30 days' : 'in 3 months';
+  const per = perWeek ? 'per week' : 'per day';
+
   return (
-    <main className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
-      <RiderPageHead
-        title="Earnings"
-        lead="What you made, per trip and per week, and when it reaches you. Every figure here comes from the same statement rows Finance pays from."
-      />
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Stat label="Today" value={kesWhole(r?.earned_today_kes)} hint="Across every trip" />
-        <Stat label="This week" value={kesWhole(r?.earned_week_kes)} hint="Since Monday" />
-        <Stat
-          label="Cash on you"
-          value={kesWhole(r?.cash_on_hand)}
-          hint={
-            r?.cash_cap
-              ? `of ${kesWhole(r.cash_cap)} · not yours until it is banked`
-              : 'No cap set for your city'
-          }
-          tone={
-            r?.cash_cap && r.cash_on_hand && r.cash_on_hand >= r.cash_cap * 0.9
-              ? 'danger'
-              : undefined
-          }
+    <RiderPage>
+      <PageHead title="Earnings Overview" lead="Track your earnings and performance">
+        <PillTabs
+          label="Earnings range"
+          items={RANGES.map((r) => ({
+            href: `/rider/earnings?range=${r.days}`,
+            label: r.label,
+            on: r.days === range.days,
+          }))}
+        />
+      </PageHead>
+
+      {error ? (
+        <p
+          role="alert"
+          className="rounded-xl bg-red-50 px-3 py-2 text-[13px] font-bold text-red-700"
+        >
+          Your earnings could not be read: {error.message}
+        </p>
+      ) : null}
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <KpiCard
+          icon={<Wallet />}
+          tone="gold"
+          value={kes(total)}
+          label={`Total earnings ${word}`}
+          change={{ now: total, before: totalBefore }}
+        />
+        <KpiCard
+          icon={<CheckCircle2 />}
+          tone="green"
+          value={jobs.toLocaleString('en-KE')}
+          label="Completed jobs"
+          change={{ now: jobs, before: before.length }}
+        />
+        <KpiCard
+          icon={<Star />}
+          tone="amber"
+          value={average == null ? DASH : kes(average)}
+          label="Average per job"
+          change={average == null ? null : { now: average, before: averageBefore }}
         />
       </div>
 
-      {error && (
-        <p className="bg-danger-bg text-danger rounded-lg px-3 py-2 text-[0.8125rem] font-bold">
-          Your earnings could not be read: {error.message}
-        </p>
-      )}
-
-      <Panel title="Every trip" note={rows.length > 0 ? plural(rows.length, 'trip') : undefined}>
-        {rows.length === 0 ? (
-          <Empty
-            title="Nothing earned yet."
-            body="Each delivery appears here the moment it is done, broken down so you can check it."
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <section className={panel}>
+          <PanelTitle
+            title={`Earnings ${per}`}
+            note={`Your best ${perWeek ? 'week' : 'day'} is marked`}
           />
-        ) : (
-          <ul className="divide-border divide-y">
-            {rows.map((e) => (
-              <li key={e.id} className="py-3">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="text-[0.875rem] font-extrabold">{e.order_reference ?? DASH}</p>
-                  <p className="text-[0.9375rem] font-extrabold tabular-nums">
-                    {kesWhole(e.total_kes)}
-                  </p>
-                </div>
-                <p className="text-muted-light text-[0.75rem] font-semibold">{day(e.earned_at)}</p>
-                <p className="text-muted mt-1 text-[0.75rem] font-semibold">
-                  {[
-                    `base ${kesWhole(e.base_kes)}`,
-                    e.distance_kes ? `distance ${kesWhole(e.distance_kes)}` : null,
-                    e.waiting_kes ? `waiting ${kesWhole(e.waiting_kes)}` : null,
-                    e.pickup_bonus_kes ? `pickup bonus ${kesWhole(e.pickup_bonus_kes)}` : null,
-                    e.peak_bonus_kes ? `peak bonus ${kesWhole(e.peak_bonus_kes)}` : null,
-                    e.tip_kes ? `tip ${kesWhole(e.tip_kes)}` : null,
-                    e.penalty_kes ? `less ${kesWhole(e.penalty_kes)}` : null,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </p>
-                {e.cash_collected_kes > 0 && (
-                  <p className="text-gold-text text-[0.75rem] font-bold">
-                    You collected {kesWhole(e.cash_collected_kes)} in cash on this one — that is
-                    NexG&apos;s, and it comes off your settlement.
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </Panel>
+          {total > 0 ? (
+            <AreaChart points={buckets} label={`Earnings ${per} ${word}`} />
+          ) : (
+            <Nothing
+              title="No earnings in this range."
+              body="Each delivery adds to this chart the moment it is done."
+            />
+          )}
+        </section>
 
-      <Panel title="Need it before the weekly run?" note="Early payout">
-        <EarlyPayout
-          availableKes={payout.availableKes ?? 0}
-          minimumKes={payout.minimumKes ?? 100}
-          payoutPhone={payout.payoutPhone ?? null}
-          requests={payout.requests ?? []}
-        />
-      </Panel>
+        <section className={panel}>
+          <PanelTitle title="Earnings Breakdown" note="What your pay was for" />
+          <Donut parts={parts} label="Share of earnings by type" />
+          {penalties > 0 || cashCollected > 0 ? (
+            <dl className="mt-4 space-y-1 border-t border-[#eef0f6] pt-3 text-[13px]">
+              {penalties > 0 ? (
+                <SumLine label="Taken off (penalties)" value={`− ${kes(penalties)}`} />
+              ) : null}
+              {cashCollected > 0 ? (
+                <SumLine label="Cash you collected (NexG's)" value={kes(cashCollected)} />
+              ) : null}
+            </dl>
+          ) : null}
+        </section>
+      </div>
 
-      <Panel title="Settlements" note={settled.length > 0 ? 'Weekly' : undefined}>
-        {settled.length === 0 ? (
-          <p className="text-muted text-[0.8125rem] font-semibold">
-            Nothing settled yet. Earnings are paid out weekly to {r?.payout_msisdn ?? DASH}.
-          </p>
-        ) : (
-          <ul className="divide-border divide-y">
-            {settled.map((s) => (
-              <li key={s.id} className="py-3">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="text-[0.875rem] font-extrabold">
-                    {s.paid_at ? day(s.paid_at) : 'Not paid yet'} · {plural(s.trips ?? 0, 'trip')}
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <section className={panel}>
+          <PanelTitle
+            title="Every trip"
+            note={current.length > 0 ? `${plural(current.length, 'trip')} ${word}` : undefined}
+          />
+          {current.length === 0 ? (
+            <Nothing
+              title="Nothing earned in this range."
+              body="Each delivery appears here broken down so you can check it."
+            />
+          ) : (
+            <ul className="divide-y divide-[#eef0f6]">
+              {current.slice(0, 25).map((e) => (
+                <li key={e.id} className="py-3">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="text-[14px] font-extrabold">{e.order_reference ?? DASH}</p>
+                    <p className="text-[15px] font-extrabold tabular-nums">
+                      {kesWhole(e.total_kes)}
+                    </p>
+                  </div>
+                  <p className="text-[12.5px] font-semibold text-slate-500">{day(e.earned_at)}</p>
+                  <p className="mt-1 text-[12.5px] font-semibold text-slate-600">
+                    {[
+                      `base ${kesWhole(e.base_kes)}`,
+                      e.distance_kes ? `distance ${kesWhole(e.distance_kes)}` : null,
+                      e.waiting_kes ? `waiting ${kesWhole(e.waiting_kes)}` : null,
+                      e.pickup_bonus_kes ? `pickup bonus ${kesWhole(e.pickup_bonus_kes)}` : null,
+                      e.peak_bonus_kes ? `peak bonus ${kesWhole(e.peak_bonus_kes)}` : null,
+                      e.tip_kes ? `tip ${kesWhole(e.tip_kes)}` : null,
+                      e.penalty_kes ? `less ${kesWhole(e.penalty_kes)}` : null,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
                   </p>
-                  <Pill tone={TONE[s.status] ?? 'bg-bg text-muted'}>{s.status.toUpperCase()}</Pill>
-                </div>
-                <dl className="mt-1 space-y-0.5">
-                  <Line label="Earned" value={kesWhole(s.earnings_kes)} />
-                  {s.bonuses_kes > 0 && <Line label="Bonuses" value={kesWhole(s.bonuses_kes)} />}
-                  {s.tips_kes > 0 && <Line label="Tips" value={kesWhole(s.tips_kes)} />}
-                  {s.cash_collected_kes > 0 && (
-                    <Line
-                      label="Cash you collected"
-                      value={`− ${kesWhole(s.cash_collected_kes)}`}
-                      muted
-                    />
-                  )}
-                  {s.cash_deposited_kes > 0 && (
-                    <Line label="Cash you banked" value={kesWhole(s.cash_deposited_kes)} muted />
-                  )}
-                  <Line label="To you" value={kesWhole(s.net_pay_kes)} strong />
-                </dl>
-                {s.failure_reason && (
-                  <p className="text-danger mt-1 text-[0.75rem] font-bold">{s.failure_reason}</p>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </Panel>
-    </main>
-  );
-}
+                  {e.cash_collected_kes > 0 ? (
+                    <p className="text-[12.5px] font-bold text-amber-700">
+                      You collected {kesWhole(e.cash_collected_kes)} in cash: that is NexG&apos;s
+                      and comes off your settlement.
+                    </p>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          )}
+          {current.length > 25 ? (
+            <p className="mt-2 text-[12.5px] font-semibold text-slate-500">
+              Showing the latest 25. Your weekly statement has the rest.
+            </p>
+          ) : null}
+        </section>
 
-function Line({
-  label,
-  value,
-  strong,
-  muted,
-}: {
-  label: string;
-  value: string;
-  strong?: boolean;
-  muted?: boolean;
-}) {
-  return (
-    <div className="flex items-baseline justify-between gap-3">
-      <dt className={`text-[0.8125rem] font-semibold ${muted ? 'text-muted-light' : 'text-muted'}`}>
-        {label}
-      </dt>
-      <dd
-        className={`shrink-0 tabular-nums ${
-          strong ? 'text-[0.9375rem] font-extrabold' : 'text-[0.8125rem] font-bold'
-        }`}
-      >
-        {value}
-      </dd>
-    </div>
+        <div className="space-y-4">
+          <Link
+            href="/rider/cashout"
+            prefetch={false}
+            className={`flex items-center justify-between gap-3 rounded-[20px] bg-gradient-to-r from-[#10162a] to-[#1c2747] p-5 text-white ${ring}`}
+          >
+            <span>
+              <span className="block text-[16px] font-extrabold">Need it before Friday?</span>
+              <span className="text-[13px] text-white/75">Cash out to M-Pesa</span>
+            </span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fdd128] text-[color:var(--rider-ink)]">
+              <ArrowRight className="h-5 w-5" aria-hidden="true" />
+            </span>
+          </Link>
+
+          <section className={panel}>
+            <PanelTitle title="Settlements" note="Paid weekly" />
+            {settled.length === 0 ? (
+              <p className="text-[13px] font-semibold text-slate-500">Nothing settled yet.</p>
+            ) : (
+              <ul className="divide-y divide-[#eef0f6]">
+                {settled.map((s) => (
+                  <li key={s.id} className="py-3">
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <p className="text-[14px] font-extrabold">
+                        {s.paid_at ? day(s.paid_at) : 'Not paid yet'} ·{' '}
+                        {plural(s.trips ?? 0, 'trip')}
+                      </p>
+                      <Pill tone={TONE[s.status] ?? 'bg-bg text-muted'}>
+                        {s.status.toUpperCase()}
+                      </Pill>
+                    </div>
+                    <dl className="mt-1 space-y-0.5 text-[13px]">
+                      <SumLine label="Earned" value={kesWhole(s.earnings_kes)} />
+                      {s.bonuses_kes > 0 ? (
+                        <SumLine label="Bonuses" value={kesWhole(s.bonuses_kes)} />
+                      ) : null}
+                      {s.tips_kes > 0 ? (
+                        <SumLine label="Tips" value={kesWhole(s.tips_kes)} />
+                      ) : null}
+                      {s.cash_collected_kes > 0 ? (
+                        <SumLine
+                          label="Cash you collected"
+                          value={`− ${kesWhole(s.cash_collected_kes)}`}
+                        />
+                      ) : null}
+                      {s.cash_deposited_kes > 0 ? (
+                        <SumLine label="Cash you banked" value={kesWhole(s.cash_deposited_kes)} />
+                      ) : null}
+                      <SumLine label="To you" value={kesWhole(s.net_pay_kes)} strong />
+                    </dl>
+                    {s.failure_reason ? (
+                      <p className="mt-1 text-[12.5px] font-bold text-red-700">
+                        {s.failure_reason}
+                      </p>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+      </div>
+    </RiderPage>
   );
 }
 

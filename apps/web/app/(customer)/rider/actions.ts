@@ -124,14 +124,14 @@ export async function requestEarlyPayout(amountKes: number, reason: string): Pro
     p_amount_kes: Math.round(amountKes),
     p_reason: reason || undefined,
   });
-  return unwrap(data, error, ['/rider/earnings']);
+  return unwrap(data, error, ['/rider/earnings', '/rider/cashout']);
 }
 
 export async function cancelEarlyPayout(requestId: string): Promise<Outcome> {
   const { data, error } = await createClient().rpc('rpc_rider_payout_cancel', {
     p_request_id: requestId,
   });
-  return unwrap(data, error, ['/rider/earnings']);
+  return unwrap(data, error, ['/rider/earnings', '/rider/cashout']);
 }
 
 export async function startPhoneChange(
@@ -159,4 +159,29 @@ export async function acceptAgreement(versionId: string): Promise<Outcome> {
   });
   const r = unwrap(data, error, ALL);
   return r.ok ? { ...r, message: 'Accepted. You can go online.' } : r;
+}
+
+/**
+ * A rider's reply to rider ops, from the Messages page. It needs
+ * rpc_rider_message_reply; until that function is in the database the
+ * call fails and the rider is told to call the rider line instead.
+ */
+export async function replyToRiderOps(body: string): Promise<Outcome> {
+  const text = body.trim();
+  if (!text) return { ok: false, message: 'Write a message first.' };
+  /* Not in the generated types until its migration lands. */
+  const client = createClient() as unknown as {
+    rpc: (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: { message: string; code?: string } | null }>;
+  };
+  const { data, error } = await client.rpc('rpc_rider_message_reply', { p_body: text });
+  if (error?.code === 'PGRST202' || error?.code === '42883') {
+    return {
+      ok: false,
+      message: 'Replies are not switched on yet. For anything urgent, call the rider line.',
+    };
+  }
+  return unwrap(data, error, ['/rider/messages', '/rider']);
 }
