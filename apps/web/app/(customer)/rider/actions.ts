@@ -162,21 +162,14 @@ export async function acceptAgreement(versionId: string): Promise<Outcome> {
 }
 
 /**
- * A rider's reply to rider ops, from the Messages page. It needs
- * rpc_rider_message_reply; until that function is in the database the
- * call fails and the rider is told to call the rider line instead.
+ * A rider's reply to rider ops, from the Messages page. Until
+ * 20270224000100 is in the database the function is missing, and the
+ * rider is told to call the rider line instead.
  */
 export async function replyToRiderOps(body: string): Promise<Outcome> {
   const text = body.trim();
   if (!text) return { ok: false, message: 'Write a message first.' };
-  /* Not in the generated types until its migration lands. */
-  const client = createClient() as unknown as {
-    rpc: (
-      fn: string,
-      args: Record<string, unknown>,
-    ) => Promise<{ data: unknown; error: { message: string; code?: string } | null }>;
-  };
-  const { data, error } = await client.rpc('rpc_rider_message_reply', { p_body: text });
+  const { data, error } = await createClient().rpc('rpc_rider_message_reply', { p_body: text });
   if (error?.code === 'PGRST202' || error?.code === '42883') {
     return {
       ok: false,
@@ -184,4 +177,18 @@ export async function replyToRiderOps(body: string): Promise<Outcome> {
     };
   }
   return unwrap(data, error, ['/rider/messages', '/rider']);
+}
+
+/** Accept or decline a job offer. The RPC checks the offer is this rider's and still open. */
+export async function answerOffer(
+  offerId: string,
+  accept: boolean,
+  declineReason?: 'too_far' | 'wrong_direction' | 'vehicle' | 'cash' | 'break' | 'other',
+): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_dispatch_offer_respond', {
+    p_offer_id: offerId,
+    p_accept: accept,
+    p_decline_reason: accept ? undefined : (declineReason ?? 'other'),
+  });
+  return unwrap(data, error, ['/rider/jobs', '/rider']);
 }

@@ -1,9 +1,9 @@
-import { DASH, Empty, Panel, Pill, clock, day, kesWhole, plural } from '@/components/partner/bits';
-import { RiderPageHead } from '@/components/rider/frame';
-import { requireRider } from '@/lib/partner';
-import { createClient } from '@/lib/supabase/server';
+import { DASH, Pill, clock, day, kesWhole, plural } from '@/components/partner/bits';
+import { riderContext } from '@/components/rider/frame';
+import { OffersBoard, type RiderOffer } from '@/components/rider/offers';
+import { Nothing, PageHead, PanelTitle, PillTabs, RiderPage, panel } from '@/components/rider/ui';
 
-export const metadata = { title: 'Trips' };
+export const metadata = { title: 'Jobs' };
 export const dynamic = 'force-dynamic';
 
 const TONE: Record<string, string> = {
@@ -21,16 +21,16 @@ const WORD: Record<string, string> = {
 };
 
 /**
- * Trips.
+ * Jobs: the offers waiting on this rider, with Accept and a map, then
+ * the trips they are on and have run.
  *
- * What was collected in cash is its own line, separate from what
- * was earned. On a cash order those are two different numbers and
- * confusing them is how a rider's float goes wrong.
+ * What was collected in cash is its own line, separate from what was
+ * earned. On a cash order those are two different numbers and confusing
+ * them is how a rider's float goes wrong.
  */
 export default async function RiderJobs({ searchParams }: { searchParams?: { show?: string } }) {
-  const me = await requireRider();
+  const { me, supabase, h, active } = await riderContext();
   const show = searchParams?.show === 'all' ? 'all' : 'live';
-  const supabase = createClient();
 
   let q = supabase
     .from('rider_jobs_v')
@@ -40,58 +40,87 @@ export default async function RiderJobs({ searchParams }: { searchParams?: { sho
     .limit(200);
   if (show === 'live') q = q.not('what_now', 'in', '("done","closed")');
 
-  const { data, error } = await q;
+  const [{ data, error }, offersRead] = await Promise.all([
+    q,
+    active ? supabase.rpc('rpc_rider_offers', {}) : Promise.resolve(null),
+  ]);
   const rows = (data as Row[] | null) ?? [];
+  const offerData = (offersRead?.data ?? null) as {
+    rider?: { lat: number; lng: number } | null;
+    offers?: RiderOffer[];
+  } | null;
+  /* Before 20270224000100 is in the database the function is missing;
+     the page still shows the trips. */
+  const offersMissing = !!offersRead?.error;
 
   return (
-    <main className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
-      <RiderPageHead
-        title="Jobs"
-        lead="Offers waiting on you and the trips you have run. Accept within the countdown; the guest and the merchant are told the moment you do."
-      />
-      <div className="flex gap-2">
-        {(['live', 'all'] as const).map((v) => (
-          <a
-            key={v}
-            href={`/rider/jobs?show=${v}`}
-            className={`rounded-full px-4 py-2 text-[0.8125rem] font-extrabold ${
-              show === v ? 'bg-ink text-white' : 'border-border-strong bg-surface border'
-            }`}
-          >
-            {v === 'live' ? 'On now' : 'Everything'}
-          </a>
-        ))}
-      </div>
+    <RiderPage>
+      <PageHead title="Available Jobs" lead="Find and accept nearby jobs" />
 
-      {error && (
-        <p className="bg-danger-bg text-danger rounded-lg px-3 py-2 text-[0.8125rem] font-bold">
-          Your trips could not be read: {error.message}
+      {!active ? (
+        <section className={panel}>
+          <Nothing
+            title="Jobs open once you are active."
+            body="Finish your setup and rider ops will activate you. Then offers show here."
+          />
+        </section>
+      ) : offersMissing ? (
+        <p className="rounded-xl bg-amber-50 px-3 py-2 text-[13px] font-bold text-amber-800">
+          Offers are not shown on the web yet. Answer them in the rider app.
         </p>
+      ) : (
+        <OffersBoard
+          offers={offerData?.offers ?? []}
+          online={h?.presence === 'online'}
+          rider={offerData?.rider ?? null}
+          maps={{
+            key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '',
+            mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_ID ?? '',
+          }}
+        />
       )}
 
-      <Panel
-        title={show === 'live' ? 'On now' : 'Every trip'}
-        note={rows.length > 0 ? plural(rows.length, 'trip') : undefined}
-      >
+      {error ? (
+        <p
+          role="alert"
+          className="rounded-xl bg-red-50 px-3 py-2 text-[13px] font-bold text-red-700"
+        >
+          Your trips could not be read: {error.message}
+        </p>
+      ) : null}
+
+      <section className={panel}>
+        <PanelTitle
+          title={show === 'live' ? 'Your trips on now' : 'Every trip'}
+          note={rows.length > 0 ? plural(rows.length, 'trip') : undefined}
+        >
+          <PillTabs
+            label="Which trips"
+            items={[
+              { href: '/rider/jobs?show=live', label: 'On now', on: show === 'live' },
+              { href: '/rider/jobs?show=all', label: 'Everything', on: show === 'all' },
+            ]}
+          />
+        </PanelTitle>
         {rows.length === 0 ? (
-          <Empty
+          <Nothing
             title={show === 'live' ? 'Nothing on right now.' : 'No trips yet.'}
             body={
               show === 'live'
-                ? 'Offers arrive in the rider app. Once you accept one it appears here.'
+                ? 'Once you accept an offer it appears here.'
                 : 'Every delivery you make is listed here with what you earned on it.'
             }
           />
         ) : (
-          <ul className="divide-border divide-y">
+          <ul className="divide-y divide-[#eef0f6]">
             {rows.map((j) => (
               <li key={j.id} className="flex items-start justify-between gap-3 py-3">
                 <div className="min-w-0">
-                  <p className="truncate text-[0.875rem] font-extrabold">{j.reference}</p>
-                  <p className="text-muted truncate text-[0.8125rem] font-semibold">
+                  <p className="truncate text-[14px] font-extrabold">{j.reference}</p>
+                  <p className="truncate text-[13px] font-semibold text-slate-600">
                     {j.merchant ?? DASH} → {j.dropoff ?? DASH}
                   </p>
-                  <p className="text-muted-light truncate text-[0.75rem] font-semibold">
+                  <p className="truncate text-[12px] font-semibold text-slate-500">
                     {day(j.placed_at)} {clock(j.placed_at)}
                     {j.delivered_at && ` · delivered ${clock(j.delivered_at)}`}
                     {j.handed_to && ` · handed to ${j.handed_to.replace(/_/g, ' ')}`}
@@ -99,11 +128,11 @@ export default async function RiderJobs({ searchParams }: { searchParams?: { sho
                 </div>
                 <div className="shrink-0 text-right">
                   <Pill tone={TONE[j.what_now]}>{WORD[j.what_now] ?? j.what_now}</Pill>
-                  <p className="mt-1 text-[0.875rem] font-extrabold tabular-nums">
+                  <p className="mt-1 text-[14px] font-extrabold tabular-nums">
                     {j.earned_cents ? kesWhole(j.earned_cents / 100) : `KES ${DASH}`}
                   </p>
                   {j.collect_cents !== null && (
-                    <p className="text-gold-text text-[0.625rem] font-bold">
+                    <p className="text-[11px] font-bold text-amber-700">
                       collect {kesWhole(j.collect_cents / 100)} cash
                     </p>
                   )}
@@ -112,8 +141,8 @@ export default async function RiderJobs({ searchParams }: { searchParams?: { sho
             ))}
           </ul>
         )}
-      </Panel>
-    </main>
+      </section>
+    </RiderPage>
   );
 }
 
