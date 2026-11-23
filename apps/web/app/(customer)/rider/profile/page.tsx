@@ -49,7 +49,7 @@ export default async function RiderProfilePage() {
   ].sort();
 
   return (
-    <div className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
+    <main className="space-y-5 px-4 py-7 sm:px-6 lg:px-8">
       <RiderPageHead
         title="Profile"
         lead="Your ride, your areas and where you are paid. The parts rider ops change are shown with the reason rather than as a greyed-out field."
@@ -119,7 +119,7 @@ export default async function RiderProfilePage() {
         maxKm={r.bike_max_km}
         areaOptions={areaOptions}
       />
-    </div>
+    </main>
   );
 }
 
