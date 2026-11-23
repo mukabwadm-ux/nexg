@@ -15,6 +15,9 @@ from (values
    coalesce((select pronargdefaults from pg_proc where proname = 'rpc_host_workspace_guide_asset'), 0) = 1),
   ('rpc_host_workspace_task_save has its two defaults (20261114000100)',
    coalesce((select max(pronargdefaults) from pg_proc where proname = 'rpc_host_workspace_task_save'), 0) = 2),
+  ('connector_connection has the merchant application session gate (20270224100200)',
+   exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'connector_connection'
+           and policyname = 'merchant_application_session_gate')),
   ('Paystack review ran (20270222000500): table public.payment_reviewer',
    to_regclass('public.payment_reviewer') is not null),
   ('no migration is recorded twice',

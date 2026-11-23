@@ -108,7 +108,10 @@ paused=$(wc -l < "$OUT/paused.txt")
 psql_q -c "select jobname || '  ' || schedule || '  ' || case when active then 'on' else 'PAUSED' end from cron.job order by jobname" | tee "$OUT/cron-jobs.txt"
 
 say "Schema compared with a database built fresh from main"
-dump() { docker exec "$CONTAINER" pg_dump -U postgres --schema-only --exclude-schema=supabase_migrations postgres | grep -v '^--' | sed '/^$/d'; }
+# pg_dump 17 wraps its output in a psql "restrict" meta-command with a random
+# token, new every dump; lines starting with a backslash are dropped so they
+# never count as a difference.
+dump() { docker exec "$CONTAINER" pg_dump -U postgres --schema-only --exclude-schema=supabase_migrations postgres | grep -v '^--' | grep -v '^[\]' | sed '/^$/d'; }
 dump > "$OUT/schema-rehearsed.sql"
 supabase db reset --local
 dump > "$OUT/schema-fresh.sql"
