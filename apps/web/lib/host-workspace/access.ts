@@ -1,5 +1,8 @@
 import 'server-only';
 
+import type { Database } from '@nexg/db';
+import { createClient as createTokenClient, type SupabaseClient } from '@supabase/supabase-js';
+
 import { createClient } from '@/lib/supabase/server';
 
 export { hostWorkspaceEnabled } from './routes';
@@ -23,12 +26,45 @@ export interface HostWorkspaceAccess {
   unitScope: string[] | null;
 }
 
-export async function hostWorkspaceAccess(): Promise<HostWorkspaceAccess> {
-  const db = createClient();
+const BEARER = /^Bearer ([A-Za-z0-9._-]{20,4096})$/;
+
+/*
+ * The NEXG Stays phone app has no website cookie: it sends the host's Supabase
+ * session as `Authorization: Bearer <access token>`, as the Consumer app does for
+ * bookings (lib/booking/app-session.ts). Same anon key, so row-level security and
+ * every rule below apply exactly as they do on the web. Returns null without the
+ * header; throws 401 for a malformed one.
+ */
+function appTokenClient(request?: Request): { db: SupabaseClient<Database>; token: string } | null {
+  const header = request?.headers.get('authorization');
+  if (!header) return null;
+  const token = BEARER.exec(header.trim())?.[1];
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!token || !url || !key)
+    throw new HostWorkspaceError(401, 'Sign in to open your host workspace.');
+  const db = createTokenClient<Database>(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    global: {
+      headers: { Authorization: `Bearer ${token}` },
+      fetch: (input, init) => fetch(input, { ...init, cache: 'no-store' }),
+    },
+  });
+  return { db, token };
+}
+
+/** True when the request carries the phone app's sign-in rather than the website cookie. */
+export function isAppRequest(request: Request) {
+  return request.headers.has('authorization');
+}
+
+export async function hostWorkspaceAccess(request?: Request): Promise<HostWorkspaceAccess> {
+  const app = appTokenClient(request);
+  const db = app?.db ?? createClient();
   const {
     data: { user },
     error: authError,
-  } = await db.auth.getUser();
+  } = await (app ? db.auth.getUser(app.token) : db.auth.getUser());
   if (authError && authError.status && authError.status >= 500) {
     throw new HostWorkspaceError(503, 'Sign-in is temporarily unavailable. Try again shortly.');
   }
@@ -85,6 +121,9 @@ export function hostWorkspaceError(error: unknown) {
 }
 
 export function requireWorkspaceOrigin(request: Request) {
+  /* The origin check stops another website using a host's cookie. A browser never
+     adds an Authorization header by itself, so a token request needs no such check. */
+  if (isAppRequest(request)) return;
   const url = new URL(request.url);
   const expectedOrigin = url.protocol + '//' + (request.headers.get('host') ?? url.host);
   if (
