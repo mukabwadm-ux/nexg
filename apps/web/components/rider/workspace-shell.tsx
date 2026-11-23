@@ -187,7 +187,9 @@ export function RiderWorkspaceShell({
       <div className="border-border bg-surface flex items-center gap-2 border-b px-4 py-2 sm:hidden">
         {presenceControl}
       </div>
-      {children}
+      {/* Every rider page's landmark. Pages render a plain div inside it,
+          never their own main (e2e/web/portal-chrome.spec.ts reads this). */}
+      <main id="main">{children}</main>
     </WorkspaceFrame>
   );
 }

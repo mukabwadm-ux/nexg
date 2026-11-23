@@ -32,13 +32,13 @@ export default async function RiderDashboard() {
 
   if (!h) {
     return (
-      <main className="mx-auto max-w-xl px-4 py-20 text-center">
+      <div className="mx-auto max-w-xl px-4 py-20 text-center">
         <h1 className="text-xl font-extrabold tracking-tight">We cannot load your dashboard</h1>
         <p className="text-muted mt-2 text-[0.9375rem] font-semibold">
           Your rider account exists but we could not read its summary. That is ours to fix — rider
           ops can already see it.
         </p>
-      </main>
+      </div>
     );
   }
 

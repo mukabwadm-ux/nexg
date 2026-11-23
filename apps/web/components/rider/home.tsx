@@ -144,7 +144,7 @@ export function RiderHomeView({
   const docsToDo = (h.documents_missing ?? 0) + (h.documents_to_fix ?? 0);
 
   return (
-    <main className="mx-auto w-full max-w-[100rem] space-y-2 px-4 py-2.5 sm:px-6 lg:px-7">
+    <div className="mx-auto w-full max-w-[100rem] space-y-2 px-4 py-2.5 sm:px-6 lg:px-7">
       <header>
         <h1 className="text-[22px] font-extrabold leading-tight tracking-tight sm:text-[24px]">
           Good {partOfDay()}, {name}
@@ -457,7 +457,7 @@ export function RiderHomeView({
           </section>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
