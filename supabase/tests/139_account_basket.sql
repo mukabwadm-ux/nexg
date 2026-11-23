@@ -1,4 +1,4 @@
--- One basket per account (20270204000100): read and written through
+-- One basket per account (20270216000100): read and written through
 -- rpc_basket_*, merged at sign-in, emptied when an order is placed.
 
 begin;
