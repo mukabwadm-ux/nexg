@@ -18,6 +18,7 @@ import { HostWorkspaceError, type HostWorkspaceAccess } from './access';
 import { validZone } from './read';
 import { saveWorkspaceTask } from './tasks';
 import { runGuideCommand } from './guides';
+import { isMoneyEdit, runMoneyEdit } from './money';
 
 const uuid = z.string().uuid();
 const name = z.string().trim().min(1).max(160);
@@ -382,6 +383,8 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
     if (error) throw new HostWorkspaceError(503, 'Other sessions could not be signed out.');
     return { message: 'Other sessions were signed out.' };
   }
+
+  if (isMoneyEdit(command)) return runMoneyEdit(access, command);
 
   if (command.type === 'save' && (collection === 'payments' || collection === 'expenses') && !id) {
     const common = z.object({
