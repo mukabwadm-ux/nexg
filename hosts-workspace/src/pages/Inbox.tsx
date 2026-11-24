@@ -7,6 +7,7 @@ import { maxPage, pageItems, stamp, text } from '../presentation';
 import { Avatar, Badge, Button, Empty, Icon, PageHeader, Pager, Panel, Tabs } from '../ui';
 import { useCompact } from '../use-compact';
 import { useWorkspace } from '../workspace';
+import { InboxTabs } from './InboxTabs';
 import { StartSupportForm, SupportReply } from './SupportComposer';
 
 const zone = 'Africa/Nairobi';
@@ -114,6 +115,7 @@ export function SupportInboxPage({ routeId }: { routeId: string }) {
           New conversation
         </a>
       </PageHeader>
+      <InboxTabs value="NexG support" />
       <div className={'nxops-inbox-layout' + (routeId ? ' nxops-mobile-conversation' : '')}>
         <Panel className="nxops-thread-list">
           <h2>NexG support</h2>
@@ -287,7 +289,7 @@ export function SupportInboxPage({ routeId }: { routeId: string }) {
   );
 }
 
-function MessageBubble({ message }: { message: SupportMessage }) {
+export function MessageBubble({ message }: { message: SupportMessage }) {
   const [part, setPart] = useState(1);
   const body = message.redacted
     ? 'This message was removed.'
