@@ -3,7 +3,8 @@
 -- A host applies from /hosts with an anonymous session, which becomes their
 -- login once they verify their email. They upload an ID and proof of
 -- authority in the workspace, NexG reviews them, and only then is the host
--- activated. Until then they cannot add or change properties or units.
+-- activated. Meanwhile they can set up properties and units, which guests do
+-- not see until the host is live (20270314000400).
 
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -159,23 +160,21 @@ select is(
   '2/1.5/4/true',
   'And the first unit carries its room counts and sits in that property, so nothing is typed twice.');
 
--- ══════════════════════════════════ 2. locked until NexG approves the host
+-- ════════════════════════════ 2. set up during review, hidden from guests
 
 set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"d4500000-0000-4000-8000-000000000001","role":"authenticated"}', true);
 
-select throws_ok(
+select lives_ok(
   format($$ select public.rpc_unit_upsert_guarded(%L::uuid, '{"name":"Renamed"}'::jsonb, %L::uuid) $$,
     (select v from t where k = 'host'), (select v from t where k = 'unit')),
-  '42501', null,
-  'Before approval a host cannot change units.');
+  'Before approval a host can change its units.');
 
-select throws_ok(
+select lives_ok(
   format($$ select public.rpc_property_upsert(%L::uuid, '{"name":"Block"}'::jsonb) $$,
     (select v from t where k = 'host')),
-  '42501', null,
-  'Or add a property.');
+  'And add a property.');
 
 -- ═══════════════════════════════════════════════════════ 3. documents
 
