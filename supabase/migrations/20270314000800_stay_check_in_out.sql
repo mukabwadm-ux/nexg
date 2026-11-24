@@ -13,6 +13,12 @@ alter table public.stay
   add column if not exists checked_out_at timestamptz,
   add column if not exists checked_out_by uuid references auth.users (id) on delete set null;
 
+-- 'stay.checked_in' (20270116000400) already covers the workspace check-in; check-out is new. Without this row,
+-- audit.log treats every check-out as an unknown action and raises the unregistered_action alert.
+insert into audit.action_registry (action, module, default_severity, money, description) values
+  ('stay.checked_out', 'hotels', 'info', false, 'Host checked a guest out')
+on conflict (action) do nothing;
+
 create or replace function public.rpc_host_stay_mark_checked_in(p_stay_id uuid)
 returns public.stay
 language plpgsql
