@@ -7,8 +7,9 @@ import { useWorkspace } from '../workspace';
 
 /*
  * Documents NexG needs before activating the account. Until NexG approves
- * them the host cannot add or change properties and units (the database
- * refuses), so this panel is the first thing a new host has to finish.
+ * them the host can set up properties and units, but guests see none of
+ * them (the public views need a live host), so this panel is what stands
+ * between a new host and their first guest.
  */
 
 type Kind = 'id_document' | 'authority' | 'kra_pin' | 'business_registration';
@@ -151,8 +152,8 @@ export function DocumentsPanel() {
         {view.status === 'live'
           ? 'NexG approved your account. You can list and manage your properties.'
           : view.status === 'verifying'
-            ? `Submitted${view.submittedAt ? ' ' + dateText(view.submittedAt) : ''}. NexG usually reviews documents within one working day. You can add or change properties once they are approved.`
-            : 'Upload these so NexG can approve your account. You can add or change properties once they are approved.'}
+            ? `Submitted${view.submittedAt ? ' ' + dateText(view.submittedAt) : ''}. NexG usually reviews documents within one working day. You can set up your properties meanwhile. They stay hidden from guests until NexG approves your account.`
+            : 'Upload these so NexG can approve your account. You can set up your properties meanwhile. They stay hidden from guests until NexG approves your account.'}
       </p>
       {view.statusReason && view.status === 'applied' && (
         <p className="mg-small-note">

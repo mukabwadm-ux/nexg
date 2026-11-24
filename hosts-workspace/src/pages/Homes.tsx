@@ -36,6 +36,8 @@ import { UnitGuideEditor, UnitGuideHistory } from './UnitGuide';
 import { DatesDialog } from './DatesDialog';
 import { StayChatButton } from './GuestInbox';
 
+import { underReview } from '../ListingPanel';
+
 import {
   PropertiesNavigation,
   propertySectionLabel,
@@ -576,6 +578,12 @@ export function PropertiesPage() {
         )}
       </PageHeader>
       <PropertiesNavigation value="overview" propertyId={selected?.id} />
+      {underReview(w.setup) && (
+        <p className="mg-small-note">
+          Hidden from guests until NexG approves your account. You can add and edit properties and
+          units now.
+        </p>
+      )}
       <Panel className="property-summary">
         <span>
           <Icon name="building" size={26} />
