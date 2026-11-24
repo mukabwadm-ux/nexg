@@ -24,9 +24,11 @@ import {
 /**
  * Directory (B1) — the default tab.
  *
- * Trips, acceptance and on-time render [—]: there is no orders domain,
- * and a zero would read as "did nothing" rather than "not measured".
- * That difference decides whether somebody gets a coaching call.
+ * Trips, acceptance, on-time and rating are counted from the trips
+ * themselves (rpc_console_rider_stats). A rate with nothing to divide by
+ * renders [—], not 0%: a zero would read as "did nothing" rather than
+ * "not measured", and that difference decides whether somebody gets a
+ * coaching call.
  *
  * Cash is the exception — it is real, it comes from the ledger, and it
  * is the column that stops a rider being offered work.
@@ -82,6 +84,11 @@ export function Directory({
   };
 
   const chosen = selected ? rows.find((r) => r.id === selected) : undefined;
+  const measured = rows.filter((r) => r.acceptance_pct !== null);
+  const avgAcceptance =
+    measured.length === 0
+      ? null
+      : measured.reduce((sum, r) => sum + Number(r.acceptance_pct), 0) / measured.length;
   const overCap = rows.filter(
     (r) => r.cash_cap_effective !== null && (r.cash_on_hand ?? 0) >= r.cash_cap_effective,
   ).length;
@@ -100,8 +107,10 @@ export function Directory({
         <Tile label="Riders active · 30d" value={num(badges.active)}>
           {plural(badges.online_now ?? 0, 'rider')} online now
         </Tile>
-        <Tile label="Avg acceptance" value={`${DASH}%`}>
-          first-offer · needs an orders domain
+        <Tile label="Avg acceptance · 30d" value={pct(avgAcceptance)}>
+          {measured.length === 0
+            ? 'no offers answered yet'
+            : `across ${plural(measured.length, 'rider')} with offers`}
         </Tile>
         <Tile
           label="Cash on hand · all"
@@ -285,7 +294,6 @@ function DetailPanel({ rider }: { rider: RiderRow }) {
         <div className="divide-border divide-y">
           <ControlRow
             riderId={rider.id}
-            control="can_receive_offers"
             label="Can receive offers"
             on={!!rider.can_receive_offers && !cooling}
             sub={
@@ -302,7 +310,6 @@ function DetailPanel({ rider }: { rider: RiderRow }) {
           />
           <ControlRow
             riderId={rider.id}
-            control="alcohol_eligible"
             label="Alcohol deliveries"
             on={false}
             sub="Needs alcohol module"
@@ -310,7 +317,6 @@ function DetailPanel({ rider }: { rider: RiderRow }) {
           />
           <ControlRow
             riderId={rider.id}
-            control="large_items_eligible"
             label="Large items (car only)"
             on={!twoWheeler}
             sub={twoWheeler ? `${VEHICLE_LABEL[rider.vehicle ?? '']} · not eligible` : 'Eligible'}
@@ -348,26 +354,26 @@ function DetailPanel({ rider }: { rider: RiderRow }) {
             Open record
           </Link>
           <Link
-            href={`/riders?tab=comms&selected=${rider.id}`}
+            href={`/riders/${rider.id}?view=messages`}
             className="border-border-strong hover:border-ink rounded-lg border px-3 py-2 text-center text-[0.8125rem] font-bold transition-colors"
           >
             Message
           </Link>
           <Link
-            href={`/riders/${rider.id}#location`}
+            href={`/riders/${rider.id}?view=overview#live`}
             className="border-border-strong hover:border-ink rounded-lg border px-3 py-2 text-center text-[0.8125rem] font-bold transition-colors"
           >
             Live location
           </Link>
           <Link
-            href={`/riders/${rider.id}#cooldown`}
+            href={`/riders/${rider.id}?view=overview#cooldown`}
             className="border-border-strong hover:border-ink rounded-lg border px-3 py-2 text-center text-[0.8125rem] font-bold transition-colors"
           >
             Put on cooldown
           </Link>
         </div>
         <Link
-          href={`/riders/${rider.id}#suspend`}
+          href={`/riders/${rider.id}?view=application#suspend`}
           className="border-danger text-danger hover:bg-danger-bg mt-2 block rounded-lg border px-3 py-2 text-center text-[0.8125rem] font-bold transition-colors"
         >
           Suspend…
@@ -387,14 +393,12 @@ function DetailPanel({ rider }: { rider: RiderRow }) {
  */
 function ControlRow({
   riderId,
-  control,
   label,
   on,
   sub,
   locked,
 }: {
   riderId: string;
-  control: string;
   label: string;
   on: boolean;
   sub: string;
@@ -413,7 +417,7 @@ function ControlRow({
         />
       ) : (
         <Link
-          href={`/riders/${riderId}#${control}`}
+          href={`/riders/${riderId}?view=overview#controls`}
           aria-label={`${label} — currently ${on ? 'on' : 'off'}. Change on the rider's record.`}
           className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
             on ? 'bg-success' : 'bg-border-strong'

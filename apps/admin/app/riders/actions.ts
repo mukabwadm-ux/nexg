@@ -280,3 +280,142 @@ export async function discardRateCardDraft(cardId: string): Promise<ReviewResult
   revalidatePath('/riders');
   return { ok: true, message: 'Draft discarded.' };
 }
+
+// ──────────────────────────────────────────── the rider's record (24 Nov 2026)
+/*
+ * The record's staff actions. Each is an existing audited RPC
+ * (20260101007800); this file only gives them a button.
+ */
+
+function revalidateRider(riderId: string) {
+  revalidatePath(`/riders/${riderId}`);
+  revalidatePath('/riders');
+}
+
+type Rpc = (
+  fn: string,
+  args: Record<string, unknown>,
+) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
+/* The new readers are not in the generated types of every branch yet. */
+const rpcOf = () => createClient().rpc as unknown as Rpc;
+
+export async function setRiderControl(
+  riderId: string,
+  control: 'can_receive_offers' | 'large_items_eligible',
+  value: boolean,
+  reason: string,
+): Promise<ReviewResult> {
+  if (!value && !reason.trim()) {
+    return { ok: false, message: 'Say why. The rider sees the reason on their portal.' };
+  }
+  const { error } = await rpcOf()('rpc_rider_set_control', {
+    p_rider_id: riderId,
+    p_control: control,
+    p_value: value,
+    p_source: 'staff',
+    p_reason: reason.trim() || null,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidateRider(riderId);
+  return { ok: true, message: value ? 'Switched on.' : 'Switched off.' };
+}
+
+export async function coolDownRider(
+  riderId: string,
+  hours: number,
+  reason: string,
+): Promise<ReviewResult> {
+  const { error } = await rpcOf()('rpc_rider_cooldown', {
+    p_rider_id: riderId,
+    p_hours: hours,
+    p_reason: reason.trim(),
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidateRider(riderId);
+  return { ok: true, message: `On cooldown for ${hours} h. No offers until then.` };
+}
+
+export async function clearRiderCooldown(riderId: string, reason: string): Promise<ReviewResult> {
+  const { error } = await rpcOf()('rpc_rider_cooldown_clear', {
+    p_rider_id: riderId,
+    p_reason: reason.trim() || null,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidateRider(riderId);
+  return { ok: true, message: 'Cooldown cleared.' };
+}
+
+export async function strikeRider(
+  riderId: string,
+  level: number,
+  reason: string,
+): Promise<ReviewResult> {
+  const { error } = await rpcOf()('rpc_rider_strike', {
+    p_rider_id: riderId,
+    p_level: level,
+    p_reason: reason.trim(),
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidateRider(riderId);
+  return { ok: true, message: 'Strike issued. It expires in 90 days.' };
+}
+
+export async function adjustRiderCash(
+  riderId: string,
+  amountKes: number,
+  reason: string,
+): Promise<ReviewResult> {
+  const { error } = await rpcOf()('rpc_cash_manual_adjustment', {
+    p_rider_id: riderId,
+    p_amount_kes: amountKes,
+    p_reason: reason.trim(),
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidateRider(riderId);
+  return { ok: true, message: 'Cash adjusted.' };
+}
+
+/** In-app: it shows in the rider's Messages on the rider portal. */
+export async function messageRider(riderId: string, body: string): Promise<ReviewResult> {
+  const { error } = await rpcOf()('rpc_rider_message_send', {
+    p_rider_id: riderId,
+    p_channel: 'in_app',
+    p_body: body,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidateRider(riderId);
+  return { ok: true, message: 'Sent. It is in their Messages on the rider portal.' };
+}
+
+export async function logRiderCall(riderId: string, note: string): Promise<ReviewResult> {
+  const { error } = await rpcOf()('rpc_rider_log_call', { p_rider_id: riderId, p_note: note });
+  if (error) return { ok: false, message: error.message };
+  revalidateRider(riderId);
+  return { ok: true, message: 'Call written down.' };
+}
+
+export interface LiveFix {
+  ok: boolean;
+  message: string;
+  lat?: number;
+  lng?: number;
+  at?: string;
+}
+
+/** Audited, high severity: off a trip it needs a reason. */
+export async function revealRiderLocation(riderId: string, reason: string): Promise<LiveFix> {
+  const { data, error } = await rpcOf()('rpc_rider_live_location', {
+    p_rider_id: riderId,
+    p_reason: reason.trim() || null,
+  });
+  if (error) return { ok: false, message: error.message };
+  const fix = data as { ok: boolean; reason?: string; lat?: number; lng?: number; at?: string };
+  if (!fix.ok) return { ok: false, message: fix.reason ?? 'No fix.' };
+  return {
+    ok: true,
+    message: 'Logged in the audit trail.',
+    lat: fix.lat,
+    lng: fix.lng,
+    at: fix.at,
+  };
+}

@@ -49,11 +49,10 @@ type Supabase = ReturnType<typeof createClient>;
  * Filters live in the URL so a link pasted into Slack opens the same
  * screen the sender was looking at.
  *
- * Everything that depends on the orders domain renders [—]. There is no
- * order service, so trips, acceptance, on-time and earnings are not
- * measured — and a zero in those columns would read as "this rider did
- * nothing", which is what gets somebody a coaching call they do not
- * deserve.
+ * Trips, acceptance, on-time and rating come from the trips themselves
+ * (rpc_console_rider_stats). A rate with nothing to divide by is [—], never
+ * 0% — a zero would read as "this rider did nothing", which is what gets
+ * somebody a coaching call they do not deserve.
  */
 export default async function RidersPage({
   searchParams,
@@ -70,22 +69,46 @@ export default async function RidersPage({
   const filter = searchParams?.filter ?? 'all';
   const selected = searchParams?.selected ?? null;
 
-  const [{ data: badgesRaw }, { data: directory }, { data: sos }] = await Promise.all([
-    supabase.rpc('rpc_rider_console_counts', {}),
-    supabase
-      .from('console_rider_directory_v')
-      .select('*')
-      .order('created_at', { ascending: false }),
-    supabase
-      .from('incident')
-      .select('id, rider_id, happened_at, description, rider:rider_id(first_name, last_name)')
-      .eq('kind', 'sos')
-      .is('acknowledged_at', null)
-      .order('happened_at', { ascending: false }),
-  ]);
+  const [{ data: badgesRaw }, { data: directory }, { data: sos }, { data: stats }] =
+    await Promise.all([
+      supabase.rpc('rpc_rider_console_counts', {}),
+      supabase
+        .from('console_rider_directory_v')
+        .select('*')
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('incident')
+        .select('id, rider_id, happened_at, description, rider:rider_id(first_name, last_name)')
+        .eq('kind', 'sos')
+        .is('acknowledged_at', null)
+        .order('happened_at', { ascending: false }),
+      /* Trips, acceptance, on-time and rating from the trips themselves
+       (20270310000100), in place of the health snapshot's copies. */
+      supabase.rpc('rpc_console_rider_stats'),
+    ]);
 
   const badges = (badgesRaw as Badges | null) ?? ({} as Badges);
-  const rows = (directory as RiderRow[] | null) ?? [];
+  const measured = (stats ?? {}) as Record<
+    string,
+    {
+      trips_30d: number;
+      acceptance_pct: number | null;
+      on_time_pct: number | null;
+      rating_avg: number | null;
+    }
+  >;
+  const rows = ((directory as RiderRow[] | null) ?? []).map((r) => {
+    const m = measured[r.id];
+    return m
+      ? {
+          ...r,
+          trips_30d: m.trips_30d,
+          acceptance_pct: m.acceptance_pct,
+          on_time_pct: m.on_time_pct,
+          rating_avg: m.rating_avg,
+        }
+      : r;
+  });
 
   return (
     <ConsoleShell staff={staff} current="/riders">
