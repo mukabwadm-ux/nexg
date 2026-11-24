@@ -24051,6 +24051,178 @@ export type Database = {
           },
         ];
       };
+      merchant_commission_term: {
+        Row: {
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          ends_on: string | null;
+          id: string;
+          merchant_id: string;
+          nexg_delivery_pct: number | null;
+          own_delivery_pct: number | null;
+          reason: string;
+          requested_at: string;
+          requested_by: string | null;
+          starts_on: string;
+          status: string;
+          terms_ref: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          ends_on?: string | null;
+          id?: string;
+          merchant_id: string;
+          nexg_delivery_pct?: number | null;
+          own_delivery_pct?: number | null;
+          reason: string;
+          requested_at?: string;
+          requested_by?: string | null;
+          starts_on: string;
+          status?: string;
+          terms_ref?: string | null;
+        };
+        Update: {
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          ends_on?: string | null;
+          id?: string;
+          merchant_id?: string;
+          nexg_delivery_pct?: number | null;
+          own_delivery_pct?: number | null;
+          reason?: string;
+          requested_at?: string;
+          requested_by?: string | null;
+          starts_on?: string;
+          status?: string;
+          terms_ref?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_commission_term_decided_by_fkey';
+            columns: ['decided_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_requested_by_fkey';
+            columns: ['requested_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       merchant_device: {
         Row: {
           app_version: string | null;
@@ -62418,6 +62590,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      fn_merchant_agreed_pct: { Args: { p_merchant_id: string }; Returns: number };
       fn_merchant_agreement_category: { Args: { p_merchant_id: string }; Returns: string };
       fn_merchant_agreement_commission: { Args: { p_merchant_id: string }; Returns: Json };
       fn_merchant_agreement_current_acceptance: {
@@ -62510,6 +62683,8 @@ export type Database = {
         }[];
       };
       fn_merchant_category_label: { Args: { p_key: string }; Returns: string };
+      fn_merchant_commission: { Args: { p_at?: string; p_merchant_id: string }; Returns: Json };
+      fn_merchant_commission_decider: { Args: { p_city_id: string }; Returns: boolean };
       fn_merchant_draft_for_write: {
         Args: { p_merchant_id: string };
         Returns: {
@@ -67613,6 +67788,24 @@ export type Database = {
       };
       rpc_merchant_catalogue_overview: { Args: { p_keys?: string[] }; Returns: Json };
       rpc_merchant_close_store: { Args: { p_branch_id: string; p_reason: string }; Returns: Json };
+      rpc_merchant_commission_decide: {
+        Args: { p_approve: boolean; p_note?: string; p_term_id: string };
+        Returns: Json;
+      };
+      rpc_merchant_commission_read: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_commission_request: {
+        Args: {
+          p_ends_on: string;
+          p_merchant_id: string;
+          p_nexg_delivery_pct: number;
+          p_own_delivery_pct: number;
+          p_reason: string;
+          p_starts_on: string;
+          p_terms_ref?: string;
+        };
+        Returns: Json;
+      };
+      rpc_merchant_commission_withdraw: { Args: { p_term_id: string }; Returns: Json };
       rpc_merchant_console_counts: { Args: { p_city_id?: string }; Returns: Json };
       rpc_merchant_control: {
         Args: {
