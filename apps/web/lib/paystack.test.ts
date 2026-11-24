@@ -126,6 +126,32 @@ describe('paystack calls', () => {
     expect(result).toMatchObject({ ok: false, refused: true, message: 'Invalid phone' });
     const body = JSON.parse((fetch.mock.calls[0] as [string, RequestInit])[1].body as string);
     expect(body.mobile_money).toEqual({ phone: '+254712345678', provider: 'mpesa' });
+    expect(body).not.toHaveProperty('subaccount');
+  });
+
+  it('splits a payment to the merchant sub-account the database names, NexG bearing the fee', async () => {
+    vi.stubEnv('PAYSTACK_TEST_SECRET_KEY', TEST);
+    const fetch = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ status: true, data: { status: 'pay_offline' } })),
+      );
+    vi.stubGlobal('fetch', fetch);
+    await sendPrompt('test', {
+      reference: 'NXP-1-3',
+      amountCents: 150000,
+      email: 'ann@example.com',
+      phone: '+254712345678',
+      provider: 'mpesa',
+      split: { subaccount: 'ACCT_ci0001', transaction_charge: 68000, bearer: 'account' },
+    });
+    const body = JSON.parse((fetch.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body).toMatchObject({
+      amount: 150000,
+      subaccount: 'ACCT_ci0001',
+      transaction_charge: 68000,
+      bearer: 'account',
+    });
   });
 
   it('charges nothing without a key', async () => {

@@ -42,13 +42,21 @@ interface RuleRow {
   constraints: { enum?: unknown; labels?: Record<string, string> } | null;
 }
 
-const PARTIES: { key: string; title: string; icon: LucideIcon; soon?: string }[] = [
+const PARTIES: {
+  key: string;
+  title: string;
+  icon: LucideIcon;
+  soon?: string;
+  /** Set elsewhere: said instead of "Coming next". */
+  elsewhere?: string;
+}[] = [
   { key: 'rider', title: 'Riders', icon: Bike },
   {
     key: 'merchant',
     title: 'Merchants',
     icon: Store,
-    soon: 'How often merchants are paid, their minimum and who pays the transfer fee.',
+    elsewhere:
+      'Each merchant is set on its own page: a Paystack sub-account (Paystack pays them every 2 working days, weekly, monthly, or when Finance releases it), or the payout run. Their commission is on the same page.',
   },
   {
     key: 'host',
@@ -215,7 +223,7 @@ export default async function PayoutRulesPage({
               </PanelHead>
               {own.length === 0 ? (
                 <p className="text-muted mt-2 text-[0.8125rem] font-semibold">
-                  Coming next. {p.soon}
+                  {p.elsewhere ?? `Coming next. ${p.soon ?? ''}`}
                 </p>
               ) : (
                 <div className="divide-border mt-2 divide-y">

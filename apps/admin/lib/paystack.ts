@@ -129,3 +129,8 @@ export function refund(
     },
   });
 }
+
+/** What Paystack says about a merchant's sub-account (GET /subaccount/:code). Read only. */
+export function fetchSubaccount(mode: PaystackMode, code: string) {
+  return call(mode, `/subaccount/${encodeURIComponent(code)}`, { method: 'GET' });
+}

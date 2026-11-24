@@ -28,6 +28,10 @@ import { OnboardingRecord } from '@/components/onboarding-record';
 import { applicationAnswerGroups } from '@/lib/application-answers';
 import { ApiBookingsCard } from '@/components/merchants/api-bookings-card';
 import { MerchantCommissionCard } from '@/components/merchants/commission-card';
+import {
+  PaystackPayoutsCard,
+  type SplitOverview,
+} from '@/components/merchants/paystack-payouts-card';
 import type { CommissionCard } from '@/lib/merchant-commission';
 import { ApplicationReviewUnavailable } from '@/components/merchants/application-review-view';
 import { MerchantActivityLog } from '@/components/merchants/activity-log';
@@ -228,6 +232,14 @@ export default async function MerchantApplicationPage({
   const commission = (
     await supabase.rpc('rpc_merchant_commission_read', { p_merchant_id: params.id })
   ).data as CommissionCard | null;
+  // How Paystack pays this merchant (a sub-account), for staff who reach it.
+  const splitOverview = (
+    await (
+      supabase as unknown as {
+        rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown }>;
+      }
+    ).rpc('rpc_merchant_split_overview', { p_merchant_id: params.id })
+  ).data as SplitOverview | null;
   const performance = summarise(
     (performanceOrders as PerformanceOrder[] | null) ?? [],
     (performanceRatings as PerformanceRating[] | null) ?? [],
@@ -486,6 +498,10 @@ export default async function MerchantApplicationPage({
                   return withdrawCommission(params.id, termId);
                 }}
               />
+            )}
+
+            {splitOverview && splitOverview.viewer === 'staff' && (
+              <PaystackPayoutsCard merchantId={params.id} overview={splitOverview} />
             )}
 
             {apiBookings && (

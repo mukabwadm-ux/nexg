@@ -106,12 +106,34 @@ async function call<T>(
   return { ok: true, data: body.data, raw, message: body.message ?? 'Done.' };
 }
 
+/**
+ * A split payment: Paystack sends the merchant's share to its sub-account as
+ * the customer pays. The database decides it (rpc_payment_paystack_attempt):
+ * NexG's part as a flat charge in cents, and NexG bears Paystack's fee.
+ */
+export interface Split {
+  subaccount: string;
+  transaction_charge: number;
+  bearer: 'account';
+}
+
+function splitFields(split: Split | undefined) {
+  return split
+    ? {
+        subaccount: split.subaccount,
+        transaction_charge: split.transaction_charge,
+        bearer: split.bearer,
+      }
+    : {};
+}
+
 export interface CheckoutInput {
   reference: string;
   amountCents: number;
   email: string;
   callbackUrl: string;
   metadata?: Record<string, unknown>;
+  split?: Split;
 }
 
 /** Opens Paystack's checkout page for a card payment. */
@@ -131,6 +153,7 @@ export function openCheckout(mode: PaystackMode, input: CheckoutInput) {
         /* Initialize takes metadata as a string; cancel_action is where
            Paystack's "Cancel payment" goes. */
         metadata: JSON.stringify({ ...input.metadata, cancel_action: input.callbackUrl }),
+        ...splitFields(input.split),
       },
     },
   );
@@ -144,6 +167,7 @@ export interface PromptInput {
   phone: string;
   provider: 'mpesa' | 'atl';
   metadata?: Record<string, unknown>;
+  split?: Split;
 }
 
 /** Sends an M-Pesa or Airtel Money prompt to the customer's phone. */
@@ -157,6 +181,7 @@ export function sendPrompt(mode: PaystackMode, input: PromptInput) {
       currency: 'KES',
       mobile_money: { phone: input.phone, provider: input.provider },
       metadata: input.metadata ?? {},
+      ...splitFields(input.split),
     },
   });
 }
@@ -168,6 +193,7 @@ export interface SavedCardInput {
   email: string;
   authorizationCode: string;
   metadata?: Record<string, unknown>;
+  split?: Split;
 }
 
 /**
@@ -188,6 +214,7 @@ export function chargeSavedCard(mode: PaystackMode, input: SavedCardInput) {
         currency: 'KES',
         authorization_code: input.authorizationCode,
         metadata: input.metadata ?? {},
+        ...splitFields(input.split),
       },
     },
   );
