@@ -6,6 +6,7 @@ import { sendQueuedPayouts } from '@/lib/mpesa-payout';
 import { settleBookings } from '@/lib/booking-payment';
 import { sweepPaystack } from '@/lib/order-payment';
 import { sweepSignatureValid } from '@/lib/paystack';
+import { sendRiderPayouts } from '@/lib/rider-payouts';
 import { createPublicClient } from '@/lib/supabase/public';
 
 export const dynamic = 'force-dynamic';
@@ -36,7 +37,9 @@ export async function POST(request: Request) {
     const paystack = await sweepPaystack(client);
     /* Paid bookings are then settled in the booking engine. */
     const bookings = await settleBookings(client);
-    return NextResponse.json({ ok: true, paystack, bookings });
+    /* Riders paid automatically (Payout rules), out of NexG's Paystack balance. */
+    const riders = await sendRiderPayouts(client);
+    return NextResponse.json({ ok: true, paystack, bookings, riders });
   }
 
   if (!callbackSecretValid(request.headers.get('x-payments-secret'))) {
