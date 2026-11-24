@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { errorMessage, workspaceRequest } from '../client';
+import { errorMessage, uploadFile, workspaceRequest } from '../client';
 import { dateText } from '../model';
 import { Badge, Button, Panel, Table } from '../ui';
 import { useWorkspace } from '../workspace';
@@ -66,6 +66,7 @@ export function DocumentsPanel() {
   const [view, setView] = useState<DocumentsView | null>(null);
   const [loadError, setLoadError] = useState('');
   const [busy, setBusy] = useState<Kind | 'submit' | null>(null);
+  const [progress, setProgress] = useState(0);
   const picker = useRef<HTMLInputElement>(null);
   const picking = useRef<Kind | null>(null);
 
@@ -84,11 +85,16 @@ export function DocumentsPanel() {
 
   async function upload(kind: Kind, file: File) {
     setBusy(kind);
+    setProgress(0);
     try {
-      const form = new FormData();
-      form.set('kind', kind);
-      form.set('file', file);
-      setView(await workspaceRequest<DocumentsView>('/documents', { method: 'POST', body: form }));
+      setView(
+        await uploadFile<DocumentsView>(
+          '/documents',
+          { kind, fileName: file.name },
+          file,
+          setProgress,
+        ),
+      );
       notify('Document uploaded.');
     } catch (error) {
       notify(errorMessage(error, 'The upload did not finish. Try again.'));
@@ -222,7 +228,11 @@ export function DocumentsPanel() {
                         picker.current?.click();
                       }}
                     >
-                      {busy === kind ? 'Uploading…' : row ? 'Replace' : 'Upload'}
+                      {busy === kind
+                        ? `Uploading ${Math.round(progress * 100)}%…`
+                        : row
+                          ? 'Replace'
+                          : 'Upload'}
                     </Button>
                   )}
                 </td>
