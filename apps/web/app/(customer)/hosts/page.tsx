@@ -25,6 +25,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { HostRegisterCard } from '@/components/hosts/host-register-card';
+import { ListYourProperty } from '@/components/hosts/list-your-property';
 import { PropertyCard, type PropertyCardRow } from '@/components/stays/listing';
 import { TailorForm } from '@/components/stays/tailor-form';
 import { SiteFooter } from '@/components/site-footer';
@@ -34,7 +35,6 @@ import airport from '@/public/images/categories/airport.jpg';
 import experiences from '@/public/images/categories/experiences.jpg';
 import laundry from '@/public/images/categories/laundry.jpg';
 import restaurants from '@/public/images/categories/restaurants.jpg';
-import sunset from '@/public/images/hero/stay-sunset.jpg';
 
 export const metadata: Metadata = {
   title: 'List your property',
@@ -203,44 +203,33 @@ const FAQ = [
 export default async function HostsPage() {
   const supabase = createPublicClient();
 
-  /*
-   * The stats are read, not written into the copy. The artboard says
-   * "11 cities"; if the database says something else, the database is
-   * right — a landing page that overstates the footprint is a promise
-   * to a host in a town nobody delivers to.
-   */
-  const [
-    { count: cityCount },
-    { data: packageRows },
-    { data: listed },
-    { data: allAreas, count: listedCount },
-  ] = await Promise.all([
-    supabase.from('city').select('id', { count: 'exact', head: true }).eq('status', 'live'),
-    /*
-     * The catalogue is per city, so an unfiltered `limit(4)` returned
-     * four copies of whichever package sorts first — the page showed
-     * "Essentials" four times.
-     *
-     * This page is not city-specific, so collapse to one card per
-     * package and take the lowest price across cities, which is what
-     * "from KES" actually claims.
-     */
-    supabase
-      .from('welcome_package')
-      .select('id, name, description, price, sort')
-      .eq('status', 'live')
-      .order('sort'),
-    /* Three of the properties already listed, as proof to a host that
+  const [{ data: packageRows }, { data: listed }, { data: allAreas, count: listedCount }] =
+    await Promise.all([
+      /*
+       * The catalogue is per city, so an unfiltered `limit(4)` returned
+       * four copies of whichever package sorts first — the page showed
+       * "Essentials" four times.
+       *
+       * This page is not city-specific, so collapse to one card per
+       * package and take the lowest price across cities, which is what
+       * "from KES" actually claims.
+       */
+      supabase
+        .from('welcome_package')
+        .select('id, name, description, price, sort')
+        .eq('status', 'live')
+        .order('sort'),
+      /* Three of the properties already listed, as proof to a host that
        this is a real shop window and not a promise. */
-    supabase
-      .from('property_public')
-      .select('*')
-      .order('from_rate_kes', { nullsFirst: false })
-      .limit(4),
-    /* Every listed area, so the form's "where, roughly?" chips are not
+      supabase
+        .from('property_public')
+        .select('*')
+        .order('from_rate_kes', { nullsFirst: false })
+        .limit(4),
+      /* Every listed area, so the form's "where, roughly?" chips are not
        limited to the four properties that fit on this page. */
-    supabase.from('property_public').select('area', { count: 'exact' }),
-  ]);
+      supabase.from('property_public').select('area', { count: 'exact' }),
+    ]);
 
   const teaser = (listed as PropertyCardRow[] | null) ?? [];
   const more = Math.max((listedCount ?? 0) - teaser.length, 0);
@@ -275,59 +264,9 @@ export default async function HostsPage() {
       />
 
       <main id="main">
-        {/* ───────────────────────────────────────────── hero */}
-        {/* Design B · "Cream Editorial": copy on the left, an arched
-            photograph with the dark "your unit" card over its lower half
-            on the right. Copy, links and the card's placeholders are
-            unchanged from the previous hero. */}
-        <section className="mx-auto grid max-w-[120rem] gap-12 px-4 pb-16 pt-10 sm:px-[30px] lg:grid-cols-[minmax(0,1fr)_400px] lg:items-center lg:gap-10 lg:pt-16 xl:grid-cols-[minmax(0,700px)_500px] xl:justify-between xl:gap-12">
-          <div className="min-w-0">
-            <p className="inline-flex items-center gap-2 rounded-full border border-[#E3DCC9] bg-white px-3.5 py-2 text-[0.78125rem] font-bold leading-tight">
-              <span aria-hidden="true" className="bg-gold h-2 w-2 shrink-0 rounded-full" />
-              For Airbnb &amp; short-stay hosts · First month free
-            </p>
-
-            <h1 className="text-ink mt-6 max-w-[700px] text-[2.5rem] font-extrabold leading-[1.04] tracking-[-0.03em] sm:text-[3.25rem] xl:text-[4.25rem]">
-              List your property{' '}
-              <span className="bg-[linear-gradient(transparent_62%,rgb(var(--gold-rgb))_62%,rgb(var(--gold-rgb))_92%,transparent_92%)] box-decoration-clone">
-                free.
-              </span>{' '}
-              Run every unit from one place.
-            </h1>
-
-            <p className="mt-6 max-w-[600px] text-[1.0625rem] font-medium leading-[1.65] text-[#4A4436] sm:text-[1.125rem]">
-              NexG puts your units in front of guests, then gives you one dashboard for bookings,
-              check-ins, housekeeping, staff and payouts. Your guests get food, rides, laundry and
-              local experiences on tap, and you get the 5-star review.
-            </p>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <Link
-                href="#list"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#141414] px-7 py-[17px] text-base font-bold leading-none text-white transition-[background-color,transform] hover:-translate-y-px hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#141414] active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
-              >
-                Start your free month <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <Link
-                href="#how"
-                className="text-ink inline-flex items-center justify-center rounded-full border border-[#E1D9C6] bg-white px-7 py-[17px] text-base font-bold leading-none transition-[border-color,transform] hover:-translate-y-px hover:border-[#141414] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#141414] active:translate-y-0 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none"
-              >
-                See how it works
-              </Link>
-            </div>
-
-            <dl className="mt-10 grid grid-cols-3 gap-4 sm:flex sm:flex-wrap sm:gap-x-11 sm:gap-y-5 lg:gap-x-8 xl:gap-x-11">
-              <Stat value="KES 0" label="to list your property" />
-              <Stat value="1 month" label="of management free" />
-              <Stat
-                value={`${cityCount ?? 0} ${cityCount === 1 ? 'city' : 'cities'}`}
-                label="across Kenya &amp; Uganda"
-              />
-            </dl>
-          </div>
-
-          <HeroVisual />
-        </section>
+        {/* Hero, the List Your Property card and "What can you list",
+            from the owner's mockup. */}
+        <ListYourProperty />
 
         {/* ───────────────────────────────────── benefits to hosts */}
         <section
@@ -746,7 +685,7 @@ export default async function HostsPage() {
         )}
 
         {/* ─────────────────────────────────────────── the form */}
-        <section id="list" className="mx-auto max-w-[120rem] px-4 py-12 sm:px-[30px]">
+        <section id="list-airbnb" className="mx-auto max-w-[120rem] px-4 py-12 sm:px-[30px]">
           <div className="rounded-2xl border border-[#ECE8DF] bg-white p-6 sm:p-10">
             <div className="grid gap-8 lg:grid-cols-[26rem_1fr] lg:items-start lg:gap-14">
               <div>
@@ -835,26 +774,6 @@ export default async function HostsPage() {
   );
 }
 
-/*
- * The value is the term, the caption is the description — so a screen
- * reader hears "KES 0, to list, guests pay per order" once rather than
- * the caption twice, which is what an sr-only duplicate produced.
- */
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="min-w-0">
-      <dt className="text-ink text-[1.375rem] font-extrabold leading-tight tracking-tight sm:text-[1.75rem]">
-        {value}
-      </dt>
-      {/* #6B6453 rather than the reference's #7A7260, which is 4.3:1 on
-          the cream ground; this is 5.3:1. */}
-      <dd className="mt-1 text-[0.78125rem] font-semibold leading-snug text-[#6B6453]">
-        {label.replace('&amp;', '&')}
-      </dd>
-    </div>
-  );
-}
-
 function PlanPoint({
   children,
   dark = false,
@@ -882,88 +801,6 @@ function PlanPoint({
         {children}
       </span>
     </li>
-  );
-}
-
-/**
- * The arched sunset photograph with the dark "your unit" card laid over
- * its lower part. Both are decorative: the photo has an empty alt and the
- * card is aria-hidden — every value in it is a placeholder, and the
- * review quote says so rather than inventing a happy host.
- *
- * The card sits in normal flow with a negative top margin (not absolute),
- * so it can never be clipped and the column grows to fit it.
- */
-function HeroVisual() {
-  return (
-    <div className="mx-auto w-full max-w-[420px] lg:mx-0 lg:max-w-[400px] lg:justify-self-end xl:max-w-[500px]">
-      <div className="relative h-[280px] overflow-hidden rounded-b-[28px] rounded-t-[min(calc(50vw_-_16px),210px)] shadow-[0_30px_60px_rgba(60,40,10,0.25)] sm:h-[470px] sm:rounded-t-[210px] lg:h-[448px] lg:rounded-t-[200px] xl:h-[560px] xl:rounded-t-[250px]">
-        <Image
-          src={sunset}
-          alt=""
-          fill
-          priority
-          placeholder="blur"
-          sizes="(min-width: 1280px) 500px, (min-width: 1024px) 400px, 420px"
-          className="object-cover"
-        />
-      </div>
-
-      <div
-        aria-hidden="true"
-        className="relative z-10 -mt-6 rounded-[24px] bg-[#141311] p-4 shadow-[0_30px_70px_rgba(0,0,0,0.35)] sm:-mt-[194px] lg:-mt-[184px] xl:-mt-[230px]"
-      >
-        <div className="flex items-center gap-3 rounded-2xl bg-[#222120] p-3.5">
-          <span className="bg-gold flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl">
-            <LayoutDashboard className="h-5 w-5 text-[#141414]" />
-          </span>
-          <span className="min-w-0">
-            <span className="block text-[0.875rem] font-extrabold leading-snug text-white">
-              Your host dashboard · 3 units
-            </span>
-            <span className="mt-0.5 block text-[0.78125rem] font-semibold leading-snug text-[#A8A39A]">
-              Bookings, staff, guests and payouts in one view
-            </span>
-          </span>
-        </div>
-
-        <div className="mt-3 rounded-2xl bg-[#0C0B0A] p-4">
-          <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#9C978E]">
-            Today
-          </p>
-          {[
-            ['Apartment 4B · Kilimani', 'Check-in 14:00', 'Ready', 'bg-[#1E5B3A] text-[#7CE0A8]'],
-            ['Studio 2 · Westlands', 'Housekeeping', 'In progress', 'bg-[#5B4708] text-[#F0CE6E]'],
-            ['Cottage · Karen', 'Check-out 11:00', 'Done', 'bg-white/10 text-[#DADADA]'],
-          ].map(([unit, task, state, tone]) => (
-            <p key={unit} className="mt-2.5 flex items-center justify-between gap-3">
-              <span className="min-w-0">
-                <span className="block truncate text-[0.8125rem] font-extrabold leading-snug text-white">
-                  {unit}
-                </span>
-                <span className="block text-[0.75rem] font-semibold text-[#9C978E]">{task}</span>
-              </span>
-              <span
-                className={`shrink-0 rounded-md px-2 py-1 text-[0.6875rem] font-extrabold ${tone}`}
-              >
-                {state}
-              </span>
-            </p>
-          ))}
-        </div>
-
-        <div className="bg-gold mt-3 flex items-center gap-3 rounded-2xl p-4">
-          <Coins className="h-5 w-5 shrink-0 text-[#141414]" />
-          {/* #3D2F05 (5.8:1 on the gold) replaces #5B4708, which was 4:1. */}
-          <p className="text-[0.84375rem] font-bold leading-snug text-[#141414]">
-            Guest ordered dinner to 4B
-            <span className="block text-[0.75rem] font-semibold text-[#3D2F05]">
-              Eligible commission tracked in your finances
-            </span>
-          </p>
-        </div>
-      </div>
-    </div>
   );
 }
 
