@@ -173,3 +173,11 @@ $$;
 
 revoke execute on function public.rpc_host_manual_finance_remove(uuid, uuid) from public, anon;
 grant execute on function public.rpc_host_manual_finance_remove(uuid, uuid) to authenticated;
+
+-- Register the host money actions, so audit.log doesn't treat them as unknown and raise unregistered_action.
+-- 'host.manual_finance_recorded' (20261113000200) predates the registry and was never added; it's added here too.
+insert into audit.action_registry (action, module, default_severity, money, description) values
+  ('host.manual_finance_recorded', 'hotels', 'info', true, 'Host recorded a payment, refund, deposit or expense by hand'),
+  ('host.manual_finance_changed', 'hotels', 'info', true, 'Host changed a hand-entered money record'),
+  ('host.manual_finance_removed', 'hotels', 'info', true, 'Host removed a hand-entered money record that never counted')
+on conflict (action) do nothing;
