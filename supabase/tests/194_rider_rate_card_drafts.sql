@@ -3,7 +3,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(11);
+select plan(12);
 
 insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, is_anonymous, created_at, updated_at)
 values
@@ -92,6 +92,12 @@ reset role;
 select is(
   (public.fn_rider_trip_pay((select v::uuid from t where k = 'nbo'), 5.2, 0, false) ->> 'totalKes')::int,
   160 + 30 * 4, 'A 5.2 km trip pays base plus 4 km.');
+
+-- ── the audit console knows both new actions
+select is(
+  (select count(*)::int from audit.action_registry
+    where action in ('rate_card.draft_saved', 'rate_card.draft_discarded')),
+  2, 'Both draft actions are in the audit registry.');
 
 -- ── the wiring gate has nothing to say about these functions
 select is(
