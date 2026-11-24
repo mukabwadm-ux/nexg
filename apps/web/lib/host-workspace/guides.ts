@@ -2,6 +2,7 @@ import 'server-only';
 
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
+import type { Json } from '@nexg/db';
 import { createClient } from '@/lib/supabase/server';
 import { HostWorkspaceError, type HostWorkspaceAccess } from './access';
 
@@ -27,10 +28,64 @@ const articleDetails = z.object({
   y: coordinate,
   markerHeight: coordinate,
 });
+/*
+ * The 3D house (owner, 24 Nov 2026), drawn in the House Builder on the phone: rooms with real sizes in metres, their
+ * doors, windows, furniture and amenity pins. Only what would break the builder or bloat the guide is checked here;
+ * the builder repairs smaller details itself when it opens a house, and keeps fields it adds over time, so unknown
+ * fields pass through. The app keeps the same limits (NEXG STAY src/house/model.ts, HOUSE_LIMITS).
+ */
+export const maxHouseCharacters = 200_000;
+const houseText = (max = 120) => z.string().max(max);
+const metres = z.number().finite();
+const houseOpening = z
+  .object({ id: houseText(), wall: metres, at: metres, width: metres })
+  .passthrough();
+const houseRoom = z
+  .object({
+    id: houseText(),
+    name: houseText(),
+    x: metres,
+    y: metres,
+    w: z.number().finite().positive().max(50),
+    d: z.number().finite().positive().max(50),
+    h: metres,
+    doors: z.array(houseOpening).max(24),
+    windows: z.array(houseOpening).max(24),
+    items: z
+      .array(z.object({ id: houseText(), preset: houseText(), x: metres, y: metres }).passthrough())
+      .max(120),
+    pins: z
+      .array(
+        z
+          .object({
+            cat: houseText(),
+            sub: houseText(),
+            x: metres,
+            y: metres,
+            note: houseText(1000).optional(),
+          })
+          .passthrough(),
+      )
+      .max(60),
+  })
+  .passthrough();
+export const houseFile = z
+  .object({
+    version: z.literal(1),
+    name: houseText(),
+    rooms: z.array(houseRoom).max(40),
+  })
+  .passthrough()
+  .refine((house) => JSON.stringify(house).length <= maxHouseCharacters, {
+    message: 'This 3D house is too large to save.',
+  });
+
 export const guideDocument = z.object({
   articles: z.array(articleDetails.extend({ id: uuid })).max(40),
   planId: uuid.nullish(),
   modelId: uuid.nullish(),
+  /* A saved house that no longer passes the checks reads as none, so the instructions still load. */
+  house: houseFile.nullish().catch(null),
 });
 export const publishedGuide = z.object({
   unitName: z.string(),
@@ -83,7 +138,9 @@ export async function runGuideCommand(access: HostWorkspaceAccess, command: Guid
   let document: z.infer<typeof guideDocument> | null = null;
   let action = command.type;
   let restoreId: string | null = null;
-  if (articleEdit || action === 'remove-guide-file') {
+  const houseEdit = action === 'save-house';
+  let houseSaved = false;
+  if (articleEdit || houseEdit || action === 'remove-guide-file') {
     const { data, error } = await db
       .from('host_unit_guide')
       .select('document,revision')
@@ -93,7 +150,25 @@ export async function runGuideCommand(access: HostWorkspaceAccess, command: Guid
     if ((data?.revision ?? 0) !== revision)
       throw new HostWorkspaceError(409, 'The guide has changed. Reload before saving.');
     document = guideDocument.parse(data?.document ?? { articles: [] });
-    if (action === 'remove-guide-file') {
+    if (houseEdit) {
+      // The house replaces the draft's house whole; null takes it out of the guide.
+      const { house } = z.object({ house: z.unknown() }).parse(command.record);
+      if (house === null) document.house = null;
+      else {
+        const result = houseFile.safeParse(house);
+        if (!result.success)
+          throw new HostWorkspaceError(
+            400,
+            result.error.issues.some(
+              (issue) => issue.message === 'This 3D house is too large to save.',
+            )
+              ? 'This 3D house is too large to save. Remove some furniture or rooms.'
+              : 'Check the 3D house: a room, door, window, item or amenity is not valid.',
+          );
+        document.house = result.data;
+        houseSaved = true;
+      }
+    } else if (action === 'remove-guide-file') {
       const { kind } = z.object({ kind: z.enum(['plan', 'model']) }).parse(command.record);
       if (kind === 'plan') document.planId = null;
       else document.modelId = null;
@@ -117,6 +192,8 @@ export async function runGuideCommand(access: HostWorkspaceAccess, command: Guid
     }
     action = 'draft';
     guideDocument.parse(document);
+    // A guide without a house leaves the key out, as guides saved before the 3D house did.
+    if (!document.house) delete document.house;
   } else if (action === 'restore') {
     restoreId = z.object({ versionId: uuid }).parse(command.record).versionId;
   }
@@ -128,13 +205,17 @@ export async function runGuideCommand(access: HostWorkspaceAccess, command: Guid
     p_unit_id: unitId,
     p_revision: revision,
     p_action: action,
-    p_document: document,
+    // The house passes unknown builder fields through, which zod types as `unknown`; it is plain JSON either way.
+    p_document: document as Json,
     p_restore_id: (restoreId ?? null) as unknown as string,
   });
   requireGuideWrite(error);
   return {
-    message:
-      action === 'draft'
+    message: houseEdit
+      ? houseSaved
+        ? '3D house saved to the guide draft.'
+        : '3D house removed from the guide draft.'
+      : action === 'draft'
         ? 'Guide draft saved.'
         : action === 'unpublish'
           ? 'Guest guide unpublished.'
