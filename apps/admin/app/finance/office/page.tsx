@@ -3,6 +3,7 @@ import {
   BarChart3,
   ClipboardCheck,
   FileText,
+  Folder,
   FolderOpen,
   PiggyBank,
   Plus,
@@ -12,6 +13,7 @@ import {
 import type { Metadata } from 'next';
 
 import { ShareDonut, TrendArea } from '@/components/charts';
+import { QuickFolders, type FolderRow } from '@/components/company/files';
 import {
   AddExpense,
   BudgetsEditor,
@@ -54,13 +56,14 @@ import {
   periodQuery,
   todayInNairobi,
 } from '@/lib/portal';
+import { companyAccess } from '@/lib/company';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { title: 'Office Finance' };
 export const dynamic = 'force-dynamic';
 
-type Tab = 'expenses' | 'approvals' | 'budgets' | 'reports';
+type Tab = 'expenses' | 'approvals' | 'budgets' | 'reports' | 'files';
 
 const EXPENSE_COLUMNS =
   '*, submitter:staff_user!fin_office_expense_submitted_by_fkey(display_name, email), decider:staff_user!fin_office_expense_decided_by_fkey(display_name), vendor:company_vendor(name), location:company_location(name)';
@@ -79,7 +82,7 @@ export default async function OfficeFinancePage({
   const staff = await requireStaff();
   const mod = requireModule(staff, 'finance');
   const canWrite = staff.isSuperAdmin || mod.level === 'full';
-  const tab: Tab = (['expenses', 'approvals', 'budgets', 'reports'] as const).includes(
+  const tab: Tab = (['expenses', 'approvals', 'budgets', 'reports', 'files'] as const).includes(
     searchParams?.tab as Tab,
   )
     ? (searchParams!.tab as Tab)
@@ -97,7 +100,13 @@ export default async function OfficeFinancePage({
   const earliest = [trendMonths[0]!, before.from, reportMonths[0]!, budgetMonth].sort()[0]!;
   const supabase = createClient();
 
-  const [expensesRes, budgetsRes, vendorsRes, locationsRes] = await Promise.all([
+  /* Files tab: Company folders marked office_finance, read through Company's
+     own rules, so it needs Company access as well. */
+  const companyMod = staff.modules.find((m) => m.key === 'company');
+  const companyCan = companyAccess(companyMod?.level, staff.isSuperAdmin);
+  const seesCompany = staff.isSuperAdmin || !!companyMod;
+
+  const [expensesRes, budgetsRes, vendorsRes, locationsRes, foldersRes] = await Promise.all([
     supabase
       .from('fin_office_expense')
       .select(EXPENSE_COLUMNS)
@@ -111,13 +120,39 @@ export default async function OfficeFinancePage({
       .gte('month', earliest),
     supabase.from('company_vendor').select('id, name').eq('status', 'active').order('name'),
     supabase.from('company_location').select('id, name').eq('active', true).order('name'),
+    tab === 'files' && seesCompany
+      ? supabase.from('company_folder_v').select('*').order('name')
+      : Promise.resolve({ data: [], error: null }),
   ]);
+
+  const allFolders = ((foldersRes.data ?? []) as Partial<FolderRow & { area: string | null }>[])
+    .filter((f) => f.id)
+    .map((f) => ({
+      id: f.id!,
+      name: f.name ?? '',
+      color: f.color ?? 'gold',
+      last_change: f.last_change ?? null,
+      file_count: Number(f.file_count ?? 0),
+      bytes: Number(f.bytes ?? 0),
+      parent_id: f.parent_id ?? null,
+      sort: Number(f.sort ?? 1000),
+      sub_count: Number(f.sub_count ?? 0),
+      all_file_count: Number(f.all_file_count ?? f.file_count ?? 0),
+      all_bytes: Number(f.all_bytes ?? f.bytes ?? 0),
+      area: f.area ?? null,
+    }));
+  const financeTops = allFolders
+    .filter((f) => !f.parent_id && f.area === 'office_finance')
+    .sort((a, b) => a.sort - b.sort || a.name.localeCompare(b.name));
+  const financeFolders: FolderRow[] = allFolders.filter((f) =>
+    financeTops.some((t) => t.id === f.id || t.id === f.parent_id),
+  );
 
   const all = (expensesRes.data ?? []) as unknown as ExpenseRow[];
   const budgets = (budgetsRes.data ?? []) as BudgetRow[];
   const vendors = (vendorsRes.data ?? []) as Choice[];
   const locations = (locationsRes.data ?? []) as Choice[];
-  const failed = expensesRes.error || budgetsRes.error;
+  const failed = expensesRes.error || budgetsRes.error || foldersRes.error;
 
   const inPeriod = all.filter((e) => e.spent_on >= period.from && e.spent_on <= period.to);
   const spent = spendBetween(all, period.from, period.to);
@@ -209,6 +244,7 @@ export default async function OfficeFinancePage({
             },
             { key: 'budgets', label: 'Budgets', icon: PiggyBank, href: href('budgets') },
             { key: 'reports', label: 'Reports', icon: FileText, href: href('reports') },
+            { key: 'files', label: 'Files', icon: Folder, href: href('files') },
           ]}
         />
 
@@ -398,6 +434,31 @@ export default async function OfficeFinancePage({
             <OfficeReport months={reportMonths} matrix={matrix} budgets={monthBudgets} />
           </Sheet>
         )}
+
+        {tab === 'files' &&
+          (!seesCompany ? (
+            <Sheet>
+              <p className="text-muted text-sm">
+                These folders live in Company files. Ask an admin for Company access to open them.
+              </p>
+            </Sheet>
+          ) : financeTops.length === 0 ? (
+            <Sheet>
+              <p className="text-muted text-sm">No Office Finance folders yet.</p>
+            </Sheet>
+          ) : (
+            financeTops.map((f) => (
+              <Sheet key={f.id}>
+                <QuickFolders
+                  folders={financeFolders}
+                  canWrite={companyCan.canWrite}
+                  period={pq}
+                  parent={f}
+                  title={f.name}
+                />
+              </Sheet>
+            ))
+          ))}
       </main>
     </ConsoleShell>
   );

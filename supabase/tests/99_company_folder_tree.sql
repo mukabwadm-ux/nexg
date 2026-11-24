@@ -37,7 +37,7 @@ join public.role r on r.key = g.role_key;
 
 select is(
   (select array_agg(name order by sort, name) from public.company_folder
-    where parent_id is null and sort < 1000),
+    where parent_id is null and sort < 1000 and area is null),
   array['Corporate and Legal', 'Human Resource', 'Finance and Accounting', 'Merchants and Partners',
         'NexG Stays and Hosts', 'Operations and Logistics', 'Sales and Management',
         'Technology and Product', 'Customer Support and Compliance', 'Management and Strategy',
@@ -53,7 +53,7 @@ select is(
 
 select is(
   (select count(*)::int from public.company_folder s
-     join public.company_folder p on p.id = s.parent_id and p.sort < 1000),
+     join public.company_folder p on p.id = s.parent_id and p.sort < 1000 and p.area is null),
   47,
   'All 47 folders inside the twelve are there');
 
@@ -147,9 +147,9 @@ select lives_ok(
   'A new top-level folder still works the old way');
 
 select is(
-  (select parent_id is null and sort = 130 from public.company_folder where id = (select v::uuid from t where k = 'top')),
+  (select parent_id is null and sort = (select max(sort) from public.company_folder where parent_id is null and sort < 1000 and id <> (select v::uuid from t where k = 'top')) + 10 from public.company_folder where id = (select v::uuid from t where k = 'top')),
   true,
-  'and goes after the twelve');
+  'and goes after the top-level folders');
 
 -- ------------------------------------------------------- reading and access
 

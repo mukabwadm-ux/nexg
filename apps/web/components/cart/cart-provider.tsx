@@ -261,6 +261,11 @@ export function useCart(): CartApi {
   return ctx;
 }
 
+/** The cart where there is one, or null on a page outside <CartProvider> (Discovery). */
+export function useOptionalCart(): CartApi | null {
+  return React.useContext(CartContext);
+}
+
 /** "KES 1,450", grouped by hand so server and browser agree. */
 export function kes(shillings: number): string {
   return 'KES ' + String(Math.round(shillings)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
