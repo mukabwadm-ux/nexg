@@ -16,6 +16,7 @@ const LINKS = [
   { href: '/account?tab=bookings', label: 'Bookings' },
   { href: '/account?tab=stays', label: 'Stays' },
   { href: '/account?tab=receipts', label: 'Receipts' },
+  { href: '/account?tab=notifications', label: 'Notifications' },
 ];
 
 function initials(meta: Record<string, unknown>, email: string | undefined): string {

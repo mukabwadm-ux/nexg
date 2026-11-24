@@ -1,9 +1,9 @@
 import { DeliverToChip } from '@nexg/location';
 
-import { NotificationBell } from './notifications/bell';
 import { Menu } from 'lucide-react';
 import Link from 'next/link';
 
+import { HeaderCart } from '@/components/cart/header-cart';
 import { PreferencesPicker } from '@/components/preferences/preferences-picker';
 import { getTranslations } from '@/lib/i18n';
 
@@ -60,7 +60,7 @@ export async function SiteHeader({ action, signIn, account: showAccount = true }
               currencyNote: t('prefs.currencyNote'),
             }}
           />
-          <NotificationBell tone="dark" />
+          <HeaderCart />
           {showAccount && <AccountButton href={account.href} label={account.label} />}
 
           <ThemeToggle className="focus-visible:ring-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 sm:h-11 sm:w-11" />
