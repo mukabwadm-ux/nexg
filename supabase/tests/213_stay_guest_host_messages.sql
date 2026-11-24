@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(25);
+select plan(28);
 
 insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, created_at, updated_at)
 values
@@ -138,6 +138,9 @@ select is((public.rpc_stay_chat_host_threads('c2110000-0000-4000-8000-0000000000
 select is(public.rpc_stay_chat_host_send(current_setting('t.thread')::uuid, 'Yes, bay 4.', 'h-1') ->> 'repeat',
   'false', 'The owner replies.');
 select throws_ok(
+  $$select public.rpc_host_message_reply(current_setting('t.thread')::uuid, 'Around the rules', 'h-x')$$,
+  '42501', null, 'The owner cannot post into a stay chat through the host support reply.');
+select throws_ok(
   $$select public.rpc_stay_chat_host_open('c2110000-0000-4000-8000-0000000000d4')$$,
   '22023', null, 'A stay with no NexG guest has no chat.');
 select is((select count(*)::int from public.host_conversation_v where id = current_setting('t.thread')::uuid),
@@ -152,6 +155,12 @@ select is((public.rpc_stay_chat_guest_threads() -> 'threads' -> 0 ->> 'unread'):
   'The guest has one unread reply.');
 select is((public.rpc_stay_chat_guest_threads() -> 'threads' -> 0 ->> 'host_name'), '[Host 211]',
   'Signed with the host''s name.');
+select throws_ok(
+  $$select public.rpc_host_message_reply(current_setting('t.thread')::uuid, 'Around the rules', 'g-x')$$,
+  '42501', null, 'Nor can the guest.');
+select throws_ok(
+  $$select public.rpc_host_message_read(current_setting('t.thread')::uuid)$$,
+  '42501', null, 'The host support read refuses a stay chat too.');
 select lives_ok($$select public.rpc_stay_chat_guest_read(current_setting('t.thread')::uuid)$$, 'The guest reads it.');
 select is((public.rpc_stay_chat_guest_threads() -> 'threads' -> 0 ->> 'unread')::int, 0, 'Nothing is unread now.');
 
