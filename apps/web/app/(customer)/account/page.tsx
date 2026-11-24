@@ -11,6 +11,7 @@ import {
   type MyApplication,
   type MySavedJob,
 } from '@/components/careers/my-applications';
+import { NotificationList } from '@/components/notifications/bell';
 import { ReceiptList } from '@/components/receipts/receipt-list';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
@@ -32,6 +33,7 @@ const TABS = [
   { key: 'stays', label: 'Stays' },
   { key: 'applications', label: 'Job applications' },
   { key: 'saved', label: 'Saved jobs' },
+  { key: 'notifications', label: 'Notifications' },
 ] as const;
 type Tab = (typeof TABS)[number]['key'];
 
@@ -136,6 +138,7 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
 
         <section className="mt-6">
           {tab === 'home' && <AccountHome />}
+          {tab === 'notifications' && <NotificationList />}
           {tab === 'receipts' && (
             <ReceiptList
               receipts={receipts.error ? null : toReceipts(receipts.data)}

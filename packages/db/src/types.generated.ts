@@ -9140,6 +9140,7 @@ export type Database = {
       };
       company_folder: {
         Row: {
+          area: string | null;
           color: string;
           created_at: string;
           created_by: string | null;
@@ -9151,6 +9152,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          area?: string | null;
           color?: string;
           created_at?: string;
           created_by?: string | null;
@@ -9161,6 +9163,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          area?: string | null;
           color?: string;
           created_at?: string;
           created_by?: string | null;
@@ -46267,6 +46270,7 @@ export type Database = {
           all_bytes: number | null;
           all_file_count: number | null;
           all_last_change: string | null;
+          area: string | null;
           bytes: number | null;
           color: string | null;
           created_at: string | null;
@@ -71955,6 +71959,7 @@ export type Database = {
           sent_at: string | null;
           source: string;
           status: Database['public']['Enums']['stay_request_status'];
+          suggested_place: string | null;
           ticket_id: string | null;
           updated_at: string;
         };

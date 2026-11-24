@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { CareersComingSoon } from '@/components/careers/careers-coming-soon';
 import { CareersNav } from '@/components/careers/careers-nav';
 import { CategoryTiles } from '@/components/careers/category-tiles';
 import { EmployerCard, TrainingBanner, WhyCareers } from '@/components/careers/employer-panels';
@@ -13,12 +14,18 @@ import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { NO_FILTERS, boardCities, facetCounts, filterJobs } from '@/lib/careers/board';
 import { loadBoard } from '@/lib/careers/load';
+import { CAREERS_BOARD_OPEN } from '@/lib/careers/open';
 
-export const metadata: Metadata = {
-  title: 'Careers',
-  description:
-    'Find jobs, gig work and internships with hotels, restaurants, property managers and other businesses on NexG.',
-};
+export const metadata: Metadata = CAREERS_BOARD_OPEN
+  ? {
+      title: 'Careers',
+      description:
+        'Find jobs, gig work and internships with hotels, restaurants, property managers and other businesses on NexG.',
+    }
+  : {
+      title: 'Careers',
+      description: 'Careers at NexG are coming soon. Job openings will be posted here.',
+    };
 
 /*
  * The same for every visitor, so cached: five minutes at most, and redrawn at
@@ -30,6 +37,8 @@ export const revalidate = 300;
 const FEATURED = 5;
 
 export default async function CareersPage() {
+  if (!CAREERS_BOARD_OPEN) return <CareersComingSoon />;
+
   const { jobs, cities } = await loadBoard();
   const latest = filterJobs(jobs, NO_FILTERS);
   const facets = facetCounts(jobs, NO_FILTERS);

@@ -1,23 +1,25 @@
 'use client';
 
-import { Bell, Check, Loader2 } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import * as React from 'react';
 
 import { createClient } from '@/lib/supabase/client';
 
 /**
- * The bell.
+ * A customer's notifications, as a list on the account page
+ * (/account?tab=notifications).
  *
- * Shown only to somebody signed in, because there is nothing to
- * show otherwise — a bell on an anonymous visit is a promise of
- * an empty drawer.
+ * This used to be a bell in the site header. The owner swapped
+ * the bell for the cart (23 Nov 2026), so the same list now
+ * lives in the account, reached from the account menu.
  *
  * It reads `user_notification_v`, which is scoped to the caller
  * by RLS, and subscribes to the same rows over Realtime so a
- * delivery moving stage lights it up without a refresh. The
- * socket authenticates first: subscribing before the session is
+ * delivery moving stage shows up without a refresh. The socket
+ * authenticates first: subscribing before the session is
  * attached joins as `anon` and silently receives nothing, which
- * looks exactly like a quiet account.
+ * looks exactly like a quiet account. Opening the list marks
+ * everything in it as read, as opening the bell did.
  */
 
 interface Row {
@@ -38,38 +40,41 @@ const TONE: Record<Row['tone'], string> = {
   urgent: 'bg-danger',
 };
 
-export function NotificationBell({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
-  const [signedIn, setSignedIn] = React.useState<boolean | null>(null);
-  const [rows, setRows] = React.useState<Row[]>([]);
-  const [open, setOpen] = React.useState(false);
+const COLUMNS = 'id, kind, title, body, tone, href, created_at, unread';
+
+export function NotificationList() {
+  const [rows, setRows] = React.useState<Row[] | null>(null);
   const [busy, setBusy] = React.useState(false);
-  const wrap = React.useRef<HTMLDivElement>(null);
 
-  const unread = rows.filter((r) => r.unread).length;
-
-  /* ───────────────────────────────── load, then stay live */
+  /* ───────────────────────────────── load, mark read, then stay live */
   React.useEffect(() => {
     const supabase = createClient();
     let channel: ReturnType<typeof supabase.channel> | null = null;
     let cancelled = false;
 
+    const load = async () => {
+      const { data } = await supabase.from('user_notification_v').select(COLUMNS).limit(30);
+      return (data as Row[] | null) ?? [];
+    };
+
     void (async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-
-      if (cancelled) return;
-      if (!session) {
-        setSignedIn(false);
+      if (cancelled || !session) {
+        if (!cancelled) setRows([]);
         return;
       }
-      setSignedIn(true);
 
-      const { data } = await supabase
-        .from('user_notification_v')
-        .select('id, kind, title, body, tone, href, created_at, unread')
-        .limit(30);
-      if (!cancelled) setRows((data as Row[] | null) ?? []);
+      const first = await load();
+      if (cancelled) return;
+      setRows(first);
+      if (first.some((r) => r.unread)) {
+        setBusy(true);
+        await supabase.rpc('rpc_notifications_read', {});
+        if (cancelled) return;
+        setBusy(false);
+      }
 
       /* The socket has to carry the session or it joins as anon
          and receives nothing — the same trap the live-ops map
@@ -91,11 +96,9 @@ export function NotificationBell({ tone = 'light' }: { tone?: 'light' | 'dark' }
                view adds `unread` and the ordering, and a client
                that recomputes them will eventually disagree
                with the server about what is new. */
-            void supabase
-              .from('user_notification_v')
-              .select('id, kind, title, body, tone, href, created_at, unread')
-              .limit(30)
-              .then(({ data }) => setRows((data as Row[] | null) ?? []));
+            void load().then((next) => {
+              if (!cancelled) setRows(next);
+            });
           },
         )
         .subscribe();
@@ -107,127 +110,65 @@ export function NotificationBell({ tone = 'light' }: { tone?: 'light' | 'dark' }
     };
   }, []);
 
-  React.useEffect(() => {
-    if (!open) return;
-    function onDown(e: MouseEvent) {
-      if (wrap.current && !wrap.current.contains(e.target as Node)) setOpen(false);
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false);
-    }
-    document.addEventListener('mousedown', onDown);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDown);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
-
-  async function markRead(id?: string) {
-    setBusy(true);
-    const supabase = createClient();
-    await supabase.rpc('rpc_notifications_read', id ? { p_id: id } : {});
-    const { data } = await supabase
-      .from('user_notification_v')
-      .select('id, kind, title, body, tone, href, created_at, unread')
-      .limit(30);
-    setRows((data as Row[] | null) ?? []);
-    setBusy(false);
-  }
-
-  if (signedIn !== true) return null;
-
   return (
-    <div ref={wrap} className="relative">
-      <button
-        type="button"
-        onClick={() => {
-          setOpen(!open);
-          if (!open && unread > 0) void markRead();
-        }}
-        aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications, nothing new'}
-        aria-expanded={open}
-        className={`relative flex h-10 w-10 items-center justify-center rounded-full border transition-colors sm:h-11 sm:w-11 ${
-          tone === 'dark'
-            ? 'text-gold border-white/15 bg-white/[0.04] hover:bg-white/[0.08]'
-            : 'border-border-strong bg-surface hover:bg-bg'
-        }`}
-      >
-        <Bell className="h-4 w-4" aria-hidden="true" />
-        {unread > 0 ? (
-          <span
-            className="bg-danger ring-surface absolute -right-1 -top-1 flex h-[1.1rem] min-w-[1.1rem] items-center justify-center rounded-full px-1 text-[0.625rem] font-extrabold text-white ring-2"
-            aria-hidden="true"
-          >
-            {unread > 9 ? '9+' : unread}
-          </span>
+    <div className="border-border bg-surface overflow-hidden rounded-xl border">
+      <div className="border-border flex items-center justify-between gap-2 border-b px-4 py-3">
+        <h2 className="text-sm font-extrabold tracking-tight">Notifications</h2>
+        {busy || rows === null ? (
+          <Loader2 className="text-muted-light h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+        ) : rows.some((r) => r.unread) ? (
+          <span className="text-muted-light text-[0.6875rem] font-semibold">Marked as read</span>
         ) : null}
-      </button>
+      </div>
 
-      {open ? (
-        <div
-          role="dialog"
-          aria-label="Notifications"
-          className="border-border bg-surface absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border shadow-2xl"
-        >
-          <div className="border-border flex items-center justify-between gap-2 border-b px-4 py-3">
-            <h2 className="text-sm font-extrabold tracking-tight">Notifications</h2>
-            {busy ? (
-              <Loader2 className="text-muted-light h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-            ) : rows.length > 0 ? (
-              <span className="text-muted-light text-[0.6875rem] font-semibold">
-                Marked as read
-              </span>
-            ) : null}
-          </div>
-
-          {rows.length === 0 ? (
-            <p className="text-muted-light px-4 py-10 text-center text-[0.8125rem] font-semibold">
-              Nothing yet. When an order moves, a refund lands or something changes on your account,
-              it shows up here.
-            </p>
-          ) : (
-            <ul className="max-h-[26rem] overflow-y-auto">
-              {rows.map((r) => {
-                const inner = (
-                  <div className="flex gap-3 px-4 py-3">
-                    <span
-                      className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${TONE[r.tone]}`}
-                      aria-hidden="true"
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-[0.8125rem] font-extrabold">{r.title}</span>
-                      {r.body ? (
-                        <span className="text-muted mt-0.5 block text-[0.75rem] font-semibold">
-                          {r.body}
-                        </span>
-                      ) : null}
-                      <span className="text-muted-light mt-0.5 block text-[0.625rem] font-semibold">
-                        {when(r.created_at)}
-                      </span>
+      {rows === null ? null : rows.length === 0 ? (
+        <p className="text-muted-light px-4 py-10 text-center text-[0.8125rem] font-semibold">
+          Nothing yet. When an order moves, a refund lands or something changes on your account, it
+          shows up here.
+        </p>
+      ) : (
+        <ul>
+          {rows.map((r) => {
+            const inner = (
+              <div className="flex gap-3 px-4 py-3">
+                <span
+                  className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${r.unread ? TONE[r.tone] : 'bg-border'}`}
+                  aria-hidden="true"
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[0.8125rem] font-extrabold">
+                    {r.title}
+                    {r.unread ? <span className="sr-only"> (new)</span> : null}
+                  </span>
+                  {r.body ? (
+                    <span className="text-muted mt-0.5 block text-[0.75rem] font-semibold">
+                      {r.body}
                     </span>
-                  </div>
-                );
-                return (
-                  <li key={r.id} className="border-border border-b last:border-0">
-                    {r.href ? (
-                      <a href={r.href} className="hover:bg-bg block transition-colors">
-                        {inner}
-                      </a>
-                    ) : (
-                      inner
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+                  ) : null}
+                  <span className="text-muted-light mt-0.5 block text-[0.625rem] font-semibold">
+                    {when(r.created_at)}
+                  </span>
+                </span>
+              </div>
+            );
+            return (
+              <li key={r.id} className="border-border border-b last:border-0">
+                {r.href ? (
+                  <a href={r.href} className="hover:bg-bg block transition-colors">
+                    {inner}
+                  </a>
+                ) : (
+                  inner
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
-          <div className="border-border border-t px-4 py-2.5">
-            <PushToggle />
-          </div>
-        </div>
-      ) : null}
+      <div className="border-border border-t px-4 py-2.5">
+        <PushToggle />
+      </div>
     </div>
   );
 }
@@ -235,7 +176,7 @@ export function NotificationBell({ tone = 'light' }: { tone?: 'light' | 'dark' }
 /**
  * Turning on notifications for this device.
  *
- * Inside the bell, not on page load, and only after somebody
+ * Inside the notifications list, not on page load, and only after somebody
  * has opened it — which means they have already shown an
  * interest in being told things. A permission prompt on arrival
  * is the fastest way to a permanent Block, and the browser does
