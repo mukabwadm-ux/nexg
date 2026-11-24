@@ -1,12 +1,13 @@
 'use client';
 
-import { Input, PhoneInput, Select, useToast } from '@nexg/ui';
+import { Button, Input, PhoneInput, Select, useToast } from '@nexg/ui';
 import {
   ArrowRight,
   BarChart3,
   Building,
   Building2,
   Check,
+  CheckCircle2,
   ChevronRight,
   FileText,
   Headset,
@@ -46,10 +47,11 @@ import { HostWelcome, useHostWelcome } from './host-welcome';
  * with the three steps. One client component because the property-type
  * cards and the form's Property Type share one value.
  *
- * The card is the same application as the long form further down: the email
- * is verified with a code (it becomes the host's login), then `applyAsHost`
- * runs `rpc_host_apply`, which creates the host, its first unit and the desk
- * ticket staff work from.
+ * The card is the same application as the long form further down, with the
+ * same steps: "Verify email" sends a code to the login email, the code is
+ * confirmed in place, and only a verified email can submit. Then
+ * `applyAsHost` runs `rpc_host_apply`, which creates the host, its first unit
+ * and the desk ticket staff work from, and the welcome email goes out.
  */
 
 const PROPERTY_TYPES: readonly {
@@ -103,7 +105,7 @@ const STEPS: readonly { icon: LucideIcon; label: string }[] = [
 ];
 
 const GOLD_BUTTON =
-  'inline-flex items-center justify-center gap-2 rounded-lg bg-[linear-gradient(180deg,#F2D27A_0%,#E0B95A_100%)] font-bold text-black shadow-[0_8px_20px_rgba(224,185,90,0.25)] transition-[filter,transform] hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-gold active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transform-none motion-reduce:transition-none';
+  'inline-flex items-center justify-center gap-2 rounded-lg bg-gold font-bold text-black shadow-[0_8px_20px_rgb(var(--gold-rgb)/0.25)] transition-[filter,transform] hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-gold active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transform-none motion-reduce:transition-none';
 
 export function ListYourProperty() {
   const [type, setType] = React.useState<HostPropertyType | ''>('');
@@ -134,14 +136,14 @@ export function ListYourProperty() {
           className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(10,9,8,0.94)_0%,rgba(10,9,8,0.82)_40%,rgba(10,9,8,0.45)_70%,rgba(10,9,8,0.35)_100%)]"
         />
         <div className="mx-auto max-w-[120rem] px-4 pb-12 pt-14 sm:px-[30px] lg:pb-14 lg:pr-[470px] lg:pt-20 xl:pr-[500px]">
-          <p className="text-[0.8125rem] font-bold uppercase tracking-[0.12em] text-[#E8C46A]">
+          <p className="text-gold text-[0.8125rem] font-bold uppercase tracking-[0.12em]">
             NEXG Stay Partners
           </p>
           <h1
             id="hosts-hero-title"
             className="mt-4 max-w-[40rem] text-[2.5rem] font-extrabold leading-[1.05] tracking-[-0.02em] text-white sm:text-[3.25rem] xl:text-[3.75rem]"
           >
-            List Your Property on <span className="text-[#E8C46A]">NEXG</span>
+            List Your Property on <span className="text-gold">NEXG</span>
           </h1>
           <p className="mt-5 max-w-[34rem] text-[1.0625rem] font-medium leading-[1.6] text-white/85">
             Turn your space into consistent income. Join NexG Stay and get your property in front of
@@ -163,11 +165,7 @@ export function ListYourProperty() {
                   i > 0 ? 'sm:border-l sm:border-white/20' : ''
                 }`}
               >
-                <Icon
-                  className="h-8 w-8 shrink-0 text-[#E8C46A]"
-                  strokeWidth={1.4}
-                  aria-hidden="true"
-                />
+                <Icon className="text-gold h-8 w-8 shrink-0" strokeWidth={1.4} aria-hidden="true" />
                 <span className="text-[0.8125rem] font-medium leading-snug text-white/90">
                   {label}
                 </span>
@@ -178,11 +176,13 @@ export function ListYourProperty() {
       </section>
 
       {/* ───────────────────────────────────────── form card */}
-      {/* In the flow on a phone (under the hero); floated over the hero and
-          the next section from lg up. */}
-      <div className="px-4 py-8 sm:px-[30px] lg:pointer-events-none lg:absolute lg:inset-x-0 lg:top-0 lg:z-10 lg:p-0">
-        <div className="mx-auto max-w-[120rem] lg:flex lg:justify-end lg:px-[30px] lg:pt-12">
-          <div className="lg:pointer-events-auto lg:w-[420px] xl:w-[440px]">
+      {/* In the flow on a phone (under the hero). From lg up it floats over
+          the hero and the next section: the layer spans both, and the card
+          sticks 16px under the 65px header until the next section's bottom
+          reaches it, then scrolls away with that section (owner, 24 Nov 2026). */}
+      <div className="px-4 py-8 sm:px-[30px] lg:pointer-events-none lg:absolute lg:inset-0 lg:z-10 lg:p-0">
+        <div className="mx-auto max-w-[120rem] lg:flex lg:h-full lg:items-start lg:justify-end lg:px-[30px] lg:pb-10 lg:pt-12">
+          <div className="lg:pointer-events-auto lg:sticky lg:top-[81px] lg:w-[420px] xl:w-[440px]">
             <ListPropertyForm type={type} onTypeChange={setType} nameRef={nameRef} />
           </div>
         </div>
@@ -213,14 +213,14 @@ export function ListYourProperty() {
                     onClick={() => setType(t.value)}
                     className={`focus-visible:outline-gold-text group relative flex h-full w-full flex-col rounded-xl border bg-white p-3 text-left transition-[border-color,box-shadow] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
                       selected
-                        ? 'border-[#D4A84B] shadow-[0_0_0_1px_#D4A84B,0_10px_24px_rgba(180,140,40,0.15)]'
+                        ? 'border-gold shadow-[0_0_0_1px_rgb(var(--gold-rgb)),0_10px_24px_rgb(var(--gold-rgb)/0.15)]'
                         : 'border-[#E7E2D6] hover:border-[#CFC6B0]'
                     }`}
                   >
                     {selected ? (
                       <span
                         aria-hidden="true"
-                        className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#C99A3E] text-white"
+                        className="bg-gold absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full text-black"
                       >
                         <Check className="h-3.5 w-3.5" strokeWidth={3} />
                       </span>
@@ -285,10 +285,14 @@ export function ListYourProperty() {
 const errorText = (error: unknown, fallback: string) =>
   error instanceof HostEmailError ? error.message : fallback;
 
-type Stage =
-  | { kind: 'details' }
+/* The same email steps as the long form (HostRegisterCard): verify the login
+   email right here with a code, then submit. */
+type EmailState =
+  | { kind: 'idle' }
+  | { kind: 'sending' }
   | { kind: 'code'; userId: string; email: string }
-  | { kind: 'checking'; userId: string; email: string };
+  | { kind: 'checking'; userId: string; email: string }
+  | { kind: 'verified'; email: string };
 
 function ListPropertyForm({
   type,
@@ -306,108 +310,111 @@ function ListPropertyForm({
   const [location, setLocation] = React.useState('');
   const [band, setBand] = React.useState('');
   const [errors, setErrors] = React.useState<Record<string, string>>({});
-  const [stage, setStage] = React.useState<Stage>({ kind: 'details' });
+  const [emailState, setEmailState] = React.useState<EmailState>({ kind: 'idle' });
   const [code, setCode] = React.useState('');
-  const [codeMessage, setCodeMessage] = React.useState('');
-  const [sentAt, setSentAt] = React.useState(0);
-  const [busy, setBusy] = React.useState(false);
+  const [emailMessage, setEmailMessage] = React.useState('');
+  const [lastEmailAt, setLastEmailAt] = React.useState(0);
+  const [pending, startTransition] = React.useTransition();
   const { done, start: sendWelcome } = useHostWelcome();
   const codeRef = React.useRef<HTMLInputElement>(null);
 
-  React.useEffect(() => {
-    if (stage.kind === 'code') codeRef.current?.focus();
-  }, [stage.kind]);
+  const verified = emailState.kind === 'verified';
+  const emailLocked = emailState.kind !== 'idle';
+  const codeOpen = emailState.kind === 'code' || emailState.kind === 'checking';
 
-  async function apply(loginEmail: string, codeSentAt: number) {
-    const result = await applyAsHost({
-      contact_name: name.trim(),
-      display_name: name.trim(),
-      phone: phone!,
-      listing_link: null,
-      address: location.trim(),
-      units_band: band || '1',
-      property_type: type || null,
-    });
-    if (!result.ok) {
-      toast({ title: 'That did not save', description: result.message });
-      setStage({ kind: 'details' });
+  React.useEffect(() => {
+    if (emailState.kind === 'code') codeRef.current?.focus();
+  }, [emailState.kind]);
+
+  async function sendCode() {
+    setEmailMessage('');
+    if (!EMAIL_PATTERN.test(email.trim())) {
+      setErrors((e) => ({ ...e, email: 'Enter a valid email address.' }));
       return;
     }
-    void sendWelcome(
-      {
-        email: loginEmail,
-        welcome: 'sending',
-        ...(result.ticketReference ? { reference: result.ticketReference } : {}),
-      },
-      codeSentAt,
-    );
+    setErrors(({ email: _ignored, ...rest }) => rest);
+    setEmailState({ kind: 'sending' });
+    try {
+      const clean = email.trim().toLowerCase();
+      const result = await sendHostEmailCode(createClient().auth, clean);
+      if (result.verified) {
+        setEmailState({ kind: 'verified', email: clean });
+        return;
+      }
+      setLastEmailAt(Date.now());
+      setCode('');
+      setEmailState({ kind: 'code', userId: result.userId, email: clean });
+    } catch (error) {
+      setEmailState({ kind: 'idle' });
+      setEmailMessage(errorText(error, 'We could not send a code. Try again.'));
+    }
   }
 
-  async function submitDetails(event: React.FormEvent) {
+  async function checkCode() {
+    if (emailState.kind !== 'code') return;
+    if (!CODE_PATTERN.test(code)) {
+      setEmailMessage('Enter the 6- or 8-digit code from the email.');
+      return;
+    }
+    const { userId, email: clean } = emailState;
+    setEmailState({ kind: 'checking', userId, email: clean });
+    setEmailMessage('');
+    try {
+      await verifyHostEmailCode(createClient().auth, userId, clean, code);
+      setEmailState({ kind: 'verified', email: clean });
+    } catch (error) {
+      setEmailState({ kind: 'code', userId, email: clean });
+      setEmailMessage(errorText(error, 'That code did not work. Send a new one.'));
+    }
+  }
+
+  function changeEmail() {
+    setEmailState({ kind: 'idle' });
+    setCode('');
+    setEmailMessage('');
+  }
+
+  function submit(event: React.FormEvent) {
     event.preventDefault();
     const next: Record<string, string> = {};
     if (!name.trim()) next['name'] = 'Enter your full name.';
-    if (!EMAIL_PATTERN.test(email.trim())) next['email'] = 'Enter a valid email address.';
+    if (!verified) next['email'] = 'Verify your email first. It becomes your login.';
     if (!phone) next['phone'] = 'Enter a valid phone number.';
     if (!type) next['type'] = 'Choose a property type.';
     if (!location.trim()) next['location'] = 'Where is the property?';
     setErrors(next);
-    if (Object.keys(next).length > 0) return;
+    if (Object.keys(next).length > 0 || emailState.kind !== 'verified') return;
+    const loginEmail = emailState.email;
 
-    setBusy(true);
-    try {
-      const clean = email.trim().toLowerCase();
-      const sent = await sendHostEmailCode(createClient().auth, clean);
-      if (sent.verified) {
-        await apply(clean, 0);
+    startTransition(async () => {
+      const result = await applyAsHost({
+        contact_name: name.trim(),
+        display_name: name.trim(),
+        phone: phone!,
+        listing_link: null,
+        address: location.trim(),
+        units_band: band || '1',
+        property_type: type || null,
+      });
+      if (!result.ok) {
+        toast({ title: 'That did not save', description: result.message });
         return;
       }
-      setSentAt(Date.now());
-      setCode('');
-      setCodeMessage('');
-      setStage({ kind: 'code', userId: sent.userId, email: clean });
-    } catch (error) {
-      setErrors({ email: errorText(error, 'We could not send a code. Try again.') });
-    } finally {
-      setBusy(false);
-    }
+      void sendWelcome(
+        {
+          email: loginEmail,
+          welcome: 'sending',
+          ...(result.ticketReference ? { reference: result.ticketReference } : {}),
+        },
+        lastEmailAt,
+      );
+    });
   }
 
-  async function submitCode(event: React.FormEvent) {
-    event.preventDefault();
-    if (stage.kind !== 'code') return;
-    if (!CODE_PATTERN.test(code)) {
-      setCodeMessage('Enter the 6- or 8-digit code from the email.');
-      return;
-    }
-    const { userId, email: clean } = stage;
-    setStage({ kind: 'checking', userId, email: clean });
-    setCodeMessage('');
-    try {
-      await verifyHostEmailCode(createClient().auth, userId, clean, code);
-    } catch (error) {
-      setStage({ kind: 'code', userId, email: clean });
-      setCodeMessage(errorText(error, 'That code did not work. Send a new one.'));
-      return;
-    }
-    await apply(clean, sentAt);
-  }
-
-  async function resend() {
-    if (stage.kind !== 'code') return;
-    setCodeMessage('');
-    try {
-      const sent = await sendHostEmailCode(createClient().auth, stage.email);
-      setSentAt(Date.now());
-      setStage({ kind: 'code', userId: sent.userId, email: stage.email });
-      setCodeMessage('We sent a new code.');
-    } catch (error) {
-      setCodeMessage(errorText(error, 'We could not send a code. Try again in a minute.'));
-    }
-  }
-
+  /* From lg the card is sticky under the header; on a short screen (a 768px
+     laptop) it scrolls inside itself rather than running off the bottom. */
   const card =
-    'scroll-mt-24 rounded-2xl bg-white p-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)] ring-1 ring-black/5 sm:p-7';
+    'scroll-mt-24 rounded-2xl bg-white p-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)] ring-1 ring-black/5 sm:p-7 lg:max-h-[calc(100vh-97px)] lg:overflow-y-auto';
 
   if (done) {
     return (
@@ -417,60 +424,8 @@ function ListPropertyForm({
     );
   }
 
-  if (stage.kind !== 'details') {
-    return (
-      <form id="list" onSubmit={submitCode} className={card} noValidate>
-        <h2 className="text-[1.5rem] font-extrabold leading-tight tracking-[-0.01em] text-[#141414]">
-          Check your email
-        </h2>
-        <p className="mt-2 text-[0.9375rem] font-medium leading-relaxed text-[#4A4436]">
-          We sent a code to <strong className="text-[#141414]">{stage.email}</strong>. Enter it to
-          confirm your email. It becomes your host login.
-        </p>
-        <div className="mt-5">
-          <Input
-            ref={codeRef}
-            id="list_code"
-            label="Code"
-            required
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            placeholder="123456"
-            maxLength={8}
-            value={code}
-            onChange={(event) => setCode(event.target.value.replace(/\D/g, ''))}
-            {...(codeMessage ? { error: codeMessage } : {})}
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={stage.kind === 'checking'}
-          className={`${GOLD_BUTTON} mt-5 h-12 w-full text-[1rem]`}
-        >
-          {stage.kind === 'checking' ? 'Creating your account…' : 'Confirm & create my account'}
-        </button>
-        <div className="mt-4 flex flex-wrap justify-between gap-3 text-[0.8125rem] font-bold text-[#4A4436]">
-          <button
-            type="button"
-            onClick={() => void resend()}
-            className="inline-flex items-center gap-1 underline-offset-4 hover:underline"
-          >
-            <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" /> Send a new code
-          </button>
-          <button
-            type="button"
-            onClick={() => setStage({ kind: 'details' })}
-            className="underline-offset-4 hover:underline"
-          >
-            Change my details
-          </button>
-        </div>
-      </form>
-    );
-  }
-
   return (
-    <form id="list" onSubmit={submitDetails} className={card} noValidate>
+    <form id="list" onSubmit={submit} className={card} noValidate>
       <h2 className="text-[1.625rem] font-extrabold leading-tight tracking-[-0.01em] text-[#141414]">
         List Your Property
       </h2>
@@ -490,17 +445,101 @@ function ListPropertyForm({
           onChange={(event) => setName(event.target.value)}
           {...(errors['name'] ? { error: errors['name'] } : {})}
         />
-        <Input
-          id="list_email"
-          type="email"
-          label="Email Address"
-          required
-          placeholder="you@example.com"
-          autoComplete="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          {...(errors['email'] ? { error: errors['email'] } : {})}
-        />
+
+        <div>
+          <div className="flex items-end gap-2">
+            <div className="min-w-0 flex-1">
+              <Input
+                id="list_email"
+                type="email"
+                label="Email Address"
+                required
+                placeholder="you@example.com"
+                autoComplete="email"
+                value={email}
+                readOnly={emailLocked}
+                onChange={(event) => setEmail(event.target.value)}
+                {...(errors['email'] ? { error: errors['email'] } : {})}
+              />
+            </div>
+            {verified ? (
+              <span className="mb-[3px] inline-flex h-11 shrink-0 items-center gap-1.5 rounded-lg bg-[#E9F5EC] px-3 text-[0.8125rem] font-extrabold text-[#1F7A3A]">
+                <CheckCircle2 className="h-4 w-4" aria-hidden="true" /> Verified
+              </span>
+            ) : emailState.kind === 'idle' || emailState.kind === 'sending' ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="mb-[3px] h-11 shrink-0"
+                disabled={emailState.kind === 'sending'}
+                onClick={() => void sendCode()}
+              >
+                {emailState.kind === 'sending' ? 'Sending…' : 'Verify email'}
+              </Button>
+            ) : null}
+          </div>
+
+          {codeOpen ? (
+            <div className="mt-3 rounded-xl border border-[#ECE6D8] bg-[#FBF9F4] p-4">
+              <p className="text-[0.8125rem] font-semibold text-[#3A352B]">
+                We sent a code to <strong>{emailState.email}</strong>. Enter it to confirm this is
+                your email.
+              </p>
+              <div className="mt-3 flex flex-wrap items-end gap-2">
+                <div className="w-36">
+                  <Input
+                    ref={codeRef}
+                    id="list_email_code"
+                    label="Code"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    placeholder="123456"
+                    maxLength={8}
+                    value={code}
+                    onChange={(event) => setCode(event.target.value.replace(/\D/g, ''))}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault();
+                        void checkCode();
+                      }
+                    }}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  className="mb-[3px] h-11"
+                  disabled={emailState.kind === 'checking'}
+                  onClick={() => void checkCode()}
+                >
+                  {emailState.kind === 'checking' ? 'Checking…' : 'Confirm'}
+                </Button>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
+                <button
+                  type="button"
+                  onClick={() => void sendCode()}
+                  className="inline-flex items-center gap-1 text-[0.8125rem] font-extrabold text-[#5B5548] underline-offset-4 hover:underline"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" /> Send again
+                </button>
+                <button
+                  type="button"
+                  onClick={changeEmail}
+                  className="text-[0.8125rem] font-extrabold text-[#5B5548] underline-offset-4 hover:underline"
+                >
+                  Change email
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          {emailMessage ? (
+            <p role="alert" className="mt-2 text-[0.8125rem] font-semibold text-[#B42318]">
+              {emailMessage}
+            </p>
+          ) : null}
+        </div>
+
         <PhoneInput
           id="list_phone"
           label="Phone Number"
@@ -542,12 +581,15 @@ function ListPropertyForm({
 
       <button
         type="submit"
-        disabled={busy}
+        disabled={pending || !verified}
         className={`${GOLD_BUTTON} mt-6 h-12 w-full text-[1rem]`}
       >
-        {busy ? 'Sending your code…' : 'Submit & Get Started'}
+        {pending ? 'Creating your account…' : 'Submit & Get Started'}
       </button>
       <p className="mt-3 text-[0.75rem] font-medium leading-relaxed text-[#5B5548]">
+        {verified
+          ? 'We will email your login and a link to set your password.'
+          : 'Verify your email above to continue.'}{' '}
         By continuing, you agree to NexG&rsquo;s{' '}
         <Link
           href="/legal#legal-group-partners"

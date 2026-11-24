@@ -132,3 +132,11 @@ function putFile(url: string, file: File, onProgress?: (fraction: number) => voi
 export function errorMessage(error: unknown, fallback: string) {
   return error instanceof WorkspaceConnectionError ? error.message : fallback;
 }
+
+export function sendStayChat<T>(action: Record<string, string>) {
+  return workspaceRequest<T>('/stay-messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(action),
+  });
+}
