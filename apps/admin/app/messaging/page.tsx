@@ -226,12 +226,16 @@ export default async function MessagingPage({
 
       <div className="px-4 pt-5 sm:px-6">
         <PillTabs
-          tabs={TABS.map((t) => ({
-            href: `/messaging?tab=${t.key}`,
-            label: t.label,
-            active: t.key === tab,
-            disabled: !t.built,
-          }))}
+          tabs={[
+            ...TABS.map((t) => ({
+              href: `/messaging?tab=${t.key}`,
+              label: t.label,
+              active: t.key === tab,
+              disabled: !t.built,
+            })),
+            /* Guest and host chats about a stay: their own page, since they are not desk conversations. */
+            { href: '/messaging/stays', label: 'Stay chats', active: false },
+          ]}
         />
       </div>
 
