@@ -11268,6 +11268,53 @@ export type Database = {
           },
         ];
       };
+      customer_note: {
+        Row: {
+          author_id: string | null;
+          body: string;
+          created_at: string;
+          guest_id: string;
+          id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          author_id?: string | null;
+          body: string;
+          created_at?: string;
+          guest_id: string;
+          id?: string;
+        };
+        Update: {
+          author_id?: string | null;
+          body?: string;
+          created_at?: string;
+          guest_id?: string;
+          id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'customer_note_author_id_fkey';
+            columns: ['author_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_note_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_guest_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'customer_note_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'guest';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       customer_notification_pref: {
         Row: {
           choices: NonNullable<Json>;
@@ -62120,6 +62167,16 @@ export type Database = {
       };
       fn_compute_rider_health: { Args: { p_as_of?: string }; Returns: number };
       fn_customer_deletion_blockers: { Args: { p_user_id: string }; Returns: Json };
+      fn_customer_guest_ensure: { Args: { p_id: string }; Returns: string };
+      fn_customer_is_partner: { Args: { p_user_id: string }; Returns: boolean };
+      fn_customer_require_act: { Args: { p_reason: string; p_what: string }; Returns: string };
+      fn_customer_resolve: {
+        Args: { p_id: string };
+        Returns: {
+          guest_id: string;
+          user_id: string;
+        }[];
+      };
       fn_data_request_blockers: { Args: { p_request_id: string }; Returns: Json };
       fn_decrypt_secret: { Args: { p_cipher: string }; Returns: string };
       fn_delivery_band: {
@@ -64950,6 +65007,28 @@ export type Database = {
         Returns: Database['public']['Enums']['connector_connection_state'];
       };
       rpc_coverage_lookup: { Args: { p_lat: number; p_lng: number }; Returns: Json };
+      rpc_customer_list: {
+        Args: {
+          p_kind?: string;
+          p_page?: number;
+          p_q?: string;
+          p_size?: number;
+          p_sort?: string;
+          p_status?: string;
+        };
+        Returns: Json;
+      };
+      rpc_customer_note_add: { Args: { p_body: string; p_id: string }; Returns: Json };
+      rpc_customer_profile: { Args: { p_id: string }; Returns: Json };
+      rpc_customer_set_suspended: {
+        Args: { p_id: string; p_reason: string; p_suspended: boolean };
+        Returns: Json;
+      };
+      rpc_customer_set_vip: {
+        Args: { p_id: string; p_reason: string; p_vip: boolean };
+        Returns: Json;
+      };
+      rpc_customer_verification_resend: { Args: { p_id: string; p_reason: string }; Returns: Json };
       rpc_data_request_anonymise: {
         Args: { p_request_id: string };
         Returns: {
