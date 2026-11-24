@@ -56,6 +56,79 @@ export function sendSupport<T>(action: Record<string, string>) {
   });
 }
 
+interface UploadTicket {
+  path: string;
+  signedUrl: string | null;
+  token: string | null;
+}
+
+function postJson(body: Record<string, unknown>): RequestInit {
+  return {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  };
+}
+
+/**
+ * Sends one file straight to storage, then asks the workspace to record it.
+ *
+ * Request bodies through the API stop at about 4.5 MB, so the workspace signs
+ * an upload for one path (upload-url), the browser sends the file there, and
+ * the workspace checks what arrived before saving it (complete).
+ */
+export async function uploadFile<T>(
+  endpoint: string,
+  details: Record<string, unknown>,
+  file: File,
+  onProgress?: (fraction: number) => void,
+): Promise<T> {
+  const fields = { ...details, mime: file.type, size: file.size };
+  const ticket = await workspaceRequest<UploadTicket>(
+    endpoint,
+    postJson({ action: 'upload-url', ...fields }),
+  );
+  if (ticket.signedUrl) await putFile(ticket.signedUrl, file, onProgress);
+  onProgress?.(1);
+  return workspaceRequest<T>(
+    endpoint,
+    postJson({ action: 'complete', ...fields, path: ticket.path }),
+  );
+}
+
+function putFile(url: string, file: File, onProgress?: (fraction: number) => void) {
+  return new Promise<void>((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open('PUT', url);
+    request.setRequestHeader('Content-Type', file.type);
+    request.setRequestHeader('x-upsert', 'false');
+    request.upload.onprogress = (event) => {
+      if (event.lengthComputable && event.total) onProgress?.(event.loaded / event.total);
+    };
+    request.onload = () => {
+      if (request.status >= 200 && request.status < 300) return resolve();
+      /* Sending the same file twice is fine: the workspace checks what is there. */
+      if (request.status === 409 || /already exists|duplicate/i.test(request.responseText))
+        return resolve();
+      reject(
+        new WorkspaceConnectionError(
+          request.status,
+          request.status === 413 || /size|too large/i.test(request.responseText)
+            ? 'This file is over 10 MB. Choose a smaller file.'
+            : /mime|type/i.test(request.responseText)
+              ? 'This type of file is not accepted here.'
+              : 'The file could not be uploaded. Try again.',
+        ),
+      );
+    };
+    request.onerror = () =>
+      reject(
+        new WorkspaceConnectionError(0, 'The upload stopped. Check your connection and try again.'),
+      );
+    request.send(file);
+  });
+}
+
 export function errorMessage(error: unknown, fallback: string) {
   return error instanceof WorkspaceConnectionError ? error.message : fallback;
 }

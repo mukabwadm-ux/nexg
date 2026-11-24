@@ -40390,6 +40390,202 @@ export type Database = {
           },
         ];
       };
+      rider_rating: {
+        Row: {
+          comment: string | null;
+          created_at: string;
+          guest_id: string | null;
+          id: string;
+          order_id: string;
+          rider_id: string;
+          stars: number;
+          tags: string[];
+        };
+        ComputedFields: never;
+        Insert: {
+          comment?: string | null;
+          created_at?: string;
+          guest_id?: string | null;
+          id?: string;
+          order_id: string;
+          rider_id: string;
+          stars: number;
+          tags?: string[];
+        };
+        Update: {
+          comment?: string | null;
+          created_at?: string;
+          guest_id?: string | null;
+          id?: string;
+          order_id?: string;
+          rider_id?: string;
+          stars?: number;
+          tags?: string[];
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'rider_rating_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_guest_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_guest_id_fkey';
+            columns: ['guest_id'];
+            isOneToOne: false;
+            referencedRelation: 'guest';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_live_orders_needs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_live_orders_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_order_detail_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_arriving_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_delivery_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: true;
+            referencedRelation: 'host_qr_activity_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_orders_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: true;
+            referencedRelation: 'order';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: true;
+            referencedRelation: 'order_money_v';
+            referencedColumns: ['order_id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: true;
+            referencedRelation: 'rider_jobs_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_rider_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_fleet_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_app_me_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_cash_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_home_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_rating_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
+        ];
+      };
       rider_reference_check: {
         Row: {
           called_at: string | null;
@@ -42126,6 +42322,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -42167,6 +42365,8 @@ export type Database = {
           check_out: string;
           checked_in_at?: string | null;
           checked_in_by?: string | null;
+          checked_out_at?: string | null;
+          checked_out_by?: string | null;
           commission_kes?: number | null;
           confirmation_sent_at?: string | null;
           confirmed_at?: string | null;
@@ -42207,6 +42407,8 @@ export type Database = {
           check_out?: string;
           checked_in_at?: string | null;
           checked_in_by?: string | null;
+          checked_out_at?: string | null;
+          checked_out_by?: string | null;
           commission_kes?: number | null;
           confirmation_sent_at?: string | null;
           confirmed_at?: string | null;
@@ -66350,6 +66552,9 @@ export type Database = {
         };
         Returns: Database['public']['Enums']['connector_connection_state'];
       };
+      rpc_console_rider_profile: { Args: { p_rider_id: string }; Returns: Json };
+      rpc_console_rider_stats: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_console_rider_trip: { Args: { p_order_id: string; p_rider_id: string }; Returns: Json };
       rpc_coverage_lookup: { Args: { p_lat: number; p_lng: number }; Returns: Json };
       rpc_customer_list: {
         Args: {
@@ -68050,6 +68255,14 @@ export type Database = {
         Args: { p_entry: Json; p_host_id: string };
         Returns: string;
       };
+      rpc_host_manual_finance_remove: {
+        Args: { p_host_id: string; p_id: string };
+        Returns: string;
+      };
+      rpc_host_manual_finance_update: {
+        Args: { p_entry: Json; p_host_id: string; p_id: string };
+        Returns: string;
+      };
       rpc_host_message_read: { Args: { p_conversation: string }; Returns: Json };
       rpc_host_message_reply: {
         Args: { p_body: string; p_conversation: string; p_idempotency_key?: string };
@@ -68296,6 +68509,108 @@ export type Database = {
       };
       rpc_host_stay_by_code: { Args: { p_code: string }; Returns: Json };
       rpc_host_stay_check_in: { Args: { p_code: string; p_name?: string }; Returns: Json };
+      rpc_host_stay_mark_checked_in: {
+        Args: { p_stay_id: string };
+        Returns: {
+          cancellation_fee_kes: number | null;
+          cancellation_terms: Json | null;
+          check_in: string;
+          check_out: string;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          host_share_kes: number | null;
+          id: string;
+          notes: string | null;
+          paid_kes: number | null;
+          party_adults: number;
+          party_children: number;
+          payment_reference: string | null;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          refund_amount_kes: number | null;
+          refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_host_stay_mark_checked_out: {
+        Args: { p_stay_id: string };
+        Returns: {
+          cancellation_fee_kes: number | null;
+          cancellation_terms: Json | null;
+          check_in: string;
+          check_out: string;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          host_share_kes: number | null;
+          id: string;
+          notes: string | null;
+          paid_kes: number | null;
+          party_adults: number;
+          party_children: number;
+          payment_reference: string | null;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          refund_amount_kes: number | null;
+          refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_host_verify: {
         Args: { p_evidence?: Json; p_host_id: string; p_method: string };
         Returns: {
@@ -70582,6 +70897,7 @@ export type Database = {
         | { Args: { p_order_id: string }; Returns: Json }
         | { Args: { p_contract_version: string; p_order_id: string }; Returns: Json };
       rpc_my_order_rating: { Args: { p_order_id: string }; Returns: number };
+      rpc_my_order_rider_rating: { Args: { p_order_id: string }; Returns: Json };
       rpc_my_recent_categories: { Args: { p_limit?: number }; Returns: Json };
       rpc_my_rider_jobs: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_rider_map_assignments: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -70800,6 +71116,10 @@ export type Database = {
       rpc_order_quote_web: { Args: { p_payload: Json }; Returns: Json };
       rpc_order_rate: {
         Args: { p_about?: string; p_comment?: string; p_order_id: string; p_stars: number };
+        Returns: Json;
+      };
+      rpc_order_rate_rider: {
+        Args: { p_comment?: string; p_order_id: string; p_stars: number; p_tags?: string[] };
         Returns: Json;
       };
       rpc_order_read_api: {
@@ -71462,6 +71782,46 @@ export type Database = {
         SetofOptions: {
           from: '*';
           to: 'plan';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_rate_card_draft_discard: { Args: { p_card_id: string }; Returns: Json };
+      rpc_rate_card_draft_save: {
+        Args: {
+          p_base_per_trip_kes: number;
+          p_cancellation_after_pickup_kes?: number;
+          p_city_id: string;
+          p_effective_from: string;
+          p_guest_tips_pass_through_pct?: number;
+          p_paid_waiting_per_5min_kes?: number;
+          p_peak_bonus_dinner_kes?: number;
+          p_peak_bonus_rain_kes?: number;
+          p_per_km_after_2km_kes: number;
+          p_second_pickup_bonus_kes?: number;
+          p_version: string;
+        };
+        Returns: {
+          approved_by: string | null;
+          base_per_trip_kes: number | null;
+          cancellation_after_pickup_kes: number | null;
+          city_id: string;
+          created_at: string;
+          effective_from: string;
+          guest_tips_pass_through_pct: number;
+          id: string;
+          paid_waiting_per_5min_kes: number | null;
+          peak_bonus_dinner_kes: number | null;
+          peak_bonus_rain_kes: number | null;
+          per_km_after_2km_kes: number | null;
+          second_approver_id: string | null;
+          second_pickup_bonus_kes: number | null;
+          status: string;
+          version: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'rider_rate_card';
           isOneToOne: true;
           isSetofReturn: false;
         };
@@ -72871,6 +73231,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -72920,6 +73282,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -72993,6 +73357,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -73047,6 +73413,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -73096,6 +73464,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -73146,6 +73516,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -73304,6 +73676,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
