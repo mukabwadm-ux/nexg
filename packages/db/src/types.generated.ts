@@ -75057,6 +75057,7 @@ export type Database = {
         Returns: Json;
       };
       rpc_zone_resume: { Args: { p_note?: string; p_zone_id: string }; Returns: Json };
+      sandbox_cinema: { Args: { p_args?: Json; p_op: string; p_tenant: string }; Returns: Json };
       zone_for_point: {
         Args: { p_lat: number; p_lng: number };
         Returns: {
