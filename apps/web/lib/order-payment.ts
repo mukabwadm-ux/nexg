@@ -11,6 +11,7 @@ import {
   sendPrompt,
   verify,
   type PaystackMode,
+  type Split,
 } from '@/lib/paystack';
 import { startBankPayment } from '@/lib/bank/payments';
 import { callbackOrigin, normalisePhone } from '@/lib/daraja';
@@ -310,6 +311,8 @@ interface Attempt {
   /* Saved card only: what the server charges. Never sent on to the phone. */
   authorization_code?: string;
   email?: string;
+  /* An order from a merchant Paystack pays directly: its share and NexG's. */
+  split?: Split;
 }
 
 /** Paystack's own checkout pages only. */
@@ -429,6 +432,7 @@ export async function startPayment(
             email,
             callbackUrl: `${site}/pay/${encodeURIComponent(payment.reference)}`,
             metadata,
+            ...(attempt.split ? { split: attempt.split } : {}),
           })
         : await sendPrompt(mode, {
             reference: attempt.attempt_reference,
@@ -437,6 +441,7 @@ export async function startPayment(
             phone: phone!,
             provider: channel === 'mpesa' ? 'mpesa' : 'atl',
             metadata,
+            ...(attempt.split ? { split: attempt.split } : {}),
           });
 
     const url =
@@ -505,6 +510,7 @@ async function chargeSaved(
     email: attempt.email,
     authorizationCode: attempt.authorization_code,
     metadata,
+    ...(attempt.split ? { split: attempt.split } : {}),
   });
   if (answer.refused || (answer.ok && answer.data?.status === 'failed')) {
     await rpc(supabase, 'rpc_payment_paystack_opened', {

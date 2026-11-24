@@ -28,6 +28,10 @@ import { OnboardingRecord } from '@/components/onboarding-record';
 import { applicationAnswerGroups } from '@/lib/application-answers';
 import { ApiBookingsCard } from '@/components/merchants/api-bookings-card';
 import { MerchantCommissionCard } from '@/components/merchants/commission-card';
+import {
+  PaystackPayoutsCard,
+  type SplitOverview,
+} from '@/components/merchants/paystack-payouts-card';
 import type { CommissionCard } from '@/lib/merchant-commission';
 import { ApplicationReviewUnavailable } from '@/components/merchants/application-review-view';
 import { MerchantActivityLog } from '@/components/merchants/activity-log';
@@ -228,6 +232,16 @@ export default async function MerchantApplicationPage({
   const commission = (
     await supabase.rpc('rpc_merchant_commission_read', { p_merchant_id: params.id })
   ).data as CommissionCard | null;
+  // How Paystack pays this merchant (a sub-account), for staff who reach it.
+  const splitOverview = toSplitOverview(
+    (
+      await (
+        supabase as unknown as {
+          rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown }>;
+        }
+      ).rpc('rpc_merchant_split_overview', { p_merchant_id: params.id })
+    ).data,
+  );
   const performance = summarise(
     (performanceOrders as PerformanceOrder[] | null) ?? [],
     (performanceRatings as PerformanceRating[] | null) ?? [],
@@ -488,6 +502,10 @@ export default async function MerchantApplicationPage({
               />
             )}
 
+            {splitOverview && splitOverview.viewer === 'staff' && (
+              <PaystackPayoutsCard merchantId={params.id} overview={splitOverview} />
+            )}
+
             {apiBookings && (
               <ApiBookingsCard
                 merchantId={params.id}
@@ -581,4 +599,25 @@ export interface FleetRow {
   plate_no: string | null;
   invite_status: string;
   rider_id: string | null;
+}
+
+/**
+ * rpc_merchant_split_overview, read defensively: anything that is not the
+ * overview object is no card, and a missing list is an empty one, so a
+ * merchant with no sub-account yet shows the card with only "add one".
+ */
+function toSplitOverview(data: unknown): SplitOverview | null {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+  const d = data as Partial<Record<keyof SplitOverview, unknown>>;
+  if (d.viewer !== 'staff' && d.viewer !== 'merchant') return null;
+  const list = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
+  return {
+    viewer: d.viewer === 'staff' ? 'staff' : 'merchant',
+    canRecord: d.canRecord === true,
+    owedCents: typeof d.owedCents === 'number' ? d.owedCents : 0,
+    subaccounts: list<SplitOverview['subaccounts'][number]>(d.subaccounts),
+    orders: list<SplitOverview['orders'][number]>(d.orders),
+    recoveries: list<SplitOverview['recoveries'][number]>(d.recoveries),
+    refundsToDecide: list<SplitOverview['refundsToDecide'][number]>(d.refundsToDecide),
+  };
 }

@@ -108,12 +108,119 @@ function commissionNote(
   return `NexG commission: ${now.pct}% on ${orders}, the rate agreed with you${dates}${standard}. Orders already placed keep the rate they were charged.`;
 }
 
+/** What rpc_merchant_split_overview tells the merchant: paid by Paystack directly. */
+export interface MoneyPaystack {
+  subaccounts: {
+    id: string;
+    test: boolean;
+    schedule: string;
+    status: string;
+    details: {
+      business_name?: string | null;
+      settlement_bank?: string | null;
+      account_last4?: string | null;
+    };
+  }[];
+  orders: {
+    orderId: string;
+    reference: string;
+    paidAt: string;
+    totalCents: number;
+    commissionCents: number;
+    keptForRefundsCents: number;
+    toMerchantCents: number;
+  }[];
+  recoveries: {
+    id: string;
+    orderReference: string | null;
+    amountCents: number;
+    recoveredCents: number;
+    method: string;
+    state: string;
+  }[];
+}
+
+const PAYSTACK_SCHEDULE: Record<string, string> = {
+  auto: 'every 2 working days',
+  weekly: 'every week',
+  monthly: 'every month',
+  manual: 'when NexG Finance releases it',
+};
+
+const RECOVERY_STATE: Record<string, string> = {
+  open: 'being taken from your next orders',
+  recovered: 'recovered',
+  invoiced: 'invoiced to you',
+  settled: 'paid by you',
+  absorbed: 'carried by NexG',
+  by_paystack: 'taken back by Paystack from your payouts',
+  cancelled: 'cancelled',
+};
+
+/** "Paid by Paystack every 2 working days to Equity ····1234", or null. */
+function paystackNote(paystack: MoneyPaystack | null): string | null {
+  const subaccounts = paystack?.subaccounts ?? [];
+  const s = subaccounts.find((x) => x.status === 'active');
+  if (!s) {
+    return subaccounts.some((x) => x.status === 'paused')
+      ? 'Paystack payouts are paused: your orders are paid in the NexG payout run for now.'
+      : null;
+  }
+  const d: Partial<MoneyPaystack['subaccounts'][number]['details']> = s.details ?? {};
+  const to = [d.business_name, d.settlement_bank, d.account_last4 ? `····${d.account_last4}` : null]
+    .filter(Boolean)
+    .join(' · ');
+  const test = s.test ? ' (test mode: no money moves)' : '';
+  return `Paystack pays you directly for each order${test}, ${PAYSTACK_SCHEDULE[s.schedule] ?? s.schedule}${to ? `, to ${to}` : ''}: the order's items less NexG commission. NexG pays Paystack's fee.`;
+}
+
+function PaystackOrders({ paystack }: { paystack: MoneyPaystack }) {
+  const orders = paystack.orders ?? [];
+  const recoveries = paystack.recoveries ?? [];
+  if (orders.length === 0 && recoveries.length === 0) return null;
+  return (
+    <div className="mo-note">
+      {orders.length > 0 && (
+        <>
+          <p className="font-bold">Orders Paystack paid you for</p>
+          <ul className="mt-1 space-y-0.5">
+            {orders.slice(0, 15).map((o) => (
+              <li key={o.orderId}>
+                {o.reference} · {dateTime(o.paidAt)} · customer paid {kes(o.totalCents)} · NexG
+                commission {kes(o.commissionCents)} · to you {kes(o.toMerchantCents)}
+                {o.keptForRefundsCents > 0
+                  ? ` (${kes(o.keptForRefundsCents)} kept for a refund)`
+                  : ''}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {recoveries.length > 0 && (
+        <>
+          <p className="mt-2 font-bold">Refunds on orders Paystack paid you for</p>
+          <ul className="mt-1 space-y-0.5">
+            {recoveries.map((r) => (
+              <li key={r.id}>
+                {r.orderReference ?? 'Order'} · {kes(r.amountCents)} ·{' '}
+                {RECOVERY_STATE[r.state] ?? r.state}
+                {r.state === 'open' ? ` (${kes(r.recoveredCents)} so far)` : ''}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function LiveMoneyWorkspace({
   home,
   statements,
   transactions,
   receipts,
   commission = null,
+  paystack = null,
 }: {
   home: MoneyHome | null;
   statements: MoneyStatement[] | null;
@@ -122,7 +229,10 @@ export function LiveMoneyWorkspace({
   receipts: Receipt[] | null;
   /** The commission NexG charges now: the rate agreed with the merchant, or the standard one. */
   commission?: MoneyCommission | null;
+  /** Paid by Paystack directly (a sub-account), when NexG set that up. */
+  paystack?: MoneyPaystack | null;
 }) {
+  const paidByPaystack = paystackNote(paystack);
   const chargedNow =
     commission?.charged_now && commission.charged_now.pct !== null
       ? { ...commission.charged_now, pct: commission.charged_now.pct }
@@ -242,6 +352,10 @@ export function LiveMoneyWorkspace({
         {tab === 'Overview' && commission && chargedNow && (
           <p className="mo-note">{commissionNote(commission, chargedNow)}</p>
         )}
+        {(tab === 'Overview' || payoutView) && paidByPaystack && (
+          <p className="mo-note">{paidByPaystack}</p>
+        )}
+        {payoutView && paystack && <PaystackOrders paystack={paystack} />}
         {payoutView && (
           <p className="mo-note">
             {payoutDestination(home)}.{' '}
