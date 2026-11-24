@@ -346,7 +346,7 @@ export default async function OfficeFinancePage({
                           <span className="mt-1.5 flex items-center gap-2">
                             <span className="bg-border/70 h-2 flex-1 overflow-hidden rounded-full">
                               <span
-                                className="block h-full rounded-full bg-gradient-to-r from-[#F0B90B] to-[#FDD128]"
+                                className="from-gold-deep to-gold block h-full rounded-full bg-gradient-to-r"
                                 style={{ width: `${c.share}%` }}
                               />
                             </span>

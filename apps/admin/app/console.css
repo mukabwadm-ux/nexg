@@ -59,7 +59,7 @@
 .console-canvas .grid > [data-tile]:first-child,
 .console-canvas .grid > :first-child > [data-tile]:only-child {
   border-color: transparent;
-  background: linear-gradient(135deg, #ffe27a, #fdd128 55%, #f0b90b);
+  background: linear-gradient(135deg, var(--gold-light), var(--gold) 55%, var(--gold-deep));
   box-shadow: 0 10px 28px -14px rgb(196 140 0 / 0.75);
 }
 

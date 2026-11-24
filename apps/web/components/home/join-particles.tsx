@@ -137,7 +137,7 @@ function draw(THREE: Three, anime: typeof Anime, element: HTMLElement) {
       uTime: { value: 0 },
       uProgress: { value: 0 },
       uPixel: { value: pixel },
-      uGold: { value: new THREE.Color('#FDD128') },
+      uGold: { value: new THREE.Color('#D2AF26') },
       uAmber: { value: new THREE.Color('#C9971B') },
     },
   });

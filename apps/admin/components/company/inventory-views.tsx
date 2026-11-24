@@ -276,7 +276,7 @@ export function InventoryReports({
                   </div>
                   <div className="bg-border/70 mt-1.5 h-2 overflow-hidden rounded-full">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-[#F0B90B] to-[#FDD128]"
+                      className="from-gold-deep to-gold h-full rounded-full bg-gradient-to-r"
                       style={{ width: `${pct}%` }}
                     />
                   </div>

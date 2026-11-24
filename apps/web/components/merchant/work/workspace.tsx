@@ -675,7 +675,7 @@ export function WorkWorkspace({
                         <button
                           type="submit"
                           disabled={pending || !sendText.trim()}
-                          className="rounded-md bg-[#FDD128] px-4 py-2 text-sm font-bold text-[#171b24] hover:bg-[#c49a29] disabled:opacity-50"
+                          className="bg-gold hover:bg-gold-deep rounded-md px-4 py-2 text-sm font-bold text-[#171b24] disabled:opacity-50"
                         >
                           {pending ? 'Sending…' : 'Send to the customer’s app'}
                         </button>
@@ -707,7 +707,7 @@ export function WorkWorkspace({
                         <button
                           type="submit"
                           disabled={pending || handoverCode.length !== 4}
-                          className="flex-1 rounded-md bg-[#FDD128] px-4 py-2 text-sm font-bold text-[#171b24] hover:bg-[#c49a29] disabled:opacity-50"
+                          className="bg-gold hover:bg-gold-deep flex-1 rounded-md px-4 py-2 text-sm font-bold text-[#171b24] disabled:opacity-50"
                         >
                           {pending ? 'Checking…' : 'Hand over'}
                         </button>
@@ -717,7 +717,7 @@ export function WorkWorkspace({
                         type="button"
                         disabled={pending}
                         onClick={() => void advance()}
-                        className="w-full rounded-md bg-[#FDD128] px-4 py-2 text-sm font-bold text-[#171b24] hover:bg-[#c49a29] disabled:opacity-50"
+                        className="bg-gold hover:bg-gold-deep w-full rounded-md px-4 py-2 text-sm font-bold text-[#171b24] disabled:opacity-50"
                       >
                         {pending
                           ? preview

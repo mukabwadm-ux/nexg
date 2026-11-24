@@ -199,7 +199,7 @@ function Section({ n, title, children }: { n: number; title: string; children: R
       <legend className="flex items-center gap-2.5 text-[0.9375rem] font-extrabold text-[#141414]">
         <span
           aria-hidden="true"
-          className="flex h-6 w-6 items-center justify-center rounded-full bg-[#141414] text-[0.75rem] text-[#F2C94C]"
+          className="text-gold flex h-6 w-6 items-center justify-center rounded-full bg-[#141414] text-[0.75rem]"
         >
           {n}
         </span>

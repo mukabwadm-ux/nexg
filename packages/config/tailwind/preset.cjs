@@ -36,6 +36,8 @@ module.exports = {
         ink: channel('--ink-rgb'),
         gold: {
           DEFAULT: channel('--gold-rgb'),
+          deep: channel('--gold-deep-rgb'),
+          light: channel('--gold-light-rgb'),
           text: channel('--gold-text-rgb'),
           soft: channel('--gold-soft-rgb'),
         },
