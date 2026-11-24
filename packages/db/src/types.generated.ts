@@ -68255,6 +68255,14 @@ export type Database = {
         Args: { p_entry: Json; p_host_id: string };
         Returns: string;
       };
+      rpc_host_manual_finance_remove: {
+        Args: { p_host_id: string; p_id: string };
+        Returns: string;
+      };
+      rpc_host_manual_finance_update: {
+        Args: { p_entry: Json; p_host_id: string; p_id: string };
+        Returns: string;
+      };
       rpc_host_message_read: { Args: { p_conversation: string }; Returns: Json };
       rpc_host_message_reply: {
         Args: { p_body: string; p_conversation: string; p_idempotency_key?: string };
