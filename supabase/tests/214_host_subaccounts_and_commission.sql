@@ -213,7 +213,8 @@ select is((select v::jsonb -> 'split' from t where k = 'try1'),
   (select jsonb_build_object('subaccount', 'ACCT_ci2120001',
             'transaction_charge', p.amount_cents - (p.amount_cents / 100 - round(p.amount_cents / 100 * 12 / 100.0)::bigint) * 100,
             'bearer', 'account')
-     from public.payment p where p.reference = (select v from t where k = 'ref1')),
+     -- The amount from the attempt's own answer: the guest cannot read public.payment here.
+     from (select (v::jsonb ->> 'amount_cents')::bigint as amount_cents from t where k = 'try1') p),
   'The host''s share goes to its sub-account; NexG keeps its 12% and pays the fee.');
 select public.rpc_payment_paystack_opened((select v from t where k = 'ref1') || '-1', 'acc_ci212',
   'https://checkout.paystack.com/ci-212', null, 'sk_live_ci_only_0123456789abcdef');
