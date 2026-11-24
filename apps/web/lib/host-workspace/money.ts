@@ -6,7 +6,7 @@ import { HostWorkspaceError, type HostWorkspaceAccess } from './access';
 /*
  * Changing or removing a payment or expense record the host already saved. New records go through
  * rpc_host_manual_finance_record in commands.ts. Recorded payments stay as they are: the host records a refund or a
- * deposit return to adjust one (see 20270312000300_host_money_record_edit.sql).
+ * deposit return to adjust one (see 20270314000900_host_money_record_edit.sql).
  */
 
 const uuid = z.string().uuid();
