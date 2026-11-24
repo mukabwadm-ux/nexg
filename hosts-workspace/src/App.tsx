@@ -17,6 +17,7 @@ import {
   ReservationsPage,
   UnitPage,
 } from './pages/Homes';
+import { GuestInboxPage } from './pages/GuestInbox';
 import { SupportInboxPage } from './pages/Inbox';
 import { FinancesPage, ReportsPage, SettingsPage } from './pages/Management';
 import { HelpPage, OperationsPage } from './pages/Operations';
@@ -91,7 +92,7 @@ export default function App() {
 }
 
 function WorkspacePage() {
-  const { page, recordId } = useWorkspace();
+  const { page, recordId, section } = useWorkspace();
   switch (page) {
     case 'setup':
       return <SetupPage />;
@@ -113,7 +114,11 @@ function WorkspacePage() {
     case 'reservations':
       return <ReservationsPage />;
     case 'inbox':
-      return <SupportInboxPage routeId={recordId} />;
+      return recordId === 'guests' ? (
+        <GuestInboxPage threadId={section} />
+      ) : (
+        <SupportInboxPage routeId={recordId} />
+      );
     case 'support-tickets':
       return <HistoryPage key="support" kind="support" />;
     case 'privacy-requests':
