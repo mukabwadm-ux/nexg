@@ -31,6 +31,7 @@ import {
   type ZoneRow,
 } from '@/components/riders/tabs';
 import { requireModule, requireStaff } from '@/lib/staff';
+import { RateCardEditor, type DraftCard } from '@/components/riders/rate-card-editor';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { title: 'Riders' };
@@ -48,11 +49,10 @@ type Supabase = ReturnType<typeof createClient>;
  * Filters live in the URL so a link pasted into Slack opens the same
  * screen the sender was looking at.
  *
- * Everything that depends on the orders domain renders [—]. There is no
- * order service, so trips, acceptance, on-time and earnings are not
- * measured — and a zero in those columns would read as "this rider did
- * nothing", which is what gets somebody a coaching call they do not
- * deserve.
+ * Trips, acceptance, on-time and rating come from the trips themselves
+ * (rpc_console_rider_stats). A rate with nothing to divide by is [—], never
+ * 0% — a zero would read as "this rider did nothing", which is what gets
+ * somebody a coaching call they do not deserve.
  */
 export default async function RidersPage({
   searchParams,
@@ -69,22 +69,46 @@ export default async function RidersPage({
   const filter = searchParams?.filter ?? 'all';
   const selected = searchParams?.selected ?? null;
 
-  const [{ data: badgesRaw }, { data: directory }, { data: sos }] = await Promise.all([
-    supabase.rpc('rpc_rider_console_counts', {}),
-    supabase
-      .from('console_rider_directory_v')
-      .select('*')
-      .order('created_at', { ascending: false }),
-    supabase
-      .from('incident')
-      .select('id, rider_id, happened_at, description, rider:rider_id(first_name, last_name)')
-      .eq('kind', 'sos')
-      .is('acknowledged_at', null)
-      .order('happened_at', { ascending: false }),
-  ]);
+  const [{ data: badgesRaw }, { data: directory }, { data: sos }, { data: stats }] =
+    await Promise.all([
+      supabase.rpc('rpc_rider_console_counts', {}),
+      supabase
+        .from('console_rider_directory_v')
+        .select('*')
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('incident')
+        .select('id, rider_id, happened_at, description, rider:rider_id(first_name, last_name)')
+        .eq('kind', 'sos')
+        .is('acknowledged_at', null)
+        .order('happened_at', { ascending: false }),
+      /* Trips, acceptance, on-time and rating from the trips themselves
+       (20270313000200), in place of the health snapshot's copies. */
+      supabase.rpc('rpc_console_rider_stats'),
+    ]);
 
   const badges = (badgesRaw as Badges | null) ?? ({} as Badges);
-  const rows = (directory as RiderRow[] | null) ?? [];
+  const measured = (stats ?? {}) as Record<
+    string,
+    {
+      trips_30d: number;
+      acceptance_pct: number | null;
+      on_time_pct: number | null;
+      rating_avg: number | null;
+    }
+  >;
+  const rows = ((directory as RiderRow[] | null) ?? []).map((r) => {
+    const m = measured[r.id];
+    return m
+      ? {
+          ...r,
+          trips_30d: m.trips_30d,
+          acceptance_pct: m.acceptance_pct,
+          on_time_pct: m.on_time_pct,
+          rating_avg: m.rating_avg,
+        }
+      : r;
+  });
 
   return (
     <ConsoleShell staff={staff} current="/riders">
@@ -116,7 +140,7 @@ export default async function RidersPage({
 
         {tab === 'cash' && (await loadCash(supabase, rows, badges, selected))}
 
-        {tab === 'settlement' && (await loadSettlement(supabase))}
+        {tab === 'settlement' && (await loadSettlement(supabase, staff.staffId))}
 
         {tab === 'supply' && (await loadSupply(supabase, badges))}
 
@@ -273,7 +297,7 @@ async function loadCash(
   );
 }
 
-async function loadSettlement(supabase: Supabase) {
+async function loadSettlement(supabase: Supabase, staffId: string) {
   const { data: runs } = await supabase
     .from('rider_settlement_run')
     .select('*')
@@ -282,16 +306,24 @@ async function loadSettlement(supabase: Supabase) {
 
   const run = ((runs as RunRow[] | null) ?? [])[0] ?? null;
 
-  const [{ data: lines }, { data: cards }, { data: bonuses }] = await Promise.all([
-    run
-      ? supabase
-          .from('rider_settlement_line')
-          .select('*, rider:rider_id(first_name, last_name, status)')
-          .eq('run_id', run.id)
-      : Promise.resolve({ data: [] as unknown[] }),
-    supabase.from('rider_rate_card').select('*').eq('status', 'current').limit(1),
-    supabase.from('rider_bonus_rule').select('id, key, enabled, params'),
-  ]);
+  const [{ data: lines }, { data: cards }, { data: bonuses }, { data: drafts }, { data: cities }] =
+    await Promise.all([
+      run
+        ? supabase
+            .from('rider_settlement_line')
+            .select('*, rider:rider_id(first_name, last_name, status)')
+            .eq('run_id', run.id)
+        : Promise.resolve({ data: [] as unknown[] }),
+      supabase.from('rider_rate_card').select('*').eq('status', 'current').limit(1),
+      supabase.from('rider_bonus_rule').select('id, key, enabled, params'),
+      supabase
+        .from('rider_rate_card')
+        .select('*')
+        .eq('status', 'draft')
+        .order('created_at', { ascending: false })
+        .limit(1),
+      supabase.from('city').select('id, name').order('name'),
+    ]);
 
   return (
     <SettlementTab
@@ -299,6 +331,14 @@ async function loadSettlement(supabase: Supabase) {
       lines={(lines as SettlementLineRow[] | null) ?? []}
       rateCard={((cards as RateCardRow[] | null) ?? [])[0] ?? null}
       bonuses={(bonuses as BonusRuleRow[] | null) ?? []}
+      editor={
+        <RateCardEditor
+          cities={(cities as { id: string; name: string }[] | null) ?? []}
+          current={((cards as RateCardRow[] | null) ?? [])[0] ?? null}
+          draft={((drafts as DraftCard[] | null) ?? [])[0] ?? null}
+          staffId={staffId}
+        />
+      }
     />
   );
 }
