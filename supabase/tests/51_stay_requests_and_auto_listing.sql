@@ -3,7 +3,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(11);
+select plan(13);
 
 set local session_replication_role = replica;
 delete from public.role_grant;
@@ -61,6 +61,28 @@ select is(
     where r.reference = (select v::jsonb ->> 'reference' from t where k = 'req')),
   true,
   'And the stay request points at its ticket.');
+
+-- ═════════════════════ 1b. the optional "suggest a place" answer is kept
+
+set local role anon;
+insert into t (k, v) select 'suggest', public.rpc_stay_request_create(jsonb_build_object(
+  'name', 'Baraka', 'phone', '+254700051001', 'city', 'nairobi',
+  'suggested_place', '  The Arbor Residences, Lavington  '))::text;
+reset role;
+
+select is(
+  (select r.suggested_place || ' | ' || (s.details ->> 'suggested_place')
+     from public.stay_request r
+     join public.support_ticket s on s.id = r.ticket_id
+    where r.reference = (select v::jsonb ->> 'reference' from t where k = 'suggest')),
+  'The Arbor Residences, Lavington | The Arbor Residences, Lavington',
+  'A suggested place is saved, trimmed, on the request and on its ticket.');
+
+select is(
+  (select suggested_place from public.stay_request
+    where reference = (select v::jsonb ->> 'reference' from t where k = 'req')),
+  null,
+  'Left out, it saves nothing: the field is optional.');
 
 -- ══════════════════════════════ 2. a complete, published unit lists itself
 
