@@ -11,6 +11,8 @@ import type * as T from './types.js';
  * `pnpm --filter @nexg-org/api-client generate` writes the types again.
  */
 it('matches the schemas the API uses', () => {
+  expectTypeOf<T.ApiBookingRider>().toEqualTypeOf<C.ApiBookingRider>();
+  expectTypeOf<T.ApiBookingRiderLocation>().toEqualTypeOf<C.ApiBookingRiderLocation>();
   expectTypeOf<T.ApiOrder>().toEqualTypeOf<C.ApiOrder>();
   expectTypeOf<T.ApiService>().toEqualTypeOf<C.ApiService>();
   expectTypeOf<T.BookingReceipt>().toEqualTypeOf<C.BookingReceipt>();

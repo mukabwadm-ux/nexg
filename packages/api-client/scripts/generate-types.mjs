@@ -15,6 +15,8 @@ const entryPath = join(root, 'src', '__generate_types__.ts');
 
 /** The types the client exports, by name, and what each is in the contracts. */
 const TYPES = {
+  ApiBookingRider: 'C.ApiBookingRider',
+  ApiBookingRiderLocation: 'C.ApiBookingRiderLocation',
   ApiOrder: 'C.ApiOrder',
   ApiService: 'C.ApiService',
   BookingReceipt: 'C.BookingReceipt',

@@ -6,6 +6,29 @@
  * when these no longer match the schemas.
  */
 
+export type ApiBookingRider = {
+  first_name: string;
+  vehicle: 'motorbike' | 'bicycle' | 'car' | 'tuktuk';
+  /** Null for a bicycle, or when none is on record. */
+  plate: string | null;
+  /** When this rider took the job. */
+  assigned_at: string | null;
+  /** Only from pickup until delivery: null before pickup, after delivery, or with no position yet. */
+  location: {
+    /** When the rider's app sent this position. */
+    at: string;
+    latitude: number;
+    longitude: number;
+  } | null;
+};
+
+export type ApiBookingRiderLocation = {
+  /** When the rider's app sent this position. */
+  at: string;
+  latitude: number;
+  longitude: number;
+};
+
 export type ApiOrder = {
   /** requested, confirmed, in_progress, completed or cancelled. */
   status: 'requested' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
@@ -23,6 +46,22 @@ export type ApiOrder = {
   stage: string;
   payment_status: string;
   created_at: string;
+  /** Who is carrying it, once a rider has the delivery job. Null until then, and after a cancellation. */
+  rider: {
+    first_name: string;
+    vehicle: 'motorbike' | 'bicycle' | 'car' | 'tuktuk';
+    /** Null for a bicycle, or when none is on record. */
+    plate: string | null;
+    /** When this rider took the job. */
+    assigned_at: string | null;
+    /** Only from pickup until delivery: null before pickup, after delivery, or with no position yet. */
+    location: {
+      /** When the rider's app sent this position. */
+      at: string;
+      latitude: number;
+      longitude: number;
+    } | null;
+  } | null;
 };
 
 export type ApiService = {
@@ -243,13 +282,29 @@ export type WebhookEvent = {
       stage: string;
       payment_status: string;
       created_at: string;
+      /** Who is carrying it, once a rider has the delivery job. Null until then, and after a cancellation. */
+      rider: {
+        first_name: string;
+        vehicle: 'motorbike' | 'bicycle' | 'car' | 'tuktuk';
+        /** Null for a bicycle, or when none is on record. */
+        plate: string | null;
+        /** When this rider took the job. */
+        assigned_at: string | null;
+        /** Only from pickup until delivery: null before pickup, after delivery, or with no position yet. */
+        location: {
+          /** When the rider's app sent this position. */
+          at: string;
+          latitude: number;
+          longitude: number;
+        } | null;
+      } | null;
     };
+    /** booking.rider_assigned only: when the rider took the job. */
+    assigned_at?: string;
     /** booking.status_changed only. */
     previous_status?: 'requested' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
     /** booking.status_changed and booking.stage_changed. */
     previous_stage?: string;
-    /** booking.rider_assigned only: when the rider took the job. */
-    assigned_at?: string;
     /** ping only. */
     endpoint_id?: string;
   };

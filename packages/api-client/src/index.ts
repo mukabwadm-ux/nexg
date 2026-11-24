@@ -27,6 +27,8 @@ export {
 } from './errors.js';
 export { verifyWebhook, type VerifyWebhookOptions } from './webhooks.js';
 export type {
+  ApiBookingRider,
+  ApiBookingRiderLocation,
   ApiOrder,
   ApiService,
   BookingReceipt,
