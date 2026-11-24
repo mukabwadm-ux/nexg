@@ -11,6 +11,11 @@ import {
   setMerchantDeactivated,
   type ApiBookingAccess,
 } from '@/app/merchants/actions';
+import {
+  decideCommission,
+  requestCommission,
+  withdrawCommission,
+} from '@/app/merchants/commission-actions';
 import { sendFeaturedPitch, unfeatureMerchant } from '@/app/featured/actions';
 import { ActivatePanel } from '@/components/activate-panel';
 import { ConsoleHeader } from '@/components/console-header';
@@ -22,6 +27,8 @@ import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
 import { applicationAnswerGroups } from '@/lib/application-answers';
 import { ApiBookingsCard } from '@/components/merchants/api-bookings-card';
+import { MerchantCommissionCard } from '@/components/merchants/commission-card';
+import type { CommissionCard } from '@/lib/merchant-commission';
 import { ApplicationReviewUnavailable } from '@/components/merchants/application-review-view';
 import { MerchantActivityLog } from '@/components/merchants/activity-log';
 import { BookingReadiness } from '@/components/merchants/booking-readiness';
@@ -215,6 +222,12 @@ export default async function MerchantApplicationPage({
     ? ((await supabase.rpc('rpc_api_booking_access_read', { p_merchant_id: params.id }))
         .data as ApiBookingAccess | null)
     : null;
+  // The commission agreed with this merchant. The read refuses staff who do
+  // not work the merchant (and answers nothing before 20270306000100), and
+  // the card stays away.
+  const commission = (
+    await supabase.rpc('rpc_merchant_commission_read', { p_merchant_id: params.id })
+  ).data as CommissionCard | null;
   const performance = summarise(
     (performanceOrders as PerformanceOrder[] | null) ?? [],
     (performanceRatings as PerformanceRating[] | null) ?? [],
@@ -455,6 +468,24 @@ export default async function MerchantApplicationPage({
                   />
                 </div>
               </Card>
+            )}
+
+            {commission && commission.viewer === 'staff' && (
+              <MerchantCommissionCard
+                card={commission}
+                onRequest={async (input) => {
+                  'use server';
+                  return requestCommission(params.id, input);
+                }}
+                onDecide={async (termId, approve, note) => {
+                  'use server';
+                  return decideCommission(params.id, termId, approve, note);
+                }}
+                onWithdraw={async (termId) => {
+                  'use server';
+                  return withdrawCommission(params.id, termId);
+                }}
+              />
             )}
 
             {apiBookings && (

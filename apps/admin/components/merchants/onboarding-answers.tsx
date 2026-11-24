@@ -79,13 +79,14 @@ export async function MerchantOnboardingAnswers({ merchantId }: { merchantId: st
   const supabase = createClient();
   const [{ data, error }, { data: merchant }] = await Promise.all([
     supabase.rpc('rpc_merchant_onboarding_read', { p_merchant_id: merchantId }),
-    supabase.from('merchant').select('commission_pct').eq('id', merchantId).maybeSingle(),
+    supabase.rpc('rpc_merchant_commission_read', { p_merchant_id: merchantId }),
   ]);
   if (error || !data) return null;
   const details = parseOnboardingDetails(data);
   const missing = new Set(details.missing.map((m) => m.key));
-  const commission = (merchant as { commission_pct: number | string | null } | null)
-    ?.commission_pct;
+  // The rate pricing charges now: an agreed term, else the preset (see the Commission card).
+  const commission = (merchant as { charged_now?: { pct: number | null } | null } | null)
+    ?.charged_now?.pct;
 
   return (
     <section
@@ -166,7 +167,7 @@ export async function MerchantOnboardingAnswers({ merchantId }: { merchantId: st
           Set by NexG
         </h3>
         <dl className="mt-2 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(0,16rem)_1fr]">
-          <dt className="text-muted font-semibold">Standard commission rate</dt>
+          <dt className="text-muted font-semibold">Commission charged now</dt>
           <dd className="font-bold">
             {commission !== null && commission !== undefined ? `${Number(commission)}%` : '—'}
           </dd>

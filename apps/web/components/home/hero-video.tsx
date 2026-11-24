@@ -10,7 +10,14 @@ const CLIPS = [
   '/videos/hero/hero-2.mp4',
   '/videos/hero/hero-3.mp4',
 ];
-const POSTER = '/videos/hero/hero-poster.jpg';
+
+/**
+ * The opening clip's own first frame (frame 0 of hero-gentleman.mp4, as
+ * WebP). It is the first thing painted, so the hero opens on the video and
+ * playback takes over with no visible change. Regenerate it if that clip
+ * changes.
+ */
+const FIRST_FRAME = '/videos/hero/hero-first-frame.webp';
 
 /**
  * The homepage hero's background: four short clips, one after another, on
@@ -18,7 +25,9 @@ const POSTER = '/videos/hero/hero-poster.jpg';
  * one fades in as the current one ends, so there is no black frame between
  * them. Only the clip on screen plays; the next one is preloaded.
  *
- * Visitors who ask for reduced motion see the first frame, still.
+ * Until the first clip plays, or when autoplay is refused (data saver, low
+ * power mode), the first frame shows as a still. Visitors who ask for
+ * reduced motion see that first frame, still.
  */
 export function HeroVideo({ className }: { className?: string }) {
   const [active, setActive] = React.useState(0);
@@ -36,9 +45,13 @@ export function HeroVideo({ className }: { className?: string }) {
   React.useEffect(() => {
     refs.current.forEach((video, i) => {
       if (!video) return;
-      if (i === active && !still) {
+      if (still) {
+        video.pause();
+        /* Back to the first frame, which is what the still shows. */
+        if (i === 0) video.currentTime = 0;
+      } else if (i === active) {
         video.currentTime = 0;
-        /* Autoplay can be refused (battery saver); the poster stays. */
+        /* Autoplay can be refused (battery saver); the first frame stays. */
         void video.play().catch(() => {});
       } else {
         video.pause();
@@ -47,7 +60,13 @@ export function HeroVideo({ className }: { className?: string }) {
   }, [active, still]);
 
   return (
-    <div className={cn('bg-night absolute inset-0', className)} aria-hidden="true">
+    <div
+      className={cn('bg-night absolute inset-0 bg-cover bg-center', className)}
+      style={{ backgroundImage: `url(${FIRST_FRAME})` }}
+      aria-hidden="true"
+    >
+      {/* Fetched before the clips, so the still is there at once. */}
+      <link rel="preload" as="image" href={FIRST_FRAME} fetchPriority="high" />
       {CLIPS.map((src, i) => (
         <video
           key={src}
@@ -55,7 +74,8 @@ export function HeroVideo({ className }: { className?: string }) {
             refs.current[i] = el;
           }}
           src={src}
-          poster={i === 0 ? POSTER : undefined}
+          poster={i === 0 ? FIRST_FRAME : undefined}
+          autoPlay={i === 0}
           muted
           playsInline
           preload={i === active || i === (active + 1) % CLIPS.length ? 'auto' : 'none'}
