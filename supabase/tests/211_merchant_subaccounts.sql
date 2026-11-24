@@ -6,7 +6,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(21);
+select plan(24);
 
 delete from vault.secrets where name in ('paystack_test_secret_key', 'paystack_live_secret_key');
 select vault.create_secret('sk_test_ci_only_0123456789abcdef', 'paystack_test_secret_key');
@@ -211,6 +211,31 @@ select is((select coalesce(sum(e.debit - e.credit), 0) from ledger.entry e
   0::bigint, 'and nothing is left owed to NexG.');
 select is(pg_temp.owed_on('c2110000-0000-4000-8000-000000000012'), 0::bigint,
   'The second order is paid out in full to the merchant too, less what came back.');
+
+-- ── 5b. a refund Paystack took from the merchant's sub-account (the usual case)
+
+insert into public.refund (id, order_id, amount_cents, method, reason_code, reason_text,
+                           requested_by, approved_by, status)
+values ('c2110000-0000-4000-8000-0000000000f2', 'c2110000-0000-4000-8000-000000000012', 30000, 'original',
+        'missing_item', '[One item missing]', 'c2110000-0000-4000-8000-0000000000b1',
+        'c2110000-0000-4000-8000-0000000000b2', 'approved');
+update public.refund set status = 'issued', issued_at = now(), provider_ref = '[NXR-ci211b]'
+ where id = 'c2110000-0000-4000-8000-0000000000f2';
+
+set local role authenticated;
+select pg_temp.as_user('c2110000-0000-4000-8000-000000000007');
+select is(public.rpc_merchant_recovery_decide('c2110000-0000-4000-8000-0000000000f2', 'paystack', 30000)
+  ->> 'method', 'paystack', 'Finance records that Paystack took KES 300 from the sub-account.');
+reset role;
+select is((select state || ':' || recovered_cents from public.merchant_recovery
+            where refund_id = 'c2110000-0000-4000-8000-0000000000f2'),
+  'by_paystack:30000', 'It is settled at once.');
+select is((select coalesce(sum(e.debit), 0) from ledger.entry e
+             join ledger.transaction x on x.id = e.transaction_id
+            where x.kind = 'merchant_refund_by_paystack'
+              and x.order_id = 'c2110000-0000-4000-8000-000000000012'
+              and e.account_code = 'cash.card_processor_receivable')::bigint,
+  30000::bigint, 'and that part stays in NexG''s Paystack balance, with nothing owed by the merchant.');
 
 -- ── 6. paused
 

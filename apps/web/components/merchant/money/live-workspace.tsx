@@ -153,6 +153,7 @@ const RECOVERY_STATE: Record<string, string> = {
   invoiced: 'invoiced to you',
   settled: 'paid by you',
   absorbed: 'carried by NexG',
+  by_paystack: 'taken back by Paystack from your payouts',
   cancelled: 'cancelled',
 };
 

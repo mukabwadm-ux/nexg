@@ -85,9 +85,9 @@ create table public.merchant_recovery (
   refund_id uuid unique references public.refund (id) on delete restrict,
   is_test boolean not null default false,
   amount_cents bigint not null check (amount_cents > 0),
-  method text not null check (method in ('next_sales', 'invoice', 'nexg')),
+  method text not null check (method in ('paystack', 'next_sales', 'invoice', 'nexg')),
   recovered_cents bigint not null default 0 check (recovered_cents >= 0),
-  state text not null check (state in ('open', 'recovered', 'invoiced', 'settled', 'absorbed', 'cancelled')),
+  state text not null check (state in ('open', 'recovered', 'invoiced', 'settled', 'absorbed', 'by_paystack', 'cancelled')),
   note text check (note is null or length(note) <= 500),
   decided_by uuid references public.staff_user (id) on delete set null,
   decided_at timestamptz not null default now(),
@@ -95,7 +95,7 @@ create table public.merchant_recovery (
   constraint recovery_not_more_than_owed check (recovered_cents <= amount_cents)
 );
 comment on table public.merchant_recovery is
-  'A merchant''s part of a refund NexG paid on an order Paystack had already paid out: taken from the merchant''s next sales, invoiced, or absorbed by NexG.';
+  'A merchant''s part of a refund NexG paid on an order Paystack had already paid out: taken by Paystack from the merchant''s sub-account (the usual case), from their next sales, invoiced, or absorbed by NexG.';
 create index merchant_recovery_open on public.merchant_recovery (merchant_id, decided_at)
   where state = 'open' and method = 'next_sales';
 alter table public.merchant_recovery enable row level security;
@@ -628,8 +628,11 @@ create trigger order_split_settled
 
 /*
  * For a refund on an order Paystack paid out to the merchant: who carries the
- * merchant's part. 'next_sales' or 'invoice' make it owed by the merchant
- * (it comes back off NexG's refund cost); 'nexg' records that NexG absorbs it.
+ * merchant's part. Owner, 24 Nov 2026: Paystack takes a refund on a split
+ * order from the merchant's sub-account, so 'paystack' is the usual answer:
+ * that part never left NexG's Paystack balance, and it is settled at once.
+ * 'next_sales' or 'invoice' are for when Paystack did not take it (the merchant
+ * owes it; it comes back off NexG's refund cost); 'nexg' means NexG absorbs it.
  */
 create function public.rpc_merchant_recovery_decide(
   p_refund_id uuid, p_method text, p_amount_cents bigint, p_note text default null)
@@ -649,8 +652,8 @@ begin
   if v_me is null or not authz.has_full_finance() then
     raise exception 'Only Finance decides who carries a refund.' using errcode = '42501';
   end if;
-  if p_method is null or p_method not in ('next_sales', 'invoice', 'nexg') then
-    raise exception 'Choose next sales, invoice or NexG.' using errcode = '22023';
+  if p_method is null or p_method not in ('paystack', 'next_sales', 'invoice', 'nexg') then
+    raise exception 'Choose Paystack, next sales, invoice or NexG.' using errcode = '22023';
   end if;
   select * into f from public.refund where id = p_refund_id for update;
   if f.id is null or f.status <> 'issued' then
@@ -679,13 +682,31 @@ begin
   end if;
 
   insert into public.merchant_recovery
-    (merchant_id, order_id, refund_id, is_test, amount_cents, method, state, note, decided_by)
+    (merchant_id, order_id, refund_id, is_test, amount_cents, method, state, recovered_cents, note, decided_by)
   values (a.split_merchant_id, o.id, f.id, v_test, p_amount_cents, p_method,
-          case p_method when 'next_sales' then 'open' when 'invoice' then 'invoiced' else 'absorbed' end,
+          case p_method when 'paystack' then 'by_paystack' when 'next_sales' then 'open'
+                        when 'invoice' then 'invoiced' else 'absorbed' end,
+          case when p_method = 'paystack' then p_amount_cents else 0 end,
           left(nullif(trim(coalesce(p_note, '')), ''), 500), v_me)
   returning id into v_id;
 
-  if p_method <> 'nexg' and not v_test then
+  if p_method = 'paystack' and not v_test then
+    /* The refund entry took the whole refund off NexG's cash; this part came
+       out of the merchant's sub-account instead, so it is still with Paystack. */
+    perform ledger.post(
+      p_kind => 'merchant_refund_by_paystack',
+      p_idempotency_key => 'recovery:' || v_id::text,
+      p_entries => jsonb_build_array(
+        jsonb_build_object('account', 'cash.card_processor_receivable', 'debit', p_amount_cents,
+          'memo', o.reference),
+        jsonb_build_object('account', 'revenue.commission', 'credit', p_amount_cents,
+          'memo', 'Paystack took this part of the refund from the merchant''s sub-account')),
+      p_order_id => o.id,
+      p_city_id => o.city_id,
+      p_actor_kind => 'staff',
+      p_actor_id => v_me,
+      p_reason_text => 'Refund taken by Paystack from the merchant''s sub-account');
+  elsif p_method in ('next_sales', 'invoice') and not v_test then
     perform ledger.post(
       p_kind => 'merchant_refund_recovery',
       p_idempotency_key => 'recovery:' || v_id::text,

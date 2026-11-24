@@ -181,7 +181,7 @@ export async function pauseSubaccount(
 export async function decideRecovery(
   merchantId: string,
   refundId: string,
-  method: 'next_sales' | 'invoice' | 'nexg',
+  method: 'paystack' | 'next_sales' | 'invoice' | 'nexg',
   amountKes: string,
   note: string,
 ): Promise<SubaccountResult> {
@@ -200,11 +200,13 @@ export async function decideRecovery(
   if (error) return { ok: false, message: refusal(error.message) };
   return done(
     merchantId,
-    method === 'next_sales'
-      ? 'Taken from their next sales: NexG keeps that much more of their next payments.'
-      : method === 'invoice'
-        ? 'Recorded as invoiced. Mark it paid here when the merchant pays.'
-        : 'Recorded: NexG carries it.',
+    method === 'paystack'
+      ? 'Recorded: Paystack took it from their sub-account.'
+      : method === 'next_sales'
+        ? 'Taken from their next sales: NexG keeps that much more of their next payments.'
+        : method === 'invoice'
+          ? 'Recorded as invoiced. Mark it paid here when the merchant pays.'
+          : 'Recorded: NexG carries it.',
   );
 }
 

@@ -366,7 +366,11 @@ function RefundRow({
   row: SplitOverview['refundsToDecide'][number];
   busy: boolean;
   canRecord: boolean;
-  onDecide: (method: 'next_sales' | 'invoice' | 'nexg', amountKes: string, note: string) => void;
+  onDecide: (
+    method: 'paystack' | 'next_sales' | 'invoice' | 'nexg',
+    amountKes: string,
+    note: string,
+  ) => void;
 }) {
   const [amount, setAmount] = React.useState(
     (Math.floor(Math.min(row.refundCents, row.shareCents)) / 100).toFixed(2),
@@ -399,8 +403,16 @@ function RefundRow({
           <button
             type="button"
             disabled={busy}
-            onClick={() => onDecide('next_sales', amount, note)}
+            onClick={() => onDecide('paystack', amount, note)}
             className={dark}
+          >
+            Paystack took it from their sub-account
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => onDecide('next_sales', amount, note)}
+            className="border-border-strong rounded-lg border px-3 py-1.5 text-[0.75rem] font-extrabold disabled:opacity-40"
           >
             Take from next sales
           </button>
@@ -432,6 +444,7 @@ const RECOVERY: Record<string, string> = {
   invoiced: 'invoiced, not paid yet',
   settled: 'paid by the merchant',
   absorbed: 'carried by NexG',
+  by_paystack: 'taken by Paystack from their sub-account',
   cancelled: 'cancelled',
 };
 
