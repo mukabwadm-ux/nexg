@@ -1,4 +1,4 @@
--- Cinemas connected to their own ticketing system (20270304000100): the cache
+-- Cinemas connected to their own ticketing system (20270304000200): the cache
 -- of what the system said, a hold's life on it, and the worker's checks.
 begin;
 create extension if not exists pgtap with schema extensions;
