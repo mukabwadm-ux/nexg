@@ -251,7 +251,7 @@ set local session_replication_role = origin;
 
 set local role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
-/* Storage's list API reads storage.objects under the caller's role, so these
+/* Storage’s list API reads storage.objects under the caller’s role, so these
    counts are what a list of the bucket would return. */
 select is(
   (select count(*)::int from storage.objects where bucket_id = 'host-guide-assets'),

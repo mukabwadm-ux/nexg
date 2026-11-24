@@ -106,7 +106,7 @@ begin
 end;
 $$;
 
-/* May the caller add or read files at this path: a member who may write the unit's guide. */
+/* May the caller add or read files at this path: a member who may write the unit’s guide. */
 create or replace function authz.can_write_guide_asset_path(p_name text)
 returns boolean
 language sql
@@ -129,7 +129,7 @@ as $$
      and not exists (select 1 from public.host_unit_guide_asset a where a.storage_path = p_name)
 $$;
 
-/* True while a QR code holder's grant for this path lasts (see rpc_host_workspace_guide_asset_sign). */
+/* True while a QR code holder’s grant for this path lasts (see rpc_host_workspace_guide_asset_sign). */
 create or replace function authz.guide_asset_granted(p_name text)
 returns boolean
 language sql
@@ -179,11 +179,11 @@ create policy host_guide_assets_guest_read on storage.objects
 -- ═══════════════════════════════════════════════ recording an uploaded file
 
 /*
- * Attach a file already uploaded to host-guide-assets to the unit's guide
+ * Attach a file already uploaded to host-guide-assets to the unit’s guide
  * draft, with the same checks as rpc_host_workspace_guide_asset_put: the unit
  * is not archived and the caller may write its guide, the draft revision
- * matches, and the file is within its kind's size. The API has already
- * checked the file's contents and its sha256 (p_digest, which is also its
+ * matches, and the file is within its kind’s size. The API has already
+ * checked the file’s contents and its sha256 (p_digest, which is also its
  * file name). The same file attached twice reuses one asset.
  */
 create or replace function public.rpc_host_workspace_guide_asset_record(
@@ -276,7 +276,7 @@ as $$
 $$;
 
 /*
- * The guest guide's read of one file by its QR code: the same answer as
+ * The guest guide’s read of one file by its QR code: the same answer as
  * rpc_host_workspace_guide_asset(p_id, p_code), and, for a file in Storage,
  * a 60-second grant so the API can sign a download link for that path only.
  */
