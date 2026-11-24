@@ -47,9 +47,10 @@ import { HostWelcome, useHostWelcome } from './host-welcome';
  * with the three steps. One client component because the property-type
  * cards and the form's Property Type share one value.
  *
- * The card is the same application as the long form further down, with the
- * same steps: "Verify email" sends a code to the login email, the code is
- * confirmed in place, and only a verified email can submit. Then
+ * The card is the only host application form on the page (the long form
+ * further down was removed, 24 Nov 2026). "Verify email" sends a code to the
+ * login email, the code is confirmed in place, and only a verified email can
+ * submit. Then
  * `applyAsHost` runs `rpc_host_apply`, which creates the host, its first unit
  * and the desk ticket staff work from, and the welcome email goes out.
  */
@@ -83,7 +84,7 @@ const TYPE_OPTIONS = PROPERTY_TYPES.map((t) => ({
   label: t.sub ? `${t.label} ${t.sub}` : t.label,
 }));
 
-/* The same bands the long form and rpc_host_apply use. */
+/* The same bands rpc_host_apply uses. */
 const UNIT_BANDS = [
   { value: '1', label: '1' },
   { value: '2_5', label: '2–5' },
@@ -241,6 +242,9 @@ export function ListYourProperty() {
                         fill
                         placeholder="blur"
                         sizes="(min-width: 1280px) 220px, 45vw"
+                        /* Served as the plain file: Vercel's image resizer answers 402 once
+                           the plan's monthly quota is used, which broke these cards. */
+                        unoptimized
                         className="object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transform-none"
                       />
                     </span>
@@ -285,7 +289,7 @@ export function ListYourProperty() {
 const errorText = (error: unknown, fallback: string) =>
   error instanceof HostEmailError ? error.message : fallback;
 
-/* The same email steps as the long form (HostRegisterCard): verify the login
+/* The email steps (as the old long form had them): verify the login
    email right here with a code, then submit. */
 type EmailState =
   | { kind: 'idle' }

@@ -24,7 +24,6 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { HostRegisterCard } from '@/components/hosts/host-register-card';
 import { ListYourProperty } from '@/components/hosts/list-your-property';
 import { PropertyCard, type PropertyCardRow } from '@/components/stays/listing';
 import { TailorForm } from '@/components/stays/tailor-form';
@@ -683,46 +682,6 @@ export default async function HostsPage() {
             </div>
           </section>
         )}
-
-        {/* ─────────────────────────────────────────── the form */}
-        <section id="list-airbnb" className="mx-auto max-w-[120rem] px-4 py-12 sm:px-[30px]">
-          <div className="rounded-2xl border border-[#ECE8DF] bg-white p-6 sm:p-10">
-            <div className="grid gap-8 lg:grid-cols-[26rem_1fr] lg:items-start lg:gap-14">
-              <div>
-                <p className="text-gold-text text-[0.6875rem] font-extrabold uppercase tracking-[0.14em]">
-                  List your Airbnb
-                </p>
-                <h2 className="mt-2 text-[1.75rem] font-extrabold leading-tight tracking-[-0.02em]">
-                  Ten minutes now. Better reviews all year.
-                </h2>
-                <p className="mt-4 text-[0.875rem] font-semibold leading-[1.8] text-[#5B5B5B]">
-                  Tell us about your first unit and confirm your email. Then sign in, upload your ID
-                  and proof of authority to let, and you&rsquo;re live as soon as NexG approves
-                  them.
-                </p>
-                <ul className="mt-5 space-y-2.5">
-                  {[
-                    'Free to list · first month of management free',
-                    'Manage one flat or a hundred',
-                    'Cancel any time',
-                  ].map((point) => (
-                    <li key={point} className="flex items-center gap-2.5">
-                      <span
-                        aria-hidden="true"
-                        className="bg-gold flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
-                      >
-                        <Check className="h-3 w-3 text-[#141414]" />
-                      </span>
-                      <span className="text-[0.8125rem] font-bold">{point}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <HostRegisterCard />
-            </div>
-          </div>
-        </section>
 
         {/* ────────────────────────────────────────────── FAQ */}
         <section className="mx-auto max-w-[120rem] px-4 py-12 sm:px-[30px]">
