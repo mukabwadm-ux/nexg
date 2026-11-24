@@ -27,7 +27,7 @@ function CareersArt() {
       <rect x="38" y="158" width="196" height="9" rx="4.5" fill="#B9B3A6" />
       <rect x="38" y="196" width="110" height="34" rx="17" fill="#D9AE2E" />
       <rect x="162" y="196" width="110" height="34" rx="17" fill="#141414" />
-      <circle cx="330" cy="150" r="30" fill="#FDD128" />
+      <circle cx="330" cy="150" r="30" fill="#D2AF26" />
       <circle cx="330" cy="140" r="10" fill="#141414" />
       <path d="M312 172 Q330 152 348 172 Z" fill="#141414" />
       <circle cx="376" cy="172" r="26" fill="#141414" stroke="#F6F3EC" strokeWidth="4" />
@@ -122,7 +122,7 @@ export function JoinSection({ t }: { t: Translate }) {
       <span
         data-reveal-glow
         aria-hidden="true"
-        className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[40rem] max-w-full -translate-x-1/2 rounded-full bg-[#FDD128]/15 blur-3xl"
+        className="bg-gold/15 pointer-events-none absolute -top-24 left-1/2 h-72 w-[40rem] max-w-full -translate-x-1/2 rounded-full blur-3xl"
       />
 
       <div data-reveal-head className="relative mx-auto max-w-3xl text-center">
@@ -146,7 +146,7 @@ export function JoinSection({ t }: { t: Translate }) {
           <path
             d={LINE}
             fill="none"
-            stroke="#FDD128"
+            stroke="#D2AF26"
             strokeWidth="3"
             strokeDasharray="2 12"
             strokeLinecap="round"

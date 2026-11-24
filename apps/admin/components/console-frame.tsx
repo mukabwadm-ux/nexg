@@ -323,7 +323,7 @@ function NavGroupRow({
           className={cn(
             row,
             here
-              ? 'bg-gold text-ink shadow-[0_6px_18px_-8px_rgba(253,209,40,0.7)]'
+              ? 'bg-gold text-ink shadow-[0_6px_18px_-8px_rgb(var(--gold-rgb)/0.7)]'
               : 'text-white/80 hover:bg-white/[0.06] hover:text-white',
           )}
         >
@@ -409,7 +409,7 @@ function GroupBody({
         className={cn(
           'flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-[0.9375rem] font-semibold transition-colors',
           here
-            ? 'bg-gold text-ink shadow-[0_6px_18px_-8px_rgba(253,209,40,0.7)]'
+            ? 'bg-gold text-ink shadow-[0_6px_18px_-8px_rgb(var(--gold-rgb)/0.7)]'
             : 'text-white/80 hover:bg-white/[0.06] hover:text-white',
         )}
       >

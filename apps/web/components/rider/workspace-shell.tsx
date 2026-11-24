@@ -75,7 +75,7 @@ function RiderSearch({ nav }: { nav: RiderNavItem[] }) {
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         placeholder="Search jobs, earnings, or help…"
         aria-label="Search the rider portal"
-        className="h-11 w-full rounded-2xl border border-[#e3e7f0] bg-white pl-11 pr-4 text-[14px] font-semibold outline-none focus:border-[#fdd128] focus:ring-2 focus:ring-[#fdd128]/40"
+        className="focus:border-gold focus:ring-gold/40 h-11 w-full rounded-2xl border border-[#e3e7f0] bg-white pl-11 pr-4 text-[14px] font-semibold outline-none focus:ring-2"
       />
       {open && q ? (
         <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-xl border border-[#e3e7f0] bg-white shadow-lg">

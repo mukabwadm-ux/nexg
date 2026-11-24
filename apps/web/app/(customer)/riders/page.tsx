@@ -211,7 +211,7 @@ export default async function RidersPage() {
                 Already on NexG?{' '}
                 <Link
                   href="/riders/sign-in"
-                  className="text-gold-text dark:text-gold rounded-sm font-extrabold underline underline-offset-4 dark:hover:text-[#FEDD5C]"
+                  className="text-gold-text dark:text-gold dark:hover:text-gold-light rounded-sm font-extrabold underline underline-offset-4"
                 >
                   Sign in
                 </Link>

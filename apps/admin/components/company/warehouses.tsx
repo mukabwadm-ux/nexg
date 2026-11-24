@@ -191,7 +191,7 @@ export function LocationsBoard({
                 <p className="text-muted-light text-xs font-semibold">Stock Value</p>
                 <div className="bg-border/70 mt-2 h-1.5 overflow-hidden rounded-full">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#F0B90B] to-[#FDD128]"
+                    className="from-gold-deep to-gold h-full rounded-full bg-gradient-to-r"
                     style={{ width: `${(s.value / biggest) * 100}%` }}
                   />
                 </div>

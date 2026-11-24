@@ -495,7 +495,7 @@ const ENTRANCES: Record<RevealVariant, Entrance> = {
       timeline.add(
         ring,
         {
-          boxShadow: ['0 0 0 0px rgba(253, 209, 40, 0.7)', '0 0 0 14px rgba(253, 209, 40, 0)'],
+          boxShadow: ['0 0 0 0px rgba(210, 175, 38, 0.7)', '0 0 0 14px rgba(210, 175, 38, 0)'],
           duration: 1400,
           ease: 'outQuad',
           onComplete: () => ring.style.removeProperty('box-shadow'),

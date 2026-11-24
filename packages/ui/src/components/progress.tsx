@@ -26,7 +26,7 @@ export function Progress({ value, label, tone = 'gold', className, ...props }: P
       <div
         className={cn(
           'h-full rounded-full transition-[width] duration-500 ease-out',
-          tone === 'gold' && 'bg-gradient-to-r from-[#F0B90B] to-[#FDD128]',
+          tone === 'gold' && 'from-gold-deep to-gold bg-gradient-to-r',
           tone === 'success' && 'bg-success',
           tone === 'danger' && 'bg-danger',
           tone === 'ink' && 'bg-ink',

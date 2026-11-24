@@ -97,7 +97,7 @@ export function ShiftPlanner({
                   aria-pressed={on}
                   className={`flex w-full flex-col items-center rounded-2xl px-1 py-2 ${ring} ${
                     on
-                      ? 'bg-[#fdd128] text-[color:var(--rider-ink)] shadow-[0_8px_18px_-10px_rgba(180,130,0,0.9)]'
+                      ? 'bg-gold text-[color:var(--rider-ink)] shadow-[0_8px_18px_-10px_rgb(var(--gold-deep-rgb)/0.9)]'
                       : 'hover:bg-[#f6f7fb]'
                   }`}
                 >
@@ -214,7 +214,7 @@ export function ShiftPlanner({
                   type="button"
                   disabled={!active || started || !zone || busy !== null}
                   onClick={() => void run(id, () => commitShift(zone, picked, w.key))}
-                  className={`rounded-xl bg-[#f3f5fa] px-5 py-2 text-[13.5px] font-extrabold text-[color:var(--rider-ink)] hover:bg-[#fff6cf] disabled:opacity-40 ${ring}`}
+                  className={`hover:bg-gold/20 rounded-xl bg-[#f3f5fa] px-5 py-2 text-[13.5px] font-extrabold text-[color:var(--rider-ink)] disabled:opacity-40 ${ring}`}
                 >
                   {busy === id ? 'Booking…' : started ? 'Started' : 'Book'}
                 </button>

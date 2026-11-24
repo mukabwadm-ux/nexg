@@ -11,8 +11,8 @@ import {
 } from '@/lib/customer-activity';
 
 const card =
-  'flex min-w-0 flex-col gap-1.5 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-white no-underline transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fdd128]';
-const why = 'text-[0.6875rem] font-extrabold uppercase tracking-[0.06em] text-[#fdd128]';
+  'flex min-w-0 flex-col gap-1.5 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-white no-underline transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold';
+const why = 'text-[0.6875rem] font-extrabold uppercase tracking-[0.06em] text-gold';
 const sub = 'text-[0.8125rem] leading-snug text-white/70';
 
 const when = (iso: string) =>
@@ -69,11 +69,11 @@ export async function ForYou() {
               href={`/account/orders/${live.id}`}
               className="inline-flex min-h-11 items-center gap-3 rounded-full bg-white/[0.08] py-1.5 pl-4 pr-1.5 text-sm font-bold text-white no-underline"
             >
-              <span className="h-2 w-2 rounded-full bg-[#fdd128]" aria-hidden="true" />
+              <span className="h-2 w-2 rounded-full bg-gold" aria-hidden="true" />
               {(live.merchant_id && activity.merchants.get(live.merchant_id)?.trading_name) ||
                 'Your order'}{' '}
               · {live.stage.replaceAll('_', ' ')}
-              <span className="rounded-full bg-[#fdd128] px-3 py-1.5 font-extrabold text-[#141414]">
+              <span className="rounded-full bg-gold px-3 py-1.5 font-extrabold text-[#141414]">
                 Track
               </span>
             </Link>

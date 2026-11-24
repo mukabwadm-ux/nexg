@@ -94,7 +94,7 @@ const BUTTON =
   'focus-visible:ring-gold inline-flex items-center justify-center gap-2 rounded-full px-6 text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 
 /** The main action: ink on the cream page, gold on the dark one. */
-const primaryButton = `${BUTTON} bg-ink text-white hover:bg-ink/85 dark:bg-gold dark:text-night dark:hover:bg-[#FEDD5C]`;
+const primaryButton = `${BUTTON} bg-ink text-white hover:bg-ink/85 dark:bg-gold dark:text-night dark:hover:bg-gold-light`;
 
 /** Ink in both themes: for the gold panel. */
 const inkButton = `${BUTTON} bg-ink text-white hover:bg-ink/85`;
@@ -183,7 +183,7 @@ export default async function MerchantsPage() {
                   Already on NexG?{' '}
                   <Link
                     href="/merchants/sign-in?next=%2Fmerchant"
-                    className="text-gold-text dark:text-gold rounded-sm font-extrabold underline underline-offset-4 dark:hover:text-[#FEDD5C]"
+                    className="text-gold-text dark:text-gold dark:hover:text-gold-light rounded-sm font-extrabold underline underline-offset-4"
                   >
                     Sign in
                   </Link>
@@ -442,7 +442,7 @@ export default async function MerchantsPage() {
 
                 <Link
                   href={registrationHref}
-                  className={`${BUTTON} bg-gold text-ink mt-8 h-14 w-full text-base hover:bg-[#FEDD5C]`}
+                  className={`${BUTTON} bg-gold text-ink hover:bg-gold-light mt-8 h-14 w-full text-base`}
                 >
                   Register Your Business
                 </Link>

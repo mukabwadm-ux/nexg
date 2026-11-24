@@ -82,7 +82,7 @@ export function loadGoogleMaps({ key, libraries = [] }: MapsLoad): Promise<typeo
 /** The tokens NexG's map style uses, for anything drawn by hand. */
 export const MAP_COLOURS = {
   ink: '#14110F',
-  gold: '#FDD128',
+  gold: '#D2AF26',
   success: '#1E7D4F',
   danger: '#B3261E',
   info: '#2B5F9E',

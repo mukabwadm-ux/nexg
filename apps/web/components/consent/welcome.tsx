@@ -188,7 +188,7 @@ export function WelcomeConsent({
             type="button"
             disabled={busy !== null}
             onClick={() => void accept()}
-            className={`${action} bg-gold text-ink hover:bg-[#FEDD5C]`}
+            className={`${action} bg-gold text-ink hover:bg-gold-light`}
           >
             {busy === 'both' ? '…' : t('consent.allow')}
           </button>
