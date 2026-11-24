@@ -3,8 +3,10 @@ import { Card } from '@nexg/ui';
 import Link from 'next/link';
 
 import type { HostPayout } from '@/lib/host-payouts';
+import type { HostCommissionCard, HostSplitOverview } from '@/lib/host-paystack';
 
 import { HostPayoutPanel } from './host-payout';
+import { HostPaystackCard } from './host-paystack-card';
 import {
   ageLabel,
   Avatar,
@@ -69,6 +71,7 @@ export function HostsTab({
   payout = null,
   canDeclarePayout = false,
   payoutUnavailable = false,
+  paystack = null,
 }: {
   hosts: HostRow[];
   units: UnitRow[];
@@ -80,6 +83,8 @@ export function HostsTab({
   /** Hospitality staff, who declare payout details; the database checks again. */
   canDeclarePayout?: boolean;
   payoutUnavailable?: boolean;
+  /** The selected host's commission and Paystack sub-account; null parts could not be read. */
+  paystack?: HostPaystack | null;
 }) {
   const visible = hosts.filter((h) => {
     switch (filter) {
@@ -216,6 +221,7 @@ export function HostsTab({
             payout={payout?.host_id === chosen.id ? payout : null}
             canDeclarePayout={canDeclarePayout}
             payoutUnavailable={payoutUnavailable}
+            paystack={paystack}
           />
         ) : (
           <Card className="p-5">
@@ -227,19 +233,29 @@ export function HostsTab({
   );
 }
 
+interface HostPaystack {
+  commission: HostCommissionCard | null;
+  overview: HostSplitOverview | null;
+}
+
 function HostPanel({
   host,
   units,
   payout,
   canDeclarePayout,
   payoutUnavailable,
+  paystack,
 }: {
   host: HostRow;
   units: UnitRow[];
   payout: HostPayout | null;
   canDeclarePayout: boolean;
   payoutUnavailable: boolean;
+  paystack: HostPaystack | null;
 }) {
+  /* Staff only: a host never reaches this console, but the read says who is asking. */
+  const showPaystack =
+    paystack?.commission?.viewer === 'staff' || paystack?.overview?.viewer === 'staff';
   return (
     <div className="space-y-4">
       <Card className="p-5">
@@ -348,6 +364,14 @@ function HostPanel({
         canDeclare={canDeclarePayout}
         unavailable={payoutUnavailable}
       />
+
+      {showPaystack && paystack && (
+        <HostPaystackCard
+          hostId={host.id}
+          commission={paystack.commission}
+          overview={paystack.overview}
+        />
+      )}
 
       {(host.status === 'applied' || host.status === 'verifying') && (
         <Card className="border-gold border-2 p-5">

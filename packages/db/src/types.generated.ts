@@ -6292,6 +6292,61 @@ export type Database = {
           },
         ];
       };
+      cancellation_preset_version: {
+        Row: {
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          id: string;
+          preset: string;
+          reason: string | null;
+          requested_at: string;
+          requested_by: string | null;
+          status: string;
+          tiers: NonNullable<Json>;
+        };
+        ComputedFields: never;
+        Insert: {
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          id?: string;
+          preset: string;
+          reason?: string | null;
+          requested_at?: string;
+          requested_by?: string | null;
+          status?: string;
+          tiers: NonNullable<Json>;
+        };
+        Update: {
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          id?: string;
+          preset?: string;
+          reason?: string | null;
+          requested_at?: string;
+          requested_by?: string | null;
+          status?: string;
+          tiers?: NonNullable<Json>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'cancellation_preset_version_decided_by_fkey';
+            columns: ['decided_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'cancellation_preset_version_requested_by_fkey';
+            columns: ['requested_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       cash_deposit: {
         Row: {
           account_reference: string | null;
@@ -18710,6 +18765,133 @@ export type Database = {
           },
         ];
       };
+      host_commission_term: {
+        Row: {
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          ends_on: string | null;
+          host_id: string;
+          id: string;
+          pct: number;
+          reason: string;
+          requested_at: string;
+          requested_by: string | null;
+          starts_on: string;
+          status: string;
+          terms_ref: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          ends_on?: string | null;
+          host_id: string;
+          id?: string;
+          pct: number;
+          reason: string;
+          requested_at?: string;
+          requested_by?: string | null;
+          starts_on: string;
+          status?: string;
+          terms_ref?: string | null;
+        };
+        Update: {
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          ends_on?: string | null;
+          host_id?: string;
+          id?: string;
+          pct?: number;
+          reason?: string;
+          requested_at?: string;
+          requested_by?: string | null;
+          starts_on?: string;
+          status?: string;
+          terms_ref?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_commission_term_decided_by_fkey';
+            columns: ['decided_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_commission_term_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_commission_term_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_commission_term_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_commission_term_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_commission_term_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_commission_term_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_commission_term_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_commission_term_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_commission_term_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_commission_term_requested_by_fkey';
+            columns: ['requested_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       host_document: {
         Row: {
           file_name: string;
@@ -19229,7 +19411,9 @@ export type Database = {
           account: NonNullable<Json>;
           declared_at: string;
           declared_by: string | null;
+          declared_by_user: string | null;
           host_id: string;
+          kra_pin: string | null;
           rail: string;
           verified_at: string | null;
           verified_by: string | null;
@@ -19241,7 +19425,9 @@ export type Database = {
           account: NonNullable<Json>;
           declared_at?: string;
           declared_by?: string | null;
+          declared_by_user?: string | null;
           host_id: string;
+          kra_pin?: string | null;
           rail: string;
           verified_at?: string | null;
           verified_by?: string | null;
@@ -19252,7 +19438,9 @@ export type Database = {
           account?: NonNullable<Json>;
           declared_at?: string;
           declared_by?: string | null;
+          declared_by_user?: string | null;
           host_id?: string;
+          kra_pin?: string | null;
           rail?: string;
           verified_at?: string | null;
           verified_by?: string | null;
@@ -19333,6 +19521,136 @@ export type Database = {
           {
             foreignKeyName: 'host_payout_verified_by_fkey';
             columns: ['verified_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      host_paystack_subaccount: {
+        Row: {
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          host_id: string;
+          id: string;
+          is_test: boolean;
+          note: string | null;
+          paystack_details: NonNullable<Json>;
+          requested_at: string;
+          requested_by: string | null;
+          schedule: string;
+          status: string;
+          subaccount_code: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          host_id: string;
+          id?: string;
+          is_test: boolean;
+          note?: string | null;
+          paystack_details?: NonNullable<Json>;
+          requested_at?: string;
+          requested_by?: string | null;
+          schedule: string;
+          status?: string;
+          subaccount_code: string;
+          updated_at?: string;
+        };
+        Update: {
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          host_id?: string;
+          id?: string;
+          is_test?: boolean;
+          note?: string | null;
+          paystack_details?: NonNullable<Json>;
+          requested_at?: string;
+          requested_by?: string | null;
+          schedule?: string;
+          status?: string;
+          subaccount_code?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'host_paystack_subaccount_decided_by_fkey';
+            columns: ['decided_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_paystack_subaccount_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_paystack_subaccount_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_paystack_subaccount_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'host_paystack_subaccount_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_paystack_subaccount_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_paystack_subaccount_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_paystack_subaccount_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_paystack_subaccount_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_paystack_subaccount_host_id_fkey';
+            columns: ['host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'host_paystack_subaccount_requested_by_fkey';
+            columns: ['requested_by'];
             isOneToOne: false;
             referencedRelation: 'staff_user';
             referencedColumns: ['id'];
@@ -34276,6 +34594,8 @@ export type Database = {
           phone: string | null;
           reference: string;
           save_card: boolean;
+          split_commission_pct: number | null;
+          split_host_id: string | null;
           split_merchant_id: string | null;
           split_recovery_cents: number;
           split_share_cents: number | null;
@@ -34300,6 +34620,8 @@ export type Database = {
           phone?: string | null;
           reference: string;
           save_card?: boolean;
+          split_commission_pct?: number | null;
+          split_host_id?: string | null;
           split_merchant_id?: string | null;
           split_recovery_cents?: number;
           split_share_cents?: number | null;
@@ -34323,6 +34645,8 @@ export type Database = {
           phone?: string | null;
           reference?: string;
           save_card?: boolean;
+          split_commission_pct?: number | null;
+          split_host_id?: string | null;
           split_merchant_id?: string | null;
           split_recovery_cents?: number;
           split_share_cents?: number | null;
@@ -34342,6 +34666,69 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'payment';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'paystack_attempt_split_host_id_fkey';
+            columns: ['split_host_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_host_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'paystack_attempt_split_host_id_fkey';
+            columns: ['split_host_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_host_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'paystack_attempt_split_host_id_fkey';
+            columns: ['split_host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'paystack_attempt_split_host_id_fkey';
+            columns: ['split_host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_earnings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'paystack_attempt_split_host_id_fkey';
+            columns: ['split_host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_home_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'paystack_attempt_split_host_id_fkey';
+            columns: ['split_host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_money_reconciliation_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'paystack_attempt_split_host_id_fkey';
+            columns: ['split_host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_settings_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'paystack_attempt_split_host_id_fkey';
+            columns: ['split_host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_setup_progress_v';
+            referencedColumns: ['host_id'];
+          },
+          {
+            foreignKeyName: 'paystack_attempt_split_host_id_fkey';
+            columns: ['split_host_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_today_v';
+            referencedColumns: ['host_id'];
           },
           {
             foreignKeyName: 'paystack_attempt_split_merchant_id_fkey';
@@ -42331,6 +42718,7 @@ export type Database = {
           checked_out_at: string | null;
           checked_out_by: string | null;
           commission_kes: number | null;
+          commission_pct: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
@@ -42374,6 +42762,7 @@ export type Database = {
           checked_out_at?: string | null;
           checked_out_by?: string | null;
           commission_kes?: number | null;
+          commission_pct?: number | null;
           confirmation_sent_at?: string | null;
           confirmed_at?: string | null;
           conflict_flagged?: boolean;
@@ -42416,6 +42805,7 @@ export type Database = {
           checked_out_at?: string | null;
           checked_out_by?: string | null;
           commission_kes?: number | null;
+          commission_pct?: number | null;
           confirmation_sent_at?: string | null;
           confirmed_at?: string | null;
           conflict_flagged?: boolean;
@@ -63726,6 +64116,7 @@ export type Database = {
       fn_buyer_id_ok: { Args: { p: Json }; Returns: boolean };
       fn_cancellation_policy: { Args: { p_policy: Json }; Returns: Json };
       fn_cancellation_policy_text: { Args: { p_policy: Json }; Returns: string };
+      fn_cancellation_preset_tiers: { Args: { p_preset: string }; Returns: Json };
       fn_capability: { Args: { p_key: string }; Returns: Json };
       fn_card_brand: { Args: { p_value: string }; Returns: string };
       fn_cash_guard: { Args: { p_rider_id: string }; Returns: undefined };
@@ -64024,11 +64415,37 @@ export type Database = {
       fn_handoff_sentence: { Args: { p_unit_id: string }; Returns: string };
       fn_health_green_streak: { Args: { p_merchant_id: string }; Returns: number };
       fn_host_amenity_labels: { Args: { p_value: Json }; Returns: string[] };
+      fn_host_commission: { Args: { p_at?: string; p_host_id: string }; Returns: Json };
       fn_host_documents_missing: { Args: { p_host_id: string }; Returns: string[] };
       fn_host_listing_point: { Args: { p_value: Json }; Returns: unknown };
       fn_host_listing_text: {
         Args: { p_label: string; p_max: number; p_value: Json };
         Returns: string;
+      };
+      fn_host_subaccount: {
+        Args: { p_host_id: string; p_is_test: boolean };
+        Returns: {
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          host_id: string;
+          id: string;
+          is_test: boolean;
+          note: string | null;
+          paystack_details: NonNullable<Json>;
+          requested_at: string;
+          requested_by: string | null;
+          schedule: string;
+          status: string;
+          subaccount_code: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'host_paystack_subaccount';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
       fn_integration_rotation_due: {
         Args: {
@@ -65074,6 +65491,7 @@ export type Database = {
           user_id: string;
         }[];
       };
+      fn_stay_commission_kes: { Args: { p_paid_kes: number; p_stay_id: string }; Returns: number };
       fn_stay_commission_rate: { Args: Record<PropertyKey, never>; Returns: number };
       fn_stay_dates_check: {
         Args: { p_check_in: string; p_check_out: string };
@@ -66087,6 +66505,16 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_cancellation_preset_decide: {
+        Args: { p_approve: boolean; p_id: string; p_note?: string };
+        Returns: Json;
+      };
+      rpc_cancellation_preset_request: {
+        Args: { p_preset: string; p_reason: string; p_tiers: Json };
+        Returns: Json;
+      };
+      rpc_cancellation_preset_withdraw: { Args: { p_id: string }; Returns: Json };
+      rpc_cancellation_presets: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_careers_apply: { Args: { p_payload: Json }; Returns: Json };
       rpc_careers_confirm_slot: {
         Args: { p_interview_id: string; p_slot: string; p_token: string };
@@ -68309,6 +68737,23 @@ export type Database = {
       };
       rpc_hospitality_counts: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_host_apply: { Args: { p_payload: Json }; Returns: Json };
+      rpc_host_commission_decide: {
+        Args: { p_approve: boolean; p_note?: string; p_term_id: string };
+        Returns: Json;
+      };
+      rpc_host_commission_read: { Args: { p_host_id: string }; Returns: Json };
+      rpc_host_commission_request: {
+        Args: {
+          p_ends_on: string;
+          p_host_id: string;
+          p_pct: number;
+          p_reason: string;
+          p_starts_on: string;
+          p_terms_ref?: string;
+        };
+        Returns: Json;
+      };
+      rpc_host_commission_withdraw: { Args: { p_term_id: string }; Returns: Json };
       rpc_host_document_add: {
         Args: {
           p_file_name: string;
@@ -68420,6 +68865,8 @@ export type Database = {
         };
       };
       rpc_host_payout_declare: { Args: { p_host_id: string; p_payout: Json }; Returns: Json };
+      rpc_host_payout_declare_mine: { Args: { p_host_id: string; p_payout: Json }; Returns: Json };
+      rpc_host_payout_mine: { Args: { p_host_id: string }; Returns: Json };
       rpc_host_payout_verify: { Args: { p_host_id: string; p_version: number }; Returns: Json };
       rpc_host_payouts: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_host_referral_link: { Args: { p_host_id: string }; Returns: Json };
@@ -68619,6 +69066,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_host_split_overview: { Args: { p_host_id: string }; Returns: Json };
       rpc_host_stay_by_code: { Args: { p_code: string }; Returns: Json };
       rpc_host_stay_check_in: { Args: { p_code: string; p_name?: string }; Returns: Json };
       rpc_host_stay_mark_checked_in: {
@@ -68633,6 +69081,7 @@ export type Database = {
           checked_out_at: string | null;
           checked_out_by: string | null;
           commission_kes: number | null;
+          commission_pct: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
@@ -68684,6 +69133,7 @@ export type Database = {
           checked_out_at: string | null;
           checked_out_by: string | null;
           commission_kes: number | null;
+          commission_pct: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
@@ -68722,6 +69172,25 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_host_subaccount_decide: {
+        Args: { p_approve: boolean; p_id: string; p_note?: string; p_paystack_details?: Json };
+        Returns: Json;
+      };
+      rpc_host_subaccount_pause: {
+        Args: { p_id: string; p_note: string; p_pause: boolean };
+        Returns: Json;
+      };
+      rpc_host_subaccount_request: {
+        Args: {
+          p_host_id: string;
+          p_is_test: boolean;
+          p_note?: string;
+          p_paystack_details: Json;
+          p_schedule: string;
+          p_subaccount_code: string;
+        };
+        Returns: Json;
       };
       rpc_host_verify: {
         Args: { p_evidence?: Json; p_host_id: string; p_method: string };
@@ -73346,6 +73815,7 @@ export type Database = {
           checked_out_at: string | null;
           checked_out_by: string | null;
           commission_kes: number | null;
+          commission_pct: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
@@ -73397,6 +73867,7 @@ export type Database = {
           checked_out_at: string | null;
           checked_out_by: string | null;
           commission_kes: number | null;
+          commission_pct: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
@@ -73486,6 +73957,7 @@ export type Database = {
           checked_out_at: string | null;
           checked_out_by: string | null;
           commission_kes: number | null;
+          commission_pct: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
@@ -73542,6 +74014,7 @@ export type Database = {
           checked_out_at: string | null;
           checked_out_by: string | null;
           commission_kes: number | null;
+          commission_pct: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
@@ -73593,6 +74066,7 @@ export type Database = {
           checked_out_at: string | null;
           checked_out_by: string | null;
           commission_kes: number | null;
+          commission_pct: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
@@ -73645,6 +74119,7 @@ export type Database = {
           checked_out_at: string | null;
           checked_out_by: string | null;
           commission_kes: number | null;
+          commission_pct: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;
@@ -73805,6 +74280,7 @@ export type Database = {
           checked_out_at: string | null;
           checked_out_by: string | null;
           commission_kes: number | null;
+          commission_pct: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
           conflict_flagged: boolean;

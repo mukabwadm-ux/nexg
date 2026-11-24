@@ -29,6 +29,7 @@ import {
   type Stay,
   type WorkspaceData,
 } from '../model';
+import { HostPayoutDetails } from './HostPayoutDetails';
 import './management.css';
 
 type Range = '7' | '30' | '90' | 'all';
@@ -1005,6 +1006,7 @@ export function FinancesPage() {
           </div>
         </Panel>
       )}
+      {tab === 'Overview' && actor.role === 'Owner' && <HostPayoutDetails />}
     </div>
   );
 }

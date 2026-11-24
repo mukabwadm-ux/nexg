@@ -13,8 +13,10 @@ import {
 } from '@/app/settings/actions';
 import { ConsoleShell } from '@/components/console-shell';
 import { PageHeader, PanelHead } from '@/components/portal/kit';
+import { CancellationPresetsPanel } from '@/components/settings/cancellation-presets-panel';
 import { SaveBar, ScheduledBanner, SettingField } from '@/components/settings/controls';
 import type { ChangeSetRow, CityRow, DefinitionRow } from '@/components/settings/shared';
+import { toCancellationPresets } from '@/lib/cancellation-presets';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -49,6 +51,8 @@ const PARTIES: {
   soon?: string;
   /** Set elsewhere: said instead of "Coming next". */
   elsewhere?: string;
+  /** Said under the rule rows. */
+  after?: string;
 }[] = [
   { key: 'rider', title: 'Riders', icon: Bike },
   {
@@ -62,7 +66,9 @@ const PARTIES: {
     key: 'host',
     title: 'Hosts',
     icon: Home,
-    soon: 'Hosts’ payout schedule and minimum, NexG’s stay commission, and the preset cancellation policies hosts choose from.',
+    soon: 'NexG’s stay commission for hosts.',
+    after:
+      'Each host’s Paystack sub-account and any agreed rate are set on the host’s panel (Hotels › Hosts).',
   },
   {
     key: 'experience_partner',
@@ -81,11 +87,23 @@ export default async function PayoutRulesPage({
   requireModule(staff, 'finance');
   const s = createClient();
 
-  const [{ data: cities }, { data: definitions }, { data: changeSets }] = await Promise.all([
-    s.from('settings_city_v').select('*').order('sort').order('name'),
-    s.from('settings_definition_v').select('*').order('sort'),
-    s.from('settings_scheduled_v').select('*').order('requested_at', { ascending: false }),
-  ]);
+  /* rpc_cancellation_presets is not in the generated types yet, and is read
+     before its migration is on every database: an error or an odd shape is
+     null, and the Hosts card says the presets could not be read. */
+  const untyped = s as unknown as {
+    rpc: (fn: string) => PromiseLike<{ data: unknown }>;
+  };
+  const [{ data: cities }, { data: definitions }, { data: changeSets }, presetsRaw] =
+    await Promise.all([
+      s.from('settings_city_v').select('*').order('sort').order('name'),
+      s.from('settings_definition_v').select('*').order('sort'),
+      s.from('settings_scheduled_v').select('*').order('requested_at', { ascending: false }),
+      Promise.resolve(untyped.rpc('rpc_cancellation_presets')).then(
+        (r) => r.data ?? null,
+        () => null,
+      ),
+    ]);
+  const presets = toCancellationPresets(presetsRaw);
   const cityRows = (cities as CityRow[] | null) ?? [];
   const defs = (definitions as DefinitionRow[] | null) ?? [];
   const cityId =
@@ -249,7 +267,7 @@ export default async function PayoutRulesPage({
                       />
                     </div>
                   ))}
-                  {city && (
+                  {city && p.key === 'rider' && (
                     <p className="text-muted-light pt-3 text-[0.75rem] font-semibold">
                       Showing {city.name}. Riders on the payout run are paid when Finance approves
                       the weekly run. Any other choice pays them automatically through Paystack to
@@ -258,6 +276,8 @@ export default async function PayoutRulesPage({
                   )}
                 </div>
               )}
+              {p.after && <p className="text-muted mt-3 text-[0.75rem] font-semibold">{p.after}</p>}
+              {p.key === 'host' && <CancellationPresetsPanel data={presets} />}
             </Card>
           );
         })}
