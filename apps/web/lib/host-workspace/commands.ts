@@ -694,6 +694,45 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
     );
   }
 
+  /* Check in (booked -> in_stay) and check out (in_stay -> departed). The
+     database also checks the dates in the host's time zone and that the unit
+     has no other guest checked in. */
+  if (
+    command.type === 'transition' &&
+    collection === 'stays' &&
+    id &&
+    (status === 'Checked in' || status === 'Completed')
+  ) {
+    const checkIn = status === 'Checked in';
+    const { data, error } = await db
+      .from('host_stay_v')
+      .select('unit_id, status')
+      .eq('host_id', hostId)
+      .eq('id', id)
+      .maybeSingle();
+    if (error) throw new HostWorkspaceError(503, 'The reservation could not be checked.');
+    if (!data?.unit_id) throw scopeError();
+    await requireUnit(access, data.unit_id);
+    if (checkIn && data.status !== 'booked')
+      throw invalid(
+        data.status === 'in_stay'
+          ? 'This guest is already checked in.'
+          : 'Only a confirmed reservation can be checked in.',
+      );
+    if (!checkIn && data.status !== 'in_stay')
+      throw invalid(
+        data.status === 'departed'
+          ? 'This guest is already checked out.'
+          : 'Only a checked-in guest can be checked out.',
+      );
+    return checked(
+      await db.rpc(checkIn ? 'rpc_host_stay_mark_checked_in' : 'rpc_host_stay_mark_checked_out', {
+        p_stay_id: id,
+      }),
+      checkIn ? 'Guest checked in.' : 'Guest checked out.',
+    );
+  }
+
   if (collection === 'packages' && (command.type === 'save' || command.type === 'delete')) {
     if (unitScope) throw scopeError();
     if (id) {
