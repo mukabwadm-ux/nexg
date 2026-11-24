@@ -44,7 +44,7 @@ export const dynamic = 'force-dynamic';
  * A rider's record. The views are links (?view=) so a pasted link opens the
  * same view. Application is the onboarding page this used to be, and is
  * where someone still onboarding lands; everything else comes from one
- * reader, rpc_console_rider_profile (20270310000100).
+ * reader, rpc_console_rider_profile (20270312000100).
  */
 const VIEWS = [
   { key: 'overview', label: 'Overview', icon: LayoutDashboard },

@@ -83,7 +83,7 @@ export default async function RidersPage({
         .is('acknowledged_at', null)
         .order('happened_at', { ascending: false }),
       /* Trips, acceptance, on-time and rating from the trips themselves
-       (20270310000100), in place of the health snapshot's copies. */
+       (20270312000100), in place of the health snapshot's copies. */
       supabase.rpc('rpc_console_rider_stats'),
     ]);
 
