@@ -103,7 +103,7 @@ const STEPS: readonly { icon: LucideIcon; label: string }[] = [
 ];
 
 const GOLD_BUTTON =
-  'inline-flex items-center justify-center gap-2 rounded-lg bg-[linear-gradient(180deg,#F2D27A_0%,#E0B95A_100%)] font-bold text-black shadow-[0_8px_20px_rgba(224,185,90,0.25)] transition-[filter,transform] hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-gold active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transform-none motion-reduce:transition-none';
+  'inline-flex items-center justify-center gap-2 rounded-lg bg-gold font-bold text-black shadow-[0_8px_20px_rgb(var(--gold-rgb)/0.25)] transition-[filter,transform] hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-gold active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transform-none motion-reduce:transition-none';
 
 export function ListYourProperty() {
   const [type, setType] = React.useState<HostPropertyType | ''>('');
@@ -134,14 +134,14 @@ export function ListYourProperty() {
           className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(10,9,8,0.94)_0%,rgba(10,9,8,0.82)_40%,rgba(10,9,8,0.45)_70%,rgba(10,9,8,0.35)_100%)]"
         />
         <div className="mx-auto max-w-[120rem] px-4 pb-12 pt-14 sm:px-[30px] lg:pb-14 lg:pr-[470px] lg:pt-20 xl:pr-[500px]">
-          <p className="text-[0.8125rem] font-bold uppercase tracking-[0.12em] text-[#E8C46A]">
+          <p className="text-gold text-[0.8125rem] font-bold uppercase tracking-[0.12em]">
             NEXG Stay Partners
           </p>
           <h1
             id="hosts-hero-title"
             className="mt-4 max-w-[40rem] text-[2.5rem] font-extrabold leading-[1.05] tracking-[-0.02em] text-white sm:text-[3.25rem] xl:text-[3.75rem]"
           >
-            List Your Property on <span className="text-[#E8C46A]">NEXG</span>
+            List Your Property on <span className="text-gold">NEXG</span>
           </h1>
           <p className="mt-5 max-w-[34rem] text-[1.0625rem] font-medium leading-[1.6] text-white/85">
             Turn your space into consistent income. Join NexG Stay and get your property in front of
@@ -163,11 +163,7 @@ export function ListYourProperty() {
                   i > 0 ? 'sm:border-l sm:border-white/20' : ''
                 }`}
               >
-                <Icon
-                  className="h-8 w-8 shrink-0 text-[#E8C46A]"
-                  strokeWidth={1.4}
-                  aria-hidden="true"
-                />
+                <Icon className="text-gold h-8 w-8 shrink-0" strokeWidth={1.4} aria-hidden="true" />
                 <span className="text-[0.8125rem] font-medium leading-snug text-white/90">
                   {label}
                 </span>
@@ -215,14 +211,14 @@ export function ListYourProperty() {
                     onClick={() => setType(t.value)}
                     className={`focus-visible:outline-gold-text group relative flex h-full w-full flex-col rounded-xl border bg-white p-3 text-left transition-[border-color,box-shadow] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
                       selected
-                        ? 'border-[#D4A84B] shadow-[0_0_0_1px_#D4A84B,0_10px_24px_rgba(180,140,40,0.15)]'
+                        ? 'border-gold shadow-[0_0_0_1px_rgb(var(--gold-rgb)),0_10px_24px_rgb(var(--gold-rgb)/0.15)]'
                         : 'border-[#E7E2D6] hover:border-[#CFC6B0]'
                     }`}
                   >
                     {selected ? (
                       <span
                         aria-hidden="true"
-                        className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#C99A3E] text-white"
+                        className="bg-gold absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full text-black"
                       >
                         <Check className="h-3.5 w-3.5" strokeWidth={3} />
                       </span>
