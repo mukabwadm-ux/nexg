@@ -21,11 +21,21 @@
   --ink: #141414;
   --ink-rgb: 20 20 20;
 
-  /* Gold */
-  --gold: #fdd128;
-  --gold-rgb: 253 209 40;
-  --gold-text: #b8901f;
-  --gold-text-rgb: 184 144 31;
+  /* Gold — the premium gold #D2AF26 (was #FDD128 until 2026-11-24).
+     Dark text on it is 8.7:1. As text it is only 2.1:1 on white, so text on
+     light grounds uses --gold-text, never --gold.
+     --gold-deep and --gold-light are the same hue 12% darker / 30% lighter:
+     hover states, gradient ends and coloured shadows.
+     --gold-text is the same hue 38% darker: 5.1:1 on white and 4.6:1 on the
+     cream page, so it passes WCAG AA (the old #B8901F was 3.0:1). */
+  --gold: #d2af26;
+  --gold-rgb: 210 175 38;
+  --gold-deep: #b99a21;
+  --gold-deep-rgb: 185 154 33;
+  --gold-light: #e0c767;
+  --gold-light-rgb: 224 199 103;
+  --gold-text: #826d18;
+  --gold-text-rgb: 130 109 24;
   --gold-soft: #fbf7ea;
   --gold-soft-rgb: 251 247 234;
 

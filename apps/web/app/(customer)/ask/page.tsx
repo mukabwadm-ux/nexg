@@ -128,7 +128,7 @@ export default async function AskPage() {
                   Running a business?{' '}
                   <Link
                     href="/merchants#register"
-                    className="text-gold-text dark:text-gold rounded-sm font-extrabold underline underline-offset-4 dark:hover:text-[#FEDD5C]"
+                    className="text-gold-text dark:text-gold dark:hover:text-gold-light rounded-sm font-extrabold underline underline-offset-4"
                   >
                     List it on NexG
                   </Link>

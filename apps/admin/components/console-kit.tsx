@@ -74,7 +74,7 @@ export function Kpi({
           href &&
             'focus-visible:ring-gold hover:-translate-y-px hover:shadow-[0_14px_30px_-16px_rgba(20,20,20,0.45)] focus-visible:outline-none focus-visible:ring-2',
           featured
-            ? 'text-ink border-transparent bg-gradient-to-br from-[#FFE27A] via-[#FDD128] to-[#F0B90B] shadow-[0_10px_28px_-14px_rgba(196,140,0,0.75)]'
+            ? 'text-ink from-gold-light via-gold to-gold-deep border-transparent bg-gradient-to-br shadow-[0_10px_28px_-14px_rgb(var(--gold-deep-rgb)/0.75)]'
             : 'border-border bg-surface shadow-[0_1px_2px_rgba(20,20,20,0.04),0_10px_26px_-20px_rgba(20,20,20,0.35)]',
         )}
       >
@@ -232,7 +232,7 @@ export function PillTabs({ tabs, className }: { tabs: PillTab[]; className?: str
         const cls = cn(
           'flex min-h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-4 text-[0.875rem] font-semibold transition-colors',
           t.active
-            ? 'bg-gold text-ink font-bold shadow-[0_6px_16px_-8px_rgba(196,140,0,0.8)]'
+            ? 'bg-gold text-ink font-bold shadow-[0_6px_16px_-8px_rgb(var(--gold-deep-rgb)/0.8)]'
             : t.disabled
               ? 'text-muted-light/70 cursor-default'
               : 'text-muted hover:bg-bg hover:text-ink',

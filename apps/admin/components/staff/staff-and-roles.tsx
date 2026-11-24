@@ -81,7 +81,7 @@ export function StaffAndRoles({
             aria-current={tab === t.key ? 'page' : undefined}
             className={`flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-xl px-4 text-[0.875rem] transition-colors ${
               tab === t.key
-                ? 'bg-gold text-ink font-bold shadow-[0_6px_16px_-8px_rgba(196,140,0,0.8)]'
+                ? 'bg-gold text-ink font-bold shadow-[0_6px_16px_-8px_rgb(var(--gold-deep-rgb)/0.8)]'
                 : 'text-muted hover:bg-bg hover:text-ink font-semibold'
             }`}
           >

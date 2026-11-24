@@ -118,7 +118,7 @@ export default async function RiderRewards() {
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
             <section className="relative isolate overflow-hidden rounded-[22px] bg-gradient-to-br from-[#121a33] to-[#0b0f1c] p-5 text-white sm:p-6">
               <div className="flex items-center gap-4">
-                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#fdd128] text-[color:var(--rider-ink)]">
+                <span className="bg-gold flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-[color:var(--rider-ink)]">
                   <Star className="h-7 w-7 fill-current" aria-hidden="true" />
                 </span>
                 <div>
@@ -145,7 +145,7 @@ export default async function RiderRewards() {
                   aria-label="Progress to the next milestone"
                 >
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-amber-400 to-[#fdd128]"
+                    className="from-gold-deep to-gold h-full rounded-full bg-gradient-to-r"
                     style={{ width: `${pct}%` }}
                   />
                 </div>
@@ -166,7 +166,7 @@ export default async function RiderRewards() {
                     <li
                       key={b.key}
                       className={`flex flex-col items-center rounded-2xl border p-3 text-center ${
-                        b.earned ? 'border-[#fdd128] bg-[#fffbe8]' : 'border-[#eef0f6]'
+                        b.earned ? 'border-gold bg-gold-soft' : 'border-[#eef0f6]'
                       }`}
                     >
                       <span
@@ -197,7 +197,7 @@ export default async function RiderRewards() {
 
           {top ? (
             <section className="flex flex-wrap items-center gap-4 rounded-[20px] bg-gradient-to-r from-[#3b1d6e] to-[#5b2a9e] p-5 text-white">
-              <Trophy className="h-10 w-10 text-[#fdd128]" aria-hidden="true" />
+              <Trophy className="text-gold h-10 w-10" aria-hidden="true" />
               <div className="min-w-0 flex-1">
                 <p className="text-[17px] font-extrabold">You&apos;re a Top Performer!</p>
                 <p className="text-[13px] text-white/80">{top.note}. Keep it up.</p>
@@ -220,7 +220,7 @@ export default async function RiderRewards() {
                             {so.toLocaleString('en-KE')} so far
                           </span>
                         ) : null}
-                        <span className="rounded-full bg-[#fff6cf] px-2.5 py-0.5 text-[13px] font-extrabold tabular-nums">
+                        <span className="bg-gold/20 rounded-full px-2.5 py-0.5 text-[13px] font-extrabold tabular-nums">
                           {r.points}
                         </span>
                       </span>

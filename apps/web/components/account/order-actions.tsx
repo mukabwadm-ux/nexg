@@ -101,7 +101,7 @@ export function OrderActions({
                 onClick={() => setStars(n)}
                 className={`h-11 w-11 rounded-full border text-lg font-extrabold ${
                   stars >= n
-                    ? 'border-[#fdd128] bg-[#fdd128] text-[#141414]'
+                    ? 'border-gold bg-gold text-[#141414]'
                     : 'border-border text-muted bg-white'
                 }`}
               >
@@ -132,7 +132,7 @@ export function OrderActions({
                 'Thank you for rating.',
               )
             }
-            className={`${button} self-start bg-[#fdd128] text-[#141414]`}
+            className={`${button} bg-gold self-start text-[#141414]`}
           >
             Send rating
           </button>
@@ -287,7 +287,7 @@ export function OrderActions({
                   'Sent. Our team replies by email and SMS, usually within a working day.',
                 )
               }
-              className={`${button} self-start bg-[#fdd128] text-[#141414]`}
+              className={`${button} bg-gold self-start text-[#141414]`}
             >
               Send to NexG support
             </button>

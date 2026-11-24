@@ -256,7 +256,7 @@ function MidnightPropertyCard({ property }: { property: PropertyCardRow }) {
               <span className="text-[0.6875rem] font-semibold text-white/70"> / night</span>
             )}
           </span>
-          <span className="text-[0.75rem] font-extrabold text-[#F2C94C] group-hover:underline">
+          <span className="text-gold text-[0.75rem] font-extrabold group-hover:underline">
             See units →
           </span>
         </span>

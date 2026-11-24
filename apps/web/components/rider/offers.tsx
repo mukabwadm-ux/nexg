@@ -107,8 +107,8 @@ export function OffersBoard({
               onClick={() => setFilter(f)}
               className={`rounded-full px-4 py-2 text-[13.5px] font-extrabold ${ring} ${
                 filter === f
-                  ? 'bg-[#fdd128] text-[color:var(--rider-ink)]'
-                  : 'bg-[#f3f5fa] text-slate-700 hover:bg-[#fff6cf]'
+                  ? 'bg-gold text-[color:var(--rider-ink)]'
+                  : 'hover:bg-gold/20 bg-[#f3f5fa] text-slate-700'
               }`}
             >
               {f === 'all' ? 'All jobs' : f === 'now' ? 'Deliver now' : 'Scheduled'} ({counts[f]})
@@ -149,7 +149,7 @@ export function OffersBoard({
                 <li
                   key={o.offerId}
                   className={`rounded-2xl border p-4 transition-colors ${
-                    on ? 'border-[#fdd128] bg-[#fffbe8]' : 'border-[#e6e9f2] bg-white'
+                    on ? 'border-gold bg-gold-soft' : 'border-[#e6e9f2] bg-white'
                   }`}
                 >
                   <button
@@ -227,7 +227,7 @@ export function OffersBoard({
                       type="button"
                       disabled={busy !== null}
                       onClick={() => void answer(o, true)}
-                      className={`rounded-xl bg-[#fdd128] px-6 py-2 text-[13.5px] font-extrabold text-[color:var(--rider-ink)] shadow-[0_6px_14px_-8px_rgba(180,130,0,0.8)] disabled:opacity-50 ${ring}`}
+                      className={`bg-gold rounded-xl px-6 py-2 text-[13.5px] font-extrabold text-[color:var(--rider-ink)] shadow-[0_6px_14px_-8px_rgb(var(--gold-deep-rgb)/0.8)] disabled:opacity-50 ${ring}`}
                     >
                       {busy === o.offerId ? 'Sending…' : 'Accept'}
                     </button>

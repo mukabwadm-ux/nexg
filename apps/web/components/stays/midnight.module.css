@@ -51,7 +51,7 @@
 
 .glass :global(input:focus),
 .glass :global(button:focus-visible) {
-  outline: 2px solid #f2c94c;
+  outline: 2px solid var(--gold);
   outline-offset: 2px;
   --tw-ring-shadow: 0 0 #0000;
   box-shadow: none;
@@ -72,7 +72,7 @@
 }
 
 .eyebrow {
-  color: #f2c94c;
+  color: var(--gold);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.16em;
@@ -91,7 +91,7 @@
   justify-content: center;
   gap: 0.5rem;
   border-radius: 12px;
-  background: linear-gradient(180deg, #f6c945, #d9a21b);
+  background: linear-gradient(180deg, var(--gold-light), var(--gold-deep));
   color: #16120a;
   font-weight: 800;
   transition: filter 0.15s ease;
@@ -143,7 +143,7 @@
 }
 
 .card:focus-visible {
-  outline: 2px solid #f2c94c;
+  outline: 2px solid var(--gold);
   outline-offset: 3px;
 }
 

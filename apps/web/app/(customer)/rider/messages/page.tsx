@@ -89,7 +89,7 @@ export default async function RiderMessages({
                     scroll={false}
                     aria-current={on ? 'page' : undefined}
                     className={`flex items-center gap-3 rounded-2xl p-3 ${ring} ${
-                      on ? 'bg-[#fff6cf]' : 'hover:bg-[#f6f7fb]'
+                      on ? 'bg-gold/20' : 'hover:bg-[#f6f7fb]'
                     }`}
                   >
                     <span
@@ -130,7 +130,7 @@ export default async function RiderMessages({
           <div className="mb-4 flex items-center gap-3 border-b border-[#eef0f6] pb-3">
             <span
               aria-hidden="true"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fdd128] text-[color:var(--rider-ink)]"
+              className="bg-gold flex h-10 w-10 items-center justify-center rounded-full text-[color:var(--rider-ink)]"
             >
               {THREADS[open].icon}
             </span>

@@ -104,7 +104,7 @@ export function OrderLive({ orderId, stage }: { orderId: string; stage: string }
         const pin = document.createElement('span');
         pin.textContent = p.kind === 'rider' ? 'Rider' : p.kind === 'pickup' ? 'Shop' : 'You';
         pin.style.cssText = `display:inline-block;padding:3px 8px;border-radius:8px;font:800 12px Manrope,sans-serif;${
-          p.kind === 'rider' ? 'background:#fdd128;color:#141414' : 'background:#141414;color:#fff'
+          p.kind === 'rider' ? 'background:#D2AF26;color:#141414' : 'background:#141414;color:#fff'
         }`;
         return new g.marker.AdvancedMarkerElement({
           map: view.map,

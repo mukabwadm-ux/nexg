@@ -109,7 +109,18 @@ export const CONSOLE_NAV: NavGroup[] = [
       { label: 'QR & attribution', href: '/hotels?tab=qr', module: 'hotels' },
     ],
   },
-  { key: 'customers', label: 'Customers', icon: 'customers', items: [] },
+  {
+    key: 'customers',
+    label: 'Customers',
+    icon: 'customers',
+    items: [
+      { label: 'All customers', href: '/customers', module: 'customers', home: true },
+      { label: 'With an account', href: '/customers?tab=accounts', module: 'customers' },
+      { label: 'Guests (no account)', href: '/customers?tab=guests', module: 'customers' },
+      { label: 'VIP', href: '/customers?tab=vip', module: 'customers' },
+      { label: 'Suspended', href: '/customers?tab=suspended', module: 'customers' },
+    ],
+  },
   {
     key: 'riders',
     label: 'Riders',

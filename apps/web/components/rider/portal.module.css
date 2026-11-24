@@ -93,14 +93,14 @@
   color: #fff;
 }
 .navLink:focus-visible {
-  outline: 2px solid #fdd128;
+  outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
 .navLink[aria-current='page'] {
-  background: #fdd128;
+  background: var(--gold);
   color: var(--rider-ink);
   font-weight: 800;
-  box-shadow: 0 6px 18px -8px #fdd128aa;
+  box-shadow: 0 6px 18px -8px rgb(var(--gold-rgb) / 0.67);
 }
 .navLabel {
   flex: 1;
