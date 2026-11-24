@@ -42322,6 +42322,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -42363,6 +42365,8 @@ export type Database = {
           check_out: string;
           checked_in_at?: string | null;
           checked_in_by?: string | null;
+          checked_out_at?: string | null;
+          checked_out_by?: string | null;
           commission_kes?: number | null;
           confirmation_sent_at?: string | null;
           confirmed_at?: string | null;
@@ -42403,6 +42407,8 @@ export type Database = {
           check_out?: string;
           checked_in_at?: string | null;
           checked_in_by?: string | null;
+          checked_out_at?: string | null;
+          checked_out_by?: string | null;
           commission_kes?: number | null;
           confirmation_sent_at?: string | null;
           confirmed_at?: string | null;
@@ -68495,6 +68501,108 @@ export type Database = {
       };
       rpc_host_stay_by_code: { Args: { p_code: string }; Returns: Json };
       rpc_host_stay_check_in: { Args: { p_code: string; p_name?: string }; Returns: Json };
+      rpc_host_stay_mark_checked_in: {
+        Args: { p_stay_id: string };
+        Returns: {
+          cancellation_fee_kes: number | null;
+          cancellation_terms: Json | null;
+          check_in: string;
+          check_out: string;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          host_share_kes: number | null;
+          id: string;
+          notes: string | null;
+          paid_kes: number | null;
+          party_adults: number;
+          party_children: number;
+          payment_reference: string | null;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          refund_amount_kes: number | null;
+          refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_host_stay_mark_checked_out: {
+        Args: { p_stay_id: string };
+        Returns: {
+          cancellation_fee_kes: number | null;
+          cancellation_terms: Json | null;
+          check_in: string;
+          check_out: string;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
+          commission_kes: number | null;
+          confirmation_sent_at: string | null;
+          confirmed_at: string | null;
+          conflict_flagged: boolean;
+          created_at: string;
+          external_ref_hash: string | null;
+          guest_first_name: string | null;
+          guest_user_id: string | null;
+          hold_expires_at: string | null;
+          host_id: string;
+          host_share_kes: number | null;
+          id: string;
+          notes: string | null;
+          paid_kes: number | null;
+          party_adults: number;
+          party_children: number;
+          payment_reference: string | null;
+          phone: string | null;
+          property_id: string | null;
+          qr_link_sent_at: string | null;
+          quote_total_kes: number | null;
+          rate_kes: number | null;
+          refund_amount_kes: number | null;
+          refund_due_at: string | null;
+          refund_note: string | null;
+          refund_reference: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
+          source: string;
+          status: string;
+          unit_id: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'stay';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       rpc_host_verify: {
         Args: { p_evidence?: Json; p_host_id: string; p_method: string };
         Returns: {
@@ -73115,6 +73223,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -73164,6 +73274,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -73237,6 +73349,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -73291,6 +73405,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -73340,6 +73456,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -73390,6 +73508,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
@@ -73548,6 +73668,8 @@ export type Database = {
           check_out: string;
           checked_in_at: string | null;
           checked_in_by: string | null;
+          checked_out_at: string | null;
+          checked_out_by: string | null;
           commission_kes: number | null;
           confirmation_sent_at: string | null;
           confirmed_at: string | null;
