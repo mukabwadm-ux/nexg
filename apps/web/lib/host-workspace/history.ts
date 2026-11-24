@@ -10,6 +10,86 @@ const label = (value: string | null) =>
 const value = (amount: number | null | undefined) => (amount == null ? '—' : money(amount));
 const count = (amount: number | null | undefined) =>
   amount == null ? '—' : amount.toLocaleString('en-KE');
+type Metric = HostHistory['metrics'][number];
+type Rpc = (
+  fn: string,
+  args: Record<string, unknown>,
+) => PromiseLike<{ data: unknown; error: unknown }>;
+
+const record = (input: unknown): Record<string, unknown> | null =>
+  input && typeof input === 'object' && !Array.isArray(input)
+    ? (input as Record<string, unknown>)
+    : null;
+
+/**
+ * An RPC the host's finance page can live without: before its migration is
+ * live, on an error, or on an odd shape, the answer is null and the page
+ * simply leaves the metric out.
+ */
+async function optional(db: HostWorkspaceAccess['db'], fn: string, hostId: string) {
+  try {
+    const { data, error } = await (db as unknown as { rpc: Rpc }).rpc(fn, { p_host_id: hostId });
+    return error ? null : record(data);
+  } catch {
+    return null;
+  }
+}
+
+/** NexG's stay commission for this host, from rpc_host_commission_read. */
+export function commissionMetric(read: Record<string, unknown> | null): Metric | null {
+  const now = record(read?.charged_now);
+  const pct = typeof now?.pct === 'string' ? Number(now.pct) : now?.pct;
+  if (typeof pct !== 'number' || !Number.isFinite(pct) || pct < 0 || pct > 100) return null;
+  return {
+    label: 'NexG commission',
+    value: pct.toLocaleString('en-KE', { maximumFractionDigits: 2 }) + '%',
+    note: now?.agreed === true ? 'Agreed with NexG' : 'NexG standard rate',
+  };
+}
+
+const schedules: Record<string, string> = {
+  auto: 'Paystack, every 2 working days',
+  weekly: 'Paystack, every week',
+  monthly: 'Paystack, every month',
+  manual: 'Paystack, when NexG releases it',
+};
+
+/**
+ * How the host is paid, from rpc_host_split_overview: Paystack straight to
+ * the host's active sub-account (a live one before a test one), or else
+ * NexG's weekly payout run.
+ */
+export function payoutMetric(overview: Record<string, unknown> | null): Metric | null {
+  if (!overview) return null;
+  if (overview.subaccounts != null && !Array.isArray(overview.subaccounts)) return null;
+  const active = ((overview.subaccounts as unknown[] | undefined) ?? [])
+    .map(record)
+    .filter(
+      (row): row is Record<string, unknown> =>
+        !!row &&
+        row.status === 'active' &&
+        typeof row.schedule === 'string' &&
+        row.schedule in schedules,
+    )
+    .sort((a, b) => Number(a.test === true) - Number(b.test === true));
+  const sub = active[0];
+  if (!sub) return { label: "How you're paid", value: 'NexG weekly payout run', note: '' };
+  const details = record(sub.details);
+  const last4 =
+    typeof details?.account_last4 === 'string' && /^[0-9]{1,4}$/.test(details.account_last4)
+      ? details.account_last4
+      : null;
+  const bank =
+    typeof details?.settlement_bank === 'string' && details.settlement_bank.trim()
+      ? details.settlement_bank.trim()
+      : 'Bank';
+  return {
+    label: "How you're paid",
+    value: schedules[sub.schedule as string]! + (sub.test === true ? ' (test)' : ''),
+    note: last4 ? bank + ' ····' + last4 : '',
+  };
+}
+
 function checked<T>(result: { data: T; error: unknown }) {
   if (result.error) throw new HostWorkspaceError(503, 'These host records could not be loaded.');
   return result.data;
@@ -19,7 +99,7 @@ export async function financeHistory(access: HostWorkspaceAccess): Promise<HostH
   const { db, hostId, userId, unitScope } = access;
   if (unitScope)
     throw new HostWorkspaceError(403, 'An account-wide host can open statements and folios.');
-  const [earningsResult, lines, memberships] = await Promise.all([
+  const [earningsResult, lines, memberships, commission, payouts] = await Promise.all([
     db.from('host_earnings_v').select('*').eq('host_id', hostId).maybeSingle(),
     allRows((from, to) =>
       db
@@ -38,6 +118,8 @@ export async function financeHistory(access: HostWorkspaceAccess): Promise<HostH
         .order('hotel_id')
         .range(from, to),
     ),
+    optional(db, 'rpc_host_commission_read', hostId),
+    optional(db, 'rpc_host_split_overview', hostId),
   ]);
   const hotels = memberships.map((row) => row.hotel_id);
   const folios = hotels.length
@@ -74,6 +156,9 @@ export async function financeHistory(access: HostWorkspaceAccess): Promise<HostH
         value: value(earnings?.guest_order_value_cents),
         note: count(earnings?.guest_order_count) + ' guest orders',
       },
+      ...[commissionMetric(commission), payoutMetric(payouts)].filter(
+        (metric): metric is Metric => metric !== null,
+      ),
     ],
     sections: [
       {

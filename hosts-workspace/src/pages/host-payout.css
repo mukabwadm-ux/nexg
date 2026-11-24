@@ -1,0 +1,118 @@
+/* How you get paid (HostPayoutDetails.tsx), on Finances › Overview for the owner. */
+.hp-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 20px 24px;
+}
+.hp-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+.hp-panel h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.hp-panel h2:focus {
+  outline: none;
+}
+.hp-panel p {
+  margin: 0;
+  max-width: 62ch;
+}
+.hp-muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+.hp-notice {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--success-soft);
+  font-size: 13px;
+}
+.hp-warning {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--warning-soft);
+  font-size: 13px;
+}
+.hp-error {
+  color: var(--danger);
+  font-size: 13px;
+}
+.hp-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px 20px;
+  margin: 0;
+}
+.hp-summary dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.hp-summary dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.hp-form fieldset {
+  display: grid;
+  gap: 14px;
+  max-width: 480px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.hp-form .field input {
+  width: 100%;
+  max-width: 100%;
+}
+.hp-legend {
+  padding: 0;
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.hp-rails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.hp-rails label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 13px;
+  cursor: pointer;
+}
+.hp-rails label.active {
+  border-color: var(--accent);
+}
+.hp-rails input {
+  appearance: auto;
+  accent-color: var(--accent);
+  margin: 0;
+}
+.hp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+@media (max-width: 640px) {
+  .hp-panel {
+    padding: 16px;
+  }
+  .hp-rails label {
+    flex: 1 1 calc(50% - 4px);
+  }
+}

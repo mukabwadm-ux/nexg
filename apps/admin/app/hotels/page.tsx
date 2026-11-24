@@ -39,6 +39,7 @@ import {
 import { Card } from '@nexg/ui';
 
 import { hostPayouts } from '@/lib/host-payouts';
+import { toHostCommission, toHostSplitOverview } from '@/lib/host-paystack';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -147,7 +148,21 @@ async function loadHosts(
   selected: string | null,
   canDeclarePayout: boolean,
 ) {
-  const [{ data: hosts }, { data: units }, payouts] = await Promise.all([
+  /* The new RPCs are not in the generated types yet, and are read before
+     their migration is on every database: an error or an odd shape is null,
+     and the panel leaves the card out rather than failing the page. */
+  const untyped = supabase as unknown as {
+    rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown }>;
+  };
+  const read = (fn: string): Promise<unknown> =>
+    selected
+      ? Promise.resolve(untyped.rpc(fn, { p_host_id: selected })).then(
+          (r) => r.data ?? null,
+          () => null,
+        )
+      : Promise.resolve(null);
+
+  const [{ data: hosts }, { data: units }, payouts, commissionRaw, splitRaw] = await Promise.all([
     supabase.from('console_host_directory_v').select('*').order('created_at', { ascending: false }),
     /* Only the selected host's units: the panel is the only thing that
        renders them, and a hundred hosts is a lot of rows to fetch for
@@ -157,6 +172,9 @@ async function loadHosts(
       : Promise.resolve({ data: [] as unknown[] }),
     /* Where the selected host is paid, masked; only the panel shows it. */
     selected ? supabase.rpc('rpc_host_payouts') : Promise.resolve({ data: null, error: null }),
+    /* NexG's commission for this host and their Paystack sub-account. */
+    read('rpc_host_commission_read'),
+    read('rpc_host_split_overview'),
   ]);
 
   return (
@@ -169,6 +187,10 @@ async function loadHosts(
       payout={hostPayouts(payouts.data).find((p) => p.host_id === selected) ?? null}
       canDeclarePayout={canDeclarePayout}
       payoutUnavailable={payouts.error != null}
+      paystack={{
+        commission: toHostCommission(commissionRaw),
+        overview: toHostSplitOverview(splitRaw),
+      }}
     />
   );
 }

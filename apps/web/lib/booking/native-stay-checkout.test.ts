@@ -209,6 +209,79 @@ describe('native stay checkout routes', () => {
     vi.unstubAllGlobals();
   });
 
+  it("a host Paystack pays directly: the prompt and the card page carry the database's split", async () => {
+    vi.stubEnv('PAYSTACK_TEST_SECRET_KEY', 'sk_test_ci_only_0123456789');
+    vi.stubEnv('PAYSTACK_LIVE_SECRET_KEY', '');
+    vi.stubEnv('DARAJA_CONSUMER_KEY', '');
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://www.nexgapp.com');
+    /* KES 14,000 at 15%: the host's sub-account gets 11,900, NexG keeps 2,100. */
+    const split = { subaccount: 'ACCT_host123', transaction_charge: 210000, bearer: 'account' };
+    let channel = 'mpesa';
+    stub.rpc.mockImplementation(async (fn: string) => {
+      if (fn === 'rpc_payment_begin_stay')
+        return { data: { reference: 'NXP-H', amount_cents: 1400000 }, error: null };
+      if (fn === 'rpc_payment_paystack_attempt')
+        return {
+          data: {
+            attempt_reference: 'NXP-H-' + channel,
+            channel,
+            amount_cents: 1400000,
+            is_test: true,
+            reused: false,
+            split,
+          },
+          error: null,
+        };
+      return { data: { ok: true }, error: null };
+    });
+    const fetch = vi.fn().mockImplementation(
+      async () =>
+        new Response(
+          JSON.stringify({
+            status: true,
+            data: {
+              status: 'pay_offline',
+              authorization_url: 'https://checkout.paystack.com/h1',
+              access_code: 'h1',
+            },
+          }),
+        ),
+    );
+    vi.stubGlobal('fetch', fetch);
+    const sent = (call: number) =>
+      JSON.parse(String((fetch.mock.calls[call]![1] as RequestInit).body)) as Record<
+        string,
+        unknown
+      >;
+
+    const prompted = await stayPaymentById(
+      request({ method: 'mpesa_stk', phone: '0712 000 000' }),
+      stayId,
+    );
+    expect(await prompted.json()).toMatchObject({ status: 'pending', reference: 'NXP-H' });
+    expect(String(fetch.mock.calls[0]![0])).toMatch(/\/charge$/);
+    expect(sent(0)).toMatchObject({
+      reference: 'NXP-H-mpesa',
+      amount: 1400000,
+      subaccount: 'ACCT_host123',
+      transaction_charge: 210000,
+      bearer: 'account',
+    });
+    expect(stub.prompt).not.toHaveBeenCalled();
+
+    channel = 'card';
+    const carded = await stayPaymentById(request({ method: 'card' }), stayId);
+    expect(await carded.json()).toMatchObject({ url: 'https://checkout.paystack.com/h1' });
+    expect(String(fetch.mock.calls[1]![0])).toMatch(/\/transaction\/initialize$/);
+    expect(sent(1)).toMatchObject({
+      subaccount: 'ACCT_host123',
+      transaction_charge: 210000,
+      bearer: 'account',
+    });
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
   it('the website pays a held stay by its id: M-Pesa straight to Safaricom while Paystack is off', async () => {
     darajaOnly();
     stub.rpc.mockImplementation(async (fn: string) =>
