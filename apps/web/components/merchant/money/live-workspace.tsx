@@ -79,18 +79,54 @@ function payoutDestination(home: MoneyHome | null) {
   }
 }
 
+/** What rpc_merchant_commission_read tells the merchant. */
+export interface MoneyCommission {
+  own_riders: boolean;
+  charged_now: { pct: number | null; agreed: boolean; preset_pct: number | null } | null;
+  in_force: { starts_on: string; ends_on: string | null } | null;
+}
+
+const longDay = (iso: string) =>
+  new Date(`${iso.slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+
+function commissionNote(
+  c: MoneyCommission,
+  now: { pct: number; agreed: boolean; preset_pct: number | null },
+) {
+  const orders = c.own_riders ? 'orders you deliver' : 'orders a NexG rider delivers';
+  if (!now.agreed) return `NexG commission: ${now.pct}% on ${orders}, the standard rate.`;
+  const dates = c.in_force
+    ? c.in_force.ends_on
+      ? ` from ${longDay(c.in_force.starts_on)} to ${longDay(c.in_force.ends_on)}`
+      : ` from ${longDay(c.in_force.starts_on)}`
+    : '';
+  const standard = now.preset_pct !== null ? ` (standard rate ${now.preset_pct}%)` : '';
+  return `NexG commission: ${now.pct}% on ${orders}, the rate agreed with you${dates}${standard}. Orders already placed keep the rate they were charged.`;
+}
+
 export function LiveMoneyWorkspace({
   home,
   statements,
   transactions,
   receipts,
+  commission = null,
 }: {
   home: MoneyHome | null;
   statements: MoneyStatement[] | null;
   transactions: MoneyTransaction[] | null;
   /** Payouts and payments to NexG, each with a printable receipt. */
   receipts: Receipt[] | null;
+  /** The commission NexG charges now: the rate agreed with the merchant, or the standard one. */
+  commission?: MoneyCommission | null;
 }) {
+  const chargedNow =
+    commission?.charged_now && commission.charged_now.pct !== null
+      ? { ...commission.charged_now, pct: commission.charged_now.pct }
+      : null;
   const [tab, setTab] = useState<LiveTab>('Overview');
   const [selectedId, setSelectedId] = useState('');
   const [search, setSearch] = useState('');
@@ -203,6 +239,9 @@ export function LiveMoneyWorkspace({
       >
         <MoneyTabs tabs={tabs} active={tab} onSelect={changeTab} />
         {tab === 'Overview' && <Metrics metrics={metrics} onInfo={setDefinition} />}
+        {tab === 'Overview' && commission && chargedNow && (
+          <p className="mo-note">{commissionNote(commission, chargedNow)}</p>
+        )}
         {payoutView && (
           <p className="mo-note">
             {payoutDestination(home)}.{' '}

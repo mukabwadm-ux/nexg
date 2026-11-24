@@ -66,5 +66,27 @@ describe('live Money workspace', () => {
     expect(html).toContain('KES 1,750');
     expect(html).toContain('href="/merchant/transactions/' + orderId + '"');
     expect(html).toContain('href="/merchant/transactions"');
+    expect(html).not.toContain('NexG commission:');
+  });
+
+  it('states the commission agreed with the merchant, with its dates', async () => {
+    from.mockImplementation(() => query([]));
+    rpc.mockImplementation(async (name: string) =>
+      name === 'rpc_merchant_commission_read'
+        ? {
+            data: {
+              own_riders: false,
+              charged_now: { pct: 20, agreed: true, preset_pct: 28 },
+              in_force: { starts_on: '2026-11-24', ends_on: '2027-05-31' },
+            },
+            error: null,
+          }
+        : { data: [], error: null },
+    );
+
+    const html = renderToStaticMarkup(await MerchantMoney());
+    expect(html).toContain(
+      'NexG commission: 20% on orders a NexG rider delivers, the rate agreed with you from 24 Nov 2026 to 31 May 2027 (standard rate 28%).',
+    );
   });
 });
