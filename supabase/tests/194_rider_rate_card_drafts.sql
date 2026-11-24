@@ -1,5 +1,5 @@
 -- The rider rate card can be drafted, and still needs two people to go live
--- (20270226000100 with rpc_rate_card_publish from 20260101007800).
+-- (20270311000100 with rpc_rate_card_publish from 20260101007800).
 
 begin;
 create extension if not exists pgtap with schema extensions;

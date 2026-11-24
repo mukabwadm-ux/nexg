@@ -1,5 +1,8 @@
 -- Rider rate card: a draft can be written.
 --
+-- 20270311000100 (first written as 20270226000100; renumbered 24 Nov 2026 to
+-- sort after main's latest migration, 20270310000100).
+--
 -- What a trip pays comes from the city's current rider_rate_card
 -- (fn_rider_trip_pay); with none, a delivery is recorded but writes no
 -- earning at all. Production has none. rpc_rate_card_publish
