@@ -219,9 +219,10 @@ begin
   if v_mime is null
     or (p_kind = 'model' and v_mime <> 'model/gltf-binary')
     or (p_kind = 'plan' and v_mime not in ('image/png','image/jpeg','image/webp'))
-    or p_path not like '%.' || case v_mime
+    -- In parentheses: an IF condition otherwise ends at the CASE's first THEN.
+    or p_path not like '%.' || (case v_mime
       when 'model/gltf-binary' then 'glb' when 'image/png' then 'png'
-      when 'image/jpeg' then 'jpg' when 'image/webp' then 'webp' end
+      when 'image/jpeg' then 'jpg' when 'image/webp' then 'webp' end)
     or v_size is null or v_size < 1 then
     raise exception 'Choose a supported guide file.' using errcode = '22023';
   end if;
