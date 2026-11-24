@@ -269,3 +269,41 @@ export async function decideApproval(
   revalidatePath('/');
   return { ok: true, message: approve ? 'Approved.' : 'Rejected.' };
 }
+
+/** The API bookings card: what rpc_api_booking_access_read answers. */
+export interface ApiBookingAccess {
+  enabled: boolean;
+  monthly_limit_kes: number | null;
+  note: string | null;
+  changed_at: string | null;
+  changed_by: string | null;
+  month_used_kes: number;
+  month_bookings: number;
+}
+
+/**
+ * Switches live API bookings on or off for a merchant, with its monthly
+ * limit. Finance's call: the function checks the role and writes the audit
+ * entry in the same transaction.
+ */
+export async function setApiBookingAccess(
+  merchantId: string,
+  enabled: boolean,
+  monthlyLimitKes: number,
+  note: string,
+): Promise<ReviewResult> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc('rpc_api_booking_access_set', {
+    p_merchant_id: merchantId,
+    p_enabled: enabled,
+    p_monthly_limit_kes: monthlyLimitKes,
+    ...(note.trim() ? { p_note: note.trim() } : {}),
+  });
+  if (error) return { ok: false, message: error.message };
+
+  revalidatePath(`/merchants/${merchantId}`);
+  return {
+    ok: true,
+    message: enabled ? 'Live API bookings are on.' : 'Live API bookings are off.',
+  };
+}

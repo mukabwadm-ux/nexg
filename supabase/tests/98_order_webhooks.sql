@@ -136,6 +136,11 @@ select is(
 
 -- ═══════════════════════════════════════════════════════════════ events
 
+-- Live API bookings need NexG's approval (20270302000200).
+insert into public.api_booking_access (merchant_id, enabled, monthly_limit_cents)
+select id, true, 100000000 from t_m
+on conflict (merchant_id) do nothing;
+
 set constraints api_webhook_order_event immediate;
 
 insert into t values ('booking', public.rpc_order_place_api(

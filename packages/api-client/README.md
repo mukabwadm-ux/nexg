@@ -57,7 +57,7 @@ Every method returns the `data` of the answer, typed as the [reference](https://
 | `delivery`    | `check`                                                       |
 | `experiences` | `list`, `listAll`                                             |
 | `services`    | `list`                                                        |
-| `orders`      | `list`, `listAll`, `get`, `create`                            |
+| `orders`      | `list`, `listAll`, `get`, `create`, `cancel`                  |
 | `sandbox`     | `moveOrder`, `assignRider` (test keys only)                   |
 | —             | `request(method, path, options)` for anything not named above |
 
@@ -68,7 +68,7 @@ An error answer throws `NexgApiError` with `status`, `code` (the API's closed se
 The client tries again, up to `maxRetries` times (default 2):
 
 - after a `429`, once `Retry-After` has passed (a wait longer than a minute goes back to you);
-- after a `5xx`, a dropped connection or the `timeoutMs` (default 30 seconds), with backoff, but only where sending again is safe: reads, the delivery check, catalogue changes (they set values) and bookings, whose `Idempotency-Key` stays the same across retries. Sandbox moves are not repeated.
+- after a `5xx`, a dropped connection or the `timeoutMs` (default 30 seconds), with backoff, but only where sending again is safe: reads, the delivery check, catalogue changes (they set values), cancellations (cancelling twice answers the same) and bookings, whose `Idempotency-Key` stays the same across retries. Sandbox moves are not repeated.
 
 A key is refused in a browser, where anyone could read it. Call NexG from your server.
 

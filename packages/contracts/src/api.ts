@@ -113,6 +113,8 @@ export const ERROR_CODES = {
   invalid_request: 'The request was not in a shape we understand.',
   not_found: 'That does not exist.',
   method_not_allowed: 'That is not something this endpoint does.',
+  conflict:
+    'That cannot be done in its current state, such as cancelling a booking a rider already has.',
   rate_limited: 'Too many requests. Give it a moment.',
   internal_error: 'Something went wrong on our side.',
 } as const;

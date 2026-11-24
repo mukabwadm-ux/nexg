@@ -36,6 +36,29 @@ export function orderWriter() {
   ) as unknown as { rpc: (name: PlaceFunction, args: Record<string, unknown>) => RpcResult };
 }
 
+/**
+ * Cancels one of the key's merchant's API bookings, for
+ * POST /v1/orders/{id}/cancel: the real order with a live key, the sandbox
+ * booking with a test key.
+ */
+export const CANCEL_FUNCTION = 'rpc_order_cancel_api';
+
+/**
+ * The client that cancels a booking. Service role: the function is granted
+ * to service_role only. It resolves the key, checks merchant_write, decides
+ * the merchant and refuses once a rider is assigned; this client decides
+ * nothing. Server only.
+ */
+export function orderCanceller() {
+  return createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: noStoreFetch } },
+  ) as unknown as {
+    rpc: (name: typeof CANCEL_FUNCTION, args: Record<string, unknown>) => RpcResult;
+  };
+}
+
 /** Moves a test booking to a later status. There is no live twin. */
 export const SANDBOX_MOVE_FUNCTION = 'rpc_order_status_api_test';
 /** Moves a test booking to a later stage. */

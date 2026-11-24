@@ -801,7 +801,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     description: [
       'Send a pickup and a drop-off. The answer says whether NexG can take the trip now. When it can, you get the drop-off zone’s usual delivery time and the delivery fee from NexG’s rate card. When it cannot, deliverable is false and reason says why: the pickup or the drop-off is outside the areas NexG serves, the trip is longer than NexG goes in that city, or deliveries into the drop-off zone are paused.',
       'NexG answers with the rules its own checkout uses. Distances are in a straight line. The fee is a base fee covering the first kilometre plus a per-kilometre rate for each further kilometre begun, both set per city.',
-      'The check reserves nothing and is not binding: a zone can be paused at any minute, and an order is priced when it is placed. A ride or courier booked through Book a service is priced by that service, which can differ from this fee.',
+      'The check reserves nothing and is not binding: a zone can be paused at any minute, and an order is priced when it is placed. A courier booked through Book a service for the same pickup and drop-off costs exactly this fee; a transfer is priced per passenger instead.',
     ],
     auth: { kind: 'optional_key', scope: 'public_read' },
     rateCost: 1,
@@ -1206,6 +1206,139 @@ export const ENDPOINTS: EndpointDoc[] = [
     source: 'apps/api/app/v1/orders/[id]/route.ts',
   },
   {
+    slug: 'cancel-order',
+    method: 'POST',
+    host: 'api',
+    path: '/v1/orders/{id}/cancel',
+    status: 'live',
+    group: 'Orders',
+    title: 'Cancel a booking',
+    summary: 'Cancel one of your API bookings, free of charge, until a rider is assigned.',
+    description: [
+      'Cancels a booking your merchant made through the API, at no cost, as long as no rider has taken it. NexG cancels the dispatch job, records who cancelled and why, and sends booking.status_changed to your endpoints.',
+      'Once a rider is assigned, the booking is under way or it has been paid, the answer is 409 conflict and nothing changes: the rider is already on the way, so NexG support handles the cancellation.',
+      'Cancelling a booking that is already cancelled answers 200 with cancelled false, so a retry is safe. With a test key it cancels a sandbox booking, under the same rule: not once a test rider is assigned.',
+    ],
+    auth: { kind: 'key', scope: 'merchant_write', merchantBound: true },
+    rateCost: 5,
+    cache: 'no-store',
+    paginated: false,
+    params: [
+      {
+        name: 'id',
+        in: 'path',
+        type: 'uuid',
+        required: true,
+        description: 'The order_id, from Book a service or List your orders.',
+      },
+      {
+        name: 'X-Api-Key',
+        in: 'header',
+        type: 'string',
+        required: true,
+        description:
+          'A key bound to your merchant, with merchant_write. A test key (nexg_test_…) cancels sandbox bookings.',
+      },
+      {
+        name: 'Content-Type',
+        in: 'header',
+        type: 'string',
+        required: false,
+        description: 'application/json, when you send a reason.',
+      },
+    ],
+    example: {
+      path: { id: '0f1e2d3c-4b5a-4697-8a8b-9c0d1e2f3a4b' },
+      body: { reason: 'The guest changed their flight.' },
+    },
+    requestResources: [
+      {
+        title: 'Cancellation',
+        at: 'body',
+        fields: [
+          {
+            name: 'reason',
+            type: 'string',
+            description:
+              'Why, in up to 500 characters. Optional: the body itself is optional. It is kept with the order.',
+          },
+        ],
+      },
+    ],
+    responseStatus: '200 OK',
+    responseExample: {
+      ok: true,
+      data: {
+        order: {
+          order_id: '0f1e2d3c-4b5a-4697-8a8b-9c0d1e2f3a4b',
+          reference: 'NX-261123-0007',
+          service: 'airport_transfer',
+          quantity: 2,
+          status: 'cancelled',
+          stage: 'cancelled',
+          payment_method: 'on_account',
+          payment_status: 'pending',
+          currency: 'KES',
+          total_cents: 450000,
+          scheduled_for: '2026-11-24T06:30:00+03:00',
+          pickup_label: 'JKIA Terminal 1A',
+          dropoff_label: 'Woodvale Grove, Westlands, Nairobi',
+          created_at: '2026-11-23T09:12:40.118+00:00',
+        },
+        cancelled: true,
+        previous_status: 'requested',
+      },
+      meta: { api_version: 'v1' },
+    },
+    responseResources: [
+      { schema: 'ApiOrder', title: 'Order', at: 'data.order', fields: ORDER_FIELDS },
+      {
+        title: 'Cancellation',
+        at: 'data',
+        fields: [
+          {
+            name: 'cancelled',
+            type: 'boolean',
+            description:
+              'true when this call cancelled the booking; false when it was already cancelled.',
+          },
+          {
+            name: 'previous_status',
+            type: 'string',
+            description: 'The status the booking had before this call.',
+          },
+        ],
+      },
+    ],
+    errors: [
+      ...credentialErrors('merchant_write', false),
+      {
+        status: 400,
+        code: 'invalid_request',
+        when: 'The id is not a UUID, or the body is not empty or JSON with a reason of up to 500 characters.',
+      },
+      { status: 403, code: 'not_found', when: 'The key is not bound to a merchant.' },
+      {
+        status: 404,
+        code: 'not_found',
+        when: 'Your merchant made no API booking with that id. Orders from the website and other merchants’ bookings answer the same.',
+      },
+      {
+        status: 409,
+        code: 'conflict',
+        when: 'A rider has taken the booking, it is under way or completed, or it has been paid. The message says which; NexG support handles it from there.',
+      },
+      { status: 500, code: 'internal_error', when: 'NexG could not cancel the booking.' },
+      UNEXPECTED_ERROR,
+    ],
+    notes: [
+      'Only bookings made through the API can be cancelled here. A customer’s order from the website or the app is the customer’s to cancel.',
+      'Cancelling costs nothing before a rider is assigned, and nothing is charged to your account.',
+    ],
+    since: '2026-11-23',
+    source: 'apps/api/app/v1/orders/[id]/cancel/route.ts',
+  },
+  {
     slug: 'create-order',
     method: 'POST',
     host: 'api',
@@ -1215,9 +1348,9 @@ export const ENDPOINTS: EndpointDoc[] = [
     title: 'Book a service',
     summary: 'A merchant books a transfer, courier or venue for its guests, priced by NexG.',
     description: [
-      'For a business that books NexG services for its own guests: a hotel or tour company booking an airport transfer, for example. With a live key the booking becomes a real NexG order, charged to your merchant’s account.',
+      'For a business that books NexG services for its own guests: a hotel or tour company booking an airport transfer, for example. With a live key the booking becomes a real NexG order, charged to your merchant’s account. Live bookings need NexG’s approval first, with a monthly limit: until then a live booking is refused with 403, and a test key books in the sandbox.',
       'With a test key it is a sandbox booking: same checks, a TEST- reference, and nothing dispatched or charged. A service NexG has not priced in your city yet gets a sample price of KES 1,000 a unit, so you can build before prices are set. See Environments.',
-      'You say what and how many; NexG works out the price from its fee settings for your city, the same way checkout does. A transfer or courier is charged per passenger or parcel, a venue booking once whatever the quantity. A request can never state a price. The total is frozen on the order when it is placed.',
+      'You say what and how many; NexG works out the price. A courier is priced per kilometre by the delivery check (POST /v1/delivery/check), once per trip: the fee the check quotes for the same pickup and drop-off is exactly what you pay, and a trip the check refuses cannot be booked. A transfer is charged per passenger and a venue booking once whatever the quantity, from NexG’s fee settings for your city. A request can never state a price. The total is frozen on the order when it is placed.',
       'Every booking needs an Idempotency-Key header. A retry with the same key gets the first answer back instead of booking twice, so a timeout is always safe to retry.',
       'The answer is 201 with the receipt as data.booking and a Location header. The booking then appears in GET /v1/orders, and GET /v1/orders/{id} reads it in full.',
     ],
@@ -1315,12 +1448,17 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 400,
         code: 'invalid_request',
-        when: 'NexG cannot book it: the service is not one it offers, it is not priced in your city yet, a ride or courier has no pickup or drop-off point, or the time has passed. The message says which.',
+        when: 'NexG cannot book it: the service is not one it offers, it is not priced in your city yet, a ride or courier has no pickup or drop-off point, the time has passed, or the delivery check refuses the courier trip (outside the areas NexG serves, too long, or the drop-off zone paused). The message says which.',
       },
       {
         status: 403,
         code: 'not_found',
-        when: 'The key is not bound to a merchant, or the merchant is not live.',
+        when: 'The key is not bound to a merchant, the merchant is not live, or NexG has not switched on live API bookings for it.',
+      },
+      {
+        status: 409,
+        code: 'conflict',
+        when: 'The booking would take this calendar month’s live API bookings (Nairobi time, cancelled ones aside) over your merchant’s monthly limit. The message gives the figures; ask NexG to raise it.',
       },
       UNEXPECTED_ERROR,
     ],
@@ -1328,7 +1466,8 @@ export const ENDPOINTS: EndpointDoc[] = [
       'Only on_account is accepted today: the booking is charged to your merchant’s account with NexG. Paying an API booking by M-Pesa or card is not available yet.',
       'Build against it with a test key (nexg_test_…). A test booking is recorded in the sandbox with a TEST- reference and never becomes an order; a booking with a live key is a real order NexG will act on.',
       'With a live key, a service can be booked in a city only once NexG has priced it there. Until then a booking is refused, and the message says so. A test key gets a sample price instead.',
-      'The developer console offers merchant_write on test keys. For a live key that books, ask NexG.',
+      'The developer console offers merchant_write on test keys. For a live key that books, ask NexG: it switches on live API bookings for your merchant, with a monthly limit.',
+      'Cancel a booking, free of charge, until a rider is assigned with POST /v1/orders/{id}/cancel.',
       'Merchant keys work only while the merchant may operate: not while it is paused, suspended or delisted, and not while its application is waiting for approval.',
     ],
     since: '2026-11-14',

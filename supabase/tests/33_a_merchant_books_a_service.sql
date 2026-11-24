@@ -83,6 +83,11 @@ from public.merchant m where m.trading_name = 'Harbour Tours';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• the booking */
 
+-- Live API bookings need NexG's approval (20270302000200).
+insert into public.api_booking_access (merchant_id, enabled, monthly_limit_cents)
+select m.id, true, 100000000 from public.merchant m where m.trading_name in ('Sunrise Tours', 'Harbour Tours')
+on conflict (merchant_id) do nothing;
+
 select lives_ok(
   $$insert into t (k, v) values ('booking', public.rpc_order_place_api(
        'tour-key-abcdefghijklmnop',
