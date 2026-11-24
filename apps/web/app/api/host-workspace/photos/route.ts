@@ -8,6 +8,7 @@ import {
   PHOTO_ROOMS,
   photosOf,
   type Photo,
+  type PhotoRoom,
 } from '@/lib/host-workspace/vocab';
 import {
   HostWorkspaceError,
@@ -26,7 +27,7 @@ const photoSchema = z.object({
   path: z.string(),
   alt: z.string().max(160).optional(),
   cover: z.boolean().optional(),
-  room: z.enum(PHOTO_ROOMS.map((room) => room.value) as [string, ...string[]]).optional(),
+  room: z.enum(PHOTO_ROOMS.map((room) => room.value) as [PhotoRoom, ...PhotoRoom[]]).optional(),
 });
 const roomSchema = photoSchema.shape.room;
 type Target = z.infer<typeof targetSchema>;
@@ -160,7 +161,7 @@ export async function POST(request: Request) {
       .trim()
       .max(160)
       .parse(form.get('alt') ?? '');
-    const room = roomSchema.parse(form.get('room') || undefined) as Photo['room'];
+    const room = roomSchema.parse(form.get('room') || undefined);
     const path = access.hostId + '/' + target.id + '/' + operationId + '.' + extension;
     let current = await gallery(access, target);
     const initial = photosOf(current);
