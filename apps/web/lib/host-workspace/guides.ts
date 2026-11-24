@@ -93,6 +93,8 @@ export const publishedGuide = z.object({
   publishedAt: z.string(),
 });
 export const guideCode = /^NXG-[23456789ABCDEFGHJKMNPQRSTVWXYZ]{6}$/;
+/** The private bucket for guide floor plans and 3D models uploaded straight to Storage. */
+export const GUIDE_ASSET_BUCKET = 'host-guide-assets';
 
 export async function requireGuideUnit(
   { db, hostId, unitScope }: HostWorkspaceAccess,

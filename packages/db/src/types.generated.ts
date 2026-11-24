@@ -19008,6 +19008,22 @@ export type Database = {
           },
         ];
       };
+      host_guide_asset_grant: {
+        Row: {
+          expires_at: string;
+          path: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          expires_at: string;
+          path: string;
+        };
+        Update: {
+          expires_at?: string;
+          path?: string;
+        };
+        Relationships: [];
+      };
       host_invoice: {
         Row: {
           created_at: string;
@@ -20343,28 +20359,34 @@ export type Database = {
       };
       host_unit_guide_asset: {
         Row: {
-          body: string;
+          body: string | null;
           digest: string;
           id: string;
           kind: string;
           mime: string;
+          size_bytes: number | null;
+          storage_path: string | null;
           unit_id: string;
         };
         ComputedFields: never;
         Insert: {
-          body: string;
+          body?: string | null;
           digest: string;
           id?: string;
           kind: string;
           mime: string;
+          size_bytes?: number | null;
+          storage_path?: string | null;
           unit_id: string;
         };
         Update: {
-          body?: string;
+          body?: string | null;
           digest?: string;
           id?: string;
           kind?: string;
           mime?: string;
+          size_bytes?: number | null;
+          storage_path?: string | null;
           unit_id?: string;
         };
         Relationships: [
@@ -69270,6 +69292,20 @@ export type Database = {
           p_unit_id: string;
         };
         Returns: number;
+      };
+      rpc_host_workspace_guide_asset_record: {
+        Args: {
+          p_digest: string;
+          p_kind: string;
+          p_path: string;
+          p_revision: number;
+          p_unit_id: string;
+        };
+        Returns: number;
+      };
+      rpc_host_workspace_guide_asset_sign: {
+        Args: { p_code: string; p_id: string };
+        Returns: Json;
       };
       rpc_host_workspace_guide_commit: {
         Args: {
