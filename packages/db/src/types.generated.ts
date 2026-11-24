@@ -71766,6 +71766,7 @@ export type Database = {
           sent_at: string | null;
           source: string;
           status: Database['public']['Enums']['stay_request_status'];
+          suggested_place: string | null;
           ticket_id: string | null;
           updated_at: string;
         };
