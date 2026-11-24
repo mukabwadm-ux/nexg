@@ -255,3 +255,55 @@ export function payerEmail(userEmail: string | null | undefined, reference: stri
   if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 200) return email;
   return `${reference.toLowerCase().replace(/[^a-z0-9-]/g, '')}@receipts.nexgapp.com`;
 }
+
+/** "0712345678" for Paystack, from "+254712345678". */
+function localNumber(e164: string): string {
+  return e164.replace(/^\+254/, '0');
+}
+
+/**
+ * Paystack's recipient for a rider's M-Pesa number (riders' automatic
+ * payouts; the console has its own copy for Finance's presses).
+ */
+export function createMpesaRecipient(mode: PaystackMode, input: { name: string; phone: string }) {
+  return call<{ recipient_code: string }>(mode, '/transferrecipient', {
+    method: 'POST',
+    body: {
+      type: 'mobile_money',
+      name: input.name.slice(0, 100),
+      account_number: localNumber(input.phone),
+      bank_code: 'MPESA',
+      currency: 'KES',
+    },
+  });
+}
+
+/**
+ * Sends `amountCents` from NexG's Paystack balance to a recipient, under our
+ * own reference: asking again with the same reference never pays twice.
+ */
+export function transfer(
+  mode: PaystackMode,
+  input: { recipient: string; amountCents: number; reference: string; reason: string },
+) {
+  return call<{ status: string; transfer_code: string; reference: string }>(mode, '/transfer', {
+    method: 'POST',
+    body: {
+      source: 'balance',
+      amount: input.amountCents,
+      recipient: input.recipient,
+      reference: input.reference,
+      reason: input.reason.slice(0, 100),
+      currency: 'KES',
+    },
+  });
+}
+
+/** What Paystack knows of a transfer under our reference (a 404 when it was never sent). */
+export function verifyTransfer(mode: PaystackMode, reference: string) {
+  return call<{ status: string; transfer_code: string; reference: string }>(
+    mode,
+    `/transfer/verify/${encodeURIComponent(reference)}`,
+    { method: 'GET' },
+  );
+}

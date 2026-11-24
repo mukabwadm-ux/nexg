@@ -4,10 +4,18 @@ import Link from 'next/link';
 import { CashoutCard } from '@/components/rider/cashout';
 import { Nothing, PageHead, PanelTitle, RiderPage, kes, panel, ring } from '@/components/rider/ui';
 import { requireRider } from '@/lib/partner';
+import { payoutTerms, payoutWhen, type PayoutRules } from '@/lib/rider-schedule';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = { title: 'Cashout' };
 export const dynamic = 'force-dynamic';
+
+const PAYOUT_LABEL: Record<string, string> = {
+  held: 'Being checked by finance',
+  sending: 'On its way',
+  paid: 'Paid',
+  failed: 'Did not go through · sent again with your next payout',
+};
 
 const LABEL: Record<string, string> = {
   pending: 'Waiting for finance',
@@ -23,6 +31,22 @@ interface PayoutOverview {
   /** Off when Finance has closed early cash-out (Payout rules). */
   earlyCashout?: boolean;
   payoutPhone?: string | null;
+  /** How this rider is paid (Payout rules). */
+  payoutRules?: PayoutRules;
+  /** Automatic payouts to this rider, newest first. */
+  payouts?: {
+    id: string;
+    state: string;
+    netKes: number;
+    grossKes?: number;
+    feeKes?: number;
+    feePaidBy?: string;
+    cashNettedKes?: number;
+    holdReason?: string | null;
+    failureReason?: string | null;
+    createdAt: string;
+    paidAt?: string | null;
+  }[];
   requests?: {
     id: string;
     amountKes: number;
@@ -58,7 +82,29 @@ export default async function RiderCashout() {
   const requests = payout.requests ?? [];
   const open = requests.find((q) => q.status === 'pending' || q.status === 'approved') ?? null;
 
+  const rules = payout.payoutRules;
+  const when = payoutWhen(rules);
+  const terms = payoutTerms(rules);
+
   const moves = [
+    ...(payout.payouts ?? [])
+      .filter((p) => p.state in PAYOUT_LABEL)
+      .map((p) => ({
+        id: `a-${p.id}`,
+        kind: 'out' as const,
+        title: 'Payout to M-Pesa',
+        note: [
+          PAYOUT_LABEL[p.state],
+          p.feePaidBy === 'rider' && (p.feeKes ?? 0) > 0 ? `fee KES ${p.feeKes}` : null,
+          (p.cashNettedKes ?? 0) > 0 ? `cash you held KES ${p.cashNettedKes}` : null,
+        ]
+          .filter(Boolean)
+          .join(' · '),
+        /* A payout still being checked has no amount sent yet: show what it pays. */
+        amount: p.netKes > 0 ? p.netKes : Math.max((p.grossKes ?? 0) - (p.cashNettedKes ?? 0), 0),
+        at: p.paidAt ?? p.createdAt,
+        muted: p.state === 'failed',
+      })),
     ...requests
       .filter((q) => q.status !== 'cancelled')
       .map((q) => ({
@@ -89,7 +135,7 @@ export default async function RiderCashout() {
     .sort((a, b) => b.at.localeCompare(a.at))
     .slice(0, 8);
 
-  const when = (iso: string) =>
+  const at = (iso: string) =>
     new Date(iso).toLocaleString('en-GB', {
       day: 'numeric',
       month: 'short',
@@ -101,14 +147,18 @@ export default async function RiderCashout() {
 
   return (
     <RiderPage>
-      <PageHead title="Cashout" lead="Withdraw your earnings before the weekly payout" />
+      <PageHead
+        title="Cashout"
+        lead={`You are paid ${when}. Need it sooner? Withdraw your earnings here.`}
+      />
+      {terms && <p className="-mt-2 mb-4 text-[13px] font-semibold text-slate-600">{terms}</p>}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         {payout.earlyCashout === false ? (
           <section className={panel}>
             <PanelTitle title="Cashout is closed" />
             <p className="text-[13px] font-semibold text-slate-600">
-              Early cashout is not open right now. You are paid in the next weekly payout.
+              Early cashout is not open right now. You are paid {when}.
             </p>
           </section>
         ) : (
@@ -155,7 +205,7 @@ export default async function RiderCashout() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[14px] font-extrabold">{m.title}</p>
                       <p className="truncate text-[12.5px] font-semibold text-slate-500">
-                        {when(m.at)}
+                        {at(m.at)}
                         {m.note ? ` · ${m.note}` : ''}
                       </p>
                     </div>

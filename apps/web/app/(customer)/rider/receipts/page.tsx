@@ -25,7 +25,7 @@ export default async function RiderReceipts() {
     <RiderBoard>
       <RiderPageHead
         title="Receipts"
-        lead="Every weekly payout NexG sends you and every cash deposit you make, with a receipt you can print or save. You also get each one by email."
+        lead="Every payout NexG sends you and every cash deposit you make, with a receipt you can print or save. You also get each one by email."
       />
       <ReceiptList
         receipts={error ? null : toReceipts(data)}

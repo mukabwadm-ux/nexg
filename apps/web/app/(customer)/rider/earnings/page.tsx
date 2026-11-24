@@ -268,7 +268,7 @@ export default async function RiderEarnings({
           )}
           {current.length > 25 ? (
             <p className="mt-2 text-[12.5px] font-semibold text-slate-500">
-              Showing the latest 25. Your weekly statement has the rest.
+              Showing the latest 25. Your statement has the rest.
             </p>
           ) : null}
         </section>
@@ -280,7 +280,9 @@ export default async function RiderEarnings({
             className={`flex items-center justify-between gap-3 rounded-[20px] bg-gradient-to-r from-[#10162a] to-[#1c2747] p-5 text-white ${ring}`}
           >
             <span>
-              <span className="block text-[16px] font-extrabold">Need it before Friday?</span>
+              <span className="block text-[16px] font-extrabold">
+                Need it before your next payout?
+              </span>
               <span className="text-[13px] text-white/75">Cash out to M-Pesa</span>
             </span>
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fdd128] text-[color:var(--rider-ink)]">
@@ -289,7 +291,7 @@ export default async function RiderEarnings({
           </Link>
 
           <section className={panel}>
-            <PanelTitle title="Settlements" note="Paid weekly" />
+            <PanelTitle title="Settlements" note="Payout runs" />
             {settled.length === 0 ? (
               <p className="text-[13px] font-semibold text-slate-500">Nothing settled yet.</p>
             ) : (

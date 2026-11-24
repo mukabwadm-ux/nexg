@@ -444,7 +444,7 @@ export function RiderHomeView({
           <p className="text-[14px] font-semibold text-white/75">
             {performance.lastWeekTotal > 0
               ? `vs ${kes(performance.lastWeekTotal)} last week`
-              : `${week?.deliveries ?? 0} deliveries since Monday · paid every Friday`}
+              : `${week?.deliveries ?? 0} deliveries since Monday`}
           </p>
           <Bars days={performance.days} />
         </section>

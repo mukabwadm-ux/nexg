@@ -38,9 +38,46 @@ const refusal = (message: string) => message.replace(/^.*?:\s*/, '').slice(0, 30
  * when Paystack confirms the transfer reached the rider.
  */
 export async function payEarlyThroughPaystack(requestId: string): Promise<TransferOutcome> {
+  return sendThroughPaystack('rider_early', requestId, 'NexG early payout');
+}
+
+/**
+ * "Pay through Paystack" for a rider's automatic payout that waits for
+ * Finance (over the largest automatic payout, or the fee not set). The
+ * database works out again what leaves and keeps NexG's reference.
+ */
+export async function payHeldRiderPayoutThroughPaystack(
+  payoutId: string,
+): Promise<TransferOutcome> {
+  return sendThroughPaystack('rider_payout', payoutId, 'NexG payout');
+}
+
+/** Cancels a held automatic payout; what it would have paid goes with the next one. */
+export async function cancelHeldRiderPayout(
+  payoutId: string,
+  note: string,
+): Promise<TransferOutcome> {
   const staff = await requireStaff();
   requireModule(staff, 'finance');
-  if (!UUID.test(requestId)) return { ok: false, message: 'That request could not be found.' };
+  if (!UUID.test(payoutId)) return { ok: false, message: 'That payout could not be found.' };
+  const client = createClient() as unknown as { rpc: Rpc };
+  const { error } = await client.rpc('rpc_finance_rider_payout_cancel', {
+    p_payout_id: payoutId,
+    p_note: note.slice(0, 300),
+  });
+  if (error) return { ok: false, message: refusal(error.message) };
+  revalidatePath('/finance/settlements');
+  return { ok: true, message: "Cancelled. It is paid with the rider's next payout." };
+}
+
+async function sendThroughPaystack(
+  kind: 'rider_early' | 'rider_payout',
+  sourceId: string,
+  reason: string,
+): Promise<TransferOutcome> {
+  const staff = await requireStaff();
+  requireModule(staff, 'finance');
+  if (!UUID.test(sourceId)) return { ok: false, message: 'That request could not be found.' };
 
   const mode = payoutMode();
   const proof = mode ? paystackProof(mode) : null;
@@ -53,8 +90,8 @@ export async function payEarlyThroughPaystack(requestId: string): Promise<Transf
   };
 
   const opened = await client.rpc('rpc_paystack_transfer_open', {
-    p_kind: 'rider_early',
-    p_source: requestId,
+    p_kind: kind,
+    p_source: sourceId,
     p_proof: proof,
   });
   if (opened.error) return { ok: false, message: refusal(opened.error.message) };
@@ -84,7 +121,7 @@ export async function payEarlyThroughPaystack(requestId: string): Promise<Transf
     recipient,
     amountCents: Number(t.amount_cents),
     reference: t.reference,
-    reason: 'NexG early payout',
+    reason,
   });
   /* Not answered: nothing is recorded as sent; pressing again re-sends under the same reference. */
   if (!sent.answered || !sent.raw) return done({ ok: false, message: sent.message });

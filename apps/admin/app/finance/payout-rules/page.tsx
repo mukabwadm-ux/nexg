@@ -39,6 +39,7 @@ interface RuleRow {
   help: string | null;
   city_id: string | null;
   value: unknown;
+  constraints: { enum?: unknown; labels?: Record<string, string> } | null;
 }
 
 const PARTIES: { key: string; title: string; icon: LucideIcon; soon?: string }[] = [
@@ -88,7 +89,9 @@ export default async function PayoutRulesPage({
 
   const { data: ruleData, error } = await s
     .from('payout_rules_v' as never)
-    .select('party, sort, key, group, scope_kind, value_type, unit, label, help, city_id, value')
+    .select(
+      'party, sort, key, group, scope_kind, value_type, unit, label, help, city_id, value, constraints',
+    )
     .or(cityId ? `city_id.is.null,city_id.eq.${cityId}` : 'city_id.is.null')
     .order('sort');
   const rules = (ruleData as unknown as RuleRow[] | null) ?? [];
@@ -231,6 +234,7 @@ export default async function PayoutRulesPage({
                         value={toValue(r.value)}
                         unit={r.unit}
                         valueType={asType(r.value_type)}
+                        options={optionsOf(r)}
                         canEdit={editable.has(r.group)}
                         lockedBy={`Changing ${r.group} rules is Finance's, with a second approver.`}
                         onStage={stageChange}
@@ -239,8 +243,9 @@ export default async function PayoutRulesPage({
                   ))}
                   {city && (
                     <p className="text-muted-light pt-3 text-[0.75rem] font-semibold">
-                      Showing {city.name}. Riders are paid weekly in the payout run; how often and
-                      on which day become rules here when payouts go through Paystack.
+                      Showing {city.name}. Riders on the payout run are paid when Finance approves
+                      the weekly run. Any other choice pays them automatically through Paystack to
+                      M-Pesa, from the start day; real riders only once real money is switched on.
                     </p>
                   )}
                 </div>
@@ -251,6 +256,19 @@ export default async function PayoutRulesPage({
       </main>
     </ConsoleShell>
   );
+}
+
+/* A choice list for an enum rule, with the labels the rule carries. */
+function optionsOf(r: RuleRow): { value: string; label: string }[] | undefined {
+  const values = r.value_type === 'enum' ? r.constraints?.enum : undefined;
+  if (!Array.isArray(values)) return undefined;
+  return values
+    .filter((v): v is string => typeof v === 'string')
+    .map((v) => ({
+      value: v,
+      label:
+        r.constraints?.labels?.[v] ?? v.charAt(0).toUpperCase() + v.slice(1).replace(/_/g, ' '),
+    }));
 }
 
 function toValue(v: unknown): number | string | boolean | null {
