@@ -33812,9 +33812,12 @@ export type Database = {
           created_by: string | null;
           destination: string;
           failure_reason: string | null;
+          fee_cents: number;
+          fee_paid_by: string | null;
           id: string;
           is_test: boolean;
           kind: string;
+          ledger_cents: number | null;
           party_id: string;
           party_type:
             | 'merchant'
@@ -33842,9 +33845,12 @@ export type Database = {
           created_by?: string | null;
           destination: string;
           failure_reason?: string | null;
+          fee_cents?: number;
+          fee_paid_by?: string | null;
           id?: string;
           is_test: boolean;
           kind: string;
+          ledger_cents?: number | null;
           party_id: string;
           party_type:
             | 'merchant'
@@ -33871,9 +33877,12 @@ export type Database = {
           created_by?: string | null;
           destination?: string;
           failure_reason?: string | null;
+          fee_cents?: number;
+          fee_paid_by?: string | null;
           id?: string;
           is_test?: boolean;
           kind?: string;
+          ledger_cents?: number | null;
           party_id?: string;
           party_type?:
             | 'merchant'
@@ -38586,6 +38595,335 @@ export type Database = {
           },
         ];
       };
+      rider_payout: {
+        Row: {
+          adjustment_id: string | null;
+          adjustments_cents: number;
+          cash_netted_cents: number;
+          city_id: string | null;
+          created_at: string;
+          cutoff_at: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          destination: string | null;
+          failure_reason: string | null;
+          fee_cents: number;
+          fee_paid_by: string;
+          gross_cents: number;
+          hold_reason: string | null;
+          id: string;
+          is_test: boolean;
+          ledger_claimed_cents: number;
+          mode: string;
+          net_cents: number;
+          paid_at: string | null;
+          rider_id: string;
+          slot_at: string;
+          state: string;
+          transfer_reference: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          adjustment_id?: string | null;
+          adjustments_cents?: number;
+          cash_netted_cents?: number;
+          city_id?: string | null;
+          created_at?: string;
+          cutoff_at: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          destination?: string | null;
+          failure_reason?: string | null;
+          fee_cents?: number;
+          fee_paid_by?: string;
+          gross_cents: number;
+          hold_reason?: string | null;
+          id?: string;
+          is_test: boolean;
+          ledger_claimed_cents?: number;
+          mode: string;
+          net_cents?: number;
+          paid_at?: string | null;
+          rider_id: string;
+          slot_at: string;
+          state: string;
+          transfer_reference?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          adjustment_id?: string | null;
+          adjustments_cents?: number;
+          cash_netted_cents?: number;
+          city_id?: string | null;
+          created_at?: string;
+          cutoff_at?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          destination?: string | null;
+          failure_reason?: string | null;
+          fee_cents?: number;
+          fee_paid_by?: string;
+          gross_cents?: number;
+          hold_reason?: string | null;
+          id?: string;
+          is_test?: boolean;
+          ledger_claimed_cents?: number;
+          mode?: string;
+          net_cents?: number;
+          paid_at?: string | null;
+          rider_id?: string;
+          slot_at?: string;
+          state?: string;
+          transfer_reference?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'rider_payout_adjustment_id_fkey';
+            columns: ['adjustment_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_adjustment';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_bounds_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'waitlist_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_decided_by_fkey';
+            columns: ['decided_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_rider_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_fleet_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_app_me_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_cash_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_home_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
+        ];
+      };
+      rider_payout_adjustment: {
+        Row: {
+          adjustment_id: string;
+          is_test: boolean;
+          payout_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          adjustment_id: string;
+          is_test: boolean;
+          payout_id: string;
+        };
+        Update: {
+          adjustment_id?: string;
+          is_test?: boolean;
+          payout_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'rider_payout_adjustment_adjustment_id_fkey';
+            columns: ['adjustment_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_adjustment';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_adjustment_payout_id_fkey';
+            columns: ['payout_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_payout';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_adjustment_payout_id_fkey';
+            columns: ['payout_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_payout_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      rider_payout_entry: {
+        Row: {
+          entry_id: number;
+          is_test: boolean;
+          payout_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          entry_id: number;
+          is_test: boolean;
+          payout_id: string;
+        };
+        Update: {
+          entry_id?: number;
+          is_test?: boolean;
+          payout_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'rider_payout_entry_payout_id_fkey';
+            columns: ['payout_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_payout';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_entry_payout_id_fkey';
+            columns: ['payout_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_payout_v';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       rider_payout_request: {
         Row: {
           adjustment_id: string | null;
@@ -38726,6 +39064,22 @@ export type Database = {
             referencedColumns: ['rider_id'];
           },
         ];
+      };
+      rider_payout_worker: {
+        Row: {
+          id: boolean;
+          live_seen_at: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          id?: boolean;
+          live_seen_at?: string | null;
+        };
+        Update: {
+          id?: boolean;
+          live_seen_at?: string | null;
+        };
+        Relationships: [];
       };
       rider_phone_change: {
         Row: {
@@ -57657,9 +58011,12 @@ export type Database = {
           created_at: string | null;
           destination: string | null;
           failure_reason: string | null;
+          fee_cents: number | null;
+          fee_paid_by: string | null;
           id: string | null;
           is_test: boolean | null;
           kind: string | null;
+          ledger_cents: number | null;
           party_id: string | null;
           party_type:
             | 'merchant'
@@ -57684,9 +58041,12 @@ export type Database = {
           created_at?: string | null;
           destination?: string | null;
           failure_reason?: string | null;
+          fee_cents?: number | null;
+          fee_paid_by?: string | null;
           id?: string | null;
           is_test?: boolean | null;
           kind?: string | null;
+          ledger_cents?: never;
           party_id?: string | null;
           party_type?:
             | 'merchant'
@@ -57710,9 +58070,12 @@ export type Database = {
           created_at?: string | null;
           destination?: string | null;
           failure_reason?: string | null;
+          fee_cents?: number | null;
+          fee_paid_by?: string | null;
           id?: string | null;
           is_test?: boolean | null;
           kind?: string | null;
+          ledger_cents?: never;
           party_id?: string | null;
           party_type?:
             | 'merchant'
@@ -60084,6 +60447,189 @@ export type Database = {
           },
           {
             foreignKeyName: 'rider_payout_request_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_week_earnings_v';
+            referencedColumns: ['rider_id'];
+          },
+        ];
+      };
+      rider_payout_v: {
+        Row: {
+          cash_netted_cents: number | null;
+          city_id: string | null;
+          created_at: string | null;
+          cutoff_at: string | null;
+          decided_at: string | null;
+          destination: string | null;
+          failure_reason: string | null;
+          fee_cents: number | null;
+          fee_paid_by: string | null;
+          gross_cents: number | null;
+          hold_reason: string | null;
+          id: string | null;
+          is_test: boolean | null;
+          mode: string | null;
+          net_cents: number | null;
+          paid_at: string | null;
+          rider_id: string | null;
+          rider_name: string | null;
+          slot_at: string | null;
+          state: string | null;
+          transfer_reference: string | null;
+          transfer_state: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_bounds_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'waitlist_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_rider_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_fleet_rider_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_app_me_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_cash_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_home_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
+            columns: ['rider_id'];
+            isOneToOne: false;
+            referencedRelation: 'rider_setup_progress_v';
+            referencedColumns: ['rider_id'];
+          },
+          {
+            foreignKeyName: 'rider_payout_rider_id_fkey';
             columns: ['rider_id'];
             isOneToOne: false;
             referencedRelation: 'rider_week_earnings_v';
@@ -63250,6 +63796,26 @@ export type Database = {
       fn_rider_early_cashout_on: { Args: { p_city_id: string }; Returns: boolean };
       fn_rider_kit_require_paid: { Args: { p_rider_id: string }; Returns: undefined };
       fn_rider_mine: { Args: { p_rider_id: string }; Returns: string };
+      fn_rider_payout_boundary: { Args: { p_rider_id: string; p_rules: Json }; Returns: string };
+      fn_rider_payout_candidates: {
+        Args: { p_boundary: string; p_cutoff: string; p_is_test: boolean; p_rider_id: string };
+        Returns: {
+          adjustment_id: string;
+          cents: number;
+          entry_id: number;
+        }[];
+      };
+      fn_rider_payout_from: { Args: { p_rules: Json }; Returns: string };
+      fn_rider_payout_mode: { Args: { p_rider_id: string }; Returns: string };
+      fn_rider_payout_next: { Args: { p_at: string; p_rules: Json }; Returns: string };
+      fn_rider_payout_owed: { Args: { p_cutoff?: string; p_rider_id: string }; Returns: number };
+      fn_rider_payout_rules: { Args: { p_city_id: string }; Returns: Json };
+      fn_rider_payout_send: {
+        Args: { p_mode: string; p_payout_id: string; p_rules: Json; p_staff: string };
+        Returns: Json;
+      };
+      fn_rider_payout_slot: { Args: { p_at: string; p_rules: Json }; Returns: string };
+      fn_rider_payout_unclaim: { Args: { p_payout_id: string }; Returns: undefined };
       fn_rider_points_sync: { Args: { p_rider_id: string }; Returns: number };
       fn_rider_proof_ok: {
         Args: { p_order_id: string; p_path: string; p_rider_id: string };
@@ -66308,6 +66874,10 @@ export type Database = {
       rpc_finance_invoices: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_finance_report_customers: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_finance_report_riders: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_finance_rider_payout_cancel: {
+        Args: { p_note: string; p_payout_id: string };
+        Returns: Json;
+      };
       rpc_finance_rider_payout_decide: {
         Args: {
           p_decision: string;
@@ -69618,6 +70188,16 @@ export type Database = {
         Args: { p_answer: string; p_proof: string; p_reference: string; p_step: string };
         Returns: Json;
       };
+      rpc_paystack_transfer_answered_worker: {
+        Args: {
+          p_answer: string;
+          p_proof: string;
+          p_reference: string;
+          p_refused: boolean;
+          p_step: string;
+        };
+        Returns: Json;
+      };
       rpc_paystack_transfer_open: {
         Args: { p_kind: string; p_proof: string; p_source: string };
         Returns: Json;
@@ -70632,6 +71212,7 @@ export type Database = {
         Args: { p_amount_kes: number; p_reason?: string };
         Returns: Json;
       };
+      rpc_rider_payouts_due: { Args: { p_limit?: number; p_proof: string }; Returns: Json };
       rpc_rider_phone_change_start: { Args: { p_kind: string; p_phone: string }; Returns: Json };
       rpc_rider_phone_change_verify: {
         Args: { p_challenge_id: string; p_code: string };
