@@ -102,7 +102,7 @@ const STAGES: Record<Subject, Record<string, StageCopy>> = {
       0,
       0,
     ],
-    // A trip group (20270314001100).
+    // A trip group (20270315000300).
     group_message: [
       'New message in your trip group',
       'Ujumbe mpya katika kundi lako la safari',
