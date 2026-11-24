@@ -38,6 +38,13 @@ vi.mock('@/app/merchants/actions', () => ({
   verifyDocument: vi.fn(),
 }));
 vi.mock('@/app/documents/actions', () => ({ fileDocumentFor: vi.fn(), remindToUpload: vi.fn() }));
+vi.mock('@/app/merchants/subaccount-actions', () => ({
+  decideRecovery: vi.fn(),
+  decideSubaccount: vi.fn(),
+  pauseSubaccount: vi.fn(),
+  requestSubaccount: vi.fn(),
+  settleRecovery: vi.fn(),
+}));
 vi.mock('@/app/featured/actions', () => ({
   sendFeaturedPitch: vi.fn(),
   unfeatureMerchant: vi.fn(),
