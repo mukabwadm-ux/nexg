@@ -43916,6 +43916,112 @@ export type Database = {
           },
         ];
       };
+      trip_group: {
+        Row: {
+          closed_at: string | null;
+          created_at: string;
+          created_by: string;
+          id: string;
+          invite_expires_at: string | null;
+          invite_revoked_at: string | null;
+          invite_token_hash: string | null;
+          name: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          closed_at?: string | null;
+          created_at?: string;
+          created_by: string;
+          id: string;
+          invite_expires_at?: string | null;
+          invite_revoked_at?: string | null;
+          invite_token_hash?: string | null;
+          name: string;
+        };
+        Update: {
+          closed_at?: string | null;
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          invite_expires_at?: string | null;
+          invite_revoked_at?: string | null;
+          invite_token_hash?: string | null;
+          name?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'trip_group_id_fkey';
+            columns: ['id'];
+            isOneToOne: true;
+            referencedRelation: 'host_conversation_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'trip_group_id_fkey';
+            columns: ['id'];
+            isOneToOne: true;
+            referencedRelation: 'msg_conversation';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'trip_group_id_fkey';
+            columns: ['id'];
+            isOneToOne: true;
+            referencedRelation: 'msg_inbox_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'trip_group_id_fkey';
+            columns: ['id'];
+            isOneToOne: true;
+            referencedRelation: 'msg_object_conversations_v';
+            referencedColumns: ['conversation_id'];
+          },
+        ];
+      };
+      trip_group_member: {
+        Row: {
+          display_name: string;
+          group_id: string;
+          joined_at: string;
+          participant_id: string | null;
+          status: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          display_name: string;
+          group_id: string;
+          joined_at?: string;
+          participant_id?: string | null;
+          status?: string;
+          user_id: string;
+        };
+        Update: {
+          display_name?: string;
+          group_id?: string;
+          joined_at?: string;
+          participant_id?: string | null;
+          status?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'trip_group_member_group_id_fkey';
+            columns: ['group_id'];
+            isOneToOne: false;
+            referencedRelation: 'trip_group';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'trip_group_member_participant_id_fkey';
+            columns: ['participant_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_participant';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       unit: {
         Row: {
           address_line: string | null;
@@ -74335,6 +74441,39 @@ export type Database = {
         Returns: Json;
       };
       rpc_translations_put: { Args: { p_locale: string; p_rows: Json }; Returns: number };
+      rpc_trip_group_close: { Args: { p_group_id: string }; Returns: Json };
+      rpc_trip_group_create: { Args: { p_my_name: string; p_name: string }; Returns: Json };
+      rpc_trip_group_invite: { Args: { p_group_id: string }; Returns: Json };
+      rpc_trip_group_invite_revoke: { Args: { p_group_id: string }; Returns: Json };
+      rpc_trip_group_join: { Args: { p_my_name: string; p_token: string }; Returns: Json };
+      rpc_trip_group_leave: { Args: { p_group_id: string }; Returns: Json };
+      rpc_trip_group_list: { Args: { p_limit?: number }; Returns: Json };
+      rpc_trip_group_members: { Args: { p_group_id: string }; Returns: Json };
+      rpc_trip_group_messages: {
+        Args: { p_before?: number; p_group_id: string; p_limit?: number };
+        Returns: Json;
+      };
+      rpc_trip_group_mute: { Args: { p_group_id: string; p_muted: boolean }; Returns: Json };
+      rpc_trip_group_preview: { Args: { p_token: string }; Returns: Json };
+      rpc_trip_group_read: { Args: { p_group_id: string }; Returns: Json };
+      rpc_trip_group_remove: { Args: { p_group_id: string; p_user_id: string }; Returns: Json };
+      rpc_trip_group_send: {
+        Args: { p_body: string; p_group_id: string; p_idempotency_key?: string };
+        Returns: Json;
+      };
+      rpc_trip_group_share: {
+        Args: {
+          p_group_id: string;
+          p_idempotency_key?: string;
+          p_kind: string;
+          p_note?: string;
+          p_ref: string;
+          p_snapshot?: Json;
+          p_summary?: string;
+          p_title: string;
+        };
+        Returns: Json;
+      };
       rpc_unit_busy: {
         Args: { p_from: string; p_to: string; p_unit_id: string };
         Returns: {
