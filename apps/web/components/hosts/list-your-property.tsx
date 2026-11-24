@@ -178,11 +178,13 @@ export function ListYourProperty() {
       </section>
 
       {/* ───────────────────────────────────────── form card */}
-      {/* In the flow on a phone (under the hero); floated over the hero and
-          the next section from lg up. */}
-      <div className="px-4 py-8 sm:px-[30px] lg:pointer-events-none lg:absolute lg:inset-x-0 lg:top-0 lg:z-10 lg:p-0">
-        <div className="mx-auto max-w-[120rem] lg:flex lg:justify-end lg:px-[30px] lg:pt-12">
-          <div className="lg:pointer-events-auto lg:w-[420px] xl:w-[440px]">
+      {/* In the flow on a phone (under the hero). From lg up it floats over
+          the hero and the next section: the layer spans both, and the card
+          sticks 16px under the 65px header until the next section's bottom
+          reaches it, then scrolls away with that section (owner, 24 Nov 2026). */}
+      <div className="px-4 py-8 sm:px-[30px] lg:pointer-events-none lg:absolute lg:inset-0 lg:z-10 lg:p-0">
+        <div className="mx-auto max-w-[120rem] lg:flex lg:h-full lg:items-start lg:justify-end lg:px-[30px] lg:pb-10 lg:pt-12">
+          <div className="lg:pointer-events-auto lg:sticky lg:top-[81px] lg:w-[420px] xl:w-[440px]">
             <ListPropertyForm type={type} onTypeChange={setType} nameRef={nameRef} />
           </div>
         </div>
@@ -406,8 +408,10 @@ function ListPropertyForm({
     }
   }
 
+  /* From lg the card is sticky under the header; on a short screen (a 768px
+     laptop) it scrolls inside itself rather than running off the bottom. */
   const card =
-    'scroll-mt-24 rounded-2xl bg-white p-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)] ring-1 ring-black/5 sm:p-7';
+    'scroll-mt-24 rounded-2xl bg-white p-6 shadow-[0_24px_60px_rgba(0,0,0,0.28)] ring-1 ring-black/5 sm:p-7 lg:max-h-[calc(100vh-97px)] lg:overflow-y-auto';
 
   if (done) {
     return (
