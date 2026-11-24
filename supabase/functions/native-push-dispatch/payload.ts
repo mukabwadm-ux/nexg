@@ -94,6 +94,8 @@ const STAGES: Record<Subject, Record<string, StageCopy>> = {
   conversation: {
     host_message: ['New message about your stay', 'Ujumbe mpya kuhusu malazi yako', 0, 0],
     guest_message: ['New message from a guest', 'Ujumbe mpya kutoka kwa mgeni', 0, 0],
+    // A trip group (20270314000600).
+    group_message: ['New message in your trip group', 'Ujumbe mpya katika kundi lako la safari', 0, 0],
   },
   job: {
     assigned: ['Delivery assigned', 'Umepewa kazi ya usafirishaji', 15, 1],
