@@ -10,6 +10,8 @@ import {
   EVENT_FIELDS,
   MERCHANT_FIELDS,
   ORDER_FIELDS,
+  RIDER_FIELDS,
+  RIDER_LOCATION_FIELDS,
   SERVICE_FIELDS,
   ZONE_FIELDS,
 } from './resources';
@@ -1088,6 +1090,33 @@ export const ENDPOINTS: EndpointDoc[] = [
       data: {
         items: [
           {
+            order_id: '5d4c3b2a-1908-4f7e-a6d5-c4b3a2918070',
+            reference: 'NX-261110-0007',
+            service: 'courier',
+            quantity: 1,
+            status: 'in_progress',
+            stage: 'picked_up',
+            payment_method: 'on_account',
+            payment_status: 'pending',
+            currency: 'KES',
+            total_cents: 30500,
+            scheduled_for: null,
+            pickup_label: 'Sarit Centre, Westlands',
+            dropoff_label: 'Ngong Road, Kilimani, Nairobi',
+            created_at: '2026-11-10T10:05:51.630+00:00',
+            rider: {
+              first_name: 'Juma',
+              vehicle: 'motorbike',
+              plate: 'KMEA 123A',
+              assigned_at: '2026-11-10T10:09:12.014+00:00',
+              location: {
+                latitude: -1.284731,
+                longitude: 36.802114,
+                at: '2026-11-10T10:21:40.552+00:00',
+              },
+            },
+          },
+          {
             order_id: '0f1e2d3c-4b5a-4697-8a8b-9c0d1e2f3a4b',
             reference: 'NX-261110-0003',
             service: '',
@@ -1102,6 +1131,7 @@ export const ENDPOINTS: EndpointDoc[] = [
             pickup_label: null,
             dropoff_label: 'Rhapta Road, Westlands, Nairobi',
             created_at: '2026-11-10T09:42:17.204+00:00',
+            rider: null,
           },
         ],
         next_cursor: null,
@@ -1110,6 +1140,13 @@ export const ENDPOINTS: EndpointDoc[] = [
     },
     responseResources: [
       { schema: 'ApiOrder', title: 'Order', at: 'data.items[]', fields: ORDER_FIELDS },
+      { schema: 'ApiBookingRider', title: 'Rider', at: 'data.items[].rider', fields: RIDER_FIELDS },
+      {
+        schema: 'ApiBookingRiderLocation',
+        title: 'Rider location',
+        at: 'data.items[].rider.location',
+        fields: RIDER_LOCATION_FIELDS,
+      },
     ],
     errors: [
       ...credentialErrors('merchant_read', false),
@@ -1176,12 +1213,26 @@ export const ENDPOINTS: EndpointDoc[] = [
           pickup_label: null,
           dropoff_label: 'Rhapta Road, Westlands, Nairobi',
           created_at: '2026-11-10T09:42:17.204+00:00',
+          rider: {
+            first_name: 'Juma',
+            vehicle: 'motorbike',
+            plate: 'KMEA 123A',
+            assigned_at: '2026-11-10T09:58:40.310+00:00',
+            location: null,
+          },
         },
       },
       meta: { api_version: 'v1' },
     },
     responseResources: [
       { schema: 'ApiOrder', title: 'Order', at: 'data.order', fields: ORDER_FIELDS },
+      { schema: 'ApiBookingRider', title: 'Rider', at: 'data.order.rider', fields: RIDER_FIELDS },
+      {
+        schema: 'ApiBookingRiderLocation',
+        title: 'Rider location',
+        at: 'data.order.rider.location',
+        fields: RIDER_LOCATION_FIELDS,
+      },
     ],
     errors: [
       ...credentialErrors('merchant_read', false),
@@ -1284,6 +1335,7 @@ export const ENDPOINTS: EndpointDoc[] = [
           pickup_label: 'JKIA Terminal 1A',
           dropoff_label: 'Woodvale Grove, Westlands, Nairobi',
           created_at: '2026-11-23T09:12:40.118+00:00',
+          rider: null,
         },
         cancelled: true,
         previous_status: 'requested',
@@ -1559,6 +1611,7 @@ export const ENDPOINTS: EndpointDoc[] = [
           pickup_label: 'JKIA Terminal 1A',
           dropoff_label: 'Woodvale Grove, Westlands, Nairobi',
           created_at: '2026-11-17T09:12:44.512+00:00',
+          rider: null,
         },
         previous_status: 'requested',
       },
@@ -1628,6 +1681,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     summary: 'Sandbox only: give a test ride or courier a rider, to try booking.rider_assigned.',
     description: [
       'A real ride or courier gets a rider when one accepts its delivery job, and NexG sends booking.rider_assigned. A test booking has no riders, so this endpoint assigns a test rider and sends the same event to your test endpoint. Call it again to try a new rider taking over.',
+      'The booking then answers a made-up rider in the shape a live booking does: first name Test, a motorbike, plate KTEST 001. Move it to picked_up and rider.location is the pickup point; to arriving, the drop-off point. Both need the booking to have been made with coordinates.',
       'Rides and couriers only, and not once the booking is completed or cancelled. There is no body. Test keys only: a live key is refused with 403.',
     ],
     auth: { kind: 'key', scope: 'merchant_write', merchantBound: true },
@@ -1670,6 +1724,13 @@ export const ENDPOINTS: EndpointDoc[] = [
           pickup_label: 'JKIA Terminal 1A',
           dropoff_label: 'Woodvale Grove, Westlands, Nairobi',
           created_at: '2026-11-17T09:12:44.512+00:00',
+          rider: {
+            first_name: 'Test',
+            vehicle: 'motorbike',
+            plate: 'KTEST 001',
+            assigned_at: '2026-11-17T09:20:03.118+00:00',
+            location: null,
+          },
         },
         assigned_at: '2026-11-17T09:20:03.118+00:00',
       },
@@ -1677,6 +1738,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     },
     responseResources: [
       { schema: 'ApiOrder', title: 'Order', at: 'data.order', fields: ORDER_FIELDS },
+      { schema: 'ApiBookingRider', title: 'Rider', at: 'data.order.rider', fields: RIDER_FIELDS },
       {
         title: 'The rider',
         at: 'data',
@@ -1711,9 +1773,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       { status: 500, code: 'internal_error', when: 'NexG could not assign the test rider.' },
       UNEXPECTED_ERROR,
     ],
-    notes: [
-      'booking.rider_assigned carries the booking and assigned_at, and nothing about the rider yet.',
-    ],
+    notes: ['booking.rider_assigned carries the booking, with its rider, and assigned_at.'],
     since: '2026-11-18',
     source: 'apps/api/app/v1/test/orders/[id]/rider/route.ts',
   },

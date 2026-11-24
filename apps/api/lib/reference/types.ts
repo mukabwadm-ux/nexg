@@ -78,6 +78,8 @@ export interface ResourceDoc {
     | 'PublicEvent'
     | 'ApiService'
     | 'ApiOrder'
+    | 'ApiBookingRider'
+    | 'ApiBookingRiderLocation'
     | 'PublicBranch'
     | 'ServiceBooking'
     | 'BookingReceipt'

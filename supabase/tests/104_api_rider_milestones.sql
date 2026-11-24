@@ -103,13 +103,13 @@ update dispatch.job
 
 select is(
   (select concat_ws('|', ev.environment, ((ev.body #>> '{data,booking,order_id}') = (select v ->> 'order_id' from t where k = 'ride'))::text,
-     ((ev.body #>> '{data,assigned_at}') is not null)::text, (ev.body -> 'data' ? 'rider')::text,
+     ((ev.body #>> '{data,assigned_at}') is not null)::text, (ev.body #> '{data,booking,rider}' ? 'first_name')::text,
      (select count(*) from public.api_webhook_delivery d where d.event_id = ev.id)::text)
    from public.api_webhook_event ev
    where ev.type = 'booking.rider_assigned'
      and ev.booking_id = (select (v ->> 'order_id')::uuid from t where k = 'ride')),
-  'live|true|true|false|1',
-  'a rider taking the job sends booking.rider_assigned to the live endpoint, with the booking and the time, and nothing about the rider');
+  'live|true|true|true|1',
+  'a rider taking the job sends booking.rider_assigned to the live endpoint, with the booking, its rider (20270311000100) and the time');
 
 update dispatch.job set assigned_at = now()
  where order_id = (select (v ->> 'order_id')::uuid from t where k = 'ride');

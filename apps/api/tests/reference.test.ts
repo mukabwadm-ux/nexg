@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import {
+  ApiBookingRider,
+  ApiBookingRiderLocation,
   ApiOrder,
   ApiService,
   BookingReceipt,
@@ -81,6 +83,8 @@ const SCHEMAS = {
   PublicEvent,
   ApiService,
   ApiOrder,
+  ApiBookingRider,
+  ApiBookingRiderLocation,
   PublicBranch,
   ServiceBooking,
   BookingReceipt,

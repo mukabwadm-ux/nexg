@@ -62687,6 +62687,7 @@ export type Database = {
       };
       fn_anonymise_guest: { Args: { p_guest_id: string }; Returns: undefined };
       fn_answer_matches: { Args: { p_answers: Json; p_condition: Json }; Returns: boolean };
+      fn_api_booking_rider: { Args: { p_order_id: string }; Returns: Json };
       fn_api_booking_status: { Args: { p_stage: string }; Returns: string };
       fn_api_catalogue_item: { Args: { p_item: Json }; Returns: Json };
       fn_api_key_issue: {
@@ -62752,6 +62753,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      fn_api_test_booking_rider: { Args: { p_id: string }; Returns: Json };
       fn_api_test_order_move: {
         Args: { p_id: string; p_merchant_id: string; p_status: string };
         Returns: Json;

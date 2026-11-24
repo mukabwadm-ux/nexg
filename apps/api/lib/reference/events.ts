@@ -25,6 +25,7 @@ export const EVENT_EXAMPLE = {
       pickup_label: 'JKIA Terminal 1A',
       dropoff_label: 'Woodvale Grove, Westlands, Nairobi',
       created_at: '2026-11-17T06:30:02.118+00:00',
+      rider: null,
     },
     previous_status: 'requested',
     previous_stage: 'placed',

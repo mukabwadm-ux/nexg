@@ -10,6 +10,17 @@ import type { ChangelogEntry } from './types';
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-11-24',
+    kind: 'changed',
+    title: 'Bookings show their rider',
+    body: [
+      'Every order now has rider. Once a rider takes the delivery job, it gives the rider’s first name, vehicle and plate, so your team can hand the order to the right person. NexG never shares a rider’s phone number or surname.',
+      'From pickup until delivery, rider.location says where the rider is: latitude, longitude, and at, when the rider’s app sent it. It is null before pickup, after delivery, and until the app sends a position. rider is null until a rider takes the job, and after a cancellation.',
+      'GET /v1/orders, GET /v1/orders/{id} and every order event carry it, so booking.rider_assigned now says who took the job. In the sandbox, a test rider answers in the same shape: located at the pickup point once picked up, and at the drop-off point while arriving.',
+    ],
+    endpoints: ['list-orders', 'get-order', 'assign-test-rider'],
+  },
+  {
     date: '2026-11-23',
     kind: 'changed',
     title: 'Live bookings: NexG’s approval, a monthly limit, couriers priced per km',

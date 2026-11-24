@@ -84,7 +84,7 @@ export default function EventsPage() {
           ],
           [
             <C key="t">booking.rider_assigned</C>,
-            'A rider takes the booking’s delivery job, and again when another rider takes over. Nothing about the rider is sent yet.',
+            'A rider takes the booking’s delivery job, and again when another rider takes over. The booking’s rider says who: first name, vehicle and plate.',
             <span key="d">
               <C>booking</C>, <C>assigned_at</C>
             </span>,

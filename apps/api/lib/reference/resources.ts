@@ -508,6 +508,54 @@ export const ORDER_FIELDS: FieldDoc[] = [
     description: 'Where it is going.',
   },
   { name: 'created_at', type: 'timestamp', description: 'When it was placed.' },
+  {
+    name: 'rider',
+    type: 'object',
+    nullable: true,
+    description:
+      'Who is carrying it, once a rider has the delivery job: first name, vehicle and plate, and where the rider is from pickup until delivery. Null until a rider takes the job, and after a cancellation.',
+  },
+];
+
+export const RIDER_FIELDS: FieldDoc[] = [
+  {
+    name: 'first_name',
+    type: 'string',
+    description:
+      'The rider’s first name, so your team knows who is coming. NexG never shares a rider’s phone number or surname.',
+  },
+  { name: 'vehicle', type: 'string', description: 'motorbike, bicycle, car or tuktuk.' },
+  {
+    name: 'plate',
+    type: 'string',
+    nullable: true,
+    description: 'The number plate, to hand the order to the right rider. Null for a bicycle.',
+  },
+  {
+    name: 'assigned_at',
+    type: 'timestamp',
+    nullable: true,
+    description:
+      'When this rider took the job. When another rider takes over, this shows the new rider.',
+  },
+  {
+    name: 'location',
+    type: 'object',
+    nullable: true,
+    description:
+      'Where the rider is, from pickup until delivery. Null before pickup, after delivery, and until the rider’s app sends a position.',
+  },
+];
+
+export const RIDER_LOCATION_FIELDS: FieldDoc[] = [
+  { name: 'latitude', type: 'number', description: 'Latitude, in degrees.' },
+  { name: 'longitude', type: 'number', description: 'Longitude, in degrees.' },
+  {
+    name: 'at',
+    type: 'timestamp',
+    description:
+      'When the rider’s app sent this position. Check it: an app that goes offline stops sending.',
+  },
 ];
 
 export const BOOKING_REQUEST_FIELDS: FieldDoc[] = [

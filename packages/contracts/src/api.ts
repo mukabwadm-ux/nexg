@@ -535,6 +535,38 @@ export const BookingStatus = z.enum([
 ]);
 export type BookingStatus = z.infer<typeof BookingStatus>;
 
+/** Where a booking's rider is: the last position the rider's app sent. */
+export const ApiBookingRiderLocation = z
+  .object({
+    latitude: z.number(),
+    longitude: z.number(),
+    /** When the rider's app sent this position. */
+    at: z.string(),
+  })
+  .strict();
+
+export type ApiBookingRiderLocation = z.infer<typeof ApiBookingRiderLocation>;
+
+/**
+ * The rider carrying a booking, as a merchant may see them: the first name,
+ * the vehicle and its plate once a rider has the delivery job, and where the
+ * rider is from pickup until delivery. Never a phone number or a surname.
+ */
+export const ApiBookingRider = z
+  .object({
+    first_name: z.string(),
+    vehicle: z.enum(['motorbike', 'bicycle', 'car', 'tuktuk']),
+    /** Null for a bicycle, or when none is on record. */
+    plate: z.string().nullable(),
+    /** When this rider took the job. */
+    assigned_at: z.string().nullable(),
+    /** Only from pickup until delivery: null before pickup, after delivery, or with no position yet. */
+    location: ApiBookingRiderLocation.nullable(),
+  })
+  .strict();
+
+export type ApiBookingRider = z.infer<typeof ApiBookingRider>;
+
 export const ApiOrder = z
   .object({
     order_id: Uuid,
@@ -553,6 +585,8 @@ export const ApiOrder = z
     pickup_label: z.string().nullable(),
     dropoff_label: z.string().nullable(),
     created_at: z.string(),
+    /** Who is carrying it, once a rider has the delivery job. Null until then, and after a cancellation. */
+    rider: ApiBookingRider.nullable(),
   })
   .strict();
 
