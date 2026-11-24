@@ -707,6 +707,19 @@ begin
   if v_hold.state in ('refund_due', 'refunded') then
     return cinema.connected_hold_result(p_hold_id);
   end if;
+  -- Paid after the cinema cancelled the showing: nothing to book, so refund.
+  if exists (select 1 from cinema.showing s where s.id = v_hold.showing_id and s.status = 'cancelled') then
+    update cinema.hold set state = 'refund_due', refund_reason = 'showing_cancelled',
+           payment_reference = btrim(p_payment_reference), settled_at = now(), next_attempt_at = null,
+           updated_at = now()
+     where id = p_hold_id;
+    perform audit.log('system'::public.actor_type, 'experiences', 'cinema.refund_due',
+      p_target_type => 'cinema_hold', p_target_id => p_hold_id, p_severity => 'high'::public.audit_severity,
+      p_reason => 'Paid for a showing the cinema had cancelled.',
+      p_after => jsonb_build_object('reason', 'showing_cancelled', 'total_minor', v_hold.total_minor,
+                                    'payment', btrim(p_payment_reference), 'state_before', v_hold.state));
+    return cinema.connected_hold_result(p_hold_id);
+  end if;
   update cinema.hold set state = 'confirming', payment_reference = btrim(p_payment_reference),
          settled_at = now(), next_attempt_at = now(), confirm_attempts = 0, updated_at = now()
    where id = p_hold_id;

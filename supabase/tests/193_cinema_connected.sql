@@ -2,7 +2,7 @@
 -- of what the system said, a hold's life on it, and the worker's checks.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(37);
+select plan(38);
 
 insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, is_anonymous, created_at, updated_at)
 values
@@ -220,6 +220,8 @@ select public.cinema_sync_apply('c1500000-0000-4000-8000-0000000000c1',
   pg_temp.programme(jsonb_build_array(pg_temp.showing('SH1', 0, 'cancelled'))));
 select is((select state from cinema.hold where id = current_setting('t.h5')::uuid), 'released',
   'A showing the cinema cancels releases its unpaid holds.');
+select is(public.cinema_payment_settled(current_setting('t.h5')::uuid, 'PS-150-5') ->> 'state', 'refund_due',
+  'A payment that lands after the cinema cancelled the showing is refunded, never confirmed.');
 select is((select status || ':' || in_latest_sync from cinema.showing where id = pg_temp.showing_id('SH4')), 'draft:false',
   'A showing left out of a sync is kept, marked not in the latest programme.');
 
