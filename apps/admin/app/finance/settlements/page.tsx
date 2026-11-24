@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { ShareDonut } from '@/components/charts';
 import { ConsoleShell } from '@/components/console-shell';
 import { EarlyPayouts, type EarlyPayoutRow } from '@/components/finance/early-payouts';
+import { RiderPayouts, type RiderPayoutRow } from '@/components/finance/rider-payouts';
 import { HostPayoutDetails } from '@/components/finance/host-payouts';
 import { MovementsTable } from '@/components/finance/movements';
 import { PartnerPayoutDetails } from '@/components/finance/partner-payouts';
@@ -159,6 +160,29 @@ export default async function SettlementsPage({
     transfer_state: latestTransfer.get(r.id)?.state ?? null,
     transfer_failure: latestTransfer.get(r.id)?.failure_reason ?? null,
   }));
+
+  /* Riders paid automatically (Payout rules): those waiting for Finance, then
+     the last few sent. Missing before the payout modes update is applied. */
+  const riderPayoutColumns =
+    'id, rider_name, mode, is_test, gross_cents, cash_netted_cents, fee_cents, fee_paid_by, net_cents, state, hold_reason, failure_reason, destination, created_at, paid_at, transfer_state';
+  const [{ data: heldPayoutRows }, { data: recentPayoutRows }] = await Promise.all([
+    supabase
+      .from('rider_payout_v' as never)
+      .select(riderPayoutColumns)
+      .eq('state', 'held')
+      .order('created_at')
+      .limit(100),
+    supabase
+      .from('rider_payout_v' as never)
+      .select(riderPayoutColumns)
+      .in('state', ['sending', 'paid', 'failed', 'cancelled'])
+      .order('created_at', { ascending: false })
+      .limit(15),
+  ]);
+  const riderPayouts = [
+    ...((heldPayoutRows ?? []) as unknown as RiderPayoutRow[]),
+    ...((recentPayoutRows ?? []) as unknown as RiderPayoutRow[]),
+  ];
 
   const [runsRes, owedRes, calendarRes] = await Promise.all([
     supabase
@@ -473,6 +497,7 @@ export default async function SettlementsPage({
         />
 
         <EarlyPayouts rows={earlyPayouts} canDecide={canVerify} />
+        <RiderPayouts rows={riderPayouts} canDecide={canVerify} />
 
         {failed && (
           <p

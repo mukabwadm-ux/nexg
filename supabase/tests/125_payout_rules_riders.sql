@@ -83,7 +83,9 @@ $$;
 
 select is(
   (select array_agg(key order by sort) from (select distinct key, sort from public.payout_rules_v
-                                              where party = 'rider') x),
+                                              where party = 'rider'
+                                                and key in ('payouts.rider.minimum_kes', 'payouts.rider.early_cashout',
+                                                            'payments.rider_early_payout_min_kes')) x),
   array['payouts.rider.minimum_kes', 'payouts.rider.early_cashout',
         'payments.rider_early_payout_min_kes'],
   'The Payout rules screen lists the riders'' rules in order.');

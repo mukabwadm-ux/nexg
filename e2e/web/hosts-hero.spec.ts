@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test';
 
 /**
- * The /hosts hero as rebuilt in #82 (host and guest benefits and
- * packages), on the Design B ("Cream Editorial") layout: one headline,
- * the two links, three stats, the three-panel dashboard card, and no
- * sideways scroll down to a 360px phone. Screenshots land in
+ * The /hosts hero as rebuilt from the owner's "List Your Property" mockup
+ * (e23578d1): one headline over the dusk photo, the "List My Property"
+ * button that brings the form card into view, four benefits, the form card,
+ * and "What can you list on NEXG?" whose cards fill the form's Property
+ * Type. No sideways scroll down to a 360px phone. Screenshots land in
  * docs/design-refs/hosts/implementation/ for comparison with the reference.
  */
 
@@ -22,31 +23,22 @@ for (const width of WIDTHS) {
     const hero = page.locator('main section').first();
 
     await expect(page.locator('h1')).toHaveCount(1);
-    await expect(page.locator('h1')).toHaveText(
-      'List your property free. Run every unit from one place.',
-    );
+    await expect(page.locator('h1')).toHaveText('List Your Property on NEXG');
+    await expect(hero.getByText('NEXG Stay Partners')).toBeVisible();
 
-    const list = hero.getByRole('link', { name: /Start your free month/ });
-    const how = hero.getByRole('link', { name: 'See how it works' });
-    await expect(list).toHaveAttribute('href', '#list');
-    await expect(how).toHaveAttribute('href', '#how');
-
-    // The third stat's number is the live city count, so only its caption is fixed.
-    for (const term of ['KES 0', '1 month']) {
-      await expect(hero.locator('dt', { hasText: term })).toBeVisible();
-    }
-    await expect(hero.locator('dd', { hasText: 'to list your property' })).toBeVisible();
-    await expect(hero.locator('dd', { hasText: 'of management free' })).toBeVisible();
-    await expect(hero.locator('dd', { hasText: 'across Kenya & Uganda' })).toBeVisible();
-
-    // The card is aria-hidden, so check its three panels by text.
-    for (const text of [
-      'Your host dashboard · 3 units',
-      'Apartment 4B · Kilimani',
-      'Guest ordered dinner to 4B',
+    for (const benefit of [
+      'Increase occupancy & revenue',
+      'Access a global base of quality guests',
+      'Secure & reliable payments',
+      'Dedicated partner support',
     ]) {
-      await expect(hero.getByText(text, { exact: false })).toBeVisible();
+      await expect(hero.getByText(benefit)).toBeVisible();
     }
+
+    // The form card: the host application, under the hero on a phone and over it from lg up.
+    const form = page.locator('form#list');
+    await expect(form.getByRole('heading', { name: 'List Your Property' })).toBeVisible();
+    await expect(form.getByRole('button', { name: 'Submit & Get Started' })).toBeVisible();
 
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -59,10 +51,20 @@ for (const width of WIDTHS) {
       });
     }
 
-    // The links go where they always went.
-    await list.click();
-    await expect(page).toHaveURL(/#list$/);
-    await how.click();
-    await expect(page).toHaveURL(/#how$/);
+    // "List My Property" brings the form into view and puts the cursor in it.
+    await hero.getByRole('button', { name: 'List My Property' }).click();
+    await expect(page.locator('#list_name')).toBeFocused();
+    await expect(form).toBeInViewport();
+
+    // Choosing what to list marks the card chosen (and fills Property Type).
+    const apartments = page
+      .locator('section[aria-labelledby="what-to-list-title"]')
+      .getByRole('button', { name: /Apartments/ });
+    await expect(apartments).toHaveAttribute('aria-pressed', 'false');
+    await apartments.click();
+    await expect(apartments).toHaveAttribute('aria-pressed', 'true');
+
+    // The page's other way in still goes where it always went.
+    await expect(page.locator('section#how')).toHaveCount(1);
   });
 }
