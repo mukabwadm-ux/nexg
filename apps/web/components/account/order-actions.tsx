@@ -20,19 +20,36 @@ const field =
  * What a customer can do with their own order (20 Nov 2026): cancel it before paying, rate it
  * once delivered, and report a problem at any time. Each is one database call that checks the
  * order is theirs (rpc_order_cancel_mine, rpc_order_rate, rpc_my_support_ticket_create).
+ *
+ * The rider who delivered it is rated on its own (24 Nov 2026, rpc_order_rate_rider): stars and
+ * a few words, read by the NexG rider team, not by the shop.
  */
+
+const RIDER_TAGS: { key: string; label: string }[] = [
+  { key: 'on_time', label: 'On time' },
+  { key: 'friendly', label: 'Friendly' },
+  { key: 'careful', label: 'Careful with my order' },
+  { key: 'followed_instructions', label: 'Followed my directions' },
+  { key: 'late', label: 'Late' },
+  { key: 'rude', label: 'Rude' },
+  { key: 'damaged', label: 'Order damaged' },
+  { key: 'hard_to_reach', label: 'Hard to reach' },
+];
 export function OrderActions({
   orderId,
   reference,
   canCancel,
   canRate,
   rated,
+  rider = null,
 }: {
   orderId: string;
   reference: string;
   canCancel: boolean;
   canRate: boolean;
   rated: number | null;
+  /** The rider who delivered it, when a NexG rider did; stars once rated. */
+  rider?: { firstName: string | null; stars: number | null } | null;
 }) {
   const router = useRouter();
   const [pending, start] = React.useTransition();
@@ -41,6 +58,10 @@ export function OrderActions({
   const [comment, setComment] = React.useState('');
   const [reporting, setReporting] = React.useState(false);
   const [problem, setProblem] = React.useState('');
+  const [riderStars, setRiderStars] = React.useState(0);
+  const [riderTags, setRiderTags] = React.useState<string[]>([]);
+  const [riderNote, setRiderNote] = React.useState('');
+  const riderName = rider?.firstName ? rider.firstName : 'your rider';
 
   const run = (
     call: () => Promise<{ data: unknown; error: { message: string } | null }>,
@@ -119,6 +140,91 @@ export function OrderActions({
       )}
       {rated !== null && (
         <p className="text-muted text-sm">You rated this order {rated} out of 5. Thank you.</p>
+      )}
+
+      {rider && rider.stars === null && (
+        <section
+          id="rate-rider"
+          aria-labelledby="rate-rider-h"
+          className="border-border flex flex-col gap-3 rounded-2xl border bg-white p-5"
+        >
+          <h2 id="rate-rider-h" className="text-lg font-extrabold">
+            How was {riderName}?
+          </h2>
+          <fieldset className="flex gap-1.5">
+            <legend className="sr-only">Stars for {riderName}, from 1 to 5</legend>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <button
+                key={n}
+                type="button"
+                aria-pressed={riderStars >= n}
+                aria-label={`${n} star${n === 1 ? '' : 's'} for ${riderName}`}
+                onClick={() => setRiderStars(n)}
+                className={`h-11 w-11 rounded-full border text-lg font-extrabold ${
+                  riderStars >= n
+                    ? 'border-[#fdd128] bg-[#fdd128] text-[#141414]'
+                    : 'border-border text-muted bg-white'
+                }`}
+              >
+                ★
+              </button>
+            ))}
+          </fieldset>
+          <fieldset className="flex flex-wrap gap-2">
+            <legend className="mb-1.5 text-sm font-bold">Anything stand out? (optional)</legend>
+            {RIDER_TAGS.map((t) => {
+              const on = riderTags.includes(t.key);
+              return (
+                <button
+                  key={t.key}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() =>
+                    setRiderTags((v) => (on ? v.filter((k) => k !== t.key) : [...v, t.key]))
+                  }
+                  className={`min-h-9 rounded-full border px-3.5 text-sm font-bold ${
+                    on ? 'border-[#141414] bg-[#141414] text-white' : 'border-border bg-white'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </fieldset>
+          <label className="block">
+            <span className="text-sm font-bold">A word for the rider team? (optional)</span>
+            <textarea
+              className={`${field} mt-1.5 min-h-16`}
+              value={riderNote}
+              onChange={(e) => setRiderNote(e.target.value)}
+              maxLength={1000}
+            />
+          </label>
+          <button
+            type="button"
+            disabled={pending || riderStars === 0}
+            onClick={() =>
+              run(
+                () =>
+                  rpc('rpc_order_rate_rider', {
+                    p_order_id: orderId,
+                    p_stars: riderStars,
+                    p_tags: riderTags,
+                    p_comment: riderNote || null,
+                  }),
+                'Thank you for rating your rider.',
+              )
+            }
+            className={`${button} self-start bg-[#fdd128] text-[#141414]`}
+          >
+            Rate {riderName}
+          </button>
+        </section>
+      )}
+      {rider && rider.stars !== null && (
+        <p className="text-muted text-sm">
+          You gave {riderName} {rider.stars} out of 5. Thank you.
+        </p>
       )}
 
       <section

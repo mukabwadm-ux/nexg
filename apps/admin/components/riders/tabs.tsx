@@ -1,6 +1,8 @@
 import { Card } from '@nexg/ui';
 import Link from 'next/link';
+import type * as React from 'react';
 
+import { MessageComposer } from './rider-record-actions';
 import {
   CashBar,
   clock,
@@ -736,11 +738,14 @@ export function SettlementTab({
   lines,
   rateCard,
   bonuses,
+  editor,
 }: {
   run: RunRow | null;
   lines: SettlementLineRow[];
   rateCard: RateCardRow | null;
   bonuses: BonusRuleRow[];
+  /** The rate card editor (client), under the published card. */
+  editor?: React.ReactNode;
 }) {
   return (
     <>
@@ -903,6 +908,8 @@ export function SettlementTab({
               Shown to riders in the app before they accept. Changes need Ops manager + Finance.
             </p>
           </Card>
+
+          {editor}
 
           <Card className="p-5">
             <p className="text-[0.9375rem] font-extrabold">Bonus rules</p>
@@ -1339,8 +1346,8 @@ export function CommsTab({
           Kiswahili version auto-attached · never sends while a rider is on a trip.
         </p>
         <p className="text-warning mt-2 text-[0.6875rem] font-bold leading-snug">
-          Nothing is delivered yet. Messages queue as notification rows; no provider is wired, so
-          the send button is not shown rather than lying about what it does.
+          Messages go to the rider portal&apos;s Messages page, where riders reply. No SMS or
+          WhatsApp provider is wired, so nothing is sent outside the portal.
         </p>
       </Card>
 
@@ -1400,6 +1407,17 @@ export function CommsTab({
           <p className="text-muted px-4 py-8 text-center text-[0.75rem] font-semibold">
             Pick a rider to see their thread.
           </p>
+        )}
+        {chosen && (
+          <div className="border-border border-t p-4">
+            <MessageComposer riderId={chosen.id} />
+            <Link
+              href={`/riders/${chosen.id}?view=messages`}
+              className="text-gold-text mt-2 inline-block text-xs font-bold"
+            >
+              Full thread on their record →
+            </Link>
+          </div>
         )}
       </Card>
     </div>

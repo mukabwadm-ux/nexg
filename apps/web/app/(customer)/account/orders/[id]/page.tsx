@@ -56,7 +56,7 @@ export default async function OrderPage({ params }: { params: { id: string } }) 
     .maybeSingle();
   if (!order) notFound();
 
-  const [items, events, merchant, rating] = await Promise.all([
+  const [items, events, merchant, rating, riderRating] = await Promise.all([
     supabase
       .from('order_item')
       .select('id, name, quantity, line_total_cents, variant_label, unit_label, removed_at')
@@ -80,6 +80,7 @@ export default async function OrderPage({ params }: { params: { id: string } }) 
         args: Record<string, unknown>,
       ) => Promise<{ data: unknown }>
     )('rpc_my_order_rating', { p_order_id: order.id }),
+    supabase.rpc('rpc_my_order_rider_rating', { p_order_id: order.id }),
   ]);
 
   const paid = ['paid', 'collected', 'partially_refunded', 'refunded'].includes(
@@ -87,6 +88,11 @@ export default async function OrderPage({ params }: { params: { id: string } }) 
   );
   const canCancel = order.stage === 'placed' && !paid;
   const rated = typeof rating.data === 'number' ? rating.data : null;
+  /* null when no NexG rider carried it (a collection, or the shop's own courier). */
+  const rider = riderRating.data as {
+    rider_first_name: string | null;
+    stars: number | null;
+  } | null;
   const name = (merchant.data as { trading_name: string } | null)?.trading_name ?? 'Your order';
 
   return (
@@ -172,6 +178,11 @@ export default async function OrderPage({ params }: { params: { id: string } }) 
           canCancel={canCancel}
           canRate={order.stage === 'delivered' && rated === null}
           rated={rated}
+          rider={
+            order.stage === 'delivered' && rider
+              ? { firstName: rider.rider_first_name, stars: rider.stars }
+              : null
+          }
         />
 
         <section
