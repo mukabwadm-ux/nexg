@@ -35,7 +35,7 @@ const actionSchema = z.discriminatedUnion('action', [
     })
     .strict(),
   z.object({ action: z.literal('read'), threadId: uuid }).strict(),
-  /* "Get NexG's help": NexG support is asked to join the chat (20270314000500). */
+  /* "Get NexG's help": NexG support is asked to join the chat (20270314001000). */
   z.object({ action: z.literal('ask-nexg'), threadId: uuid }).strict(),
 ]);
 

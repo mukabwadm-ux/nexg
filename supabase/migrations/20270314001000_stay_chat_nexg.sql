@@ -1,7 +1,7 @@
 -- NexG in stay chats (owner, 24 Nov 2026: "I hope hosts can message guests and the other way, and NexG admin at the
 -- same time").
 --
--- Builds on 20270312000110, where a stay chat is a `direct` conversation between a stay's guest and its host. That
+-- Builds on 20270314000700, where a stay chat is a `direct` conversation between a stay's guest and its host. That
 -- stays true: a stay chat is still `direct`, so the Concierge desk queue (msg_inbox_v, msg_can_read on external
 -- conversations) and the host's support inbox never list it. NexG reaches it only through the functions below.
 --
@@ -30,10 +30,10 @@
 -- nothing. A party can ask even after the chat closed for new messages, since disputes come after check-out; NexG
 -- can then reply, but the guest and host still cannot write after the 30 days.
 --
--- Replaced from 20270312000110, with only the changes above: authz.stay_chat_thread (side 'nexg', `nexg` key,
+-- Replaced from 20270314000700, with only the changes above: authz.stay_chat_thread (side 'nexg', `nexg` key,
 -- unread includes NexG) and authz.stay_chat_page (side 'nexg' and 'system', system lines included).
 --
--- Rollback: re-run authz.stay_chat_thread and authz.stay_chat_page from 20270312000110; drop the nine functions
+-- Rollback: re-run authz.stay_chat_thread and authz.stay_chat_page from 20270314000700; drop the nine functions
 -- created here (rpc_stay_chat_staff_*, rpc_stay_chat_*_ask_nexg, authz.stay_chat_nexg_staff, authz.stay_chat_nexg,
 -- authz.stay_chat_staff_me, authz.stay_chat_notify_nexg, authz.stay_chat_ask); drop trigger msg_message_rings_nexg
 -- and its function; drop columns msg_conversation.nexg_requested_at and nexg_requested_side; delete the
@@ -103,7 +103,7 @@ $$;
 
 -- ═══════════════════════════════════════════════════ the thread and its page, NexG included
 
-/* Replaces 20270312000110's: side 'nexg' for staff, the `nexg` key, and NexG's messages count as unread. */
+/* Replaces 20270314000700's: side 'nexg' for staff, the `nexg` key, and NexG's messages count as unread. */
 create or replace function authz.stay_chat_thread(p_conversation uuid, p_side text)
 returns jsonb
 language sql
@@ -165,7 +165,7 @@ as $$
 $$;
 
 /*
- * Replaces 20270312000110's: NexG's lines are side 'nexg' with the author "NexG", and the joined / left / asked
+ * Replaces 20270314000700's: NexG's lines are side 'nexg' with the author "NexG", and the joined / left / asked
  * lines (kind system) are included as side 'system'.
  */
 create or replace function authz.stay_chat_page(p_conversation uuid, p_before bigint, p_limit integer)
@@ -733,7 +733,7 @@ insert into audit.action_registry (action, module, default_severity, needs_revie
   ('stay.chat_staff_message', 'messaging', 'info', false, 'A NexG staff member wrote in a stay chat, which the guest and host both read')
 on conflict (action) do nothing;
 
-/* Read marks are not a state change anybody is accountable for (as 20270312000110). */
+/* Read marks are not a state change anybody is accountable for (as 20270314000700). */
 insert into wiring_audit_exempt (function_name, reason, recorded_in)
 values
   ('rpc_stay_chat_staff_read',

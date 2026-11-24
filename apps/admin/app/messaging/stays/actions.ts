@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 
 /**
- * NexG in a guest and host stay chat (20270314000500). Who may read, join and write, and the audit of each, is
+ * NexG in a guest and host stay chat (20270314001000). Who may read, join and write, and the audit of each, is
  * decided in the database; these only call it.
  */
 

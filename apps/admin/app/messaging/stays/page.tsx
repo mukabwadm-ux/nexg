@@ -40,7 +40,7 @@ interface ThreadsResult {
 /**
  * Operate → Messaging → Stay chats.
  *
- * The private chats between a stay's guest and its host (20270312000110), which the Concierge queue never lists.
+ * The private chats between a stay's guest and its host (20270314000700), which the Concierge queue never lists.
  * The Concierge desk and hospitality operations can read them here, join as NexG, and write; the guest and the host
  * see that NexG joined and read everything NexG writes. Every opening, join, message and leave is audited in the
  * database. Who may see a chat is decided there too: anyone else reaching this page gets nothing.

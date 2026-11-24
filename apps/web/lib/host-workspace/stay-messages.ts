@@ -3,12 +3,12 @@ import 'server-only';
 import { HostWorkspaceError, type HostWorkspaceAccess } from './access';
 
 /*
- * Chats between a stay's guest and the host (migration 20270312000110). The RPCs check access themselves: the host
+ * Chats between a stay's guest and the host (migration 20270314000700). The RPCs check access themselves: the host
  * side is any member who can see the stay's unit. This file only turns their JSON into the workspace's shape and
  * their refusals into plain HTTP errors.
  */
 
-/* 'nexg' is a NexG staff line, shown as "NexG"; 'system' is a "NexG joined" or "asked NexG" line (20270314000500). */
+/* 'nexg' is a NexG staff line, shown as "NexG"; 'system' is a "NexG joined" or "asked NexG" line (20270314001000). */
 export type StaySide = 'guest' | 'host' | 'nexg' | 'system';
 
 /** NexG's part in a chat: in it now, and whether someone asked and is still waiting for a NexG reply. */

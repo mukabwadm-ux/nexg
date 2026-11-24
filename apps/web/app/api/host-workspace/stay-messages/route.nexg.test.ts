@@ -74,7 +74,7 @@ beforeEach(() => {
   });
 });
 
-// NexG in stay chats (20270314000500): what the host workspace passes on, and "Get NexG's help".
+// NexG in stay chats (20270314001000): what the host workspace passes on, and "Get NexG's help".
 describe('NexG in a stay chat', () => {
   it('passes on NexG lines, system lines and whether NexG is in the chat', async () => {
     mock.rpc.mockResolvedValueOnce({

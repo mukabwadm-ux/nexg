@@ -90,11 +90,11 @@ const STAGES: Record<Subject, Record<string, StageCopy>> = {
   ticket: {
     reply: ['NexG support replied', 'Huduma ya NexG imejibu', 0, 0],
   },
-  // A stay chat (20270312000110). Never the message text: the app loads it after a tap.
+  // A stay chat (20270314000700). Never the message text: the app loads it after a tap.
   conversation: {
     host_message: ['New message about your stay', 'Ujumbe mpya kuhusu malazi yako', 0, 0],
     guest_message: ['New message from a guest', 'Ujumbe mpya kutoka kwa mgeni', 0, 0],
-    // NexG in a stay chat (20270314000500): to the guest and the host alike.
+    // NexG in a stay chat (20270314001000): to the guest and the host alike.
     nexg_joined: ['NexG joined your stay chat', 'NexG imejiunga na mazungumzo ya malazi', 0, 0],
     nexg_message: [
       'NexG replied in your stay chat',
