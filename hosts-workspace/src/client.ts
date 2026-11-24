@@ -82,13 +82,14 @@ export async function uploadFile<T>(
   details: Record<string, unknown>,
   file: File,
   onProgress?: (fraction: number) => void,
+  tooLarge = 'This file is over 10 MB. Choose a smaller file.',
 ): Promise<T> {
   const fields = { ...details, mime: file.type, size: file.size };
   const ticket = await workspaceRequest<UploadTicket>(
     endpoint,
     postJson({ action: 'upload-url', ...fields }),
   );
-  if (ticket.signedUrl) await putFile(ticket.signedUrl, file, onProgress);
+  if (ticket.signedUrl) await putFile(ticket.signedUrl, file, onProgress, tooLarge);
   onProgress?.(1);
   return workspaceRequest<T>(
     endpoint,
@@ -96,7 +97,12 @@ export async function uploadFile<T>(
   );
 }
 
-function putFile(url: string, file: File, onProgress?: (fraction: number) => void) {
+function putFile(
+  url: string,
+  file: File,
+  onProgress: ((fraction: number) => void) | undefined,
+  tooLarge: string,
+) {
   return new Promise<void>((resolve, reject) => {
     const request = new XMLHttpRequest();
     request.open('PUT', url);
@@ -114,17 +120,21 @@ function putFile(url: string, file: File, onProgress?: (fraction: number) => voi
         new WorkspaceConnectionError(
           request.status,
           request.status === 413 || /size|too large/i.test(request.responseText)
-            ? 'This file is over 10 MB. Choose a smaller file.'
+            ? tooLarge
             : /mime|type/i.test(request.responseText)
               ? 'This type of file is not accepted here.'
               : 'The file could not be uploaded. Try again.',
         ),
       );
     };
-    request.onerror = () =>
+    /* The connection dropped part-way: nothing is stored, so trying the same file again starts it afresh. */
+    const stopped = () =>
       reject(
         new WorkspaceConnectionError(0, 'The upload stopped. Check your connection and try again.'),
       );
+    request.onerror = stopped;
+    request.ontimeout = stopped;
+    request.onabort = stopped;
     request.send(file);
   });
 }

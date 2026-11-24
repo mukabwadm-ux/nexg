@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Unit } from '../model';
 import { ModelViewer } from '../ModelViewer';
-import { errorMessage, workspaceRequest } from '../client';
+import { errorMessage, uploadFile } from '../client';
 import { Badge, Button, Empty, Icon, Pager, Panel, Table, Tabs } from '../ui';
 import { useWorkspace } from '../workspace';
 import { AmenityInstructions } from './AmenityInstructions';
@@ -10,30 +10,48 @@ export function guideAsset(id: string, code?: string) {
   return '/api/host-workspace/guide/asset?' + new URLSearchParams(code ? { id, code } : { id });
 }
 
+async function sha256(file: File) {
+  const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer());
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
 export function UnitGuideEditor({ unit }: { unit: Unit }) {
   const w = useWorkspace();
   const [tab, setTab] = useState('Unit map');
   const [mode, setMode] = useState(unit.planId && !unit.modelId ? '2D plan' : '3D');
   const [selected, setSelected] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState<number | null>(null);
   const articles = w.data.articles.filter((article) => article.unitId === unit.id);
   const card = w.data.qrCards.find((card) => card.unitId === unit.id && card.status === 'Placed');
 
   async function upload(file: File, kind: 'plan' | 'model') {
     if (busy) return;
+    const tooLarge =
+      kind === 'model' ? 'Choose a GLB file up to 12 MB.' : 'Choose a floor plan up to 2 MB.';
+    /* The workspace refuses it too; saying so here spares reading a large file first. */
+    if (file.size > (kind === 'model' ? 12 : 2) * 1024 * 1024) return w.notify(tooLarge);
     setBusy(true);
+    setProgress(0);
     try {
-      const body = new FormData();
-      body.set('file', file);
-      const query = new URLSearchParams({
-        unit: unit.id,
-        revision: String(unit.guideRevision ?? 0),
-        kind,
-      });
-      const result = await workspaceRequest<{ message: string }>('/guide?' + query, {
-        method: 'POST',
-        body,
-      });
+      /* Browsers rarely know a GLB's type, so the model is sent as what it is. The workspace checks the contents. */
+      const sent =
+        kind === 'model' ? new File([file], file.name, { type: 'model/gltf-binary' }) : file;
+      /* The file's fingerprint names it in storage, so trying the same file again picks up what already arrived. */
+      const digest = await sha256(sent);
+      const result = await uploadFile<{ message: string }>(
+        '/guide',
+        {
+          unit: unit.id,
+          kind,
+          revision: unit.guideRevision ?? 0,
+          digest,
+          fileName: file.name,
+        },
+        sent,
+        setProgress,
+        tooLarge,
+      );
       await w.refresh();
       setMode(kind === 'plan' ? '2D plan' : '3D');
       w.notify(result.message);
@@ -41,6 +59,7 @@ export function UnitGuideEditor({ unit }: { unit: Unit }) {
       w.notify(errorMessage(error, 'The guide file could not be attached.'));
     } finally {
       setBusy(false);
+      setProgress(null);
     }
   }
 
@@ -116,8 +135,14 @@ export function UnitGuideEditor({ unit }: { unit: Unit }) {
             <div className="map-footer">
               <Tabs items={['3D', '2D plan']} value={mode} onChange={setMode} />
               <label className="field">
-                <span>
-                  {busy ? 'Saving file…' : mode === '3D' ? 'Upload GLB' : 'Upload floor plan'}
+                <span aria-live="polite">
+                  {progress !== null && progress < 1
+                    ? `Uploading ${Math.round(progress * 100)}%…`
+                    : busy
+                      ? 'Checking file…'
+                      : mode === '3D'
+                        ? 'Upload GLB, up to 12 MB'
+                        : 'Upload floor plan: PNG, JPEG or WebP, up to 2 MB'}
                 </span>
                 <input
                   type="file"
