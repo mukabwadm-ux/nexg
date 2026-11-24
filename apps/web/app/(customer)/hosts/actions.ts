@@ -14,6 +14,8 @@ export interface HostApplyResult {
   imported?: { property: boolean; photo: boolean };
 }
 
+export type HostPropertyType = 'vacation_home' | 'apartment' | 'hotel' | 'portfolio';
+
 export interface HostApplyInput {
   contact_name: string;
   display_name: string;
@@ -27,6 +29,8 @@ export interface HostApplyInput {
   import_listing?: boolean;
   /** …and agreed that NexG may copy its cover photo. */
   photo_consent?: boolean;
+  /** The hero form's Property Type. A portfolio makes the host a property manager. */
+  property_type?: HostPropertyType | null;
 }
 
 /**
@@ -69,12 +73,16 @@ export async function applyAsHost(input: HostApplyInput): Promise<HostApplyResul
       address: input.address,
       units_band: input.units_band,
       handoff: input.handoff ?? null,
+      /* Not stored by rpc_host_apply yet; sent so a later version can keep it. */
+      property_type: input.property_type ?? null,
       kind:
-        input.units_band === '1'
-          ? 'single_unit'
-          : input.units_band === '20_plus'
-            ? 'property_manager'
-            : 'multi_unit',
+        input.property_type === 'portfolio'
+          ? 'property_manager'
+          : input.units_band === '1'
+            ? 'single_unit'
+            : input.units_band === '20_plus'
+              ? 'property_manager'
+              : 'multi_unit',
       ...(listing
         ? {
             listing: {
