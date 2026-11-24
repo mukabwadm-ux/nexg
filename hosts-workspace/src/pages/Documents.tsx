@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { errorMessage, workspaceRequest } from '../client';
+import { errorMessage, uploadFile, workspaceRequest } from '../client';
 import { dateText } from '../model';
 import { Badge, Button, Panel, Table } from '../ui';
 import { useWorkspace } from '../workspace';
 
 /*
  * Documents NexG needs before activating the account. Until NexG approves
- * them the host cannot add or change properties and units (the database
- * refuses), so this panel is the first thing a new host has to finish.
+ * them the host can set up properties and units, but guests see none of
+ * them (the public views need a live host), so this panel is what stands
+ * between a new host and their first guest.
  */
 
 type Kind = 'id_document' | 'authority' | 'kra_pin' | 'business_registration';
@@ -65,6 +66,7 @@ export function DocumentsPanel() {
   const [view, setView] = useState<DocumentsView | null>(null);
   const [loadError, setLoadError] = useState('');
   const [busy, setBusy] = useState<Kind | 'submit' | null>(null);
+  const [progress, setProgress] = useState(0);
   const picker = useRef<HTMLInputElement>(null);
   const picking = useRef<Kind | null>(null);
 
@@ -83,11 +85,16 @@ export function DocumentsPanel() {
 
   async function upload(kind: Kind, file: File) {
     setBusy(kind);
+    setProgress(0);
     try {
-      const form = new FormData();
-      form.set('kind', kind);
-      form.set('file', file);
-      setView(await workspaceRequest<DocumentsView>('/documents', { method: 'POST', body: form }));
+      setView(
+        await uploadFile<DocumentsView>(
+          '/documents',
+          { kind, fileName: file.name },
+          file,
+          setProgress,
+        ),
+      );
       notify('Document uploaded.');
     } catch (error) {
       notify(errorMessage(error, 'The upload did not finish. Try again.'));
@@ -151,8 +158,8 @@ export function DocumentsPanel() {
         {view.status === 'live'
           ? 'NexG approved your account. You can list and manage your properties.'
           : view.status === 'verifying'
-            ? `Submitted${view.submittedAt ? ' ' + dateText(view.submittedAt) : ''}. NexG usually reviews documents within one working day. You can add or change properties once they are approved.`
-            : 'Upload these so NexG can approve your account. You can add or change properties once they are approved.'}
+            ? `Submitted${view.submittedAt ? ' ' + dateText(view.submittedAt) : ''}. NexG usually reviews documents within one working day. You can set up your properties meanwhile. They stay hidden from guests until NexG approves your account.`
+            : 'Upload these so NexG can approve your account. You can set up your properties meanwhile. They stay hidden from guests until NexG approves your account.'}
       </p>
       {view.statusReason && view.status === 'applied' && (
         <p className="mg-small-note">
@@ -221,7 +228,11 @@ export function DocumentsPanel() {
                         picker.current?.click();
                       }}
                     >
-                      {busy === kind ? 'Uploading…' : row ? 'Replace' : 'Upload'}
+                      {busy === kind
+                        ? `Uploading ${Math.round(progress * 100)}%…`
+                        : row
+                          ? 'Replace'
+                          : 'Upload'}
                     </Button>
                   )}
                 </td>
