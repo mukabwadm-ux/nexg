@@ -11,7 +11,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(40);
+select plan(41);
 
 delete from vault.secrets where name in ('paystack_test_secret_key', 'paystack_live_secret_key');
 select vault.create_secret('sk_test_ci_only_0123456789abcdef', 'paystack_test_secret_key');
@@ -209,12 +209,12 @@ select public.rpc_host_subaccount_decide((select v::uuid from t where k = 'subT'
 select pg_temp.as_user('c2120000-0000-4000-8000-000000000021');
 insert into t select 'try1', public.rpc_payment_paystack_attempt((select v from t where k = 'ref1'), 'card', null,
   'sk_live_ci_only_0123456789abcdef')::text;
+/* Worked out by hand from the fixture, so a change to the split maths breaks this:
+   unit A is KES 7,000 a night, stay1 is 2 nights = KES 14,000 (1,400,000 cents);
+   the host's agreed rate is 12% = KES 1,680, so NexG's transaction_charge is
+   168,000 cents and the host's sub-account gets KES 12,320. */
 select is((select v::jsonb -> 'split' from t where k = 'try1'),
-  (select jsonb_build_object('subaccount', 'ACCT_ci2120001',
-            'transaction_charge', p.amount_cents - (p.amount_cents / 100 - round(p.amount_cents / 100 * 12 / 100.0)::bigint) * 100,
-            'bearer', 'account')
-     -- The amount from the attempt's own answer: the guest cannot read public.payment here.
-     from (select (v::jsonb ->> 'amount_cents')::bigint as amount_cents from t where k = 'try1') p),
+  '{"subaccount": "ACCT_ci2120001", "transaction_charge": 168000, "bearer": "account"}'::jsonb,
   'The host''s share goes to its sub-account; NexG keeps its 12% and pays the fee.');
 select public.rpc_payment_paystack_opened((select v from t where k = 'ref1') || '-1', 'acc_ci212',
   'https://checkout.paystack.com/ci-212', null, 'sk_live_ci_only_0123456789abcdef');
@@ -238,17 +238,25 @@ select public.rpc_payment_paystack_webhook((select v from t where k = 'paid3'),
   pg_temp.ps_sign((select v from t where k = 'paid3')));
 reset role;
 
-select ok((select status = 'booked' and commission_pct = 12
-             and commission_kes = round(paid_kes * 12 / 100.0)::bigint
-             and host_share_kes = paid_kes - commission_kes
+/* Read as the setup role (reset role above). By hand: stay1 = 2 nights x
+   KES 7,000 = KES 14,000 paid; 12% of 14,000 = KES 1,680 commission; the
+   host's share is 14,000 - 1,680 = KES 12,320. commission_pct is numeric(5,2). */
+select is((select status || ':' || commission_pct || ':' || paid_kes || ':' || commission_kes
+                  || ':' || host_share_kes
              from public.stay where id = (select v::uuid from t where k = 'stay1')),
+  'booked:12.00:14000:1680:12320',
   'The stay is booked at the agreed 12%, and the host''s share is the rest.');
 select ok((select commission_pct = 12 from public.stay where id = (select v::uuid from t where k = 'stay1'))
           and (public.fn_host_commission('c2121000-0000-4000-8000-00000000000a') ->> 'pct')::numeric = 10,
   'A rate approved after the stay was held does not change that stay''s commission.');
-select is((select a.split_share_cents from public.paystack_attempt a
+/* The settle books a split payment as it was sent, so comparing the two
+   columns with each other cannot fail. Both against the hand-worked share:
+   KES 12,320 (14,000 - 12% of 14,000) = 1,232,000 cents. */
+select is((select a.split_share_cents || ':'
+                  || (select host_share_kes * 100 from public.stay where id = (select v::uuid from t where k = 'stay1'))
+             from public.paystack_attempt a
             where a.reference = (select v from t where k = 'ref1') || '-1'),
-  (select host_share_kes * 100 from public.stay where id = (select v::uuid from t where k = 'stay1')),
+  '1232000:1232000',
   'What Paystack sent the host is exactly the host''s share the settle worked out.');
 select is((select count(*)::int from ledger.transaction
             where kind = 'host_paid_by_paystack' and related ->> 'stay_id' = (select v from t where k = 'stay1')),
@@ -268,7 +276,7 @@ select ok(exists (select 1 from public.receipt
   'The host''s receipt names the 12% charged.');
 select ok(exists (select 1 from public.host_message
                    where host_id = 'c2121000-0000-4000-8000-00000000000a'
-                     and body like '%after NexG''s 12% is KES%'),
+                     and body like '%after NexG''s 12% is KES 12,320.'),
   'The host is told the rate they were charged.');
 
 -- Paystack did not split stay 3: the weekly run pays it.
@@ -281,9 +289,20 @@ select is((select count(*)::int from audit.audit_event
             where action = 'payment.split_not_made' and target_type = 'host'
               and target_id = 'c2121000-0000-4000-8000-00000000000a'),
   1, 'and it is flagged for Finance.');
-select is(pg_temp.host_owed_on((select v::uuid from t where k = 'stay3')),
-  (select host_share_kes * 100 from public.stay where id = (select v::uuid from t where k = 'stay3')),
+/* By hand: stay3 = 2 nights x KES 7,000 = KES 14,000, held before the 10%
+   term was approved, so 12% = KES 1,680; the host is owed KES 12,320 =
+   1,232,000 cents. */
+select is(pg_temp.host_owed_on((select v::uuid from t where k = 'stay3')), 1232000::bigint,
   'The host''s share of it stays owed for the weekly run.');
+/* The positive control for "the weekly run would pay nothing more" above: the
+   same run query sees the host's KES 12,320 on the unsplit stay. */
+select is((select coalesce(sum(e.credit - e.debit), 0)::bigint
+            from public.fn_settlement_owed(now() - interval '30 days', now() + interval '1 day') o
+            join ledger.entry e on e.id = any (o.entry_ids)
+            join ledger.transaction x on x.id = e.transaction_id
+           where o.party_id = 'c2121000-0000-4000-8000-00000000000a'
+             and x.related ->> 'stay_id' = (select v from t where k = 'stay3')),
+  1232000::bigint, 'and the weekly run would pay the host exactly that.');
 
 -- ── 6. NexG cancels the split stay: once Paystack refunds it, the refund comes back from the sub-account
 
@@ -367,17 +386,24 @@ set local role authenticated;
 select pg_temp.as_user('c2120000-0000-4000-8000-000000000006');
 select public.rpc_host_subaccount_pause((select v::uuid from t where k = 'sub'), true, 'Bank details changing');
 select pg_temp.as_user('c2120000-0000-4000-8000-000000000022');
-select is(public.rpc_payment_paystack_attempt((select v from t where k = 'ref4'), 'card', null,
-  'sk_live_ci_only_0123456789abcdef') -> 'split', null,
+/* Not a bare comparison of the split with null: the answer must be a real attempt
+   (ok true) that carries no split key. */
+select is((select (r ->> 'ok') || ':' || (r ? 'split')::text
+             from (select public.rpc_payment_paystack_attempt((select v from t where k = 'ref4'), 'card', null,
+                     'sk_live_ci_only_0123456789abcdef') as r) q),
+  'true:false',
   'Paused: new stays are not split and go to the weekly run.');
 
 -- ── 9. who sees what
 
 select pg_temp.as_user('c2120000-0000-4000-8000-000000000031');
-select is((select (r ->> 'viewer') || ':' || (select count(*) from jsonb_array_elements(r -> 'terms') x
-                                               where x ? 'reason' or x ? 'requested_by_name' or x ? 'decision_note')
+/* The term count (both approved: 12% and 10%) keeps the 0 from passing on an
+   empty list. */
+select is((select (r ->> 'viewer') || ':' || jsonb_array_length(r -> 'terms') || ':'
+                  || (select count(*) from jsonb_array_elements(r -> 'terms') x
+                       where x ? 'reason' or x ? 'requested_by_name' or x ? 'decision_note')
              from (select public.rpc_host_commission_read('c2121000-0000-4000-8000-00000000000a') as r) q),
-  'host:0', 'The host sees their rate without staff names or notes.');
+  'host:2:0', 'The host sees their rate without staff names or notes.');
 select is((select (r ->> 'viewer') || ':' || jsonb_array_length(r -> 'subaccounts') || ':'
                   || (select count(*) from jsonb_array_elements(r -> 'subaccounts') x
                        where x ? 'requestedByName' or x ? 'note')
