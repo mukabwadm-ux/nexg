@@ -3,7 +3,7 @@ import 'server-only';
 import { HostWorkspaceError, type HostWorkspaceAccess } from './access';
 
 /*
- * Chats between a stay's guest and the host (migration 20270312000110). The RPCs check access themselves: the host
+ * Chats between a stay's guest and the host (migration 20270314000700). The RPCs check access themselves: the host
  * side is any member who can see the stay's unit. This file only turns their JSON into the workspace's shape and
  * their refusals into plain HTTP errors.
  */
