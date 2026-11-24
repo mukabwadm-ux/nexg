@@ -1,7 +1,7 @@
 -- Trip groups: people talk about stays, experiences and plans together (owner, 24 Nov 2026: "groups where people
 -- talk about stays, experiences or plans").
 --
--- Built on the one conversation model (20260101016500) and the stay-chat pattern (20270312000110, which must land
+-- Built on the one conversation model (20260101016500) and the stay-chat pattern (20270314000700, which must land
 -- first: this reuses its push subject 'conversation'). A group is a `msg_conversation` of kind 'group'. Its id IS the
 -- conversation's id. Members are `guest` participants by user id, so the tables' own policies let a member read
 -- and nobody else. Every write goes through the rpc_trip_group_* functions below.
@@ -75,7 +75,7 @@ revoke all on public.trip_group, public.trip_group_member from public, anon, aut
 
 -- ═══════════════════════════════════════════════════ push words
 
-/* The push queue's subject 'conversation' comes from stay chat (20270312000110). Stage words live in the edge function. */
+/* The push queue's subject 'conversation' comes from stay chat (20270314000700). Stage words live in the edge function. */
 
 -- ═══════════════════════════════════════════════════ helpers (not callable by apps)
 
