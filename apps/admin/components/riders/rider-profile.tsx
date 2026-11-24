@@ -354,6 +354,13 @@ export const RATING_TAG_LABEL: Record<string, string> = {
   hard_to_reach: 'Hard to reach',
 };
 
+const YEARS_LABEL: Record<string, string> = {
+  new: 'New to riding',
+  '1_2': '1–2 years',
+  '3_5': '3–5 years',
+  '5_plus': '5+ years',
+};
+
 const th =
   'px-4 py-3 text-left text-[0.625rem] font-extrabold uppercase tracking-wide text-muted-light';
 const td = 'px-4 py-3 text-[0.8125rem] font-semibold';
@@ -483,7 +490,7 @@ export function OverviewView({ p }: { p: RiderProfile }) {
       <div className="space-y-6">
         <Panel id="live" title="Right now" className="scroll-mt-6">
           <div className="flex flex-wrap items-center gap-2">
-            <Pill tone={l.presence === 'offline' ? undefined : 'good'}>{words(l.presence)}</Pill>
+            {l.presence === 'offline' && <Pill>offline</Pill>}
             <PresencePill presence={l.presence} cooldownUntil={l.cooldown_until} />
             {!l.can_receive_offers && <Pill tone="warn">offers paused</Pill>}
           </div>
@@ -530,7 +537,7 @@ export function OverviewView({ p }: { p: RiderProfile }) {
                 ['Plate', pr.plate_no ?? DASH],
                 ['Ownership', words(pr.ownership)],
                 ['Insurance', words(pr.insurance)],
-                ['Years riding', pr.years_riding ?? DASH],
+                ['Years riding', YEARS_LABEL[pr.years_riding ?? ''] ?? DASH],
                 ['Areas', pr.areas?.length ? pr.areas.join(', ') : DASH],
                 ['Shifts they prefer', pr.shifts?.length ? pr.shifts.join(', ') : DASH],
               ]}
@@ -778,7 +785,11 @@ function TripTimeline({ trip, photos }: { trip: TripDetail; photos: Record<strin
   }
   steps.sort((a, b) => new Date(a.at ?? 0).getTime() - new Date(b.at ?? 0).getTime());
 
-  const handoverPhoto = trip.handoff_photo_path ? photos[trip.handoff_photo_path] : undefined;
+  /* Shown beside the timeline only when no step already carries it. */
+  const handoverPhoto =
+    trip.handoff_photo_path && !trip.events.some((e) => e.photo_path === trip.handoff_photo_path)
+      ? photos[trip.handoff_photo_path]
+      : undefined;
 
   return (
     <Panel

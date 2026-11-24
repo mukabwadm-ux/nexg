@@ -296,8 +296,11 @@ type Rpc = (
   fn: string,
   args: Record<string, unknown>,
 ) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
-/* The new readers are not in the generated types of every branch yet. */
-const rpcOf = () => createClient().rpc as unknown as Rpc;
+/* One loose signature for the existing RPCs below, bound to its client. */
+const rpcOf = (): Rpc => {
+  const client = createClient();
+  return client.rpc.bind(client) as unknown as Rpc;
+};
 
 export async function setRiderControl(
   riderId: string,

@@ -1,6 +1,7 @@
 'use client';
 
 import { Card } from '@nexg/ui';
+import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import {
@@ -33,6 +34,7 @@ const danger =
 type Outcome = { ok: boolean; message: string } | null;
 
 function useRun() {
+  const router = useRouter();
   const [busy, setBusy] = React.useState(false);
   const [result, setResult] = React.useState<Outcome>(null);
   const run = async (action: () => Promise<{ ok: boolean; message: string }>) => {
@@ -41,6 +43,8 @@ function useRun() {
     const outcome = await action();
     setResult(outcome);
     setBusy(false);
+    /* The page re-reads the record, so the change shows at once. */
+    if (outcome.ok) router.refresh();
     return outcome.ok;
   };
   return { busy, result, run };
@@ -280,7 +284,11 @@ export function RevealLocation({ riderId, onTrip }: { riderId: string; onTrip: b
         <p className="text-xs font-bold">
           {fix.lat.toFixed(5)}, {fix.lng.toFixed(5)}
           {fix.at &&
-            ` · ${new Date(fix.at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`}{' '}
+            ` · ${new Date(fix.at).toLocaleTimeString('en-GB', {
+              hour: '2-digit',
+              minute: '2-digit',
+              timeZone: 'Africa/Nairobi',
+            })}`}{' '}
           ·{' '}
           <a
             href={`https://www.google.com/maps?q=${fix.lat},${fix.lng}`}
