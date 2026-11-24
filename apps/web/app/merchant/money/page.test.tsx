@@ -89,4 +89,59 @@ describe('live Money workspace', () => {
       'NexG commission: 20% on orders a NexG rider delivers, the rate agreed with you from 24 Nov 2026 to 31 May 2027 (standard rate 28%).',
     );
   });
+
+  describe('Paystack payouts line', () => {
+    /** Every other read answers empty; the split overview answers `overview`. */
+    async function moneyWith(overview: unknown) {
+      from.mockImplementation(() => query([]));
+      rpc.mockImplementation(async (name: string) =>
+        name === 'rpc_merchant_split_overview'
+          ? { data: overview, error: null }
+          : { data: [], error: null },
+      );
+      return renderToStaticMarkup(await MerchantMoney());
+    }
+
+    it('shows no Paystack line to a merchant with no sub-account (every merchant on day one)', async () => {
+      const html = await moneyWith({ subaccounts: [], orders: [], recoveries: [] });
+      expect(html).not.toContain('Paystack pays you');
+      expect(html).not.toContain('Paystack payouts are paused');
+    });
+
+    it('does not crash when the overview has no lists or is not an overview at all', async () => {
+      for (const overview of [{}, null, [], 'unexpected']) {
+        const html = await moneyWith(overview);
+        expect(html).not.toContain('Paystack pays you');
+      }
+    });
+
+    it('says how Paystack pays a merchant with an active sub-account', async () => {
+      const html = await moneyWith({
+        subaccounts: [
+          {
+            id: 's1',
+            test: false,
+            schedule: 'weekly',
+            status: 'active',
+            details: { settlement_bank: 'Equity', account_last4: '1234' },
+          },
+        ],
+        orders: [],
+        recoveries: [],
+      });
+      expect(html).toContain(
+        'Paystack pays you directly for each order, every week, to Equity · ····1234',
+      );
+    });
+
+    it('says payouts are paused, and falls back to the payout run, when it is paused', async () => {
+      const html = await moneyWith({
+        subaccounts: [{ id: 's1', test: false, schedule: 'auto', status: 'paused' }],
+        orders: [],
+        recoveries: [],
+      });
+      expect(html).toContain('Paystack payouts are paused');
+      expect(html).not.toContain('Paystack pays you');
+    });
+  });
 });

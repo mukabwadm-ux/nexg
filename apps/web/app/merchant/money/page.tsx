@@ -31,6 +31,23 @@ const commissionCard = z.object({
   in_force: z.object({ starts_on: z.string(), ends_on: z.string().nullable() }).nullable(),
 });
 
+/**
+ * rpc_merchant_split_overview, read defensively: anything that is not the
+ * overview object (no migration yet, an error, an unexpected answer) is
+ * "no Paystack payouts", and a missing list is an empty one. A merchant with
+ * no sub-account (every merchant on day one) gets empty lists, never a crash.
+ */
+function toMoneyPaystack(data: unknown): MoneyPaystack | null {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+  const d = data as Partial<Record<keyof MoneyPaystack, unknown>>;
+  const list = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
+  return {
+    subaccounts: list<MoneyPaystack['subaccounts'][number]>(d.subaccounts),
+    orders: list<MoneyPaystack['orders'][number]>(d.orders),
+    recoveries: list<MoneyPaystack['recoveries'][number]>(d.recoveries),
+  };
+}
+
 export default async function MerchantMoney() {
   const merchant = await requireMerchant();
   const client = createClient();
@@ -81,7 +98,7 @@ export default async function MerchantMoney() {
       transactions={!transactions.error && rows.success ? rows.data : null}
       receipts={receipts.error ? null : toReceipts(receipts.data)}
       commission={rate?.success ? rate.data : null}
-      paystack={paystack.error ? null : ((paystack.data as MoneyPaystack | null) ?? null)}
+      paystack={paystack.error ? null : toMoneyPaystack(paystack.data)}
     />
   );
 }

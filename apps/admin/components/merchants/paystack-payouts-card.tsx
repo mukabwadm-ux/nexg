@@ -284,7 +284,7 @@ function SubaccountRow({
   onPause: (pause: boolean, note: string) => void;
 }) {
   const [note, setNote] = React.useState('');
-  const d = row.details;
+  const d: Partial<SplitOverview['subaccounts'][number]['details']> = row.details ?? {};
   const mismatch = d.paystack_schedule && d.paystack_schedule.toLowerCase() !== row.schedule;
   return (
     <li className="border-border rounded-lg border p-3">

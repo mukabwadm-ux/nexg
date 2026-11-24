@@ -159,13 +159,14 @@ const RECOVERY_STATE: Record<string, string> = {
 
 /** "Paid by Paystack every 2 working days to Equity ····1234", or null. */
 function paystackNote(paystack: MoneyPaystack | null): string | null {
-  const s = paystack?.subaccounts.find((x) => x.status === 'active');
+  const subaccounts = paystack?.subaccounts ?? [];
+  const s = subaccounts.find((x) => x.status === 'active');
   if (!s) {
-    return paystack?.subaccounts.some((x) => x.status === 'paused')
+    return subaccounts.some((x) => x.status === 'paused')
       ? 'Paystack payouts are paused: your orders are paid in the NexG payout run for now.'
       : null;
   }
-  const d = s.details;
+  const d: Partial<MoneyPaystack['subaccounts'][number]['details']> = s.details ?? {};
   const to = [d.business_name, d.settlement_bank, d.account_last4 ? `····${d.account_last4}` : null]
     .filter(Boolean)
     .join(' · ');
@@ -174,14 +175,16 @@ function paystackNote(paystack: MoneyPaystack | null): string | null {
 }
 
 function PaystackOrders({ paystack }: { paystack: MoneyPaystack }) {
-  if (paystack.orders.length === 0 && paystack.recoveries.length === 0) return null;
+  const orders = paystack.orders ?? [];
+  const recoveries = paystack.recoveries ?? [];
+  if (orders.length === 0 && recoveries.length === 0) return null;
   return (
     <div className="mo-note">
-      {paystack.orders.length > 0 && (
+      {orders.length > 0 && (
         <>
           <p className="font-bold">Orders Paystack paid you for</p>
           <ul className="mt-1 space-y-0.5">
-            {paystack.orders.slice(0, 15).map((o) => (
+            {orders.slice(0, 15).map((o) => (
               <li key={o.orderId}>
                 {o.reference} · {dateTime(o.paidAt)} · customer paid {kes(o.totalCents)} · NexG
                 commission {kes(o.commissionCents)} · to you {kes(o.toMerchantCents)}
@@ -193,11 +196,11 @@ function PaystackOrders({ paystack }: { paystack: MoneyPaystack }) {
           </ul>
         </>
       )}
-      {paystack.recoveries.length > 0 && (
+      {recoveries.length > 0 && (
         <>
           <p className="mt-2 font-bold">Refunds on orders Paystack paid you for</p>
           <ul className="mt-1 space-y-0.5">
-            {paystack.recoveries.map((r) => (
+            {recoveries.map((r) => (
               <li key={r.id}>
                 {r.orderReference ?? 'Order'} · {kes(r.amountCents)} ·{' '}
                 {RECOVERY_STATE[r.state] ?? r.state}
