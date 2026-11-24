@@ -266,7 +266,7 @@ test('every stage the database can queue has words, and none shows a code, a pri
       'hold_expired',
     ],
     ticket: ['reply'],
-    conversation: ['host_message', 'guest_message', 'group_message'],
+    conversation: ['host_message', 'guest_message', 'nexg_joined', 'nexg_message', 'group_message'],
     job: [
       'assigned',
       'ready',

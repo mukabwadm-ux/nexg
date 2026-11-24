@@ -29559,6 +29559,8 @@ export type Database = {
           last_message_at: string | null;
           last_staff_message_at: string | null;
           legal_hold: boolean;
+          nexg_requested_at: string | null;
+          nexg_requested_side: string | null;
           origin_channel: Database['public']['Enums']['msg_channel'];
           owner_team: string;
           parent_conversation_id: string | null;
@@ -29594,6 +29596,8 @@ export type Database = {
           last_message_at?: string | null;
           last_staff_message_at?: string | null;
           legal_hold?: boolean;
+          nexg_requested_at?: string | null;
+          nexg_requested_side?: string | null;
           origin_channel: Database['public']['Enums']['msg_channel'];
           owner_team?: string;
           parent_conversation_id?: string | null;
@@ -29628,6 +29632,8 @@ export type Database = {
           last_message_at?: string | null;
           last_staff_message_at?: string | null;
           legal_hold?: boolean;
+          nexg_requested_at?: string | null;
+          nexg_requested_side?: string | null;
           origin_channel?: Database['public']['Enums']['msg_channel'];
           owner_team?: string;
           parent_conversation_id?: string | null;
@@ -73431,6 +73437,7 @@ export type Database = {
         };
       };
       rpc_stay_cancellation_policy: { Args: { p_unit_id: string }; Returns: Json };
+      rpc_stay_chat_guest_ask_nexg: { Args: { p_thread_id: string }; Returns: Json };
       rpc_stay_chat_guest_messages: {
         Args: { p_before?: number; p_limit?: number; p_thread_id: string };
         Returns: Json;
@@ -73442,6 +73449,7 @@ export type Database = {
         Returns: Json;
       };
       rpc_stay_chat_guest_threads: { Args: { p_limit?: number }; Returns: Json };
+      rpc_stay_chat_host_ask_nexg: { Args: { p_thread_id: string }; Returns: Json };
       rpc_stay_chat_host_messages: {
         Args: { p_before?: number; p_limit?: number; p_thread_id: string };
         Returns: Json;
@@ -73453,6 +73461,18 @@ export type Database = {
         Returns: Json;
       };
       rpc_stay_chat_host_threads: { Args: { p_host_id: string; p_limit?: number }; Returns: Json };
+      rpc_stay_chat_staff_join: { Args: { p_thread_id: string }; Returns: Json };
+      rpc_stay_chat_staff_leave: { Args: { p_thread_id: string }; Returns: Json };
+      rpc_stay_chat_staff_messages: {
+        Args: { p_before?: number; p_limit?: number; p_thread_id: string };
+        Returns: Json;
+      };
+      rpc_stay_chat_staff_read: { Args: { p_thread_id: string }; Returns: Json };
+      rpc_stay_chat_staff_send: {
+        Args: { p_body: string; p_idempotency_key?: string; p_thread_id: string };
+        Returns: Json;
+      };
+      rpc_stay_chat_staff_threads: { Args: { p_filter?: string; p_limit?: number }; Returns: Json };
       rpc_stay_checkout_status: { Args: { p_stay_id: string }; Returns: Json };
       rpc_stay_confirm: {
         Args: { p_reference?: string; p_stay_id: string };
