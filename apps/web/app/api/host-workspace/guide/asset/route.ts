@@ -21,6 +21,14 @@ const asset = z.union([
 /** How long a guide file's signed Storage link lasts. The page asks again on every load. */
 const SIGNED_SECONDS = 600;
 
+/* rpc_host_workspace_guide_asset_sign is newer than the generated types. */
+type Signer = {
+  rpc: (
+    name: 'rpc_host_workspace_guide_asset_sign',
+    args: { p_id: string; p_code: string },
+  ) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
+};
+
 export async function GET(request: Request) {
   if (!hostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Guide file unavailable.' }, 404);
   const params = new URL(request.url).searchParams;
@@ -30,17 +38,22 @@ export async function GET(request: Request) {
     return hostWorkspaceJson({ error: 'Guide file unavailable.' }, 404);
   try {
     const db = code ? createClient() : (await hostWorkspaceAccess(request)).db;
-    const { data, error } = await db.rpc('rpc_host_workspace_guide_asset', {
-      p_id: id.data,
-      p_code: code ?? undefined,
-    });
+    // With a QR code, the sign RPC runs the same check and, for a Storage file,
+    // grants its path for a minute so the guest's link below can be signed.
+    // Storage never lets a guest read a guide file by its name alone.
+    const { data, error } = code
+      ? await (db as unknown as Signer).rpc('rpc_host_workspace_guide_asset_sign', {
+          p_id: id.data,
+          p_code: code,
+        })
+      : await db.rpc('rpc_host_workspace_guide_asset', { p_id: id.data });
     if (error) throw new HostWorkspaceError(503, 'The guide file could not be loaded.');
     const decoded = asset.safeParse(data);
     if (!decoded.success) return hostWorkspaceJson({ error: 'Guide file unavailable.' }, 404);
     if ('path' in decoded.data) {
       // A model can be larger than a function response may be, so the browser
       // fetches it from Storage. The storage policies allow the host members of
-      // the unit, and anyone for a file the published guide uses.
+      // the unit, and a guest only for the path the sign RPC just granted.
       const signed = await db.storage
         .from(GUIDE_ASSET_BUCKET)
         .createSignedUrl(decoded.data.path, SIGNED_SECONDS);

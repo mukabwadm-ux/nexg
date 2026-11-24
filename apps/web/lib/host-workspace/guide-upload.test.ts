@@ -353,4 +353,34 @@ describe('guide files: reading', () => {
     expect(response.headers.get('content-type')).toBe('image/png');
     expect(Buffer.from(await response.arrayBuffer()).equals(png)).toBe(true);
   });
+
+  it('asks the sign RPC with the QR code before signing a guest link', async () => {
+    const db = fakeDb();
+    const rpc = vi.fn(async () => ({
+      data: { mime: 'image/png', path: modelPath('a'.repeat(64)) },
+      error: null,
+    }));
+    db.access.db.rpc = rpc;
+    state.anon = db.access.db;
+    const response = await getAsset(new Request(`${GUIDE}/asset?id=${ASSET}&code=nxg-t2k4mw`));
+    expect(response.status).toBe(302);
+    expect(rpc).toHaveBeenCalledWith('rpc_host_workspace_guide_asset_sign', {
+      p_id: ASSET,
+      p_code: 'NXG-T2K4MW',
+    });
+    expect(db.calls.find((call) => call.method === 'createSignedUrl')?.args).toEqual([
+      BUCKET,
+      modelPath('a'.repeat(64)),
+      600,
+    ]);
+  });
+
+  it('reads a host member file without the sign RPC', async () => {
+    const db = fakeDb();
+    const rpc = vi.fn(async () => ({ data: { mime: 'image/png', base64: '' }, error: null }));
+    db.access.db.rpc = rpc;
+    state.access = db.access;
+    await getAsset(new Request(`${GUIDE}/asset?id=${ASSET}`));
+    expect(rpc).toHaveBeenCalledWith('rpc_host_workspace_guide_asset', { p_id: ASSET });
+  });
 });

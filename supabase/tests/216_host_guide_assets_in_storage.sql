@@ -251,21 +251,49 @@ set local session_replication_role = origin;
 
 set local role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
+/* Storage's list API reads storage.objects under the caller's role, so these
+   counts are what a list of the bucket would return. */
+select is(
+  (select count(*)::int from storage.objects where bucket_id = 'host-guide-assets'),
+  0, 'Without the QR code, a guest cannot read or list any guide file, even the published floor plan.');
+select throws_ok(
+  $$select count(*) from public.host_guide_asset_grant$$,
+  '42501', null, 'Nor read or write the read grants directly.');
+select ok(
+  public.rpc_host_workspace_guide_asset_sign('e2164000-0000-4000-8000-0000000000c1', 'NXG-WRONG1') is null,
+  'A wrong QR code gets nothing.');
+select is(
+  (select count(*)::int from storage.objects where bucket_id = 'host-guide-assets'),
+  0, 'And grants nothing.');
+select is(
+  public.rpc_host_workspace_guide_asset_sign('e2164000-0000-4000-8000-0000000000c1', 'NXG-T2K4MW'),
+  jsonb_build_object('mime', 'image/png', 'path', (select v from t where k = 'published')),
+  'With the QR code, the guest guide gets the published floor plan''s path to sign.');
 select is(
   (select count(*)::int from storage.objects
     where bucket_id = 'host-guide-assets' and name = (select v from t where k = 'published')),
-  1, 'A guest can read the floor plan the published guide uses.');
+  1, 'Then that file can be signed for the guest.');
 select is(
   (select count(*)::int from storage.objects
     where bucket_id = 'host-guide-assets' and name <> (select v from t where k = 'published')),
   0, 'And no other guide file, such as the draft''s model.');
-select is(
-  public.rpc_host_workspace_guide_asset('e2164000-0000-4000-8000-0000000000c1', 'NXG-T2K4MW'),
-  jsonb_build_object('mime', 'image/png', 'path', (select v from t where k = 'published')),
-  'With the QR code, the guest guide gets the file''s path to sign.');
 select ok(
-  public.rpc_host_workspace_guide_asset((select v::uuid from t where k = 'model_id'), 'NXG-T2K4MW') is null,
-  'But not the unpublished draft''s model.');
+  public.rpc_host_workspace_guide_asset_sign((select v::uuid from t where k = 'model_id'), 'NXG-T2K4MW') is null,
+  'The code does not reach the unpublished draft''s model.');
+reset role;
+
+select is(
+  (select count(*)::int from public.host_guide_asset_grant
+    where path = (select v from t where k = 'published')
+      and expires_at > now() and expires_at <= now() + interval '60 seconds'),
+  1, 'The grant is for that one path and lasts a minute.');
+update public.host_guide_asset_grant set expires_at = now() - interval '1 second';
+
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select is(
+  (select count(*)::int from storage.objects where bucket_id = 'host-guide-assets'),
+  0, 'Once the grant has expired, the file is private again.');
 reset role;
 
 -- ══════════════════════════════════════════ 8. the audit registry

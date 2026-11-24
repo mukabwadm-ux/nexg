@@ -14,8 +14,11 @@
 --     same path, and the sha256 matches the existing (unit, kind, digest) de-duplication.
 --   * Storage policies: the host members who may write a unit's guide (authz.can_see_unit, as the guide RPCs check)
 --     may read and add files under that unit; they may remove a file only while no guide asset records it (a file
---     that failed its checks). Hospitality staff may read. Anyone may read a file the unit's published guide uses,
---     which is what rpc_host_workspace_guide_asset already hands a guest with the QR code.
+--     that failed its checks). Hospitality staff may read. A guest reads a file only through its QR code: the
+--     guide's file route calls rpc_host_workspace_guide_asset_sign with the code, which runs the same check as
+--     rpc_host_workspace_guide_asset and grants that one path for 60 seconds (host_guide_asset_grant), long enough
+--     for the route to sign a 600-second download link. There is no read policy on the object name alone, so the
+--     bucket cannot be listed or crawled without a code.
 --   * host_unit_guide_asset keeps its bytes for files stored before this change (body) and points at Storage for new
 --     ones (storage_path); exactly one of the two is set. Both stay readable.
 --   * rpc_host_workspace_guide_asset returns {mime, base64} for a stored body, or {mime, path} for a Storage file.
@@ -56,6 +59,21 @@ alter table public.host_unit_guide_asset
 
 comment on column public.host_unit_guide_asset.storage_path is
   'The file in the host-guide-assets bucket, for assets uploaded straight to Storage. Null for assets stored in body.';
+
+-- ═══════════════════════════════════════════════ guest read grants
+
+/*
+ * A path a QR code holder has just asked for, readable by the Storage policy
+ * host_guide_assets_guest_read until expires_at. Written only by
+ * rpc_host_workspace_guide_asset_sign; no direct grants.
+ */
+create table if not exists public.host_guide_asset_grant (
+  path text primary key,
+  expires_at timestamptz not null
+);
+alter table public.host_guide_asset_grant enable row level security;
+revoke all on public.host_guide_asset_grant from public, anon, authenticated;
+create index if not exists host_guide_asset_grant_expires_idx on public.host_guide_asset_grant (expires_at);
 
 -- ═══════════════════════════════════════════════ path checks
 
@@ -111,41 +129,22 @@ as $$
      and not exists (select 1 from public.host_unit_guide_asset a where a.storage_path = p_name)
 $$;
 
-/*
- * True when the file is the plan or model of a unit's published guide that a
- * guest can open by its QR code (the same conditions as
- * rpc_host_workspace_published_guide). Every other guide file stays private.
- */
-create or replace function authz.guide_asset_is_public(p_name text)
+/* True while a QR code holder's grant for this path lasts (see rpc_host_workspace_guide_asset_sign). */
+create or replace function authz.guide_asset_granted(p_name text)
 returns boolean
 language sql
 stable
 security definer
 set search_path = ''
 as $$
-  select exists (
-    select 1
-      from public.host_unit_guide_asset a
-      join public.host_unit_guide guide on guide.unit_id = a.unit_id
-      join public.host_unit_guide_version version
-        on version.id = guide.published_id and version.unit_id = guide.unit_id
-      join public.unit u on u.id = a.unit_id
-      join public.host h on h.id = u.host_id
-     where a.storage_path = p_name
-       and a.id::text in (version.document ->> 'planId', version.document ->> 'modelId')
-       and h.status = 'live' and u.status = 'live' and u.archived_at is null
-       and exists (
-         select 1 from public.property_qr q
-          where q.owner_type = 'unit' and q.owner_id = u.id and q.host_id = u.host_id
-            and q.voided_at is null and q.state = 'placed' and q.placed_confirmed_at is not null)
-  )
+  select exists (select 1 from public.host_guide_asset_grant g where g.path = p_name and g.expires_at > now())
 $$;
 
 revoke execute on function authz.guide_asset_path_unit(text), authz.can_write_guide_asset_path(text),
-  authz.can_remove_guide_asset_path(text), authz.guide_asset_is_public(text) from public;
+  authz.can_remove_guide_asset_path(text), authz.guide_asset_granted(text) from public;
 grant execute on function authz.guide_asset_path_unit(text), authz.can_write_guide_asset_path(text),
   authz.can_remove_guide_asset_path(text) to authenticated;
-grant execute on function authz.guide_asset_is_public(text) to anon, authenticated;
+grant execute on function authz.guide_asset_granted(text) to anon, authenticated;
 
 -- ═══════════════════════════════════════════════ storage policies
 
@@ -170,10 +169,12 @@ create policy host_guide_assets_staff_read on storage.objects
   for select to authenticated
   using (bucket_id = 'host-guide-assets' and authz.works_hospitality(null));
 
+/* A guest: only a path a QR code holder has just been granted, never by its name alone. */
 drop policy if exists host_guide_assets_public_read on storage.objects;
-create policy host_guide_assets_public_read on storage.objects
+drop policy if exists host_guide_assets_guest_read on storage.objects;
+create policy host_guide_assets_guest_read on storage.objects
   for select to anon, authenticated
-  using (bucket_id = 'host-guide-assets' and authz.guide_asset_is_public(name));
+  using (bucket_id = 'host-guide-assets' and authz.guide_asset_granted(name));
 
 -- ═══════════════════════════════════════════════ recording an uploaded file
 
@@ -273,6 +274,33 @@ as $$
     )
   )
 $$;
+
+/*
+ * The guest guide's read of one file by its QR code: the same answer as
+ * rpc_host_workspace_guide_asset(p_id, p_code), and, for a file in Storage,
+ * a 60-second grant so the API can sign a download link for that path only.
+ */
+create or replace function public.rpc_host_workspace_guide_asset_sign(p_id uuid, p_code text)
+returns jsonb language plpgsql volatile security definer set search_path = ''
+as $$
+declare
+  v_asset jsonb;
+begin
+  if p_id is null or p_code is null then
+    return null;
+  end if;
+  v_asset := public.rpc_host_workspace_guide_asset(p_id, p_code);
+  if v_asset ? 'path' then
+    delete from public.host_guide_asset_grant where expires_at <= now();
+    insert into public.host_guide_asset_grant (path, expires_at)
+      values (v_asset ->> 'path', now() + interval '60 seconds')
+      on conflict (path) do update set expires_at = excluded.expires_at;
+  end if;
+  return v_asset;
+end;
+$$;
+revoke execute on function public.rpc_host_workspace_guide_asset_sign(uuid,text) from public;
+grant execute on function public.rpc_host_workspace_guide_asset_sign(uuid,text) to anon, authenticated;
 
 -- ═══════════════════════════════════════════════ audit
 
