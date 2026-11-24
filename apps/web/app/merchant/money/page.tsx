@@ -22,10 +22,19 @@ const transactionRows = z.array(
   }),
 );
 
+/* rpc_merchant_commission_read, as much as the merchant needs. */
+const commissionCard = z.object({
+  own_riders: z.boolean(),
+  charged_now: z
+    .object({ pct: z.number().nullable(), agreed: z.boolean(), preset_pct: z.number().nullable() })
+    .nullable(),
+  in_force: z.object({ starts_on: z.string(), ends_on: z.string().nullable() }).nullable(),
+});
+
 export default async function MerchantMoney() {
   const merchant = await requireMerchant();
   const client = createClient();
-  const [home, statements, transactions, receipts] = await Promise.all([
+  const [home, statements, transactions, receipts, commission] = await Promise.all([
     client
       .from('merchant_home_v')
       .select('payout_rail, earned_today_cents')
@@ -51,7 +60,9 @@ export default async function MerchantMoney() {
       .eq('party_id', merchant.id)
       .order('issued_at', { ascending: false })
       .limit(100),
+    client.rpc('rpc_merchant_commission_read', { p_merchant_id: merchant.id }),
   ]);
+  const rate = commission.error ? null : commissionCard.safeParse(commission.data);
   const rows = transactionRows.safeParse(transactions.data);
 
   return (
@@ -60,6 +71,7 @@ export default async function MerchantMoney() {
       statements={statements.error ? null : statements.data}
       transactions={!transactions.error && rows.success ? rows.data : null}
       receipts={receipts.error ? null : toReceipts(receipts.data)}
+      commission={rate?.success ? rate.data : null}
     />
   );
 }
