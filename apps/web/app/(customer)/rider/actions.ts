@@ -192,3 +192,51 @@ export async function answerOffer(
   });
   return unwrap(data, error, ['/rider/jobs', '/rider']);
 }
+
+// ─────────────────────────────────────────────── the trip
+
+/** Where the rider is now. Only kept while online or on a trip; the RPC ignores it otherwise. */
+export async function pingLocation(lat: number, lng: number, observedAt: string): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_rider_location_ping', {
+    p_latitude: lat,
+    p_longitude: lng,
+    p_observed_at: observedAt,
+  });
+  return unwrap(data, error);
+}
+
+export type TripStep = 'at_pickup' | 'waiting' | 'picked_up' | 'arriving' | 'delivered';
+
+/** One step of an assigned trip. The RPC checks the order is this rider's and in the right stage. */
+export async function tripStep(
+  orderId: string,
+  step: TripStep,
+  extra: { handedTo?: string; code?: string; photoPath?: string; note?: string } = {},
+): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_rider_order_step', {
+    p_order_id: orderId,
+    p_step: step,
+    p_handed_to: extra.handedTo ?? 'guest',
+    p_code: extra.code || undefined,
+    p_photo_path: extra.photoPath || undefined,
+    p_details: extra.note ? { note: extra.note } : {},
+  });
+  return unwrap(data, error, ['/rider/jobs', '/rider', '/rider/earnings']);
+}
+
+/** The cash taken at the door, before the order can be finished. */
+export async function recordCash(orderId: string, amountCents: number): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_rider_cash_collected', {
+    p_order_id: orderId,
+    p_amount_cents: amountCents,
+  });
+  return unwrap(data, error, ['/rider/jobs', '/rider/cash']);
+}
+
+/** The code the shop enters to hand this rider the order. */
+export async function pickupCode(orderId: string): Promise<Outcome> {
+  const { data, error } = await createClient().rpc('rpc_my_rider_pickup_code', {
+    p_order_id: orderId,
+  });
+  return unwrap(data, error);
+}
