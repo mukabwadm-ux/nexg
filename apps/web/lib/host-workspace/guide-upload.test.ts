@@ -76,7 +76,10 @@ interface Stored {
 }
 
 /** The client's rpc: each guide RPC answers with its own data shape (a count, or {mime, path | base64}). */
-type Rpc = (name: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+type Rpc = (
+  name: string,
+  args: Record<string, unknown>,
+) => Promise<{ data: unknown; error: unknown }>;
 
 /** A host member's client with mocked storage, rpc and the unit check. */
 function fakeDb(stored: Record<string, Stored> = {}, rpcError: unknown = null) {
