@@ -34,6 +34,7 @@ import { money, dateText, activeStay, totals, nights, type Stay } from '../model
 import { UnitGuideEditor, UnitGuideHistory } from './UnitGuide';
 
 import { DatesDialog } from './DatesDialog';
+import { StayChatButton } from './GuestInbox';
 
 import { underReview } from '../ListingPanel';
 
@@ -1405,6 +1406,7 @@ export function ReservationsPage({
             <Button variant="primary" onClick={() => w.inspect('stays', record.id)}>
               Open reservation
             </Button>
+            {record.source === 'nexg' && <StayChatButton stayId={record.id} />}
           </div>
           <div className="stay-shortcuts">
             <Button onClick={() => w.go('unit', record.unitId, 'guest-guide')}>
