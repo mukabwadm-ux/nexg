@@ -19,8 +19,29 @@ import {
   requireWorkspaceOrigin,
   type HostWorkspaceAccess,
 } from '@/lib/host-workspace/access';
+import {
+  isJsonRequest,
+  readUploadStep,
+  requireUploaded,
+  signUpload,
+} from '@/lib/host-workspace/direct-upload';
+
+/*
+ * Large photos skip the API body (Vercel stops request bodies at about 4.5 MB):
+ * POST JSON {action:'upload-url', room, mime, size, operationId} returns a
+ * signed upload URL, the client sends the file straight to Storage, and
+ * POST JSON {action:'complete', room, mime, size, operationId, alt, path}
+ * adds it to the gallery. Multipart still works for small files.
+ */
 
 export const dynamic = 'force-dynamic';
+const BUCKET = 'host-photos';
+const BAD_PHOTO = 'Choose a PNG, JPEG or WebP photo up to 10 MB.';
+const PHOTO_EXTENSIONS: Record<string, string> = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/webp': 'webp',
+};
 const maxBytes = 10 * 1024 * 1024;
 const targetSchema = z.object({ kind: z.enum(['property', 'unit']), id: z.string().uuid() });
 const photoSchema = z.object({
@@ -134,28 +155,108 @@ export async function GET(request: Request) {
   }
 }
 
+const stepSchema = z.object({
+  operationId: z.string().uuid(),
+  mime: z.string().max(100),
+  size: z.number().int(),
+  room: z.union([roomSchema, z.literal('')]).optional(),
+  alt: z.string().trim().max(160).optional().default(''),
+});
+const uploadStepSchema = z.discriminatedUnion('action', [
+  stepSchema.extend({ action: z.literal('upload-url') }),
+  stepSchema.extend({ action: z.literal('complete'), path: z.string().max(400) }),
+]);
+
+function photoExtension(mime: string, size: number) {
+  const extension = PHOTO_EXTENSIONS[mime];
+  if (!extension || size <= 0 || size > maxBytes) throw new HostWorkspaceError(400, BAD_PHOTO);
+  return extension;
+}
+
+type Gallery = Awaited<ReturnType<typeof gallery>>;
+
+/** The gallery as it stands, after checking there is room for one more photo at `path`. */
+async function roomForOneMore(access: HostWorkspaceAccess, target: Target, path: string) {
+  const current = await gallery(access, target);
+  const photos = photosOf(current);
+  const present = photos.some((photo) => photo.path === path);
+  if (!present && photos.length >= PHOTO_LIMIT[target.kind])
+    throw new HostWorkspaceError(400, 'Remove one photo before adding another.');
+  return { current, present };
+}
+
+/** Add the stored photo at `path` to the gallery, retrying if someone else saved first. */
+async function addToGallery(
+  access: HostWorkspaceAccess,
+  target: Target,
+  initial: Gallery,
+  photo: { path: string; alt: string; room?: PhotoRoom },
+) {
+  let current = initial;
+  const { path, alt, room } = photo;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const photos = photosOf(current);
+    if (photos.some((item) => item.path === path)) return await view(access, target, current);
+    if (
+      await save(access, target, current, [
+        ...photos,
+        { path, alt, cover: photos.length === 0, ...(room ? { room } : {}) },
+      ])
+    )
+      return await view(access, target, await gallery(access, target));
+    current = await gallery(access, target);
+  }
+  throw new HostWorkspaceError(
+    409,
+    'The gallery is being edited. Refresh and retry the same photo.',
+  );
+}
+
+/** The two JSON steps of a direct upload. */
+async function uploadStep(request: Request) {
+  const target = targetFrom(request);
+  const step = uploadStepSchema.parse(await readUploadStep(request));
+  const extension = photoExtension(step.mime, step.size);
+  const access = await hostWorkspaceAccess(request);
+  const path = access.hostId + '/' + target.id + '/' + step.operationId + '.' + extension;
+  const { current, present } = await roomForOneMore(access, target, path);
+
+  if (step.action === 'upload-url') {
+    if (present) return hostWorkspaceJson({ path, signedUrl: null, token: null, done: true });
+    return hostWorkspaceJson(await signUpload(access, BUCKET, path));
+  }
+
+  if (step.path !== path)
+    throw new HostWorkspaceError(400, 'This upload does not belong to this gallery.');
+  if (present) return await view(access, target, current);
+  await requireUploaded(access, BUCKET, path, { mime: step.mime, maxBytes }, BAD_PHOTO);
+  const room = step.room || undefined;
+  return await addToGallery(access, target, current, { path, alt: step.alt, room });
+}
+
+/**
+ * Add one photo: multipart (file, operationId, alt, room) for small files, or
+ * the JSON upload-url / complete steps for any size.
+ */
 export async function POST(request: Request) {
   if (!hostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
   try {
     requireWorkspaceOrigin(request);
+    if (isJsonRequest(request)) return await uploadStep(request);
     if (
       !request.headers.get('content-type')?.startsWith('multipart/form-data') ||
       Number(request.headers.get('content-length')) > maxBytes + 16_000
     )
-      throw new HostWorkspaceError(400, 'Choose a PNG, JPEG or WebP photo up to 10 MB.');
+      throw new HostWorkspaceError(400, BAD_PHOTO);
 
     const target = targetFrom(request);
     const access = await hostWorkspaceAccess(request);
     const form = await request.formData();
     const operationId = z.string().uuid().parse(form.get('operationId'));
     const file = form.get('file');
-    const extension =
-      file instanceof File &&
-      ({ 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' } as Record<string, string>)[
-        file.type
-      ];
+    const extension = file instanceof File ? PHOTO_EXTENSIONS[file.type] : undefined;
     if (!(file instanceof File) || !extension || !file.size || file.size > maxBytes)
-      throw new HostWorkspaceError(400, 'Choose a PNG, JPEG or WebP photo up to 10 MB.');
+      throw new HostWorkspaceError(400, BAD_PHOTO);
     const alt = z
       .string()
       .trim()
@@ -163,14 +264,11 @@ export async function POST(request: Request) {
       .parse(form.get('alt') ?? '');
     const room = roomSchema.parse(form.get('room') || undefined);
     const path = access.hostId + '/' + target.id + '/' + operationId + '.' + extension;
-    let current = await gallery(access, target);
-    const initial = photosOf(current);
-    if (initial.some((photo) => photo.path === path)) return await view(access, target, current);
-    if (initial.length >= PHOTO_LIMIT[target.kind])
-      throw new HostWorkspaceError(400, 'Remove one photo before adding another.');
+    const { current, present } = await roomForOneMore(access, target, path);
+    if (present) return await view(access, target, current);
 
     const { error } = await access.db.storage
-      .from('host-photos')
+      .from(BUCKET)
       .upload(path, file, { contentType: file.type, upsert: false });
     if (error && !/already exists|duplicate/i.test(error.message))
       throw new HostWorkspaceError(
@@ -178,22 +276,7 @@ export async function POST(request: Request) {
         'The photo upload could not be confirmed. Retry the same file.',
       );
 
-    for (let attempt = 0; attempt < 3; attempt++) {
-      const photos = photosOf(current);
-      if (photos.some((photo) => photo.path === path)) return await view(access, target, current);
-      if (
-        await save(access, target, current, [
-          ...photos,
-          { path, alt, cover: photos.length === 0, ...(room ? { room } : {}) },
-        ])
-      )
-        return await view(access, target, await gallery(access, target));
-      current = await gallery(access, target);
-    }
-    throw new HostWorkspaceError(
-      409,
-      'The gallery is being edited. Refresh and retry the same photo.',
-    );
+    return await addToGallery(access, target, current, { path, alt, room });
   } catch (error) {
     return respond(error);
   }
