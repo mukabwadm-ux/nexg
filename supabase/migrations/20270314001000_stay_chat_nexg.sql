@@ -11,7 +11,8 @@
 --     purpose, as in authz.handles_guest_data: signing up a host is not a reason to read their guests' messages.
 --     Finance, dispatch and every other staff role are refused.
 --   * A staff member can read a stay chat's messages without joining, so they can triage, but every opening of a
---     transcript is audited (stay.chat_staff_viewed). Nobody can post without joining first.
+--     transcript is audited (stay.chat_staff_viewed) and queued for review, like every other reveal. Nobody can post
+--     without joining first.
 --   * Joining adds one participant per staff member, shown to the guest and the host as "NexG". It posts a line
 --     both sides see ("NexG joined this chat."), and audits stay.chat_staff_joined. Leaving does the same.
 --   * Every staff message is audited (stay.chat_staff_message: who, which chat, the message id and its length,
@@ -727,7 +728,7 @@ revoke execute on function public.tg_stay_chat_rings_nexg() from authenticated;
 
 insert into audit.action_registry (action, module, default_severity, needs_review, description) values
   ('stay.chat_nexg_requested', 'messaging', 'info', false, 'A guest or host asked NexG to help in a stay chat'),
-  ('stay.chat_staff_viewed', 'messaging', 'info', false, 'A NexG staff member opened a guest and host stay chat'),
+  ('stay.chat_staff_viewed', 'messaging', 'info', true, 'A NexG staff member opened a guest and host stay chat; queued for review like every other reveal'),
   ('stay.chat_staff_joined', 'messaging', 'notice', false, 'A NexG staff member joined a stay chat; both sides see NexG is there'),
   ('stay.chat_staff_left', 'messaging', 'info', false, 'A NexG staff member left a stay chat'),
   ('stay.chat_staff_message', 'messaging', 'info', false, 'A NexG staff member wrote in a stay chat, which the guest and host both read')
