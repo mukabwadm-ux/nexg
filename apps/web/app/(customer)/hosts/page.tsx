@@ -642,7 +642,7 @@ export default async function HostsPage() {
                      * rendering — a number invented here is one a host
                      * would later be invoiced.
                      */}
-                    <p className="mt-1.5 text-[0.75rem] font-extrabold text-[#B8901F]">
+                    <p className="text-gold-text mt-1.5 text-[0.75rem] font-extrabold">
                       from KES{' '}
                       {pkg.price === null ? '[—]' : Number(pkg.price).toLocaleString('en-KE')}
                     </p>
@@ -673,7 +673,7 @@ export default async function HostsPage() {
 
             <h2 className="mt-5 text-[2rem] font-extrabold leading-[1.1] tracking-[-0.02em] sm:text-[2.75rem]">
               Tell us what you need. We&rsquo;ll find the{' '}
-              <span className="text-[#B8901F]">place</span>.
+              <span className="text-gold-text">place</span>.
             </h2>
 
             <p className="mt-4 max-w-[34rem] text-[0.9375rem] font-semibold leading-[1.8] text-[#5B5B5B]">
@@ -750,7 +750,7 @@ export default async function HostsPage() {
           <div className="rounded-2xl border border-[#ECE8DF] bg-white p-6 sm:p-10">
             <div className="grid gap-8 lg:grid-cols-[26rem_1fr] lg:items-start lg:gap-14">
               <div>
-                <p className="text-[0.6875rem] font-extrabold uppercase tracking-[0.14em] text-[#B8901F]">
+                <p className="text-gold-text text-[0.6875rem] font-extrabold uppercase tracking-[0.14em]">
                   List your Airbnb
                 </p>
                 <h2 className="mt-2 text-[1.75rem] font-extrabold leading-tight tracking-[-0.02em]">

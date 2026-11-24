@@ -120,7 +120,7 @@ const KIND_LOOK: Record<FileKind, { icon: typeof FileText; tone: Tone; color: st
   slides: { icon: Presentation, tone: 'amber', color: 'text-[#E8730C] bg-[#FDF0E4]' },
   image: { icon: FileImage, tone: 'purple', color: 'text-[#7E3FD1] bg-[#F3EAFE]' },
   text: { icon: FileText, tone: 'grey', color: 'text-muted bg-[#F1EFEA]' },
-  archive: { icon: FileArchive, tone: 'gold', color: 'text-[#B8901F] bg-[#FBF3D9]' },
+  archive: { icon: FileArchive, tone: 'gold', color: 'text-gold-text bg-[#FBF3D9]' },
   other: { icon: FileIcon, tone: 'grey', color: 'text-muted bg-[#F1EFEA]' },
 };
 

@@ -386,7 +386,7 @@ export function HostRegisterCard() {
           role="status"
           className="mt-4 flex items-start gap-3 rounded-xl bg-[#F6F3EC] p-4 text-sm font-semibold leading-[1.6] text-[#3A352B]"
         >
-          <Mail className="mt-0.5 h-5 w-5 shrink-0 text-[#B8901F]" aria-hidden="true" />
+          <Mail className="text-gold-text mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
           <span>
             {done.welcome === 'sent' ? (
               <>
