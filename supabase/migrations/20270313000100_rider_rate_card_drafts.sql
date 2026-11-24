@@ -22,6 +22,12 @@
 -- transfers (#200, #202): they read what a rider is owed, which is
 -- written from this card when a trip is delivered.
 
+/* The two new audit actions, so the audit console names them. */
+insert into audit.action_registry (action, module, default_severity, description) values
+  ('rate_card.draft_saved', 'riders', 'notice', 'A rider rate card draft was written or changed'),
+  ('rate_card.draft_discarded', 'riders', 'notice', 'A rider rate card draft was discarded')
+on conflict (action) do nothing;
+
 create or replace function public.rpc_rate_card_draft_save(
   p_city_id uuid,
   p_version text,
