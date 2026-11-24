@@ -8,7 +8,8 @@ export type Subject =
   | 'offer'
   | 'disposal'
   | 'payout'
-  | 'account';
+  | 'account'
+  | 'conversation';
 
 export interface Delivery {
   id: string;
@@ -88,6 +89,11 @@ const STAGES: Record<Subject, Record<string, StageCopy>> = {
   },
   ticket: {
     reply: ['NexG support replied', 'Huduma ya NexG imejibu', 0, 0],
+  },
+  // A stay chat (20270314000700). Never the message text: the app loads it after a tap.
+  conversation: {
+    host_message: ['New message about your stay', 'Ujumbe mpya kuhusu malazi yako', 0, 0],
+    guest_message: ['New message from a guest', 'Ujumbe mpya kutoka kwa mgeni', 0, 0],
   },
   job: {
     assigned: ['Delivery assigned', 'Umepewa kazi ya usafirishaji', 15, 1],

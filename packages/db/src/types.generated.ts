@@ -29573,6 +29573,7 @@ export type Database = {
           resolved_in_one: boolean | null;
           retention_until: string | null;
           status: Database['public']['Enums']['msg_conv_status'];
+          stay_id: string | null;
           subject: string;
           topic: Database['public']['Enums']['msg_topic'] | null;
         };
@@ -29607,6 +29608,7 @@ export type Database = {
           resolved_in_one?: boolean | null;
           retention_until?: string | null;
           status?: Database['public']['Enums']['msg_conv_status'];
+          stay_id?: string | null;
           subject: string;
           topic?: Database['public']['Enums']['msg_topic'] | null;
         };
@@ -29640,6 +29642,7 @@ export type Database = {
           resolved_in_one?: boolean | null;
           retention_until?: string | null;
           status?: Database['public']['Enums']['msg_conv_status'];
+          stay_id?: string | null;
           subject?: string;
           topic?: Database['public']['Enums']['msg_topic'] | null;
         };
@@ -73202,6 +73205,28 @@ export type Database = {
         };
       };
       rpc_stay_cancellation_policy: { Args: { p_unit_id: string }; Returns: Json };
+      rpc_stay_chat_guest_messages: {
+        Args: { p_before?: number; p_limit?: number; p_thread_id: string };
+        Returns: Json;
+      };
+      rpc_stay_chat_guest_open: { Args: { p_stay_id: string }; Returns: Json };
+      rpc_stay_chat_guest_read: { Args: { p_thread_id: string }; Returns: Json };
+      rpc_stay_chat_guest_send: {
+        Args: { p_body: string; p_idempotency_key?: string; p_thread_id: string };
+        Returns: Json;
+      };
+      rpc_stay_chat_guest_threads: { Args: { p_limit?: number }; Returns: Json };
+      rpc_stay_chat_host_messages: {
+        Args: { p_before?: number; p_limit?: number; p_thread_id: string };
+        Returns: Json;
+      };
+      rpc_stay_chat_host_open: { Args: { p_stay_id: string }; Returns: Json };
+      rpc_stay_chat_host_read: { Args: { p_thread_id: string }; Returns: Json };
+      rpc_stay_chat_host_send: {
+        Args: { p_body: string; p_idempotency_key?: string; p_thread_id: string };
+        Returns: Json;
+      };
+      rpc_stay_chat_host_threads: { Args: { p_host_id: string; p_limit?: number }; Returns: Json };
       rpc_stay_checkout_status: { Args: { p_stay_id: string }; Returns: Json };
       rpc_stay_confirm: {
         Args: { p_reference?: string; p_stay_id: string };
