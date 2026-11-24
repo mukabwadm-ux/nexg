@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type * as Access from '@/lib/host-workspace/access';
 
 const mock = vi.hoisted(() => ({ rpc: vi.fn(), access: vi.fn() }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/server', () => ({ createClient: () => ({}) }));
 vi.mock('@/lib/host-workspace/access', async (importOriginal) => {
-  const real = await importOriginal<typeof import('@/lib/host-workspace/access')>();
+  const real = await importOriginal<typeof Access>();
   return { ...real, hostWorkspaceAccess: mock.access };
 });
 
