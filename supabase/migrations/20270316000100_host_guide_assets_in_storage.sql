@@ -28,6 +28,8 @@
 --   * host.guide_asset_added (logged by the old and the new RPC) and host.guide_draft, host.guide_publish,
 --     host.guide_unpublish and host.guide_restore (logged by rpc_host_workspace_guide_commit, which the new RPC calls
 --     to save the draft) are registered in audit.action_registry.
+--   * rpc_host_workspace_guide_asset_sign is in wiring_anon_allow (a QR code holder calls it signed out) and in
+--     wiring_audit_exempt (its only write is the short-lived read grant), each with its reason.
 -- rpc_host_workspace_guide_asset_put (the multipart path) is unchanged and keeps working for small files.
 
 -- ═══════════════════════════════════════════════ bucket
@@ -302,6 +304,22 @@ end;
 $$;
 revoke execute on function public.rpc_host_workspace_guide_asset_sign(uuid,text) from public;
 grant execute on function public.rpc_host_workspace_guide_asset_sign(uuid,text) to anon, authenticated;
+
+/*
+ * The wiring gate (test 26): a guest holding the QR code has no session, so anon executes the sign RPC, and it
+ * writes one grant row. Both are written down here rather than waved through.
+ */
+insert into public.wiring_anon_allow (function_name, reason, guarded_by) values
+  ('rpc_host_workspace_guide_asset_sign',
+   'A guest scanning a unit''s QR code has no session; the guest guide''s file route asks for a floor plan or 3D model with the code.',
+   'Returns null and writes nothing unless rpc_host_workspace_guide_asset(p_id, p_code) answers: the code must open a live, published guide and the asset must be that guide''s planId or modelId. It only grants that one Storage path for 60 seconds (one row per path, upserted), and deletes expired grants on every write.')
+on conflict (function_name) do update set reason = excluded.reason, guarded_by = excluded.guarded_by;
+
+insert into public.wiring_audit_exempt (function_name, reason, recorded_in) values
+  ('rpc_host_workspace_guide_asset_sign',
+   'A guest reading a published guide file is a read, not an action; the only write is a 60-second Storage read grant that is deleted once it expires',
+   'host_guide_asset_grant, with its path and expiry, for the minute it lasts')
+on conflict (function_name) do update set reason = excluded.reason, recorded_in = excluded.recorded_in;
 
 -- ═══════════════════════════════════════════════ audit
 

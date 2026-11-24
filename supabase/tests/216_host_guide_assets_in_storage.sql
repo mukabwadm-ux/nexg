@@ -186,9 +186,10 @@ select is(
   public.rpc_host_workspace_guide_asset_record('e2163000-0000-4000-8000-00000000000a', 0, 'model',
     (select v from t where k = 'model'), repeat('a', 64)),
   1, 'The owner attaches the uploaded model to the draft.');
+reset role;
+/* host_unit_guide_asset has no direct grants; the workspace reaches it only through the RPCs. */
 insert into t select 'model_id', id::text from public.host_unit_guide_asset
   where storage_path = (select v from t where k = 'model');
-reset role;
 
 select is(
   (select (document ->> 'modelId') || ' / ' || revision::text from public.host_unit_guide

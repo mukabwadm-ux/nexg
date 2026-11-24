@@ -75,6 +75,9 @@ interface Stored {
   mime: string;
 }
 
+/** The client's rpc: each guide RPC answers with its own data shape (a count, or {mime, path | base64}). */
+type Rpc = (name: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+
 /** A host member's client with mocked storage, rpc and the unit check. */
 function fakeDb(stored: Record<string, Stored> = {}, rpcError: unknown = null) {
   const calls: { method: string; args: unknown[] }[] = [];
@@ -118,7 +121,7 @@ function fakeDb(stored: Record<string, Stored> = {}, rpcError: unknown = null) {
       }),
     }),
   };
-  const rpc = vi.fn(async (name: string, args: Record<string, unknown>) => {
+  const rpc = vi.fn<Rpc>(async (name, args) => {
     calls.push({ method: 'rpc', args: [name, args] });
     return { data: 1, error: rpcError };
   });
@@ -324,7 +327,7 @@ describe('guide files: direct upload', () => {
 describe('guide files: reading', () => {
   it('redirects a Storage file to a short-lived signed URL', async () => {
     const db = fakeDb();
-    db.access.db.rpc = vi.fn(async () => ({
+    db.access.db.rpc = vi.fn<Rpc>(async () => ({
       data: { mime: 'model/gltf-binary', path: modelPath('a'.repeat(64)) },
       error: null,
     }));
@@ -343,7 +346,7 @@ describe('guide files: reading', () => {
 
   it('still serves a file stored in the database before direct uploads', async () => {
     const db = fakeDb();
-    db.access.db.rpc = vi.fn(async () => ({
+    db.access.db.rpc = vi.fn<Rpc>(async () => ({
       data: { mime: 'image/png', base64: png.toString('base64') },
       error: null,
     }));
@@ -356,7 +359,7 @@ describe('guide files: reading', () => {
 
   it('asks the sign RPC with the QR code before signing a guest link', async () => {
     const db = fakeDb();
-    const rpc = vi.fn(async () => ({
+    const rpc = vi.fn<Rpc>(async () => ({
       data: { mime: 'image/png', path: modelPath('a'.repeat(64)) },
       error: null,
     }));
@@ -377,7 +380,7 @@ describe('guide files: reading', () => {
 
   it('reads a host member file without the sign RPC', async () => {
     const db = fakeDb();
-    const rpc = vi.fn(async () => ({ data: { mime: 'image/png', base64: '' }, error: null }));
+    const rpc = vi.fn<Rpc>(async () => ({ data: { mime: 'image/png', base64: '' }, error: null }));
     db.access.db.rpc = rpc;
     state.access = db.access;
     await getAsset(new Request(`${GUIDE}/asset?id=${ASSET}`));
