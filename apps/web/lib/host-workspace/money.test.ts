@@ -19,7 +19,7 @@ function access(
   },
   unitScope: string[] | null = null,
 ) {
-  const rpc = vi.fn(async () => result);
+  const rpc = vi.fn(async (_name: string, _args: unknown) => result);
   return {
     rpc,
     access: {
