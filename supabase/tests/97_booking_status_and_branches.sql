@@ -53,6 +53,11 @@ select is(
   'arriving=in_progress cancelled=cancelled delivered=completed placed=requested preparing=confirmed refunded=completed',
   'stages map to the status a partner expects');
 
+-- Live API bookings need NexG's approval (20270302000200).
+insert into public.api_booking_access (merchant_id, enabled, monthly_limit_cents)
+select id, true, 100000000 from t_m
+on conflict (merchant_id) do nothing;
+
 insert into t values ('live', public.rpc_order_place_api(
   'status-live-key-000000000000000000', 'status-idem-000000000000001',
   '{"service":"venue_booking","quantity":2}'::jsonb));

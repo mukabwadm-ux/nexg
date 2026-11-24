@@ -187,7 +187,6 @@ export function RiderRecordPanel({
         <dl className="mt-3 grid gap-3 sm:grid-cols-2">
           <Fact label="Areas they know" value={rider.areas.join(', ') || null} />
           <Fact label="Shifts" value={rider.shifts.map((s) => LABELS[s] ?? s).join(', ') || null} />
-          <Fact label="Cash on delivery" value={rider.cash_ok ? 'Happy to carry' : 'M-Pesa only'} />
           <Fact
             label="Kit they already have"
             value={rider.kit_has.map((k) => LABELS[k] ?? k).join(', ') || 'Nothing yet'}

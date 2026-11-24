@@ -235,9 +235,7 @@ export function OnboardingRecord({
                   className={`text-xs font-bold ${branch.zone ? 'text-success' : 'text-warning'}`}
                 >
                   {branch.zone
-                    ? `${branch.zone.name} · ${branch.zone.tier} · ${branch.zone.eta_min}–${branch.zone.eta_max} min${
-                        branch.zone.cod_allowed ? '' : ' · no cash on delivery'
-                      }`
+                    ? `${branch.zone.name} · ${branch.zone.tier} · ${branch.zone.eta_min}–${branch.zone.eta_max} min`
                     : 'Outside every zone'}
                 </span>
                 {branch.latitude && branch.longitude && (

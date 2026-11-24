@@ -1,131 +1,156 @@
 import type { LegalDocument } from './types';
 
 /**
- * Terms of service, transcribed from the signed-off `Terms of Service`
- * artboard. The wording is the client's, including the draft notice.
+ * End-User Terms and Conditions, transcribed from the client's Word document
+ * "1.3 End-User Terms and Conditions and Privacy Policy". The operative
+ * wording is theirs; only the clause numbers lost in the Word list formatting
+ * have been restored, and the blank contact details are the ones the site
+ * already publishes (info@nexgapp.com, as in the Refunds policy, and the
+ * postal address in the Cookie Policy). The plain-English notes are ours.
  *
- * `draft` stays true and `version` stays null until a Kenyan lawyer has
- * reviewed it. Both are read by the page and by any acceptance recorded
- * against it — there is deliberately no way to accept an unversioned
- * document.
+ * The document's Part II, the Privacy Policy, is the separate /legal/privacy
+ * page. Its effective date is still blank, so `version` stays null.
  */
 export const terms: LegalDocument = {
   slug: 'terms',
   key: 'terms',
-  title: 'Terms of Service',
-  tagline: 'Rules for using NexG as a guest',
+  title: 'End-User Terms and Conditions',
+  tagline: 'Rules for using NexG as a customer',
   intro:
-    'The rules for using NexG as a guest. We’ve written a plain-English summary beside every section — the summary helps you read, but the full text is what applies.',
+    'These End-User Terms and Conditions (“Terms”) govern access to and use of the NexGenius mobile application and website (together, the “Platform”) operated by NexGenius Concierge Limited (“NexGenius”, “we”, “us”). By creating an account or using the Platform you agree to be bound by these Terms.',
   version: null,
-  lastUpdated: null,
-  draft: true,
+  lastUpdated: '23 November 2026',
+  draft: false,
   sections: [
     {
-      id: 'who-we-are',
-      heading: 'Who we are',
+      id: 'the-service',
+      heading: 'The Service',
       body: [
-        'NexG is operated by Nexgenius Concierge Limited, a company registered in Kenya. Contact details and registered office are listed at the end of this document.',
-      ],
-      plainEnglish: 'We are a Kenyan company. Here is how to reach us.',
-    },
-    {
-      id: 'what-nexg-does',
-      heading: 'What NexG does',
-      body: [
-        'NexG is a platform that lets you request goods and services from independent merchants and have them delivered by independent riders, with help from our concierge team. NexG is not the seller of the goods or the provider of the delivery unless we say so explicitly for a particular service.',
+        '1.1 NexGenius operates a technology platform that connects users (“you”, the “End-User”) with independent riders (“Riders”), merchants (“Merchants”) and participating hotels or properties (“Property Partners”) to enable the ordering, delivery and concierge fulfilment of goods and services.',
+        '1.2 NexGenius is a technology intermediary. Riders are independent contractors and Merchants are independent businesses; NexGenius does not itself sell, prepare, or deliver the goods or services ordered through the Platform, save where expressly stated.',
       ],
       plainEnglish:
-        'We connect you with merchants and riders. Most of what you order is sold by them, not by us.',
+        'We connect you with riders, merchants and hotels. Most of what you order is sold and delivered by them, not by us.',
     },
     {
-      id: 'your-account',
-      heading: 'Your account',
+      id: 'eligibility-and-account-registration',
+      heading: 'Eligibility and Account Registration',
       body: [
-        'You can order as a guest without an account. If you create one, you are responsible for keeping your phone number current and your one-time codes private. You must be 18 or older to create an account or place an order.',
-      ],
-      plainEnglish: 'Keep your phone number up to date. You must be 18+.',
-    },
-    {
-      id: 'placing-an-order',
-      heading: 'Placing an order',
-      body: [
-        'The price, delivery fee, service fee (if any) and estimated delivery time are shown before you confirm. By confirming you agree to pay that amount. Merchant prices may differ from in-store prices.',
-      ],
-      plainEnglish: 'You see the full price before you confirm. That is what you pay.',
-    },
-    {
-      id: 'payments',
-      heading: 'Payments',
-      body: [
-        'We accept M-Pesa, pay on delivery (where offered) and charge-to-room at participating hotels. Pay-on-delivery orders may be limited in value or require a confirmed phone number.',
+        '2.1 You must be at least eighteen (18) years old and capable of forming a binding contract under Kenyan law to create an account. You warrant that all registration information you provide is accurate, current and complete.',
+        '2.2 You are responsible for maintaining the confidentiality of your account credentials and for all activity under your account. Notify us immediately at info@nexgapp.com of any unauthorised use.',
       ],
       plainEnglish:
-        'Pay by M-Pesa, on delivery where it is offered, or to your room at partner hotels.',
+        'You must be 18+. Keep your sign-in private and tell us if someone else uses it.',
     },
     {
-      id: 'cancellations-and-refunds',
-      heading: 'Cancellations and refunds',
+      id: 'orders-pricing-and-payment',
+      heading: 'Orders, Pricing and Payment',
       body: [
-        'You can cancel free of charge until the merchant confirms your order. After that, cancellation fees may apply as set out in our Refunds & Cancellations policy. Refunds are returned to the original payment method.',
-      ],
-      plainEnglish: 'Cancel free until the merchant confirms. After that, see the Refunds policy.',
-    },
-    {
-      id: 'concierge-requests',
-      heading: 'Concierge requests',
-      body: [
-        'For requests outside the catalogue, a concierge will quote a price and time before anything is purchased on your behalf. Nothing is bought until you approve the quote.',
-      ],
-      plainEnglish: 'For special requests, we quote first. Nothing is bought until you say yes.',
-    },
-    {
-      id: 'delivery-and-tracking',
-      heading: 'Delivery and tracking',
-      body: [
-        'Delivery times are estimates. You can track your rider live. If an order is late or incomplete, tell us through the order screen and we will investigate with the merchant and rider.',
-      ],
-      plainEnglish: 'Times are estimates. Track live, and tell us quickly if something is wrong.',
-    },
-    {
-      id: 'restricted-items',
-      heading: 'Restricted items',
-      body: [
-        'Alcohol is delivered only to persons aged 18 or over and a rider may ask for ID. We do not deliver prescription medicines, weapons, or items prohibited under Kenyan law.',
-      ],
-      plainEnglish: 'Alcohol is 18+ with ID. Some items we simply will not carry.',
-    },
-    {
-      id: 'your-conduct',
-      heading: 'Your conduct',
-      body: [
-        'Treat riders, merchants and concierge staff with respect. Abuse, fraud, chargeback abuse or repeated pay-on-delivery refusals may lead to account suspension.',
-      ],
-      plainEnglish: 'Be decent to the people serving you, or we may close your account.',
-    },
-    {
-      id: 'our-liability',
-      heading: 'Our liability',
-      body: [
-        'To the extent permitted by law, NexG’s liability for any order is limited to the amount you paid for that order. We are not liable for the quality of goods supplied by merchants beyond helping you obtain a refund or replacement.',
+        '3.1 Prices displayed on the Platform are set by the relevant Merchant or Property Partner and may include a NexGenius service fee, delivery fee and applicable taxes, each shown separately before checkout.',
+        '3.2 Payment may be made by mobile money, card, or such other method as NexGenius enables from time to time through its licensed payment service provider. By submitting payment details you authorise NexGenius and its payment processor to charge the total order value.',
+        '3.3 Orders are subject to acceptance by the relevant Merchant. NexGenius may cancel or decline any order at its discretion, including for suspected fraud, unavailability of items, or safety concerns, and will refund any amount already charged for a cancelled order in accordance with the Refund, Cancellation and Complaints Policy.',
       ],
       plainEnglish:
-        'If something goes wrong, our liability is capped at what you paid for that order.',
+        'Merchants set prices; every fee is shown before you pay. If an order is cancelled, you get your money back.',
+    },
+    {
+      id: 'delivery',
+      heading: 'Delivery',
+      body: [
+        '4.1 Estimated delivery times are indicative only and not guaranteed. NexGenius is not liable for delays caused by traffic, weather, Rider availability, or circumstances beyond its reasonable control.',
+        '4.2 You must provide an accurate delivery location and be reasonably available to receive the order. Where you are not available within a reasonable period after Rider arrival, the order may be treated as delivered and no refund will be due save as required by Kenyan consumer protection law.',
+      ],
+      plainEnglish:
+        'Times are estimates. Give the right address and be there when the rider arrives.',
+    },
+    {
+      id: 'user-conduct',
+      heading: 'User Conduct',
+      body: [
+        '5.1 You shall not use the Platform to:',
+        '(a) order or request unlawful goods or services;',
+        '(b) harass, threaten or endanger a Rider, Merchant or Property Partner representative;',
+        '(c) provide false information; or',
+        '(d) attempt to circumvent NexGenius’s payment or fee systems by arranging off-platform transactions with a Rider or Merchant met through the Platform.',
+        '5.2 NexGenius may suspend or terminate your account for breach of clause 5.1, safety concerns, or suspected fraud, with or without notice depending on severity.',
+      ],
+      plainEnglish:
+        'Nothing unlawful, no abuse, no lies, and no deals off the app. Break this and we may close your account.',
+    },
+    {
+      id: 'ratings-reviews-and-content',
+      heading: 'Ratings, Reviews and Content',
+      body: [
+        '6.1 You may be invited to rate and review Riders, Merchants and Property Partners. Reviews must be honest, based on genuine experience, and free of defamatory, hateful or unlawful content. NexGenius may remove content that breaches this clause.',
+      ],
+      plainEnglish: 'Reviews must be honest and decent, or we take them down.',
+    },
+    {
+      id: 'intellectual-property',
+      heading: 'Intellectual Property',
+      body: [
+        '7.1 The Platform, including its software, design, trademarks and content (excluding Merchant-supplied content), is owned by or licensed to NexGenius and protected under the Copyright Act, 2001 and the Trade Marks Act. You are granted a limited, non-exclusive, non-transferable licence to use the Platform for personal, non-commercial ordering purposes only.',
+      ],
+      plainEnglish: 'The Platform is ours. You may use it to order for yourself.',
+    },
+    {
+      id: 'limitation-of-liability',
+      heading: 'Limitation of Liability',
+      body: [
+        '8.1 To the maximum extent permitted by Kenyan law, NexGenius’s aggregate liability to you arising out of or in connection with the Platform shall not exceed the value of the order giving rise to the claim in the ninety (90) days preceding the event. NexGenius is not liable for indirect, incidental or consequential loss.',
+        '8.2 Nothing in these Terms excludes or limits liability that cannot lawfully be excluded or limited, including liability for death or personal injury caused by NexGenius’s negligence or for fraud.',
+      ],
+      plainEnglish:
+        'Our liability is capped at the value of the order in question, except where the law does not allow a cap.',
+    },
+    {
+      id: 'indemnity',
+      heading: 'Indemnity',
+      body: [
+        '9.1 You agree to indemnify NexGenius against claims, losses and costs arising from your breach of these Terms or your misuse of the Platform, save to the extent caused by NexGenius’s own default.',
+      ],
+      plainEnglish: 'If your breach or misuse costs us money, you cover it.',
+    },
+    {
+      id: 'data-protection',
+      heading: 'Data Protection',
+      body: [
+        '10.1 NexGenius processes your personal data in accordance with the Privacy Policy set out in Part II of this document and the Data Protection Act, 2019.',
+      ],
+      plainEnglish: 'Our Privacy Policy explains how we handle your data.',
+    },
+    {
+      id: 'suspension-and-termination',
+      heading: 'Suspension and Termination',
+      body: [
+        '11.1 Either party may terminate the account relationship at any time. NexGenius may suspend or terminate access immediately for breach of these Terms, suspected fraud, or a legal or regulatory requirement to do so.',
+      ],
+      plainEnglish:
+        'You can leave any time. We can suspend you for a breach, fraud or a legal reason.',
     },
     {
       id: 'changes-to-these-terms',
-      heading: 'Changes to these terms',
+      heading: 'Changes to these Terms',
       body: [
-        'We may update these terms. We will show the “last updated” date at the top and, for material changes, notify you in the app or by SMS before they take effect.',
+        '12.1 NexGenius may update these Terms from time to time. Material changes will be notified through the Platform or by email at least seven (7) days before taking effect. Continued use after the effective date constitutes acceptance.',
       ],
-      plainEnglish: 'If we change something important, we will tell you first.',
+      plainEnglish: 'We give you 7 days’ notice of important changes.',
     },
     {
       id: 'governing-law-and-disputes',
-      heading: 'Governing law and disputes',
+      heading: 'Governing Law and Disputes',
       body: [
-        'These terms are governed by the laws of Kenya. Disputes will first be handled through our support team; unresolved disputes may be referred to the courts of Kenya.',
+        '13.1 These Terms are governed by the laws of Kenya. Disputes shall first be raised through NexGenius’s complaints process (see the Refund, Cancellation and Complaints Policy). Unresolved disputes shall be subject to the exclusive jurisdiction of the courts of Kenya, save that either party may refer a dispute to arbitration in Nairobi under the Arbitration Act, 1995 by mutual written agreement.',
       ],
-      plainEnglish: 'Kenyan law applies. Talk to support first.',
+      plainEnglish: 'Kenyan law applies. Complain to us first; then the Kenyan courts.',
+    },
+    {
+      id: 'contact',
+      heading: 'Contact',
+      body: [
+        'Questions about these Terms may be sent to info@nexgapp.com or NexGenius Concierge Limited, P.O. Box 50691-00100, Nairobi.',
+      ],
+      plainEnglish: 'Email info@nexgapp.com or write to us in Nairobi.',
     },
   ],
 };

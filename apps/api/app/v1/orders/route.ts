@@ -127,6 +127,8 @@ function bookingError(error: { message: string; code?: string }) {
     const keyRefused = message.startsWith('That API key is not valid');
     return jsonError('not_found', message, { status: keyRefused ? 401 : 403 });
   }
+  // P0004: the booking would pass the merchant's monthly limit for live API bookings.
+  if (error.code === 'P0004') return jsonError('conflict', message);
   if (error.code === 'P0001' && PRICING_REFUSALS.some((m) => message.startsWith(m))) {
     return jsonError('invalid_request', message);
   }

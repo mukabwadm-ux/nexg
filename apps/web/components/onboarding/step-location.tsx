@@ -459,9 +459,7 @@ export function LocationStep() {
                     }`}
                   >
                     {branch.zone
-                      ? `${branch.tier === 'core' ? 'Core' : branch.tier === 'extended' ? 'Extended' : 'Trial'} zone · ${branch.eta_min}–${branch.eta_max} min${
-                          branch.cod_allowed === false ? ' · cash-on-delivery limited' : ''
-                        }`
+                      ? `${branch.tier === 'core' ? 'Core' : branch.tier === 'extended' ? 'Extended' : 'Trial'} zone · ${branch.eta_min}–${branch.eta_max} min`
                       : 'No zone yet — pick an area'}
                   </p>
                 </div>

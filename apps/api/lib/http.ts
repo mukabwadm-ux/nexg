@@ -47,6 +47,7 @@ const DEFAULT_STATUS: Record<ErrorCode, number> = {
   invalid_request: 400,
   not_found: 404,
   method_not_allowed: 405,
+  conflict: 409,
   rate_limited: 429,
   internal_error: 500,
 };

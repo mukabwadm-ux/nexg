@@ -187,8 +187,9 @@ export default function IntroductionPage() {
           <A href="/docs/reference">API reference</A>.
         </li>
         <li>
-          Prefer tools? Download the <A href="/openapi.json">OpenAPI spec</A> for code generators
-          and API clients, or the <A href="/postman.json">Postman collection</A> and set its{' '}
+          Writing TypeScript? Install the <A href="/docs/client-library">client library</A>. Prefer
+          other tools? Download the <A href="/openapi.json">OpenAPI spec</A> for code generators and
+          API clients, or the <A href="/postman.json">Postman collection</A> and set its{' '}
           <C>apiKey</C> variable to a test key.
         </li>
       </List>

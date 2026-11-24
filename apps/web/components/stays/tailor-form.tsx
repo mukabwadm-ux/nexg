@@ -78,6 +78,7 @@ export function TailorForm({
   const [picked, setPicked] = React.useState<string[]>([]);
   const [pickedAreas, setPickedAreas] = React.useState<string[]>([]);
   const [notes, setNotes] = React.useState('');
+  const [suggestedPlace, setSuggestedPlace] = React.useState('');
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [pending, startTransition] = React.useTransition();
   const [reference, setReference] = React.useState<string | null>(null);
@@ -135,6 +136,7 @@ export function TailorForm({
           [subject ? `Asking about ${subject}.` : null, notes.trim() || null]
             .filter(Boolean)
             .join(' ') || null,
+        suggested_place: suggestedPlace.trim() || null,
         consent_marketing: false,
         source: subject ? 'stays_property' : 'stays_hero',
       });
@@ -371,6 +373,16 @@ export function TailorForm({
               placeholder="Arriving late, travelling with a baby, a quiet street…"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
+            />
+          </div>
+          <div className="mt-4">
+            <Input
+              id="stay_suggested_place"
+              label="Suggest a place you know or would like to try (optional)"
+              placeholder="A hotel, an apartment block, a guesthouse…"
+              maxLength={300}
+              value={suggestedPlace}
+              onChange={(e) => setSuggestedPlace(e.target.value)}
             />
           </div>
         </div>

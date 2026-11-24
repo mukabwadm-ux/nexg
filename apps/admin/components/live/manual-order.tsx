@@ -46,7 +46,7 @@ export function ManualOrder({
   const [branches, setBranches] = React.useState<{ id: string; name: string }[]>([]);
   const [dropoff, setDropoff] = React.useState('');
   const [note, setNote] = React.useState('');
-  const [payment, setPayment] = React.useState('cash_on_delivery');
+  const [payment, setPayment] = React.useState('mpesa_stk');
   const [lines, setLines] = React.useState<Line[]>([{ name: '', quantity: 1, unit: '' }]);
 
   React.useEffect(() => {
@@ -286,7 +286,6 @@ export function ManualOrder({
               onChange={(e) => setPayment(e.target.value)}
               className="border-border-strong w-full rounded-lg border px-3 py-2 text-[0.8125rem] font-bold"
             >
-              <option value="cash_on_delivery">Pay on delivery</option>
               <option value="mpesa_stk">M-Pesa</option>
               <option value="charge_to_room">Charge to room</option>
               <option value="on_account">On account</option>

@@ -302,20 +302,6 @@ function DetailPanel({ rider }: { rider: RiderRow }) {
           />
           <ControlRow
             riderId={rider.id}
-            control="pay_on_delivery_eligible"
-            label="Pay-on-delivery eligible"
-            on={!!rider.pay_on_delivery_eligible}
-            sub={
-              rider.cash_cap_effective === null
-                ? 'No cash cap set for this city — cash orders stay off'
-                : rider.offers_paused_reason === 'over_cap'
-                  ? `Paused by the system · over cap ${kes(rider.cash_cap_effective)}`
-                  : `Cash cap ${kes(rider.cash_cap_effective)}`
-            }
-            locked={rider.offers_paused_reason === 'over_cap'}
-          />
-          <ControlRow
-            riderId={rider.id}
             control="alcohol_eligible"
             label="Alcohol deliveries"
             on={false}

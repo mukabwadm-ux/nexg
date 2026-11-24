@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   if (!hostWorkspaceEnabled()) return hostWorkspaceJson({ error: 'Workspace unavailable.' }, 404);
   const kind = new URL(request.url).searchParams.get('kind');
   try {
-    const access = await hostWorkspaceAccess();
+    const access = await hostWorkspaceAccess(request);
     if (kind === 'finance') return hostWorkspaceJson(await financeHistory(access));
     if (kind === 'analytics') return hostWorkspaceJson(await analyticsHistory(access));
     if (kind === 'support') return hostWorkspaceJson(await supportHistory(access));

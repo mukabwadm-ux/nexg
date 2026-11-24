@@ -10,6 +10,36 @@ import type { ChangelogEntry } from './types';
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-11-23',
+    kind: 'changed',
+    title: 'Live bookings: NexG’s approval, a monthly limit, couriers priced per km',
+    body: [
+      'A live key books for real only once NexG has switched on live API bookings for your merchant, with a monthly limit. Until then POST /v1/orders answers 403, and a test key books in the sandbox. A booking that would pass the limit answers 409 conflict.',
+      'A courier is now priced per kilometre by the delivery check, once per trip: the fee POST /v1/delivery/check quotes for the same pickup and drop-off is exactly what you pay, and a trip the check refuses is refused with its message. Transfers are still charged per passenger, and venue bookings once.',
+      'The sandbox prices couriers the same way, and refuses the trips the live API would refuse.',
+    ],
+    endpoints: ['create-order'],
+  },
+  {
+    date: '2026-11-23',
+    kind: 'added',
+    title: 'Cancelling a booking',
+    body: [
+      'POST /v1/orders/{id}/cancel cancels one of your API bookings, free of charge, until a rider is assigned. NexG cancels the dispatch job, keeps your reason with the order and sends booking.status_changed.',
+      'After a rider is assigned, or once the booking is under way or paid, the answer is 409 with the new error code conflict, and NexG support handles it. Cancelling twice answers the same, so a retry is safe. A test key cancels sandbox bookings under the same rule.',
+    ],
+    endpoints: ['cancel-order'],
+  },
+  {
+    date: '2026-11-23',
+    kind: 'added',
+    title: 'TypeScript client library',
+    body: [
+      'npm install @nexg-org/api-client: a typed method for every endpoint, retries after a 429 or a server error where sending again is safe, an idempotency key on every booking, pagination, and verifyWebhook for the order events NexG posts to you. No dependencies; Node 20 or later, Deno, Bun and edge runtimes.',
+    ],
+    endpoints: [],
+  },
+  {
     date: '2026-11-18',
     kind: 'added',
     title: 'Update many catalogue items at once',

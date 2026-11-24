@@ -184,7 +184,7 @@ const FAQ = [
   },
   {
     q: 'What if my guest has no Kenyan number?',
-    a: 'They order with any phone number, including a foreign SIM, and pay by M-Pesa or in cash on delivery where the merchant offers it.',
+    a: 'They order with any phone number, including a foreign SIM, and pay by M-Pesa before the order goes out.',
   },
   {
     q: 'Who is responsible if something goes wrong?',

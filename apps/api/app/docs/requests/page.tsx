@@ -124,7 +124,6 @@ export default function RequestsPage() {
         rows={[
           [<C key="f">price_kes</C>, 'Whole Kenyan shillings', <span key="e"><C>1450</C> is KES 1,450</span>],
           [<C key="f">total_cents</C>, 'Cents', <span key="e"><C>161625</C> is KES 1,616.25</span>],
-          [<C key="f">pay_on_delivery_cap_kes</C>, 'Whole Kenyan shillings', <span key="e"><C>5000</C> is KES 5,000</span>],
         ]}
       />
       <P>

@@ -74,6 +74,11 @@ select is(
 
 -- ═══════════════════════════════════════════════════════════════ the booking
 
+-- Live API bookings need NexG's approval (20270302000200).
+insert into public.api_booking_access (merchant_id, enabled, monthly_limit_cents)
+select m.id, true, 100000000 from public.merchant m where m.trading_name = 'Lakeside Venues'
+on conflict (merchant_id) do nothing;
+
 select lives_ok(
   $$insert into t values ('venue', public.rpc_order_place_api(
       'flat-key-abcdefghijklmnop', 'flat-idem-000000000000001',

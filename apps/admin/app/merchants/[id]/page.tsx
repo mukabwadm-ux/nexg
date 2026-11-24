@@ -6,9 +6,16 @@ import { notFound, redirect } from 'next/navigation';
 import {
   deleteMerchant,
   goLive,
+  setApiBookingAccess,
   setControls,
   setMerchantDeactivated,
+  type ApiBookingAccess,
 } from '@/app/merchants/actions';
+import {
+  decideCommission,
+  requestCommission,
+  withdrawCommission,
+} from '@/app/merchants/commission-actions';
 import { sendFeaturedPitch, unfeatureMerchant } from '@/app/featured/actions';
 import { ActivatePanel } from '@/components/activate-panel';
 import { ConsoleHeader } from '@/components/console-header';
@@ -19,6 +26,9 @@ import { MerchantLifecycleActions } from '@/components/merchant-lifecycle-action
 import { PitchPanel, type Preview } from '@/components/featured/pitch-panel';
 import { OnboardingRecord } from '@/components/onboarding-record';
 import { applicationAnswerGroups } from '@/lib/application-answers';
+import { ApiBookingsCard } from '@/components/merchants/api-bookings-card';
+import { MerchantCommissionCard } from '@/components/merchants/commission-card';
+import type { CommissionCard } from '@/lib/merchant-commission';
 import { ApplicationReviewUnavailable } from '@/components/merchants/application-review-view';
 import { MerchantActivityLog } from '@/components/merchants/activity-log';
 import { BookingReadiness } from '@/components/merchants/booking-readiness';
@@ -204,6 +214,20 @@ export default async function MerchantApplicationPage({
   const city = merchant.city as { name: string } | null;
   const primary = branches?.[0];
   const canManageLifecycle = staff.isSuperAdmin || staff.roles.includes('merchant_ops');
+  // Live API bookings are Finance's call (rpc_api_booking_access_set). The read
+  // answers nothing until 20270302000200 is in the database, and the card stays away.
+  const canApproveApiBookings =
+    staff.isSuperAdmin || staff.roles.includes('finance') || staff.roles.includes('finance_lead');
+  const apiBookings = canApproveApiBookings
+    ? ((await supabase.rpc('rpc_api_booking_access_read', { p_merchant_id: params.id }))
+        .data as ApiBookingAccess | null)
+    : null;
+  // The commission agreed with this merchant. The read refuses staff who do
+  // not work the merchant (and answers nothing before 20270306000100), and
+  // the card stays away.
+  const commission = (
+    await supabase.rpc('rpc_merchant_commission_read', { p_merchant_id: params.id })
+  ).data as CommissionCard | null;
   const performance = summarise(
     (performanceOrders as PerformanceOrder[] | null) ?? [],
     (performanceRatings as PerformanceRating[] | null) ?? [],
@@ -434,8 +458,6 @@ export default async function MerchantApplicationPage({
                     state={{
                       accepting_orders: !!merchant.accepting_orders,
                       explore_visible: !!merchant.explore_visible,
-                      pay_on_delivery: !!merchant.pay_on_delivery,
-                      pay_on_delivery_cap_kes: merchant.pay_on_delivery_cap_kes ?? null,
                       concierge_pick: !!merchant.concierge_pick,
                       accepting_orders_changed_at: merchant.accepting_orders_changed_at ?? null,
                     }}
@@ -446,6 +468,36 @@ export default async function MerchantApplicationPage({
                   />
                 </div>
               </Card>
+            )}
+
+            {commission && commission.viewer === 'staff' && (
+              <MerchantCommissionCard
+                card={commission}
+                onRequest={async (input) => {
+                  'use server';
+                  return requestCommission(params.id, input);
+                }}
+                onDecide={async (termId, approve, note) => {
+                  'use server';
+                  return decideCommission(params.id, termId, approve, note);
+                }}
+                onWithdraw={async (termId) => {
+                  'use server';
+                  return withdrawCommission(params.id, termId);
+                }}
+              />
+            )}
+
+            {apiBookings && (
+              <ApiBookingsCard
+                merchantId={params.id}
+                live={merchant.status === 'live'}
+                state={apiBookings}
+                onSave={async (enabled, monthlyLimitKes, note) => {
+                  'use server';
+                  return setApiBookingAccess(params.id, enabled, monthlyLimitKes, note);
+                }}
+              />
             )}
 
             {canManageLifecycle && (

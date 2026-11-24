@@ -51,6 +51,13 @@ export const GUIDE_SECTIONS: NavSection[] = [
         description:
           'Make your first request in a minute, then get a key and read your own merchant’s orders.',
       },
+      {
+        href: '/docs/client-library',
+        label: 'Client library',
+        title: 'TypeScript client library',
+        description:
+          '@nexg-org/api-client on npm: a typed method for every endpoint, safe retries and idempotency keys, and the order-event signature check.',
+      },
     ],
   },
   {

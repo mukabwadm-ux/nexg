@@ -111,8 +111,8 @@ select is(
   (public.rpc_order_place_api_test('nexg_test_key-for-the-sandbox-test-0000', 'sandbox-booking-key-0002',
      '{"service":"courier","quantity":3,"pickup_label":"Shop","pickup_lat":-1.30,"pickup_lng":36.80,
        "dropoff_label":"Office","dropoff_lat":-1.26,"dropoff_lng":36.80}') ->> 'total_cents')::bigint,
-  300000::bigint,
-  'an unpriced service gets the sample price, KES 1,000 a unit');
+  18000::bigint,
+  'a courier is priced by the delivery check, once per trip: 4.4 km is KES 80 + 4 x 25 (20270302000200)');
 
 select is(
   (public.rpc_order_place_api_test('nexg_test_key-for-the-sandbox-test-0000', 'sandbox-booking-key-0003',

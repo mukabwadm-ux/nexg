@@ -23,6 +23,8 @@ export interface StayRequestInput {
   purpose: string | null;
   must_haves: string[];
   notes: string | null;
+  /** Optional: a place they know or would like to try. Up to 300 characters. */
+  suggested_place?: string | null;
   consent_marketing: boolean;
   source?: string;
   /** Cloudflare Turnstile token, checked before anything is written. */
@@ -65,6 +67,7 @@ export async function requestStay(input: StayRequestInput): Promise<StayRequestR
       purpose: input.purpose,
       must_haves: input.must_haves,
       notes: input.notes,
+      suggested_place: input.suggested_place?.trim().slice(0, 300) || null,
       consent_marketing: input.consent_marketing,
       source: input.source ?? 'stays_hero',
     },

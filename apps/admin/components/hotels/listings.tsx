@@ -59,6 +59,8 @@ export interface StayRequestRow {
   assigned_to_name: string | null;
   options: number;
   age_hours: number;
+  /** Optional answer on the form: a place they know or would like to try. */
+  suggested_place?: string | null;
 }
 
 export interface MatchRow {
@@ -408,6 +410,17 @@ function RequestPanel({ request, matches }: { request: StayRequestRow; matches: 
             </p>
             <p className="text-muted mt-1 text-[0.75rem] font-semibold leading-[1.7]">
               {request.notes}
+            </p>
+          </>
+        )}
+
+        {request.suggested_place && (
+          <>
+            <p className="text-muted-light mt-4 text-[0.625rem] font-extrabold uppercase tracking-wide">
+              A place they suggest
+            </p>
+            <p className="text-muted mt-1 text-[0.75rem] font-semibold leading-[1.7]">
+              {request.suggested_place}
             </p>
           </>
         )}

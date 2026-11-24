@@ -3415,6 +3415,147 @@ export type Database = {
         };
         Relationships: [];
       };
+      api_booking_access: {
+        Row: {
+          changed_at: string;
+          changed_by: string | null;
+          enabled: boolean;
+          merchant_id: string;
+          monthly_limit_cents: number;
+          note: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          changed_at?: string;
+          changed_by?: string | null;
+          enabled?: boolean;
+          merchant_id: string;
+          monthly_limit_cents: number;
+          note?: string | null;
+        };
+        Update: {
+          changed_at?: string;
+          changed_by?: string | null;
+          enabled?: boolean;
+          merchant_id?: string;
+          monthly_limit_cents?: number;
+          note?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_booking_access_changed_by_fkey';
+            columns: ['changed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_booking_access_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
       api_connection: {
         Row: {
           auth_header: string | null;
@@ -3598,6 +3739,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -3793,6 +3941,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_idempotency_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -4027,6 +4182,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_key_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -4296,6 +4458,13 @@ export type Database = {
             foreignKeyName: 'api_test_order_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -4505,6 +4674,13 @@ export type Database = {
             foreignKeyName: 'api_webhook_endpoint_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_webhook_endpoint_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -4635,6 +4811,13 @@ export type Database = {
             foreignKeyName: 'api_webhook_event_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_webhook_event_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -4727,6 +4910,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'approval_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -4837,6 +5027,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'auto_message_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -4983,6 +5180,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'basket_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -5235,6 +5439,13 @@ export type Database = {
             foreignKeyName: 'bookable_resource_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'bookable_resource_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -5419,6 +5630,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -5748,6 +5966,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'broadcast_recipient_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -6404,6 +6629,13 @@ export type Database = {
             foreignKeyName: 'cash_rule_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: true;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'cash_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: true;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -6906,6 +7138,13 @@ export type Database = {
             foreignKeyName: 'catalogue_edit_request_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_edit_request_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -7050,6 +7289,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_import_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -7273,6 +7519,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -7610,6 +7863,13 @@ export type Database = {
             foreignKeyName: 'catalogue_photo_task_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_photo_task_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -7787,6 +8047,13 @@ export type Database = {
             foreignKeyName: 'catalogue_price_flag_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_price_flag_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -7918,6 +8185,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_section_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -8086,6 +8360,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_setup_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -8422,6 +8703,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'city_hours_exception_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -8852,6 +9140,7 @@ export type Database = {
       };
       company_folder: {
         Row: {
+          area: string | null;
           color: string;
           created_at: string;
           created_by: string | null;
@@ -8863,6 +9152,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          area?: string | null;
           color?: string;
           created_at?: string;
           created_by?: string | null;
@@ -8873,6 +9163,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          area?: string | null;
           color?: string;
           created_at?: string;
           created_by?: string | null;
@@ -9058,6 +9349,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_location_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -9558,6 +9856,13 @@ export type Database = {
             foreignKeyName: 'company_vendor_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'company_vendor_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -9698,6 +10003,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'concierge_shift_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -9961,6 +10273,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'connector_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -10415,6 +10734,13 @@ export type Database = {
             foreignKeyName: 'coverage_gap_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'coverage_gap_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -10570,6 +10896,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -10923,6 +11256,13 @@ export type Database = {
             foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_engine_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -11098,6 +11438,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'customer_saved_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -11472,6 +11819,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -12029,6 +12383,13 @@ export type Database = {
             foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'engine_booking_erasure_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -12181,6 +12542,13 @@ export type Database = {
             foreignKeyName: 'event_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -12317,6 +12685,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_feed_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -12491,6 +12866,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -12674,6 +13056,13 @@ export type Database = {
             foreignKeyName: 'experience_partner_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -12794,6 +13183,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'experience_partner_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -13106,6 +13502,13 @@ export type Database = {
             foreignKeyName: 'featured_booking_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -13268,6 +13671,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -13504,6 +13914,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -13821,6 +14238,13 @@ export type Database = {
             foreignKeyName: 'featured_event_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_event_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -14044,6 +14468,13 @@ export type Database = {
             foreignKeyName: 'featured_fee_line_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_fee_line_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -14249,6 +14680,13 @@ export type Database = {
             foreignKeyName: 'featured_metrics_daily_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_metrics_daily_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -14347,6 +14785,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -14490,6 +14935,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -15026,6 +15478,13 @@ export type Database = {
             foreignKeyName: 'fin_client_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'fin_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -15523,6 +15982,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'fin_kpi_daily_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -16186,6 +16652,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'fin_settlement_run_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -17173,6 +17646,13 @@ export type Database = {
             foreignKeyName: 'group_order_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'group_order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -17787,6 +18267,13 @@ export type Database = {
             foreignKeyName: 'holiday_calendar_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'holiday_calendar_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -18004,6 +18491,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -20021,6 +20515,13 @@ export type Database = {
             foreignKeyName: 'hotel_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -20818,6 +21319,13 @@ export type Database = {
             foreignKeyName: 'incident_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'incident_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -21084,6 +21592,13 @@ export type Database = {
             foreignKeyName: 'job_application_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'job_application_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -21248,6 +21763,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'legal_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -21461,6 +21983,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: true;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'live_pulse_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: true;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -21970,6 +22499,13 @@ export type Database = {
             foreignKeyName: 'merchant_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -22104,6 +22640,13 @@ export type Database = {
             columns: ['parent_merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -22299,6 +22842,13 @@ export type Database = {
             foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -22460,6 +23010,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: true;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_party_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -22631,6 +23188,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_agreement_signed_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -22856,6 +23420,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: true;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_application_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -23230,6 +23801,13 @@ export type Database = {
             foreignKeyName: 'merchant_branch_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -23266,6 +23844,78 @@ export type Database = {
             columns: ['zone_id'];
             isOneToOne: false;
             referencedRelation: 'zone_bounds';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      merchant_branch_place: {
+        Row: {
+          branch_id: string;
+          google_place_id: string;
+          set_at: string;
+          set_by: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          branch_id: string;
+          google_place_id: string;
+          set_at?: string;
+          set_by?: string | null;
+        };
+        Update: {
+          branch_id?: string;
+          google_place_id?: string;
+          set_at?: string;
+          set_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_branch_place_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: true;
+            referencedRelation: 'branch_readiness_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_place_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: true;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_place_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_branch';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_place_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_branch_list_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_place_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_branch_live_v';
+            referencedColumns: ['branch_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_place_branch_id_fkey';
+            columns: ['branch_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_branch_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_place_set_by_fkey';
+            columns: ['set_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
             referencedColumns: ['id'];
           },
         ];
@@ -23389,8 +24039,187 @@ export type Database = {
             foreignKeyName: 'merchant_chain_setting_parent_id_fkey';
             columns: ['parent_id'];
             isOneToOne: true;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_chain_setting_parent_id_fkey';
+            columns: ['parent_id'];
+            isOneToOne: true;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
+      merchant_commission_term: {
+        Row: {
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          ends_on: string | null;
+          id: string;
+          merchant_id: string;
+          nexg_delivery_pct: number | null;
+          own_delivery_pct: number | null;
+          reason: string;
+          requested_at: string;
+          requested_by: string | null;
+          starts_on: string;
+          status: string;
+          terms_ref: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          ends_on?: string | null;
+          id?: string;
+          merchant_id: string;
+          nexg_delivery_pct?: number | null;
+          own_delivery_pct?: number | null;
+          reason: string;
+          requested_at?: string;
+          requested_by?: string | null;
+          starts_on: string;
+          status?: string;
+          terms_ref?: string | null;
+        };
+        Update: {
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          ends_on?: string | null;
+          id?: string;
+          merchant_id?: string;
+          nexg_delivery_pct?: number | null;
+          own_delivery_pct?: number | null;
+          reason?: string;
+          requested_at?: string;
+          requested_by?: string | null;
+          starts_on?: string;
+          status?: string;
+          terms_ref?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_commission_term_decided_by_fkey';
+            columns: ['decided_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_commission_term_requested_by_fkey';
+            columns: ['requested_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -23570,6 +24399,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_device_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -23773,6 +24609,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_fleet_rider_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -24007,6 +24850,13 @@ export type Database = {
             foreignKeyName: 'merchant_health_snapshot_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_health_snapshot_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -24141,6 +24991,13 @@ export type Database = {
             foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -24263,6 +25120,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_holiday_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -24450,6 +25314,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -24647,6 +25518,13 @@ export type Database = {
             foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -24795,6 +25673,13 @@ export type Database = {
             foreignKeyName: 'merchant_import_batch_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_import_batch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -24913,6 +25798,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_import_mapping_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -25103,6 +25995,13 @@ export type Database = {
             foreignKeyName: 'merchant_invite_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_invite_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -25269,6 +26168,13 @@ export type Database = {
             foreignKeyName: 'merchant_item_extra_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_item_extra_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -25412,6 +26318,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_live_email_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -25585,6 +26498,13 @@ export type Database = {
             foreignKeyName: 'merchant_message_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_message_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -25707,6 +26627,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: true;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_onboarding_answer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -25931,6 +26858,13 @@ export type Database = {
             foreignKeyName: 'merchant_penalty_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_penalty_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -26108,6 +27042,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -26303,6 +27244,13 @@ export type Database = {
             foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_creative_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -26476,6 +27424,13 @@ export type Database = {
             foreignKeyName: 'merchant_review_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_review_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -26642,6 +27597,13 @@ export type Database = {
             foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_offering_detail_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -26757,6 +27719,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_setup_reminder_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -26936,6 +27905,13 @@ export type Database = {
             foreignKeyName: 'merchant_statement_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_statement_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -27077,6 +28053,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_status_change_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -27240,6 +28223,13 @@ export type Database = {
             foreignKeyName: 'merchant_strike_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_strike_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -27358,6 +28348,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_terms_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -27529,6 +28526,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_user_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -27711,6 +28715,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'modifier_group_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -28174,6 +29185,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -29023,6 +30041,13 @@ export type Database = {
             foreignKeyName: 'notification_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'notification_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -29520,6 +30545,13 @@ export type Database = {
             foreignKeyName: 'oauth_client_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'oauth_client_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -29639,6 +30671,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'onboarding_slot_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -29959,6 +30998,13 @@ export type Database = {
             foreignKeyName: 'order_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'order_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -30100,6 +31146,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -31382,6 +32435,13 @@ export type Database = {
             foreignKeyName: 'order_rating_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_rating_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -32185,6 +33245,13 @@ export type Database = {
             foreignKeyName: 'payment_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'payment_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -32326,6 +33393,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'payment_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -32751,6 +33825,61 @@ export type Database = {
           },
         ];
       };
+      paystack_recipient: {
+        Row: {
+          created_at: string;
+          destination: string;
+          id: string;
+          is_test: boolean;
+          party_id: string;
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
+          recipient_code: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          destination: string;
+          id?: string;
+          is_test: boolean;
+          party_id: string;
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
+          recipient_code: string;
+        };
+        Update: {
+          created_at?: string;
+          destination?: string;
+          id?: string;
+          is_test?: boolean;
+          party_id?: string;
+          party_type?:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
+          recipient_code?: string;
+        };
+        Relationships: [];
+      };
       paystack_refund: {
         Row: {
           amount_cents: number;
@@ -32842,6 +33971,105 @@ export type Database = {
             columns: ['stay_id'];
             isOneToOne: false;
             referencedRelation: 'stay';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      paystack_transfer: {
+        Row: {
+          account_name: string | null;
+          amount_cents: number;
+          completed_at: string | null;
+          created_at: string;
+          created_by: string | null;
+          destination: string;
+          failure_reason: string | null;
+          id: string;
+          is_test: boolean;
+          kind: string;
+          party_id: string;
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
+          recipient_code: string | null;
+          reference: string;
+          sent_txn: string | null;
+          source_id: string;
+          state: string;
+          transfer_code: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          account_name?: string | null;
+          amount_cents: number;
+          completed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          destination: string;
+          failure_reason?: string | null;
+          id?: string;
+          is_test: boolean;
+          kind: string;
+          party_id: string;
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
+          recipient_code?: string | null;
+          reference: string;
+          sent_txn?: string | null;
+          source_id: string;
+          state?: string;
+          transfer_code?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          account_name?: string | null;
+          amount_cents?: number;
+          completed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          destination?: string;
+          failure_reason?: string | null;
+          id?: string;
+          is_test?: boolean;
+          kind?: string;
+          party_id?: string;
+          party_type?:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner';
+          recipient_code?: string | null;
+          reference?: string;
+          sent_txn?: string | null;
+          source_id?: string;
+          state?: string;
+          transfer_code?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'paystack_transfer_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
             referencedColumns: ['id'];
           },
         ];
@@ -33020,6 +34248,13 @@ export type Database = {
             foreignKeyName: 'plan_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'plan_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -33142,6 +34377,7 @@ export type Database = {
           id: string;
           included_by: string | null;
           kind: Database['public']['Enums']['block_kind'];
+          merchant_id: string | null;
           partner_contact_log: NonNullable<Json>;
           pay_on_day: NonNullable<Json>;
           plan_id: string;
@@ -33175,6 +34411,7 @@ export type Database = {
           id?: string;
           included_by?: string | null;
           kind: Database['public']['Enums']['block_kind'];
+          merchant_id?: string | null;
           partner_contact_log?: NonNullable<Json>;
           pay_on_day?: NonNullable<Json>;
           plan_id: string;
@@ -33207,6 +34444,7 @@ export type Database = {
           id?: string;
           included_by?: string | null;
           kind?: Database['public']['Enums']['block_kind'];
+          merchant_id?: string | null;
           partner_contact_log?: NonNullable<Json>;
           pay_on_day?: NonNullable<Json>;
           plan_id?: string;
@@ -33341,6 +34579,111 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'plan_block';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'plan_block_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
           },
           {
             foreignKeyName: 'plan_block_plan_id_fkey';
@@ -33580,6 +34923,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -34009,6 +35359,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -34576,6 +35933,13 @@ export type Database = {
             columns: ['first_merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -35355,6 +36719,13 @@ export type Database = {
             foreignKeyName: 'referral_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: true;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'referral_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: true;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -35775,6 +37146,7 @@ export type Database = {
       };
       rider: {
         Row: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -35855,6 +37227,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          accepts_test_payouts?: boolean;
           activated_at?: string | null;
           activated_by?: string | null;
           alcohol_eligible?: boolean;
@@ -35934,6 +37307,7 @@ export type Database = {
           years_riding?: string | null;
         };
         Update: {
+          accepts_test_payouts?: boolean;
           activated_at?: string | null;
           activated_by?: string | null;
           alcohol_eligible?: boolean;
@@ -36053,6 +37427,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -36179,6 +37560,13 @@ export type Database = {
             columns: ['employer_merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -36547,6 +37935,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_bonus_rule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -37975,6 +39370,13 @@ export type Database = {
             foreignKeyName: 'rider_rate_card_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_rate_card_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -38621,6 +40023,13 @@ export type Database = {
             foreignKeyName: 'rider_settlement_line_paid_to_merchant_id_fkey';
             columns: ['paid_to_merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_settlement_line_paid_to_merchant_id_fkey';
+            columns: ['paid_to_merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -38798,6 +40207,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_settlement_run_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -39445,6 +40861,13 @@ export type Database = {
             foreignKeyName: 'role_grant_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'role_grant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -40033,6 +41456,7 @@ export type Database = {
           sent_at: string | null;
           source: string;
           status: Database['public']['Enums']['stay_request_status'];
+          suggested_place: string | null;
           ticket_id: string | null;
           updated_at: string;
         };
@@ -40061,6 +41485,7 @@ export type Database = {
           sent_at?: string | null;
           source?: string;
           status?: Database['public']['Enums']['stay_request_status'];
+          suggested_place?: string | null;
           ticket_id?: string | null;
           updated_at?: string;
         };
@@ -40088,6 +41513,7 @@ export type Database = {
           sent_at?: string | null;
           source?: string;
           status?: Database['public']['Enums']['stay_request_status'];
+          suggested_place?: string | null;
           ticket_id?: string | null;
           updated_at?: string;
         };
@@ -40132,6 +41558,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -40625,6 +42058,13 @@ export type Database = {
             foreignKeyName: 'support_ticket_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'support_ticket_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -41106,6 +42546,13 @@ export type Database = {
             foreignKeyName: 'unit_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -41481,6 +42928,13 @@ export type Database = {
             foreignKeyName: 'vacancy_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -41698,6 +43152,13 @@ export type Database = {
             foreignKeyName: 'vacancy_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -41890,6 +43351,13 @@ export type Database = {
             foreignKeyName: 'waitlist_signup_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'waitlist_signup_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -42010,6 +43478,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -42205,6 +43680,13 @@ export type Database = {
             foreignKeyName: 'welcome_package_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -42338,6 +43820,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -42674,6 +44163,13 @@ export type Database = {
             foreignKeyName: 'api_connection_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_connection_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -42821,6 +44317,13 @@ export type Database = {
             foreignKeyName: 'alert_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'alert_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -42919,6 +44422,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'break_glass_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -43204,6 +44714,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'legal_hold_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -43514,6 +45031,13 @@ export type Database = {
             foreignKeyName: 'merchant_branch_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -43734,6 +45258,13 @@ export type Database = {
             foreignKeyName: 'job_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -43821,6 +45352,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'job_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -43948,6 +45486,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -44171,6 +45716,13 @@ export type Database = {
             foreignKeyName: 'vacancy_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -44222,6 +45774,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -44391,6 +45950,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -44581,6 +46147,13 @@ export type Database = {
             foreignKeyName: 'catalogue_item_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'catalogue_item_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -44697,6 +46270,7 @@ export type Database = {
           all_bytes: number | null;
           all_file_count: number | null;
           all_last_change: string | null;
+          area: string | null;
           bytes: number | null;
           color: string | null;
           created_at: string | null;
@@ -44853,6 +46427,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'experience_component_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -45186,6 +46767,13 @@ export type Database = {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -45222,6 +46810,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -45326,6 +46921,13 @@ export type Database = {
             foreignKeyName: 'featured_booking_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -45446,6 +47048,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -45534,6 +47143,13 @@ export type Database = {
             foreignKeyName: 'featured_booking_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -45660,6 +47276,13 @@ export type Database = {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -45714,6 +47337,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -46033,6 +47663,13 @@ export type Database = {
             foreignKeyName: 'host_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -46131,6 +47768,13 @@ export type Database = {
             foreignKeyName: 'hotel_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'hotel_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -46210,6 +47854,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'order_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -46343,6 +47994,13 @@ export type Database = {
             foreignKeyName: 'order_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'order_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -46463,6 +48121,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -46677,6 +48342,13 @@ export type Database = {
             foreignKeyName: 'order_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'order_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -46797,6 +48469,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -47069,6 +48748,13 @@ export type Database = {
             foreignKeyName: 'merchant_parent_merchant_id_fkey';
             columns: ['parent_merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -47189,6 +48875,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'order_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -47336,6 +49029,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -47512,6 +49212,13 @@ export type Database = {
             foreignKeyName: 'order_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'order_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -47664,6 +49371,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'order_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -47830,6 +49544,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -48061,6 +49782,13 @@ export type Database = {
             foreignKeyName: 'qr_scan_first_merchant_id_fkey';
             columns: ['first_merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'qr_scan_first_merchant_id_fkey';
+            columns: ['first_merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -48176,6 +49904,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -48308,6 +50043,13 @@ export type Database = {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
             columns: ['employer_merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -48340,6 +50082,7 @@ export type Database = {
           sent_at: string | null;
           source: string | null;
           status: Database['public']['Enums']['stay_request_status'] | null;
+          suggested_place: string | null;
         };
         ComputedFields: never;
         Relationships: [
@@ -48376,6 +50119,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'stay_request_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -48489,6 +50239,13 @@ export type Database = {
             foreignKeyName: 'vacancy_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'vacancy_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -48587,6 +50344,13 @@ export type Database = {
             foreignKeyName: 'zone_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -48671,6 +50435,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -48766,6 +50537,13 @@ export type Database = {
             foreignKeyName: 'curated_day_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'curated_day_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -48853,6 +50631,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'order_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -49153,6 +50938,13 @@ export type Database = {
             foreignKeyName: 'rider_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -49273,6 +51065,13 @@ export type Database = {
             columns: ['employer_merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -49402,6 +51201,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'event_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -49569,6 +51375,13 @@ export type Database = {
             foreignKeyName: 'featured_booking_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -49605,6 +51418,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -49694,6 +51514,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -49821,6 +51648,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_placement_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -50097,6 +51931,13 @@ export type Database = {
             foreignKeyName: 'fin_kpi_daily_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'fin_kpi_daily_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -50299,6 +52140,13 @@ export type Database = {
             foreignKeyName: 'fin_settlement_run_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'fin_settlement_run_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -50419,6 +52267,13 @@ export type Database = {
             foreignKeyName: 'host_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -50503,6 +52358,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -50629,6 +52491,13 @@ export type Database = {
             columns: ['parent_merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -50727,6 +52596,13 @@ export type Database = {
             foreignKeyName: 'rider_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -50847,6 +52723,13 @@ export type Database = {
             columns: ['employer_merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['employer_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -51412,6 +53295,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'welcome_package_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -52124,6 +54014,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'host_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -52959,6 +54856,13 @@ export type Database = {
             foreignKeyName: 'merchant_branch_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -53115,6 +55019,13 @@ export type Database = {
             foreignKeyName: 'merchant_branch_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -53228,6 +55139,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_branch_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -53478,6 +55396,13 @@ export type Database = {
             foreignKeyName: 'dispute_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'dispute_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -53540,6 +55465,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -53666,6 +55598,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'featured_booking_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -53829,6 +55768,13 @@ export type Database = {
             foreignKeyName: 'rider_employer_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'rider_employer_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -53913,6 +55859,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -54098,6 +56051,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -54295,6 +56255,13 @@ export type Database = {
             foreignKeyName: 'order_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -54455,6 +56422,13 @@ export type Database = {
             foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_hours_override_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -54482,6 +56456,7 @@ export type Database = {
           featured: boolean | null;
           health_badge: string | null;
           id: string | null;
+          is_test: boolean | null;
           listed_at: string | null;
           min_order_kes: number | null;
           opens_today: string | null;
@@ -54594,6 +56569,13 @@ export type Database = {
             columns: ['parent_merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_parent_merchant_id_fkey';
+            columns: ['parent_merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -54763,6 +56745,13 @@ export type Database = {
             foreignKeyName: 'order_rating_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_rating_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -54916,6 +56905,13 @@ export type Database = {
             foreignKeyName: 'merchant_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'merchant_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -55008,6 +57004,15 @@ export type Database = {
           status?: never;
           topic?: never;
         };
+        Relationships: [];
+      };
+      merchant_traits_public: {
+        Row: {
+          merchant_id: string | null;
+          popularity_band: number | null;
+          traits: string[] | null;
+        };
+        ComputedFields: never;
         Relationships: [];
       };
       merchant_week_bars_v: {
@@ -55109,6 +57114,13 @@ export type Database = {
             columns: ['merchant_id'];
             isOneToOne: false;
             referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'order_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
             referencedColumns: ['merchant_id'];
           },
           {
@@ -55301,6 +57313,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'msg_conversation_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -55744,6 +57763,13 @@ export type Database = {
             foreignKeyName: 'order_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'order_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -55776,6 +57802,107 @@ export type Database = {
             referencedColumns: ['city_id'];
           },
         ];
+      };
+      payout_rules_v: {
+        Row: {
+          city_id: string | null;
+          city_name: string | null;
+          constraints: Json | null;
+          group: string | null;
+          help: string | null;
+          key: string | null;
+          label: string | null;
+          party: string | null;
+          scope_kind: string | null;
+          sort: number | null;
+          unit: string | null;
+          value: Json | null;
+          value_type: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
+      paystack_transfer_v: {
+        Row: {
+          amount_cents: number | null;
+          completed_at: string | null;
+          created_at: string | null;
+          destination: string | null;
+          failure_reason: string | null;
+          id: string | null;
+          is_test: boolean | null;
+          kind: string | null;
+          party_id: string | null;
+          party_type:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner'
+            | null;
+          reference: string | null;
+          source_id: string | null;
+          state: string | null;
+          transfer_code: string | null;
+          updated_at: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_cents?: number | null;
+          completed_at?: string | null;
+          created_at?: string | null;
+          destination?: string | null;
+          failure_reason?: string | null;
+          id?: string | null;
+          is_test?: boolean | null;
+          kind?: string | null;
+          party_id?: string | null;
+          party_type?:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner'
+            | null;
+          reference?: string | null;
+          source_id?: string | null;
+          state?: string | null;
+          transfer_code?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          amount_cents?: number | null;
+          completed_at?: string | null;
+          created_at?: string | null;
+          destination?: string | null;
+          failure_reason?: string | null;
+          id?: string | null;
+          is_test?: boolean | null;
+          kind?: string | null;
+          party_id?: string | null;
+          party_type?:
+            | 'merchant'
+            | 'rider'
+            | 'host'
+            | 'hotel'
+            | 'guest'
+            | 'provider'
+            | 'nexg'
+            | 'experience_partner'
+            | null;
+          reference?: string | null;
+          source_id?: string | null;
+          state?: string | null;
+          transfer_code?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
       };
       promotion_banner_v: {
         Row: {
@@ -55925,6 +58052,13 @@ export type Database = {
             foreignKeyName: 'merchant_promotion_merchant_id_fkey';
             columns: ['merchant_id'];
             isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_promotion_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
           },
@@ -55998,6 +58132,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -56179,6 +58320,7 @@ export type Database = {
           house_rules: string | null;
           id: string | null;
           is_sample: boolean | null;
+          is_test: boolean | null;
           kind: Database['public']['Enums']['property_kind'] | null;
           latitude: number | null;
           longitude: number | null;
@@ -56232,6 +58374,13 @@ export type Database = {
             foreignKeyName: 'property_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -56277,6 +58426,7 @@ export type Database = {
           handoff_arranged: boolean | null;
           id: string | null;
           is_sample: boolean | null;
+          is_test: boolean | null;
           label_public: string | null;
           latitude: number | null;
           longitude: number | null;
@@ -56381,6 +58531,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'property_qr_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -56743,6 +58900,13 @@ export type Database = {
             foreignKeyName: 'order_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'order_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -56944,6 +59108,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -57512,6 +59683,13 @@ export type Database = {
             foreignKeyName: 'rider_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -57968,6 +60146,13 @@ export type Database = {
             foreignKeyName: 'rider_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -58138,6 +60323,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'rider_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -58713,6 +60905,13 @@ export type Database = {
             foreignKeyName: 'version_key_fkey';
             columns: ['key'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['key'];
+          },
+          {
+            foreignKeyName: 'version_key_fkey';
+            columns: ['key'];
+            isOneToOne: false;
             referencedRelation: 'settings_definition_v';
             referencedColumns: ['key'];
           },
@@ -58749,6 +60948,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'version_scope_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -59038,6 +61244,13 @@ export type Database = {
             foreignKeyName: 'change_set_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'change_set_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -59190,6 +61403,13 @@ export type Database = {
             foreignKeyName: 'zone_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -59309,6 +61529,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'unit_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -59658,6 +61885,13 @@ export type Database = {
             foreignKeyName: 'waitlist_signup_city_id_fkey';
             columns: ['city_id'];
             isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'waitlist_signup_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
             referencedRelation: 'settings_city_v';
             referencedColumns: ['city_id'];
           },
@@ -59775,6 +62009,13 @@ export type Database = {
             columns: ['city_id'];
             isOneToOne: false;
             referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'zone_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
             referencedColumns: ['city_id'];
           },
           {
@@ -60320,6 +62561,10 @@ export type Database = {
       fn_ledger_backfill: { Args: { p_limit?: number }; Returns: Json };
       fn_line_options: { Args: { p_item_id: string; p_options: Json }; Returns: Json };
       fn_line_variant: { Args: { p_item_id: string; p_variant: string }; Returns: Json };
+      fn_link_guest_by_confirmed_phone: {
+        Args: { p_phone: string; p_user_id: string };
+        Returns: Json;
+      };
       fn_listing_sync: { Args: { p_unit_id: string }; Returns: undefined };
       fn_load_available: { Args: { p_plan_id: string }; Returns: undefined };
       fn_mask_phone: { Args: { p_phone: string }; Returns: string };
@@ -60345,6 +62590,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      fn_merchant_agreed_pct: { Args: { p_merchant_id: string }; Returns: number };
       fn_merchant_agreement_category: { Args: { p_merchant_id: string }; Returns: string };
       fn_merchant_agreement_commission: { Args: { p_merchant_id: string }; Returns: Json };
       fn_merchant_agreement_current_acceptance: {
@@ -60437,6 +62683,8 @@ export type Database = {
         }[];
       };
       fn_merchant_category_label: { Args: { p_key: string }; Returns: string };
+      fn_merchant_commission: { Args: { p_at?: string; p_merchant_id: string }; Returns: Json };
+      fn_merchant_commission_decider: { Args: { p_city_id: string }; Returns: boolean };
       fn_merchant_draft_for_write: {
         Args: { p_merchant_id: string };
         Returns: {
@@ -60654,6 +62902,7 @@ export type Database = {
           isSetofReturn: true;
         };
       };
+      fn_merchant_sells_alcohol: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_merchant_setup_offering_authorize: { Args: { p_merchant_id: string }; Returns: undefined };
       fn_merchant_setup_offering_write: {
         Args: { p_data: Json; p_merchant_id: string };
@@ -60906,7 +63155,12 @@ export type Database = {
         Args: { p_data: Json; p_mode: string; p_source: string };
         Returns: Json;
       };
+      fn_paystack_transfer_apply: {
+        Args: { p_data: Json; p_mode: string; p_source: string };
+        Returns: Json;
+      };
       fn_phone_country_code: { Args: { p_phone: string }; Returns: string };
+      fn_phone_key: { Args: { p_phone: string }; Returns: string };
       fn_pick_concierge: { Args: { p_city_id: string }; Returns: string };
       fn_pin_from_text: {
         Args: { p_text: string };
@@ -60925,6 +63179,19 @@ export type Database = {
       };
       fn_plan_view: { Args: { p_plan_id: string }; Returns: Json };
       fn_plate_matches: { Args: { p_plate: string; p_read: string }; Returns: boolean };
+      fn_price_api_booking: {
+        Args: {
+          p_at?: string;
+          p_city_id: string;
+          p_payload: Json;
+          p_quantity: number;
+          p_service: Omit<
+            Database['public']['Tables']['api_service']['Row'],
+            Database['public']['Tables']['api_service']['ComputedFields']
+          >;
+        };
+        Returns: Json;
+      };
       fn_price_api_service: {
         Args: {
           p_at?: string;
@@ -61069,6 +63336,7 @@ export type Database = {
       fn_rider_draft_for_write: {
         Args: { p_rider_id: string };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -61154,6 +63422,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      fn_rider_early_cashout_on: { Args: { p_city_id: string }; Returns: boolean };
       fn_rider_kit_require_paid: { Args: { p_rider_id: string }; Returns: undefined };
       fn_rider_mine: { Args: { p_rider_id: string }; Returns: string };
       fn_rider_points_sync: { Args: { p_rider_id: string }; Returns: number };
@@ -61332,6 +63601,7 @@ export type Database = {
       rpc_activate_rider: {
         Args: { p_reason?: string; p_rider_id: string };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -61436,6 +63706,7 @@ export type Database = {
           id: string;
           included_by: string | null;
           kind: Database['public']['Enums']['block_kind'];
+          merchant_id: string | null;
           partner_contact_log: NonNullable<Json>;
           pay_on_day: NonNullable<Json>;
           plan_id: string;
@@ -61504,6 +63775,16 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_api_booking_access_read: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_api_booking_access_set: {
+        Args: {
+          p_enabled: boolean;
+          p_merchant_id: string;
+          p_monthly_limit_kes: number;
+          p_note?: string;
+        };
+        Returns: Json;
       };
       rpc_api_connection_clear_secret: { Args: { p_id: string; p_kind: string }; Returns: Json };
       rpc_api_connection_save: { Args: { p: Json }; Returns: Json };
@@ -61643,6 +63924,7 @@ export type Database = {
           id: string;
           included_by: string | null;
           kind: Database['public']['Enums']['block_kind'];
+          merchant_id: string | null;
           partner_contact_log: NonNullable<Json>;
           pay_on_day: NonNullable<Json>;
           plan_id: string;
@@ -61684,6 +63966,7 @@ export type Database = {
           id: string;
           included_by: string | null;
           kind: Database['public']['Enums']['block_kind'];
+          merchant_id: string | null;
           partner_contact_log: NonNullable<Json>;
           pay_on_day: NonNullable<Json>;
           plan_id: string;
@@ -61868,6 +64151,7 @@ export type Database = {
           id: string;
           included_by: string | null;
           kind: Database['public']['Enums']['block_kind'];
+          merchant_id: string | null;
           partner_contact_log: NonNullable<Json>;
           pay_on_day: NonNullable<Json>;
           plan_id: string;
@@ -62366,6 +64650,7 @@ export type Database = {
           id: string;
           included_by: string | null;
           kind: Database['public']['Enums']['block_kind'];
+          merchant_id: string | null;
           partner_contact_log: NonNullable<Json>;
           pay_on_day: NonNullable<Json>;
           plan_id: string;
@@ -62745,6 +65030,7 @@ export type Database = {
           id: string;
           included_by: string | null;
           kind: Database['public']['Enums']['block_kind'];
+          merchant_id: string | null;
           partner_contact_log: NonNullable<Json>;
           pay_on_day: NonNullable<Json>;
           plan_id: string;
@@ -65502,6 +67788,24 @@ export type Database = {
       };
       rpc_merchant_catalogue_overview: { Args: { p_keys?: string[] }; Returns: Json };
       rpc_merchant_close_store: { Args: { p_branch_id: string; p_reason: string }; Returns: Json };
+      rpc_merchant_commission_decide: {
+        Args: { p_approve: boolean; p_note?: string; p_term_id: string };
+        Returns: Json;
+      };
+      rpc_merchant_commission_read: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_commission_request: {
+        Args: {
+          p_ends_on: string;
+          p_merchant_id: string;
+          p_nexg_delivery_pct: number;
+          p_own_delivery_pct: number;
+          p_reason: string;
+          p_starts_on: string;
+          p_terms_ref?: string;
+        };
+        Returns: Json;
+      };
+      rpc_merchant_commission_withdraw: { Args: { p_term_id: string }; Returns: Json };
       rpc_merchant_console_counts: { Args: { p_city_id?: string }; Returns: Json };
       rpc_merchant_control: {
         Args: {
@@ -67001,6 +69305,7 @@ export type Database = {
         | { Args: { p_order_id: string }; Returns: Json }
         | { Args: { p_contract_version: string; p_order_id: string }; Returns: Json };
       rpc_my_order_rating: { Args: { p_order_id: string }; Returns: number };
+      rpc_my_recent_categories: { Args: { p_limit?: number }; Returns: Json };
       rpc_my_rider_jobs: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_rider_map_assignments: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_rider_offers: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -67190,6 +69495,10 @@ export type Database = {
         Returns: Json;
       };
       rpc_order_breakdown: { Args: { p_order_id: string }; Returns: Json };
+      rpc_order_cancel_api: {
+        Args: { p_api_key: string; p_order_id: string; p_reason?: string };
+        Returns: Json;
+      };
       rpc_order_cancel_mine: { Args: { p_order_id: string; p_reason?: string }; Returns: Json };
       rpc_order_contact: {
         Args: { p_channel: string; p_order_id: string; p_party: string; p_reveal?: boolean };
@@ -67496,6 +69805,14 @@ export type Database = {
       };
       rpc_paystack_refund_open: {
         Args: { p_kind: string; p_proof: string; p_target: string };
+        Returns: Json;
+      };
+      rpc_paystack_transfer_answered: {
+        Args: { p_answer: string; p_proof: string; p_reference: string; p_step: string };
+        Returns: Json;
+      };
+      rpc_paystack_transfer_open: {
+        Args: { p_kind: string; p_proof: string; p_source: string };
         Returns: Json;
       };
       rpc_place_confirm: { Args: { p_payload: Json }; Returns: Json };
@@ -68174,6 +70491,7 @@ export type Database = {
       rpc_rider_cooldown: {
         Args: { p_hours: number; p_reason: string; p_rider_id: string };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -68262,6 +70580,7 @@ export type Database = {
       rpc_rider_cooldown_clear: {
         Args: { p_reason?: string; p_rider_id: string };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -68368,6 +70687,7 @@ export type Database = {
         | {
             Args: { p_deposit_kes?: number; p_rider_id: string };
             Returns: {
+              accepts_test_payouts: boolean;
               activated_at: string | null;
               activated_by: string | null;
               alcohol_eligible: boolean;
@@ -68580,6 +70900,7 @@ export type Database = {
       rpc_rider_reinstate: {
         Args: { p_reason: string; p_rider_id: string };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -68686,6 +71007,7 @@ export type Database = {
           p_value: Json;
         };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -68847,6 +71169,7 @@ export type Database = {
       rpc_rider_two_person_approve: {
         Args: { p_request_id: string };
         Returns: {
+          accepts_test_payouts: boolean;
           activated_at: string | null;
           activated_by: string | null;
           alcohol_eligible: boolean;
@@ -69026,6 +71349,7 @@ export type Database = {
       };
       rpc_saved_add: { Args: { p_item_id?: string; p_merchant_id: string }; Returns: Json };
       rpc_saved_remove: { Args: { p_saved_id: string }; Returns: Json };
+      rpc_sees_test_tenants: { Args: Record<PropertyKey, never>; Returns: boolean };
       rpc_send_plan: {
         Args: { p_guest_name?: string; p_guest_phone?: string; p_plan_id: string };
         Returns: {
@@ -69235,6 +71559,10 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_staff_branch_place_set: {
+        Args: { p_branch_id: string; p_place_id: string };
+        Returns: Json;
       };
       rpc_staff_directory: {
         Args: Record<PropertyKey, never>;
@@ -69671,6 +71999,7 @@ export type Database = {
           sent_at: string | null;
           source: string;
           status: Database['public']['Enums']['stay_request_status'];
+          suggested_place: string | null;
           ticket_id: string | null;
           updated_at: string;
         };

@@ -73,6 +73,8 @@ export function CheckoutForm({
   const [quoting, setQuoting] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  /** Asking "clear the whole cart?" before it goes. */
+  const [confirmClear, setConfirmClear] = React.useState(false);
   /* One id per checkout attempt, so a retry on a weak connection returns the same order. */
   const requestId = React.useRef<string | null>(null);
   /* A laundry collects from the customer, at a time they choose (agreed 11 Nov 2026). */
@@ -308,14 +310,56 @@ export function CheckoutForm({
       <div className="min-w-0 space-y-6">
         <section className="border-border bg-surface rounded-2xl border p-5">
           <div className="flex items-baseline justify-between gap-3">
-            <h2 className="text-lg font-extrabold">{cart.merchantName}</h2>
-            <Link
-              href={discoverMerchantHref(cart.merchantId)}
-              className="text-gold-text text-sm font-bold hover:underline"
-            >
-              Add more
-            </Link>
+            <h2 className="min-w-0 truncate text-lg font-extrabold">{cart.merchantName}</h2>
+            <div className="flex shrink-0 items-baseline gap-4">
+              <Link
+                href={discoverMerchantHref(cart.merchantId)}
+                className="text-gold-text text-sm font-bold hover:underline"
+              >
+                Add more
+              </Link>
+              <button
+                type="button"
+                onClick={() => setConfirmClear(true)}
+                aria-expanded={confirmClear}
+                className="text-muted hover:text-danger text-sm font-bold hover:underline"
+              >
+                Clear cart
+              </button>
+            </div>
           </div>
+          {confirmClear && (
+            <div
+              role="alertdialog"
+              aria-labelledby="clear-cart-question"
+              className="border-danger/30 bg-danger-bg mt-3 flex flex-wrap items-center gap-3 rounded-xl border p-3"
+            >
+              <p id="clear-cart-question" className="min-w-0 flex-1 basis-48 text-sm font-bold">
+                Remove all {itemCount} {itemCount === 1 ? 'item' : 'items'} from{' '}
+                {cart.merchantName ?? 'this shop'}? Your cart empties on every device you are signed
+                in on.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirmClear(false)}
+                  className="border-border bg-surface rounded-full border px-4 py-1.5 text-sm font-bold"
+                >
+                  Keep
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setConfirmClear(false);
+                    cart.clear();
+                  }}
+                  className="bg-danger rounded-full px-4 py-1.5 text-sm font-bold text-white"
+                >
+                  Clear cart
+                </button>
+              </div>
+            </div>
+          )}
           <ul className="divide-border mt-3 divide-y">
             {cart.lines.map((line) => (
               <li key={lineKey(line)} className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3">

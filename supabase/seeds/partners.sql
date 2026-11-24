@@ -97,7 +97,7 @@ begin
     v_m_live, '[Westlands Kitchen Ltd]', '[Westlands Kitchen]', 'restaurant',
     '[Owner One]', '+254700000901', 'merchant.live@nexgapp.com',
     v_city, 'live', 7, now() - interval '40 days', now() - interval '30 days', v_admin,
-    true, true, true, 300000,
+    true, true, false, null,
     'same_daily', 25, 6, 2,
     'mpesa_paybill', '{"paybill":"[—]","account":"[—]"}'::jsonb,
     '{"cuisine":"fast_food","serves_alcohol":"no","dietary":["vegetarian"],"spend_band":"500_1500"}'::jsonb,
@@ -264,7 +264,7 @@ begin
     1400, 20000, true, true, 15,
     array['Westlands', 'Kilimani', 'CBD'],
     array['evenings', 'late_night', 'weekends'],
-    '+254700000903', 'green', 88, true, true, 'nexg_pool')
+    '+254700000903', 'green', 88, true, false, 'nexg_pool')
   on conflict (id) do nothing;
 
   insert into public.document

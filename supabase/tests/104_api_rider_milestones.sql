@@ -40,6 +40,11 @@ insert into public.api_webhook_endpoint (merchant_id, environment, url, secret_r
 select id, env, 'https://hooks.partner.co.ke/nexg/riders-' || env, 'api_webhook:riders-' || env, 'whsec_rider1'
 from t_m cross join (values ('live'), ('test')) e(env);
 
+-- Live API bookings need NexG's approval (20270302000200).
+insert into public.api_booking_access (merchant_id, enabled, monthly_limit_cents)
+select id, true, 100000000 from t_m
+on conflict (merchant_id) do nothing;
+
 set constraints api_webhook_order_event, dispatch.api_webhook_rider_event immediate;
 
 insert into t values ('ride', public.rpc_order_place_api(

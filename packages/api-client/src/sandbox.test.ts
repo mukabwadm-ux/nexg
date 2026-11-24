@@ -9,7 +9,7 @@ import { NexgApiError } from './errors.js';
  *
  *   NEXG_SANDBOX_BASE_URL=https://api.nexgapp.com \
  *   NEXG_SANDBOX_KEY=nexg_test_… \
- *   pnpm --filter @nexg/api-client test
+ *   pnpm --filter @nexg-org/api-client test
  *
  * The key needs merchant_read, merchant_write and catalogue_write. Only a
  * test key is accepted: its bookings are sandbox bookings, nothing is

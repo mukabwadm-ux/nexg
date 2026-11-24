@@ -38,7 +38,8 @@ export default function IdempotencyPage() {
         <A href="/docs/reference/check-delivery">delivery check</A>, which only answers a
         question. A <A href="/docs/reference/update-catalogue-items">catalogue change</A> sets a
         price or availability rather than adding to it, so sending it twice leaves the same
-        result. If one of these times out or fails with a <C>5xx</C>, send it again, waiting
+        result, and <A href="/docs/reference/cancel-order">cancelling a booking</A> that is already
+        cancelled answers the same again. If one of these times out or fails with a <C>5xx</C>, send it again, waiting
         longer each time (1, 2, then 4 seconds is plenty). After a <C>429</C>, wait for{' '}
         <C>Retry-After</C> first.
       </P>

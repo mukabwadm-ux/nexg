@@ -12,10 +12,10 @@ The owner, 22 Nov 2026: "proceed, as long as they are using one shared backend f
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | D1  | **Bookings stay in the booking engine.** Apps book through the website's bridge (`20270116000300_app_bookings`), paid by Paystack with deposits (#190). Supabase `customer_booking` is not the booking system for apps. |
 | D2  | **Done (website on it 22 Nov).** One payment route for every client: `POST /api/customer/checkout/orders/{orderId}/payment` on the website, signed in by bearer token (apps) or session cookie (website); `GET /api/customer/checkout/payment-methods` lists what is on offer. M-Pesa goes to Safaricom (Daraja) until Paystack is live, then to Paystack. The website-only start routes are gone. Not an Edge Function. Contract: `docs/shared-services/payments.md`. |
-| D3  | **Paystack:** card, M-Pesa and Airtel through one company account (owner, 21 Nov), plus bank transfer. Cash on delivery is no longer offered on customer orders (owner, 20 Nov; `20270128000100`); staff may still place cash orders. Test mode until the owner switches it live. |
+| D3  | **Paystack:** card, M-Pesa and Airtel through one company account (owner, 21 Nov), plus bank transfer. Cash on delivery is gone: customers lost it on 20 Nov (`20270128000100`), and on 23 Nov the owner had it removed from the system (`20270301000100`): no order of any channel may be cash on delivery, and the shop, zone and rider switches are off and locked. Test mode until the owner switches it live. |
 | D4  | **Done.** A basket saved to the account; a signed-out basket merges in at sign-in (`20270216000100`, live 22 Nov). Contract: `docs/shared-services/basket.md`. |
 | D5  | **Paying confirms the order** (owner, 18 Nov), so the shop starts and readies it with no separate accept; rider and customer steps as recommended. Each step was already built (`20270109000300`, `20270115000400`, `20270115000600`, `20270128000100`). `20270221000100` adds one table of the steps (`order_step_rule`), a guard that refuses any other stage change, and `rpc_order_next_steps` for every app's buttons. A shop may decline an order before starting it (owner, 22 Nov): `rpc_merchant_order_decline`, `20270223000100`, with a reason, a full automatic refund if paid, and a Decline button on the Work page. Contract: `docs/shared-services/order-steps.md`. |
-| D6  | One Supabase sign-in for every app; rider sign-in not touched. In production only email and guests are on (22 Nov). The website's Google and Apple buttons are built and wait for the owner's provider keys and `NEXT_PUBLIC_AUTH_GOOGLE`/`_APPLE`; phone confirmation by SMS code is on the account page and waits for an SMS provider (owner to choose: Africa's Talking needs a send-SMS hook, Twilio does not). Contract: `docs/shared-services/sign-in.md`. |
+| D6  | One Supabase sign-in for every app; rider sign-in not touched. In production only email and guests are on (22 Nov). The website's Google and Apple buttons are built and wait for the owner's provider keys and `NEXT_PUBLIC_AUTH_GOOGLE`/`_APPLE`; phone confirmation by SMS code is on the account page and waits for an SMS provider; confirming a phone links the guest orders placed with it (`20270225000100`, a trigger on `auth.users`) (owner to choose: Africa's Talking needs a send-SMS hook, Twilio does not). Contract: `docs/shared-services/sign-in.md`. |
 
 Also decided since 12 Nov: guests may order delivery on a temporary (anonymous) session (18 Nov, `20270109000100_guest_orders`); bookings and stay holds still need an account. Order together (group baskets) is `20270130009000`.
 
@@ -30,7 +30,7 @@ Also decided since 12 Nov: guests may order delivery on a temporary (anonymous) 
 
 **The phone apps' repositories** are not reachable from the shared-services machine, so each shared piece ships as the backend plus a written contract in `docs/shared-services/` for the app teams.
 
-**Order of the remaining work:** D6 sign-in, then R3, R8 and R9. Also open: the website's stay checkout still starts M-Pesa through `/api/payments/mpesa/stay`; a merchant health score is not computed anywhere yet (`merchant_health_snapshot` has no writer), so shop declines are recorded (`cancel_reason_code = 'merchant_declined'`) but not yet scored.
+**Order of the remaining work:** the owner's provider setup for D6; R8 and R9 are done. Also open: a merchant health score is not computed anywhere yet (`merchant_health_snapshot` has no writer), so shop declines are recorded (`cancel_reason_code = 'merchant_declined'`) but not yet scored.
 
 For whoever continues the shared-services work. The owner sends the private parts separately:
 
@@ -141,7 +141,7 @@ These are also needed before launch:
 - **D12:** one storage layout.
 - **D13:** where each service runs. The website, admin and API already deploy on Vercel. Still open:
   - the connector worker;
-  - the booking engine. Its VPS deploy kit (#78) brings its own web server on ports 80 and 443, and those ports are already in use on the target server.
+  - the booking engine: **decided 23 Nov, it stays on the VPS with its own database** (owner: "This is okay on the VPS, so leave this as it is"). Moving it into NexgApp is off the list.
 - **D14:** packaging for `@nexg/maps`.
 - **D15:** one settlement system for merchants, riders and hosts.
 
@@ -176,8 +176,8 @@ These are also needed before launch:
 - **R5:** a host API on Supabase, replacing the Stays app's local host service (D7).
 - **R6:** an App Review demo account for host features, after R4 and R5.
 - **R7:** public merchant ratings and customer order ratings (D11).
-- **R8:** merchant traits, a staff-only place ID per branch, a popularity band from 0 to 3, and the customer's recent categories.
-- **R9:** `plan_block.merchant_id`.
+- **R8:** done 23 Nov on the plan's defaults (`20270227000100`): `merchant_traits_public` (traits and a popularity band 0–3), the staff-only `merchant_branch_place` (Google place ID per branch), and `rpc_my_recent_categories`. Contract: `docs/shared-services/merchant-facts.md`.
+- **R9:** done 23 Nov (`20270227000200`): `plan_block.merchant_id`, filled from a component's partner when there is one, and returned by `fn_plan_view` with the shop's name.
 - **R10:** films, showings and ticket prices for cinemas (D9).
 - **R11:** Play, Flights and Cinemas categories. Paused by the owner on 12 Nov; see below.
 
