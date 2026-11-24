@@ -39,7 +39,8 @@ export function SetupPage() {
     },
     {
       label: 'Documents & approval',
-      detail: 'Upload your ID and proof of authority. Properties unlock once NexG approves them.',
+      detail:
+        'Upload your ID and proof of authority. Your properties stay hidden from guests until NexG approves them.',
       done: setup.live,
       open: () => go('setup', '', 'verify'),
     },
