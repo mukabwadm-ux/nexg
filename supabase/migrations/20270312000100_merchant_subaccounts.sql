@@ -286,7 +286,7 @@ begin
     raise exception 'Say why.' using errcode = 'check_violation';
   end if;
   select * into s from public.merchant_paystack_subaccount where id = p_id for update;
-  if s.id is null or s.status <> case when p_pause then 'active' else 'paused' end then
+  if s.id is null or s.status <> (case when p_pause then 'active' else 'paused' end) then
     raise exception 'That sub-account is not %.', case when p_pause then 'active' else 'paused' end
       using errcode = '22023';
   end if;
