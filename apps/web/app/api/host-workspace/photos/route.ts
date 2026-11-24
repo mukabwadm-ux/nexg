@@ -24,6 +24,7 @@ import {
   readUploadStep,
   requireUploaded,
   signUpload,
+  uploadedObject,
 } from '@/lib/host-workspace/direct-upload';
 
 /*
@@ -222,8 +223,19 @@ async function uploadStep(request: Request) {
   const { current, present } = await roomForOneMore(access, target, path);
 
   if (step.action === 'upload-url') {
-    if (present) return hostWorkspaceJson({ path, signedUrl: null, token: null, done: true });
-    return hostWorkspaceJson(await signUpload(access, BUCKET, path));
+    const done = hostWorkspaceJson({ path, signedUrl: null, token: null, done: true });
+    if (present) return done;
+    // A retry of an upload that reached Storage but was never recorded (the
+    // connection dropped, or the gallery was busy): skip the send and let
+    // complete check the stored file. The path is fixed by operationId, so
+    // signing again would be refused as a duplicate.
+    if (await uploadedObject(access, BUCKET, path)) return done;
+    try {
+      return hostWorkspaceJson(await signUpload(access, BUCKET, path));
+    } catch (error) {
+      if (error instanceof HostWorkspaceError && error.status === 409) return done;
+      throw error;
+    }
   }
 
   if (step.path !== path)

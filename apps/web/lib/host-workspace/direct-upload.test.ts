@@ -41,7 +41,12 @@ interface StoredObject {
 }
 
 /** A host member's client with mocked storage, rpc and table reads. */
-function fakeDb(options: { objects?: StoredObject[]; gallery?: unknown[]; unitScope?: string[] }) {
+function fakeDb(options: {
+  objects?: StoredObject[];
+  gallery?: unknown[];
+  unitScope?: string[];
+  signError?: string;
+}) {
   const objects = options.objects ?? [];
   let gallery = options.gallery ?? [];
   const storageCalls: { bucket: string; method: string; args: unknown[] }[] = [];
@@ -49,6 +54,7 @@ function fakeDb(options: { objects?: StoredObject[]; gallery?: unknown[]; unitSc
     from: (bucket: string) => ({
       createSignedUploadUrl: vi.fn(async (path: string, opts: unknown) => {
         storageCalls.push({ bucket, method: 'createSignedUploadUrl', args: [path, opts] });
+        if (options.signError) return { data: null, error: { message: options.signError } };
         return {
           data: {
             path,
@@ -282,9 +288,10 @@ describe('photos: direct upload', () => {
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body).toMatchObject({ path, token: 'upload-token' });
-    expect(db.storageCalls[0]).toMatchObject({
+    expect(db.storageCalls).toContainEqual({
       bucket: 'host-photos',
       method: 'createSignedUploadUrl',
+      args: [path, { upsert: false }],
     });
   });
 
@@ -346,6 +353,32 @@ describe('photos: direct upload', () => {
     );
     expect(response.status).toBe(200);
     expect(db.rpc).not.toHaveBeenCalled();
+  });
+
+  it('lets a retry skip the send when the photo reached Storage but was never recorded', async () => {
+    const db = fakeDb({
+      objects: [{ name: `${OP}.jpg`, metadata: { size: 7 * MB, mimetype: 'image/jpeg' } }],
+    });
+    state.access = db.access;
+    const step = { room: 'kitchen', mime: 'image/jpeg', size: 7 * MB, operationId: OP };
+    const ticket = await postPhoto(jsonPost(PHOTOS, { action: 'upload-url', ...step }));
+    expect(ticket.status).toBe(200);
+    expect(await ticket.json()).toEqual({ path, signedUrl: null, token: null, done: true });
+    expect(db.storageCalls.map((call) => call.method)).not.toContain('createSignedUploadUrl');
+
+    const complete = await postPhoto(jsonPost(PHOTOS, { action: 'complete', ...step, path }));
+    expect(complete.status).toBe(200);
+    expect(db.gallery()).toEqual([{ path, alt: '', cover: true, room: 'kitchen' }]);
+  });
+
+  it('treats a duplicate refusal from Storage on a retry as already sent', async () => {
+    const db = fakeDb({ signError: 'The resource already exists' });
+    state.access = db.access;
+    const response = await postPhoto(
+      jsonPost(PHOTOS, { action: 'upload-url', mime: 'image/jpeg', size: MB, operationId: OP }),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ path, signedUrl: null, done: true });
   });
 
   it('refuses a path that is not this operation’s', async () => {
