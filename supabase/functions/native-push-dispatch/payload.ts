@@ -94,6 +94,14 @@ const STAGES: Record<Subject, Record<string, StageCopy>> = {
   conversation: {
     host_message: ['New message about your stay', 'Ujumbe mpya kuhusu malazi yako', 0, 0],
     guest_message: ['New message from a guest', 'Ujumbe mpya kutoka kwa mgeni', 0, 0],
+    // NexG in a stay chat (20270314000500): to the guest and the host alike.
+    nexg_joined: ['NexG joined your stay chat', 'NexG imejiunga na mazungumzo ya malazi', 0, 0],
+    nexg_message: [
+      'NexG replied in your stay chat',
+      'NexG imejibu kwenye mazungumzo ya malazi',
+      0,
+      0,
+    ],
   },
   job: {
     assigned: ['Delivery assigned', 'Umepewa kazi ya usafirishaji', 15, 1],

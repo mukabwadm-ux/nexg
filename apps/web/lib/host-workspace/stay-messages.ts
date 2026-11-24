@@ -8,7 +8,16 @@ import { HostWorkspaceError, type HostWorkspaceAccess } from './access';
  * their refusals into plain HTTP errors.
  */
 
-export type StaySide = 'guest' | 'host';
+/* 'nexg' is a NexG staff line, shown as "NexG"; 'system' is a "NexG joined" or "asked NexG" line (20270314000500). */
+export type StaySide = 'guest' | 'host' | 'nexg' | 'system';
+
+/** NexG's part in a chat: in it now, and whether someone asked and is still waiting for a NexG reply. */
+export interface StayNexg {
+  present: boolean;
+  requestedAt: string | null;
+  requestedSide: 'guest' | 'host' | null;
+  waiting: boolean;
+}
 
 export interface StayThreadMessagePreview {
   body: string | null;
@@ -34,6 +43,7 @@ export interface StayThread {
   lastMessageAt: string | null;
   lastMessage: StayThreadMessagePreview | null;
   unread: number;
+  nexg: StayNexg;
 }
 
 export interface StayMessage {
@@ -89,7 +99,21 @@ function isObject(value: unknown): value is Json {
 }
 
 const text = (value: unknown) => (typeof value === 'string' ? value : null);
-const side = (value: unknown): StaySide => (value === 'guest' ? 'guest' : 'host');
+const side = (value: unknown): StaySide =>
+  value === 'guest' || value === 'nexg' || value === 'system' ? value : 'host';
+
+function nexgOf(value: unknown): StayNexg {
+  const nexg = isObject(value) ? value : {};
+  return {
+    present: nexg.present === true,
+    requestedAt: text(nexg.requested_at),
+    requestedSide:
+      nexg.requested_side === 'guest' || nexg.requested_side === 'host'
+        ? nexg.requested_side
+        : null,
+    waiting: nexg.waiting === true,
+  };
+}
 
 export function threadOf(value: unknown): StayThread {
   if (!isObject(value) || typeof value.id !== 'string' || typeof value.stay_id !== 'string') {
@@ -121,6 +145,7 @@ export function threadOf(value: unknown): StayThread {
       : null,
     unread:
       typeof value.unread === 'number' && Number.isSafeInteger(value.unread) ? value.unread : 0,
+    nexg: nexgOf(value.nexg),
   };
 }
 

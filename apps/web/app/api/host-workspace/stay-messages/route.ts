@@ -35,6 +35,8 @@ const actionSchema = z.discriminatedUnion('action', [
     })
     .strict(),
   z.object({ action: z.literal('read'), threadId: uuid }).strict(),
+  /* "Get NexG's help": NexG support is asked to join the chat (20270314000500). */
+  z.object({ action: z.literal('ask-nexg'), threadId: uuid }).strict(),
 ]);
 
 type Json = Record<string, unknown>;
@@ -109,6 +111,28 @@ export async function POST(request: Request) {
         );
       const readTo = isObject(data) && typeof data.read_to === 'number' ? data.read_to : 0;
       return hostWorkspaceJson({ ok: true, readTo });
+    }
+
+    if (action.action === 'ask-nexg') {
+      const { data, error } = await access.db.rpc('rpc_stay_chat_host_ask_nexg', {
+        p_thread_id: action.threadId,
+      });
+      if (error)
+        throw stayChatError(
+          error,
+          'This chat is unavailable.',
+          'NexG could not be asked. Try again.',
+        );
+      if (!isObject(data) || data.ok !== true)
+        throw new HostWorkspaceError(503, 'NexG could not be asked. Try again.');
+      return hostWorkspaceJson({
+        ok: true,
+        already: data.already === true,
+        message:
+          data.already === true
+            ? 'NexG has been asked and will reply here.'
+            : 'NexG has been asked to help. They will reply in this chat.',
+      });
     }
 
     const { data, error } = await access.db.rpc('rpc_stay_chat_host_send', {
