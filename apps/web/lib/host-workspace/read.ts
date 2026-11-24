@@ -481,6 +481,8 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
             guidePublished: Boolean(guides.get(row.id)?.publishedId),
             planId: guides.get(row.id)?.document.planId ?? undefined,
             modelId: guides.get(row.id)?.document.modelId ?? undefined,
+            // The 3D house in the guide draft (the phone's House Builder opens it from here).
+            house: guides.get(row.id)?.document.house ?? undefined,
             status: label(row.status),
             readiness: row.status === 'live' ? 'Ready' : label(row.status),
             capacity: row.max_guests ?? 0,

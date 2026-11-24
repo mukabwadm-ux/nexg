@@ -292,6 +292,7 @@ const commandSchema = z.object({
     'restore',
     'unpublish',
     'remove-guide-file',
+    'save-house',
     'listing',
   ]),
   collection: z.string().optional(),
@@ -310,7 +311,7 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
   if (
     (collection === 'articles' && (command.type === 'save' || command.type === 'delete')) ||
     (collection === 'units' &&
-      ['publish', 'restore', 'unpublish', 'remove-guide-file'].includes(command.type))
+      ['publish', 'restore', 'unpublish', 'remove-guide-file', 'save-house'].includes(command.type))
   ) {
     return runGuideCommand(access, command);
   }
