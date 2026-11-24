@@ -84,6 +84,15 @@ const PARTNER_LINKS = [
   { key: 'nav.careers', noteKey: 'nav.careers.note', href: '/careers', icon: Briefcase },
 ] as const;
 
+/** The X (Twitter) mark. Lucide has no X logo, and its `X` is the close icon. */
+function XLogo({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" className={className}>
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
+
 /* NexG's own accounts only. Add a network here only when NexG has an account on it. */
 const SOCIALS = [
   { label: 'Facebook', href: 'https://web.facebook.com/share/1C8dtH1oGw/', icon: Facebook },
@@ -97,6 +106,7 @@ const SOCIALS = [
     href: 'https://www.linkedin.com/in/nexgenius-concierge-325066437?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
     icon: Linkedin,
   },
+  { label: 'X', href: 'https://x.com/nexgconcierge', icon: XLogo },
 ] as const;
 
 /** A menu row's link: a plain link for a page outside the Next.js app (`fullLoad`), else the router's. */
