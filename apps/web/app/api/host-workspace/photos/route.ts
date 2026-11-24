@@ -2,7 +2,13 @@ import { createHash } from 'node:crypto';
 
 import { z } from 'zod';
 
-import { coverOf, photosOf, type Photo } from '@/lib/host-workspace/vocab';
+import {
+  coverOf,
+  PHOTO_LIMIT,
+  PHOTO_ROOMS,
+  photosOf,
+  type Photo,
+} from '@/lib/host-workspace/vocab';
 import {
   HostWorkspaceError,
   hostWorkspaceEnabled,
@@ -20,7 +26,9 @@ const photoSchema = z.object({
   path: z.string(),
   alt: z.string().max(160).optional(),
   cover: z.boolean().optional(),
+  room: z.enum(PHOTO_ROOMS.map((room) => room.value) as [string, ...string[]]).optional(),
 });
+const roomSchema = photoSchema.shape.room;
 type Target = z.infer<typeof targetSchema>;
 
 function targetFrom(request: Request) {
@@ -74,7 +82,8 @@ async function view(
   const cover = coverOf(photos);
   return hostWorkspaceJson({
     version: revision(raw),
-    limit: target.kind === 'property' ? 12 : 8,
+    limit: PHOTO_LIMIT[target.kind],
+    rooms: PHOTO_ROOMS,
     photos: photos.map((photo) => ({
       ...photo,
       cover: photo.path === cover?.path,
@@ -93,7 +102,7 @@ async function save(
     p_kind: target.kind,
     p_id: target.id,
     p_expected: previous,
-    p_photos: photos.map(({ path, alt, cover }) => ({ path, alt, cover })),
+    p_photos: photos.map(({ path, alt, cover, room }) => ({ path, alt, cover, room })),
   });
   if (error?.code === '40001') return false;
   if (error?.code === '42501')
@@ -151,11 +160,12 @@ export async function POST(request: Request) {
       .trim()
       .max(160)
       .parse(form.get('alt') ?? '');
+    const room = roomSchema.parse(form.get('room') || undefined) as Photo['room'];
     const path = access.hostId + '/' + target.id + '/' + operationId + '.' + extension;
     let current = await gallery(access, target);
     const initial = photosOf(current);
     if (initial.some((photo) => photo.path === path)) return await view(access, target, current);
-    if (initial.length >= (target.kind === 'property' ? 12 : 8))
+    if (initial.length >= PHOTO_LIMIT[target.kind])
       throw new HostWorkspaceError(400, 'Remove one photo before adding another.');
 
     const { error } = await access.db.storage
@@ -171,7 +181,10 @@ export async function POST(request: Request) {
       const photos = photosOf(current);
       if (photos.some((photo) => photo.path === path)) return await view(access, target, current);
       if (
-        await save(access, target, current, [...photos, { path, alt, cover: photos.length === 0 }])
+        await save(access, target, current, [
+          ...photos,
+          { path, alt, cover: photos.length === 0, ...(room ? { room } : {}) },
+        ])
       )
         return await view(access, target, await gallery(access, target));
       current = await gallery(access, target);
@@ -192,9 +205,12 @@ export async function PATCH(request: Request) {
     const target = targetFrom(request);
     const access = await hostWorkspaceAccess(request);
     const body = await request.text();
-    if (body.length > 20_000) throw new HostWorkspaceError(400, 'The gallery update is too large.');
+    if (body.length > 60_000) throw new HostWorkspaceError(400, 'The gallery update is too large.');
     const update = z
-      .object({ version: z.string().length(64), photos: z.array(photoSchema).max(12) })
+      .object({
+        version: z.string().length(64),
+        photos: z.array(photoSchema).max(PHOTO_LIMIT[target.kind]),
+      })
       .parse(JSON.parse(body));
     const current = await gallery(access, target);
     const allowed = new Set(photosOf(current).map((photo) => photo.path));

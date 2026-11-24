@@ -187,13 +187,26 @@ a.btn,
   min-height: 0;
   object-fit: contain;
 }
+/* Room tabs above the gallery (owner, 24 Nov 2026): scroll sideways rather than wrap into a wall of buttons. */
+.host-gallery-rooms {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+.host-gallery-rooms > * {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
 .host-gallery-form {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
   gap: 8px;
   align-items: end;
 }
-.host-gallery-form input {
+.host-gallery-form input,
+.host-gallery-form select {
   width: 100%;
   min-width: 0;
 }

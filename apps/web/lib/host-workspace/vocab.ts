@@ -89,10 +89,32 @@ export const STAY_AMENITIES: readonly string[] = [
 /** Long free text a guest reads: house rules, cancellation, neighbourhood. */
 export const LISTING_TEXT_MAX = 2000;
 
+/*
+ * The rooms a gallery is grouped by (owner, 24 Nov 2026): guests browse a unit room by room. A studio's sleeping
+ * corner is "bedroom". Photos with no room (older ones) show under "other".
+ */
+export const PHOTO_ROOMS = [
+  { value: 'living', label: 'Living area' },
+  { value: 'dining', label: 'Dining' },
+  { value: 'kitchen', label: 'Kitchen' },
+  { value: 'bedroom', label: 'Bedroom / bed area' },
+  { value: 'washroom', label: 'Washroom' },
+  { value: 'outside', label: 'Balcony & outside' },
+  { value: 'other', label: 'Other' },
+] as const;
+export type PhotoRoom = (typeof PHOTO_ROOMS)[number]['value'];
+const ROOMS = new Set<string>(PHOTO_ROOMS.map((room) => room.value));
+export const isPhotoRoom = (value: unknown): value is PhotoRoom =>
+  typeof value === 'string' && ROOMS.has(value);
+
+/** How many photos a gallery holds: enough for several per room. */
+export const PHOTO_LIMIT = { property: 30, unit: 40 } as const;
+
 export interface Photo {
   path: string;
   alt?: string;
   cover?: boolean;
+  room?: PhotoRoom;
 }
 
 /**
@@ -106,9 +128,15 @@ export interface Photo {
  */
 export function photosOf(v: unknown): Photo[] {
   if (!Array.isArray(v)) return [];
-  return v.filter(
-    (p): p is Photo => typeof p === 'object' && p !== null && typeof (p as Photo).path === 'string',
-  );
+  return v
+    .filter(
+      (p): p is Photo =>
+        typeof p === 'object' && p !== null && typeof (p as Photo).path === 'string',
+    )
+    .map((p) => {
+      const { room, ...rest } = p;
+      return isPhotoRoom(room) ? { ...rest, room } : rest;
+    });
 }
 
 /** The cover, or the first one, or nothing. */

@@ -4,8 +4,21 @@ import { errorMessage, workspaceRequest } from '../client';
 import { Badge, Button, Empty, Icon, PageHeader, Pager, Panel } from '../ui';
 import { useWorkspace } from '../workspace';
 
-type Photo = { path: string; alt?: string; cover?: boolean; url: string };
-type Gallery = { version: string; limit: number; photos: Photo[] };
+type Photo = { path: string; alt?: string; cover?: boolean; room?: string; url: string };
+type Room = { value: string; label: string };
+type Gallery = { version: string; limit: number; rooms?: Room[]; photos: Photo[] };
+/* Guests browse a unit room by room (owner, 24 Nov 2026). The server sends the list; this is the fallback. */
+const ROOMS: Room[] = [
+  { value: 'living', label: 'Living area' },
+  { value: 'dining', label: 'Dining' },
+  { value: 'kitchen', label: 'Kitchen' },
+  { value: 'bedroom', label: 'Bedroom / bed area' },
+  { value: 'washroom', label: 'Washroom' },
+  { value: 'outside', label: 'Balcony & outside' },
+  { value: 'other', label: 'Other' },
+];
+const MAX_BYTES = 10 * 1024 * 1024;
+const roomOf = (photo: Photo) => photo.room || 'other';
 
 export function PhotosPage() {
   const w = useWorkspace();
@@ -53,12 +66,16 @@ function GalleryEditor({
   const [load, setLoad] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [upload, setUpload] = useState<{ file: File; operationId: string } | null>(null);
+  const [upload, setUpload] = useState<{ file: File; operationId: string }[]>([]);
+  const [room, setRoom] = useState('living');
+  const [filter, setFilter] = useState('all');
   const [alt, setAlt] = useState('');
   const [remove, setRemove] = useState(false);
   const [confirmation, setConfirmation] = useState('');
-  const current = Math.max(1, Math.min(page, draft.length));
-  const photo = draft[current - 1];
+  const rooms = saved?.rooms?.length ? saved.rooms : ROOMS;
+  const shown = filter === 'all' ? draft : draft.filter((item) => roomOf(item) === filter);
+  const current = Math.max(1, Math.min(page, shown.length));
+  const photo = shown[current - 1];
   const dirty = saved !== null && JSON.stringify(draft) !== JSON.stringify(saved.photos);
 
   useEffect(() => {
@@ -95,25 +112,39 @@ function GalleryEditor({
     }
   }
 
+  /* Several photos at once, all tagged with the chosen room. Each is its own upload, so a failure keeps the ones
+     already sent and leaves the rest ready to retry. */
   async function add(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!upload || dirty) return;
+    if (!upload.length || dirty) return;
     const form = event.currentTarget;
-    const body = new FormData();
-    body.set('file', upload.file);
-    body.set('operationId', upload.operationId);
-    body.set('alt', alt);
-    if (await mutate({ method: 'POST', body })) {
-      form.reset();
-      setUpload(null);
-      setAlt('');
+    let sent = 0;
+    for (const item of upload) {
+      const body = new FormData();
+      body.set('file', item.file);
+      body.set('operationId', item.operationId);
+      body.set('alt', alt);
+      body.set('room', room);
+      if (!(await mutate({ method: 'POST', body }))) break;
+      sent += 1;
     }
+    if (sent === upload.length) {
+      form.reset();
+      setUpload([]);
+      setAlt('');
+      setFilter(room);
+      setPage(1);
+    } else setUpload(upload.slice(sent));
   }
 
+  /* Swaps this photo with its neighbour in the room being shown, keeping the whole gallery's order. */
   function move(by: number) {
-    const position = current - 1;
+    const neighbour = shown[current - 1 + by];
+    if (!photo || !neighbour) return;
+    const a = draft.indexOf(photo);
+    const b = draft.indexOf(neighbour);
     const next = [...draft];
-    [next[position], next[position + by]] = [next[position + by], next[position]];
+    [next[a], next[b]] = [next[b], next[a]];
     setDraft(next);
     setPage(current + by);
   }
@@ -144,6 +175,29 @@ function GalleryEditor({
         {!saved && !error && <p>Loading gallery…</p>}
         {saved && (
           <>
+            <div className="host-gallery-rooms" role="tablist" aria-label="Rooms">
+              {[{ value: 'all', label: 'All' }, ...rooms].map((item) => {
+                const count =
+                  item.value === 'all'
+                    ? draft.length
+                    : draft.filter((entry) => roomOf(entry) === item.value).length;
+                return (
+                  <Button
+                    key={item.value}
+                    role="tab"
+                    aria-selected={filter === item.value}
+                    variant={filter === item.value ? 'primary' : undefined}
+                    onClick={() => {
+                      setFilter(item.value);
+                      setPage(1);
+                      if (item.value !== 'all') setRoom(item.value);
+                    }}
+                  >
+                    {item.label} · {count}
+                  </Button>
+                );
+              })}
+            </div>
             {photo ? (
               <>
                 <div className="host-gallery-photo">
@@ -165,7 +219,7 @@ function GalleryEditor({
                   <Button disabled={busy || current === 1} onClick={() => move(-1)}>
                     Move earlier
                   </Button>
-                  <Button disabled={busy || current === draft.length} onClick={() => move(1)}>
+                  <Button disabled={busy || current === shown.length} onClick={() => move(1)}>
                     Move later
                   </Button>
                   <Button
@@ -175,6 +229,26 @@ function GalleryEditor({
                     Remove photo
                   </Button>
                 </div>
+                <label className="field">
+                  <span>Room</span>
+                  <select
+                    disabled={busy}
+                    value={roomOf(photo)}
+                    onChange={(event) =>
+                      setDraft(
+                        draft.map((item) =>
+                          item.path === photo.path ? { ...item, room: event.target.value } : item,
+                        ),
+                      )
+                    }
+                  >
+                    {rooms.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <label className="field">
                   <span>Photo description</span>
                   <input
@@ -190,10 +264,14 @@ function GalleryEditor({
                     }
                   />
                 </label>
-                <Pager page={current} total={draft.length} pageSize={1} onChange={setPage} />
+                <Pager page={current} total={shown.length} pageSize={1} onChange={setPage} />
               </>
             ) : (
-              <p className="mg-small-note">Add a photo to start this gallery.</p>
+              <p className="mg-small-note">
+                {filter === 'all'
+                  ? 'Add a photo to start this gallery.'
+                  : 'No photos in this room yet. Add some below.'}
+              </p>
             )}
             {dirty ? (
               <div className="mg-row-actions">
@@ -209,7 +287,12 @@ function GalleryEditor({
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
                         version: saved.version,
-                        photos: draft.map(({ path, alt, cover }) => ({ path, alt, cover })),
+                        photos: draft.map(({ path, alt, cover, room }) => ({
+                          path,
+                          alt,
+                          cover,
+                          ...(room ? { room } : {}),
+                        })),
                       }),
                     })
                   }
@@ -220,14 +303,39 @@ function GalleryEditor({
             ) : (
               <form className="host-gallery-form" onSubmit={add}>
                 <label className="field">
-                  <span>Add photo</span>
+                  <span>Room</span>
+                  <select
+                    value={room}
+                    disabled={busy}
+                    onChange={(event) => setRoom(event.target.value)}
+                  >
+                    {rooms.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="field">
+                  <span>Add photos · JPEG, PNG or WebP, up to 10 MB each</span>
                   <input
                     type="file"
+                    multiple
                     accept="image/jpeg,image/png,image/webp"
                     disabled={busy || draft.length >= saved.limit}
                     onChange={(event) => {
-                      const file = event.target.files?.[0];
-                      setUpload(file ? { file, operationId: crypto.randomUUID() } : null);
+                      setError('');
+                      const files = Array.from(event.target.files ?? []);
+                      const tooBig = files.filter((file) => file.size > MAX_BYTES);
+                      const space = saved.limit - draft.length;
+                      const fits = files.filter((file) => file.size <= MAX_BYTES).slice(0, space);
+                      if (tooBig.length)
+                        setError(tooBig.map((file) => file.name).join(', ') + ' is over 10 MB.');
+                      else if (fits.length < files.length)
+                        setError(
+                          `This gallery holds ${saved.limit} photos. Only the first ${fits.length} will be added.`,
+                        );
+                      setUpload(fits.map((file) => ({ file, operationId: crypto.randomUUID() })));
                     }}
                   />
                 </label>
@@ -240,8 +348,12 @@ function GalleryEditor({
                     disabled={busy}
                   />
                 </label>
-                <Button type="submit" variant="primary" disabled={busy || !upload}>
-                  {busy ? 'Uploading…' : 'Upload'}
+                <Button type="submit" variant="primary" disabled={busy || !upload.length}>
+                  {busy
+                    ? 'Uploading…'
+                    : upload.length > 1
+                      ? `Upload ${upload.length} photos`
+                      : 'Upload'}
                 </Button>
               </form>
             )}
