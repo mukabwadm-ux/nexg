@@ -216,7 +216,7 @@ export function TailorForm({
             className={`h-1 flex-1 rounded-full transition-colors ${
               dark
                 ? i <= step
-                  ? 'bg-[#F2C94C]'
+                  ? 'bg-gold'
                   : 'bg-white/[0.22]'
                 : i <= step
                   ? 'bg-gold'
@@ -468,7 +468,7 @@ function Toggle({
       className={`rounded-full px-3 py-1.5 text-[0.75rem] font-bold transition-colors ${
         dark
           ? on
-            ? 'bg-[#F2C94C] text-[#16120A]'
+            ? 'bg-gold text-[#16120A]'
             : 'border border-white/30 text-white hover:border-white/60'
           : on
             ? 'bg-ink text-white'

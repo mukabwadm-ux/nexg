@@ -100,7 +100,7 @@ export default async function ExperienceHome({
               <h1 className="text-ink mt-6 max-w-[11ch] break-words text-[2.75rem] font-extrabold leading-[1.02] tracking-[-0.03em] sm:text-[4rem] lg:text-[5rem]">
                 {titleLead}
                 {titleLead && ' '}
-                <span className="bg-[linear-gradient(transparent_62%,#F2C94C_62%,#F2C94C_92%,transparent_92%)] box-decoration-clone">
+                <span className="bg-[linear-gradient(transparent_62%,rgb(var(--gold-rgb))_62%,rgb(var(--gold-rgb))_92%,transparent_92%)] box-decoration-clone">
                   {titleMark}
                 </span>
               </h1>

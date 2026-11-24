@@ -285,7 +285,7 @@ export default async function RiderEarnings({
               </span>
               <span className="text-[13px] text-white/75">Cash out to M-Pesa</span>
             </span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fdd128] text-[color:var(--rider-ink)]">
+            <span className="bg-gold flex h-10 w-10 items-center justify-center rounded-full text-[color:var(--rider-ink)]">
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </span>
           </Link>

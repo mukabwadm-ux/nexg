@@ -151,7 +151,7 @@ export function hhmm(time: string | null): string {
 
 /** The bar's segments, in the order the artboard's legend lists them. */
 export const MOOD_COLOUR: Record<string, string> = {
-  wild: '#FDD128',
+  wild: '#D2AF26',
   taste: '#E7C86A',
   night: '#B8901F',
   events: '#B8901F',

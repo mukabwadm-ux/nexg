@@ -279,7 +279,7 @@ export function CategoryExplorer({
         hidden={visible.length === 0}
         className="mx-auto max-w-[120rem] px-4 pb-16 sm:px-[30px] sm:pb-20"
       >
-        <div className="text-ink relative overflow-hidden rounded-[2rem] bg-[#FDD128] px-6 py-10 sm:px-12 sm:py-14 lg:flex lg:items-center lg:justify-between lg:gap-12">
+        <div className="text-ink bg-gold relative overflow-hidden rounded-[2rem] px-6 py-10 sm:px-12 sm:py-14 lg:flex lg:items-center lg:justify-between lg:gap-12">
           <span
             aria-hidden="true"
             className="pointer-events-none absolute -bottom-40 -right-24 h-[26rem] w-[26rem] rounded-full bg-white/30 blur-3xl"
@@ -298,7 +298,7 @@ export function CategoryExplorer({
           <div className="relative mt-8 flex flex-wrap gap-3 lg:mt-0 lg:shrink-0">
             <Link
               href="/ask"
-              className="bg-ink focus-visible:ring-ink inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-bold text-white transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FDD128]"
+              className="bg-ink focus-visible:ring-ink focus-visible:ring-offset-gold inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-bold text-white transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             >
               {say('cats.askConcierge')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>

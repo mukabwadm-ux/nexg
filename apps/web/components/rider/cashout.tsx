@@ -101,7 +101,7 @@ export function CashoutCard({
           >
             <label className="block">
               <span className="text-[13px] font-semibold text-white/80">Amount to withdraw</span>
-              <span className="mt-1 flex items-center rounded-xl bg-white px-3 text-[color:var(--rider-ink)] focus-within:ring-2 focus-within:ring-[#fdd128]">
+              <span className="focus-within:ring-gold mt-1 flex items-center rounded-xl bg-white px-3 text-[color:var(--rider-ink)] focus-within:ring-2">
                 <span className="text-[15px] font-extrabold text-slate-500">KSh</span>
                 <input
                   inputMode="numeric"
@@ -125,7 +125,7 @@ export function CashoutCard({
             <button
               type="submit"
               disabled={busy || !payoutPhone || !value || tooSmall || tooBig}
-              className={`w-full rounded-xl bg-[#fdd128] px-4 py-3 text-[15px] font-extrabold text-[color:var(--rider-ink)] disabled:opacity-50 ${ring}`}
+              className={`bg-gold w-full rounded-xl px-4 py-3 text-[15px] font-extrabold text-[color:var(--rider-ink)] disabled:opacity-50 ${ring}`}
             >
               {busy ? 'Sending…' : 'Withdraw Funds'}
             </button>
@@ -159,8 +159,8 @@ export function CashoutCard({
                 onClick={() => setAmount(String(q))}
                 className={`rounded-xl border px-3 py-2.5 text-[13.5px] font-extrabold tabular-nums transition-colors disabled:opacity-40 ${ring} ${
                   value === q
-                    ? 'border-[#fdd128] bg-[#fff6cf]'
-                    : 'border-[#e6e9f2] bg-white hover:bg-[#fffbe8]'
+                    ? 'border-gold bg-gold/20'
+                    : 'hover:bg-gold-soft border-[#e6e9f2] bg-white'
                 }`}
               >
                 {kes(q)}

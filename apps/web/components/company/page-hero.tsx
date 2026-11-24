@@ -23,13 +23,13 @@ export function PageHero({
   return (
     <section className="mx-auto max-w-[120rem] px-4 pt-6 sm:px-[30px]">
       <div
-        className={`bg-ink relative overflow-hidden rounded-[2rem] border-t-[3px] border-[#FDD128] px-6 text-white sm:px-12 sm:py-20 lg:px-16 lg:py-24 ${
+        className={`bg-ink border-gold relative overflow-hidden rounded-[2rem] border-t-[3px] px-6 text-white sm:px-12 sm:py-20 lg:px-16 lg:py-24 ${
           compact ? 'py-10' : 'py-16'
         }`}
       >
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute -right-32 -top-40 h-[28rem] w-[28rem] rounded-full bg-[#FDD128]/15 blur-3xl"
+          className="bg-gold/15 pointer-events-none absolute -right-32 -top-40 h-[28rem] w-[28rem] rounded-full blur-3xl"
         />
         <div className="relative max-w-3xl">
           <p className="text-gold text-xs font-extrabold uppercase tracking-[0.2em]">{eyebrow}</p>

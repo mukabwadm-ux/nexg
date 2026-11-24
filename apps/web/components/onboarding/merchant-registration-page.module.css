@@ -183,9 +183,9 @@
       .mo-field
       > :is(input, select, textarea):is(:focus, :focus-visible)
   ) {
-  border-color: #fdd128;
+  border-color: var(--gold);
   outline: none;
-  box-shadow: inset 0 0 0 1px #fdd128;
+  box-shadow: inset 0 0 0 1px var(--gold);
 }
 
 /* A hint shows only once the label has moved out of its way. */

@@ -26,7 +26,7 @@ export function ReplyBox() {
         if (result.ok) setBody('');
       }}
     >
-      <div className="flex items-center gap-2 rounded-2xl border border-[#e3e7f0] bg-white p-1.5 pl-4 focus-within:border-[#fdd128] focus-within:ring-2 focus-within:ring-[#fdd128]/40">
+      <div className="focus-within:border-gold focus-within:ring-gold/40 flex items-center gap-2 rounded-2xl border border-[#e3e7f0] bg-white p-1.5 pl-4 focus-within:ring-2">
         <input
           value={body}
           onChange={(event) => setBody(event.target.value)}
@@ -39,7 +39,7 @@ export function ReplyBox() {
           type="submit"
           disabled={busy || !body.trim()}
           aria-label="Send"
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#fdd128] text-[color:var(--rider-ink)] disabled:opacity-50 ${ring}`}
+          className={`bg-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[color:var(--rider-ink)] disabled:opacity-50 ${ring}`}
         >
           <ArrowRight className="h-5 w-5" aria-hidden="true" />
         </button>

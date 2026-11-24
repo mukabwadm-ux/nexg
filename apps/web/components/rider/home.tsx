@@ -198,7 +198,7 @@ export function RiderHomeView({
           preserveAspectRatio="none"
           className="absolute bottom-0 left-0 -z-10 h-16 w-[60%] sm:h-20"
         >
-          <path d="M0 120 L0 70 C 120 40, 260 110, 600 120 Z" fill="#fdd128" opacity="0.9" />
+          <path d="M0 120 L0 70 C 120 40, 260 110, 600 120 Z" fill="#D2AF26" opacity="0.9" />
           <path d="M0 120 L0 95 C 160 70, 300 118, 520 120 Z" fill="#f5b400" opacity="0.9" />
         </svg>
         <div className="flex flex-col gap-5 p-5 pb-12 sm:p-7 sm:pb-14 md:flex-row md:items-center md:justify-between">
@@ -219,7 +219,7 @@ export function RiderHomeView({
               </p>
               <Link
                 href={active ? '/rider/jobs' : (nextStep?.href ?? '/rider/documents')}
-                className={`bg-gold mt-4 inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-[15px] font-extrabold text-[color:var(--rider-ink)] shadow-[0_8px_20px_-10px_#fdd128] ${ring}`}
+                className={`bg-gold mt-4 inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-[15px] font-extrabold text-[color:var(--rider-ink)] shadow-[0_8px_20px_-10px_rgb(var(--gold-rgb))] ${ring}`}
               >
                 {active ? 'View today’s jobs' : 'Continue setup'}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -857,7 +857,7 @@ function Bars({ days }: { days: number[] }) {
         {days.map((value, index) => (
           <div key={DAYS[index]} className="flex h-full items-end justify-center">
             <span
-              className={`w-full max-w-[34px] rounded-t-md ${index === today ? 'bg-gradient-to-t from-amber-500 to-yellow-200' : 'bg-gradient-to-t from-amber-600 to-amber-400'}`}
+              className={`w-full max-w-[34px] rounded-t-md ${index === today ? 'from-gold to-gold-light bg-gradient-to-t' : 'from-gold-deep to-gold bg-gradient-to-t'}`}
               style={{ height: `${Math.max(4, (value / max) * 100)}%` }}
               title={`${DAYS[index]}: ${kes(value)}`}
             />

@@ -101,7 +101,7 @@ function Notice({
       <Link
         href={href}
         prefetch={false}
-        className="bg-gold text-ink focus-visible:ring-ink mt-6 inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-extrabold hover:bg-[#FEDD5C] focus-visible:outline-none focus-visible:ring-2"
+        className="bg-gold text-ink focus-visible:ring-ink hover:bg-gold-light mt-6 inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-extrabold focus-visible:outline-none focus-visible:ring-2"
       >
         {action}
         <ArrowRight aria-hidden="true" className="h-4 w-4" />
