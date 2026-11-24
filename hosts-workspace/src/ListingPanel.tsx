@@ -3,6 +3,11 @@ import { useState } from 'react';
 import { Badge, Button } from './ui';
 import { useWorkspace } from './workspace';
 
+/** A host NexG has not approved yet: it can set up listings, guests see none of them. */
+export function underReview(setup: { status: string }) {
+  return setup.status === 'Applied' || setup.status === 'Verifying';
+}
+
 /**
  * The unit's publish switch on NEXG Stays, with what it still needs.
  * Nothing goes live until the host publishes it, and they can take it down
@@ -17,8 +22,10 @@ export function ListingPanel({ unitId }: { unitId: string }) {
   if (!unit || !listing) return null;
 
   const ready = listing.missing.length === 0;
-  const status =
-    listing.listed && !listing.heldByStaff
+  const reviewing = underReview(w.setup);
+  const status = reviewing
+    ? { tone: 'warning' as const, text: 'Hidden until approval' }
+    : listing.listed && !listing.heldByStaff
       ? { tone: 'success' as const, text: 'Live on NEXG Stays' }
       : listing.published && listing.heldByStaff
         ? { tone: 'warning' as const, text: 'Published · taken down by NexG' }
@@ -38,9 +45,11 @@ export function ListingPanel({ unitId }: { unitId: string }) {
         <div>
           <strong>Listing on NEXG Stays</strong>
           <p className="muted">
-            {listing.published
-              ? 'Guests can find and book this unit while it is published and complete.'
-              : 'Guests cannot see this unit until you publish it.'}
+            {reviewing
+              ? 'Hidden from guests until NexG approves your account. You can publish it after that.'
+              : listing.published
+                ? 'Guests can find and book this unit while it is published and complete.'
+                : 'Guests cannot see this unit until you publish it.'}
           </p>
         </div>
         <Badge tone={status.tone}>{status.text}</Badge>

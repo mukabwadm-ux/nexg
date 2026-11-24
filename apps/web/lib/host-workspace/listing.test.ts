@@ -228,13 +228,12 @@ describe('saving a unit', () => {
     );
   });
 
-  it('tells a host under review why the unit was not saved', async () => {
-    const review =
-      'Your account is under review. You can add or change properties and units once NexG approves your documents.';
-    const { access: a } = access({ data: null, error: { code: '42501', message: review } });
+  it('tells a closed host why the unit was not saved', async () => {
+    const closed = 'This host account is closed. Contact NexG support to reopen it.';
+    const { access: a } = access({ data: null, error: { code: '42501', message: closed } });
     await expect(
       runHostCommand(a, { type: 'save', collection: 'units', id: UNIT, record: { name: 'A' } }),
-    ).rejects.toThrow(review);
+    ).rejects.toThrow(closed);
   });
 
   it('keeps Postgres permission errors generic', async () => {

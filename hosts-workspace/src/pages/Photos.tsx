@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 
-import { errorMessage, workspaceRequest } from '../client';
+import { errorMessage, uploadFile, workspaceRequest } from '../client';
 import { Badge, Button, Empty, Icon, PageHeader, Pager, Panel } from '../ui';
 import { useWorkspace } from '../workspace';
 
@@ -65,6 +65,7 @@ function GalleryEditor({
   const [page, setPage] = useState(1);
   const [load, setLoad] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [sending, setSending] = useState<{ index: number; progress: number } | null>(null);
   const [error, setError] = useState('');
   const [upload, setUpload] = useState<{ file: File; operationId: string }[]>([]);
   const [room, setRoom] = useState('living');
@@ -93,12 +94,13 @@ function GalleryEditor({
     return () => controller.abort();
   }, [endpoint, load]);
 
-  async function mutate(init: RequestInit) {
+  async function mutate(init: RequestInit | (() => Promise<Gallery>)) {
     if (busy) return false;
     setBusy(true);
     setError('');
     try {
-      const next = await workspaceRequest<Gallery>(endpoint, init);
+      const next =
+        typeof init === 'function' ? await init() : await workspaceRequest<Gallery>(endpoint, init);
       setSaved(next);
       setDraft(next.photos);
       await refresh();
@@ -119,15 +121,20 @@ function GalleryEditor({
     if (!upload.length || dirty) return;
     const form = event.currentTarget;
     let sent = 0;
-    for (const item of upload) {
-      const body = new FormData();
-      body.set('file', item.file);
-      body.set('operationId', item.operationId);
-      body.set('alt', alt);
-      body.set('room', room);
-      if (!(await mutate({ method: 'POST', body }))) break;
+    for (const [index, item] of upload.entries()) {
+      setSending({ index, progress: 0 });
+      const sentPhoto = await mutate(() =>
+        uploadFile<Gallery>(
+          endpoint,
+          { operationId: item.operationId, alt, room },
+          item.file,
+          (progress) => setSending({ index, progress }),
+        ),
+      );
+      if (!sentPhoto) break;
       sent += 1;
     }
+    setSending(null);
     if (sent === upload.length) {
       form.reset();
       setUpload([]);
@@ -349,11 +356,13 @@ function GalleryEditor({
                   />
                 </label>
                 <Button type="submit" variant="primary" disabled={busy || !upload.length}>
-                  {busy
-                    ? 'Uploading…'
-                    : upload.length > 1
-                      ? `Upload ${upload.length} photos`
-                      : 'Upload'}
+                  {sending
+                    ? `Uploading${upload.length > 1 ? ` ${sending.index + 1} of ${upload.length}` : ''} ${Math.round(sending.progress * 100)}%…`
+                    : busy
+                      ? 'Saving…'
+                      : upload.length > 1
+                        ? `Upload ${upload.length} photos`
+                        : 'Upload'}
                 </Button>
               </form>
             )}

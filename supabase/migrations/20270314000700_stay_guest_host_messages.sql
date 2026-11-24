@@ -765,6 +765,126 @@ create trigger host_user_stay_chat_scope
   after update of units, user_id, host_id or delete on public.host_user
   for each row execute function public.tg_stay_chat_member_scope();
 
+-- ═══════════════════════════════════════════════════ the host support RPCs stay out of stay chats
+
+/*
+ * rpc_host_message_reply and rpc_host_message_read (20260101019900) accept any conversation where the caller has a
+ * participant row by user id. Stay chats create exactly those rows (the guest's `guest` row, each member's
+ * `host_user` row), so without this the guest or a member could post into a stay chat past every rule above: the
+ * 30-day close, the length limit, the stay status checks and the push to the other side. Both now refuse any
+ * conversation tied to a stay; stay chats go through rpc_stay_chat_* only. The host support thread is never tied
+ * to a stay, so it behaves as before. The membership check also moves ahead of the idempotency lookup, so a
+ * non-member can no longer learn whether a key was used in a conversation.
+ *
+ * Bodies are otherwise those of 20260101019900. create or replace keeps the existing grants.
+ */
+create or replace function public.rpc_host_message_reply(
+  p_conversation uuid,
+  p_body text,
+  p_idempotency_key text default null
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_uid uuid := (select auth.uid());
+  v_participant public.msg_participant;
+  v_existing public.msg_message;
+  v_id uuid;
+  v_seq bigint;
+begin
+  if coalesce(trim(p_body), '') = '' then
+    raise exception 'An empty message helps nobody.' using errcode = '22023';
+  end if;
+
+  select p.* into v_participant
+    from public.msg_participant p
+    join public.msg_conversation c on c.id = p.conversation_id
+   where p.conversation_id = p_conversation
+     and c.stay_id is null
+     and p.left_at is null
+     and p.user_id is not null
+     and p.user_id = v_uid
+   limit 1;
+
+  if not found then
+    raise exception 'You are not in this conversation.' using errcode = '42501';
+  end if;
+
+  /* A repeat of the same key is the same message. Somebody on
+     a bad connection pressing send twice must not send twice. */
+  if p_idempotency_key is not null then
+    select * into v_existing from public.msg_message
+     where conversation_id = p_conversation and idempotency_key = p_idempotency_key;
+    if found then
+      return jsonb_build_object('ok', true, 'message_id', v_existing.id,
+        'seq', v_existing.seq, 'repeat', true);
+    end if;
+  end if;
+
+  insert into public.msg_message (
+    conversation_id, kind, author_participant_id, body, visibility,
+    channel_out, delivery, idempotency_key)
+  values (
+    p_conversation, 'text', v_participant.id, trim(p_body), 'external',
+    'host_view', 'stored', p_idempotency_key)
+  returning id, seq into v_id, v_seq;
+
+  /* Reopen it: a host replying to something marked resolved is telling us it was not. */
+  update public.msg_conversation
+     set last_message_at = now(),
+         last_external_message_at = now(),
+         status = case when status in ('resolved', 'closed') then 'open' else status end,
+         resolved_at = case when status in ('resolved', 'closed') then null else resolved_at end,
+         first_response_due_at = case
+           when status in ('resolved', 'closed') then now() + interval '2 hours'
+           else first_response_due_at end
+   where id = p_conversation;
+
+  /* Their own message is not unread to them. */
+  update public.msg_participant
+     set last_read_seq = greatest(last_read_seq, v_seq)
+   where id = v_participant.id;
+
+  return jsonb_build_object('ok', true, 'message_id', v_id, 'seq', v_seq);
+end;
+$$;
+
+/** Mark a host support thread read, up to the last message in it. Stay chats use rpc_stay_chat_*_read. */
+create or replace function public.rpc_host_message_read(p_conversation uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_uid uuid := (select auth.uid());
+  v_max bigint;
+begin
+  if exists (
+    select 1 from public.msg_conversation c
+     where c.id = p_conversation and c.stay_id is not null) then
+    raise exception 'You are not in this conversation.' using errcode = '42501';
+  end if;
+
+  select max(seq) into v_max from public.msg_message
+   where conversation_id = p_conversation and visibility = 'external';
+
+  update public.msg_participant
+     set last_read_seq = greatest(last_read_seq, coalesce(v_max, 0))
+   where conversation_id = p_conversation
+     and user_id is not null and user_id = v_uid;
+
+  if not found then
+    raise exception 'You are not in this conversation.' using errcode = '42501';
+  end if;
+
+  return jsonb_build_object('ok', true, 'read_to', coalesce(v_max, 0));
+end;
+$$;
+
 -- ═══════════════════════════════════════════════════ accounted for
 
 insert into audit.action_registry (action, module, description) values
