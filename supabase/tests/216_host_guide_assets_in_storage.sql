@@ -1,7 +1,8 @@
 -- Guide files in Storage (20270316000100): the host-guide-assets bucket, who
 -- may add, read and remove a unit's floor plan and 3D model, the RPC that
 -- records an uploaded file, and files stored in the database before this
--- change staying readable.
+-- change staying readable. And (20270316000200) a guest opening a guide file
+-- through its QR code is in the audit log, once per grant and without the code.
 
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -271,6 +272,10 @@ select is(
   jsonb_build_object('mime', 'image/png', 'path', (select v from t where k = 'published')),
   'With the QR code, the guest guide gets the published floor plan''s path to sign.');
 select is(
+  public.rpc_host_workspace_guide_asset_sign('e2164000-0000-4000-8000-0000000000c1', 'NXG-T2K4MW'),
+  jsonb_build_object('mime', 'image/png', 'path', (select v from t where k = 'published')),
+  'A reload straight after gets the same path, refreshing the grant.');
+select is(
   (select count(*)::int from storage.objects
     where bucket_id = 'host-guide-assets' and name = (select v from t where k = 'published')),
   1, 'Then that file can be signed for the guest.');
@@ -288,6 +293,28 @@ select is(
     where path = (select v from t where k = 'published')
       and expires_at > now() and expires_at <= now() + interval '60 seconds'),
   1, 'The grant is for that one path and lasts a minute.');
+
+/* The audit log: one row for the read that created the grant, none for the reload. */
+select is(
+  (select count(*)::int from audit.audit_event where action = 'host.guide_file_opened_by_guest'),
+  1, 'The guest''s read is in the audit log once, and the reload straight after adds no second row.');
+select is(
+  (select actor_type::text || ' / ' || target_type || ' / ' || target_id::text || ' / ' || after::text
+     from audit.audit_event where action = 'host.guide_file_opened_by_guest'),
+  'guest / unit / e2163000-0000-4000-8000-00000000000a / '
+    || jsonb_build_object('asset_id', 'e2164000-0000-4000-8000-0000000000c1', 'kind', 'plan')::text,
+  'It is a guest''s read of that unit''s floor plan, naming the asset and its kind.');
+select ok(
+  not exists (select 1 from audit.audit_event e
+               where e.action = 'host.guide_file_opened_by_guest' and to_jsonb(e)::text ilike '%T2K4MW%')
+  and not exists (select 1 from audit.event_origin o join audit.audit_event e on e.id = o.event_id
+                   where e.action = 'host.guide_file_opened_by_guest' and to_jsonb(o)::text ilike '%T2K4MW%'),
+  'The QR code is not in the audit row.');
+select is(
+  (select count(*)::int from audit.audit_event where action = 'host.guide_file_opened_by_guest'
+     and target_id = 'e2163000-0000-4000-8000-00000000000a'
+     and (after ->> 'asset_id') = (select v from t where k = 'model_id')),
+  0, 'The refused read of the draft''s model is not logged.');
 update public.host_guide_asset_grant set expires_at = now() - interval '1 second';
 
 set local role anon;
@@ -297,13 +324,29 @@ select is(
   0, 'Once the grant has expired, the file is private again.');
 reset role;
 
+/* Opening the file again after the grant expired is a new read, logged again. */
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+select ok(
+  public.rpc_host_workspace_guide_asset_sign('e2164000-0000-4000-8000-0000000000c1', 'NXG-T2K4MW') is not null,
+  'The guest opens the floor plan again after the grant expired.');
+reset role;
+select is(
+  (select count(*)::int from audit.audit_event where action = 'host.guide_file_opened_by_guest'),
+  2, 'That read is logged as a second row.');
+
 -- ══════════════════════════════════════════ 8. the audit registry
 
 select is(
   (select count(*)::int from audit.action_registry
     where action in ('host.guide_asset_added', 'host.guide_draft', 'host.guide_publish',
-                     'host.guide_unpublish', 'host.guide_restore')),
-  5, 'Every guide action the upload and the draft save log is registered.');
+                     'host.guide_unpublish', 'host.guide_restore', 'host.guide_file_opened_by_guest')),
+  6, 'Every guide action the upload, the draft save and a guest''s read log is registered.');
+select ok(
+  not exists (select 1 from public.wiring_audit_exempt where function_name = 'rpc_host_workspace_guide_asset_sign')
+  and exists (select 1 from public.wiring_anon_allow where function_name = 'rpc_host_workspace_guide_asset_sign'
+                and coalesce(trim(guarded_by), '') <> ''),
+  'The sign RPC is no longer audit-exempt, and the anon allowlist still says what guards it.');
 
 select * from finish();
 rollback;
