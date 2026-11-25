@@ -74180,6 +74180,9 @@ export type Database = {
         };
       };
       rpc_stay_confirmation_sent: { Args: { p_stay_id: string }; Returns: boolean };
+      rpc_stay_guest_guide: { Args: { p_stay_id: string }; Returns: Json };
+      rpc_stay_guest_guide_asset_sign: { Args: { p_id: string; p_stay_id: string }; Returns: Json };
+      rpc_stay_guest_stays: { Args: { p_limit?: number }; Returns: Json };
       rpc_stay_hold: {
         Args: { p_check_in: string; p_check_out: string; p_guest?: Json; p_unit_id: string };
         Returns: Json;
