@@ -2,7 +2,7 @@
 -- of what the system said, a hold's life on it, and the worker's checks.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(38);
+select plan(58);
 
 insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, is_anonymous, created_at, updated_at)
 values
@@ -224,6 +224,113 @@ select is(public.cinema_payment_settled(current_setting('t.h5')::uuid, 'PS-150-5
   'A payment that lands after the cinema cancelled the showing is refunded, never confirmed.');
 select is((select status || ':' || in_latest_sync from cinema.showing where id = pg_temp.showing_id('SH4')), 'draft:false',
   'A showing left out of a sync is kept, marked not in the latest programme.');
+
+-- ─────────────────────────────────────────────────────── what the review found
+
+-- Two showings that swap places on one screen are both taken.
+select public.cinema_sync_apply('c1500000-0000-4000-8000-0000000000c1',
+  pg_temp.programme(jsonb_build_array(pg_temp.showing('SH5', 10), pg_temp.showing('SH6', 13))));
+select set_config('t.swap', public.cinema_sync_apply('c1500000-0000-4000-8000-0000000000c1',
+  pg_temp.programme(jsonb_build_array(pg_temp.showing('SH5', 13), pg_temp.showing('SH6', 10))))::text, true);
+select is(jsonb_array_length(current_setting('t.swap')::jsonb -> 'refused'), 0,
+  'Two showings that swap places on a screen refuse nothing.');
+select is((select string_agg(status, ',' order by source_ref) from cinema.showing
+            where id in (pg_temp.showing_id('SH5'), pg_temp.showing_id('SH6'))), 'on_sale,on_sale',
+  'And both stay on sale, at their new times.');
+
+-- A film NexG cannot take is refused on its own; the rest arrives.
+select set_config('t.badfilm', public.cinema_sync_apply('c1500000-0000-4000-8000-0000000000c1', pg_temp.programme(
+  jsonb_build_array(pg_temp.showing('SH5', 13), pg_temp.showing('SH6', 10),
+                    jsonb_set(pg_temp.showing('SH7', 20), '{filmRef}', '"F9"')),
+  jsonb_build_array(
+    jsonb_build_object('ref', 'F1', 'title', 'The Long Rains', 'runtimeMinutes', 120, 'releaseDate', '2026-10-01',
+                       'classification', 'PG', 'externalIds', jsonb_build_object('imdb', 'tt0150001')),
+    jsonb_build_object('ref', 'F9', 'title', 'Broken', 'runtimeMinutes', 'abc'))))::text, true);
+select ok(current_setting('t.badfilm')::jsonb -> 'refused' @> '[{"ref": "F9", "kind": "film"}]',
+  'A film NexG cannot take is refused on its own, with the reason.');
+select ok(current_setting('t.badfilm')::jsonb -> 'refused' @> '[{"ref": "SH7"}]', 'So is the showing that needs it.');
+select is((current_setting('t.badfilm')::jsonb ->> 'showings')::int, 2, 'The rest of the programme still arrives.');
+
+-- A screen entered before the cinema connected is adopted, not duplicated.
+insert into cinema.screen (id, merchant_id, name)
+values ('c1500000-0000-4000-8000-0000000000e9', 'c1500000-0000-4000-8000-00000000000a', 'Screen 9');
+select public.cinema_sync_apply('c1500000-0000-4000-8000-0000000000c1', jsonb_set(
+  pg_temp.programme(jsonb_build_array(pg_temp.showing('SH5', 13), pg_temp.showing('SH6', 10))), '{screens}',
+  (pg_temp.programme('[]'::jsonb) -> 'screens') || jsonb_build_array(jsonb_build_object(
+    'ref', 'S9', 'name', 'Screen 9', 'rows', jsonb_build_array(jsonb_build_object('label', 'A', 'position', 1,
+      'seats', jsonb_build_array(jsonb_build_object('code', 'A1', 'column', 1, 'number', 1, 'type', 'standard'))))))));
+select is((select connection_id::text || ':' || source_ref from cinema.screen
+            where id = 'c1500000-0000-4000-8000-0000000000e9'), 'c1500000-0000-4000-8000-0000000000c1:S9',
+  'A screen of the same name, entered before the cinema connected, is adopted rather than clashing.');
+
+-- A booking found after NexG stopped waiting is honoured, not refunded.
+select is(public.cinema_record_confirm(current_setting('t.h4')::uuid, 'SBX-B-4-LATE', '[]'::jsonb) ->> 'state',
+  'confirmed', 'A booking the cinema made after NexG stopped waiting is confirmed, not refunded.');
+
+-- Cancelling is written down first, and asked again until the cinema answers.
+select is(public.cinema_record_cancel_requested(current_setting('t.h4')::uuid) ->> 'message',
+  'Cancelling with [Cinema 150 A]…', 'A cancel is written down before the cinema is asked.');
+update cinema.hold set cancel_next_at = now() - interval '1 second' where id = current_setting('t.h4')::uuid;
+select ok(public.cinema_due_work(50) -> 'cancels' @> to_jsonb(array[current_setting('t.h4')]),
+  'A cancel the cinema has not answered is handed to the worker to ask again.');
+select is(public.cinema_record_cancel_failed(current_setting('t.h4')::uuid, 'Too close to the start.', true) ->> 'state',
+  'confirmed', 'Refused for good by the cinema: the booking stands.');
+select is((select cancel_requested_at from cinema.hold where id = current_setting('t.h4')::uuid), null,
+  'And the request is dropped.');
+
+-- A payment that lands once sales have closed is refunded.
+select public.cinema_sync_apply('c1500000-0000-4000-8000-0000000000c1', pg_temp.programme(jsonb_build_array(
+  pg_temp.showing('SH5', 13), pg_temp.showing('SH6', 10), pg_temp.showing('SH8', -23.9))));
+select set_config('t.h6', public.cinema_record_hold(pg_temp.showing_id('SH8'), 'c1500000-0000-4000-8000-000000000001',
+  'c1500000-0000-4000-8000-0000000000d6', array['A1'], '[]'::jsonb, 65000, 'SBX-H-6', now() + interval '3 minutes')
+  ->> 'holdId', true);
+select public.cinema_payment_settled(current_setting('t.h6')::uuid, 'PS-150-6');
+select is((select state || ':' || refund_reason from cinema.hold where id = current_setting('t.h6')::uuid),
+  'refund_due:paid_too_late', 'A payment that arrives after sales closed is refunded, not booked.');
+
+-- A connected cinema stops selling 20 minutes before the start.
+select public.cinema_sync_apply('c1500000-0000-4000-8000-0000000000c1', pg_temp.programme(jsonb_build_array(
+  pg_temp.showing('SH5', 13), pg_temp.showing('SH6', 10), pg_temp.showing('SH8', -23.9, 'cancelled'),
+  pg_temp.showing('SH9', -23.75))));
+select ok(not (public.rpc_cinema_programme((now() at time zone 'Africa/Nairobi')::date, 7, 'c1500000-0000-4000-8000-00000000000a') -> 'showings'
+               @> jsonb_build_array(jsonb_build_object('id', pg_temp.showing_id('SH9')))),
+  'A connected cinema''s showing 15 minutes away is no longer offered: there is no time left to pay.');
+select ok(public.rpc_cinema_programme((now() at time zone 'Africa/Nairobi')::date, 7, 'c1500000-0000-4000-8000-00000000000a') -> 'showings'
+          @> jsonb_build_array(jsonb_build_object('id', pg_temp.showing_id('SH5'))),
+  'Later showings are.');
+
+-- A customer holds seats for at most three showings at a time.
+select public.cinema_record_hold(pg_temp.showing_id('SH5'), 'c1500000-0000-4000-8000-000000000003', gen_random_uuid(), array['A1'], '[]'::jsonb,
+  65000, 'SBX-L-1', now() + interval '7 minutes');
+select public.cinema_record_hold(pg_temp.showing_id('SH5'), 'c1500000-0000-4000-8000-000000000003', gen_random_uuid(), array['A2'], '[]'::jsonb,
+  65000, 'SBX-L-2', now() + interval '7 minutes');
+select public.cinema_record_hold(pg_temp.showing_id('SH6'), 'c1500000-0000-4000-8000-000000000003', gen_random_uuid(), array['A1'], '[]'::jsonb,
+  65000, 'SBX-L-3', now() + interval '7 minutes');
+select throws_ok(format($$select public.cinema_record_hold(%L, 'c1500000-0000-4000-8000-000000000003', gen_random_uuid(), array['A3'], '[]'::jsonb,
+  90000, 'SBX-L-4', now() + interval '7 minutes')$$, pg_temp.showing_id('SH6')),
+  'P0001', 'You already have seats held for three showings. Pay for them or let them go first.',
+  'A fourth live hold is refused.');
+select is(jsonb_array_length(public.cinema_active_holds('c1500000-0000-4000-8000-000000000003')), 3, 'The customer''s live holds are listed.');
+select is(public.cinema_hold_for_request('c1500000-0000-4000-8000-000000000001', 'c1500000-0000-4000-8000-0000000000d1') ->> 'holdId',
+  current_setting('t.h1'), 'A retry finds the hold NexG already has.');
+
+-- Pausing and resuming.
+select set_config('request.jwt.claims', '{"sub":"c1500000-0000-4000-8000-000000000003","role":"authenticated"}', true);
+set local role authenticated;
+select public.rpc_cinema_pause('c1500000-0000-4000-8000-00000000000a', true);
+select public.rpc_cinema_pause('c1500000-0000-4000-8000-00000000000a', false);
+reset role;
+select is((select (last_sync_at is null) || ':' || (stale_closed_at is not null) from cinema.sync_state
+            where connection_id = 'c1500000-0000-4000-8000-0000000000c1'), 'true:true',
+  'Resuming asks for a sync at once, without a false "stopped syncing".');
+select ok(public.cinema_due_work(50) -> 'syncs' @> jsonb_build_array(jsonb_build_object('connectionId', 'c1500000-0000-4000-8000-0000000000c1')),
+  'And the worker syncs it next.');
+update public.connector_connection set state = 'draft' where id = 'c1500000-0000-4000-8000-0000000000c2';
+set local role authenticated;
+select throws_ok($$select public.rpc_cinema_pause('c1500000-0000-4000-8000-00000000000b', true)$$,
+  '22023', 'Finish connecting the ticketing system first.',
+  'A connection still being set up cannot be paused, nor resumed into selling.');
+reset role;
 
 select * from finish();
 rollback;

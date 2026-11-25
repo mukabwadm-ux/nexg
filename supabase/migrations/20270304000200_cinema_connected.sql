@@ -63,7 +63,9 @@ insert into audit.action_registry (action, module, default_severity, money, desc
   ('cinema.confirm_failed', 'experiences', 'notice', true, 'A cinema did not confirm a paid booking (retrying)'),
   ('cinema.refund_due', 'experiences', 'high', true, 'A paid cinema booking needs a refund'),
   ('cinema.refunded', 'experiences', 'info', true, 'A paid cinema booking was refunded'),
-  ('cinema.booking_cancelled', 'experiences', 'notice', true, 'A cinema booking was cancelled')
+  ('cinema.booking_cancelled', 'experiences', 'notice', true, 'A cinema booking was cancelled'),
+  ('cinema.cancel_requested', 'experiences', 'notice', true, 'A customer asked to cancel a cinema booking'),
+  ('cinema.cancel_refused', 'experiences', 'notice', true, 'A cinema refused to cancel a booking')
 on conflict (action) do nothing;
 
 -- ═══════════════════════════════════════════════ 1. the sandbox adapter
@@ -158,6 +160,10 @@ alter table cinema.hold
   add column if not exists last_error text,
   add column if not exists refund_reason text,
   add column if not exists refund_reference text,
+  add column if not exists cancel_requested_at timestamptz,
+  add column if not exists cancel_attempts integer not null default 0,
+  add column if not exists cancel_next_at timestamptz,
+  add column if not exists cancel_error text,
   add column if not exists created_at timestamptz not null default now(),
   add column if not exists updated_at timestamptz not null default now();
 
@@ -174,6 +180,8 @@ alter table cinema.hold add constraint hold_refund_reason
   check (state not in ('refund_due', 'refunded') or refund_reason is not null);
 
 create index if not exists cinema_hold_due_idx on cinema.hold (next_attempt_at) where state = 'confirming';
+create index if not exists cinema_hold_cancel_idx on cinema.hold (cancel_next_at)
+  where state = 'confirmed' and cancel_requested_at is not null;
 create index if not exists cinema_hold_expiry_idx on cinema.hold (expires_at)
   where state in ('held', 'paying') and connection_id is not null;
 
@@ -271,6 +279,7 @@ declare
   v_name text := nullif(btrim(p_screen ->> 'name'), '');
   v_layout text := coalesce(nullif(btrim(p_screen ->> 'layoutVersion'), ''), md5(coalesce(p_screen -> 'rows', '[]'::jsonb)::text));
   v_screen cinema.screen;
+  v_have boolean;
   v_row jsonb;
   v_seat jsonb;
 begin
@@ -279,13 +288,31 @@ begin
   end if;
   select * into v_screen from cinema.screen
    where connection_id = p_connection_id and source_ref = v_ref for update;
+  v_have := found;
 
-  if found and v_screen.layout_version is not distinct from v_layout then
+  if not v_have then
+    -- The same screen under the cinema's earlier system, or entered by hand
+    -- before it connected: adopted, not duplicated (names are unique per
+    -- cinema). Its layout is replaced unless seats on it are already sold.
+    select sc.* into v_screen from cinema.screen sc
+     where sc.merchant_id = p_merchant_id and sc.name = v_name
+       and (sc.connection_id is null or not exists (
+             select 1 from public.connector_connection cc
+              where cc.id = sc.connection_id and cc.state not in ('disconnected', 'revoked')))
+     for update;
+    if found then
+      update cinema.screen set connection_id = p_connection_id, source_ref = v_ref, layout_version = null
+       where id = v_screen.id returning * into v_screen;
+      v_have := true;
+    end if;
+  end if;
+
+  if v_have and v_screen.layout_version is not distinct from v_layout then
     update cinema.screen set name = v_name, synced_at = now() where id = v_screen.id;
     return v_screen.id;
   end if;
 
-  if found and exists (
+  if v_have and exists (
     select 1 from cinema.hold h join cinema.showing s on s.id = h.showing_id
      where s.screen_id = v_screen.id and s.starts_at > now()
        and h.state in ('paying', 'confirming', 'confirmed')) then
@@ -294,7 +321,7 @@ begin
     return v_screen.id;
   end if;
 
-  if not found then
+  if not v_have then
     insert into cinema.screen (merchant_id, name, connection_id, source_ref, layout_version, synced_at)
     values (p_merchant_id, v_name, p_connection_id, v_ref, v_layout, now())
     returning * into v_screen;
@@ -390,14 +417,48 @@ begin
     raise exception 'A programme says which window it covers.' using errcode = '22023';
   end if;
 
+  -- A film or screen NexG cannot take is refused on its own, with the
+  -- reason; the showings that need it are refused in turn. The rest of the
+  -- programme still arrives, cancellations included.
   for v_item in select value from jsonb_array_elements(coalesce(p_programme -> 'films', '[]'::jsonb)) loop
-    perform cinema.film_for_source(c.id, v_item);
-    v_films := v_films + 1;
+    begin
+      perform cinema.film_for_source(c.id, v_item);
+      v_films := v_films + 1;
+    exception
+      when sqlstate '22023' or check_violation or not_null_violation or unique_violation
+           or invalid_text_representation or invalid_datetime_format or datetime_field_overflow
+           or numeric_value_out_of_range or string_data_right_truncation then
+        v_refused := v_refused || jsonb_build_object('ref', v_item ->> 'ref', 'kind', 'film', 'reason', sqlerrm);
+    end;
   end loop;
 
   for v_item in select value from jsonb_array_elements(coalesce(p_programme -> 'screens', '[]'::jsonb)) loop
-    perform cinema.screen_for_source(c.id, m.id, v_item);
-    v_screens := v_screens + 1;
+    begin
+      perform cinema.screen_for_source(c.id, m.id, v_item);
+      v_screens := v_screens + 1;
+    exception
+      when sqlstate '22023' or check_violation or not_null_violation or unique_violation or foreign_key_violation
+           or invalid_text_representation or numeric_value_out_of_range or string_data_right_truncation then
+        v_refused := v_refused || jsonb_build_object('ref', v_item ->> 'ref', 'kind', 'screen', 'reason', sqlerrm);
+    end;
+  end loop;
+
+  -- A showing moving to another time or screen leaves its old slot first, so
+  -- two showings that swap places do not refuse each other.
+  for v_item in select value from jsonb_array_elements(coalesce(p_programme -> 'showings', '[]'::jsonb)) loop
+    begin
+      update cinema.showing s set status = 'draft'
+       where s.connection_id = c.id and s.source_ref = nullif(btrim(v_item ->> 'ref'), '')
+         and s.status in ('on_sale', 'closed')
+         and (s.starts_at is distinct from (v_item ->> 'startsAt')::timestamptz
+              or s.ends_at is distinct from (v_item ->> 'endsAt')::timestamptz
+              or s.screen_id is distinct from (select sc.id from cinema.screen sc
+                                                where sc.connection_id = c.id
+                                                  and sc.source_ref = v_item ->> 'screenRef'));
+    exception
+      when invalid_text_representation or invalid_datetime_format or datetime_field_overflow then
+        null;  -- refused with its reason below
+    end;
   end loop;
 
   for v_item in select value from jsonb_array_elements(coalesce(p_programme -> 'showings', '[]'::jsonb)) loop
@@ -560,6 +621,8 @@ as $$
       when 'showing_cancelled' then coalesce(p_cinema, 'The cinema') || ' cancelled this showing. Your '
         || cinema.kes(p_total_minor) || ' is being refunded.'
       when 'customer_cancelled' then 'Cancelled. Your ' || cinema.kes(p_total_minor) || ' is being refunded.'
+      when 'paid_too_late' then 'Your payment arrived after sales for this showing closed. Your '
+        || cinema.kes(p_total_minor) || ' is being refunded.'
       else coalesce(p_cinema, 'The cinema') || ' couldn''t confirm your seats. Your ' || cinema.kes(p_total_minor)
         || ' is being refunded to your card or M-Pesa; it shows in 1 to 5 days.' end
     when 'refunded' then 'Refunded.'
@@ -585,9 +648,12 @@ as $$
                                   'screenName', sc.name, 'startsAt', s.starts_at),
     'tickets', h.tickets,
     'bookingRef', h.source_booking_ref,
-    'message', cinema.hold_message(
-      case when h.state = 'held' and h.expires_at <= statement_timestamp() then 'expired' else h.state end,
-      h.refund_reason, m.trading_name, h.total_minor)
+    'cancelRequested', case when h.state = 'confirmed' and h.cancel_requested_at is not null then true end,
+    'message', case when h.state = 'confirmed' and h.cancel_requested_at is not null
+      then 'Cancelling with ' || coalesce(m.trading_name, 'the cinema') || '…'
+      else cinema.hold_message(
+        case when h.state = 'held' and h.expires_at <= statement_timestamp() then 'expired' else h.state end,
+        h.refund_reason, m.trading_name, h.total_minor) end
   ))
   from cinema.hold h
   join cinema.showing s on s.id = h.showing_id
@@ -630,6 +696,14 @@ begin
       using errcode = '22023';
   end if;
   select array_agg(distinct x order by x) into v_seats from unnest(p_seats) x;
+  -- Seats held on a cinema's real system block its box office: a customer
+  -- holds for at most three showings at a time.
+  if (select count(*) from cinema.hold
+       where guest_id = p_user_id and connection_id is not null and state in ('held', 'paying')
+         and settled_at is null and expires_at > now()) >= 3 then
+    raise exception 'You already have seats held for three showings. Pay for them or let them go first.'
+      using errcode = 'P0001', hint = 'too_many_holds';
+  end if;
 
   insert into cinema.hold (guest_id, request_id, showing_id, seat_codes, total_minor, expires_at, state,
                            connection_id, source_hold_ref, lines)
@@ -720,6 +794,20 @@ begin
                                     'payment', btrim(p_payment_reference), 'state_before', v_hold.state));
     return cinema.connected_hold_result(p_hold_id);
   end if;
+  -- Paid after sales closed (10 minutes before the start): too late to book.
+  if exists (select 1 from cinema.showing s
+              where s.id = v_hold.showing_id and s.starts_at - interval '10 minutes' <= now()) then
+    update cinema.hold set state = 'refund_due', refund_reason = 'paid_too_late',
+           payment_reference = btrim(p_payment_reference), settled_at = now(), next_attempt_at = null,
+           updated_at = now()
+     where id = p_hold_id;
+    perform audit.log('system'::public.actor_type, 'experiences', 'cinema.refund_due',
+      p_target_type => 'cinema_hold', p_target_id => p_hold_id, p_severity => 'high'::public.audit_severity,
+      p_reason => 'Paid after sales for the showing closed.',
+      p_after => jsonb_build_object('reason', 'paid_too_late', 'total_minor', v_hold.total_minor,
+                                    'payment', btrim(p_payment_reference), 'state_before', v_hold.state));
+    return cinema.connected_hold_result(p_hold_id);
+  end if;
   update cinema.hold set state = 'confirming', payment_reference = btrim(p_payment_reference),
          settled_at = now(), next_attempt_at = now(), confirm_attempts = 0, updated_at = now()
    where id = p_hold_id;
@@ -751,16 +839,19 @@ begin
   if v_hold.state = 'confirmed' then
     return cinema.connected_hold_result(p_hold_id);
   end if;
-  if v_hold.state <> 'confirming' then
+  -- A booking that went through is never refunded: one found after NexG gave
+  -- up waiting is confirmed, as long as the refund has not been paid.
+  if v_hold.state <> 'confirming'
+     and not (v_hold.state = 'refund_due' and v_hold.refund_reason = 'confirm_refused') then
     raise exception 'Only a paid hold is confirmed.' using errcode = '22023';
   end if;
   update cinema.hold set state = 'confirmed', confirmation_ref = v_ref, source_booking_ref = v_ref,
          tickets = coalesce(p_tickets, '[]'::jsonb), next_attempt_at = null, last_error = null,
-         updated_at = now()
+         refund_reason = null, updated_at = now()
    where id = p_hold_id;
   perform audit.log('system'::public.actor_type, 'experiences', 'cinema.booking_confirmed',
     p_target_type => 'cinema_hold', p_target_id => p_hold_id,
-    p_after => jsonb_build_object('booking', v_ref, 'seats', v_hold.seat_codes,
+    p_after => jsonb_build_object('booking', v_ref, 'seats', v_hold.seat_codes, 'state_before', v_hold.state,
                                   'total_minor', v_hold.total_minor, 'payment', v_hold.payment_reference));
   return cinema.connected_hold_result(p_hold_id);
 end;
@@ -863,11 +954,86 @@ begin
   if v_hold.state <> 'confirmed' then
     raise exception 'Only a confirmed booking is cancelled.' using errcode = '22023';
   end if;
-  update cinema.hold set state = 'refund_due', refund_reason = p_reason, updated_at = now() where id = p_hold_id;
+  update cinema.hold set state = 'refund_due', refund_reason = p_reason, cancel_next_at = null, cancel_error = null,
+         updated_at = now()
+   where id = p_hold_id;
   perform audit.log('system'::public.actor_type, 'experiences', 'cinema.booking_cancelled',
     p_target_type => 'cinema_hold', p_target_id => p_hold_id,
     p_after => jsonb_build_object('reason', p_reason, 'booking', v_hold.source_booking_ref,
                                   'total_minor', v_hold.total_minor));
+  return cinema.connected_hold_result(p_hold_id);
+end;
+$$;
+
+/* The customer asked to cancel: written down before the cinema is asked, so
+   a cancel the cinema made but never answered is still finished (the worker
+   asks again) and refunded. */
+create or replace function public.cinema_record_cancel_requested(p_hold_id uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_hold cinema.hold;
+begin
+  select * into v_hold from cinema.hold where id = p_hold_id for update;
+  if not found or v_hold.connection_id is null then
+    raise exception 'Seat hold not found.' using errcode = 'P0002';
+  end if;
+  if v_hold.state in ('refund_due', 'refunded') then
+    return cinema.connected_hold_result(p_hold_id);
+  end if;
+  if v_hold.state <> 'confirmed' then
+    raise exception 'Only a confirmed booking is cancelled.' using errcode = '22023';
+  end if;
+  if v_hold.cancel_requested_at is null then
+    update cinema.hold set cancel_requested_at = now(), cancel_attempts = 0, cancel_error = null,
+           cancel_next_at = now() + interval '1 minute', updated_at = now()
+     where id = p_hold_id;
+    perform audit.log('guest'::public.actor_type, 'experiences', 'cinema.cancel_requested',
+      p_actor_id => v_hold.guest_id, p_target_type => 'cinema_hold', p_target_id => p_hold_id,
+      p_after => jsonb_build_object('booking', v_hold.source_booking_ref, 'total_minor', v_hold.total_minor));
+  end if;
+  return cinema.connected_hold_result(p_hold_id);
+end;
+$$;
+
+/* The cinema did not cancel. Refused for good (too close to the start): the
+   request is dropped and the booking stands. No answer: asked again after 1,
+   2, 5 and then every 10 minutes. */
+create or replace function public.cinema_record_cancel_failed(p_hold_id uuid, p_error text, p_final boolean)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_hold cinema.hold;
+  v_attempts integer;
+begin
+  select * into v_hold from cinema.hold where id = p_hold_id for update;
+  if not found or v_hold.connection_id is null then
+    raise exception 'Seat hold not found.' using errcode = 'P0002';
+  end if;
+  if v_hold.state <> 'confirmed' or v_hold.cancel_requested_at is null then
+    return cinema.connected_hold_result(p_hold_id);
+  end if;
+  v_attempts := v_hold.cancel_attempts + 1;
+  if coalesce(p_final, false) then
+    update cinema.hold set cancel_requested_at = null, cancel_next_at = null, cancel_attempts = v_attempts,
+           cancel_error = left(p_error, 500), updated_at = now()
+     where id = p_hold_id;
+    perform audit.log('system'::public.actor_type, 'experiences', 'cinema.cancel_refused',
+      p_target_type => 'cinema_hold', p_target_id => p_hold_id,
+      p_after => jsonb_build_object('error', left(p_error, 500), 'booking', v_hold.source_booking_ref));
+  else
+    update cinema.hold set cancel_attempts = v_attempts, cancel_error = left(p_error, 500),
+           cancel_next_at = now() + (array[interval '1 minute', interval '2 minutes', interval '5 minutes',
+                                           interval '10 minutes'])[least(v_attempts, 4)],
+           updated_at = now()
+     where id = p_hold_id;
+  end if;
   return cinema.connected_hold_result(p_hold_id);
 end;
 $$;
@@ -961,6 +1127,10 @@ begin
       select jsonb_agg(x.id) from (select id from cinema.hold
         where state in ('held', 'paying') and settled_at is null and connection_id is not null
           and expires_at <= now() order by expires_at limit v_limit) x), '[]'::jsonb),
+    'cancels', coalesce((
+      select jsonb_agg(x.id) from (select id from cinema.hold
+        where state = 'confirmed' and cancel_requested_at is not null and cancel_next_at <= now()
+        order by cancel_next_at limit v_limit) x), '[]'::jsonb),
     'refunds', coalesce((
       select jsonb_agg(x.id) from (select id from cinema.hold
         where state = 'refund_due' order by updated_at limit v_limit) x), '[]'::jsonb)
@@ -981,11 +1151,43 @@ as $$
     'connectionId', h.connection_id, 'adapterId', c.adapter_id, 'environment', c.environment,
     'showingId', s.id, 'showingRef', s.source_ref, 'seats', to_jsonb(h.seat_codes), 'totalMinor', h.total_minor,
     'holdRef', h.source_hold_ref, 'bookingRef', h.source_booking_ref,
-    'paymentReference', h.payment_reference, 'expiresAt', h.expires_at, 'startsAt', s.starts_at)
+    'paymentReference', h.payment_reference, 'expiresAt', h.expires_at, 'startsAt', s.starts_at,
+    'settledAt', h.settled_at, 'refundReason', h.refund_reason, 'cancelRequestedAt', h.cancel_requested_at,
+    'cinemaName', m.trading_name)
   from cinema.hold h
   join cinema.showing s on s.id = h.showing_id
+  join cinema.screen sc on sc.id = s.screen_id
   join public.connector_connection c on c.id = h.connection_id
+  left join public.merchant m on m.id = sc.merchant_id
   where h.id = p_hold_id
+$$;
+
+/* The customer's own hold for a request id, if NexG already has it. */
+create or replace function public.cinema_hold_for_request(p_user_id uuid, p_request_id uuid)
+returns jsonb
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select cinema.connected_hold_result(h.id) || jsonb_build_object('showingId', h.showing_id)
+  from cinema.hold h
+  where h.guest_id = p_user_id and h.request_id = p_request_id and h.connection_id is not null
+$$;
+
+/* A customer's seats still held on cinemas' systems (not yet paid). */
+create or replace function public.cinema_active_holds(p_user_id uuid)
+returns jsonb
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select coalesce(jsonb_agg(jsonb_build_object('holdId', h.id, 'showingId', h.showing_id, 'state', h.state)
+                            order by h.created_at), '[]'::jsonb)
+  from cinema.hold h
+  where h.guest_id = p_user_id and h.connection_id is not null and h.state in ('held', 'paying')
+    and h.settled_at is null and h.expires_at > now()
 $$;
 
 /* What the live calls need about a showing: its connection and the
@@ -1000,11 +1202,12 @@ as $$
   select jsonb_build_object(
     'showingId', s.id, 'showingRef', s.source_ref, 'status', s.status, 'startsAt', s.starts_at,
     'connectionId', c.id, 'adapterId', c.adapter_id, 'environment', c.environment, 'connectionState', c.state,
-    'merchantId', sc.merchant_id, 'screenId', sc.id,
+    'merchantId', sc.merchant_id, 'screenId', sc.id, 'cinemaName', m.trading_name,
     'prices', jsonb_build_object('standard', s.standard_minor, 'vip', s.vip_minor, 'wheelchair', s.wheelchair_minor))
   from cinema.showing s
   join cinema.screen sc on sc.id = s.screen_id
   join public.connector_connection c on c.id = s.connection_id
+  left join public.merchant m on m.id = sc.merchant_id
   where s.id = p_showing_id
 $$;
 
@@ -1047,12 +1250,13 @@ declare
   v_due jsonb := public.cinema_due_work(50);
 begin
   if jsonb_array_length(v_due -> 'syncs') = 0 and jsonb_array_length(v_due -> 'confirms') = 0
-     and jsonb_array_length(v_due -> 'expiries') = 0 then
+     and jsonb_array_length(v_due -> 'expiries') = 0 and jsonb_array_length(v_due -> 'cancels') = 0 then
     return jsonb_build_object('ok', true, 'waiting', 0);
   end if;
   return public.fn_cinema_worker_poke() || jsonb_build_object(
     'syncs', jsonb_array_length(v_due -> 'syncs'), 'confirms', jsonb_array_length(v_due -> 'confirms'),
-    'expiries', jsonb_array_length(v_due -> 'expiries'));
+    'expiries', jsonb_array_length(v_due -> 'expiries'), 'cancels', jsonb_array_length(v_due -> 'cancels'),
+    'refunds', jsonb_array_length(v_due -> 'refunds'));
 end;
 $$;
 
@@ -1187,6 +1391,9 @@ begin
       return public.rpc_cinema_connection(p_merchant_id);
     end if;
     update public.connector_connection set state = 'disconnected', updated_at = now() where id = c.id;
+    -- Its showings can no longer be booked on its system: off sale on NexG.
+    update cinema.showing set status = 'closed'
+     where connection_id = c.id and status = 'on_sale' and starts_at > now();
   end if;
   insert into public.connector_connection (adapter_id, merchant_id, environment, state, created_by_user)
   values (a.id, m.id, (case when a.state = 'sandbox' then 'sandbox' else 'production' end)::public.connector_environment,
@@ -1216,12 +1423,17 @@ begin
     raise exception 'Connect the cinema''s ticketing system first.' using errcode = '22023';
   end if;
   if coalesce(p_paused, false) then
+    if c.state not in ('operational', 'degraded', 'suspended') then
+      raise exception 'Finish connecting the ticketing system first.' using errcode = '22023';
+    end if;
     update public.connector_connection set state = 'suspended', updated_at = now() where id = c.id;
     update cinema.showing set status = 'closed' where connection_id = c.id and status = 'on_sale';
-  else
-    update public.connector_connection set state = 'operational', updated_at = now()
-     where id = c.id and state = 'suspended';
-    update cinema.sync_state set last_sync_at = null where connection_id = c.id;
+  elsif c.state = 'suspended' then
+    update public.connector_connection set state = 'operational', updated_at = now() where id = c.id;
+    -- Sync at once. Its showings are already closed by the pause, so the
+    -- stopped-syncing check does not close them again; the sync reopens them.
+    insert into cinema.sync_state (connection_id, last_sync_at, stale_closed_at) values (c.id, null, now())
+    on conflict (connection_id) do update set last_sync_at = null, stale_closed_at = now();
   end if;
   perform audit.log('merchant_user'::public.actor_type, 'experiences', 'cinema.sales_paused',
     p_target_type => 'merchant', p_target_id => m.id, p_target_label => m.trading_name, p_city_id => m.city_id,
@@ -1435,6 +1647,8 @@ begin
       where s.starts_at >= (p_from::timestamp at time zone 'Africa/Nairobi')
         and s.starts_at < ((p_from + p_days)::timestamp at time zone 'Africa/Nairobi')
         and s.starts_at > statement_timestamp() + interval '10 minutes'
+        -- A connected cinema stops selling 20 minutes before: time to pay, then its own 10.
+        and (sh.connection_id is null or s.starts_at > statement_timestamp() + interval '20 minutes')
         and (p_merchant_id is null or s.merchant_id = p_merchant_id)
         and (p_film_id is null or s.film_id = p_film_id)
     )
@@ -1493,6 +1707,10 @@ revoke all on function public.cinema_record_confirm_failed(uuid, text, boolean) 
 revoke all on function public.cinema_record_hold_ended(uuid, text) from public, anon, authenticated;
 revoke all on function public.cinema_record_cancelled(uuid, text) from public, anon, authenticated;
 revoke all on function public.cinema_record_refunded(uuid, text) from public, anon, authenticated;
+revoke all on function public.cinema_record_cancel_requested(uuid) from public, anon, authenticated;
+revoke all on function public.cinema_record_cancel_failed(uuid, text, boolean) from public, anon, authenticated;
+revoke all on function public.cinema_hold_for_request(uuid, uuid) from public, anon, authenticated;
+revoke all on function public.cinema_active_holds(uuid) from public, anon, authenticated;
 revoke all on function public.cinema_due_work(integer) from public, anon, authenticated;
 revoke all on function public.cinema_hold_for_worker(uuid) from public, anon, authenticated;
 revoke all on function public.cinema_showing_for_call(uuid) from public, anon, authenticated;
@@ -1509,6 +1727,10 @@ grant execute on function public.cinema_record_confirm_failed(uuid, text, boolea
 grant execute on function public.cinema_record_hold_ended(uuid, text) to service_role;
 grant execute on function public.cinema_record_cancelled(uuid, text) to service_role;
 grant execute on function public.cinema_record_refunded(uuid, text) to service_role;
+grant execute on function public.cinema_record_cancel_requested(uuid) to service_role;
+grant execute on function public.cinema_record_cancel_failed(uuid, text, boolean) to service_role;
+grant execute on function public.cinema_hold_for_request(uuid, uuid) to service_role;
+grant execute on function public.cinema_active_holds(uuid) to service_role;
 grant execute on function public.cinema_due_work(integer) to service_role;
 grant execute on function public.cinema_hold_for_worker(uuid) to service_role;
 grant execute on function public.cinema_showing_for_call(uuid) to service_role;
