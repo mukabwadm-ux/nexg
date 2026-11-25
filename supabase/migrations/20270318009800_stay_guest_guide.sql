@@ -15,9 +15,11 @@
 --     gate code (never shown to guests).
 --   * rpc_stay_guest_guide(p_stay_id): the unit's published guide, in the same shape as
 --     rpc_host_workspace_published_guide ({unitName, document, publishedAt}). Refused (42501) unless the stay is the
---     caller's. Null unless the stay has a unit, is booked, in_stay or departed, and check-out was under 14 days ago;
---     the host and unit are live, the unit is not archived, and the guide is published. A cancelled stay never
---     qualifies. It does not need a placed QR card: the booking is the guest's access.
+--     caller's. Null unless the stay has a unit, is booked or in_stay, and check-out has not passed; the host and
+--     unit are live, the unit is not archived, and the guide is published. It closes when the stay ends, as
+--     rpc_my_stay_code (20270116000400) does: guide articles often hold the door or lockbox steps and the Wi-Fi
+--     password, written for whoever is in the unit, so a departed guest must not keep reading them for the next
+--     guest. A cancelled stay never qualifies. It does not need a placed QR card: the booking is the guest's access.
 --   * rpc_stay_guest_guide_asset_sign(p_stay_id, p_id): the guide's floor plan or 3D model, as
 --     rpc_host_workspace_guide_asset_sign (20270316000200) does for a QR code. The asset must be the published
 --     document's planId or modelId, of the stay's own unit. A file in Storage gets a 60-second read grant on its path,
@@ -36,9 +38,10 @@
 /*
  * The unit whose published guide the stay’s guest may read now, or null.
  * The caller check is the caller’s job: this only explains the stay.
- * Booked or in a stay, or departed (a booked stay whose host never marked
- * it is treated the same), until 14 days after check-out. Never cancelled
- * or held. The host and unit are live, the unit is not archived, and the
+ * Booked or in a stay, until check-out. Closed once the host checks the
+ * guest out (departed) or check-out passes, as rpc_my_stay_code is: the
+ * guide holds the unit's access steps for whoever stays next. Never
+ * cancelled or held. The host and unit are live, the unit is not archived, and the
  * guide has a published version.
  */
 create or replace function authz.stay_guest_guide_unit(p_stay_id uuid)
@@ -55,8 +58,8 @@ as $$
     join public.host_unit_guide guide on guide.unit_id = u.id
    where s.id = p_stay_id
      and s.guest_user_id is not null
-     and s.status in ('booked', 'in_stay', 'departed')
-     and now() < s.check_out + interval '14 days'
+     and s.status in ('booked', 'in_stay')
+     and now() < s.check_out
      and h.status = 'live'
      and u.status = 'live'
      and u.archived_at is null

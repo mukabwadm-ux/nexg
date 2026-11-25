@@ -76,7 +76,8 @@ update public.host_unit_guide set published_id = 'e2325000-0000-4000-8000-000000
 /*
  * The guest's stays. s1 booked (a). s2 departed 8 days ago (a). s3 departed 30 days ago (a). s4 cancelled after it
  * was confirmed (a). s5 a hold (a). s6 a hold that lapsed unpaid (a). s7 booked, unit b (unpublished guide).
- * s8 booked, unit c (paused). s9 booked with no unit. And the other user's booked stay in unit a.
+ * s8 booked, unit c (paused). s9 booked with no unit. s10 still booked, but check-out passed yesterday (a).
+ * And the other user's booked stay in unit a.
  */
 insert into public.stay (id, host_id, property_id, unit_id, guest_first_name, guest_user_id,
                          check_in, check_out, source, status, hold_expires_at, confirmed_at,
@@ -118,6 +119,10 @@ values
    'e2322000-0000-4000-8000-00000000000a', null,'Amina',
    'e2320000-0000-4000-8000-000000000001', now() + interval '50 days', now() + interval '52 days',
    'nexg','booked', null, now(), 1, 0),
+  ('e2326000-0000-4000-8000-0000000000aa','e2321000-0000-4000-8000-00000000000a',
+   'e2322000-0000-4000-8000-00000000000a','e2323000-0000-4000-8000-00000000000a','Amina',
+   'e2320000-0000-4000-8000-000000000001', now() - interval '3 days', now() - interval '1 day',
+   'nexg','booked', null, now() - interval '10 days', 1, 0),
   ('e2326000-0000-4000-8000-0000000000b1','e2321000-0000-4000-8000-00000000000a',
    'e2322000-0000-4000-8000-00000000000a','e2323000-0000-4000-8000-00000000000a','Brian',
    'e2320000-0000-4000-8000-000000000002', now() + interval '60 days', now() + interval '62 days',
@@ -140,7 +145,7 @@ select is(
   array['e2326000-0000-4000-8000-0000000000a1','e2326000-0000-4000-8000-0000000000a2',
         'e2326000-0000-4000-8000-0000000000a3','e2326000-0000-4000-8000-0000000000a4',
         'e2326000-0000-4000-8000-0000000000a7','e2326000-0000-4000-8000-0000000000a8',
-        'e2326000-0000-4000-8000-0000000000a9'],
+        'e2326000-0000-4000-8000-0000000000a9','e2326000-0000-4000-8000-0000000000aa'],
   'The guest lists their booked, departed and confirmed-then-cancelled stays; never a hold, a lapsed hold, or another guest''s stay.');
 select is(
   public.rpc_stay_guest_stays() -> 'stays' -> 0 ->> 'id', 'e2326000-0000-4000-8000-0000000000a9',
@@ -167,8 +172,8 @@ select is(
   (select array_agg(x ->> 'id' order by x ->> 'id')
      from jsonb_array_elements(public.rpc_stay_guest_stays() -> 'stays') x
     where (x -> 'guide_available')::boolean),
-  array['e2326000-0000-4000-8000-0000000000a1','e2326000-0000-4000-8000-0000000000a2'],
-  'A guide is available for the booked stay and the one that ended 8 days ago, and no other.');
+  array['e2326000-0000-4000-8000-0000000000a1'],
+  'A guide is available for the booked stay that has not ended, and no other.');
 
 -- ══════════════════════════════════════════ 2. the guest reads their stay's guide
 
@@ -176,8 +181,10 @@ select is(
   public.rpc_stay_guest_guide('e2326000-0000-4000-8000-0000000000a1'),
   current_setting('t.published_guide')::jsonb,
   'The guest reads their booked stay''s published guide, with the 3D house, in the QR guide''s shape.');
-select isnt(public.rpc_stay_guest_guide('e2326000-0000-4000-8000-0000000000a2'), null,
-  'And a stay that ended 8 days ago.');
+select is(public.rpc_stay_guest_guide('e2326000-0000-4000-8000-0000000000a2'), null,
+  'The guide closes when the host checks the guest out: not a stay that departed 8 days ago.');
+select is(public.rpc_stay_guest_guide('e2326000-0000-4000-8000-0000000000aa'), null,
+  'Nor a stay still marked booked whose check-out has passed.');
 select is(public.rpc_stay_guest_guide('e2326000-0000-4000-8000-0000000000a3'), null,
   'Not one that ended 30 days ago.');
 select is(public.rpc_stay_guest_guide('e2326000-0000-4000-8000-0000000000a4'), null,
@@ -221,6 +228,9 @@ select is(
 select is(
   public.rpc_stay_guest_guide_asset_sign('e2326000-0000-4000-8000-0000000000a4', 'e2324000-0000-4000-8000-0000000000c1'),
   null, 'A cancelled stay gets no file.');
+select is(
+  public.rpc_stay_guest_guide_asset_sign('e2326000-0000-4000-8000-0000000000a2', 'e2324000-0000-4000-8000-0000000000c1'),
+  null, 'Nor a stay that has departed.');
 select is(
   public.rpc_stay_guest_guide_asset_sign('e2326000-0000-4000-8000-0000000000a7', 'e2324000-0000-4000-8000-0000000000c1'),
   null, 'Nor does a stay in another unit, even of the same host.');
