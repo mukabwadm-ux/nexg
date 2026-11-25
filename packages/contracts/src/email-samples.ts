@@ -171,7 +171,7 @@ const SAMPLES: Record<string, Sample> = {
       intro: 'Karibu Kitchen finished its application and is waiting for a review.',
       action: {
         label: 'Open the console',
-        url: 'https://admin.nexgapp.com/merchants/applications',
+        url: 'https://control.nexgapp.com/merchants/applications',
       },
     },
   },
@@ -180,7 +180,7 @@ const SAMPLES: Record<string, Sample> = {
     content: {
       title: 'New rider application: Brian Otieno',
       intro: 'Name: Brian Otieno\nPhone: +254 700 000 000\nArea: Westlands',
-      action: { label: 'Open in the console', url: 'https://admin.nexgapp.com/riders' },
+      action: { label: 'Open in the console', url: 'https://control.nexgapp.com/riders' },
     },
   },
   all: {
