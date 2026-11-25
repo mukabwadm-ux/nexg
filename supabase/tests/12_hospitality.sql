@@ -103,13 +103,17 @@ select throws_ok(
 
 -- ═══════════════════════════════════ units and their contacts
 
-/* A unit that says "leave with the askari" needs a confirmed askari. */
-select throws_ok(
-  $$ update public.unit set status = 'live'
-     where host_id = (select id from public.host where phone = '+254700000900') $$,
-  23514,
-  null,
-  'a unit cannot go live promising an askari nobody has confirmed'
+/*
+ * A unit that says "leave with the askari" no longer waits on a
+ * confirmed askari: the host using the app is the caretaker
+ * (20270320000100). Its readiness has nothing left to confirm.
+ */
+select ok(
+  not (public.fn_unit_readiness(
+         (select id from public.unit
+           where host_id = (select id from public.host where phone = '+254700000900')))
+       ? 'contact_confirmed'),
+  'a unit left with the askari has no caretaker confirmation to wait on'
 );
 
 /*
