@@ -411,6 +411,23 @@ export async function runSpecialistFixtures({
           closes: '20:00',
         };
         const service = await offering(merchant, 'LINKED_WINDOWS', [van.id, processing.id], setup);
+        // The customer chooses real collection and return windows (owner, 25 Nov 2026): the van's hours, inside the
+        // business's own hours, as long as the offering's window.
+        for (const leg of ['incoming', 'outgoing']) {
+          const windows = (await engine.availability(merchant, service.id, '2030-01-02', false, {
+            leg,
+          })) as any;
+          assert.ok(windows.slots.length > 0, `laundry offers ${leg} windows`);
+          for (const slot of windows.slots) {
+            assert.ok(Date.parse(slot.start) >= Date.parse('2030-01-02T08:00:00+03:00'));
+            assert.ok(Date.parse(slot.end) <= Date.parse('2030-01-02T20:00:00+03:00'));
+            assert.equal(Date.parse(slot.end) - Date.parse(slot.start), 60 * 60000);
+          }
+        }
+        await assert.rejects(
+          () => engine.availability(merchant, service.id, '2030-01-02', false, { leg: 'sideways' }),
+          (e: any) => e.code === 'invalid_leg',
+        );
         const input = {
           model: 'LINKED_WINDOWS',
           incoming: {
@@ -1060,6 +1077,19 @@ export async function runSpecialistFixtures({
           custodyDurationMinutes: 1440,
         };
         const service = await offering(merchant, 'SERVICE_JOB', [bay.id, team.id], setup);
+        // A service job offers windows as long as the job, when both the bay and the team work (owner, 25 Nov 2026).
+        const windows = (await engine.availability(merchant, service.id, '2030-01-08')) as any;
+        assert.ok(windows.slots.length > 0, 'a service job offers windows');
+        assert.ok(
+          windows.slots.every(
+            (slot: any) => Date.parse(slot.end) - Date.parse(slot.start) === 30 * 60000,
+          ),
+        );
+        assert.equal(
+          windows.slots[0].start,
+          '2030-01-08T05:00:00.000Z',
+          'the first window starts when they open',
+        );
         const input = {
           model: 'SERVICE_JOB',
           jobDescription: 'Accepted exterior and interior wash.',
