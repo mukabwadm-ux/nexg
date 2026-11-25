@@ -80,7 +80,7 @@ export function Directory({
     if (f !== 'all') params.set('filter', f);
     const s = next.selected === undefined ? selected : next.selected;
     if (s) params.set('selected', s);
-    return `/riders?${params.toString()}`;
+    return `/riders/console?${params.toString()}`;
   };
 
   const chosen = selected ? rows.find((r) => r.id === selected) : undefined;

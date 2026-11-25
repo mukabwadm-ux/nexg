@@ -53,7 +53,7 @@ export function RiderTabs({ current }: { current: string }) {
   return (
     <PillTabs
       tabs={RIDER_TABS.map((tab) => ({
-        href: `/riders?tab=${tab.key}`,
+        href: `/riders/console?tab=${tab.key}`,
         label: tab.label,
         icon: RIDER_ICONS[tab.key],
         active: current === tab.key,
