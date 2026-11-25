@@ -77,7 +77,7 @@ jobs:
           done <<'URLS'
           prefetch https://www.nexgapp.com/merchants/sign-in
           get https://www.nexgapp.com/api/host-workspace
-          prefetch https://admin.nexgapp.com/sign-in
+          prefetch https://control.nexgapp.com/sign-in
           prefetch https://api.nexgapp.com/sign-in
           URLS
           [ "$warn" = 0 ] || echo "Some requests were not answered; see the warnings."
