@@ -9,7 +9,8 @@
     ".": "./src/index.ts",
     "./details": "./src/details.ts",
     "./invoice": "./src/invoice.ts",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./documents": "./src/finance-docs/index.ts"
   },
   "scripts": {
     "build": "echo \"@nexg/merchant-agreement is consumed as source via transpilePackages\"",
@@ -21,11 +22,13 @@
   "dependencies": {
     "@nexg/contracts": "workspace:*",
     "pdf-lib": "1.17.1",
+    "qrcode": "1.5.4",
     "zod": "3.24.1"
   },
   "devDependencies": {
     "@nexg/config": "workspace:*",
     "@types/node": "20.17.10",
+    "@types/qrcode": "1.5.6",
     "eslint": "8.57.1",
     "rimraf": "6.0.1",
     "typescript": "5.7.2",

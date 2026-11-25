@@ -3,6 +3,7 @@
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { recordCategorySignal } from '@/lib/category-signal';
 import { discoverCategoryHref } from '@/lib/discover-links';
 
 /**
@@ -17,38 +18,13 @@ import { discoverCategoryHref } from '@/lib/discover-links';
 
 export interface PopularCategory {
   key: string;
-  /** The id the tap counter records, so the most tapped tiles come first. */
-  tile?: string;
   label: string;
+  /** The stock photo's path; imageUrl is one uploaded in the admin. */
   image: string;
   imageUrl?: string | null;
-  /** A merchant category for Explore, or a fixed destination. */
+  /** A merchant category for Discovery, or a fixed destination. */
   category?: string;
   href?: string;
-}
-
-/**
- * Count a tap, at most once per tile per browser per day, without holding up
- * the navigation. Nothing about the visitor is sent: only which tile.
- */
-function recordTap(tile: string | undefined) {
-  if (!tile || typeof navigator === 'undefined') return;
-  const today = new Date().toISOString().slice(0, 10);
-  const key = `nexg.tile-tap.${tile}`;
-  try {
-    if (window.localStorage.getItem(key) === today) return;
-    window.localStorage.setItem(key, today);
-  } catch {
-    /* Private mode or storage blocked: count it anyway. */
-  }
-  const body = JSON.stringify({ tile });
-  if (
-    !navigator.sendBeacon?.('/api/category-tap', new Blob([body], { type: 'application/json' }))
-  ) {
-    void fetch('/api/category-tap', { method: 'POST', body, keepalive: true }).catch(
-      () => undefined,
-    );
-  }
 }
 
 export function PopularCategories({
@@ -107,17 +83,18 @@ export function PopularCategories({
           >
             <Link
               href={hrefFor(item)}
-              onClick={() => recordTap(item.tile)}
+              onClick={() => recordCategorySignal(item.category, 'visit')}
               className="focus-visible:ring-gold group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             >
               <span className="shadow-card bg-surface relative block aspect-square overflow-hidden rounded-full">
                 <Image
-                  src={item.imageUrl || `/images/categories/${item.image}.jpg`}
+                  src={item.imageUrl || item.image}
                   alt=""
                   fill
                   sizes="(min-width: 1024px) 10vw, 8rem"
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  unoptimized={!!item.imageUrl}
+                  /* Vercel's image resizer is out of quota (402): serve the file. */
+                  unoptimized
                 />
               </span>
               <span className="mt-2.5 block text-center text-[0.8125rem] font-bold leading-tight">

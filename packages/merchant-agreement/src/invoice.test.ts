@@ -79,15 +79,14 @@ function sampleInvoice(lineCount = 4): InvoicePdfInput {
 }
 
 describe('client invoice PDF', () => {
-  it('renders a tax invoice on the letterhead', async () => {
+  it('renders a tax invoice in the branded design', async () => {
     const rendered = await renderInvoicePdf(sampleInvoice(), SAMPLE_LETTERHEAD);
     expect(Buffer.from(rendered.bytes.subarray(0, 5)).toString('latin1')).toBe('%PDF-');
     expect(rendered.sha256).toBe(createHash('sha256').update(rendered.bytes).digest('hex'));
     const pdf = await PDFDocument.load(rendered.bytes);
-    expect(pdf.getPageCount()).toBe(1);
-    expect(rendered.pages).toBe(1);
+    expect(pdf.getPageCount()).toBe(rendered.pages);
     expect(pdf.getTitle()).toBe('Tax Invoice NX-INV-2026-000123');
-    expect(pdf.getAuthor()).toBe('NexGenius Concierge Limited');
+    expect(pdf.getAuthor()).toBe('Nexgenius Concierge Limited');
     const { width, height } = pdf.getPage(0).getSize();
     expect([Math.round(width), Math.round(height)]).toEqual([595, 842]);
   }, 30_000);

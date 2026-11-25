@@ -17,7 +17,7 @@ import { PopularCategories } from '@/components/home/popular-categories';
 import { StoresNearYou } from '@/components/home/stores-near-you';
 import { SiteFooter } from '@/components/site-footer';
 import { BEST_SELLERS, bestSellerFromCatalogue, type BestSeller } from '@/lib/best-sellers';
-import { categoryTiles } from '@/lib/categories';
+import { popularTiles } from '@/lib/categories';
 import { signMedia } from '@/lib/promo-media-server';
 import { translator, type Locale, type Translate } from '@/lib/i18n/dictionaries';
 import type { NearbyStore } from '@/lib/stores-near';
@@ -142,19 +142,26 @@ function cardMedia(
   return null;
 }
 
-/* Taps per category tile over the last 30 days. Refreshed every five minutes;
-   if it cannot be read, the tiles keep their usual order. */
-const getTileTaps = unstable_cache(
+/* Visits plus searches per category over the last 30 days, for Popular
+   categories (lib/categories, popularTiles). Refreshed every five minutes; a
+   counter that cannot be read counts as empty, so the tiles keep the fixed
+   priority order. */
+const getCategorySignals = unstable_cache(
   async (): Promise<Record<string, number>> => {
-    const { data, error } = await createPublicClient().rpc('rpc_category_tile_popularity', {
-      p_days: 30,
-    });
-    if (error || !data) return {};
-    return Object.fromEntries(
-      (data as { tile: string; clicks: number }[]).map((row) => [row.tile, Number(row.clicks)]),
-    );
+    const supabase = createPublicClient();
+    const [taps, searches] = await Promise.all([
+      supabase.rpc('rpc_category_tile_popularity', { p_days: 30 }),
+      supabase.rpc('rpc_popular_search_ranking', { p_days: 30 }),
+    ]);
+    const signals: Record<string, number> = {};
+    const add = (key: string, count: unknown) => {
+      signals[key] = (signals[key] ?? 0) + (Number(count) || 0);
+    };
+    if (!taps.error) for (const row of taps.data ?? []) add(row.tile, row.clicks);
+    if (!searches.error) for (const row of searches.data ?? []) add(row.topic, row.searches);
+    return signals;
   },
-  ['homepage-tile-taps'],
+  ['homepage-category-signals'],
   { revalidate: 300 },
 );
 
@@ -222,9 +229,9 @@ export async function HomePageContent({
   translate?: Translate;
 }) {
   const t = translate ?? translator(locale);
-  const [{ stores, featured }, tileTaps, liveBestSellers] = await Promise.all([
+  const [{ stores, featured }, categorySignals, liveBestSellers] = await Promise.all([
     getHomeData(),
-    getTileTaps(),
+    getCategorySignals(),
     getBestSellers().catch(() => [] as BestSeller[]),
   ]);
   const supabase = createPublicClient();
@@ -267,7 +274,7 @@ export async function HomePageContent({
               heading={t('home.popular.heading')}
               sub={t('home.popular.sub')}
               allLabel={t('home.popular.all')}
-              items={categoryTiles(t, categories, tileTaps)}
+              items={popularTiles(t, categories, categorySignals)}
             />
           </Reveal>
         </section>
