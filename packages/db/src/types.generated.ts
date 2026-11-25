@@ -64396,7 +64396,11 @@ export type Database = {
       fn_compute_rider_health: { Args: { p_as_of?: string }; Returns: number };
       fn_console_period: {
         Args: { p_from: string; p_to: string };
-        Returns: { end_at: string; prev_start: string; start_at: string }[];
+        Returns: {
+          end_at: string;
+          prev_start: string;
+          start_at: string;
+        }[];
       };
       fn_customer_deletion_blockers: { Args: { p_user_id: string }; Returns: Json };
       fn_customer_guest_ensure: { Args: { p_id: string }; Returns: string };
@@ -69904,9 +69908,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -69918,7 +69924,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -69926,6 +69935,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         SetofOptions: {
@@ -69946,9 +69956,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -69960,7 +69972,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -69968,6 +69983,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         SetofOptions: {
@@ -69983,9 +69999,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -69997,7 +70015,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -70005,6 +70026,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         SetofOptions: {
@@ -70020,9 +70042,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -70034,7 +70058,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -70042,6 +70069,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         SetofOptions: {
