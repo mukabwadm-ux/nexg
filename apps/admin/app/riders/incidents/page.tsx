@@ -123,7 +123,7 @@ interface CaseRow {
 
 /**
  * Riders → Incidents & Disputes: every incident and dispute about a rider
- * or a delivery (public.incident, with the case fields of 20270321000100),
+ * or a delivery (public.incident, with the case fields of 20270321000200),
  * read by rpc_console_riders_cases. Create, assign, start, escalate and
  * resolve go through audited RPCs; the case page keeps the notes.
  */
