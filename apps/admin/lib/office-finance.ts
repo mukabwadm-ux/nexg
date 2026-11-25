@@ -21,8 +21,10 @@ export const EXPENSE_CATEGORIES: Record<string, { label: string; color: string }
 };
 
 export const EXPENSE_STATUS: Record<string, { label: string; tone: Tone }> = {
-  submitted: { label: 'Waiting for Approval', tone: 'amber' },
-  approved: { label: 'Approved', tone: 'blue' },
+  /* Recorded. The database calls it approved; submitted is left over from
+     when a second person approved each one, and reads the same. */
+  approved: { label: 'Recorded', tone: 'blue' },
+  submitted: { label: 'Recorded', tone: 'blue' },
   paid: { label: 'Paid', tone: 'green' },
   rejected: { label: 'Turned Down', tone: 'red' },
   cancelled: { label: 'Cancelled', tone: 'grey' },
@@ -37,8 +39,13 @@ export const PAYMENT_METHODS: Record<string, string> = {
   other: 'Other',
 };
 
-/** Approved and paid expenses are spend; waiting, turned down and cancelled are not. */
-export const SPEND = new Set(['approved', 'paid']);
+/** Recorded and paid expenses are spend; turned down and cancelled are not. */
+export const SPEND = new Set(['approved', 'submitted', 'paid']);
+
+/** The status a list filters by: a left-over submitted one is recorded. */
+export function expenseStatus(status: string): string {
+  return status === 'submitted' ? 'approved' : status;
+}
 
 export interface ExpenseLike {
   spent_on: string;
@@ -112,7 +119,7 @@ export function vsLabel(before: { from: string; to: string }): string {
   return `vs ${month}`;
 }
 
-/** Spend (approved and paid) between two days, inclusive. */
+/** Spend (recorded and paid) between two days, inclusive. */
 export function spendBetween(rows: ExpenseLike[], from: string, to: string): number {
   return rows
     .filter((r) => SPEND.has(r.status) && r.spent_on >= from && r.spent_on <= to)

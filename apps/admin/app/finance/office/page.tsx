@@ -1,7 +1,6 @@
 import { formatRange } from '@nexg/ui';
 import {
   BarChart3,
-  ClipboardCheck,
   FileText,
   Folder,
   FolderOpen,
@@ -64,16 +63,16 @@ import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = { title: 'Office Finance' };
 export const dynamic = 'force-dynamic';
 
-type Tab = 'expenses' | 'approvals' | 'budgets' | 'reports' | 'files';
+type Tab = 'expenses' | 'budgets' | 'reports' | 'files';
 
 const EXPENSE_COLUMNS =
   '*, submitter:staff_user!fin_office_expense_submitted_by_fkey(display_name, email), decider:staff_user!fin_office_expense_decided_by_fkey(display_name), vendor:company_vendor(name), location:company_location(name)';
 
 /**
- * Finance → Office finance: what NexG spends on running itself, approved
- * by a second person, paid with a reference, and measured against monthly
- * budgets. Every figure is summed from fin_office_expense and
- * fin_office_budget; spend means approved and paid expenses.
+ * Finance → Office finance: what NexG spends on running itself, recorded
+ * straight away (nobody approves it), paid with a reference, and measured
+ * against monthly budgets. Every figure is summed from fin_office_expense and
+ * fin_office_budget; spend means recorded and paid expenses.
  */
 export default async function OfficeFinancePage({
   searchParams,
@@ -81,9 +80,13 @@ export default async function OfficeFinancePage({
   searchParams?: { tab?: string; from?: string; to?: string; month?: string; new?: string };
 }) {
   const staff = await requireStaff();
-  const mod = requireModule(staff, 'finance');
-  const canWrite = staff.isSuperAdmin || mod.level === 'full';
-  const tab: Tab = (['expenses', 'approvals', 'budgets', 'reports', 'files'] as const).includes(
+  /* Office Finance is its own module; Finance reaches it too, so the page
+     still opens for Finance staff before the module exists in a database. */
+  const office = staff.modules.find((m) => m.key === 'office_finance');
+  const finance = staff.modules.find((m) => m.key === 'finance');
+  const mod = office ?? finance ?? requireModule(staff, 'office_finance');
+  const canWrite = staff.isSuperAdmin || mod.level === 'full' || finance?.level === 'full';
+  const tab: Tab = (['expenses', 'budgets', 'reports', 'files'] as const).includes(
     searchParams?.tab as Tab,
   )
     ? (searchParams!.tab as Tab)
@@ -162,10 +165,6 @@ export default async function OfficeFinancePage({
   const budget = budgetFor(budgets, periodMonths);
   const used = utilisation(spent, budget);
   const transactions = inPeriod.filter((e) => SPEND.has(e.status)).length;
-  const waiting = all.filter((e) => e.status === 'submitted');
-  const waitingForMe = waiting.filter(
-    (e) => canWrite && (e.submitted_by !== staff.staffId || staff.isSuperAdmin),
-  );
   const categories = byCategory(inPeriod);
   const trend = monthlySpend(all, trendMonths).map((m) => ({
     day: m.month,
@@ -212,7 +211,7 @@ export default async function OfficeFinancePage({
       <PageHeader
         icon={FolderOpen}
         title="Office Finance"
-        subtitle="Manage and track all office expenses, budgets, and approvals."
+        subtitle="Record and track all office expenses and budgets."
         actions={
           <>
             <RangeControl from={period.from} to={period.to} />
@@ -236,13 +235,6 @@ export default async function OfficeFinancePage({
                   },
                 ]
               : []),
-            {
-              key: 'approvals',
-              label: 'Approvals',
-              icon: ClipboardCheck,
-              href: href('approvals'),
-              alert: waitingForMe.length,
-            },
             { key: 'budgets', label: 'Budgets', icon: PiggyBank, href: href('budgets') },
             { key: 'reports', label: 'Reports', icon: FileText, href: href('reports') },
             { key: 'files', label: 'Files', icon: Folder, href: href('files') },
@@ -271,7 +263,7 @@ export default async function OfficeFinancePage({
                     : { value: change(spent, spentBefore)!, upIsBad: true }
                 }
                 deltaNote={vsLabel(before)}
-                note={spentBefore === 0 ? 'Approved and paid this period' : undefined}
+                note={spentBefore === 0 ? 'Recorded and paid this period' : undefined}
               />
               <Stat
                 icon={PiggyBank}
@@ -299,8 +291,6 @@ export default async function OfficeFinancePage({
                 icon={Receipt}
                 value={transactions.toLocaleString('en-KE')}
                 label="Expense Transactions"
-                note={waiting.length ? `${waiting.length} waiting for approval` : undefined}
-                href={waiting.length ? href('approvals') : undefined}
               />
             </StatGrid>
 
@@ -322,7 +312,7 @@ export default async function OfficeFinancePage({
                     />
                   ) : (
                     <p className="text-muted-light py-12 text-center text-sm">
-                      No approved or paid office expenses in this period.
+                      No office expenses recorded in this period.
                     </p>
                   )}
                 </div>
@@ -355,8 +345,6 @@ export default async function OfficeFinancePage({
               <Sheet>
                 <ExpensesTable
                   rows={inPeriod}
-                  me={staff.staffId}
-                  isSuperAdmin={staff.isSuperAdmin}
                   canWrite={canWrite}
                   vendors={vendors}
                   locations={locations}
@@ -399,23 +387,6 @@ export default async function OfficeFinancePage({
               </Sheet>
             </div>
           </>
-        )}
-
-        {tab === 'approvals' && (
-          <Sheet>
-            <ExpensesTable
-              rows={waiting}
-              me={staff.staffId}
-              isSuperAdmin={staff.isSuperAdmin}
-              canWrite={canWrite}
-              vendors={vendors}
-              locations={locations}
-              title={
-                canWrite ? 'Waiting for Approval' : 'Waiting for Approval (full Finance decides)'
-              }
-              approvals
-            />
-          </Sheet>
         )}
 
         {tab === 'budgets' && (

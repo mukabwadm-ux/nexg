@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { finishOAuthProfile } from '@/app/(customer)/sign-in/actions';
+import { finishOAuthProfile, signOut } from '@/app/(customer)/sign-in/actions';
 import { goTo } from '@/components/auth/password-recovery';
 import { CUSTOMER_LANDING } from '@/lib/auth-portals';
 import { DATA_PROTECTION_POLICY_URL, NEW_TAB } from '@/lib/legal-documents';
@@ -36,6 +36,14 @@ export function FinishProfile({
   const [pending, setPending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
+  /* Apple's "Hide my email" gives a relay address that never matches an
+     existing NexG email account, so Supabase cannot link the two. */
+  async function switchToOtherAccount() {
+    await signOut();
+    // A full load, so nothing from the signed-out session stays on screen.
+    window.location.assign(next ? `/sign-in?next=${encodeURIComponent(next)}` : '/sign-in');
+  }
+
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     setPending(true);
@@ -59,6 +67,19 @@ export function FinishProfile({
           ? ' Apple is hiding your email from us; messages still reach you through Apple.'
           : null}
       </p>
+      {privateRelay ? (
+        <p className="text-muted mt-3 text-sm font-semibold leading-[1.7]">
+          Already have a NexG account with your own email? This is a new, separate account.{' '}
+          <button
+            type="button"
+            onClick={() => void switchToOtherAccount()}
+            className="text-ink font-bold underline underline-offset-2"
+          >
+            Sign in with that one instead
+          </button>{' '}
+          so your orders stay together.
+        </p>
+      ) : null}
       <form onSubmit={submit} noValidate className="mt-6 space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <Input
