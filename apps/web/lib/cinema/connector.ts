@@ -71,9 +71,61 @@ export interface HoldAnswer {
   lines: { seat: string; type: SeatType; priceMinor: number }[];
 }
 
+/**
+ * What kind of code a ticket's barcode is, as the cinema's door scanner reads
+ * it. 'other' is a kind NexG cannot draw: the app then shows the ticket
+ * reference rather than a picture the scanner would not read. No format at
+ * all means QR (the app's default).
+ */
+export type BarcodeFormat = 'qr' | 'code128' | 'pdf417' | 'aztec' | 'other';
+
+export interface Ticket {
+  seat: string;
+  ticketRef: string;
+  barcode?: string;
+  barcodeFormat?: BarcodeFormat;
+}
+
 export interface BookingAnswer {
   bookingRef: string;
-  tickets: { seat: string; ticketRef: string; barcode?: string }[];
+  tickets: Ticket[];
+}
+
+const FORMATS: Record<string, Exclude<BarcodeFormat, 'other'>> = {
+  qr: 'qr',
+  qrcode: 'qr',
+  code128: 'code128',
+  pdf417: 'pdf417',
+  aztec: 'aztec',
+  aztecode: 'aztec',
+  azteccode: 'aztec',
+};
+
+/** A system's own name for a barcode kind, as NexG's ("QR_CODE", "Code-128", …). Never a guess. */
+export function barcodeFormat(raw: unknown): BarcodeFormat | undefined {
+  if (typeof raw !== 'string' || raw.trim() === '') return undefined;
+  return FORMATS[raw.toLowerCase().replace(/[^a-z0-9]/g, '')] ?? 'other';
+}
+
+/**
+ * Tickets as NexG records them: seat, reference, the barcode value, and its
+ * format beside it when the system said one. Every adapter's answer passes
+ * through this before it is recorded.
+ */
+export function normaliseTickets(raw: unknown): Ticket[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.flatMap((item) => {
+    if (typeof item !== 'object' || item === null) return [];
+    const t = item as Record<string, unknown>;
+    if (typeof t.seat !== 'string' || typeof t.ticketRef !== 'string') return [];
+    const ticket: Ticket = { seat: t.seat, ticketRef: t.ticketRef };
+    if (typeof t.barcode === 'string' && t.barcode !== '') {
+      ticket.barcode = t.barcode;
+      const format = barcodeFormat(t.barcodeFormat);
+      if (format) ticket.barcodeFormat = format;
+    }
+    return [ticket];
+  });
 }
 
 export interface Capabilities {

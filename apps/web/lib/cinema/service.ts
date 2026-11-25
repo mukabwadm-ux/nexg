@@ -1,5 +1,6 @@
 import {
   CinemaError,
+  normaliseTickets,
   withTimeout,
   type BookingAnswer,
   type CinemaConnector,
@@ -607,7 +608,7 @@ export async function runWorker(db: Rpc, connectorFor: ConnectorFor, now = () =>
         const recorded = await db('cinema_record_confirm', {
           p_hold_id: holdId,
           p_booking_ref: booking.bookingRef,
-          p_tickets: booking.tickets,
+          p_tickets: normaliseTickets(booking.tickets),
         });
         if (recorded.error) throw new Error(recorded.error.message);
         done.foundLate += 1;
@@ -703,7 +704,7 @@ async function confirmOne(
     const recorded = await db('cinema_record_confirm', {
       p_hold_id: holdId,
       p_booking_ref: booking.bookingRef,
-      p_tickets: booking.tickets,
+      p_tickets: normaliseTickets(booking.tickets),
     });
     if (recorded.error) {
       // NexG can no longer take this booking (already refunded): the cinema must not keep it.
