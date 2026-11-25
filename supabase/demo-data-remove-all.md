@@ -15,23 +15,23 @@ after the owner types yes there.
 
 ## What goes
 
-| Kind | Count | Which | Created by |
-|---|---|---|---|
-| Shops (merchants) | 11 | Sokoni Grill House, Hifadhi Sushi & Asian, Asubuhi Coffee & Bakery, Safi Laundry & Dry Cleaning, Afya Point Pharmacy, Zamani Wine & Spirits, Ua Flowers & Gifts, Mitindo Fashion Boutique, Nyumbani Grocers, Demo Kitchen, Demo Kitchen (setting up) | `supabase/demo-data.sql` (28 Sep), `scripts/demo-partners*.sql` (8 Oct) |
-| Their branches, opening hours, menus | 11 branches, 63 hour rows, 23 menu sections, 42 items, 2 commission terms, 2 status changes, 3 baskets (3 lines) | children of the shops above | the same, and `demo-catalogue.sql` |
-| Hosts | 4 | Riverine Collection, Lantern Stays (the "sample listings"), Demo Stays, Demo Stays (setting up) | `supabase/seeds/stays-demo-production.sql` (1 Oct), `scripts/demo-partners*.sql` |
-| Properties | 10 | The Arbour, Brook House, Olive Cottage, Lantern Lavington, The Perch, Harvest Court, Demo Stays Kilimani ×2, Tygah, Part | the same, plus 2 added by people testing on the Demo Stays login (9 and 24 Nov) |
-| Units | 14 | every unit of those properties (2 of them, "Readt" and "Fyyygy", were added on the Demo Stays login on 25 Nov) | the same |
-| Host extras | 8 QR codes, 89 QR scans, 1 package order, 1 task, 1 unit guide (+1 version) | | made on the demo hosts |
-| Stay requests | 3 | ST-W3Q8NR, ST-K4M2PQ, ST-B7X9JD (requester "[Requester]") and their 1 match | `stays-demo-production.sql` |
-| Stays | 1 | a test booking on Demo Stays (guest "xcxcxc", 9–12 Nov, unpaid) | testing |
-| Riders | 11 | Joseph Mutua, Alice Wambui, Dennis Ochieng, Halima Yusuf, Victor Kimani, Mary Atieno, Stephen Barasa (all invented), Demo Rider, Demo Applicant, Demo Rider, Demo New Rider | `demo-data.sql`, `demo-partners*.sql`, `demo-accounts.sql` |
-| Rider extras | 1 device, 8 document records (7 rider + 1 shop, no real files behind the 7) | | the same |
-| Sign-ins | 10 | the 7 Demo Merchant / Rider / Host / Manager logins from `demo-partners*`, the 2 rider logins and the demo customer from `demo-accounts.sql` | the same |
-| Test orders at the demo shops | 9 | NX-261105-0001 to 0004, NX-261110-0005/0006, NX-261111-0007, NX-261115-0008, NX-261121-0009: none paid, nothing charged | 7 by the owner's own test sign-ins, 2 by two other customer accounts |
-| Their payments | 9 | M-Pesa prompts that were never paid (5 "authorised", 4 "abandoned"), with 11 events and 8 prompts | |
-| Order details | 16 events, 9 items, 1 handoff code | | |
-| Other | 1 guest profile and 1 draft plan of demo logins; 68 in-app notifications about the demo rows; push installations, preferences, identities and sessions of the demo sign-ins | | |
+| Kind                                 | Count                                                                                                                                                                       | Which                                                                                                                                                                                                                                                | Created by                                                                       |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Shops (merchants)                    | 11                                                                                                                                                                          | Sokoni Grill House, Hifadhi Sushi & Asian, Asubuhi Coffee & Bakery, Safi Laundry & Dry Cleaning, Afya Point Pharmacy, Zamani Wine & Spirits, Ua Flowers & Gifts, Mitindo Fashion Boutique, Nyumbani Grocers, Demo Kitchen, Demo Kitchen (setting up) | `supabase/demo-data.sql` (28 Sep), `scripts/demo-partners*.sql` (8 Oct)          |
+| Their branches, opening hours, menus | 11 branches, 63 hour rows, 23 menu sections, 42 items, 2 commission terms, 2 status changes, 3 baskets (3 lines)                                                            | children of the shops above                                                                                                                                                                                                                          | the same, and `demo-catalogue.sql`                                               |
+| Hosts                                | 4                                                                                                                                                                           | Riverine Collection, Lantern Stays (the "sample listings"), Demo Stays, Demo Stays (setting up)                                                                                                                                                      | `supabase/seeds/stays-demo-production.sql` (1 Oct), `scripts/demo-partners*.sql` |
+| Properties                           | 10                                                                                                                                                                          | The Arbour, Brook House, Olive Cottage, Lantern Lavington, The Perch, Harvest Court, Demo Stays Kilimani ×2, Tygah, Part                                                                                                                             | the same, plus 2 added by people testing on the Demo Stays login (9 and 24 Nov)  |
+| Units                                | 14                                                                                                                                                                          | every unit of those properties (2 of them, "Readt" and "Fyyygy", were added on the Demo Stays login on 25 Nov)                                                                                                                                       | the same                                                                         |
+| Host extras                          | 8 QR codes, 89 QR scans, 1 package order, 1 task, 1 unit guide (+1 version)                                                                                                 |                                                                                                                                                                                                                                                      | made on the demo hosts                                                           |
+| Stay requests                        | 3                                                                                                                                                                           | ST-W3Q8NR, ST-K4M2PQ, ST-B7X9JD (requester "[Requester]") and their 1 match                                                                                                                                                                          | `stays-demo-production.sql`                                                      |
+| Stays                                | 1                                                                                                                                                                           | a test booking on Demo Stays (guest "xcxcxc", 9–12 Nov, unpaid)                                                                                                                                                                                      | testing                                                                          |
+| Riders                               | 11                                                                                                                                                                          | Joseph Mutua, Alice Wambui, Dennis Ochieng, Halima Yusuf, Victor Kimani, Mary Atieno, Stephen Barasa (all invented), Demo Rider, Demo Applicant, Demo Rider, Demo New Rider                                                                          | `demo-data.sql`, `demo-partners*.sql`, `demo-accounts.sql`                       |
+| Rider extras                         | 1 device, 8 document records (7 rider + 1 shop, no real files behind the 7)                                                                                                 |                                                                                                                                                                                                                                                      | the same                                                                         |
+| Sign-ins                             | 10                                                                                                                                                                          | the 7 Demo Merchant / Rider / Host / Manager logins from `demo-partners*`, the 2 rider logins and the demo customer from `demo-accounts.sql`                                                                                                         | the same                                                                         |
+| Test orders at the demo shops        | 9                                                                                                                                                                           | NX-261105-0001 to 0004, NX-261110-0005/0006, NX-261111-0007, NX-261115-0008, NX-261121-0009: none paid, nothing charged                                                                                                                              | 7 by the owner's own test sign-ins, 2 by two other customer accounts             |
+| Their payments                       | 9                                                                                                                                                                           | M-Pesa prompts that were never paid (5 "authorised", 4 "abandoned"), with 11 events and 8 prompts                                                                                                                                                    |                                                                                  |
+| Order details                        | 16 events, 9 items, 1 handoff code                                                                                                                                          |                                                                                                                                                                                                                                                      |                                                                                  |
+| Other                                | 1 guest profile and 1 draft plan of demo logins; 68 in-app notifications about the demo rows; push installations, preferences, identities and sessions of the demo sign-ins |                                                                                                                                                                                                                                                      |                                                                                  |
 
 No ledger account, settlement line, host invoice or paid payment exists for any of
 them; the script stops if one appears.
@@ -75,24 +75,24 @@ Step 3 of the script counts them: 4 before, 0 after.
   raises, so nothing could commit. All checks passed. Counts before → after
   (rolled back; repeated at about 09:50 UTC after a 14th unit appeared):
 
-  | | before | after |
-  |---|---|---|
-  | shops | 39 | 28 |
-  | hosts | 16 | 12 |
-  | properties | 23 | 13 |
-  | units | 27 | 13 |
-  | riders | 38 | 27 |
-  | sign-ins | 132 | 122 |
-  | orders | 9 | 0 |
-  | payments | 9 | 0 |
-  | stays | 1 | 0 |
-  | stay requests | 8 | 5 |
-  | guest profiles | 5 | 4 |
-  | QR scans | 89 | 0 |
-  | notifications | 604 | 536 |
-  | shop members | 36 | 33 |
-  | menu items | 52 | 10 |
-  | documents | 131 | 123 |
+  |                | before | after |
+  | -------------- | ------ | ----- |
+  | shops          | 39     | 28    |
+  | hosts          | 16     | 12    |
+  | properties     | 23     | 13    |
+  | units          | 27     | 13    |
+  | riders         | 38     | 27    |
+  | sign-ins       | 132    | 122   |
+  | orders         | 9      | 0     |
+  | payments       | 9      | 0     |
+  | stays          | 1      | 0     |
+  | stay requests  | 8      | 5     |
+  | guest profiles | 5      | 4     |
+  | QR scans       | 89     | 0     |
+  | notifications  | 604    | 536   |
+  | shop members   | 36     | 33    |
+  | menu items     | 52     | 10    |
+  | documents      | 131    | 123   |
 
   The copy gave the same "after" numbers when the script committed there.
   Production was unchanged afterwards.
