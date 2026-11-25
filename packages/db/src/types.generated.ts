@@ -71669,6 +71669,10 @@ export type Database = {
       rpc_my_card_remove: { Args: { p_card_id: string; p_proof: string }; Returns: Json };
       rpc_my_cards: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_cinema_hold: { Args: { p_hold_id: string }; Returns: Json };
+      rpc_my_cinema_holds: {
+        Args: { p_before?: string; p_before_id?: string; p_limit?: number };
+        Returns: Json;
+      };
       rpc_my_data_export_request: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_data_requests: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_engine_booking_code: {

@@ -355,6 +355,31 @@ export async function myHold(user: Rpc, holdId: string) {
   });
 }
 
+/** The customer's own holds and bookings, newest first (contract v3, step 4b). */
+export async function myHolds(
+  user: Rpc,
+  page: { limit?: number; before?: string; beforeId?: string },
+) {
+  return must<{ holds: HoldView[]; next: { before: string; beforeId: string } | null }>(
+    user('rpc_my_cinema_holds', {
+      p_limit: page.limit ?? 20,
+      p_before: page.before ?? null,
+      p_before_id: page.beforeId ?? null,
+    }),
+    (e) => {
+      if (e.code === '42501')
+        throw new CinemaProblem(401, 'AUTH_REQUIRED', 'Sign in to see your tickets.');
+      if (e.code === '22023')
+        throw new CinemaProblem(
+          422,
+          'INVALID_REQUEST',
+          'That page of your tickets could not be read.',
+        );
+      throw unavailable();
+    },
+  );
+}
+
 export async function preparePayment(
   user: Rpc,
   db: Rpc,

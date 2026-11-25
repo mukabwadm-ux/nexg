@@ -7,7 +7,7 @@ vi.mock('@/lib/supabase/customer-api', () => ({
   customerApiClient: () => ({ rpc: mock.userRpc, auth: { getUser: mock.getUser } }),
 }));
 
-import { holdGet, holdsPost, workerPost } from './http';
+import { holdGet, holdsGet, holdsPost, workerPost } from './http';
 
 const secret = 's'.repeat(32);
 const HOLD = '22222222-2222-4222-8222-222222222222';
@@ -120,5 +120,60 @@ describe('the customer endpoints', () => {
     );
     expect(answer.status).toBe(404);
     expect(await answer.json()).toMatchObject({ code: 'NOT_FOUND', title: 'Seat hold not found.' });
+  });
+});
+
+describe('the customer list of holds', () => {
+  const list = (query = '', auth?: string) =>
+    holdsGet(
+      new Request(`https://nexg.test/api/customer/cinema/holds${query}`, {
+        headers: auth ? { authorization: auth } : {},
+      }),
+    );
+
+  it('needs a signed-in customer', async () => {
+    const answer = await list();
+    expect(answer.status).toBe(401);
+    expect(await answer.json()).toMatchObject({ code: 'AUTH_REQUIRED' });
+  });
+
+  it("reads the customer's own holds with their own token, newest first", async () => {
+    mock.getUser.mockResolvedValue({ data: { user: { id: 'u' } }, error: null });
+    mock.userRpc.mockResolvedValue({
+      data: { holds: [{ holdId: 'h2' }, { holdId: 'h1' }], next: null },
+      error: null,
+    });
+    // A plain read: it works without the server's service-role key.
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', '');
+    const answer = await list('', 'Bearer t');
+    expect(answer.status).toBe(200);
+    expect(await answer.json()).toEqual({
+      holds: [{ holdId: 'h2' }, { holdId: 'h1' }],
+      next: null,
+    });
+    expect(mock.userRpc).toHaveBeenCalledWith('rpc_my_cinema_holds', {
+      p_limit: 20,
+      p_before: null,
+      p_before_id: null,
+    });
+    expect(mock.rpc).not.toHaveBeenCalled();
+  });
+
+  it('pages with the cursor the last answer gave', async () => {
+    mock.getUser.mockResolvedValue({ data: { user: { id: 'u' } }, error: null });
+    mock.userRpc.mockResolvedValue({ data: { holds: [], next: null }, error: null });
+    const before = '2026-11-25T10:00:00.000Z';
+    await list(`?limit=5&before=${encodeURIComponent(before)}&beforeId=${HOLD}`, 'Bearer t');
+    expect(mock.userRpc).toHaveBeenCalledWith('rpc_my_cinema_holds', {
+      p_limit: 5,
+      p_before: before,
+      p_before_id: HOLD,
+    });
+  });
+
+  it('refuses half a cursor or a page too big', async () => {
+    expect((await list('?before=2026-11-25T10:00:00Z', 'Bearer t')).status).toBe(422);
+    expect((await list('?limit=500', 'Bearer t')).status).toBe(422);
+    expect(mock.getUser).not.toHaveBeenCalled();
   });
 });
