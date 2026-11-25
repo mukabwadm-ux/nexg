@@ -95,7 +95,7 @@ inserted as (
       then d.cover
     end,
     d.featured, d.concierge_pick, true, true,
-    true
+    false
   from demo d, city_ids c
   /* Once per demo business: contact_email is no longer unique (one owner may
      run several businesses, 20270203000600), so check rather than conflict. */
