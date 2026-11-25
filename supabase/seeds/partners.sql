@@ -378,10 +378,10 @@ begin
     now() - make_interval(mins => v.age - 45)
   from (values
     (1, '[Hotel] · Rm [—]',      'delivered', 'mpesa_stk',       'paid',      120000, 220, true,  true,  true),
-    (2, '[Apartment] · Kilimani','delivered', 'cash_on_delivery','collected',  86000, 180, true,  true,  true),
+    (2, '[Apartment] · Kilimani','delivered', 'mpesa_stk',       'paid',       86000, 180, true,  true,  true),
     (3, '[Guest house] · Karen', 'picked_up', 'card',            'paid',      140000,  38, true,  true,  false),
     (4, '[Hotel] · Rm [—]',      'preparing', 'mpesa_stk',       'paid',       64000,   9, false, false, false),
-    (5, '[Apartment] · Westlands','placed',   'cash_on_delivery','pending',    95000,   3, false, false, false)
+    (5, '[Apartment] · Westlands','placed',   'mpesa_stk',       'pending',    95000,   3, false, false, false)
   ) as v(n, drop, stage, pay, paystat, sub, age, ready, picked, delivered)
   on conflict (reference) do nothing;
 

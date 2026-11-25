@@ -331,7 +331,7 @@ begin
     now() - interval '55 days', 'own', 'comprehensive', now() - interval '50 days',
     true, 'rider', 0, 20000, true, true, 15,
     array['Westlands', 'Kilimani', 'CBD'], array['evenings', 'weekends'],
-    '+254700090003', 'green', 88, false, true, 'nexg_pool')
+    '+254700090003', 'green', 88, false, false, 'nexg_pool')
   on conflict (id) do nothing;
   insert into public.document
     (owner_type, owner_id, requirement_id, storage_path, mime, size_bytes,
