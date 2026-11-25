@@ -24,7 +24,7 @@ const rows = [
     spent_on: '2026-11-12',
     category: 'office_supplies',
     amount_cents: 12_000_000,
-    status: 'submitted',
+    status: 'cancelled',
   },
   { spent_on: '2026-11-13', category: 'rent_utilities', amount_cents: 11_360_000, status: 'paid' },
   { spent_on: '2026-10-28', category: 'it_systems', amount_cents: 27_800_000, status: 'paid' },
@@ -61,9 +61,19 @@ describe('periods and months', () => {
 });
 
 describe('spend', () => {
-  it('counts approved and paid expenses only', () => {
+  it('counts recorded and paid expenses only', () => {
     expect(spendBetween(rows, '2026-11-01', '2026-11-30')).toBe(194_860_000);
     expect(spendBetween(rows, '2026-10-01', '2026-10-31')).toBe(27_800_000);
+  });
+
+  it('counts an expense still marked waiting from before approvals were dropped', () => {
+    const old = {
+      spent_on: '2026-11-12',
+      category: 'other',
+      amount_cents: 180_000,
+      status: 'submitted',
+    };
+    expect(spendBetween([old], '2026-11-01', '2026-11-30')).toBe(180_000);
   });
 
   it('splits spend by category, largest first', () => {

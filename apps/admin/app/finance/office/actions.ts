@@ -5,9 +5,9 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 
 /**
- * Office finance writes. The rules (full Finance only, a second person
- * approves, nothing paid before approval, paid is final) and the audit
- * entries live in the rpc_office_* functions.
+ * Office finance writes. The rules (full Finance only, recorded straight
+ * away, paid is final) and the audit entries live in the rpc_office_*
+ * functions.
  */
 
 export interface Outcome {
@@ -53,21 +53,7 @@ export async function saveExpense(input: ExpenseInput): Promise<Outcome> {
     p_id: input.id ?? undefined,
   });
   refresh();
-  return done(
-    error,
-    input.id ? 'Expense updated' : 'Expense recorded for approval',
-    data ?? undefined,
-  );
-}
-
-export async function decideExpense(id: string, approve: boolean, note: string): Promise<Outcome> {
-  const { error } = await createClient().rpc('rpc_office_expense_decide', {
-    p_id: id,
-    p_approve: approve,
-    p_note: note || undefined,
-  });
-  refresh();
-  return done(error, approve ? 'Approved' : 'Turned down');
+  return done(error, input.id ? 'Expense updated' : 'Expense recorded', data ?? undefined);
 }
 
 export async function payExpense(input: {

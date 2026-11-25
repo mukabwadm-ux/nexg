@@ -33,6 +33,8 @@ export interface NavItem {
   label: string;
   href: string;
   module: string;
+  /** A second module that also reaches this entry. */
+  orModule?: string;
   home?: boolean;
 }
 
@@ -140,7 +142,13 @@ export const CONSOLE_NAV: NavGroup[] = [
     label: 'Finance',
     icon: 'finance',
     items: [
-      { label: 'Office Finance', href: '/finance/office', module: 'finance', home: true },
+      {
+        label: 'Office Finance',
+        href: '/finance/office',
+        module: 'office_finance',
+        orModule: 'finance',
+        home: true,
+      },
       { label: 'Transactions', href: '/finance/transactions', module: 'finance', home: true },
       {
         label: 'Settlements & Payouts',
@@ -228,7 +236,9 @@ export function navFor(modules: Set<string>): (NavGroup & { built: boolean })[] 
       return group.module && modules.has(group.module) ? [{ ...group, built: true }] : [];
     }
     if (group.items.length === 0) return [{ ...group, built: false }];
-    const items = group.items.filter((item) => modules.has(item.module));
+    const items = group.items.filter(
+      (item) => modules.has(item.module) || (!!item.orModule && modules.has(item.orModule)),
+    );
     return items.length > 0 ? [{ ...group, items, built: true }] : [];
   });
 }

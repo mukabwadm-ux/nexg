@@ -104,8 +104,8 @@ insert into t values ('rent', public.rpc_office_expense_save(
 select is(
   (select status || ' ' || (number like 'EXP-____-%')::text from public.fin_office_expense
     where id = (select v::uuid from t where k = 'rent')),
-  'submitted true',
-  'Finance records an expense, numbered and waiting for approval');
+  'approved true',
+  'Finance records an expense, numbered and recorded straight away');
 
 select throws_ok(
   $$select public.rpc_office_expense_save(current_date + 2, 'Future rent', 'rent_utilities', 1000, 'Someone')$$,
@@ -114,32 +114,34 @@ select throws_ok(
 
 select throws_ok(
   $$select public.rpc_office_expense_decide((select v::uuid from t where k = 'rent'), true)$$,
-  '42501', 'Someone other than whoever recorded it has to approve this expense.',
-  'Nobody approves their own expense');
+  '23514', 'This expense is not waiting for a decision.',
+  'Nobody has to approve it');
 
 select throws_ok(
-  $$select public.rpc_office_expense_pay((select v::uuid from t where k = 'rent'), 'bank_transfer', 'FT96')$$,
-  '23514', 'Only an approved expense can be marked paid.',
-  'Nothing is paid before it is approved');
+  $$select public.rpc_office_expense_pay((select v::uuid from t where k = 'rent'), 'mpesa')$$,
+  '22023', 'Enter the M-Pesa or bank reference.',
+  'An M-Pesa payment needs its reference');
 
--- ---------------------------------------------------- a second person decides
+-- ------------------------------------------------------- a colleague corrects it
 
 select set_config('request.jwt.claims',
   '{"sub":"96000000-0000-4000-8000-0000000000a2","role":"authenticated"}', true);
 
 select throws_ok(
   $$select public.rpc_office_expense_decide((select v::uuid from t where k = 'rent'), false)$$,
-  '22023', 'Say why it is turned down.',
-  'Turning an expense down needs a reason');
+  '23514', 'This expense is not waiting for a decision.',
+  'Nor turn it down');
 
 select lives_ok(
-  $$select public.rpc_office_expense_decide((select v::uuid from t where k = 'rent'), true, 'Lease on file')$$,
-  'A colleague with full Finance approves it');
+  $$select public.rpc_office_expense_save(current_date, 'Office rent – May – Test HQ 96', 'rent_utilities',
+      100000000, 'Test Landlord 96', p_id => (select v::uuid from t where k = 'rent'))$$,
+  'A colleague with full Finance can correct a recorded expense');
 
-select throws_ok(
-  $$select public.rpc_office_expense_pay((select v::uuid from t where k = 'rent'), 'mpesa')$$,
-  '22023', 'Enter the M-Pesa or bank reference.',
-  'An M-Pesa payment needs its reference');
+select is(
+  (select status || ' ' || description from public.fin_office_expense
+    where id = (select v::uuid from t where k = 'rent')),
+  'approved Office rent – May – Test HQ 96',
+  'and it stays recorded');
 
 select lives_ok(
   $$select public.rpc_office_expense_pay((select v::uuid from t where k = 'rent'), 'bank_transfer', 'FT96RENT')$$,
@@ -155,7 +157,7 @@ select is(
 select throws_ok(
   $$select public.rpc_office_expense_save(current_date, 'Office rent – changed', 'rent_utilities',
       50000000, 'Test Landlord 96', p_id => (select v::uuid from t where k = 'rent'))$$,
-  '23514', 'Only an expense waiting for approval or turned down can be changed.',
+  '23514', 'A paid or cancelled expense stays as it is.',
   'A paid expense cannot be changed');
 
 select throws_ok(
@@ -163,30 +165,30 @@ select throws_ok(
   '23514', 'A paid or cancelled expense stays as it is.',
   'or cancelled');
 
-/* Turned down, fixed, and back for approval. */
+/* One turned down under the old rule is fixed and recorded. */
 insert into t values ('fuel', public.rpc_office_expense_save(
   current_date - 3, 'Generator diesel 96', 'office_supplies', 3600000, 'Test Fuel 96')::text);
 
-select set_config('request.jwt.claims',
-  '{"sub":"96000000-0000-4000-8000-0000000000a1","role":"authenticated"}', true);
+reset role;
+update public.fin_office_expense set status = 'rejected', decision_note = 'Wrong category'
+ where id = (select v::uuid from t where k = 'fuel');
+set local role authenticated;
 
-select lives_ok(
-  $$select public.rpc_office_expense_decide((select v::uuid from t where k = 'fuel'), false, 'Wrong category')$$,
-  'An expense is turned down with a reason');
-
-select set_config('request.jwt.claims',
-  '{"sub":"96000000-0000-4000-8000-0000000000a2","role":"authenticated"}', true);
+select is(
+  (select status from public.fin_office_expense where id = (select v::uuid from t where k = 'fuel')),
+  'rejected',
+  'An expense turned down before the change');
 
 select lives_ok(
   $$select public.rpc_office_expense_save(current_date - 3, 'Generator diesel 96', 'rent_utilities',
       3600000, 'Test Fuel 96', p_id => (select v::uuid from t where k = 'fuel'))$$,
-  'and fixed by whoever recorded it');
+  'is fixed by anyone with full Finance');
 
 select is(
   (select status || ' ' || category || ' ' || coalesce(decision_note, 'cleared')
      from public.fin_office_expense where id = (select v::uuid from t where k = 'fuel')),
-  'submitted rent_utilities cleared',
-  'which sends it back for approval with the old decision cleared');
+  'approved rent_utilities cleared',
+  'which records it, with the old decision cleared');
 
 -- ------------------------------------------------------------------ budgets
 
@@ -216,7 +218,7 @@ select ok(
 
 select throws_ok(
   $$select public.rpc_office_expense_save(current_date, 'Ops lunch', 'other', 500000, 'Cafe')$$,
-  '42501', 'Only people with full Finance access can do this.',
+  '42501', 'Only people with Office Finance or full Finance access can do this.',
   'but cannot record them');
 
 select set_config('request.jwt.claims',
@@ -227,7 +229,7 @@ select is(
   0,
   'Staff outside Finance see no office expenses');
 
--- ----------------------------------------------- a super admin's own approval
+-- ------------------------------------------------- a super admin records one
 
 select set_config('request.jwt.claims',
   '{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
@@ -235,19 +237,18 @@ select set_config('request.jwt.claims',
 insert into t values ('own', public.rpc_office_expense_save(
   current_date, 'Domain renewal 96', 'it_systems', 250000, 'Test Registrar 96')::text);
 
-select lives_ok(
-  $$select public.rpc_office_expense_decide((select v::uuid from t where k = 'own'), true)$$,
-  'A super admin may approve an expense they recorded');
+select is(
+  (select status from public.fin_office_expense where id = (select v::uuid from t where k = 'own')),
+  'approved',
+  'A super admin''s expense is recorded the same way');
 
 reset role;
 
 select is(
-  (select m.review_state::text from audit.audit_event e
-     join audit.event_meta m on m.event_id = e.id
-    where e.action = 'finance.office_expense_self_approved'
-      and e.target_id = (select v::uuid from t where k = 'own')),
-  'needs_review',
-  'but that approval waits in the audit log for review');
+  (select string_agg(e.action, ',' order by e.at) from audit.audit_event e
+    where e.target_id = (select v::uuid from t where k = 'own')),
+  'finance.office_expense_recorded',
+  'with one audit entry saying who recorded it, and no approval to review');
 
 select is(
   (select count(*)::int from audit.audit_event

@@ -34,7 +34,7 @@ export function OfficeReport({
 
   return (
     <div className="flex flex-col gap-4">
-      <PanelHead title="Office Spend by Month" aside="approved and paid">
+      <PanelHead title="Office Spend by Month" aside="recorded and paid">
         <ExportButton
           label="Export CSV"
           filename="office-expenses-by-month.csv"
@@ -56,7 +56,7 @@ export function OfficeReport({
       </PanelHead>
       {categories.length === 0 ? (
         <p className="text-muted-light py-8 text-center text-sm">
-          No approved or paid office expenses in these months yet.
+          No office expenses recorded in these months yet.
         </p>
       ) : (
         <div className="border-border overflow-x-auto rounded-2xl border">
