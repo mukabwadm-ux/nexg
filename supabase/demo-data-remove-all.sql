@@ -78,7 +78,7 @@ declare
   c_merchants uuid[] := '{0f593f6f-18d5-457e-abe0-9cb3390eaf47,44c2b280-5c93-4aae-aed0-31716b23a466,626929b8-2461-4ea2-b991-60c28905a6b7,65826856-a316-4d78-a676-4929b7adfc54,6a9a3fa7-206c-4dc6-b997-91a05d783238,94782028-7e7d-42fb-873e-c81139cd4d08,afb8ba00-6f22-4275-ba6b-a8d82c215b31,b2bec944-4d02-4c56-947b-0a5b405ae9b2,c6ca5e03-5c7c-4a19-ac51-6c5de40b14c9,dddddddd-1111-4000-8000-000000000001,eeeeeeee-1111-4000-8000-000000000001}';
   c_hosts uuid[] := '{11000000-0000-4000-8000-000000000001,11000000-0000-4000-8000-000000000002,dddddddd-6666-4000-8000-000000000001,eeeeeeee-5555-4000-8000-000000000001}';
   c_properties uuid[] := '{12000000-0000-4000-8000-000000000001,12000000-0000-4000-8000-000000000002,12000000-0000-4000-8000-000000000003,12000000-0000-4000-8000-000000000004,12000000-0000-4000-8000-000000000005,12000000-0000-4000-8000-000000000006,d1c675c9-18e9-41b8-8e0e-cfe1192fc49d,dddddddd-7777-4000-8000-000000000001,eeeeeeee-6666-4000-8000-000000000001,f570a833-25c3-4429-83ed-186dd0ab1873}';
-  c_units uuid[] := '{05685eac-e445-447b-8d8f-f3ee53977d68,1fc9e3a3-162a-4be0-9a42-8e9661eab417,5004b3eb-1d9d-4464-902c-f5da1a8630bb,721f9ab3-947a-4721-8c43-f1e1350c51bd,821de337-2402-4f26-a03e-2bc1ace6595f,8cf14a96-eddd-4935-944a-1bf0fbf0588a,9d6aaa15-acc4-475b-94ce-6eae214c18da,a687b77b-c9e6-4601-92b0-7209776359f9,d3fbdfc7-01b0-44f6-aab5-6486e84e5c5b,db39ef31-2d34-465e-b251-862f5c9b4369,dddddddd-8888-4000-8000-000000000001,dddddddd-8888-4000-8000-000000000002,eeeeeeee-7777-4000-8000-000000000001}';
+  c_units uuid[] := '{05685eac-e445-447b-8d8f-f3ee53977d68,1fc9e3a3-162a-4be0-9a42-8e9661eab417,5004b3eb-1d9d-4464-902c-f5da1a8630bb,721f9ab3-947a-4721-8c43-f1e1350c51bd,7cb5f67e-c584-4b48-a295-6c2e5f356c85,821de337-2402-4f26-a03e-2bc1ace6595f,8cf14a96-eddd-4935-944a-1bf0fbf0588a,9d6aaa15-acc4-475b-94ce-6eae214c18da,a687b77b-c9e6-4601-92b0-7209776359f9,d3fbdfc7-01b0-44f6-aab5-6486e84e5c5b,db39ef31-2d34-465e-b251-862f5c9b4369,dddddddd-8888-4000-8000-000000000001,dddddddd-8888-4000-8000-000000000002,eeeeeeee-7777-4000-8000-000000000001}';
   c_riders uuid[] := '{0cdf01b7-f673-4494-8287-7c6fed8ec26a,1117022a-4c5a-4f73-8164-9129e04d7e00,13567c44-723c-490f-b79f-176839802bf5,2f230881-f3ae-4816-9da8-45dd92ff50aa,667c5984-fd95-440a-ace4-35090226fdad,6eb1b1ae-a2cd-3fcf-3afe-9763eb1d3709,6fbc16f5-86cc-d85b-4f30-dd5a5acab584,99c93977-26e2-4fb0-bb9e-57d6f68fe570,9e7849cc-5190-4d60-ad2a-dc9c1ef0fd1a,dddddddd-3333-4000-8000-000000000001,eeeeeeee-3333-4000-8000-000000000001}';
   c_users uuid[] := '{308cb308-e650-4fb5-9491-a0e9ed3b137c,5f046217-836d-41d0-8c4e-4f956cc5e261,89ae9893-fea4-4aee-8738-fbfee2168274,dddddddd-0000-4000-8000-000000000001,dddddddd-0000-4000-8000-000000000002,dddddddd-0000-4000-8000-000000000003,eeeeeeee-0000-4000-8000-000000000001,eeeeeeee-0000-4000-8000-000000000002,eeeeeeee-0000-4000-8000-000000000003,eeeeeeee-0000-4000-8000-000000000004}';
   c_orders uuid[] := '{1bae8f30-75a4-4547-9260-86dfd786c88c,1bf095fe-7b8a-49ea-b976-aea40eecb4d4,374bf18c-ec26-4b90-8ee7-ac257badb070,5597fa44-6816-4c27-b97c-9ed058f7685a,7971d8dd-52d0-4b67-aaf5-2d4174a4e3c3,95ec7c05-a3db-4b0f-9747-6d0291095508,9b6c647c-9af1-46df-a674-ec1ca04193ad,a12ff91d-8c09-4539-aedd-e9142a32c858,bc5561dd-679b-4265-9df2-ee180e35dcd4}';
@@ -99,7 +99,7 @@ begin
       ('merchant', 'public.merchant', c_merchants, 11, 'f567d693340f8fcc248adcc852323f6d'),
       ('host', 'public.host', c_hosts, 4, 'a5cea661b48de13ab8e1a1f926c039c2'),
       ('property', 'public.property', c_properties, 10, 'd9ac4404af927073605ba6bf1408318d'),
-      ('unit', 'public.unit', c_units, 13, 'a308eed66987dd40454ac8d28373cea1'),
+      ('unit', 'public.unit', c_units, 14, 'eea997b653a8673ac01a8eff450dff76'),
       ('rider', 'public.rider', c_riders, 11, 'ef8754c6737e616458714156961290eb'),
       ('sign-in', 'auth.users', c_users, 10, 'fa65cfa94988b1e1bb497591003b475a'),
       ('order', 'public."order"', c_orders, 9, '8d247c1c5417c03b157749f87bbd086c'),
@@ -230,7 +230,7 @@ begin
   -- Guides, tasks and package orders cascade.
   delete from public.unit where id = any (c_units);
   get diagnostics v_n = row_count;
-  if v_n <> 13 then raise exception 'units: deleted %, expected 13', v_n; end if;
+  if v_n <> 14 then raise exception 'units: deleted %, expected 14', v_n; end if;
 
   delete from public.property where id = any (c_properties);
   get diagnostics v_n = row_count;
@@ -287,7 +287,7 @@ begin
     raise exception 'Demo rows are still there after the deletes; nothing was deleted.';
   end if;
 
-  raise notice 'Removed 11 shops, 4 hosts, 10 properties, 13 units, 11 riders, 10 sign-ins, 9 test orders, 9 payments, 1 stay, 3 stay requests, 1 guest, 1 plan, 8 documents, 89 QR scans, 68 notifications.';
+  raise notice 'Removed 11 shops, 4 hosts, 10 properties, 14 units, 11 riders, 10 sign-ins, 9 test orders, 9 payments, 1 stay, 3 stay requests, 1 guest, 1 plan, 8 documents, 89 QR scans, 68 notifications.';
 end
 $remove$;
 

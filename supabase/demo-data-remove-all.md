@@ -21,7 +21,7 @@ after the owner types yes there.
 | Their branches, opening hours, menus | 11 branches, 63 hour rows, 23 menu sections, 42 items, 2 commission terms, 2 status changes, 3 baskets (3 lines) | children of the shops above | the same, and `demo-catalogue.sql` |
 | Hosts | 4 | Riverine Collection, Lantern Stays (the "sample listings"), Demo Stays, Demo Stays (setting up) | `supabase/seeds/stays-demo-production.sql` (1 Oct), `scripts/demo-partners*.sql` |
 | Properties | 10 | The Arbour, Brook House, Olive Cottage, Lantern Lavington, The Perch, Harvest Court, Demo Stays Kilimani ×2, Tygah, Part | the same, plus 2 added by people testing on the Demo Stays login (9 and 24 Nov) |
-| Units | 13 | every unit of those properties | the same |
+| Units | 14 | every unit of those properties (2 of them, "Readt" and "Fyyygy", were added on the Demo Stays login on 25 Nov) | the same |
 | Host extras | 8 QR codes, 89 QR scans, 1 package order, 1 task, 1 unit guide (+1 version) | | made on the demo hosts |
 | Stay requests | 3 | ST-W3Q8NR, ST-K4M2PQ, ST-B7X9JD (requester "[Requester]") and their 1 match | `stays-demo-production.sql` |
 | Stays | 1 | a test booking on Demo Stays (guest "xcxcxc", 9–12 Nov, unpaid) | testing |
@@ -73,14 +73,14 @@ Step 3 of the script counts them: 4 before, 0 after.
   copy were then removed.
 - **Rolled-back dry run on production.** Step 2 ran inside a block that always
   raises, so nothing could commit. All checks passed. Counts before → after
-  (rolled back):
+  (rolled back; repeated at about 09:50 UTC after a 14th unit appeared):
 
   | | before | after |
   |---|---|---|
   | shops | 39 | 28 |
   | hosts | 16 | 12 |
-  | properties | 22 | 12 |
-  | units | 25 | 12 |
+  | properties | 23 | 13 |
+  | units | 27 | 13 |
   | riders | 38 | 27 |
   | sign-ins | 132 | 122 |
   | orders | 9 | 0 |
@@ -103,9 +103,7 @@ purged.
 
 ## Please confirm (owner)
 
-1. **Demo Stays login is in use.** It signed in on 23 Nov, and a property "Part" was
-   added on it on 24 Nov. If someone still needs it, say so and it is taken out of
-   the script.
+1. **Demo Stays login is in use.** It signed in on 23 Nov; a property "Part" was added on 24 Nov and two units on 25 Nov (07:58 and 09:33 UTC). The script stops, deleting nothing, if it changes again before the apply. If someone still needs it, say so and it is taken out of the script.
 2. **Stays page goes empty.** The 6 sample listings (Riverine Collection, Lantern
    Stays) are the only stays shown on the site today. No real host is live yet.
 3. **Two customers' test orders.** Two of the 9 unpaid orders at fake shops were
