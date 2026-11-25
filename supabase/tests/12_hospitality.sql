@@ -106,7 +106,7 @@ select throws_ok(
 /*
  * A unit that says "leave with the askari" no longer waits on a
  * confirmed askari: the host using the app is the caretaker
- * (20270318009900). Its readiness has nothing left to confirm.
+ * (20270320000100). Its readiness has nothing left to confirm.
  */
 select ok(
   not (public.fn_unit_readiness(

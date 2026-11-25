@@ -1,4 +1,4 @@
--- No caretaker confirmation (20270318009900): the host using the app is the
+-- No caretaker confirmation (20270320000100): the host using the app is the
 -- caretaker, so a unit whose handoff is "caretaker" or "leave with the askari"
 -- is ready, goes live and can be published without caretaker_confirmed_at.
 

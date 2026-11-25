@@ -294,7 +294,7 @@ function HostPanel({
         </div>
         <ul className="divide-border divide-y">
           {units.map((u) => {
-            /* contact_confirmed is no longer a check (20270318009900): the
+            /* contact_confirmed is no longer a check (20270320000100): the
                host using the app is the caretaker. Older rows may still
                carry the key, so it is skipped. */
             const missing = Object.entries(u.readiness ?? {})
