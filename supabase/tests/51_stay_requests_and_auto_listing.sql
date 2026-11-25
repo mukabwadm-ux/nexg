@@ -4,6 +4,8 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(13);
+-- Property review (20270323000100): the homes in this file count as reviewed and approved.
+alter table public.property alter column review_status set default 'approved';
 
 set local session_replication_role = replica;
 delete from public.role_grant;

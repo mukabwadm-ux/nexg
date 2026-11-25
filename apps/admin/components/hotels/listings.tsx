@@ -32,6 +32,8 @@ export interface PropertyRow {
   from_rate_kes: number | null;
   /** Why it is not on the website. Worked out in the view. */
   blocked_reason: string | null;
+  /** NexG's check (20270323000100); absent before that migration. */
+  review_status?: string | null;
 }
 
 export interface StayRequestRow {
@@ -100,15 +102,21 @@ export function ListingsTab({
   matches,
   filter,
   selected,
+  reviewOnly = false,
 }: {
   properties: PropertyRow[];
   requests: StayRequestRow[];
   matches: MatchRow[];
   filter: string;
   selected: string | null;
+  reviewOnly?: boolean;
 }) {
   const live = properties.filter((p) => p.listed && !p.blocked_reason);
   const blocked = properties.filter((p) => p.blocked_reason);
+  /* The review column arrives with 20270323000100; before it nobody waits. */
+  const reviewing = properties.some((p) => typeof p.review_status === 'string');
+  const waiting = properties.filter((p) => p.review_status === 'pending');
+  const shown = reviewOnly ? waiting : properties;
   const open = requests.filter((r) => ['new', 'reviewing', 'matched', 'sent'].includes(r.status));
   const unanswered = requests.filter((r) => r.status === 'new');
 
@@ -133,12 +141,37 @@ export function ListingsTab({
     if (f !== 'all') p.set('filter', f);
     const sel = s === undefined ? selected : s;
     if (sel) p.set('selected', sel);
+    if (reviewOnly) p.set('properties', 'review');
+    return `/hotels?${p.toString()}`;
+  };
+  const propertiesHref = (review: boolean) => {
+    const p = new URLSearchParams({ tab: 'listings' });
+    if (filter !== 'all') p.set('filter', filter);
+    if (selected) p.set('selected', selected);
+    if (review) p.set('properties', 'review');
     return `/hotels?${p.toString()}`;
   };
 
   return (
     <>
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div
+        className={`mt-6 grid gap-3 sm:grid-cols-2 ${reviewing ? 'xl:grid-cols-5' : 'xl:grid-cols-4'}`}
+      >
+        {reviewing && (
+          <Tile
+            label="Waiting for NexG review"
+            value={num(waiting.length)}
+            tone={waiting.length > 0 ? 'warning' : undefined}
+          >
+            {waiting.length > 0 ? (
+              <Link href={propertiesHref(true)} className="underline">
+                check them before guests see them
+              </Link>
+            ) : (
+              'every property has been checked'
+            )}
+          </Tile>
+        )}
         <Tile label="Live on the website" value={num(live.length)}>
           {plural(
             live.reduce((s, p) => s + p.units_listed, 0),
@@ -168,12 +201,23 @@ export function ListingsTab({
       </div>
 
       {/* ───────────────────────────────── what guests can see */}
-      <Card className="mt-6 overflow-x-auto p-0">
+      {reviewing && (
+        <div className="mt-6 flex flex-wrap items-center gap-2">
+          <Chip on={!reviewOnly} href={propertiesHref(false)}>
+            All properties
+          </Chip>
+          <Chip on={reviewOnly} href={propertiesHref(true)}>
+            Waiting for review {waiting.length}
+          </Chip>
+        </div>
+      )}
+      <Card className={`${reviewing ? 'mt-4' : 'mt-6'} overflow-x-auto p-0`}>
         <div className="border-border flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
           <h2 className="text-[0.9375rem] font-extrabold">Properties</h2>
           <p className="text-muted-light text-[0.6875rem] font-semibold">
-            A property shows to guests only when it is listed, its host is live and it has a live
-            listed unit — all three, checked in the view
+            {reviewing
+              ? 'A property shows to guests only when NexG has approved it, it is listed, its host is live and it has a live listed unit. Open one to check it.'
+              : 'A property shows to guests only when it is listed, its host is live and it has a live listed unit — all three, checked in the view. Open one to see everything about it.'}
           </p>
         </div>
         <table className="w-full min-w-[42rem] text-left">
@@ -188,18 +232,20 @@ export function ListingsTab({
             </tr>
           </thead>
           <tbody>
-            {properties.map((p) => (
+            {shown.map((p) => (
               <tr key={p.id} className="border-border hover:bg-bg border-b last:border-b-0">
                 <td className="px-4 py-3">
-                  <span className="flex items-center gap-2.5">
+                  <Link href={`/hotels/properties/${p.id}`} className="flex items-center gap-2.5">
                     <Avatar name={p.name} square />
                     <span className="min-w-0">
-                      <span className="block text-[0.8125rem] font-extrabold">{p.name}</span>
+                      <span className="block text-[0.8125rem] font-extrabold hover:underline">
+                        {p.name}
+                      </span>
                       <span className="text-muted-light block text-[0.6875rem] font-semibold">
                         {p.kind.replace(/_/g, ' ')} · {p.area ?? p.city_name ?? DASH}
                       </span>
                     </span>
-                  </span>
+                  </Link>
                 </td>
                 <td className="text-muted px-4 py-3 text-[0.75rem] font-semibold">
                   {p.host_name ?? DASH}
@@ -227,9 +273,11 @@ export function ListingsTab({
                 </td>
               </tr>
             ))}
-            {properties.length === 0 && (
+            {shown.length === 0 && (
               <EmptyRow colSpan={6}>
-                No properties yet. One is created when a host groups their units into a building.
+                {reviewOnly
+                  ? 'Nothing is waiting for review.'
+                  : 'No properties yet. One is created when a host groups their units into a building.'}
               </EmptyRow>
             )}
           </tbody>

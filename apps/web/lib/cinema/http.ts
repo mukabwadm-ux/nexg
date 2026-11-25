@@ -12,6 +12,7 @@ import {
   cancelBooking,
   liveSeatMap,
   myHold,
+  myHolds,
   placeHold,
   preparePayment,
   releaseHold,
@@ -69,10 +70,15 @@ interface Caller {
   db: Rpc;
 }
 
-async function caller(request: Request): Promise<Caller | Response> {
+/* A read that only needs the customer's own token gets no server client. */
+const noServer: Rpc = async () => {
+  throw new Error('This endpoint does not use the server client.');
+};
+
+async function caller(request: Request, server = true): Promise<Caller | Response> {
   const token = /^Bearer ([\w.-]{1,4096})$/i.exec(request.headers.get('authorization') ?? '')?.[1];
   if (!token) return signIn();
-  const db = cinemaServerDb();
+  const db = server ? cinemaServerDb() : noServer;
   if (!db) return unavailable();
   const client = customerApiClient(token);
   const {
@@ -84,9 +90,14 @@ async function caller(request: Request): Promise<Caller | Response> {
   return { userId: user.id, user: asRpc(client), db };
 }
 
-async function handle(request: Request, work: (who: Caller) => Promise<unknown>, status = 200) {
+async function handle(
+  request: Request,
+  work: (who: Caller) => Promise<unknown>,
+  status = 200,
+  server = true,
+) {
   try {
-    const who = await caller(request);
+    const who = await caller(request, server);
     if (who instanceof Response) return who;
     const body = await work(who);
     if (body === undefined) return new Response(null, { status: 204, headers });
@@ -109,6 +120,26 @@ export function seatsGet(request: Request, showingId: string) {
   if (!id)
     return Promise.resolve(problem(410, 'SHOWING_CLOSED', 'This showing is no longer on sale.'));
   return handle(request, ({ user, db }) => liveSeatMap(user, db, connectorRegistry(db), id));
+}
+
+const pageQuery = z
+  .object({
+    limit: z.coerce.number().int().min(1).max(50).optional(),
+    before: z.string().datetime({ offset: true }).optional(),
+    beforeId: uuid.optional(),
+  })
+  .strict()
+  .refine((q) => (q.before === undefined) === (q.beforeId === undefined));
+
+/* GET /api/customer/cinema/holds: the customer's own holds and bookings,
+   newest first, paged by ?before=…&beforeId=… from the answer's `next`. */
+export function holdsGet(request: Request) {
+  const query = pageQuery.safeParse(Object.fromEntries(new URL(request.url).searchParams));
+  if (!query.success)
+    return Promise.resolve(
+      problem(422, 'INVALID_REQUEST', 'That page of your tickets could not be read.'),
+    );
+  return handle(request, ({ user }) => myHolds(user, query.data), 200, false);
 }
 
 /* POST /api/customer/cinema/holds */

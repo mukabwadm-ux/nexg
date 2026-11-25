@@ -3,6 +3,8 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(14);
+-- Property review (20270323000100): the homes in this file count as reviewed and approved.
+alter table public.property alter column review_status set default 'approved';
 
 -- ─────────────────────────────────────────────────────────── fixtures
 

@@ -35949,6 +35949,10 @@ export type Database = {
           neighbourhood_note: string | null;
           photos: NonNullable<Json>;
           point: unknown;
+          review_reason: string | null;
+          review_status: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
           slug: string;
           summary: string | null;
           unlisted_by_staff_at: string | null;
@@ -35981,6 +35985,10 @@ export type Database = {
           neighbourhood_note?: string | null;
           photos?: NonNullable<Json>;
           point?: unknown;
+          review_reason?: string | null;
+          review_status?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
           slug: string;
           summary?: string | null;
           unlisted_by_staff_at?: string | null;
@@ -36012,6 +36020,10 @@ export type Database = {
           neighbourhood_note?: string | null;
           photos?: NonNullable<Json>;
           point?: unknown;
+          review_reason?: string | null;
+          review_status?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
           slug?: string;
           summary?: string | null;
           unlisted_by_staff_at?: string | null;
@@ -36161,6 +36173,13 @@ export type Database = {
           {
             foreignKeyName: 'property_listed_by_fkey';
             columns: ['listed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'property_reviewed_by_fkey';
+            columns: ['reviewed_by'];
             isOneToOne: false;
             referencedRelation: 'staff_user';
             referencedColumns: ['id'];
@@ -51288,6 +51307,10 @@ export type Database = {
           listed_at: string | null;
           name: string | null;
           photo_count: number | null;
+          review_reason: string | null;
+          review_status: string | null;
+          reviewed_at: string | null;
+          reviewed_by_name: string | null;
           slug: string | null;
           summary: string | null;
           units: number | null;
@@ -71798,6 +71821,10 @@ export type Database = {
       rpc_my_card_remove: { Args: { p_card_id: string; p_proof: string }; Returns: Json };
       rpc_my_cards: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_cinema_hold: { Args: { p_hold_id: string }; Returns: Json };
+      rpc_my_cinema_holds: {
+        Args: { p_before?: string; p_before_id?: string; p_limit?: number };
+        Returns: Json;
+      };
       rpc_my_data_export_request: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_data_requests: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_engine_booking_code: {
@@ -72436,6 +72463,54 @@ export type Database = {
           neighbourhood_note: string | null;
           photos: NonNullable<Json>;
           point: unknown;
+          review_reason: string | null;
+          review_status: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          slug: string;
+          summary: string | null;
+          unlisted_by_staff_at: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'property';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      rpc_property_review: {
+        Args: { p_decision: string; p_property_id: string; p_reason?: string };
+        Returns: {
+          accepts_test_payments: boolean;
+          amenities: string[];
+          area: string | null;
+          cancellation_policy: string | null;
+          cancellation_terms: Json | null;
+          check_in_from: string | null;
+          check_out_by: string | null;
+          city_id: string | null;
+          created_at: string;
+          deleted_at: string | null;
+          deleted_by: string | null;
+          description: string | null;
+          floors: number | null;
+          host_id: string;
+          house_rules: string | null;
+          id: string;
+          is_sample: boolean;
+          kind: Database['public']['Enums']['property_kind'];
+          listed: boolean;
+          listed_at: string | null;
+          listed_by: string | null;
+          name: string;
+          neighbourhood_note: string | null;
+          photos: NonNullable<Json>;
+          point: unknown;
+          review_reason: string | null;
+          review_status: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
           slug: string;
           summary: string | null;
           unlisted_by_staff_at: string | null;
@@ -72476,6 +72551,10 @@ export type Database = {
           neighbourhood_note: string | null;
           photos: NonNullable<Json>;
           point: unknown;
+          review_reason: string | null;
+          review_status: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
           slug: string;
           summary: string | null;
           unlisted_by_staff_at: string | null;
@@ -72487,6 +72566,17 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      rpc_property_team: {
+        Args: { p_property_id: string };
+        Returns: {
+          accepted_at: string;
+          created_at: string;
+          email: string;
+          role: string;
+          unit_scope: number;
+          user_id: string;
+        }[];
       };
       rpc_property_upsert: {
         Args: { p_host_id: string; p_property: Json; p_property_id?: string };
@@ -72516,6 +72606,10 @@ export type Database = {
           neighbourhood_note: string | null;
           photos: NonNullable<Json>;
           point: unknown;
+          review_reason: string | null;
+          review_status: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
           slug: string;
           summary: string | null;
           unlisted_by_staff_at: string | null;

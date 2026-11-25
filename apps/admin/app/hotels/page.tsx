@@ -61,7 +61,7 @@ type Supabase = ReturnType<typeof createClient>;
 export default async function HotelsPage({
   searchParams,
 }: {
-  searchParams?: { tab?: string; filter?: string; selected?: string };
+  searchParams?: { tab?: string; filter?: string; selected?: string; properties?: string };
 }) {
   const staff = await requireStaff();
   requireModule(staff, 'hotels');
@@ -104,7 +104,8 @@ export default async function HotelsPage({
         <HotelTabs current={tab} />
 
         {tab === 'hosts' && (await loadHosts(supabase, badges, filter, selected, worksHospitality))}
-        {tab === 'listings' && (await loadListings(supabase, filter, selected))}
+        {tab === 'listings' &&
+          (await loadListings(supabase, filter, selected, searchParams?.properties === 'review'))}
         {tab === 'refunds' &&
           (worksHospitality ? (
             await loadRefunds(supabase, filter)
@@ -214,7 +215,12 @@ async function loadRefunds(supabase: Supabase, filter: string) {
   );
 }
 
-async function loadListings(supabase: Supabase, filter: string, selected: string | null) {
+async function loadListings(
+  supabase: Supabase,
+  filter: string,
+  selected: string | null,
+  reviewOnly: boolean,
+) {
   const [{ data: properties }, { data: requests }, { data: matches }] = await Promise.all([
     supabase.from('console_property_v').select('*').order('name'),
     supabase.from('console_stay_request_v').select('*').order('created_at', { ascending: false }),
@@ -235,6 +241,7 @@ async function loadListings(supabase: Supabase, filter: string, selected: string
       matches={(matches as MatchRow[] | null) ?? []}
       filter={filter}
       selected={selected}
+      reviewOnly={reviewOnly}
     />
   );
 }

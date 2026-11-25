@@ -5,6 +5,8 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(11);
+-- Property review (20270323000100): the homes in this file count as reviewed and approved.
+alter table public.property alter column review_status set default 'approved';
 
 delete from vault.secrets where name in ('paystack_test_secret_key', 'paystack_live_secret_key');
 select vault.create_secret('sk_test_ci_only_0123456789abcdef', 'paystack_test_secret_key');
