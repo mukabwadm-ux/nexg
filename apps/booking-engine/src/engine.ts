@@ -2353,6 +2353,8 @@ export class BookingEngine {
         },
         custodyState: CUSTODY_MODELS.has(n.model) ? 'not_started' : undefined,
         createdBy: identity.userId,
+        // The range the quote was reserved against: its deposit and its final price are read from it.
+        ...(quoteReserve ? { quoteRange: { ...n.quoteRange } } : {}),
         // A quote waits for its deposit as long as a prepaid booking waits for its payment.
         ...(quoteReserve
           ? { expiresAt: new Date(this.clock() + PREPAID_HOLD_MINUTES * 60000).toISOString() }
