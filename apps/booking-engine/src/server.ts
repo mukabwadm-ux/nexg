@@ -80,6 +80,8 @@ export function createBookingServer(engine: BookingEngine, secret: string) {
           : undefined,
         startTime: url.searchParams.get('startTime') ?? undefined,
         endTime: url.searchParams.get('endTime') ?? undefined,
+        // Laundry: the collection (incoming) or the return (outgoing) leg's windows.
+        leg: url.searchParams.get('leg') ?? undefined,
       };
       if (path.startsWith('/v1/public/')) {
         const match = path.match(

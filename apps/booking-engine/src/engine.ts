@@ -68,6 +68,12 @@ const NON_BLOCKING = new Set([
   'FREIGHT',
 ]);
 const FLEXIBLE = new Set(['ASSET_INTERVAL', 'STORAGE', 'TOUR', 'LINKED_WINDOWS', 'FREIGHT']);
+/**
+ * Work that reserves no calendar capacity but is still done at a time the customer chooses (owner, 25 Nov 2026):
+ * a service visit, and laundry's collection and return. The public availability read offers the windows the
+ * assigned people or vehicles work; the business still accepts the request.
+ */
+const WINDOW_MODELS = new Set(['SERVICE_JOB', 'LINKED_WINDOWS']);
 const CUSTODY_MODELS = new Set(['ASSET_INTERVAL', 'STORAGE', 'SPACE_RESERVATION']);
 const KINDS = new Set(['staff', 'asset', 'vehicle', 'room', 'space', 'equipment', 'capacity_pool']);
 const BLOCKING = new Set(['held', 'confirmed']);
@@ -1101,8 +1107,9 @@ export class BookingEngine {
       !this.externalReservations(b.configuration ?? {});
     return {
       ...pricing,
-      // A deposit the business asks stays the amount due now (owner, 22 Nov 2026).
-      ...(prepaid && pricing.totalDueMinor > 0 && !hasDeposit(pricing)
+      // A booking or reservation is paid in full to confirm it (owner, 25 Nov 2026: "booking means youve paid
+      // 100% same with reservations"); a business's reservation fee no longer lowers what is due now.
+      ...(prepaid && pricing.totalDueMinor > 0
         ? { dueNowMinor: pricing.totalDueMinor, balanceMinor: 0 }
         : {}),
       ...(prepaid && pricing.totalDueMinor > 0 ? { paymentPolicyId: PREPAID_POLICY } : {}),
@@ -1770,6 +1777,7 @@ export class BookingEngine {
       startTime?: string;
       endTime?: string;
       resourceIds?: string[];
+      leg?: string;
     } = {},
   ) {
     const b = publicOnly ? await this.assertPublished(identity) : await this.readBusiness(identity);
@@ -1779,6 +1787,12 @@ export class BookingEngine {
       return { slots: [], reason: 'Authoritative pricing or collection confirmation is required.' };
     if (this.externalReservations(b.configuration ?? {}))
       return { slots: [], reason: 'Source availability is not confirmed.' };
+    if (
+      WINDOW_MODELS.has(service.nexg.model) &&
+      service.active !== false &&
+      service.nexg.bookingEnabled !== false
+    )
+      return this.workWindows(identity, service, date, options);
     if (
       service.active === false ||
       service.nexg.bookingEnabled === false ||
@@ -1930,6 +1944,82 @@ export class BookingEngine {
       reason: slots.length ? undefined : 'No available times for this quantity and period.',
       timezone: 'Africa/Nairobi',
       quantity,
+    };
+  }
+  /**
+   * The windows a service visit or a laundry leg can be done in on one Nairobi day: every 15 minutes, a window as long
+   * as the work (the job's duration, else the offering's, else an hour) that every assigned resource works in full,
+   * after the lead time and within the horizon, and on the business's working days and hours for laundry. The work
+   * doesn't block the calendar, so each window is offered for the asked quantity; the business accepts the request.
+   */
+  private async workWindows(
+    identity: Identity,
+    service: Doc,
+    date: string,
+    options: { quantity?: number; leg?: string },
+  ) {
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
+      !Number.isFinite(Date.parse(`${date}T12:00:00+03:00`)) ||
+      new Date(`${date}T12:00:00+03:00`).toISOString().slice(0, 10) !== date
+    )
+      throw new BookingError(422, 'Choose a valid date.', 'invalid_date');
+    const quantity = integer(options.quantity ?? 1, 'Quantity', 1);
+    if (options.leg !== undefined && options.leg !== 'incoming' && options.leg !== 'outgoing')
+      throw new BookingError(422, 'Choose the collection or the return.', 'invalid_leg');
+    const n = service.nexg,
+      setup = n.specialistSetup;
+    const laundry =
+      n.model === 'LINKED_WINDOWS' && setup?.model === 'LINKED_WINDOWS' ? setup : undefined;
+    const job = n.model === 'SERVICE_JOB' && setup?.model === 'SERVICE_JOB' ? setup : undefined;
+    const ids: string[] = laundry
+      ? options.leg === 'outgoing'
+        ? laundry.outgoingResourceIds
+        : laundry.incomingResourceIds
+      : job
+        ? job.resourceIds
+        : (n.resourceIds ?? []);
+    const base = { timezone: 'Africa/Nairobi', quantity };
+    if (!ids?.length)
+      return {
+        ...base,
+        slots: [],
+        reason: 'The business has not assigned anyone to this work yet.',
+      };
+    const resources = await Promise.all(ids.map((id) => this.own('resources', id, identity)));
+    if (resources.some((r) => r.active === false))
+      return { ...base, slots: [], reason: 'No available times for this day.' };
+    const length =
+      (job?.durationMinutes && job.durationMinutes > 0
+        ? job.durationMinutes
+        : service.duration > 1
+          ? service.duration
+          : 60) * 60000;
+    const day = Date.parse(`${date}T00:00:00+03:00`),
+      now = this.clock(),
+      earliest = now + (n.leadTimeMinutes ?? 0) * 60000,
+      latest = n.horizonDays ? now + n.horizonDays * 86400000 : Number.POSITIVE_INFINITY;
+    const weekday = new Date(Date.parse(`${date}T12:00:00+03:00`) + EAT).getUTCDay();
+    if (laundry?.workingDays?.length && !laundry.workingDays.includes(weekday))
+      return { ...base, slots: [], reason: 'The business does not work on this day.' };
+    const opens = laundry?.opens ? day + minutes(laundry.opens) * 60000 : day,
+      closes = laundry?.closes ? day + minutes(laundry.closes) * 60000 : day + 86400000;
+    const slots: Array<{ start: string; end: string; remainingCapacity: number }> = [];
+    for (let i = 0; i < 96; i++) {
+      const start = day + i * 15 * 60000,
+        end = start + length;
+      if (start < earliest || start > latest || start < opens || end > closes) continue;
+      if (resources.some((r) => !this.scheduleAllows(service, r, start, end))) continue;
+      slots.push({
+        start: new Date(start).toISOString(),
+        end: new Date(end).toISOString(),
+        remainingCapacity: quantity,
+      });
+    }
+    return {
+      ...base,
+      slots,
+      reason: slots.length ? undefined : 'No available times for this day.',
     };
   }
   private references(d: Doc, resourceId: any) {
@@ -2119,13 +2209,13 @@ export class BookingEngine {
           'price_changed',
         );
       this.validateBookingDetails(service, input);
-      // Every customer booking is paid through NexG before it is confirmed
-      // (owner, 19 Nov 2026): in full, or the business's deposit now and the
-      // balance later (owner, 22 Nov 2026: "Deposits now"). Free bookings have
-      // nothing to pay.
+      // Every customer booking and reservation is paid in full through NexG
+      // before it is confirmed (owner, 19 Nov 2026; again 25 Nov 2026: "booking
+      // means youve paid 100% same with reservations", which ends the 22 Nov
+      // deposit exception). Free bookings have nothing to pay.
       const prepaid =
         publicOnly && !requestOnly && !pricing.indicative && pricing.totalDueMinor > 0;
-      if (prepaid && !hasDeposit(pricing)) {
+      if (prepaid) {
         pricing.dueNowMinor = pricing.totalDueMinor;
         pricing.balanceMinor = 0;
       }
