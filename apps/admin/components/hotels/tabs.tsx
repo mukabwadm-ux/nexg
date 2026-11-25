@@ -294,16 +294,17 @@ function HostPanel({
         </div>
         <ul className="divide-border divide-y">
           {units.map((u) => {
+            /* contact_confirmed is no longer a check (20270320000100): the
+               host using the app is the caretaker. Older rows may still
+               carry the key, so it is skipped. */
             const missing = Object.entries(u.readiness ?? {})
-              .filter(([, ok]) => !ok)
+              .filter(([k, ok]) => !ok && k !== 'contact_confirmed')
               .map(([k]) =>
                 k === 'qr_placed'
                   ? 'QR not yet placed'
-                  : k === 'contact_confirmed'
-                    ? 'confirm caretaker number'
-                    : k === 'delivery_hours' || k === 'hours'
-                      ? 'set delivery hours'
-                      : `add ${k}`,
+                  : k === 'delivery_hours' || k === 'hours'
+                    ? 'set delivery hours'
+                    : `add ${k}`,
               );
             return (
               <li key={u.id} className="px-4 py-3">
