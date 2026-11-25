@@ -451,3 +451,9 @@ begin
   raise notice 'Host seeds ready: host.live@nexgapp.com (live) and host.pending@nexgapp.com (2 of 5), password devpassword';
 end
 $$;
+
+-- Property review (migration 20270323000100): the live host's homes count as
+-- checked by NexG. The pending host's homes stay waiting for review.
+update public.property p set review_status = 'approved', reviewed_at = now()
+ where p.review_status = 'pending'
+   and exists (select 1 from public.host h where h.id = p.host_id and h.status = 'live');

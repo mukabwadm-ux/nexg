@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 
+import { needsReason, REVIEW_DECISIONS, type ReviewDecision } from '@/lib/property-detail';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -173,4 +174,45 @@ export async function declareHostPayout(
       (data as { message?: string } | null)?.message ??
       'Saved. Finance verifies the details before a payout run pays the host.',
   };
+}
+
+/**
+ * NexG's check of a property: approve, reject or suspend (both with a
+ * reason the host can act on), or reinstate. Who may decide, and which
+ * move is allowed from which state, is checked by rpc_property_review,
+ * which also writes audit.log.
+ */
+export async function reviewProperty(input: {
+  propertyId: string;
+  decision: string;
+  reason: string;
+}): Promise<{ error?: string; success?: boolean }> {
+  const staff = await requireStaff();
+  requireModule(staff, 'hotels');
+  if (!uuid.test(input.propertyId)) return { error: 'The property ID is invalid.' };
+  if (!isReviewDecision(input.decision)) return { error: 'Choose a valid decision.' };
+  const reason = input.reason.trim();
+  if (needsReason(input.decision) && reason.length < 5)
+    return { error: 'Give the reason, in words the host can act on.' };
+
+  const { error } = await createClient().rpc('rpc_property_review', {
+    p_property_id: input.propertyId,
+    p_decision: input.decision,
+    p_reason: reason ? reason.slice(0, 500) : undefined,
+  });
+  if (error)
+    return {
+      error:
+        error.code === '22023' || error.code === '42501' || error.code === 'P0002'
+          ? error.message
+          : 'The decision could not be saved. Try again.',
+    };
+
+  revalidatePath(`/hotels/properties/${input.propertyId}`);
+  revalidatePath('/hotels');
+  return { success: true };
+}
+
+function isReviewDecision(v: string): v is ReviewDecision {
+  return (REVIEW_DECISIONS as readonly string[]).includes(v);
 }

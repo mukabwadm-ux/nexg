@@ -4,7 +4,7 @@ vi.mock('server-only', () => ({}));
 
 import type { HostWorkspaceAccess } from './access';
 import { runHostCommand } from './commands';
-import { pinOf } from './read';
+import { pinOf, propertyStatus } from './read';
 import { STAY_AMENITIES } from './vocab';
 
 const HOST = '11111111-1111-4111-8111-111111111111';
@@ -244,5 +244,16 @@ describe('saving a unit', () => {
     await expect(
       runHostCommand(a, { type: 'save', collection: 'units', id: UNIT, record: { name: 'A' } }),
     ).rejects.toThrow('outside your workspace access');
+  });
+});
+
+describe('the property badge', () => {
+  it('puts NexG review before the listing switch', () => {
+    expect(propertyStatus(true, 'pending')).toBe('Waiting for NexG review');
+    expect(propertyStatus(true, 'rejected')).toBe('Not approved by NexG');
+    expect(propertyStatus(true, 'suspended')).toBe('Suspended by NexG');
+    expect(propertyStatus(true, 'approved')).toBe('Active');
+    expect(propertyStatus(false, 'approved')).toBe('Unlisted');
+    expect(propertyStatus(true, undefined)).toBe('Active');
   });
 });

@@ -238,3 +238,10 @@ where r.reference = 'ST-W3Q8NR' and u.name = 'Apartment 2A';
 update public.property set is_sample = true
  where host_id in ('11000000-0000-4000-8000-000000000001',
                    '11000000-0000-4000-8000-000000000002');
+
+-- Property review (migration 20270323000100): the local sample homes count as
+-- checked by NexG, so they show to guests as they did before review began.
+update public.property set review_status = 'approved', reviewed_at = now()
+ where host_id in ('11000000-0000-4000-8000-000000000001',
+                   '11000000-0000-4000-8000-000000000002')
+   and review_status = 'pending';

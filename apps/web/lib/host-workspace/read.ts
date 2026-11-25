@@ -67,6 +67,18 @@ export function pinOf(point: unknown): { lat: number; lng: number } | null {
   return { lat: Number(lat.toFixed(6)), lng: Number(lng.toFixed(6)) };
 }
 
+/**
+ * The badge a host sees on a property. NexG's review (20270323000100) comes
+ * first: until staff approve it, guests cannot see it however it is listed.
+ * Without a review status (an older database) it is listed or not.
+ */
+export function propertyStatus(listed: boolean, review: string | undefined): string {
+  if (review === 'pending') return 'Waiting for NexG review';
+  if (review === 'rejected') return 'Not approved by NexG';
+  if (review === 'suspended') return 'Suspended by NexG';
+  return listed ? 'Active' : 'Unlisted';
+}
+
 /** The browser Maps key and Map ID the site already uses, when both are set. */
 function mapsConfig() {
   const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
@@ -444,6 +456,20 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
         ),
       );
 
+  /* NexG's check of each property (20270323000100). Read on its own, so the
+     workspace still loads on a database that does not have it yet. */
+  const reviewOf = new Map<string, string>();
+  if (properties.length > 0) {
+    const { data: reviewRows } = await db
+      .from('property')
+      .select('id, review_status')
+      .in(
+        'id',
+        properties.map((row) => row.id),
+      );
+    for (const row of reviewRows ?? []) reviewOf.set(row.id, row.review_status);
+  }
+
   const data: WorkspaceData = {
     properties: properties
       .map((row) => ({
@@ -453,7 +479,7 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
         description: row.description ?? '',
         kind: row.kind,
         image: image(row.id),
-        status: row.listed ? 'Active' : 'Unlisted',
+        status: propertyStatus(row.listed, reviewOf.get(row.id)),
         floors: row.floors,
         summary: row.summary ?? '',
         checkInFrom: row.check_in_from?.slice(0, 5) ?? '',
