@@ -47,7 +47,8 @@ export function SocialSignIn({
   label = 'or use your email',
 }: {
   next?: string;
-  label?: string;
+  /** The divider text under the buttons; null leaves the divider out. */
+  label?: string | null;
 }) {
   const providers = (Object.keys(ENABLED) as Provider[]).filter((p) => ENABLED[p]);
   const [busy, setBusy] = React.useState<Provider | null>(null);
@@ -109,13 +110,15 @@ export function SocialSignIn({
           {error}
         </p>
       ) : null}
-      <div className="mt-6 flex items-center gap-3" aria-hidden="true">
-        <span className="border-border flex-1 border-t" />
-        <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-[0.12em]">
-          {label}
-        </span>
-        <span className="border-border flex-1 border-t" />
-      </div>
+      {label === null ? null : (
+        <div className="mt-6 flex items-center gap-3" aria-hidden="true">
+          <span className="border-border flex-1 border-t" />
+          <span className="text-muted-light text-[0.6875rem] font-extrabold uppercase tracking-[0.12em]">
+            {label}
+          </span>
+          <span className="border-border flex-1 border-t" />
+        </div>
+      )}
     </div>
   );
 }

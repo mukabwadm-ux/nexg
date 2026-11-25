@@ -16,8 +16,10 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import * as React from 'react';
 
+import { LazySocialSignIn } from '@/components/auth/social-sign-in-lazy';
 import { DEFAULT_LOCALE, translator, type Locale } from '@/lib/i18n/dictionaries';
 
 import { Logo } from './logo';
@@ -131,6 +133,7 @@ export function SiteMenu({
 
   const [open, setOpen] = React.useState(false);
   const close = () => setOpen(false);
+  const pathname = usePathname();
 
   /*
    * The same store the header chip reads.
@@ -311,6 +314,10 @@ export function SiteMenu({
           {/* ------------------------------------------------------- footer */}
           {/* The bottom padding clears a phone's home indicator. */}
           <footer className="border-border/70 bg-bg border-t px-5 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:px-9 sm:py-4">
+            {/* Google sign-in; it shows only while the provider is switched on. */}
+            <div className="[&:not(:empty)]:mb-3">
+              <LazySocialSignIn next={pathname ?? undefined} label={null} />
+            </div>
             <div className="flex gap-3">
               <Link
                 href="/sign-in"
