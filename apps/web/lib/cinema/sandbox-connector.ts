@@ -1,5 +1,6 @@
 import {
   CinemaError,
+  normaliseTickets,
   type BookingAnswer,
   type CinemaConnector,
   type HoldAnswer,
@@ -124,7 +125,7 @@ export class SandboxCinemaConnector implements CinemaConnector {
     const answer = await this.call('confirm', input);
     const booking = {
       bookingRef: String(answer.bookingRef),
-      tickets: (answer.tickets as BookingAnswer['tickets']) ?? [],
+      tickets: normaliseTickets(answer.tickets),
     };
     // "Books, then answers too late": the booking exists, the caller times out.
     if (answer.late) await this.sleep(9000);
@@ -136,7 +137,7 @@ export class SandboxCinemaConnector implements CinemaConnector {
     if (!answer.found || answer.cancelled) return null;
     return {
       bookingRef: String(answer.bookingRef),
-      tickets: (answer.tickets as BookingAnswer['tickets']) ?? [],
+      tickets: normaliseTickets(answer.tickets),
     };
   }
 

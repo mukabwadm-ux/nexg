@@ -138,3 +138,18 @@ describe('the live timeout', () => {
     expect(await withTimeout(Promise.resolve(7))).toBe(7);
   });
 });
+
+describe("the sandbox cinema's tickets", () => {
+  it('say their barcodes are QR codes', async () => {
+    const { connector } = sandbox({
+      confirm: {
+        ok: true,
+        bookingRef: 'B1',
+        tickets: [{ seat: 'F7', ticketRef: 'B1-F7', barcode: 'ABC123', barcodeFormat: 'qr' }],
+      },
+    });
+    expect(
+      (await connector.confirm({ holdRef: 'H', requestId: 'r', paymentRef: 'p' })).tickets,
+    ).toEqual([{ seat: 'F7', ticketRef: 'B1-F7', barcode: 'ABC123', barcodeFormat: 'qr' }]);
+  });
+});
