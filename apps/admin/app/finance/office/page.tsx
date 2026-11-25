@@ -23,6 +23,7 @@ import {
   type Choice,
   type ExpenseRow,
 } from '@/components/finance/office';
+import { MonthlyReportLinks } from '@/components/finance/monthly-report-links';
 import { OfficeReport } from '@/components/finance/office-report';
 import { ConsoleShell } from '@/components/console-shell';
 import { RangeControl } from '@/components/portal/client-kit';
@@ -430,9 +431,12 @@ export default async function OfficeFinancePage({
         )}
 
         {tab === 'reports' && (
-          <Sheet>
-            <OfficeReport months={reportMonths} matrix={matrix} budgets={monthBudgets} />
-          </Sheet>
+          <>
+            <MonthlyReportLinks today={today} />
+            <Sheet>
+              <OfficeReport months={reportMonths} matrix={matrix} budgets={monthBudgets} />
+            </Sheet>
+          </>
         )}
 
         {tab === 'files' &&

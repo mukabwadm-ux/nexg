@@ -28,6 +28,7 @@ import { ShareDonut, TrendArea } from '@/components/charts';
 import { ConsoleShell } from '@/components/console-shell';
 import { Exports, type ExportLogRow } from '@/components/finance/exports';
 import { Fees, type FeeLineRow, type TakeRow } from '@/components/finance/fees';
+import { MonthlyReportLinks } from '@/components/finance/monthly-report-links';
 import {
   Overview,
   type CalendarRow,
@@ -571,6 +572,7 @@ export default async function FinanceReportsPage({
 
     body = (
       <>
+        <MonthlyReportLinks today={today} />
         <Sheet>
           <PanelHead
             title="Financial Summary"

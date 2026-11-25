@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import * as React from 'react';
 
+import { DocumentLinks } from '@/components/finance/document-links';
 import {
   Empty,
   SectionTitle,
@@ -291,6 +292,11 @@ export function Settlement({
                         <span className="text-muted-light ml-1.5 text-[0.6875rem]">
                           · {l.party_type}
                         </span>
+                        <DocumentLinks
+                          href={`/finance/documents/settlement/${l.id}`}
+                          label="settlement statement"
+                          className="mt-1 flex"
+                        />
                         {l.hold_reason ? (
                           <p className="text-danger mt-0.5 text-[0.6875rem] font-semibold">
                             {l.hold_reason}

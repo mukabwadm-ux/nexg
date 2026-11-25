@@ -30,6 +30,7 @@ import {
   type InvoiceInput,
   type Outcome,
 } from '@/app/finance/invoices/actions';
+import { DocumentLinks } from '@/components/finance/document-links';
 import { KRA_STATUS } from '@/components/finance/invoice-list';
 import {
   ActionMenu,
@@ -979,7 +980,13 @@ export function ClientInvoicePanel({
                       {p.recorded_by_name ? ` · recorded by ${p.recorded_by_name}` : ''}
                     </span>
                   </span>
-                  <span className="font-bold tabular-nums">KES {money(p.amount_cents)}</span>
+                  <span className="flex shrink-0 flex-col items-end gap-1">
+                    <span className="font-bold tabular-nums">KES {money(p.amount_cents)}</span>
+                    <DocumentLinks
+                      href={`/finance/documents/receipt/${p.id}?invoice=${detail.invoice.id}`}
+                      label="receipt"
+                    />
+                  </span>
                 </li>
               ))}
             </ul>
