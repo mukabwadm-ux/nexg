@@ -99,9 +99,11 @@ const primaryButton = `${BUTTON} bg-ink text-white hover:bg-ink/85 dark:bg-gold 
 /** Ink in both themes: for the gold panel. */
 const inkButton = `${BUTTON} bg-ink text-white hover:bg-ink/85`;
 
-export const dynamic = 'force-dynamic';
-// Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
-export const fetchCache = 'force-no-store';
+// The data is the same for every visitor, so its database reads are kept for
+// a minute: a busy day costs the database one read a minute, not one per
+// visit. (The page itself still renders per visit, for the visitor's language.)
+// See docs/scaling-plan.md and lib/supabase/public.ts.
+export const revalidate = 60;
 
 export default async function MerchantsPage() {
   /* The form is on this page, in the hero. */

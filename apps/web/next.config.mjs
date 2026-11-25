@@ -32,6 +32,13 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   /*
+   * Serve images as they are, not through Vercel's /_next/image optimizer.
+   * The Hobby plan's image-optimization quota ran out (2026-11-25) and every
+   * optimized image then failed with "402 OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED":
+   * a broken-image icon on store cards, category tiles and logos.
+   */
+  images: { unoptimized: true },
+  /*
    * NexG Discovery: its own app, built into public/discover by `discovery/scripts/build-for-web.mjs` (the
    * `build` and `discover` scripts). The /discover page (app/discover) shows the site header over it.
    * Same origin as the rest of the site, so its cart is this site's cart (localStorage "nexg.cart.v1").

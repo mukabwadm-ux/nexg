@@ -12,9 +12,11 @@ export const metadata: Metadata = {
   title: 'All Categories · NexG',
   description: 'Browse all categories and services across Nairobi on NexG.',
 };
-export const dynamic = 'force-dynamic';
-// Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
-export const fetchCache = 'force-no-store';
+// The data is the same for every visitor, so its database reads are kept for
+// a minute: a busy day costs the database one read a minute, not one per
+// visit. (The page itself still renders per visit, for the visitor's language.)
+// See docs/scaling-plan.md and lib/supabase/public.ts.
+export const revalidate = 60;
 
 /**
  * All categories: a dark header with search and filters, then every active

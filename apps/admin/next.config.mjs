@@ -20,6 +20,12 @@ const nextConfig = {
     // `pnpm lint` runs ESLint as its own CI step; do not run it twice.
     ignoreDuringBuilds: true,
   },
+  /*
+   * Serve images as they are: Vercel's /_next/image optimizer answers
+   * "402 OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED" since the Hobby plan's
+   * quota ran out (2026-11-25), which broke the console logo.
+   */
+  images: { unoptimized: true },
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },

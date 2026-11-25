@@ -58,7 +58,7 @@ export async function activateRider(riderId: string, reason: string): Promise<Re
   if (error) return { ok: false, message: error.message };
 
   revalidatePath(`/riders/${riderId}`);
-  revalidatePath('/riders');
+  revalidatePath('/riders', 'layout');
   return { ok: true, message: 'Rider activated.' };
 }
 
@@ -76,7 +76,7 @@ export async function markRiderKitPaid(
   });
   if (error) return { ok: false, message: error.message };
   revalidatePath(`/riders/${riderId}`);
-  revalidatePath('/riders');
+  revalidatePath('/riders', 'layout');
   return { ok: true, message: 'Kit payment recorded.' };
 }
 
@@ -91,7 +91,7 @@ export async function issueRiderKit(riderId: string): Promise<ReviewResult> {
   });
   if (error) return { ok: false, message: error.message };
   revalidatePath(`/riders/${riderId}`);
-  revalidatePath('/riders');
+  revalidatePath('/riders', 'layout');
   return { ok: true, message: 'Kit marked as handed over.' };
 }
 
@@ -107,7 +107,7 @@ export async function acknowledgeSos(formData: FormData): Promise<void> {
 
   await supabase.rpc('rpc_incident_sos_ack', { p_incident_id: id });
 
-  revalidatePath('/riders');
+  revalidatePath('/riders', 'layout');
   revalidatePath(`/riders/incidents/${id}`);
 }
 
@@ -118,7 +118,7 @@ export async function acknowledgeSos(formData: FormData): Promise<void> {
 
 function done(riderId: string, message: string): ReviewResult {
   revalidatePath(`/riders/${riderId}`);
-  revalidatePath('/riders');
+  revalidatePath('/riders', 'layout');
   return { ok: true, message };
 }
 
@@ -252,7 +252,7 @@ export async function saveRateCardDraft(input: RateCardInput): Promise<ReviewRes
     p_guest_tips_pass_through_pct: input.tipsPassThroughPct,
   });
   if (error) return { ok: false, message: error.message };
-  revalidatePath('/riders');
+  revalidatePath('/riders', 'layout');
   return { ok: true, message: 'Draft saved. It needs two different people to approve it.' };
 }
 
@@ -262,7 +262,7 @@ export async function publishRateCard(cardId: string): Promise<ReviewResult> {
     p_card_id: cardId,
   });
   if (error) return { ok: false, message: error.message };
-  revalidatePath('/riders');
+  revalidatePath('/riders', 'layout');
   const live = (data as { status?: string } | null)?.status === 'current';
   return {
     ok: true,
@@ -277,7 +277,7 @@ export async function discardRateCardDraft(cardId: string): Promise<ReviewResult
     p_card_id: cardId,
   });
   if (error) return { ok: false, message: error.message };
-  revalidatePath('/riders');
+  revalidatePath('/riders', 'layout');
   return { ok: true, message: 'Draft discarded.' };
 }
 
@@ -289,7 +289,7 @@ export async function discardRateCardDraft(cardId: string): Promise<ReviewResult
 
 function revalidateRider(riderId: string) {
   revalidatePath(`/riders/${riderId}`);
-  revalidatePath('/riders');
+  revalidatePath('/riders', 'layout');
 }
 
 type Rpc = (
@@ -421,4 +421,71 @@ export async function revealRiderLocation(riderId: string, reason: string): Prom
     lng: fix.lng,
     at: fix.at,
   };
+}
+
+/* ──────────────────────────────────────────── incidents & disputes (cases) */
+
+export interface NewCase {
+  caseType: string;
+  priority: string;
+  description: string;
+  riderId?: string | null;
+  orderReference?: string | null;
+  reason?: string | null;
+  reportedBy?: string;
+}
+
+/** Opens a case through rpc_console_rider_case_open, which audits it. */
+export async function openRiderCase(input: NewCase): Promise<ReviewResult> {
+  const { error } = await rpcOf()('rpc_console_rider_case_open', {
+    p_case_type: input.caseType,
+    p_priority: input.priority,
+    p_description: input.description,
+    p_rider_id: input.riderId || null,
+    p_order_reference: input.orderReference?.trim() || null,
+    p_reason: input.reason || null,
+    p_reported_by: input.reportedBy || 'staff',
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/riders', 'layout');
+  return { ok: true, message: 'Case opened.' };
+}
+
+/** Assign to me, start, escalate or change priority. */
+export async function updateRiderCase(
+  caseId: string,
+  action: 'assign_me' | 'start' | 'escalate' | 'priority',
+  priority?: string,
+): Promise<ReviewResult> {
+  const { error } = await rpcOf()('rpc_console_rider_case_update', {
+    p_case_id: caseId,
+    p_action: action,
+    p_priority: priority ?? null,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/riders', 'layout');
+  const said: Record<string, string> = {
+    assign_me: 'Assigned to you.',
+    start: 'Marked in progress.',
+    escalate: 'Escalated.',
+    priority: 'Priority changed.',
+  };
+  return { ok: true, message: said[action] ?? 'Saved.' };
+}
+
+export async function resolveRiderCase(
+  caseId: string,
+  outcome: string,
+  resolution: string,
+  compensationKes: number | null,
+): Promise<ReviewResult> {
+  const { error } = await rpcOf()('rpc_console_rider_case_resolve', {
+    p_case_id: caseId,
+    p_outcome: outcome,
+    p_resolution: resolution,
+    p_compensation_kes: compensationKes,
+  });
+  if (error) return { ok: false, message: error.message };
+  revalidatePath('/riders', 'layout');
+  return { ok: true, message: 'Case resolved.' };
 }

@@ -49,7 +49,14 @@ function StoreCard({ store }: { store: RankedStore }) {
   const open = store.accepting_orders !== false && !store.closed_today;
   const minutes =
     store.prep_minutes != null && store.prep_minutes > 0 ? Math.round(store.prep_minutes) : null;
-  const photo = store.cover_photo_path ?? category?.photo ?? null;
+  /* The store's cover, then its category's stand-in photo. A photo that fails
+     to load is dropped for the next one; with none left the card keeps its
+     plain gradient, never a broken-image icon over the category chip. */
+  const [failed, setFailed] = React.useState<string[]>([]);
+  const photo =
+    [store.cover_photo_path, category?.photo].find(
+      (src): src is string => !!src && !failed.includes(src),
+    ) ?? null;
   const closes = hhmm(store.closes_today);
   const name = unbracket(store.trading_name);
   const area = store.branch_name ? unbracket(store.branch_name) : null;
@@ -63,9 +70,11 @@ function StoreCard({ store }: { store: RankedStore }) {
         <span className="relative block aspect-[4/3] overflow-hidden bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E]">
           {photo && (
             <Image
+              key={photo}
               src={photo}
               alt=""
               fill
+              onError={() => setFailed((list) => [...list, photo])}
               sizes="(min-width: 1024px) 24vw, 18rem"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />

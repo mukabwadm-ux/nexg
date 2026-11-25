@@ -5,7 +5,16 @@ import { notFound } from 'next/navigation';
 
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
+import { CaseActions } from '@/components/riders/module-client';
 import { clock, DASH, riderName, when } from '@/components/riders/shared';
+import {
+  CASE_REASON_LABEL,
+  CASE_TYPE_LABEL,
+  caseRef,
+  OUTCOME_LABEL,
+  PRIORITY_LABEL,
+  slaLeft,
+} from '@/lib/riders-module';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -34,7 +43,7 @@ export default async function IncidentPage({ params }: { params: { id: string } 
       /* One literal, not a concatenation: PostgREST infers the row type
          from the string itself, and `a' + 'b` gives it nothing to read. */
       .select(
-        'id, kind, severity, status, happened_at, description, resolution, resolved_at, acknowledged_at, injury, police_ref, insurance_claim_ref, insurance_claim_status, compensation_kes, order_reference, reported_by_type, rider_id, rider:rider_id(first_name, last_name, phone, vehicle, plate_no)',
+        'id, kind, severity, status, case_type, priority, reason, sla_due_at, escalated_at, outcome, assignee_id, happened_at, description, resolution, resolved_at, acknowledged_at, injury, police_ref, insurance_claim_ref, insurance_claim_status, compensation_kes, order_reference, reported_by_type, rider_id, rider:rider_id(first_name, last_name, phone, vehicle, plate_no)',
       )
       .eq('id', params.id)
       .maybeSingle(),
@@ -68,10 +77,10 @@ export default async function IncidentPage({ params }: { params: { id: string } 
 
       <main className="px-4 py-6 sm:px-8">
         <Link
-          href="/riders?tab=health"
+          href="/riders/incidents"
           className="text-muted hover:text-ink text-[0.75rem] font-bold"
         >
-          ← Back to Health &amp; safety
+          ← Back to Incidents &amp; Disputes
         </Link>
 
         {unacknowledged && (
@@ -152,6 +161,52 @@ export default async function IncidentPage({ params }: { params: { id: string } 
           </div>
 
           <div className="space-y-4">
+            <Card className="p-5">
+              <p className="text-[0.9375rem] font-extrabold">Case {caseRef(incident.id)}</p>
+              <dl className="mt-3 space-y-2 text-[0.75rem] font-semibold">
+                <Row
+                  label="Type"
+                  value={CASE_TYPE_LABEL[incident.case_type] ?? incident.case_type}
+                />
+                <Row
+                  label="Reason"
+                  value={
+                    incident.reason ? (CASE_REASON_LABEL[incident.reason] ?? incident.reason) : DASH
+                  }
+                />
+                <Row
+                  label="Priority"
+                  value={PRIORITY_LABEL[incident.priority] ?? incident.priority}
+                />
+                <Row
+                  label="SLA"
+                  value={incident.resolved_at ? 'Closed' : slaLeft(incident.sla_due_at).text}
+                />
+                <Row
+                  label="Escalated"
+                  value={
+                    incident.escalated_at
+                      ? `${when(incident.escalated_at)} ${clock(incident.escalated_at)}`
+                      : 'No'
+                  }
+                />
+                <Row
+                  label="Outcome"
+                  value={
+                    incident.outcome ? (OUTCOME_LABEL[incident.outcome] ?? incident.outcome) : DASH
+                  }
+                />
+              </dl>
+              {incident.status !== 'resolved' && incident.status !== 'closed' && (
+                <CaseActions
+                  caseId={incident.id}
+                  status={incident.status}
+                  escalated={!!incident.escalated_at}
+                  assigned={!!incident.assignee_id}
+                />
+              )}
+            </Card>
+
             <Card className="p-5">
               <p className="text-[0.9375rem] font-extrabold">Rider</p>
               {rider ? (

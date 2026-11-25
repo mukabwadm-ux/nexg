@@ -61,10 +61,10 @@ export function Hero({ copy, locale }: { copy: HeroCopy; locale: Locale }) {
         {/* Three clips in turn: the kitchen, the lobby, the room. */}
         <HeroVideo />
         {/* Phone: dark from the middle down, where the text sits. */}
-        <div className="to-night absolute inset-0 bg-gradient-to-b from-black/55 via-black/70 lg:hidden" />
+        <div className="to-night absolute inset-0 bg-gradient-to-b from-black/35 via-black/55 lg:hidden" />
         {/* Desktop: dark on the left behind the text and search, easing to a
             lighter veil on the right so the clip still reads. */}
-        <div className="from-night/95 via-night/80 to-night/35 absolute inset-0 hidden bg-gradient-to-r via-50% lg:block" />
+        <div className="from-night/80 via-night/55 to-night/10 absolute inset-0 hidden bg-gradient-to-r via-50% lg:block" />
         <div className="from-night absolute inset-x-0 bottom-0 hidden h-40 bg-gradient-to-t to-transparent lg:block" />
       </div>
 
