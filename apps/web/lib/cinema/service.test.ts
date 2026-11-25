@@ -763,3 +763,39 @@ describe('the worker and late answers', () => {
     });
   });
 });
+
+describe('tickets as NexG records them', () => {
+  it("records each barcode's format in NexG's names", async () => {
+    connector = fakeConnector({
+      confirm: vi.fn(async () => ({
+        bookingRef: 'B-1',
+        tickets: [
+          { seat: 'F7', ticketRef: 'T-1', barcode: 'X1', barcodeFormat: 'Code-128' as never },
+        ],
+      })),
+    });
+    const db = fakeRpc({
+      cinema_due_work: { data: { syncs: [], confirms: [HOLD], expiries: [], refunds: [] } },
+      cinema_hold_for_worker: {
+        data: {
+          holdId: HOLD,
+          state: 'confirming',
+          requestId: REQUEST,
+          connectionId: 'conn',
+          adapterId: 'sandbox-cinema',
+          showingRef: 'SB-1',
+          seats: ['F7'],
+          totalMinor: 65000,
+          holdRef: 'H-1',
+          bookingRef: null,
+          paymentReference: 'PSK-1',
+          expiresAt: '2099-01-01T16:40:00Z',
+        },
+      },
+    });
+    await runWorker(db.rpc, () => connector);
+    expect(db.calls.find((c) => c.fn === 'cinema_record_confirm')?.args).toMatchObject({
+      p_tickets: [{ seat: 'F7', ticketRef: 'T-1', barcode: 'X1', barcodeFormat: 'code128' }],
+    });
+  });
+});
