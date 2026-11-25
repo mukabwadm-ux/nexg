@@ -7,6 +7,7 @@ import type { Letterhead } from '@nexg/merchant-agreement';
 import { renderInvoicePdf, type InvoicePdfInput } from '@nexg/merchant-agreement/invoice';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+import { taxInvoiceCheckCode } from './finance-documents';
 import { billToOf, normaliseDetail, type ClientInvoiceDetail } from './client-invoices';
 
 /**
@@ -68,6 +69,7 @@ export function pdfInput(d: ClientInvoiceDetail): InvoicePdfInput {
     notes: d.invoice.notes,
     kraStatus: d.tax_invoice?.kra_status ?? 'pending',
     kraReference: d.tax_invoice?.kra_reference ?? null,
+    checkCode: d.tax_invoice ? taxInvoiceCheckCode(d.tax_invoice.id) : null,
     createdAt: new Date(d.invoice.issued_at ?? `${d.invoice.issue_date}T09:00:00Z`),
   };
 }

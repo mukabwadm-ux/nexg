@@ -305,7 +305,7 @@ insert into t values ('number',
   public.rpc_fin_invoice_issue((select v::uuid from t where k = 'inv1')) ->> 'number');
 
 select ok(
-  (select v from t where k = 'number') ~ '^NX-INV-[0-9]{4}-[0-9]{6}$'
+  (select v from t where k = 'number') ~ '^NEXG-INV-[0-9]{4}-[0-9]{5,}$'
   and (select number from public.fin_invoice where id = (select v::uuid from t where k = 'inv1'))
       = (select v from t where k = 'number'),
   'Issuing numbers the invoice in the KRA series');
@@ -505,7 +505,7 @@ select is(
   'so the client owes nothing for it');
 
 select is(
-  (select f.status || ' ' || f.void_reason || ' ' || cn.kind || ' ' || (cn.number like 'NX-CRN-%')::text
+  (select f.status || ' ' || f.void_reason || ' ' || cn.kind || ' ' || (cn.number like 'NEXG-CRN-%')::text
           || ' ' || cn.purpose || ' ' || cn.gross_cents || ' ' || cn.kra_status
      from public.fin_invoice f join public.tax_invoice cn on cn.id = f.credit_note_id
     where f.id = (select v::uuid from t where k = 'inv3')),
