@@ -74,6 +74,18 @@ const FLEXIBLE = new Set(['ASSET_INTERVAL', 'STORAGE', 'TOUR', 'LINKED_WINDOWS',
  * assigned people or vehicles work; the business still accepts the request.
  */
 const WINDOW_MODELS = new Set(['SERVICE_JOB', 'LINKED_WINDOWS']);
+/**
+ * A quote is reserved with half of the top of its price range (owner, 25 Nov 2026: "a quote must come from a range and
+ * its 50% of the highest which can always come down in case the final price is less than the highest"). The business
+ * then sends its final price; the customer pays the rest, or is owed the difference when the final price is below
+ * what was paid.
+ */
+const QUOTE_DEPOSIT_BPS = 5000;
+const quoteDeposit = (topMinor: number) => Math.round((topMinor * QUOTE_DEPOSIT_BPS) / 10000);
+const reservableQuote = (n: Doc | undefined) =>
+  n?.model === 'REQUEST_QUOTE' &&
+  Number.isSafeInteger(n.quoteRange?.maxMinor) &&
+  n.quoteRange.maxMinor > 0;
 const CUSTODY_MODELS = new Set(['ASSET_INTERVAL', 'STORAGE', 'SPACE_RESERVATION']);
 const KINDS = new Set(['staff', 'asset', 'vehicle', 'room', 'space', 'equipment', 'capacity_pool']);
 const BLOCKING = new Set(['held', 'confirmed']);
@@ -890,6 +902,13 @@ export class BookingEngine {
         'invalid_price',
       );
     const details = normalizePublicDetails(input.model, input as Doc);
+    // Owner, 25 Nov 2026: a quote is reserved against a range, so a quote offering needs one ("range required").
+    if (input.model === 'REQUEST_QUOTE' && !details.quoteRange)
+      throw new BookingError(
+        422,
+        'Set the lowest and highest expected price. Customers reserve with half of the highest.',
+        'quote_range_required',
+      );
     const locationId = location(identity, input.locationId);
     const normalizedSpecialist = specialistSetup(
       input.model,
@@ -1117,6 +1136,22 @@ export class BookingEngine {
       binding: !sourceRequired && !pricing.indicative,
       sourceRequired,
       indicative: sourceRequired || pricing.indicative,
+      ...(publicOnly && !sourceRequired && reservableQuote(service.nexg)
+        ? this.quoteReservation(service.nexg.quoteRange)
+        : {}),
+    };
+  }
+  /** What reserving a quote asks: half of the top of the range now, the rest once the final price is known. */
+  private quoteReservation(range: { minMinor: number; maxMinor: number; note?: string }) {
+    const deposit = quoteDeposit(range.maxMinor);
+    return {
+      quoteRange: { ...range },
+      totalDueMinor: range.maxMinor,
+      dueNowMinor: deposit,
+      balanceMinor: range.maxMinor - deposit,
+      paymentPolicyId: PREPAID_POLICY,
+      indicative: true,
+      binding: false,
     };
   }
   private async entitlementChange(
@@ -1641,7 +1676,12 @@ export class BookingEngine {
       );
   }
   private isExpiredHold(d: Doc, now = this.clock()): boolean {
-    return !!(d.status === 'held' && d.nexg?.expiresAt && Date.parse(d.nexg.expiresAt) <= now);
+    // A request keeps its status on nexg (a reserved quote waiting for its deposit is held there).
+    return !!(
+      (d.status ?? d.nexg?.status) === 'held' &&
+      d.nexg?.expiresAt &&
+      Date.parse(d.nexg.expiresAt) <= now
+    );
   }
   private availabilityReader(reservations: Doc[], sessions: Doc[], now: number): Payload {
     const blocks = (d: Doc) => BLOCKING.has(d.status) && !this.isExpiredHold(d, now);
@@ -2219,7 +2259,17 @@ export class BookingEngine {
         pricing.dueNowMinor = pricing.totalDueMinor;
         pricing.balanceMinor = 0;
       }
-      const paymentRequired = prepaid || n.requiresPayment === true || pricing.dueNowMinor > 0;
+      // A customer reserves a quote by paying half of the top of its range (owner, 25 Nov 2026).
+      const quoteReserve = publicOnly && n.model === 'REQUEST_QUOTE' && !externalPrice;
+      if (quoteReserve && !reservableQuote(n))
+        throw new BookingError(
+          409,
+          'This business has not set a price range for this yet.',
+          'quote_range_required',
+        );
+      if (quoteReserve) Object.assign(pricing, this.quoteReservation(n.quoteRange));
+      const paymentRequired =
+        prepaid || quoteReserve || n.requiresPayment === true || pricing.dueNowMinor > 0;
       const id = publicId(),
         token = customerToken;
       let bookingCode: string | undefined;
@@ -2272,7 +2322,7 @@ export class BookingEngine {
         configurationRevision: b.configuration?.revision,
         acceptedConfiguration: structuredClone(b.configuration ?? {}),
         status:
-          input.hold || (paymentRequired && !requestOnly)
+          input.hold || quoteReserve || (paymentRequired && !requestOnly)
             ? 'held'
             : requestOnly
               ? 'pending'
@@ -2289,18 +2339,24 @@ export class BookingEngine {
           minimumBillableUnits: n.minimumBillableUnits,
         },
         acceptedPolicies: {
-          paymentPolicyId: prepaid ? PREPAID_POLICY : n.paymentPolicyId,
+          paymentPolicyId: prepaid || quoteReserve ? PREPAID_POLICY : n.paymentPolicyId,
           changePolicyId: n.changePolicyId,
           version: n.policyVersion,
           terms: {
-            payment: prepaid
-              ? `Pay the full amount through NexG within ${PREPAID_HOLD_MINUTES} minutes to confirm; until then the time is held for you.`
-              : 'No online prepayment; pay the merchant separately.',
+            payment: quoteReserve
+              ? `Pay half of the top of the price range through NexG within ${PREPAID_HOLD_MINUTES} minutes to reserve. The business then sends its final price: you pay the rest, or get back what you paid above it.`
+              : prepaid
+                ? `Pay the full amount through NexG within ${PREPAID_HOLD_MINUTES} minutes to confirm; until then the time is held for you.`
+                : 'No online prepayment; pay the merchant separately.',
             changes: 'Changes and cancellation before work starts, subject to availability.',
           },
         },
         custodyState: CUSTODY_MODELS.has(n.model) ? 'not_started' : undefined,
         createdBy: identity.userId,
+        // A quote waits for its deposit as long as a prepaid booking waits for its payment.
+        ...(quoteReserve
+          ? { expiresAt: new Date(this.clock() + PREPAID_HOLD_MINUTES * 60000).toISOString() }
+          : {}),
       };
       let doc: Doc;
       if (requestOnly && !input.hold) {
@@ -2965,12 +3021,34 @@ export class BookingEngine {
             'Accept or confirm this work before starting.',
             'invalid_transition',
           );
+        // A reserved quote is accepted with the business's final price: the balance is the final price less what was
+        // paid, and a final price below what was paid is owed back (owner, 25 Nov 2026).
+        const quoted = action === 'accept' && n.quoteRange && n.model === 'REQUEST_QUOTE';
+        const finalMinor = quoted
+          ? integer(input.finalPriceMinor, 'Final price', 0, 1e11)
+          : undefined;
+        const paidNet = (n.paidMinor ?? 0) - (n.refundedMinor ?? 0);
+        const finalPricing =
+          finalMinor !== undefined
+            ? {
+                ...n.pricing,
+                finalMinor,
+                totalDueMinor: finalMinor,
+                totalMinor: finalMinor,
+                dueNowMinor: Math.max(finalMinor - paidNet, 0),
+                balanceMinor: Math.max(finalMinor - paidNet, 0),
+                refundDueMinor: Math.max(paidNet - finalMinor, 0),
+                indicative: false,
+                binding: true,
+              }
+            : undefined;
         result = await this.update(
           collection,
           doc.id,
           {
             nexg: {
               ...n,
+              ...(finalPricing ? { pricing: finalPricing, priceMinor: finalMinor } : {}),
               status:
                 collection === 'booking-requests'
                   ? action === 'accept'
@@ -3388,8 +3466,10 @@ export class BookingEngine {
     requirePlatform(identity);
     return this.command(identity, key, `booking.${id}.settle`, input, async (req) => {
       await this.expiredInTransaction(identity, req);
-      const doc = await this.own('reservations', id, identity, req);
+      const { collection, doc } = await this.locateBooking(identity, id, req);
       const n = doc.nexg ?? {};
+      if (collection === 'booking-requests')
+        return this.settleQuotePayment(identity, req, id, doc, input);
       if (n.acceptedPolicies?.paymentPolicyId !== PREPAID_POLICY)
         throw new BookingError(
           409,
@@ -3477,6 +3557,95 @@ export class BookingEngine {
       });
       return this.bookingView(result);
     });
+  }
+  /**
+   * A reserved quote's payment: the deposit (half of the top of the range) while it waits for it, which sends the
+   * request to the business; then, once the business accepted it with its final price, exactly the balance.
+   */
+  private async settleQuotePayment(identity: Identity, req: any, id: string, doc: Doc, input: Doc) {
+    const n = doc.nexg ?? {};
+    const state = doc.status ?? n.status;
+    if (!n.quoteRange || n.acceptedPolicies?.paymentPolicyId !== PREPAID_POLICY)
+      throw new BookingError(
+        409,
+        'This request is not paid through NexG.',
+        'payment_policy_required',
+      );
+    const provider = text(input.provider, 'Payment provider', 40),
+      reference = text(input.reference, 'Payment reference', 200),
+      simulated = provider === 'simulated';
+    if (simulated && !this.options.simulatedPayments)
+      throw new BookingError(403, 'Test payments are switched off.', 'simulated_payments_off');
+    if (
+      (n.paymentEvidence ?? []).some(
+        (e: any) => e.provider === provider && e.reference === reference,
+      )
+    )
+      return this.bookingView(doc);
+    const paidBefore = n.paidMinor ?? 0;
+    const expired = !!n.expiresAt && Date.parse(n.expiresAt) <= this.clock();
+    const depositStep = state === 'held' && paidBefore === 0;
+    const due = depositStep
+      ? (n.pricing?.dueNowMinor ?? 0)
+      : state === 'accepted' && n.pricing?.finalMinor !== undefined
+        ? Math.max(n.pricing.finalMinor - paidBefore + (n.refundedMinor ?? 0), 0)
+        : 0;
+    if (depositStep && expired)
+      throw new BookingError(
+        409,
+        'This reservation is no longer held. Refund the payment.',
+        'hold_expired',
+      );
+    if (due <= 0)
+      throw new BookingError(
+        409,
+        'Nothing is due on this request. Refund the payment.',
+        'already_paid',
+      );
+    const amountMinor = simulated ? due : integer(input.amountMinor, 'Paid amount', 1);
+    if (amountMinor !== due)
+      throw new BookingError(
+        422,
+        'The amount paid does not match the amount due.',
+        'payment_amount_mismatch',
+      );
+    const at = new Date(this.clock()).toISOString();
+    const paid = paidBefore + amountMinor;
+    const result = await this.update(
+      'booking-requests',
+      doc.id,
+      {
+        nexg: {
+          ...n,
+          status: depositStep ? 'pending' : state,
+          paidMinor: paid,
+          paymentState: simulated ? 'simulated' : 'provider_verified',
+          paymentEvidence: [
+            ...(n.paymentEvidence ?? []),
+            {
+              amountMinor,
+              currency: 'KES',
+              provider,
+              reference,
+              recordedAt: at,
+              verification: simulated ? 'simulated' : 'provider_verified',
+              ...(simulated ? { note: 'Test payment: no money was collected.' } : {}),
+            },
+          ],
+          // Nothing more is due until the business sends its final price; after the balance, nothing at all.
+          pricing: { ...n.pricing, dueNowMinor: 0, ...(depositStep ? {} : { balanceMinor: 0 }) },
+          expiresAt: null,
+          version: n.version + 1,
+        },
+      },
+      identity,
+      req,
+    );
+    await this.audit(identity, req, simulated ? 'booking.paid_simulated' : 'booking.paid', id, {
+      version: result.nexg?.version,
+      step: depositStep ? 'deposit' : 'balance',
+    });
+    return this.bookingView(result);
   }
   /**
    * NexG: a customer deleted their account. Every booking at this business

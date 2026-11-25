@@ -1675,6 +1675,18 @@ function OfferingForm({
               refundTerms: String(values.get('refundTerms') || ''),
             },
             resourceSelectionMode: values.get('resourceSelectionMode'),
+            // Owner, 25 Nov 2026: a quote has a price range, and customers reserve it with half of the highest.
+            ...(model === 'REQUEST_QUOTE'
+              ? {
+                  quoteRange: {
+                    minMinor: kesInputToMinor(String(values.get('quoteMin'))),
+                    maxMinor: kesInputToMinor(String(values.get('quoteMax'))),
+                    ...(String(values.get('quoteNote') || '').trim()
+                      ? { note: String(values.get('quoteNote')).trim() }
+                      : {}),
+                  },
+                }
+              : {}),
             ...(['FIELD_VISIT', 'TRANSFER'].includes(model)
               ? {
                   serviceArea: {
@@ -1735,6 +1747,45 @@ function OfferingForm({
         />
       ) : null}
 
+      {model === 'REQUEST_QUOTE' ? (
+        <>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Lowest expected price in KES">
+              <input
+                name="quoteMin"
+                required
+                type="number"
+                min={0}
+                max={1000000000}
+                step="0.01"
+                className={inputClass}
+              />
+            </Field>
+            <Field
+              label="Highest expected price in KES"
+              hint="Customers reserve with half of this. Your final price can be lower."
+            >
+              <input
+                name="quoteMax"
+                required
+                type="number"
+                min={1}
+                max={1000000000}
+                step="0.01"
+                className={inputClass}
+              />
+            </Field>
+          </div>
+          <Field label="What the price depends on (optional)">
+            <input
+              name="quoteNote"
+              maxLength={300}
+              className={inputClass}
+              placeholder="For example: the guest count and the menu"
+            />
+          </Field>
+        </>
+      ) : null}
       <Field label="How the price is calculated">
         <select className={inputClass} value={pricing} onChange={(e) => setPricing(e.target.value)}>
           <option value="per_booking">Fixed price per booking</option>

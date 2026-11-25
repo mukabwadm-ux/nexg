@@ -617,3 +617,186 @@ test('customer bookings: reference and name only, prepaid, codes, check-in, eras
     assert.ok((await ok.json()).forgotten >= 1);
   });
 });
+
+test('a quote is reserved with half of the top of its range, then paid to its final price', async (t) => {
+  // Owner, 25 Nov 2026: "a quote must come from a range and its 50% of the highest which can always come down in
+  // case the final price is less than the highest"; "customers must reserve if its quote method"; range required.
+  const directory = await mkdtemp(path.join(tmpdir(), 'nexg-quote-'));
+  let now = Date.parse('2030-01-01T00:00:00Z');
+  const payload = await createPayload({
+    sqliteUrl: 'file:' + path.join(directory, 'test.db').replaceAll('\\', '/'),
+    cacheKey: randomUUID(),
+    secret: 'quote-test-secret-is-long-and-not-production-1234567890',
+  });
+  t.after(() => payload.destroy());
+  const engine = new BookingEngine(payload, true, () => now);
+  const owner: Identity = {
+    businessId: 'quote-events',
+    userId: 'owner-q',
+    role: 'owner',
+    expiresAt: Date.now() + 60000,
+  };
+  const customer: Identity = { ...owner, role: 'customer', userId: `account_${randomUUID()}` };
+  const platform: Identity = { ...owner, role: 'platform', userId: 'nexg-payments' };
+  const key = () => randomUUID();
+  await engine.configure(owner, { subcategoryId: 'private_events', published: true }, key());
+  const planner = await engine.addResource(
+    owner,
+    {
+      name: 'Planner',
+      kind: 'staff',
+      quantity: 1,
+      schedule: { days: [0, 1, 2, 3, 4, 5, 6], start: '08:00', end: '20:00' },
+    },
+    key(),
+  );
+  const base: OfferingInput = {
+    name: 'Wedding reception',
+    model: 'REQUEST_QUOTE',
+    resourceIds: [planner.id],
+    priceMinor: 0,
+    currency: 'KES',
+    pricingBasis: 'indicative',
+    intakeMode: 'request_quote',
+    active: true,
+    bookingEnabled: true,
+    leadTimeMinutes: 0,
+    horizonDays: 3650,
+    paymentPolicyId: 'NO_PREPAYMENT_V1',
+    changePolicyId: 'CHANGE_BEFORE_START_V1',
+    policyVersion: 1,
+  };
+  await assert.rejects(
+    () => engine.addOffering(owner, base, key()),
+    (e: any) => e.code === 'quote_range_required',
+    'a quote offering needs its range',
+  );
+  const offering = (await engine.addOffering(
+    owner,
+    { ...base, quoteRange: { minMinor: 18000000, maxMinor: 24000000 } } as any,
+    key(),
+  )) as any;
+
+  const quote = (await engine.quote(customer, { offeringId: offering.id }, true)) as any;
+  assert.equal(quote.dueNowMinor, 12000000, 'half of the top of the range');
+  assert.equal(quote.totalDueMinor, 24000000);
+  assert.equal(quote.balanceMinor, 12000000);
+
+  const made = (await engine.createBooking(
+    customer,
+    { offeringId: offering.id, customer: { name: 'Akinyi' }, notes: '120 guests' } as any,
+    key(),
+    true,
+  )) as any;
+  const id = made.booking.id;
+  assert.equal(made.booking.status, 'held', 'held until its deposit is paid');
+  assert.equal(made.booking.pricing.dueNowMinor, 12000000);
+  assert.equal(made.booking.acceptedPolicies.paymentPolicyId, 'NEXG_PREPAID_V1');
+
+  await assert.rejects(
+    () =>
+      engine.settlePayment(
+        platform,
+        id,
+        { provider: 'paystack', reference: 'Q-0', amountMinor: 24000000 },
+        key(),
+      ),
+    (e: any) => e.code === 'payment_amount_mismatch',
+    'only the deposit reserves it',
+  );
+  const reserved = (await engine.settlePayment(
+    platform,
+    id,
+    { provider: 'paystack', reference: 'Q-1', amountMinor: 12000000 },
+    key(),
+  )) as any;
+  assert.equal(reserved.status, 'pending', 'the deposit sends the request to the business');
+  assert.equal(reserved.paidMinor, 12000000);
+
+  await assert.rejects(
+    () => engine.changeBooking(owner, id, 'accept', { expectedVersion: reserved.version }, key()),
+    (e: any) => e.code === 'invalid_number' || /Final price/.test(e.message),
+    'the business accepts with its final price',
+  );
+  const accepted = (await engine.changeBooking(
+    owner,
+    id,
+    'accept',
+    { expectedVersion: reserved.version, finalPriceMinor: 20000000 },
+    key(),
+  )) as any;
+  assert.equal(accepted.status, 'accepted');
+  assert.equal(accepted.pricing.finalMinor, 20000000);
+  assert.equal(accepted.pricing.balanceMinor, 8000000, 'the final price less the deposit');
+  assert.equal(accepted.pricing.refundDueMinor, 0);
+
+  await assert.rejects(
+    () =>
+      engine.settlePayment(
+        platform,
+        id,
+        { provider: 'paystack', reference: 'Q-2', amountMinor: 12000000 },
+        key(),
+      ),
+    (e: any) => e.code === 'payment_amount_mismatch',
+  );
+  const settled = (await engine.settlePayment(
+    platform,
+    id,
+    { provider: 'paystack', reference: 'Q-3', amountMinor: 8000000 },
+    key(),
+  )) as any;
+  assert.equal(settled.paidMinor, 20000000);
+  await assert.rejects(
+    () =>
+      engine.settlePayment(
+        platform,
+        id,
+        { provider: 'paystack', reference: 'Q-4', amountMinor: 1 },
+        key(),
+      ),
+    (e: any) => e.code === 'already_paid',
+  );
+
+  // A final price below the deposit: the difference is owed back, nothing more is due.
+  const second = (await engine.createBooking(
+    customer,
+    { offeringId: offering.id, customer: { name: 'Akinyi' } } as any,
+    key(),
+    true,
+  )) as any;
+  const paid = (await engine.settlePayment(
+    platform,
+    second.booking.id,
+    { provider: 'paystack', reference: 'Q-5', amountMinor: 12000000 },
+    key(),
+  )) as any;
+  const lower = (await engine.changeBooking(
+    owner,
+    second.booking.id,
+    'accept',
+    { expectedVersion: paid.version, finalPriceMinor: 10000000 },
+    key(),
+  )) as any;
+  assert.equal(lower.pricing.balanceMinor, 0);
+  assert.equal(lower.pricing.refundDueMinor, 2000000);
+
+  // An unpaid reservation lapses like a prepaid booking's hold.
+  const third = (await engine.createBooking(
+    customer,
+    { offeringId: offering.id, customer: { name: 'Akinyi' } } as any,
+    key(),
+    true,
+  )) as any;
+  now += 60 * 60 * 1000;
+  await assert.rejects(
+    () =>
+      engine.settlePayment(
+        platform,
+        third.booking.id,
+        { provider: 'paystack', reference: 'Q-6', amountMinor: 12000000 },
+        key(),
+      ),
+    (e: any) => e.code === 'hold_expired',
+  );
+});
