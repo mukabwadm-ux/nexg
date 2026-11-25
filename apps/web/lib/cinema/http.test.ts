@@ -49,15 +49,31 @@ describe('the cinema worker endpoint', () => {
             data: { syncs: [], confirms: [], expiries: [], cancels: [], refunds: ['x'] },
             error: null,
           }
-        : {
-            data: { holdId: 'x', state: 'refund_due', refundReason: 'customer_cancelled' },
-            error: null,
-          },
+        : fn === 'fn_cinema_refund_open'
+          ? {
+              /* Already with Paystack: nothing is sent again. */
+              data: {
+                reference: 'NXR-0123456789abcdef',
+                amount_cents: 65000,
+                mode: 'test',
+                paystack_transaction: '4099260516',
+                state: 'pending',
+              },
+              error: null,
+            }
+          : {
+              data: { holdId: 'x', state: 'refund_due', refundReason: 'customer_cancelled' },
+              error: null,
+            },
     );
     const answer = await worker({ 'x-cinema-worker-secret': secret });
     expect(answer.status).toBe(200);
-    expect(await answer.json()).toMatchObject({ refundsWaiting: 1 });
+    expect(await answer.json()).toMatchObject({ refundsWaiting: 1, refundsFailed: 0 });
     expect(mock.rpc).toHaveBeenCalledWith('cinema_due_work', { p_limit: 50 });
+    expect(mock.rpc).toHaveBeenCalledWith('fn_cinema_refund_open', {
+      p_hold_id: 'x',
+      p_reason: 'customer_cancelled',
+    });
   });
 });
 

@@ -28,6 +28,8 @@ export interface PaystackResult<T> {
   raw?: string;
   /** Paystack answered and refused (a 4xx), as opposed to not answering. */
   refused?: boolean;
+  /** Paystack's HTTP status when it answered with an error. */
+  status?: number;
   message: string;
 }
 
@@ -99,6 +101,7 @@ async function call<T>(
     return {
       ok: false,
       refused: response.status >= 400 && response.status < 500,
+      status: response.status,
       raw,
       message: body.message?.slice(0, 300) ?? `Paystack refused (${response.status}).`,
     };
@@ -333,4 +336,25 @@ export function verifyTransfer(mode: PaystackMode, reference: string) {
     `/transfer/verify/${encodeURIComponent(reference)}`,
     { method: 'GET' },
   );
+}
+
+/**
+ * Refunds a Paystack transaction (its id) by `amountCents`, under our own
+ * reference (the console's copy is apps/admin/lib/paystack.ts). Paystack's
+ * answer only says it was asked: the refund is done when its refund.processed
+ * webhook says so.
+ */
+export function refund(
+  mode: PaystackMode,
+  input: { transaction: string; amountCents: number; reference: string; note: string },
+) {
+  return call<{ status?: string; id?: number }>(mode, '/refund', {
+    method: 'POST',
+    body: {
+      transaction: input.transaction,
+      amount: input.amountCents,
+      reference: input.reference,
+      merchant_note: input.note.slice(0, 200),
+    },
+  });
 }

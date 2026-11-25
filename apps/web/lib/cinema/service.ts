@@ -6,6 +6,7 @@ import {
   type HoldAnswer,
   type SeatType,
 } from './connector';
+import { refundCinemaHold } from './refund';
 
 /**
  * The cinema checkout and its worker, against any CinemaConnector
@@ -506,9 +507,16 @@ export async function runWorker(db: Rpc, connectorFor: ConnectorFor, now = () =>
     foundLate: 0,
     failed: 0,
     left: 0,
-    /* Refunds are made by the Paystack chat's full-refund function, and shown
-       in the admin until then. */
+    /* Full refunds through Paystack (lib/cinema/refund.ts): asked now, asked
+       before and awaiting Paystack's answer, or not sent (shown in the admin).
+       refundsNeedPerson: live refunds are off, a person refunds by hand.
+       refundsDeferred: the cinema could not say whether a late booking was
+       made, so no refund this run. */
+    refundsStarted: 0,
     refundsWaiting: 0,
+    refundsFailed: 0,
+    refundsNeedPerson: 0,
+    refundsDeferred: 0,
   };
 
   // Each item on its own: one that fails is retried next run, the rest go on.
@@ -560,9 +568,16 @@ export async function runWorker(db: Rpc, connectorFor: ConnectorFor, now = () =>
       hold.refundReason === 'confirm_refused' &&
       now().getTime() - settled < LATE_BOOKING_LOOKUP_MS
     ) {
-      const booking = await withTimeout(
-        connectorFor(hold).lookup(`confirm:${hold.requestId}`),
-      ).catch(() => null);
+      /* Only a definite "no booking" lets the refund go ahead. A lookup that
+         fails or times out leaves this hold for the next run: never refund
+         money for seats the cinema may have booked. */
+      let booking: BookingAnswer | null;
+      try {
+        booking = await withTimeout(connectorFor(hold).lookup(`confirm:${hold.requestId}`));
+      } catch {
+        done.refundsDeferred += 1;
+        return;
+      }
       if (booking) {
         const recorded = await db('cinema_record_confirm', {
           p_hold_id: holdId,
@@ -574,7 +589,29 @@ export async function runWorker(db: Rpc, connectorFor: ConnectorFor, now = () =>
         return;
       }
     }
-    done.refundsWaiting += 1;
+    /* Paystack is asked to refund the whole payment. The hold becomes
+       "refunded" (the contract's cinema_record_refunded) only when Paystack's
+       refund.processed answer arrives, through fn_paystack_refund_apply, not
+       here. A failure is logged and counted; the next run tries again. */
+    try {
+      const refunded = await refundCinemaHold(db, holdId, hold.refundReason ?? 'refund_due');
+      if (refunded.outcome === 'sent') done.refundsStarted += 1;
+      else if (refunded.outcome === 'needs_person') done.refundsNeedPerson += 1;
+      else if (refunded.outcome === 'refused') {
+        // Recorded as failed by the database; counted once, not asked again this run.
+        done.refundsFailed += 1;
+        console.warn('cinema refund refused by Paystack', {
+          holdId,
+          reason: refunded.message.slice(0, 200),
+        });
+      } else done.refundsWaiting += 1;
+    } catch (failure) {
+      done.refundsFailed += 1;
+      console.warn('cinema refund not sent', {
+        holdId,
+        reason: failure instanceof Error ? failure.message.slice(0, 200) : 'unknown',
+      });
+    }
   });
 
   await each(
