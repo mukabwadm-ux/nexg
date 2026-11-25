@@ -1,43 +1,103 @@
 import { describe, expect, it } from 'vitest';
 
-import { categoryTiles, POPULAR_CATEGORIES, TILE_IDS } from './categories';
+import {
+  countedCategory,
+  MIN_CATEGORY_SIGNALS,
+  pinnedPriorities,
+  popularTiles,
+  PRIORITY_CATEGORIES,
+  TILE_COUNT,
+} from './categories';
 
 const t = (key: string) => key;
-const configured = [
-  { category: 'flowers_gifts', label: 'Flowers & Gifts', image_path: null },
-  { category: 'laundry_cleaning', label: 'Laundry Services', image_path: null },
+const ACTIVE = [
+  'restaurants_food',
+  'alcohol_beverages',
+  'pharmacy',
+  'laundry_cleaning',
+  'airport_transfers',
+  'travel_tours',
+  'experiences',
+  'games_sports',
+  'beauty',
+  'wellness',
+  'groceries_essentials',
+  'pets',
+  'tech_electronics',
+  'flowers_gifts',
 ];
+const configured = ACTIVE.map((category) => ({ category, label: `Label ${category}` }));
+const order = (signals: Record<string, number> = {}) =>
+  popularTiles(t, configured, signals).map((tile) => tile.category);
 
-describe('categoryTiles', () => {
-  it('keeps the usual order when nothing has been tapped yet', () => {
-    expect(categoryTiles(t, configured).map((tile) => tile.tile)).toEqual(
-      POPULAR_CATEGORIES.map((item) => item.image),
-    );
+describe('popularTiles', () => {
+  it('leads with the five priorities, in order, with no data', () => {
+    expect(order().slice(0, 5)).toEqual([...PRIORITY_CATEGORIES]);
+    expect(order()).toHaveLength(TILE_COUNT);
   });
 
-  it('puts the most tapped tiles first and keeps the usual order for ties', () => {
-    const order = categoryTiles(t, configured, { laundry: 40, airport: 12, beauty: 12 }).map(
-      (tile) => tile.tile,
+  it('keeps the fixed order while the counts are thin', () => {
+    /* Today's live counts (2026-11-25): 30 taps in 30 days. */
+    expect(order({ airport: 7, gifts: 7, laundry: 6, restaurants: 4, pharmacy: 1 })).toEqual(
+      order(),
     );
-    expect(order.slice(0, 3)).toEqual(['laundry', 'beauty', 'airport']);
-    expect(order.slice(3)).toEqual(
-      POPULAR_CATEGORIES.map((item) => item.image).filter(
-        (id) => !['laundry', 'beauty', 'airport'].includes(id),
-      ),
-    );
+    expect(order({ tech_electronics: 299 })).toEqual(order());
   });
 
-  it('never shows one configured label on two tiles', () => {
-    const labels = categoryTiles(t, configured).map((tile) => tile.label);
-    expect(new Set(labels).size).toBe(labels.length);
-    expect(labels).toContain('home.pc.flowers');
-    expect(labels).toContain('home.pc.gifts');
-    expect(labels).toContain('Laundry Services');
+  it('lets the ranking in gradually, keeping the first priorities pinned', () => {
+    const busy = { tech_electronics: 250, wellness: 60 };
+    expect(order(busy).slice(0, 5)).toEqual([
+      'restaurants_food',
+      'laundry_cleaning',
+      'pharmacy',
+      'tech_electronics',
+      'wellness',
+    ]);
+    expect(order({ tech_electronics: 700 })[0]).toBe('restaurants_food');
+    expect(order({ tech_electronics: 700 })[1]).toBe('tech_electronics');
+    expect(order({ tech_electronics: 900, wellness: 150 }).slice(0, 2)).toEqual([
+      'tech_electronics',
+      'wellness',
+    ]);
   });
 
-  it('counts taps only for tiles that exist', () => {
-    expect(TILE_IDS).toContain('restaurants');
-    expect(TILE_IDS).not.toContain('home.pc.restaurants');
-    expect(new Set(TILE_IDS).size).toBe(TILE_IDS.length);
+  it('ignores a category with too few of its own', () => {
+    const tiles = order({ tech_electronics: 400, pets: MIN_CATEGORY_SIGNALS - 1 });
+    expect(tiles).not.toContain('pets');
+  });
+
+  it('shows only active categories', () => {
+    const tiles = popularTiles(
+      t,
+      configured.filter((row) => row.category !== 'beauty'),
+    );
+    expect(tiles.map((tile) => tile.category)).not.toContain('beauty');
+    expect(order({ marketplace: 2000 })).not.toContain('marketplace');
+    expect(order({ games_sports: 2000 })[0]).toBe('games_sports');
+  });
+
+  it('uses the translated tile name, else the configured one', () => {
+    const tiles = popularTiles(t, configured);
+    expect(tiles[0]?.label).toBe('Label restaurants_food');
+    const say = (key: string) => (key === 'home.pc.laundry' ? 'Laundry' : key);
+    expect(popularTiles(say, configured)[1]?.label).toBe('Laundry');
+  });
+});
+
+describe('counting', () => {
+  it('folds old tile names and aliases into their category', () => {
+    expect(countedCategory('gifts')).toBe('flowers_gifts');
+    expect(countedCategory('airport')).toBe('airport_transfers');
+    expect(countedCategory('restaurant')).toBe('restaurants_food');
+    for (const id of PRIORITY_CATEGORIES) expect(countedCategory(id)).toBe(id);
+    expect(countedCategory('not-a-category')).toBeUndefined();
+  });
+
+  it('pins all five below 300, then three, one and none', () => {
+    expect(pinnedPriorities(0)).toBeNull();
+    expect(pinnedPriorities(299)).toBeNull();
+    expect(pinnedPriorities(300)).toBe(3);
+    expect(pinnedPriorities(600)).toBe(1);
+    expect(pinnedPriorities(1000)).toBe(0);
   });
 });

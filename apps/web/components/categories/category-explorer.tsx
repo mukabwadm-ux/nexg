@@ -19,6 +19,7 @@ import * as React from 'react';
 
 import { CATEGORY_IMAGE_MAP, getCategoryImage } from '@nexg/contracts';
 import { Reveal } from '@/components/reveal';
+import { recordCategorySignal } from '@/lib/category-signal';
 import { discoverCategoryHref } from '@/lib/discover-links';
 import { translator } from '@/lib/i18n/dictionaries';
 
@@ -169,8 +170,10 @@ export function CategoryExplorer({
                 /* One result: go straight to it. Otherwise close the keyboard so
                    the matching cards are in view. */
                 const only = visible.length === 1 ? visible[0] : undefined;
-                if (only) router.push(discoverCategoryHref(only.id));
-                else (document.activeElement as HTMLElement | null)?.blur();
+                if (only) {
+                  recordCategorySignal(only.id, 'search');
+                  router.push(discoverCategoryHref(only.id));
+                } else (document.activeElement as HTMLElement | null)?.blur();
               }}
               className="border-gold/45 focus-within:border-gold focus-within:ring-gold/40 mt-8 flex max-w-xl items-center rounded-full border bg-white/[0.06] p-1 transition-colors focus-within:ring-2"
             >
@@ -394,6 +397,11 @@ function CategoryCard({
       <Link
         href={discoverCategoryHref(category.id)}
         aria-label={`${category.name}, ${hits.length ? meta : count}`}
+        onClick={() => {
+          recordCategorySignal(category.id, 'visit');
+          /* Opened from a search: that search led here. */
+          if (term) recordCategorySignal(category.id, 'search');
+        }}
         className="focus-visible:ring-gold focus-visible:ring-offset-bg group relative flex h-[13.5rem] flex-col justify-end overflow-hidden rounded-[1.25rem] border border-black/5 bg-gradient-to-br from-[#3B2E1B] via-[#241D13] to-[#14120E] text-white transition-shadow duration-300 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:h-[19rem] sm:rounded-[1.5rem] lg:h-[20rem] dark:border-white/10"
       >
         {src ? (
