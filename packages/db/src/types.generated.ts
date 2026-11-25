@@ -63949,7 +63949,59 @@ export type Database = {
     };
     Functions: {
       authz_outbox_readable: { Args: Record<PropertyKey, never>; Returns: boolean };
+      cinema_active_holds: { Args: { p_user_id: string }; Returns: Json };
+      cinema_due_work: { Args: { p_limit?: number }; Returns: Json };
+      cinema_hold_for_request: { Args: { p_request_id: string; p_user_id: string }; Returns: Json };
+      cinema_hold_for_worker: { Args: { p_hold_id: string }; Returns: Json };
+      cinema_payment_settled: {
+        Args: { p_hold_id: string; p_payment_reference: string };
+        Returns: Json;
+      };
+      cinema_record_cancel_failed: {
+        Args: { p_error: string; p_final: boolean; p_hold_id: string };
+        Returns: Json;
+      };
+      cinema_record_cancel_requested: { Args: { p_hold_id: string }; Returns: Json };
+      cinema_record_cancelled: { Args: { p_hold_id: string; p_reason: string }; Returns: Json };
+      cinema_record_confirm: {
+        Args: { p_booking_ref: string; p_hold_id: string; p_tickets: Json };
+        Returns: Json;
+      };
+      cinema_record_confirm_failed: {
+        Args: { p_error: string; p_final: boolean; p_hold_id: string };
+        Returns: Json;
+      };
+      cinema_record_hold: {
+        Args: {
+          p_expires_at: string;
+          p_lines: Json;
+          p_request_id: string;
+          p_seats: string[];
+          p_showing_id: string;
+          p_source_hold_ref: string;
+          p_total_minor: number;
+          p_user_id: string;
+        };
+        Returns: Json;
+      };
+      cinema_record_hold_ended: { Args: { p_hold_id: string; p_state: string }; Returns: Json };
+      cinema_record_paying: { Args: { p_expires_at: string; p_hold_id: string }; Returns: Json };
+      cinema_record_refunded: {
+        Args: { p_hold_id: string; p_refund_reference: string };
+        Returns: Json;
+      };
+      cinema_record_snapshot: {
+        Args: { p_observed_at: string; p_showing_id: string; p_taken: string[] };
+        Returns: undefined;
+      };
+      cinema_showing_for_call: { Args: { p_showing_id: string }; Returns: Json };
+      cinema_sync_apply: { Args: { p_connection_id: string; p_programme: Json }; Returns: Json };
+      cinema_sync_failed: {
+        Args: { p_connection_id: string; p_error: string };
+        Returns: undefined;
+      };
       cron_app_email_reminders: { Args: Record<PropertyKey, never>; Returns: number };
+      cron_cinema_worker: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_expire_unpaid_mpesa_orders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_featured_activate: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_eligibility: { Args: Record<PropertyKey, never>; Returns: number };
@@ -64150,6 +64202,7 @@ export type Database = {
         Args: { p_answers: Json; p_condition: Json };
         Returns: boolean;
       };
+      fn_cinema_worker_poke: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_city_for_point: {
         Args: { p_lat: number; p_lng: number };
         Returns: {
@@ -66663,10 +66716,16 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_cinema_bookings_for_merchant: {
+        Args: { p_limit?: number; p_merchant_id: string };
+        Returns: Json;
+      };
       rpc_cinema_confirm_hold: {
         Args: { p_confirmation_ref: string; p_hold_id: string };
         Returns: Json;
       };
+      rpc_cinema_connect: { Args: { p_adapter_id: string; p_merchant_id: string }; Returns: Json };
+      rpc_cinema_connection: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_cinema_hold_seats: {
         Args: {
           p_expected_total_minor: number;
@@ -66676,8 +66735,13 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_cinema_pause: { Args: { p_merchant_id: string; p_paused: boolean }; Returns: Json };
       rpc_cinema_programme: {
         Args: { p_days?: number; p_film_id?: string; p_from: string; p_merchant_id?: string };
+        Returns: Json;
+      };
+      rpc_cinema_programme_for_merchant: {
+        Args: { p_days?: number; p_from: string; p_merchant_id: string };
         Returns: Json;
       };
       rpc_cinema_publish_showing: {
@@ -71501,6 +71565,7 @@ export type Database = {
       rpc_my_bookings: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_card_remove: { Args: { p_card_id: string; p_proof: string }; Returns: Json };
       rpc_my_cards: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_my_cinema_hold: { Args: { p_hold_id: string }; Returns: Json };
       rpc_my_data_export_request: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_data_requests: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_my_engine_booking_code: {
