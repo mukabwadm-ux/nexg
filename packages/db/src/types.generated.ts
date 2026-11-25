@@ -33979,6 +33979,7 @@ export type Database = {
           booking_id: string | null;
           booking_step: string | null;
           channel: string | null;
+          cinema_hold_id: string | null;
           city_id: string | null;
           created_at: string;
           created_by: string | null;
@@ -34014,6 +34015,7 @@ export type Database = {
           booking_id?: string | null;
           booking_step?: string | null;
           channel?: string | null;
+          cinema_hold_id?: string | null;
           city_id?: string | null;
           created_at?: string;
           created_by?: string | null;
@@ -34048,6 +34050,7 @@ export type Database = {
           booking_id?: string | null;
           booking_step?: string | null;
           channel?: string | null;
+          cinema_hold_id?: string | null;
           city_id?: string | null;
           created_at?: string;
           created_by?: string | null;
@@ -64266,6 +64269,7 @@ export type Database = {
         Args: { p_answers: Json; p_condition: Json };
         Returns: boolean;
       };
+      fn_cinema_refund_open: { Args: { p_hold_id: string; p_reason: string }; Returns: Json };
       fn_cinema_worker_poke: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_city_for_point: {
         Args: { p_lat: number; p_lng: number };
@@ -65226,6 +65230,10 @@ export type Database = {
       fn_payments_worker_poke: { Args: { p_body?: Json }; Returns: Json };
       fn_paystack_apply: {
         Args: { p_data: Json; p_event: string; p_mode: string; p_payload: Json };
+        Returns: Json;
+      };
+      fn_paystack_refund_answered_system: {
+        Args: { p_answer: Json; p_reference: string };
         Returns: Json;
       };
       fn_paystack_refund_apply: {
@@ -66802,6 +66810,7 @@ export type Database = {
         Returns: Json;
       };
       rpc_cinema_pause: { Args: { p_merchant_id: string; p_paused: boolean }; Returns: Json };
+      rpc_cinema_payment_state: { Args: { p_hold_id: string }; Returns: Json };
       rpc_cinema_programme: {
         Args: { p_days?: number; p_film_id?: string; p_from: string; p_merchant_id?: string };
         Returns: Json;
@@ -72007,6 +72016,7 @@ export type Database = {
         Args: { p_provider: string; p_raw_body: string; p_signature_header: string };
         Returns: Json;
       };
+      rpc_payment_begin_cinema: { Args: { p_hold_id: string }; Returns: Json };
       rpc_payment_begin_engine_booking: {
         Args: {
           p_amount_cents: number;
@@ -75580,7 +75590,7 @@ export type Database = {
         | 'paused'
         | 'suspended'
         | 'delisted';
-      payment_intent: 'order' | 'featured_slot' | 'rider_float' | 'stay' | 'booking';
+      payment_intent: 'order' | 'featured_slot' | 'rider_float' | 'stay' | 'booking' | 'cinema';
       payment_state: 'pending' | 'authorised' | 'paid' | 'failed' | 'abandoned' | 'reversed';
       placement_kind: 'homepage' | 'category_top' | 'popular_request';
       plan_block_status: 'proposed' | 'confirmed' | 'changed' | 'unavailable' | 'removed' | 'done';
@@ -77402,7 +77412,7 @@ export const Constants = {
         'suspended',
         'delisted',
       ],
-      payment_intent: ['order', 'featured_slot', 'rider_float', 'stay', 'booking'],
+      payment_intent: ['order', 'featured_slot', 'rider_float', 'stay', 'booking', 'cinema'],
       payment_state: ['pending', 'authorised', 'paid', 'failed', 'abandoned', 'reversed'],
       placement_kind: ['homepage', 'category_top', 'popular_request'],
       plan_block_status: ['proposed', 'confirmed', 'changed', 'unavailable', 'removed', 'done'],

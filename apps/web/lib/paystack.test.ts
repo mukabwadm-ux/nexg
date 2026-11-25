@@ -8,6 +8,7 @@ import {
   openCheckout,
   payerEmail,
   paystackMode,
+  refund,
   sendPrompt,
   signatureMode,
   sweepSignatureValid,
@@ -169,5 +170,30 @@ describe('paystack calls', () => {
       ).ok,
     ).toBe(false);
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('refunds a transaction by its id, in cents, under our reference', async () => {
+    vi.stubEnv('PAYSTACK_TEST_SECRET_KEY', TEST);
+    const fetch = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ status: true, data: { status: 'pending', id: 7 } })),
+      );
+    vi.stubGlobal('fetch', fetch);
+    const answer = await refund('test', {
+      transaction: '4099260516',
+      amountCents: 65000,
+      reference: 'NXR-0123456789abcdef',
+      note: 'NexG refund NXR-0123456789abcdef',
+    });
+    expect(answer.ok).toBe(true);
+    const [url, init] = fetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('https://api.paystack.co/refund');
+    expect(JSON.parse(init.body as string)).toEqual({
+      transaction: '4099260516',
+      amount: 65000,
+      reference: 'NXR-0123456789abcdef',
+      merchant_note: 'NexG refund NXR-0123456789abcdef',
+    });
   });
 });
