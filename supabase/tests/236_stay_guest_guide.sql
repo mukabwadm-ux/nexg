@@ -1,5 +1,5 @@
 -- A signed-in guest lists their own stays and reads their stay's published guide, floor plan and 3D model in the
--- Stays app (20270318009800). Nobody else can, a cancelled or held stay cannot, and an unpublished guide is nothing.
+-- Stays app (20270320000300). Nobody else can, a cancelled or held stay cannot, and an unpublished guide is nothing.
 
 begin;
 create extension if not exists pgtap with schema extensions;
