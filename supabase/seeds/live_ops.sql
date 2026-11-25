@@ -125,7 +125,7 @@ begin
     'NX-SEED-0001', v_guest, v_merchant, v_branch, v_city, v_zone, 'web',
     '[Hotel] · Rm [—]',
     extensions.st_setsrid(extensions.st_makepoint(v_lng - 0.004, v_lat - 0.008), 4326)::extensions.geography,
-    'knock softly', 'confirmed', 'cash_on_delivery', 'pending',
+    'knock softly', 'confirmed', 'mpesa_stk', 'paid',
     120000, 25000, 6000, 151000, 'KES',
     array['motorbike'],
     now() - interval '6 minutes', now() - interval '5 minutes',
