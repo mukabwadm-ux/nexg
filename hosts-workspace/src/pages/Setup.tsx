@@ -27,7 +27,7 @@ export function SetupPage() {
     },
     {
       label: 'Delivery handoff',
-      detail: 'Set the handoff rule and confirm the contact.',
+      detail: 'Set the handoff rule riders follow.',
       done: setup.steps.handoff,
       open: () => (first ? go('unit', first.id, 'access') : go('properties')),
     },
@@ -119,7 +119,6 @@ export function SetupPage() {
                 <th>Unit</th>
                 <th>Address</th>
                 <th>Handoff</th>
-                <th>Contact</th>
                 <th>Hours</th>
                 <th>QR placed</th>
               </tr>
@@ -134,7 +133,6 @@ export function SetupPage() {
                   </td>
                   <td>{flag(row.address)}</td>
                   <td>{flag(row.handoff)}</td>
-                  <td>{flag(row.contact)}</td>
                   <td>{flag(row.hours)}</td>
                   <td>{flag(row.qr)}</td>
                 </tr>

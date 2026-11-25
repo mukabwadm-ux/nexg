@@ -29,7 +29,22 @@ const nextConfig = {
    * name the orders domain will want.
    */
   async redirects() {
-    return [{ source: '/concierge', destination: '/support', permanent: true }];
+    return [
+      /*
+       * The console moved from admin.nexgapp.com to control.nexgapp.com.
+       * The old address stays attached to this project and answers every
+       * path with a 308 to the same path on the new one; Next keeps the
+       * query string. Staff sign in once on the new address: auth cookies
+       * are host-only, so a session on the old host does not carry over.
+       */
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'admin.nexgapp.com' }],
+        destination: 'https://control.nexgapp.com/:path*',
+        permanent: true,
+      },
+      { source: '/concierge', destination: '/support', permanent: true },
+    ];
   },
 };
 

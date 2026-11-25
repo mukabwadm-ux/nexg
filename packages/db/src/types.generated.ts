@@ -15629,6 +15629,70 @@ export type Database = {
         };
         Relationships: [];
       };
+      fin_document: {
+        Row: {
+          amount_cents: number | null;
+          check_code: string;
+          id: string;
+          issued_at: string;
+          issued_by: string | null;
+          kind: string;
+          party_label: string | null;
+          reference: string;
+          subject: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_cents?: number | null;
+          check_code?: string;
+          id?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          kind: string;
+          party_label?: string | null;
+          reference: string;
+          subject: string;
+        };
+        Update: {
+          amount_cents?: number | null;
+          check_code?: string;
+          id?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          kind?: string;
+          party_label?: string | null;
+          reference?: string;
+          subject?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'fin_document_issued_by_fkey';
+            columns: ['issued_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      fin_document_counter: {
+        Row: {
+          kind: string;
+          last_number: number;
+          year: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          kind: string;
+          last_number: number;
+          year: number;
+        };
+        Update: {
+          kind?: string;
+          last_number?: number;
+          year?: number;
+        };
+        Relationships: [];
+      };
       fin_export_log: {
         Row: {
           from_date: string;
@@ -64362,6 +64426,7 @@ export type Database = {
       fn_fin_build_kpi: { Args: { p_days?: number }; Returns: number };
       fn_fin_build_party_owed: { Args: Record<PropertyKey, never>; Returns: number };
       fn_fin_build_revenue: { Args: { p_end: string; p_start: string }; Returns: number };
+      fn_fin_document_next_reference: { Args: { p_at?: string; p_kind: string }; Returns: string };
       fn_fin_kpi_for: {
         Args: { p_city_id: string; p_day: string };
         Returns: {
@@ -65594,6 +65659,7 @@ export type Database = {
           title: string;
         }[];
       };
+      fn_tax_invoice_check_code: { Args: { p_id: string }; Returns: string };
       fn_tax_issue_order: { Args: { p_order_id: string }; Returns: number };
       fn_tax_issue_order_compliant: { Args: { p_order_id: string }; Returns: number };
       fn_tax_next_number: { Args: { p_at?: string }; Returns: string };
@@ -68501,6 +68567,11 @@ export type Database = {
       rpc_featured_send_pitch: { Args: { p_merchant_id: string; p_note?: string }; Returns: Json };
       rpc_fin_client_save: { Args: { p_client?: Json; p_id?: string }; Returns: string };
       rpc_fin_clients: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_fin_document_issue: {
+        Args: { p_kind: string; p_month?: string; p_subject_id?: string };
+        Returns: Json;
+      };
+      rpc_fin_document_verify: { Args: { p_code?: string; p_reference: string }; Returns: Json };
       rpc_fin_export: { Args: { p_from: string; p_kind: string; p_to: string }; Returns: Json };
       rpc_fin_invoice_detail: { Args: { p_id: string }; Returns: Json };
       rpc_fin_invoice_issue: { Args: { p_id: string }; Returns: Json };
