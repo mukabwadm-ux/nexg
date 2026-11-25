@@ -274,7 +274,7 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
       : allRows((from, to) => {
           const query = db
             .from('unit_readiness_v')
-            .select('unit_id, address_done, handoff_done, contact_confirmed, hours_done, qr_placed')
+            .select('unit_id, address_done, handoff_done, hours_done, qr_placed')
             .eq('host_id', hostId);
           if (unitScope) query.in('unit_id', unitScope);
           return query.order('unit_id').range(from, to);
@@ -897,7 +897,6 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
                 unitId: row.unit_id,
                 address: row.address_done === true,
                 handoff: row.handoff_done === true,
-                contact: row.contact_confirmed === true,
                 hours: row.hours_done === true,
                 qr: row.qr_placed === true,
               },

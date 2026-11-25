@@ -44,7 +44,6 @@ export const EVENTS: { key: string; label: string; channel: string }[] = [
   },
   { key: 'retired_card_scanned', label: 'Retired QR card scanned', channel: 'Push' },
   { key: 'request_waiting', label: 'Request waiting on you', channel: 'Push + WhatsApp' },
-  { key: 'caretaker_unconfirmed', label: 'Caretaker not confirmed after 48 h', channel: 'Push' },
   { key: 'invoice_ready', label: 'Statement or invoice ready', channel: 'Email' },
   { key: 'guest_data_request', label: 'Guest data request', channel: 'Email + push' },
   { key: 'stay_review_received', label: 'Stay review received', channel: 'In-app' },

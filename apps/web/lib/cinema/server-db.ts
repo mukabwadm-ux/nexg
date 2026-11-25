@@ -37,6 +37,10 @@ const ALLOWED = new Set([
   'cinema_sync_apply',
   'cinema_sync_failed',
   'sandbox_cinema',
+  /* Full refunds of paid holds (20270320000200, service role only): open
+     NexG's refund, then record Paystack's answer (lib/cinema/refund.ts). */
+  'fn_cinema_refund_open',
+  'fn_paystack_refund_answered_system',
 ]);
 
 export function cinemaServerDb(): Rpc | null {

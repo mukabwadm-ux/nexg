@@ -311,7 +311,6 @@ export interface HostSetup {
     unitId: string;
     address: boolean;
     handoff: boolean;
-    contact: boolean;
     hours: boolean;
     qr: boolean;
   }>;

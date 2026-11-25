@@ -1,6 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CinemaError, type CinemaConnector } from './connector';
+
+const refunds = vi.hoisted(() => ({ refundCinemaHold: vi.fn() }));
+vi.mock('./refund', () => refunds);
 import {
   CinemaProblem,
   cancelBooking,
@@ -622,13 +625,92 @@ describe('the worker and late answers', () => {
     });
   });
 
-  it('leaves other refunds waiting for the refund to be paid', async () => {
+  it('does not refund while the cinema cannot say whether it booked late', async () => {
+    refunds.refundCinemaHold.mockReset();
+    connector = fakeConnector({
+      lookup: vi.fn(async () => {
+        throw new CinemaError('unavailable', 'The cinema did not answer.');
+      }),
+    });
+    const db = fakeRpc({ cinema_due_work: due([HOLD]), cinema_hold_for_worker: { data: late } });
+    expect(await runWorker(db.rpc, () => connector)).toMatchObject({
+      refundsDeferred: 1,
+      refundsStarted: 0,
+      refundsFailed: 0,
+      failed: 0,
+    });
+    expect(refunds.refundCinemaHold).not.toHaveBeenCalled();
+  });
+
+  it('refunds a refused confirm once the cinema says it has no booking', async () => {
+    refunds.refundCinemaHold.mockReset();
+    refunds.refundCinemaHold.mockResolvedValueOnce({ reference: 'NXR-1', outcome: 'sent' });
+    connector = fakeConnector({ lookup: vi.fn(async () => null) });
+    const db = fakeRpc({ cinema_due_work: due([HOLD]), cinema_hold_for_worker: { data: late } });
+    expect(await runWorker(db.rpc, () => connector)).toMatchObject({
+      refundsStarted: 1,
+      refundsDeferred: 0,
+    });
+    expect(connector.lookup).toHaveBeenCalledTimes(1);
+    expect(refunds.refundCinemaHold).toHaveBeenCalledWith(db.rpc, HOLD, 'confirm_refused');
+  });
+
+  it('counts refunds left to a person, and Paystack refusals once', async () => {
+    refunds.refundCinemaHold.mockReset();
+    refunds.refundCinemaHold
+      .mockResolvedValueOnce({ outcome: 'needs_person', message: 'Live refunds are off.' })
+      .mockResolvedValueOnce({ reference: 'NXR-2', outcome: 'refused', message: 'No.' });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const db = fakeRpc({
+      cinema_due_work: due([HOLD, HOLD]),
+      cinema_hold_for_worker: { data: { ...late, refundReason: 'showing_cancelled' } },
+    });
+    expect(await runWorker(db.rpc, () => connector)).toMatchObject({
+      refundsNeedPerson: 1,
+      refundsFailed: 1,
+      refundsStarted: 0,
+      failed: 0,
+    });
+    expect(refunds.refundCinemaHold).toHaveBeenCalledTimes(2);
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+  });
+
+  it('refunds other holds through Paystack, and counts what happened', async () => {
+    refunds.refundCinemaHold.mockReset();
+    refunds.refundCinemaHold.mockResolvedValueOnce({ reference: 'NXR-1', outcome: 'sent' });
     const db = fakeRpc({
       cinema_due_work: due([HOLD]),
       cinema_hold_for_worker: { data: { ...late, refundReason: 'customer_cancelled' } },
     });
-    expect((await runWorker(db.rpc, () => connector)).refundsWaiting).toBe(1);
+    expect(await runWorker(db.rpc, () => connector)).toMatchObject({
+      refundsStarted: 1,
+      refundsWaiting: 0,
+      refundsFailed: 0,
+    });
+    expect(refunds.refundCinemaHold).toHaveBeenCalledWith(db.rpc, HOLD, 'customer_cancelled');
     expect(connector.lookup).not.toHaveBeenCalled();
+    // Never recorded as refunded here: only Paystack's processed answer does that.
+    expect(db.names()).not.toContain('cinema_record_refunded');
+  });
+
+  it('counts a refund that was not sent, without stopping the run', async () => {
+    refunds.refundCinemaHold.mockReset();
+    refunds.refundCinemaHold
+      .mockResolvedValueOnce({ reference: 'NXR-1', outcome: 'waiting' })
+      .mockRejectedValueOnce(new Error('Live Paystack is not switched on'));
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const db = fakeRpc({
+      cinema_due_work: due([HOLD, HOLD]),
+      cinema_hold_for_worker: { data: { ...late, refundReason: 'showing_cancelled' } },
+    });
+    expect(await runWorker(db.rpc, () => connector)).toMatchObject({
+      refundsWaiting: 1,
+      refundsFailed: 1,
+      failed: 0,
+    });
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
   });
 
   it('does not confirm a hold that was handled since it was listed', async () => {
