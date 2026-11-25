@@ -6,8 +6,6 @@ import {
   Briefcase,
   Building2,
   Car,
-  CheckCircle2,
-  FileText,
   Landmark,
   Laptop,
   Megaphone,
@@ -20,7 +18,6 @@ import {
   Users,
   Wallet,
   Wrench,
-  XCircle,
   type LucideIcon,
 } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -28,7 +25,6 @@ import * as React from 'react';
 
 import {
   cancelExpense,
-  decideExpense,
   payExpense,
   receiptLink,
   saveExpense,
@@ -50,7 +46,12 @@ import {
   useShowMore,
 } from '@/components/portal/client-kit';
 import { Person, Pill } from '@/components/portal/kit';
-import { EXPENSE_CATEGORIES, EXPENSE_STATUS, PAYMENT_METHODS } from '@/lib/office-finance';
+import {
+  EXPENSE_CATEGORIES,
+  EXPENSE_STATUS,
+  expenseStatus,
+  PAYMENT_METHODS,
+} from '@/lib/office-finance';
 import { day, kes, shillings, todayInNairobi } from '@/lib/portal';
 import { createClient } from '@/lib/supabase/client';
 
@@ -120,7 +121,7 @@ function CategoryPill({ category }: { category: string }) {
   );
 }
 
-type Panel = { kind: 'edit' | 'approve' | 'reject' | 'pay' | 'cancel'; row: ExpenseRow };
+type Panel = { kind: 'edit' | 'pay' | 'cancel'; row: ExpenseRow };
 
 function useReceipt() {
   const { toast } = useToast();
@@ -142,25 +143,18 @@ function useReceipt() {
 
 export function ExpensesTable({
   rows,
-  me,
-  isSuperAdmin,
   canWrite,
   vendors,
   locations,
   title,
   compact = false,
-  approvals = false,
 }: {
   rows: ExpenseRow[];
-  me: string;
-  isSuperAdmin: boolean;
   canWrite: boolean;
   vendors: Choice[];
   locations: Choice[];
   title: string;
   compact?: boolean;
-  /** The Approvals view: a Review button and no status filter. */
-  approvals?: boolean;
 }) {
   const [q, setQ] = React.useState('');
   const [category, setCategory] = React.useState('all');
@@ -171,7 +165,7 @@ export function ExpensesTable({
   const shown = rows.filter(
     (r) =>
       (category === 'all' || r.category === category) &&
-      (status === 'all' || r.status === status) &&
+      (status === 'all' || expenseStatus(r.status) === status) &&
       (!term ||
         `${r.number} ${r.description} ${r.payee} ${r.payment_reference ?? ''} ${r.vendor?.name ?? ''}`
           .toLowerCase()
@@ -179,29 +173,14 @@ export function ExpensesTable({
   );
   const filtered = term !== '' || category !== 'all' || status !== 'all';
   const { shown: page, more } = useShowMore(shown, compact ? 6 : 25);
-  const mayDecide = (r: ExpenseRow) =>
-    canWrite && r.status === 'submitted' && (r.submitted_by !== me || isSuperAdmin);
+  const editable = (r: ExpenseRow) => canWrite && !['paid', 'cancelled'].includes(r.status);
 
   const actions = (r: ExpenseRow) => [
-    canWrite &&
-      ['submitted', 'rejected'].includes(r.status) && {
-        label: 'Edit',
-        icon: <Pencil />,
-        opensOverlay: true,
-        onSelect: () => setPanel({ kind: 'edit', row: r }),
-      },
-    mayDecide(r) && {
-      label: 'Approve',
-      icon: <CheckCircle2 />,
-      separated: true,
+    editable(r) && {
+      label: 'Edit',
+      icon: <Pencil />,
       opensOverlay: true,
-      onSelect: () => setPanel({ kind: 'approve', row: r }),
-    },
-    mayDecide(r) && {
-      label: 'Turn Down',
-      icon: <XCircle />,
-      opensOverlay: true,
-      onSelect: () => setPanel({ kind: 'reject', row: r }),
+      onSelect: () => setPanel({ kind: 'edit', row: r }),
     },
     canWrite &&
       r.status === 'approved' && {
@@ -294,20 +273,13 @@ export function ExpensesTable({
       enableSorting: false,
       cell: ({ row: { original: r } }) => (
         <span className="flex items-center justify-end gap-1">
-          {approvals && mayDecide(r) ? (
-            <Button size="sm" variant="black" onClick={() => setPanel({ kind: 'approve', row: r })}>
-              Review
-            </Button>
-          ) : (
-            canWrite &&
-            ['submitted', 'rejected'].includes(r.status) && (
-              <IconAction
-                label={`Edit ${r.number}`}
-                onClick={() => setPanel({ kind: 'edit', row: r })}
-              >
-                <Pencil />
-              </IconAction>
-            )
+          {editable(r) && (
+            <IconAction
+              label={`Edit ${r.number}`}
+              onClick={() => setPanel({ kind: 'edit', row: r })}
+            >
+              <Pencil />
+            </IconAction>
           )}
           <ActionMenu label={`Actions for ${r.number}`} actions={actions(r)} />
         </span>
@@ -337,37 +309,29 @@ export function ExpensesTable({
               ...Object.entries(EXPENSE_CATEGORIES).map(([k, v]) => ({ value: k, label: v.label })),
             ]}
           />
-          {!approvals && (
-            <FilterSelect
-              label="Status"
-              value={status}
-              onChange={setStatus}
-              className="flex-1 sm:flex-none"
-              options={[
-                { value: 'all', label: 'All Statuses' },
-                ...Object.entries(EXPENSE_STATUS).map(([k, v]) => ({ value: k, label: v.label })),
-              ]}
-            />
-          )}
+          <FilterSelect
+            label="Status"
+            value={status}
+            onChange={setStatus}
+            className="flex-1 sm:flex-none"
+            options={[
+              { value: 'all', label: 'All Statuses' },
+              ...Object.entries(EXPENSE_STATUS)
+                .filter(([k]) => k !== 'submitted')
+                .map(([k, v]) => ({ value: k, label: v.label })),
+            ]}
+          />
         </div>
       </div>
 
       {shown.length === 0 ? (
         <EmptyState
           icon={<Receipt className="h-5 w-5" />}
-          title={
-            filtered
-              ? 'Nothing matches'
-              : approvals
-                ? 'Nothing waiting for approval'
-                : 'No office expenses here'
-          }
+          title={filtered ? 'Nothing matches' : 'No office expenses here'}
           description={
             filtered
               ? 'Try another search, category or status.'
-              : approvals
-                ? 'Expenses recorded by a colleague wait here for you to approve or turn down.'
-                : 'Record rent, utilities, salaries and other office spending with Add Expense. A second person approves each one before it is paid.'
+              : 'Record rent, utilities, salaries and other office spending with Add Expense. It counts straight away.'
           }
           {...(filtered
             ? {
@@ -420,14 +384,6 @@ export function ExpensesTable({
           expense={panel.row}
           vendors={vendors}
           locations={locations}
-          onClose={() => setPanel(null)}
-        />
-      )}
-      {panel && (panel.kind === 'approve' || panel.kind === 'reject') && (
-        <DecidePanel
-          expense={panel.row}
-          approve={panel.kind === 'approve'}
-          self={panel.row.submitted_by === me}
           onClose={() => setPanel(null)}
         />
       )}
@@ -538,8 +494,8 @@ function ExpensePanel({
       open
       onOpenChange={(o) => !o && onClose()}
       title={expense ? `Edit ${expense.number}` : 'Add Expense'}
-      subtitle="A colleague with full Finance access approves it before it is paid."
-      submitLabel={expense ? 'Save and Send for Approval' : 'Record for Approval'}
+      subtitle="It is recorded straight away and counts in budgets and reports."
+      submitLabel={expense ? 'Save Changes' : 'Record Expense'}
       busy={busy || uploading}
       width="lg"
       onSubmit={async () => {
@@ -566,7 +522,7 @@ function ExpensePanel({
     >
       {expense?.status === 'rejected' && expense.decision_note && (
         <p className="bg-danger-bg text-danger rounded-xl px-4 py-3 text-sm font-semibold">
-          Turned down: “{expense.decision_note}”. Fix it and save to send it back for approval.
+          Turned down: “{expense.decision_note}”. Fix it and save to record it.
         </p>
       )}
       <TextField
@@ -663,84 +619,13 @@ function ExpensePanel({
         value={f.notes}
         onChange={(e) => set('notes', e.target.value)}
         maxLength={1000}
-        placeholder="Invoice number, period it covers, anything the approver should know"
+        placeholder="Invoice number, period it covers, anything worth knowing later"
       />
     </FormPanel>
   );
 }
 
-/* ──────────────────────────────────────────── decide, pay and cancel */
-
-function DecidePanel({
-  expense: e,
-  approve,
-  self,
-  onClose,
-}: {
-  expense: ExpenseRow;
-  approve: boolean;
-  self: boolean;
-  onClose: () => void;
-}) {
-  const [note, setNote] = React.useState('');
-  const { run, busy } = useRunner();
-  const openReceipt = useReceipt();
-  return (
-    <FormPanel
-      open
-      onOpenChange={(o) => !o && onClose()}
-      title={approve ? `Approve ${kes(e.amount_cents)}` : 'Turn Down Expense'}
-      subtitle={`${e.number} · ${e.description}`}
-      submitLabel={approve ? 'Approve' : 'Turn Down'}
-      danger={!approve}
-      busy={busy}
-      onSubmit={() => run(() => decideExpense(e.id, approve, note))}
-    >
-      {self && approve && (
-        <p className="bg-danger-bg text-danger rounded-xl px-4 py-3 text-sm font-semibold">
-          You recorded this expense. As a super admin you can approve it, and the audit log marks it
-          for review.
-        </p>
-      )}
-      <dl className="divide-border border-border divide-y rounded-2xl border text-sm">
-        {(
-          [
-            ['Paid To', e.payee],
-            ['Category', EXPENSE_CATEGORIES[e.category]?.label ?? e.category],
-            ['Spent On', day(e.spent_on)],
-            ['Recorded By', e.submitter?.display_name ?? e.submitter?.email ?? '—'],
-          ] as const
-        ).map(([k, v]) => (
-          <div key={k} className="flex justify-between gap-4 px-4 py-2.5">
-            <dt className="text-muted font-semibold">{k}</dt>
-            <dd className="text-right font-bold">{v}</dd>
-          </div>
-        ))}
-      </dl>
-      {e.notes && <p className="bg-bg rounded-xl px-4 py-3 text-sm">{e.notes}</p>}
-      {e.receipt_path ? (
-        <Button
-          variant="outline"
-          size="sm"
-          leadingIcon={<FileText className="h-4 w-4" />}
-          onClick={() => openReceipt(e.receipt_path!)}
-        >
-          Open the Receipt
-        </Button>
-      ) : (
-        <p className="text-muted-light text-xs">No receipt attached.</p>
-      )}
-      <TextArea
-        label={approve ? 'Note' : 'Why It Is Turned Down'}
-        required={!approve}
-        value={note}
-        onChange={(ev) => setNote(ev.target.value)}
-        maxLength={1000}
-        placeholder={approve ? 'Optional' : 'So it can be fixed and sent again'}
-      />
-    </FormPanel>
-  );
-}
+/* ─────────────────────────────────────────────────────── pay and cancel */
 
 function PayPanel({ expense: e, onClose }: { expense: ExpenseRow; onClose: () => void }) {
   const [method, setMethod] = React.useState('bank_transfer');
