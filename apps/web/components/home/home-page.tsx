@@ -221,6 +221,29 @@ const getBestSellers = unstable_cache(
   { revalidate: 300 },
 );
 
+/* The category tiles. Cached like the rest of the page, so every homepage
+   visit no longer reads category_config, and a renamed or hidden category
+   shows within five minutes. A failed read is not cached. */
+const getHomeCategories = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from('category_config')
+      .select('category, label, image_path')
+      .eq('is_active', true)
+      .order('sort');
+    if (error) throw new Error(`Could not load homepage categories: ${error.message}`);
+    return (data ?? []).map((category) => ({
+      ...category,
+      image_url: category.image_path
+        ? supabase.storage.from('category-images').getPublicUrl(category.image_path).data.publicUrl
+        : null,
+    }));
+  },
+  ['homepage-categories'],
+  { revalidate: 300 },
+);
+
 export async function HomePageContent({
   locale,
   translate,
@@ -229,26 +252,12 @@ export async function HomePageContent({
   translate?: Translate;
 }) {
   const t = translate ?? translator(locale);
-  const [{ stores, featured }, categorySignals, liveBestSellers] = await Promise.all([
+  const [{ stores, featured }, categorySignals, liveBestSellers, categories] = await Promise.all([
     getHomeData(),
     getCategorySignals(),
     getBestSellers().catch(() => [] as BestSeller[]),
+    getHomeCategories(),
   ]);
-  const supabase = createPublicClient();
-  const { data: categoryRows, error: categoryError } = await supabase
-    .from('category_config')
-    .select('category, label, image_path')
-    .eq('is_active', true)
-    .order('sort');
-  if (categoryError) {
-    throw new Error(`Could not load homepage categories: ${categoryError.message}`);
-  }
-  const categories = (categoryRows ?? []).map((category) => ({
-    ...category,
-    image_url: category.image_path
-      ? supabase.storage.from('category-images').getPublicUrl(category.image_path).data.publicUrl
-      : null,
-  }));
 
   return (
     <>

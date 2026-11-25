@@ -41,9 +41,11 @@ export const metadata: Metadata = {
     'List your Airbnb or short-stay property on NexG for free. Manage bookings, units, staff and payouts from one dashboard for KES 1,000 per unit per month, with your first month free.',
 };
 
-export const dynamic = 'force-dynamic';
-// Next 14 caches plain fetches with no expiry; see lib/supabase/public.ts.
-export const fetchCache = 'force-no-store';
+// The data is the same for every visitor, so its database reads are kept for
+// a minute: a busy day costs the database one read a minute, not one per
+// visit. (The page itself still renders per visit, for the visitor's language.)
+// See docs/scaling-plan.md and lib/supabase/public.ts.
+export const revalidate = 60;
 
 /*
  * Pricing, in one place so the hero, the plans, the form and the FAQ
