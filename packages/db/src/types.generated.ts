@@ -21579,9 +21579,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -21593,7 +21595,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -21601,6 +21606,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         ComputedFields: never;
@@ -21608,9 +21614,11 @@ export type Database = {
           acknowledged_at?: string | null;
           acknowledged_by?: string | null;
           assignee_id?: string | null;
+          case_type: string;
           compensation_kes?: number | null;
           created_at?: string;
           description?: string | null;
+          escalated_at?: string | null;
           evidence?: NonNullable<Json>;
           guest_user_id?: string | null;
           happened_at?: string;
@@ -21622,7 +21630,10 @@ export type Database = {
           location?: unknown;
           merchant_id?: string | null;
           order_reference?: string | null;
+          outcome?: string | null;
           police_ref?: string | null;
+          priority: string;
+          reason?: string | null;
           redispatched_order_reference?: string | null;
           reported_by_id?: string | null;
           reported_by_type: string;
@@ -21630,15 +21641,18 @@ export type Database = {
           resolved_at?: string | null;
           rider_id?: string | null;
           severity?: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status?: Database['public']['Enums']['incident_status'];
         };
         Update: {
           acknowledged_at?: string | null;
           acknowledged_by?: string | null;
           assignee_id?: string | null;
+          case_type?: string;
           compensation_kes?: number | null;
           created_at?: string;
           description?: string | null;
+          escalated_at?: string | null;
           evidence?: NonNullable<Json>;
           guest_user_id?: string | null;
           happened_at?: string;
@@ -21650,7 +21664,10 @@ export type Database = {
           location?: unknown;
           merchant_id?: string | null;
           order_reference?: string | null;
+          outcome?: string | null;
           police_ref?: string | null;
+          priority?: string;
+          reason?: string | null;
           redispatched_order_reference?: string | null;
           reported_by_id?: string | null;
           reported_by_type?: string;
@@ -21658,6 +21675,7 @@ export type Database = {
           resolved_at?: string | null;
           rider_id?: string | null;
           severity?: Database['public']['Enums']['incident_severity'];
+          sla_due_at?: string;
           status?: Database['public']['Enums']['incident_status'];
         };
         Relationships: [
@@ -64090,6 +64108,53 @@ export type Database = {
         Args: { p_connection_id: string; p_error: string };
         Returns: undefined;
       };
+      console_my_riders: { Args: Record<PropertyKey, never>; Returns: string[] };
+      console_rider_facts: {
+        Args: { p_end: string; p_start: string };
+        Returns: {
+          accept_sec: number;
+          acceptance_pct: number;
+          activated_at: string;
+          adjustments_kes: number;
+          background_check: string;
+          bucket: string;
+          cancelled: number;
+          completion_pct: number;
+          created_at: string;
+          delivery_min: number;
+          docs_required: number;
+          docs_verified: number;
+          earned_all_kes: number;
+          earned_kes: number;
+          kyc: string;
+          last_active: string;
+          name: string;
+          offers_accepted: number;
+          offers_answered: number;
+          on_time: number;
+          on_time_pct: number;
+          payable_cents: number;
+          payout_method: string;
+          payout_paid_at: string;
+          payout_state: string;
+          phone: string;
+          plate_no: string;
+          presence: string;
+          rating_avg: number;
+          rating_count: number;
+          rider_id: string;
+          score: number;
+          status: string;
+          submitted_at: string;
+          timed: number;
+          trips: number;
+          trips_all: number;
+          trips_today: number;
+          vehicle: string;
+          zone_id: string;
+          zone_name: string;
+        }[];
+      };
       cron_app_email_reminders: { Args: Record<PropertyKey, never>; Returns: number };
       cron_cinema_worker: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_expire_unpaid_mpesa_orders: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -64329,6 +64394,14 @@ export type Database = {
         Returns: number;
       };
       fn_compute_rider_health: { Args: { p_as_of?: string }; Returns: number };
+      fn_console_period: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          end_at: string;
+          prev_start: string;
+          start_at: string;
+        }[];
+      };
       fn_customer_deletion_blockers: { Args: { p_user_id: string }; Returns: Json };
       fn_customer_guest_ensure: { Args: { p_id: string }; Returns: string };
       fn_customer_is_partner: { Args: { p_user_id: string }; Returns: boolean };
@@ -67276,9 +67349,92 @@ export type Database = {
         };
         Returns: Database['public']['Enums']['connector_connection_state'];
       };
+      rpc_console_rider_case_open: {
+        Args: {
+          p_case_type: string;
+          p_description: string;
+          p_order_reference?: string;
+          p_priority: string;
+          p_reason?: string;
+          p_reported_by?: string;
+          p_rider_id?: string;
+        };
+        Returns: string;
+      };
+      rpc_console_rider_case_resolve: {
+        Args: {
+          p_case_id: string;
+          p_compensation_kes?: number;
+          p_outcome: string;
+          p_resolution: string;
+        };
+        Returns: Json;
+      };
+      rpc_console_rider_case_update: {
+        Args: { p_action: string; p_case_id: string; p_note?: string; p_priority?: string };
+        Returns: Json;
+      };
       rpc_console_rider_profile: { Args: { p_rider_id: string }; Returns: Json };
       rpc_console_rider_stats: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_console_rider_trip: { Args: { p_order_id: string; p_rider_id: string }; Returns: Json };
+      rpc_console_riders_availability: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_console_riders_cases: {
+        Args: {
+          p_from: string;
+          p_page?: number;
+          p_priority?: string;
+          p_q?: string;
+          p_size?: number;
+          p_tab?: string;
+          p_to: string;
+          p_type?: string;
+        };
+        Returns: Json;
+      };
+      rpc_console_riders_deliveries: {
+        Args: {
+          p_from: string;
+          p_page?: number;
+          p_q?: string;
+          p_size?: number;
+          p_tab?: string;
+          p_to: string;
+          p_zone?: string;
+        };
+        Returns: Json;
+      };
+      rpc_console_riders_earnings: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_console_riders_list: {
+        Args: {
+          p_from: string;
+          p_kyc?: string;
+          p_page?: number;
+          p_q?: string;
+          p_size?: number;
+          p_sort?: string;
+          p_tab?: string;
+          p_to: string;
+          p_vehicle?: string;
+          p_zone?: string;
+        };
+        Returns: Json;
+      };
+      rpc_console_riders_onboarding: {
+        Args: {
+          p_from: string;
+          p_kyc?: string;
+          p_page?: number;
+          p_q?: string;
+          p_size?: number;
+          p_tab?: string;
+          p_to: string;
+          p_vehicle?: string;
+          p_zone?: string;
+        };
+        Returns: Json;
+      };
+      rpc_console_riders_overview: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_console_riders_performance: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_coverage_lookup: { Args: { p_lat: number; p_lng: number }; Returns: Json };
       rpc_customer_list: {
         Args: {
@@ -69752,9 +69908,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -69766,7 +69924,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -69774,6 +69935,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         SetofOptions: {
@@ -69794,9 +69956,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -69808,7 +69972,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -69816,6 +69983,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         SetofOptions: {
@@ -69831,9 +69999,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -69845,7 +70015,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -69853,6 +70026,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         SetofOptions: {
@@ -69868,9 +70042,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -69882,7 +70058,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -69890,6 +70069,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         SetofOptions: {

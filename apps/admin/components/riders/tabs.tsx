@@ -528,7 +528,7 @@ export function CashTab({
                   <tr key={r.id} className="border-border hover:bg-bg border-b last:border-b-0">
                     <td className="px-4 py-3">
                       <Link
-                        href={`/riders?tab=cash&selected=${r.id}`}
+                        href={`/riders/console?tab=cash&selected=${r.id}`}
                         className="text-[0.8125rem] font-extrabold hover:underline"
                       >
                         {riderName(r)}
@@ -1360,7 +1360,7 @@ export function CommsTab({
             <li key={m.id} className="px-4 py-3">
               <p className="flex flex-wrap items-center gap-2">
                 <Link
-                  href={`/riders?tab=comms&selected=${m.rider_id}`}
+                  href={`/riders/console?tab=comms&selected=${m.rider_id}`}
                   className="text-[0.8125rem] font-extrabold hover:underline"
                 >
                   {m.rider ? riderName(m.rider) : DASH}
