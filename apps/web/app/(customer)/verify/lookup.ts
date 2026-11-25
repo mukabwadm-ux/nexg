@@ -23,7 +23,7 @@ export const KIND_LABELS: Record<NonNullable<Verdict['kind']>, string> = {
 /** Asks the database whether a NexG document reference is genuine; null when it cannot say. */
 export async function lookUp(reference: string, code: string | null): Promise<Verdict | null> {
   const { data, error } = await createPublicClient().rpc(
-    'rpc_document_verify' as never,
+    'rpc_fin_document_verify' as never,
     { p_reference: reference, p_code: code } as never,
   );
   if (error) return null;

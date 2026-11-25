@@ -16,7 +16,7 @@
 -- 2. rpc_fin_document_issue: the admin's way in, for staff who reach Finance.
 --    Amounts and names are read from the records here, not taken from the
 --    caller.
--- 3. rpc_document_verify: the public check behind nexgapp.com/verify. Anyone
+-- 3. rpc_fin_document_verify: the public check behind nexgapp.com/verify. Anyone
 --    with a reference learns only whether it is genuine, its type and date;
 --    the check code printed on the document (in its QR code) also shows who
 --    it was issued to and the amount.
@@ -168,6 +168,14 @@ begin
     insert into public.fin_document (kind, reference, subject, party_label, amount_cents, issued_by)
     values (p_kind, public.fn_fin_document_next_reference(p_kind), v_subject, v_party, v_amount, v_staff)
     returning * into v_doc;
+
+    perform audit.log(
+      p_actor_type => 'staff', p_module => 'finance', p_action => 'finance.document_issued',
+      p_actor_id => v_staff,
+      p_target_type => 'fin_document', p_target_id => v_doc.id,
+      p_target_label => v_doc.reference,
+      p_after => jsonb_build_object('kind', p_kind, 'subject', v_subject,
+        'party', v_party, 'amount_cents', v_amount));
   end if;
 
   return jsonb_build_object(
@@ -198,7 +206,7 @@ revoke execute on function public.fn_tax_invoice_check_code(uuid) from public, a
  * document's check code: found, type, reference, date and status only.
  * With it: also who it was issued to and the amount.
  */
-create or replace function public.rpc_document_verify(p_reference text, p_code text default null)
+create or replace function public.rpc_fin_document_verify(p_reference text, p_code text default null)
 returns jsonb
 language plpgsql
 stable
@@ -250,8 +258,21 @@ begin
 end;
 $$;
 
-revoke execute on function public.rpc_document_verify(text, text) from public;
-grant execute on function public.rpc_document_verify(text, text) to anon, authenticated;
+revoke execute on function public.rpc_fin_document_verify(text, text) from public;
+grant execute on function public.rpc_fin_document_verify(text, text) to anon, authenticated;
+
+-- ═══════════════════════════════════════════════ audit and the wiring gate (test 26)
+
+insert into audit.action_registry (action, module, default_severity, money, description) values
+  ('finance.document_issued', 'finance', 'info', false,
+   'Finance printed a receipt, settlement statement or monthly report for the first time, which gave it its reference')
+on conflict (action) do nothing;
+
+insert into public.wiring_anon_allow (function_name, reason, guarded_by) values
+  ('rpc_fin_document_verify',
+   'Anyone holding a NexG finance document checks it on nexgapp.com/verify, with no session: customers, merchants, banks and KRA.',
+   'Read-only (stable, writes nothing). With a reference alone it says only whether it exists, its type, date and status; the party and amount need the 12-character check code printed in the document''s QR code (random per register row, or the SHA-256 of the tax invoice id, which is never public). References over 40 characters are refused.')
+on conflict (function_name) do update set reason = excluded.reason, guarded_by = excluded.guarded_by;
 
 -- ═══════════════════════════════════════════════════════════ KRA series
 
