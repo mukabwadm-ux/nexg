@@ -36003,8 +36003,9 @@ export type Database = {
           split_recovery_cents: number;
           split_share_cents: number | null;
           split_subaccount: string | null;
+          fn_paystack_try_unpaid: boolean | null;
         };
-        ComputedFields: never;
+        ComputedFields: 'fn_paystack_try_unpaid';
         Insert: {
           access_code?: string | null;
           authorization_url?: string | null;
