@@ -1,3 +1,8 @@
+/** The console's old address, now served by this site as a 404 only. */
+const RETIRED_HOST = [{ type: 'host', value: 'admin.nexgapp.com' }];
+/** Page paths only: not /_next, /api, or a file (anything with a dot). */
+const RETIRED_PAGE_PATH = ':path((?!_next/|api/)[^.]*)';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -46,7 +51,23 @@ const nextConfig = {
    * goes to the page instead, query string and all.
    */
   async redirects() {
-    return [{ source: '/discover/index.html', destination: '/discover', permanent: false }];
+    return [
+      { source: '/discover/index.html', destination: '/discover', permanent: false },
+      /*
+       * On the retired admin.nexgapp.com, a link followed from its own 404 page
+       * (the header, footer and "Ask the concierge desk") goes on to the same
+       * path on www. Anything else on that host is the 404 (see rewrites).
+       */
+      {
+        source: `/${RETIRED_PAGE_PATH}`,
+        has: [
+          ...RETIRED_HOST,
+          { type: 'header', key: 'referer', value: 'https://admin\\.nexgapp\\.com(/.*)?' },
+        ],
+        destination: 'https://www.nexgapp.com/:path',
+        permanent: false,
+      },
+    ];
   },
   /*
    * The page behind the "Open NEXG" button in the code emails (supabase/app-emails/README.md):
@@ -55,10 +76,32 @@ const nextConfig = {
    * docs/email-templates/app-code.html; it is static and not indexed, and middleware does not run on it.
    */
   async rewrites() {
-    return [{ source: '/app/code', destination: '/app-code.html' }];
+    return {
+      /*
+       * admin.nexgapp.com is retired (the console moved; the owner, 25 Nov 2026).
+       * Every page there is the site's 404, under the site's header and footer, and
+       * nothing on it points at the console. Before files, so `/` and every real
+       * route on that host land on the 404 too; the site's own files (/_next, /api,
+       * anything with an extension) still load, or the page could not draw.
+       */
+      beforeFiles: [
+        {
+          source: `/${RETIRED_PAGE_PATH}`,
+          has: RETIRED_HOST,
+          destination: '/retired-address-not-found',
+        },
+      ],
+      afterFiles: [{ source: '/app/code', destination: '/app-code.html' }],
+      fallback: [],
+    };
   },
   async headers() {
     return [
+      {
+        source: '/:path*',
+        has: RETIRED_HOST,
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
       { source: '/app/code', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
       { source: '/app-code.html', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
     ];
