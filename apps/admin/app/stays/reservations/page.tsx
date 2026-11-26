@@ -18,30 +18,35 @@ import {
   GoldTabs,
   Pagination,
 } from '@/components/portal/dash';
-import { DashClear, DashSearch } from '@/components/portal/dash-filters';
-import { LogCaseButton } from '@/components/stays/client';
+import { DashClear, DashSearch, DashSelect } from '@/components/portal/dash-filters';
+import { CreateReservationButton } from '@/components/stays/client';
 import {
   Chip,
   DataTable,
   ErrorNote,
   FilterRow,
+  Footnote,
   PanelHint,
   PersonCell,
   StaysHeader,
   WaitingForDatabase,
   WithPanel,
 } from '@/components/stays/module';
-import { StayPanel } from '@/components/stays/stay-panel';
+import { StayPanel, STAY_PANEL_TABS } from '@/components/stays/stay-panel';
 import {
   asNumber,
   asObject,
+  FILTER_WINDOW,
+  filterOf,
   kesCompact,
   kesFull,
   label,
   n,
   oneOf,
+  optionsFrom,
   PAGE_SIZE,
   pageOf,
+  pageSlice,
   paged,
   shortDate,
   SOURCE_LABEL,
@@ -63,9 +68,19 @@ const TABS = [
   { key: 'cancelled', label: 'Cancelled' },
 ] as const;
 
+interface UnitOption {
+  unit_id: string;
+  host_id: string;
+  label: string;
+  property_name: string | null;
+  nightly_rate_kes: number | null;
+  unit_status: string;
+}
+
 /**
  * Stays → Reservations: every stay overlapping the period, by state, with
- * the stay's own panel. Holds and blocked dates are not reservations.
+ * the stay's own tabbed panel. Holds and blocked dates are not reservations.
+ * Building and source filter the period's first 500 stays on the page.
  */
 export default async function ReservationsPage({
   searchParams,
@@ -76,8 +91,12 @@ export default async function ReservationsPage({
     city?: string;
     tab?: string;
     q?: string;
+    building?: string;
+    unit?: string;
+    source?: string;
     page?: string;
     selected?: string;
+    ptab?: string;
   };
 }) {
   const ctx = await staysContext(searchParams);
@@ -88,10 +107,18 @@ export default async function ReservationsPage({
     'all',
   );
   const q = (searchParams?.q ?? '').slice(0, 120);
+  const building = filterOf(searchParams?.building);
+  const unitFilter = filterOf(searchParams?.unit);
+  const source = filterOf(searchParams?.source);
   const page = pageOf(searchParams?.page);
   const selected = uuidOrNull(searchParams?.selected);
+  const ptab = oneOf(
+    STAY_PANEL_TABS.map((t) => t.key),
+    searchParams?.ptab,
+    'overview',
+  );
 
-  const [list, detail] = await Promise.all([
+  const [list, detail, units] = await Promise.all([
     ctx.read('rpc_console_stays_list', {
       p_from: period.from,
       p_to: period.to,
@@ -99,14 +126,38 @@ export default async function ReservationsPage({
       p_view: 'reservations',
       p_tab: tab,
       p_q: q || null,
-      p_page: page,
-      p_size: PAGE_SIZE,
+      p_page: 1,
+      p_size: FILTER_WINDOW,
     }),
     selected ? ctx.read('rpc_console_stay_detail', { p_stay_id: selected }) : Promise.resolve(null),
+    ctx.read('rpc_console_stays_units', {
+      p_from: period.from,
+      p_to: period.to,
+      p_city: city,
+      p_tab: 'all',
+      p_q: null,
+      p_property: null,
+      p_page: 1,
+      p_size: FILTER_WINDOW,
+    }),
   ]);
-  const rows = paged<StayRow>(list.data);
+  const all = paged<StayRow>(list.data);
+  const filtered = all.rows.filter(
+    (r) =>
+      (!building || r.property_name === building) &&
+      (!unitFilter || r.unit_label === unitFilter) &&
+      (!source || r.source === source),
+  );
+  const rows = pageSlice(filtered, page, PAGE_SIZE);
   const summary = asObject(asObject(list.data).summary);
-  const keep = { tab: tab === 'all' ? null : tab, q: q || null };
+  const unitRows = paged<UnitOption>(units.data).rows.filter((u) => u.unit_status !== 'archived');
+  const keep = {
+    tab: tab === 'all' ? null : tab,
+    q: q || null,
+    building,
+    unit: unitFilter,
+    source,
+  };
   const href = (params: Record<string, string | null>) =>
     staysHref('/stays/reservations', period, city, { ...keep, ...params });
 
@@ -119,7 +170,16 @@ export default async function ReservationsPage({
         cities={ctx.cities}
         city={city}
         exportHref={staysHref('/stays/export', period, city, { report: 'bookings' })}
-        action={<LogCaseButton label="Log a case" />}
+        action={
+          <CreateReservationButton
+            units={unitRows.map((u) => ({
+              id: u.unit_id,
+              hostId: u.host_id,
+              label: `${u.label}${u.property_name ? ` · ${u.property_name}` : ''}`,
+              rate: u.nightly_rate_kes,
+            }))}
+          />
+        }
       />
       <DashCanvas>
         {list.waiting ? (
@@ -133,31 +193,31 @@ export default async function ReservationsPage({
                 featured
                 icon={CalendarCheck}
                 label="Total Reservations"
-                value={n(rows.counts.all ?? 0)}
+                value={n(all.counts.all ?? 0)}
                 explain="Stays overlapping the period, cancelled ones included."
               />
               <DashKpi
                 icon={CheckCircle2}
                 label="Confirmed"
-                value={n(rows.counts.confirmed ?? 0)}
+                value={n(all.counts.confirmed ?? 0)}
                 explain="Booked and due to arrive or arriving, not yet checked in."
               />
               <DashKpi
                 icon={BedDouble}
                 label="Checked-in (Active)"
-                value={n(rows.counts.checked_in ?? 0)}
+                value={n(all.counts.checked_in ?? 0)}
                 explain="Guests in the unit now."
               />
               <DashKpi
                 icon={LogOut}
                 label="Checked-out"
-                value={n(rows.counts.completed ?? 0)}
+                value={n(all.counts.completed ?? 0)}
                 explain="Stays that have ended."
               />
               <DashKpi
                 icon={XCircle}
                 label="Cancelled"
-                value={n(rows.counts.cancelled ?? 0)}
+                value={n(all.counts.cancelled ?? 0)}
                 explain="Cancelled stays and refunds."
               />
               <DashKpi
@@ -180,6 +240,10 @@ export default async function ReservationsPage({
                   <StayPanel
                     detail={detail.data}
                     closeHref={href({ selected: null, page: String(page) })}
+                    tab={ptab}
+                    tabHref={(k) =>
+                      href({ selected, page: String(page), ptab: k === 'overview' ? null : k })
+                    }
                   />
                 ) : (
                   <PanelHint>Choose a reservation to see its details.</PanelHint>
@@ -194,10 +258,10 @@ export default async function ReservationsPage({
                   tabs={TABS.map((t) => ({
                     key: t.key,
                     label: t.label,
-                    count: rows.counts[t.key] ?? 0,
+                    count: all.counts[t.key] ?? 0,
                     href: staysHref('/stays/reservations', period, city, {
+                      ...keep,
                       tab: t.key === 'all' ? null : t.key,
-                      q: q || null,
                     }),
                   }))}
                 />
@@ -207,11 +271,35 @@ export default async function ReservationsPage({
                     label="Search reservations"
                     placeholder="Search by guest name, booking ref, unit, building…"
                   />
-                  <DashClear params={['q', 'tab', 'selected']} />
+                  <DashSelect
+                    label="Building"
+                    param="building"
+                    value={building ?? 'all'}
+                    options={optionsFrom(all.rows, (r) => r.property_name)}
+                  />
+                  <DashSelect
+                    label="Unit"
+                    param="unit"
+                    value={unitFilter ?? 'all'}
+                    options={optionsFrom(
+                      all.rows.filter((r) => !building || r.property_name === building),
+                      (r) => r.unit_label,
+                    )}
+                  />
+                  <DashSelect
+                    label="Source"
+                    param="source"
+                    value={source ?? 'all'}
+                    options={Object.entries(SOURCE_LABEL).map(([value, text]) => ({
+                      value,
+                      label: text,
+                    }))}
+                  />
+                  <DashClear params={['q', 'tab', 'building', 'unit', 'source', 'selected']} />
                 </FilterRow>
                 <DataTable
                   caption="Reservations"
-                  isEmpty={rows.rows.length === 0}
+                  isEmpty={rows.length === 0}
                   empty="No reservations match. Clear the filters or widen the period."
                   head={[
                     'Booking Ref',
@@ -224,7 +312,7 @@ export default async function ReservationsPage({
                     'Source',
                   ]}
                 >
-                  {rows.rows.map((r) => (
+                  {rows.map((r) => (
                     <tr
                       key={r.stay_id}
                       className={r.stay_id === selected ? 'bg-[#FFFBF0]' : undefined}
@@ -270,10 +358,16 @@ export default async function ReservationsPage({
                 <Pagination
                   page={page}
                   size={PAGE_SIZE}
-                  total={rows.total}
+                  total={filtered.length}
                   noun="reservations"
                   href={(p) => href({ page: p > 1 ? String(p) : null })}
                 />
+                {all.total > FILTER_WINDOW && (
+                  <Footnote>
+                    Showing the latest {n(FILTER_WINDOW)} of {n(all.total)}: narrow the period or
+                    search to reach the rest.
+                  </Footnote>
+                )}
               </DashCard>
             </WithPanel>
           </>

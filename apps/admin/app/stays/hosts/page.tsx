@@ -2,9 +2,17 @@ import type { Metadata } from 'next';
 
 import { ConsoleShell } from '@/components/console-shell';
 import { DashCanvas } from '@/components/portal/dash';
-import { HOST_TAB_KEYS, HostsScreen } from '@/components/stays/hosts-screen';
+import { HOST_PANEL_TABS, HOST_TAB_KEYS, HostsScreen } from '@/components/stays/hosts-screen';
 import { ErrorNote, StaysHeader, WaitingForDatabase } from '@/components/stays/module';
-import { oneOf, PAGE_SIZE, pageOf, staysHref, uuidOrNull } from '@/lib/stays-module';
+import {
+  FILTER_WINDOW,
+  filterOf,
+  oneOf,
+  PAGE_SIZE,
+  pageOf,
+  staysHref,
+  uuidOrNull,
+} from '@/lib/stays-module';
 import { staysContext } from '@/lib/stays-server';
 
 export const metadata: Metadata = { title: 'Stays · Hosts' };
@@ -24,6 +32,10 @@ export default async function Page({
     q?: string;
     page?: string;
     selected?: string;
+    type?: string;
+    kyc?: string;
+    compliance?: string;
+    ptab?: string;
   };
 }) {
   const ctx = await staysContext(searchParams);
@@ -34,8 +46,8 @@ export default async function Page({
   const list = await ctx.read('rpc_console_stays_hosts', {
     p_tab: tab,
     p_q: q || null,
-    p_page: page,
-    p_size: PAGE_SIZE,
+    p_page: 1,
+    p_size: FILTER_WINDOW,
   });
 
   return (
@@ -65,6 +77,12 @@ export default async function Page({
             page={page}
             size={PAGE_SIZE}
             selected={uuidOrNull(searchParams?.selected)}
+            filters={{
+              type: filterOf(searchParams?.type),
+              kyc: filterOf(searchParams?.kyc),
+              compliance: filterOf(searchParams?.compliance),
+            }}
+            ptab={oneOf(HOST_PANEL_TABS, searchParams?.ptab, 'verification')}
             canDecide={ctx.staff.isSuperAdmin || ctx.staff.roles.some((r) => DECIDERS.includes(r))}
           />
         )}

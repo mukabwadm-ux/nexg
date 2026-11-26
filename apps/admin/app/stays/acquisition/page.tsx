@@ -9,6 +9,7 @@ import {
   Users,
 } from 'lucide-react';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 import { ShareDonut } from '@/components/charts';
 import { ConsoleShell } from '@/components/console-shell';
@@ -59,9 +60,13 @@ export const dynamic = 'force-dynamic';
 const TABS = [
   { key: 'all', label: 'Overview' },
   { key: 'host', label: 'Host Acquisition' },
-  { key: 'property_manager', label: 'Property Managers' },
-  { key: 'partner', label: 'Partners & Channels' },
+  { key: 'units', label: 'Unit Acquisition' },
   { key: 'referrals', label: 'Referrals' },
+  { key: 'partner', label: 'Partners & Channels' },
+  { key: 'property_manager', label: 'Property Managers' },
+  { key: 'campaigns', label: 'Campaigns' },
+  { key: 'leads', label: 'Leads' },
+  { key: 'funnel', label: 'Conversion Funnel' },
 ] as const;
 
 interface LeadRow {
@@ -112,7 +117,7 @@ export default async function AcquisitionPage({
       p_from: period.from,
       p_to: period.to,
       p_city: city,
-      p_tab: tab,
+      p_tab: ['units', 'campaigns', 'leads', 'funnel'].includes(tab) ? 'all' : tab,
       p_q: q || null,
       p_page: page,
       p_size: PAGE_SIZE,
@@ -167,7 +172,7 @@ export default async function AcquisitionPage({
           <ErrorNote message={list.error} />
         ) : (
           <>
-            <DashKpiGrid className="xl:grid-cols-7">
+            <DashKpiGrid className="xl:grid-cols-4 2xl:grid-cols-7">
               <DashKpi
                 featured
                 icon={Users}
@@ -226,10 +231,15 @@ export default async function AcquisitionPage({
                 tabs={TABS.map((t) => ({
                   key: t.key,
                   label: t.label,
-                  count: t.key === 'all' ? null : asNumber(counts[t.key]),
-                  href: staysHref('/stays/acquisition', period, city, {
-                    tab: t.key === 'all' ? null : t.key,
-                  }),
+                  count: ['host', 'property_manager', 'partner', 'referrals'].includes(t.key)
+                    ? asNumber(counts[t.key])
+                    : null,
+                  href:
+                    t.key === 'campaigns'
+                      ? staysHref('/stays/marketing', period, city, { tab: 'campaigns' })
+                      : staysHref('/stays/acquisition', period, city, {
+                          tab: t.key === 'all' ? null : t.key,
+                        }),
                 }))}
               />
             </DashCard>
@@ -329,7 +339,15 @@ export default async function AcquisitionPage({
                         <LeadStatusSelect leadId={r.id} status={r.status} />
                       </td>
                       <td>{r.assigned_name ?? '—'}</td>
-                      <td>{r.next_action ?? '—'}</td>
+                      <td>
+                        {r.next_action ? (
+                          <span className="inline-flex whitespace-nowrap rounded-lg border border-[#F5D27A] bg-[#FFFBF0] px-2 py-1 text-[0.8125rem] font-bold text-[#8A5C00]">
+                            {r.next_action}
+                          </span>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </DataTable>
@@ -343,7 +361,17 @@ export default async function AcquisitionPage({
               </DashCard>
 
               <div className="grid content-start gap-4">
-                <DashCard title="Referral Program">
+                <DashCard
+                  title="Referral Program"
+                  aside={
+                    <Link
+                      href="/hotels?tab=hosts"
+                      className="rounded-lg border border-[#1A1A1A] px-3 py-1.5 text-[0.8125rem] font-bold"
+                    >
+                      Manage Program
+                    </Link>
+                  }
+                >
                   <p className="text-muted mb-3 text-[0.875rem] font-semibold">
                     Hosts share their referral code; NexG rewards them when the host they referred
                     goes live.
