@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { paystackMode, paystackProof, refund, type PaystackMode } from '@/lib/paystack';
+import { loadPaystackKeys } from '@/lib/paystack-keys';
 
 import type { Rpc } from './service';
 
@@ -130,6 +131,7 @@ export async function refundCinemaHold(
 
   /* The second check, on this server: live money is refunded only with live
      Paystack switched on here. */
+  await loadPaystackKeys();
   if (!mayRefund(refundRow.mode)) {
     if (refundRow.mode === 'live')
       return {

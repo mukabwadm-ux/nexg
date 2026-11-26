@@ -3,10 +3,15 @@ import type { Metadata } from 'next';
 import { CheckoutForm } from '@/components/cart/checkout-form';
 import { SiteHeader } from '@/components/site-header';
 import { offers } from '@/lib/payment-methods';
+import { loadPaystackKeys } from '@/lib/paystack-keys';
 
 export const metadata: Metadata = { title: 'Checkout' };
 
-export default function CheckoutPage() {
+/* What can be paid with is read on each visit, never fixed at build time. */
+export const dynamic = 'force-dynamic';
+
+export default async function CheckoutPage() {
+  await loadPaystackKeys();
   return (
     <>
       <SiteHeader />

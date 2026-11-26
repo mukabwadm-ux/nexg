@@ -66412,6 +66412,7 @@ export type Database = {
         Args: { p_data: Json; p_event: string; p_mode: string; p_payload: Json };
         Returns: Json;
       };
+      fn_paystack_problem_actions: { Args: Record<PropertyKey, never>; Returns: string[] };
       fn_paystack_refund_answered_system: {
         Args: { p_answer: Json; p_reference: string };
         Returns: Json;
@@ -66419,6 +66420,10 @@ export type Database = {
       fn_paystack_refund_apply: {
         Args: { p_data: Json; p_mode: string; p_source: string };
         Returns: Json;
+      };
+      fn_paystack_refund_label: {
+        Args: { p_kind: string; p_payment_id: string; p_refund_id: string; p_stay_id: string };
+        Returns: string;
       };
       fn_paystack_transfer_apply: {
         Args: { p_data: Json; p_mode: string; p_source: string };
@@ -70068,6 +70073,15 @@ export type Database = {
       };
       rpc_fin_verify: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_finance_invoices: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_finance_nexg: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_finance_paystack_approvals: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_finance_paystack_payees: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_finance_paystack_problem_review: {
+        Args: { p_event_id: number; p_note?: string };
+        Returns: Json;
+      };
+      rpc_finance_paystack_problems: { Args: { p_limit?: number }; Returns: Json };
+      rpc_finance_paystack_refunds: { Args: { p_show?: string }; Returns: Json };
       rpc_finance_report_customers: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_finance_report_riders: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_finance_rider_payout_cancel: {
@@ -73637,6 +73651,9 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_paystack_key_remove: { Args: { p_mode: string; p_reason: string }; Returns: Json };
+      rpc_paystack_key_set: { Args: { p_mode: string; p_value: string }; Returns: Json };
+      rpc_paystack_key_status: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_paystack_refund_answered: {
         Args: { p_answer: string; p_proof: string; p_reference: string };
         Returns: Json;
@@ -73645,6 +73662,7 @@ export type Database = {
         Args: { p_kind: string; p_proof: string; p_target: string };
         Returns: Json;
       };
+      rpc_paystack_server_keys: { Args: { p_minute: number; p_proof: string }; Returns: Json };
       rpc_paystack_transfer_answered: {
         Args: { p_answer: string; p_proof: string; p_reference: string; p_step: string };
         Returns: Json;

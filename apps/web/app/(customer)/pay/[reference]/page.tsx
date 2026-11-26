@@ -72,6 +72,8 @@ export default async function PaymentReturn({ params }: { params: { reference: s
     }
   }
 
+  /* Bank only, which no Paystack key bears on, so none is loaded here. Offering
+     a Paystack method on this page needs loadPaystackKeys() first. */
   const bankEnabled = offers('bank_transfer');
 
   /* Pay-on-delivery orders have no payment yet: checkout sends the guest here

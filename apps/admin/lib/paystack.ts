@@ -1,11 +1,17 @@
 import 'server-only';
 
+import { paystackSecret } from '@/lib/paystack-keys';
+
 /**
  * Paystack, admin side: refunds only (Paystack slice 6, owner 22 Nov 2026).
  * Nothing here can take a payment, so a mistake in the console cannot charge
  * anybody. The same keys as the website, set by the owner on this app too:
  *   PAYSTACK_TEST_SECRET_KEY, and PAYSTACK_LIVE_SECRET_KEY for live payments.
  * A refund always goes out in the mode the payment came in on.
+ *
+ * With PAYSTACK_KEYS_TOKEN set, the keys come from Vault alone and those two
+ * variables are ignored (lib/paystack-keys.ts). Whatever reads a key here
+ * awaits loadPaystackKeys() first.
  */
 
 const BASE = 'https://api.paystack.co';
@@ -13,9 +19,7 @@ const BASE = 'https://api.paystack.co';
 export type PaystackMode = 'test' | 'live';
 
 function key(mode: PaystackMode): string | null {
-  const value = (
-    mode === 'live' ? process.env.PAYSTACK_LIVE_SECRET_KEY : process.env.PAYSTACK_TEST_SECRET_KEY
-  )?.trim();
+  const value = paystackSecret(mode)?.trim();
   if (!value) return null;
   if (mode === 'live' ? !value.startsWith('sk_live_') : !value.startsWith('sk_test_')) return null;
   return value;
@@ -38,7 +42,7 @@ export interface PaystackAnswer {
 async function call(
   mode: PaystackMode,
   path: string,
-  init: { method: 'GET' | 'POST'; body?: unknown },
+  init: { method: 'GET' | 'POST'; body?: unknown; unsent?: string },
 ): Promise<PaystackAnswer> {
   const secret = key(mode);
   if (!secret) return { answered: false, message: 'Paystack is not connected on the console.' };
@@ -63,7 +67,14 @@ async function call(
     }
     return { answered: true, status: response.status, raw, message };
   } catch {
-    return { answered: false, message: 'We could not reach Paystack. The refund is not sent yet.' };
+    /* A read sends nothing, so only a POST says what is not sent. */
+    return {
+      answered: false,
+      message:
+        init.method === 'GET'
+          ? 'We could not reach Paystack.'
+          : `We could not reach Paystack. ${init.unsent ?? 'Nothing is recorded as sent.'}`,
+    };
   }
 }
 
@@ -73,7 +84,7 @@ async function call(
  * move no money, and the database lets them go only to test payees.
  */
 export function payoutMode(): PaystackMode | null {
-  if (process.env.NEXG_PAYSTACK_LIVE === '1' && key('live')) return 'live';
+  if (process.env.NEXG_PAYSTACK_LIVE?.trim() === '1' && key('live')) return 'live';
   return key('test') ? 'test' : null;
 }
 
@@ -127,6 +138,7 @@ export function refund(
 ) {
   return call(mode, '/refund', {
     method: 'POST',
+    unsent: 'The refund is not sent yet.',
     body: {
       transaction: input.transaction,
       amount: input.amountCents,
@@ -139,4 +151,28 @@ export function refund(
 /** What Paystack says about a merchant's sub-account (GET /subaccount/:code). Read only. */
 export function fetchSubaccount(mode: PaystackMode, code: string) {
   return call(mode, `/subaccount/${encodeURIComponent(code)}`, { method: 'GET' });
+}
+
+/** NexG's Paystack balance, one entry per currency (GET /balance). Read only. */
+export function fetchBalance(mode: PaystackMode) {
+  return call(mode, '/balance', { method: 'GET' });
+}
+
+/**
+ * Settlements to NexG's own bank account (GET /settlement), a page at a time.
+ * `subaccount=none` leaves out what Paystack settles to merchants and hosts.
+ * Read only.
+ */
+export function fetchSettlements(
+  mode: PaystackMode,
+  input: { from: string; to: string; page: number; perPage: number },
+) {
+  const query = new URLSearchParams({
+    perPage: String(input.perPage),
+    page: String(input.page),
+    subaccount: 'none',
+    from: input.from,
+    to: input.to,
+  });
+  return call(mode, `/settlement?${query.toString()}`, { method: 'GET' });
 }

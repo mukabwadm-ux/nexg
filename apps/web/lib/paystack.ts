@@ -2,6 +2,8 @@ import 'server-only';
 
 import crypto from 'node:crypto';
 
+import { paystackSecret } from '@/lib/paystack-keys';
+
 /**
  * Paystack, server only (owner, 21 Nov 2026: one company Paystack account;
  * card, M-Pesa and Airtel Money all through it).
@@ -12,6 +14,10 @@ import crypto from 'node:crypto';
  * The same values sit in Supabase Vault (paystack_test_secret_key,
  * paystack_live_secret_key): the database accepts the key as proof that a
  * call comes from this server, and checks webhooks with it again.
+ *
+ * With PAYSTACK_KEYS_TOKEN set, the keys come from Vault alone and the two
+ * variables above are ignored (lib/paystack-keys.ts). Whatever reads a key
+ * here awaits loadPaystackKeys() first.
  *
  * Amounts are in the currency's smallest unit (KES cents), the unit the
  * order tables use, so nothing is converted here.
@@ -34,9 +40,7 @@ export interface PaystackResult<T> {
 }
 
 function key(mode: PaystackMode): string | null {
-  const value = (
-    mode === 'live' ? process.env.PAYSTACK_LIVE_SECRET_KEY : process.env.PAYSTACK_TEST_SECRET_KEY
-  )?.trim();
+  const value = paystackSecret(mode)?.trim();
   if (!value) return null;
   /* A key in the wrong slot is refused rather than used. */
   if (mode === 'live' ? !value.startsWith('sk_live_') : !value.startsWith('sk_test_')) return null;

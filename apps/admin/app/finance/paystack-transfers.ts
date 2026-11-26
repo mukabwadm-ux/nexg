@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { createMpesaRecipient, payoutMode, paystackProof, transfer } from '@/lib/paystack';
+import { loadPaystackKeys } from '@/lib/paystack-keys';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -79,6 +80,7 @@ async function sendThroughPaystack(
   requireModule(staff, 'finance');
   if (!UUID.test(sourceId)) return { ok: false, message: 'That request could not be found.' };
 
+  await loadPaystackKeys();
   const mode = payoutMode();
   const proof = mode ? paystackProof(mode) : null;
   if (!mode || !proof) return { ok: false, message: 'Paystack is unavailable at the moment.' };
