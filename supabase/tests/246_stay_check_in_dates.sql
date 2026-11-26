@@ -1,13 +1,13 @@
 -- Check-in follows the host's calendar day, and an early check-out frees the unit (20270328000200).
 --
 -- A confirmed stay can be checked in from its arrival date to the night before departure, whatever the
--- session's time zone. After a check-out the nights left over can be blocked, held, booked and searched
+-- session's time zone, from the workspace and with the reservation code alike. After a check-out the nights left over can be blocked, held, booked and searched
 -- again, the stay keeps its dates, and the unit list no longer shows the guest. A guest who is still
 -- checked in keeps the nights.
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(33);
+select plan(43);
 
 -- ─────────────────────────────────────────────────────────── fixtures
 
@@ -48,7 +48,7 @@ select ('f4630000-0000-4000-8000-0000000000' || n)::uuid,
        ('f4620000-0000-4000-8000-00000000000' || case when n in (31, 32) then 'b' else 'a' end)::uuid,
        'U' || n, 'U' || n, '[Address]', 'Kilimani', (select id from public.city where slug = 'nairobi'),
        'lockbox', 'live', true, 1, 2, 7000
-  from unnest(array[11,12,13,14,15,16,17,21,22,23,24,31,32,41,42,43]) n;
+  from unnest(array[11,12,13,14,15,16,17,21,22,23,24,31,32,41,42,43,51,52,53,54,55,56]) n;
 
 create temp table d as
 select (now() at time zone 'Africa/Nairobi')::date as today,
@@ -76,9 +76,26 @@ select ('f4640000-0000-4000-8000-0000000000' || v.n)::uuid, u.host_id, u.propert
     -- checked in with the session on Africa/Nairobi
     (21,  1, 2), (22,  0, 1), (23, -1, 0), (24, -2, -1),
     -- early check-out (41), and guests who stay checked in (43)
-    (41, -1, 4), (43, -1, 4)
+    (41, -1, 4), (43, -1, 4),
+    -- checked in with the reservation code
+    (51,  1, 2), (52,  0, 1), (53, -1, 0), (54, -2, -1), (55,  0, 2), (56, -1, 1)
   ) v(n, arrives, departs)
   join public.unit u on u.id = ('f4630000-0000-4000-8000-0000000000' || v.n)::uuid;
+
+/* Another booking on unit 55, from an earlier date, whose guest has not been checked out. */
+insert into public.stay (id, host_id, property_id, unit_id, guest_first_name, party_adults, party_children,
+                         check_in, check_out, source, status)
+select 'f4640000-0000-4000-8000-000000000057', u.host_id, u.property_id, u.id, 'G57', 1, 0,
+       (d.today - 2 + time '14:00') at time zone 'Africa/Nairobi',
+       (d.today + time '10:00') at time zone 'Africa/Nairobi',
+       'entered', 'in_stay'
+  from d, public.unit u where u.id = 'f4630000-0000-4000-8000-000000000055';
+
+/* The reservation codes of the stays checked in with one. */
+insert into public.reservation_code (stay_id, code)
+select ('f4640000-0000-4000-8000-0000000000' || v.n)::uuid, v.code
+  from (values (51, 'DAYSAA'), (52, 'DAYSBB'), (53, 'DAYSCC'), (54, 'DAYSDD'), (55, 'DAYSEE'),
+               (56, 'DAYSFF')) v(n, code);
 
 /* The far host: arriving today late in the evening, and tomorrow just after midnight, local time. */
 insert into public.stay (id, host_id, property_id, unit_id, guest_first_name, party_adults, party_children,
@@ -167,7 +184,42 @@ select throws_ok(
   (select 'The guest can be checked in from ' || to_char(far_today + 1, 'FMDD Mon YYYY') || '.' from d),
   'And not on the host''s day before, although that arrival falls on the earlier date in UTC.');
 
--- ══════════════════════════════════════════════ 4. an early check-out
+-- ══════════════════════════════════════════════ 4. the reservation code keeps the same days
+
+select is(
+  (select public.rpc_host_stay_check_in('DAYSAA') - 'ok'),
+  (select jsonb_build_object('reason', 'too_early',
+            'message', 'The guest can be checked in from ' || to_char(today + 1, 'FMDD Mon YYYY') || '.') from d),
+  'Code: a guest arriving tomorrow is not checked in today, and the answer names the arrival date.');
+select is(public.rpc_host_stay_check_in('DAYSBB') ->> 'ok', 'true',
+  'Code: a one-night stay is checked in on the arrival day.');
+select is(public.rpc_host_stay_check_in('DAYSCC') ->> 'reason', 'ended',
+  'Code: not on the departure day.');
+select is(public.rpc_host_stay_check_in('DAYSDD') ->> 'reason', 'ended',
+  'Code: nor on the day after.');
+select is(public.rpc_host_stay_check_in('DAYSFF') ->> 'ok', 'true',
+  'Code: and on the day between.');
+select is(public.rpc_host_stay_check_in('DAYSEE') ->> 'reason', 'unit_occupied',
+  'Code: not while another guest is still checked in to the unit.');
+
+reset role;
+select results_eq(
+  $$ select s.status, c.used_at is null from public.stay s
+       join public.reservation_code c on c.stay_id = s.id
+      where s.id in ('f4640000-0000-4000-8000-000000000051', 'f4640000-0000-4000-8000-000000000053',
+                     'f4640000-0000-4000-8000-000000000055')
+      order by s.id $$,
+  $$ values ('booked'::text, true), ('booked'::text, true), ('booked'::text, true) $$,
+  'A refused stay stays booked, and its code unused.');
+
+set local role authenticated;
+select is(
+  (select status from public.rpc_host_stay_mark_checked_out('f4640000-0000-4000-8000-000000000057')),
+  'departed', 'The earlier guest checks out.');
+select is(public.rpc_host_stay_check_in('DAYSEE') ->> 'ok', 'true',
+  'Code: then the arriving guest is checked in with the same code.');
+
+-- ══════════════════════════════════════════════ 5. an early check-out
 
 select is(
   (select count(*)::int from (
@@ -205,7 +257,7 @@ select results_eq(
   $$ values (false, false, null::text, true) $$,
   'The unit list no longer shows the guest who left.');
 
--- ══════════════════════════════════════════════ 5. the guest side of the freed nights
+-- ══════════════════════════════════════════════ 6. the guest side of the freed nights
 
 select set_config('request.jwt.claims',
   '{"sub":"f4600000-0000-4000-8000-000000000002","role":"authenticated"}', true);
@@ -239,7 +291,7 @@ select throws_ok(
   '23P01', 'Those dates are no longer available.',
   'And no guest can hold them.');
 
--- ══════════════════════════════════════════════ 6. the host side
+-- ══════════════════════════════════════════════ 7. the host side
 
 select set_config('request.jwt.claims',
   '{"sub":"f4600000-0000-4000-8000-000000000001","role":"authenticated"}', true);
@@ -249,11 +301,13 @@ select lives_ok(
        'f4630000-0000-4000-8000-000000000041', (select today + 1 from d), (select today + 2 from d)) $$,
   'The host can block a freed night.');
 create temp table held as
-select (public.rpc_stay_host_hold('f4610000-0000-4000-8000-00000000000a',
-          jsonb_build_object('unit_id', 'f4630000-0000-4000-8000-000000000041', 'guest_first_name', 'Held',
-            'check_in', (d.today + 2)::text || ' 14:00:00 Africa/Nairobi',
-            'check_out', (d.today + 3)::text || ' 10:00:00 Africa/Nairobi'), 24)).id
-  from d;
+select h.id, h.rate_kes
+  from d, public.rpc_stay_host_hold('f4610000-0000-4000-8000-00000000000a',
+         jsonb_build_object('unit_id', 'f4630000-0000-4000-8000-000000000041', 'guest_first_name', 'Held',
+           'rate_kes', 6500,
+           'check_in', (d.today + 2)::text || ' 14:00:00 Africa/Nairobi',
+           'check_out', (d.today + 3)::text || ' 10:00:00 Africa/Nairobi'), 24) h;
+select is((select rate_kes::int from held), 6500, 'A hold keeps its nightly rate.');
 select is(
   (select status from public.rpc_stay_confirm((select id from held))),
   'booked', 'The host can hold another and confirm it.');
