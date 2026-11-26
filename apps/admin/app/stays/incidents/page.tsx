@@ -67,6 +67,8 @@ const TABS = [
   { key: 'disputes', label: 'Disputes' },
   { key: 'claims', label: 'Claims & Refunds' },
   { key: 'escalations', label: 'Escalations' },
+  { key: 'sla', label: 'SLA & Performance' },
+  { key: 'policies', label: 'Policies & Rules' },
 ] as const;
 
 interface CaseRow {
@@ -182,7 +184,7 @@ export default async function IncidentsPage({
           <ErrorNote message={list.error} />
         ) : (
           <>
-            <DashKpiGrid className="xl:grid-cols-7">
+            <DashKpiGrid className="xl:grid-cols-4 2xl:grid-cols-7">
               <DashKpi
                 featured
                 icon={AlertTriangle}
@@ -416,6 +418,74 @@ export default async function IncidentsPage({
                   </DashCard>
                 </div>
               </>
+            ) : tab === 'sla' ? (
+              <div className="grid gap-4 xl:grid-cols-2">
+                <DashCard title="SLA Performance">
+                  <MeterRows
+                    empty="No cases to measure yet."
+                    rows={
+                      total === 0
+                        ? []
+                        : [
+                            {
+                              label: 'First Response (≤ 1 hr)',
+                              value: asMaybe(k.first_response_pct),
+                              text: pct(asMaybe(k.first_response_pct), 0),
+                            },
+                            {
+                              label: 'Resolution (≤ 24 hrs)',
+                              value: asMaybe(k.resolution_pct),
+                              text: pct(asMaybe(k.resolution_pct), 0),
+                            },
+                            {
+                              label: 'Escalation (≤ 4 hrs)',
+                              value: asMaybe(k.escalation_pct),
+                              text: pct(asMaybe(k.escalation_pct), 0),
+                            },
+                          ]
+                    }
+                  />
+                  <Footnote>
+                    The share of cases that met each target, of those that got that far.
+                  </Footnote>
+                </DashCard>
+                <DashCard title="Resolution">
+                  <Fact label="Avg. resolution time">
+                    {asMaybe(k.avg_resolution_h) == null
+                      ? '—'
+                      : `${asMaybe(k.avg_resolution_h)} hrs`}
+                  </Fact>
+                  <Fact label="Resolved">{n(asNumber(k.resolved))}</Fact>
+                  <Fact label="Still open">{n(asNumber(k.open) + asNumber(k.in_progress))}</Fact>
+                  <Fact label="Escalated">{n(asNumber(k.escalated))}</Fact>
+                </DashCard>
+              </div>
+            ) : tab === 'policies' ? (
+              <DashCard title="Policies & Rules">
+                <ul className="max-w-[48rem] space-y-3 text-[0.9375rem] leading-relaxed">
+                  <li>
+                    <b>Targets.</b> First response within 1 hour, resolution within 24 hours,
+                    escalation within 4 hours.
+                  </li>
+                  <li>
+                    <b>Priority.</b> Urgent and high cases go first; safety, access and no-hot-water
+                    problems for a guest in the unit are at least high.
+                  </li>
+                  <li>
+                    <b>Closing a case.</b> Resolving or closing needs a written resolution; every
+                    change is audited.
+                  </li>
+                  <li>
+                    <b>Refunds.</b> Money back to a guest goes through the refunds queue (Hotels ›
+                    Stay refunds), not the case itself.
+                  </li>
+                  <li>
+                    <b>Guest orders.</b> Problems with food, groceries or transfers are order
+                    disputes in Operations, not stay cases.
+                  </li>
+                </ul>
+                <Footnote>Stay cancellation terms are the presets on Payout rules.</Footnote>
+              </DashCard>
             ) : (
               <DashCard className="min-w-0">
                 <FilterRow>

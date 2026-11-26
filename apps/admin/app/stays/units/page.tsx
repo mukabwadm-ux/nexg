@@ -1,16 +1,26 @@
 import {
+  AirVent,
   BedDouble,
   Building2,
+  Car,
   CalendarCheck,
   CheckCircle2,
   Coins,
+  Dumbbell,
+  Home,
   Layers,
   LineChart,
   PauseCircle,
   Ruler,
+  Tv,
   Users,
+  UtensilsCrossed,
+  Waves,
+  Wifi,
+  type LucideIcon,
 } from 'lucide-react';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 import { ShareDonut } from '@/components/charts';
 import { ConsoleShell } from '@/components/console-shell';
@@ -22,8 +32,9 @@ import {
   GoldTabs,
   Pagination,
 } from '@/components/portal/dash';
-import { DashClear, DashSearch } from '@/components/portal/dash-filters';
+import { DashClear, DashSearch, DashSelect } from '@/components/portal/dash-filters';
 import { UnitControls } from '@/components/stays/client';
+import { PanelTabs } from '@/components/stays/extras';
 import {
   Chip,
   DataTable,
@@ -31,6 +42,7 @@ import {
   Fact,
   FilterRow,
   Footnote,
+  GoldLink,
   PanelHint,
   photoUrl,
   PlaceCell,
@@ -43,17 +55,22 @@ import {
   asMaybe,
   asNumber,
   asObject,
+  FILTER_WINDOW,
+  filterOf,
   kesCompact,
   kesFull,
   n,
   oneOf,
+  optionsFrom,
   PAGE_SIZE,
   pageOf,
+  pageSlice,
   paged,
   pct,
   shortDate,
   staysHref,
   uuidOrNull,
+  type StayRow,
 } from '@/lib/stays-module';
 import { staysContext } from '@/lib/stays-server';
 
@@ -68,6 +85,14 @@ const TABS = [
   { key: 'setting_up', label: 'Setting up' },
   { key: 'inactive', label: 'Inactive' },
 ] as const;
+
+const PANEL_TABS = [
+  { key: 'overview', label: 'Overview' },
+  { key: 'availability', label: 'Availability' },
+  { key: 'rates', label: 'Rates & Pricing' },
+  { key: 'bookings', label: 'Bookings' },
+  { key: 'history', label: 'History' },
+];
 
 interface UnitRow {
   unit_id: string;
@@ -97,6 +122,21 @@ interface UnitRow {
   occupancy_pct: number | null;
 }
 
+/** An amenity's icon in the designs' amenity row. */
+function amenityIcon(a: string): LucideIcon {
+  if (/wi-?fi|internet/i.test(a)) return Wifi;
+  if (/kitchen|cook/i.test(a)) return UtensilsCrossed;
+  if (/tv|netflix/i.test(a)) return Tv;
+  if (/a\/?c|air/i.test(a)) return AirVent;
+  if (/park/i.test(a)) return Car;
+  if (/pool|swim/i.test(a)) return Waves;
+  if (/gym|fitness/i.test(a)) return Dumbbell;
+  return Home;
+}
+
+const bedroomsText = (b: number | null) =>
+  b == null ? '—' : b === 0 ? 'Studio' : `${b} Bedroom${b === 1 ? '' : 's'}`;
+
 /** Stays → Accommodation Units: every unit, its rate and how full it was in the period. */
 export default async function UnitsPage({
   searchParams,
@@ -107,8 +147,11 @@ export default async function UnitsPage({
     city?: string;
     tab?: string;
     q?: string;
+    building?: string;
+    bedrooms?: string;
     page?: string;
     selected?: string;
+    ptab?: string;
   };
 }) {
   const ctx = await staysContext(searchParams);
@@ -119,8 +162,15 @@ export default async function UnitsPage({
     'all',
   );
   const q = (searchParams?.q ?? '').slice(0, 120);
+  const building = filterOf(searchParams?.building);
+  const bedrooms = filterOf(searchParams?.bedrooms);
   const page = pageOf(searchParams?.page);
   const selected = uuidOrNull(searchParams?.selected);
+  const ptab = oneOf(
+    PANEL_TABS.map((t) => t.key),
+    searchParams?.ptab,
+    'overview',
+  );
 
   const list = await ctx.read('rpc_console_stays_units', {
     p_from: period.from,
@@ -128,13 +178,20 @@ export default async function UnitsPage({
     p_city: city,
     p_tab: tab,
     p_q: q || null,
-    p_page: page,
-    p_size: PAGE_SIZE,
+    p_property: null,
+    p_page: 1,
+    p_size: FILTER_WINDOW,
   });
-  const rows = paged<UnitRow>(list.data);
+  const all = paged<UnitRow>(list.data);
   const k = asObject(asObject(list.data).kpis);
-  /* The selected unit: from this page, or read on its own when it is on another. */
-  let unit = rows.rows.find((r) => r.unit_id === selected) ?? null;
+  const filtered = all.rows.filter(
+    (r) =>
+      (!building || r.property_name === building) &&
+      (!bedrooms || String(r.bedrooms ?? '') === bedrooms),
+  );
+  const rows = pageSlice(filtered, page, PAGE_SIZE);
+  /* The selected unit: from this list, or read on its own when filtered out. */
+  let unit = all.rows.find((r) => r.unit_id === selected) ?? null;
   if (selected && !unit) {
     const one = await ctx.read('rpc_console_stays_units', {
       p_from: period.from,
@@ -142,15 +199,161 @@ export default async function UnitsPage({
       p_city: null,
       p_tab: 'all',
       p_q: null,
+      p_property: null,
       p_page: 1,
-      p_size: 500,
+      p_size: FILTER_WINDOW,
     });
     unit = paged<UnitRow>(one.data).rows.find((r) => r.unit_id === selected) ?? null;
   }
-  const keep = { tab: tab === 'all' ? null : tab, q: q || null };
+  const bookings =
+    unit && ptab === 'bookings'
+      ? paged<StayRow>(
+          (
+            await ctx.read('rpc_console_stays_list', {
+              p_from: period.from,
+              p_to: period.to,
+              p_city: null,
+              p_view: 'reservations',
+              p_tab: 'all',
+              p_q: unit.label,
+              p_page: 1,
+              p_size: 50,
+            })
+          ).data,
+        ).rows.filter((s) => s.unit_id === unit!.unit_id)
+      : [];
+  const keep = { tab: tab === 'all' ? null : tab, q: q || null, building, bedrooms };
   const href = (params: Record<string, string | null>) =>
     staysHref('/stays/units', period, city, { ...keep, ...params });
   const web = (process.env.NEXT_PUBLIC_WEB_ORIGIN ?? 'https://nexgapp.com').replace(/\/$/, '');
+
+  let panelBody: React.ReactNode = null;
+  if (unit) {
+    if (ptab === 'availability') {
+      panelBody = (
+        <>
+          <Fact label="Booked nights (period)">{n(unit.nights)}</Fact>
+          <Fact label="Blocked nights (period)">{n(unit.blocked_nights)}</Fact>
+          <Fact label="Occupancy (period)">{pct(unit.occupancy_pct)}</Fact>
+          <Link
+            className="mt-2 inline-block font-bold underline"
+            href={staysHref('/stays/availability', period, city, {
+              selected: unit.unit_id,
+              tab: 'calendar',
+            })}
+          >
+            Open the unit calendar
+          </Link>
+        </>
+      );
+    } else if (ptab === 'rates') {
+      panelBody = (
+        <>
+          <Fact label="Nightly Rate">{kesFull(unit.nightly_rate_kes)}</Fact>
+          <Fact label="Weekly Rate">
+            {unit.nightly_rate_kes ? `${kesFull(unit.nightly_rate_kes * 7)} (7 × nightly)` : '—'}
+          </Fact>
+          <Fact label="Monthly Rate">
+            {unit.nightly_rate_kes ? `${kesFull(unit.nightly_rate_kes * 30)} (30 × nightly)` : '—'}
+          </Fact>
+          <Footnote>
+            NexG keeps one nightly rate per unit; weekly and monthly are that rate times the nights.
+          </Footnote>
+        </>
+      );
+    } else if (ptab === 'bookings') {
+      panelBody =
+        bookings.length === 0 ? (
+          <p className="text-muted text-[0.875rem] font-semibold">No bookings in this period.</p>
+        ) : (
+          <ul>
+            {bookings.map((b) => (
+              <li
+                key={b.stay_id}
+                className="border-border flex justify-between gap-2 border-b py-1.5 text-[0.875rem] last:border-b-0"
+              >
+                <a
+                  className="font-semibold hover:underline"
+                  href={staysHref('/stays/reservations', period, city, { selected: b.stay_id })}
+                >
+                  {b.ref} · {b.guest_name}
+                </a>
+                <span className="text-muted whitespace-nowrap">
+                  {shortDate(b.check_in).slice(0, 6)} – {shortDate(b.check_out).slice(0, 6)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        );
+    } else if (ptab === 'history') {
+      panelBody = (
+        <p className="text-muted text-[0.875rem] font-semibold">
+          Listed {shortDate(unit.created_at)}. Rate changes, blocks and reviews are in the{' '}
+          <Link className="underline" href="/audit">
+            audit log
+          </Link>
+          .
+        </p>
+      );
+    } else {
+      panelBody = (
+        <div className="grid gap-4 2xl:grid-cols-2">
+          <div>
+            <h3 className="text-[0.9375rem] font-extrabold">Unit Information</h3>
+            <Fact icon={Layers} label="Unit ID">
+              {unit.unit_no ?? unit.label}
+            </Fact>
+            <Fact icon={Building2} label="Building">
+              {unit.property_name ?? '—'}
+            </Fact>
+            <Fact icon={BedDouble} label="Bedrooms">
+              {bedroomsText(unit.bedrooms)}
+            </Fact>
+            <Fact icon={Users} label="Max Guests">
+              {unit.max_guests ?? '—'}
+            </Fact>
+            <Fact icon={Layers} label="Floor">
+              {unit.floor ?? '—'}
+            </Fact>
+            <Fact icon={Ruler} label="Size">
+              {unit.size_sqm ? `${unit.size_sqm} m²` : '—'}
+            </Fact>
+            <Fact icon={CalendarCheck} label="Listed On">
+              {shortDate(unit.created_at)}
+            </Fact>
+          </div>
+          <div>
+            <h3 className="text-[0.9375rem] font-extrabold">Occupancy (period)</h3>
+            <ShareDonut
+              stacked
+              centre={pct(unit.occupancy_pct, 0)}
+              data={[
+                {
+                  key: 'occupied',
+                  label: `Occupied (${unit.nights} nights)`,
+                  value: unit.nights,
+                  color: '#F5A623',
+                },
+                {
+                  key: 'blocked',
+                  label: `Blocked (${unit.blocked_nights} nights)`,
+                  value: unit.blocked_nights,
+                  color: '#C9C4B8',
+                },
+              ]}
+            />
+            <Fact label="Nightly Rate">{kesFull(unit.nightly_rate_kes)}</Fact>
+            <Fact label="Weekly Rate">
+              {unit.nightly_rate_kes ? kesFull(unit.nightly_rate_kes * 7) : '—'}
+            </Fact>
+            <Fact label="Monthly Rate">
+              {unit.nightly_rate_kes ? kesFull(unit.nightly_rate_kes * 30) : '—'}
+            </Fact>
+          </div>
+        </div>
+      );
+    }
+  }
 
   return (
     <ConsoleShell staff={ctx.staff}>
@@ -162,17 +365,9 @@ export default async function UnitsPage({
         city={city}
         exportHref={staysHref('/stays/export', period, city, { report: 'units' })}
         action={
-          <a
-            href={`${web}/hosts`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="focus-visible:ring-gold inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-xl bg-gradient-to-b from-[#FFD24D] to-[#F5B400] px-4 text-[0.9375rem] font-bold text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2"
-          >
-            + Add Unit
-            <span className="sr-only">
-              (hosts add units in their workspace; opens the host page)
-            </span>
-          </a>
+          <GoldLink href={`${web}/hosts`} icon={Home} external>
+            Add Unit
+          </GoldLink>
         }
       />
       <DashCanvas>
@@ -187,25 +382,25 @@ export default async function UnitsPage({
                 featured
                 icon={BedDouble}
                 label="Total Units"
-                value={n(rows.counts.all ?? 0)}
+                value={n(all.counts.all ?? 0)}
                 explain="Units not archived."
               />
               <DashKpi
                 icon={CheckCircle2}
                 label="Active Units"
-                value={n(rows.counts.listed ?? 0)}
+                value={n(all.counts.listed ?? 0)}
                 explain="Live and listed: guests can book them."
               />
               <DashKpi
                 icon={PauseCircle}
                 label="Inactive Units"
-                value={n((rows.counts.inactive ?? 0) + (rows.counts.setting_up ?? 0))}
+                value={n((all.counts.inactive ?? 0) + (all.counts.setting_up ?? 0))}
                 explain="Paused, or still being set up by the host."
               />
               <DashKpi
                 icon={CalendarCheck}
                 label="Occupied Units"
-                value={n(rows.counts.occupied ?? 0)}
+                value={n(all.counts.occupied ?? 0)}
                 explain="A guest is checked in right now."
               />
               <DashKpi
@@ -238,64 +433,51 @@ export default async function UnitsPage({
                         className="mb-3 h-40 w-full rounded-xl object-cover"
                       />
                     )}
-                    <p className="text-muted mb-3 text-[0.875rem] font-semibold">
-                      {[unit.property_name, unit.area].filter(Boolean).join(', ') || 'No building'}
+                    <p className="text-muted mb-3 flex items-center justify-between gap-2 text-[0.875rem] font-semibold">
+                      <span>
+                        {[unit.property_name, unit.area].filter(Boolean).join(', ') ||
+                          'No building'}
+                      </span>
+                      {unit.property_id && (
+                        <Link
+                          href={`/hotels/properties/${unit.property_id}`}
+                          className="rounded-lg border border-[#F5D27A] bg-[#FFFBF0] px-3 py-1.5 text-[0.8125rem] font-bold text-[#8A5C00]"
+                        >
+                          Edit Unit
+                        </Link>
+                      )}
                     </p>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div>
-                        <h3 className="text-[0.9375rem] font-extrabold">Unit Information</h3>
-                        <Fact icon={Layers} label="Unit ID">
-                          {unit.unit_no ?? unit.label}
-                        </Fact>
-                        <Fact icon={Building2} label="Building">
-                          {unit.property_name ?? '—'}
-                        </Fact>
-                        <Fact icon={BedDouble} label="Bedrooms">
-                          {unit.bedrooms ?? '—'}
-                        </Fact>
-                        <Fact icon={Users} label="Max Guests">
-                          {unit.max_guests ?? '—'}
-                        </Fact>
-                        <Fact icon={Layers} label="Floor">
-                          {unit.floor ?? '—'}
-                        </Fact>
-                        <Fact icon={Ruler} label="Size">
-                          {unit.size_sqm ? `${unit.size_sqm} m²` : '—'}
-                        </Fact>
-                        <Fact icon={CalendarCheck} label="Listed On">
-                          {shortDate(unit.created_at)}
-                        </Fact>
-                      </div>
-                      <div>
-                        <h3 className="text-[0.9375rem] font-extrabold">Occupancy</h3>
-                        <ShareDonut
-                          stacked
-                          centre={pct(unit.occupancy_pct, 0)}
-                          data={[
-                            {
-                              key: 'occupied',
-                              label: `Occupied (${unit.nights} nights)`,
-                              value: unit.nights,
-                              color: '#F5A623',
-                            },
-                            {
-                              key: 'blocked',
-                              label: `Blocked (${unit.blocked_nights} nights)`,
-                              value: unit.blocked_nights,
-                              color: '#C9C4B8',
-                            },
-                          ]}
-                        />
-                        <Fact label="Nightly Rate">{kesFull(unit.nightly_rate_kes)}</Fact>
-                        <Fact label="Revenue (period)">{kesCompact(unit.revenue_kes)}</Fact>
-                      </div>
-                    </div>
-                    <h3 className="mt-3 text-[0.9375rem] font-extrabold">Amenities</h3>
-                    <p className="text-muted mb-3 text-[0.875rem] font-semibold">
-                      {(unit.unit_amenities ?? []).length > 0
-                        ? unit.unit_amenities!.join(' · ')
-                        : 'None listed.'}
-                    </p>
+                    <PanelTabs
+                      tabs={PANEL_TABS}
+                      active={ptab}
+                      href={(key) =>
+                        href({
+                          selected: unit!.unit_id,
+                          page: String(page),
+                          ptab: key === 'overview' ? null : key,
+                        })
+                      }
+                    />
+                    {panelBody}
+                    <h3 className="mt-4 text-[0.9375rem] font-extrabold">Amenities</h3>
+                    {(unit.unit_amenities ?? []).length > 0 ? (
+                      <ul className="my-2 flex flex-wrap gap-3">
+                        {unit.unit_amenities!.map((a) => {
+                          const I = amenityIcon(a);
+                          return (
+                            <li
+                              key={a}
+                              className="flex w-14 flex-col items-center gap-1 text-center text-[0.75rem] font-semibold"
+                            >
+                              <I aria-hidden="true" className="h-5 w-5 text-[#E5A800]" />
+                              {a}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p className="text-muted mb-3 text-[0.875rem] font-semibold">None listed.</p>
+                    )}
                     {unit.current_stay && (
                       <p className="mb-3 text-[0.875rem] font-semibold">
                         Occupied {shortDate(unit.current_stay.check_in)} –{' '}
@@ -312,16 +494,8 @@ export default async function UnitsPage({
                     )}
                     <UnitControls unitId={unit.unit_id} rate={unit.nightly_rate_kes} />
                     <Footnote>
-                      Hosts edit photos, amenities and house rules in their workspace; the property
-                      itself is reviewed on{' '}
-                      {unit.property_id ? (
-                        <a className="underline" href={`/hotels/properties/${unit.property_id}`}>
-                          its property page
-                        </a>
-                      ) : (
-                        'its property page'
-                      )}
-                      .
+                      Hosts edit photos, amenities and house rules in their workspace; Edit Unit
+                      opens the property review page.
                     </Footnote>
                   </SidePanel>
                 ) : (
@@ -337,10 +511,10 @@ export default async function UnitsPage({
                   tabs={TABS.map((t) => ({
                     key: t.key,
                     label: t.label,
-                    count: rows.counts[t.key] ?? 0,
+                    count: all.counts[t.key] ?? 0,
                     href: staysHref('/stays/units', period, city, {
+                      ...keep,
                       tab: t.key === 'all' ? null : t.key,
-                      q: q || null,
                     }),
                   }))}
                 />
@@ -350,11 +524,29 @@ export default async function UnitsPage({
                     label="Search units"
                     placeholder="Search unit by name, number, building or host…"
                   />
-                  <DashClear params={['q', 'tab', 'selected']} />
+                  <DashSelect
+                    label="Building"
+                    param="building"
+                    value={building ?? 'all'}
+                    options={optionsFrom(all.rows, (r) => r.property_name)}
+                  />
+                  <DashSelect
+                    label="Bedrooms"
+                    param="bedrooms"
+                    value={bedrooms ?? 'all'}
+                    options={[
+                      ...new Set(
+                        all.rows.map((r) => r.bedrooms).filter((b): b is number => b != null),
+                      ),
+                    ]
+                      .sort((a, b) => a - b)
+                      .map((b) => ({ value: String(b), label: bedroomsText(b) }))}
+                  />
+                  <DashClear params={['q', 'tab', 'building', 'bedrooms', 'selected']} />
                 </FilterRow>
                 <DataTable
                   caption="Accommodation units"
-                  isEmpty={rows.rows.length === 0}
+                  isEmpty={rows.length === 0}
                   empty="No units match."
                   head={[
                     'Unit',
@@ -367,7 +559,7 @@ export default async function UnitsPage({
                     'Occupancy',
                   ]}
                 >
-                  {rows.rows.map((r) => (
+                  {rows.map((r) => (
                     <tr
                       key={r.unit_id}
                       className={r.unit_id === selected ? 'bg-[#FFFBF0]' : undefined}
@@ -375,13 +567,7 @@ export default async function UnitsPage({
                       <td>
                         <PlaceCell
                           title={r.label}
-                          sub={
-                            r.bedrooms != null
-                              ? r.bedrooms === 0
-                                ? 'Studio'
-                                : `${r.bedrooms} Bedroom${r.bedrooms === 1 ? '' : 's'}`
-                              : undefined
-                          }
+                          sub={bedroomsText(r.bedrooms)}
                           photo={photoUrl(r.photo)}
                           href={href({ selected: r.unit_id, page: String(page) })}
                         />
@@ -392,7 +578,10 @@ export default async function UnitsPage({
                       </td>
                       <td>{r.host_name ?? '—'}</td>
                       <td className="text-center tabular-nums">{r.bedrooms ?? '—'}</td>
-                      <td className="text-center tabular-nums">{r.max_guests ?? '—'}</td>
+                      <td className="whitespace-nowrap text-center tabular-nums">
+                        <Users aria-hidden="true" className="mr-1 inline h-3.5 w-3.5" />
+                        {r.max_guests ?? '—'}
+                      </td>
                       <td className="whitespace-nowrap font-bold tabular-nums">
                         {kesFull(r.nightly_rate_kes)}
                       </td>
@@ -410,10 +599,13 @@ export default async function UnitsPage({
                 <Pagination
                   page={page}
                   size={PAGE_SIZE}
-                  total={rows.total}
+                  total={filtered.length}
                   noun="units"
                   href={(p) => href({ page: p > 1 ? String(p) : null })}
                 />
+                <Footnote>
+                  Revenue this period across these units: {kesCompact(asNumber(k.revenue_kes))}.
+                </Footnote>
               </DashCard>
             </WithPanel>
           </>

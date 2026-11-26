@@ -16,6 +16,7 @@ import * as React from 'react';
 import {
   approveHost,
   blockDates,
+  createReservation,
   checkInStay,
   checkOutStay,
   moderateReview,
@@ -920,5 +921,126 @@ export function SimpleAction({
     <Button type="button" variant="outline" disabled={busy} onClick={() => run(action)}>
       {text}
     </Button>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────── reservations */
+
+/** Create Reservation: a booking taken by phone, at the door or on another site. */
+export function CreateReservationButton({
+  units,
+}: {
+  units: { id: string; hostId: string; label: string; rate: number | null }[];
+}) {
+  const { run, busy } = useRunner();
+  const [open, setOpen] = React.useState(false);
+  const [form, setForm] = React.useState({
+    unitId: '',
+    checkIn: '',
+    checkOut: '',
+    guest: '',
+    phone: '',
+    adults: '1',
+    children: '0',
+    source: 'entered',
+    rate: '',
+  });
+  const set = (k: keyof typeof form) => (e: { target: { value: string } }) =>
+    setForm((f) => ({ ...f, [k]: e.target.value }));
+  const unit = units.find((u) => u.id === form.unitId);
+  return (
+    <>
+      <HeaderButton icon={PlusCircle} gold onClick={() => setOpen(true)}>
+        Create Reservation
+      </HeaderButton>
+      <FormPanel
+        open={open}
+        onOpenChange={setOpen}
+        title="Create a reservation"
+        subtitle="A booking taken outside NexG checkout. A clash with another booking is saved and flagged for the host, not refused. Guests paying online book on the site."
+        submitLabel="Create reservation"
+        busy={busy}
+        onSubmit={() =>
+          run(() =>
+            createReservation({
+              ...form,
+              hostId: unit?.hostId ?? '',
+              rate: form.rate || (unit?.rate ? String(unit.rate) : ''),
+            }),
+          )
+        }
+      >
+        <SelectField
+          label="Unit"
+          required
+          value={form.unitId}
+          onChange={set('unitId')}
+          placeholder="Choose a unit"
+          options={units.map((u) => ({ value: u.id, label: u.label }))}
+        />
+        <FieldRow>
+          <TextField
+            label="Check-in"
+            type="date"
+            required
+            value={form.checkIn}
+            onChange={set('checkIn')}
+          />
+          <TextField
+            label="Check-out"
+            type="date"
+            required
+            value={form.checkOut}
+            onChange={set('checkOut')}
+          />
+        </FieldRow>
+        <FieldRow>
+          <TextField
+            label="Guest first name"
+            required
+            value={form.guest}
+            onChange={set('guest')}
+            maxLength={80}
+          />
+          <TextField label="Phone" value={form.phone} onChange={set('phone')} />
+        </FieldRow>
+        <FieldRow>
+          <TextField
+            label="Adults"
+            inputMode="numeric"
+            value={form.adults}
+            onChange={set('adults')}
+          />
+          <TextField
+            label="Children"
+            inputMode="numeric"
+            value={form.children}
+            onChange={set('children')}
+          />
+        </FieldRow>
+        <FieldRow>
+          <SelectField
+            label="Source"
+            required
+            value={form.source}
+            onChange={set('source')}
+            options={[
+              { value: 'entered', label: 'Direct (phone / email)' },
+              { value: 'walk_in', label: 'Walk-in' },
+              { value: 'airbnb', label: 'Airbnb' },
+              { value: 'booking_com', label: 'Booking.com' },
+            ]}
+          />
+          <TextField
+            label="Rate per night (KES)"
+            inputMode="numeric"
+            value={form.rate}
+            onChange={set('rate')}
+            placeholder={unit?.rate ? String(unit.rate) : ''}
+            hint="Empty uses the unit's rate."
+          />
+        </FieldRow>
+      </FormPanel>
+    </>
   );
 }

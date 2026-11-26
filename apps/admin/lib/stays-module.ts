@@ -324,3 +324,23 @@ export const REPORTS = [
 ] as const;
 
 export type ReportKey = (typeof REPORTS)[number]['key'];
+
+/** One page of rows already filtered on the server page. */
+export function pageSlice<T>(rows: T[], page: number, size: number): T[] {
+  return rows.slice((page - 1) * size, page * size);
+}
+
+/** The distinct, sorted, non-empty values of one field, for a filter's options. */
+export function optionsFrom<T>(rows: T[], pick: (row: T) => string | null | undefined) {
+  return [...new Set(rows.map(pick).filter((v): v is string => !!v))]
+    .sort((a, b) => a.localeCompare(b))
+    .map((v) => ({ value: v, label: v }));
+}
+
+/** A filter's value from the address bar: null for "all" or nothing. */
+export function filterOf(value: string | undefined): string | null {
+  return value && value !== 'all' ? value.slice(0, 160) : null;
+}
+
+/** The most rows a screen reads at once when it filters on the page. */
+export const FILTER_WINDOW = 500;
