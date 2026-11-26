@@ -46,6 +46,10 @@ const holdView = z.object({
   status: z.enum(['held', 'booked', 'expired', 'cancelled', 'in_stay', 'departed']),
   paymentStatus: z.enum(['unpaid', 'pending', 'failed', 'paid']),
   refundDue: z.boolean(),
+  /* The money has gone back. Optional: a database before 20270328000100 omits both. */
+  refunded: z.boolean().optional(),
+  /* NexG cancelled the stay after booking it, as opposed to a lapsed hold or a late payment. */
+  cancelledAfterBooking: z.boolean().optional(),
   reference: z.string().min(1).max(128).optional(),
   providerPending: z.boolean().optional(),
 });

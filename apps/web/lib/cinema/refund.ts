@@ -56,7 +56,7 @@ export type CinemaRefundOutcome =
       message: string;
     }
   | {
-      /** Paystack refused (4xx). Its answer is recorded and the refund marked failed; not asked again this run. */
+      /** Paystack refused (a 4xx other than 401, 403, 409 and 429). Its answer is recorded and the refund marked failed; not asked again this run. */
       reference: string;
       outcome: 'refused';
       message: string;
@@ -152,8 +152,11 @@ export async function refundCinemaHold(
      again under the same reference. */
   if (!answer.ok && !answer.refused) throw new CinemaRefundError(answer.message, reference);
   /* A rate limit (429) or a key problem (401, 403) is not Paystack deciding
-     about this refund: record nothing, so it is asked again next run. */
-  if (!answer.ok && (answer.status === 429 || answer.status === 401 || answer.status === 403)) {
+     about this refund, and a reference already used (409) means Paystack may
+     have taken an earlier try, so it must not be marked failed. Record
+     nothing: the refund stays opened until Paystack's webhook or a later run
+     moves it. */
+  if (!answer.ok && [401, 403, 409, 429].includes(answer.status ?? 0)) {
     throw new CinemaRefundError(answer.message, reference);
   }
   if (!answer.raw) throw new CinemaRefundError(answer.message, reference);

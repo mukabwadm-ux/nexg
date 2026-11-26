@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Card, Input } from '@nexg/ui';
-import { CalendarCheck, Clock, Smartphone } from 'lucide-react';
+import { CalendarCheck, CalendarX, Clock, Smartphone } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -13,6 +13,7 @@ import {
   type CheckoutStatus,
 } from '@/app/(customer)/stays/[slug]/book/actions';
 import { ChargedInKesNote, ChargedPrice, Price } from '@/components/currency/price';
+import { createClient } from '@/lib/supabase/client';
 
 interface UnitOption {
   id: string;
@@ -23,6 +24,14 @@ interface UnitOption {
 }
 
 type Step = 'dates' | 'pay' | 'waiting' | 'done' | 'expired';
+
+/* What rpc_stay_checkout_status does not say about a cancelled stay, read from
+   the guest's own row (row-level security gives them no one else's). */
+interface Cancellation {
+  confirmed_at: string | null;
+  refunded_at: string | null;
+  refund_amount_kes: number | null;
+}
 
 const kes = (n: number) => `KES ${n.toLocaleString('en-KE')}`;
 
@@ -44,6 +53,41 @@ function longDate(day: string) {
     year: 'numeric',
     timeZone: 'UTC',
   });
+}
+
+/** What a guest is told about a cancelled stay that was booked, or paid for. */
+function cancelledNotice(status: CheckoutStatus, cancellation: Cancellation) {
+  const refunded = cancellation.refunded_at !== null;
+  const reference = status.paymentReference ? ` (${status.paymentReference})` : '';
+
+  /* Never booked: the payment came after the hold ran out and the dates had gone. */
+  if (cancellation.confirmed_at === null && status.refundDue) {
+    return {
+      heading: 'Your payment arrived late',
+      text:
+        'Your hold ran out before M-Pesa confirmed the payment, and the dates were taken in the ' +
+        'meantime. Nothing is booked. ' +
+        (refunded
+          ? `Your payment${reference} has been refunded in full.`
+          : `We have your payment${reference} and will refund it in full.`) +
+        ' Write to us from the help page if you would like other dates instead.',
+    };
+  }
+
+  const paid = status.paidKes ?? 0;
+  const back = cancellation.refund_amount_kes ?? paid;
+  const money = back < paid ? `${kes(back)} of the ${kes(paid)} you paid` : `Your ${kes(back)}`;
+  const outcome = refunded
+    ? `${money} has been refunded.`
+    : status.refundDue
+      ? `${money} is being refunded to the way you paid.`
+      : cancellation.refund_amount_kes === 0
+        ? 'No refund is due under the cancellation policy.'
+        : 'Write to us from the help page about your payment.';
+  return {
+    heading: 'This stay is cancelled',
+    text: cancellation.confirmed_at === null ? outcome : `NexG cancelled this stay. ${outcome}`,
+  };
 }
 
 /**
@@ -80,6 +124,7 @@ export function StayCheckout({
   const [step, setStep] = useState<Step>(initial.stayId ? 'waiting' : 'dates');
   const [stayId, setStayId] = useState(initial.stayId ?? '');
   const [status, setStatus] = useState<CheckoutStatus | null>(null);
+  const [cancellation, setCancellation] = useState<Cancellation | null>(null);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [busyAction, setBusyAction] = useState(false);
@@ -120,12 +165,25 @@ export function StayCheckout({
       setStep('dates');
       return;
     }
+    let cancelled: Cancellation | null = null;
+    if (next.status === 'cancelled') {
+      const { data } = await createClient()
+        .from('stay')
+        .select('confirmed_at, refunded_at, refund_amount_kes')
+        .eq('id', stayId)
+        .maybeSingle();
+      /* Unread, nothing is claimed either way: the next check asks again. */
+      if (!data) return;
+      cancelled = data;
+    }
+    setCancellation(cancelled);
     setStatus(next);
     setExpiresAt(next.holdExpiresAt);
     if (next.status === 'booked') setStep('done');
-    else if (next.status === 'expired' || (next.status === 'cancelled' && !next.refundDue))
-      setStep('expired');
-    else if (next.refundDue) setStep('done');
+    else if (cancelled) {
+      /* Only a hold that ended with nothing booked or paid "ran out". */
+      setStep(cancelled.confirmed_at || next.refundDue || next.paidKes ? 'done' : 'expired');
+    } else if (next.status === 'expired') setStep('expired');
     else if (next.paymentState === 'failed') {
       setError(
         next.paymentFailure
@@ -239,39 +297,37 @@ export function StayCheckout({
     </div>
   );
 
+  if (step === 'done' && status && cancellation) {
+    const notice = cancelledNotice(status, cancellation);
+    return (
+      <Card className="p-6">
+        <CalendarX aria-hidden="true" className="text-muted h-8 w-8" />
+        <h2 className="mt-3 text-[1.25rem] font-extrabold">{notice.heading}</h2>
+        <p className="text-muted mt-2 text-[0.875rem] font-semibold leading-[1.7]">{notice.text}</p>
+        <Button asChild variant="outline" className="mt-6">
+          <Link href="/stays">Back to stays</Link>
+        </Button>
+      </Card>
+    );
+  }
+
   if (step === 'done') {
     return (
       <Card className="p-6">
         <CalendarCheck aria-hidden="true" className="text-success h-8 w-8" />
-        {status?.refundDue ? (
-          <>
-            <h2 className="mt-3 text-[1.25rem] font-extrabold">Your payment arrived late</h2>
-            <p className="text-muted mt-2 text-[0.875rem] font-semibold leading-[1.7]">
-              Your hold ran out before M-Pesa confirmed the payment, and the dates were taken in the
-              meantime. Nothing is booked. We have your payment
-              {status.paymentReference ? ` (${status.paymentReference})` : ''} and will refund it in
-              full. Write to us from the help page if you would like other dates instead.
-            </p>
-          </>
-        ) : (
-          <>
-            <h2 className="mt-3 text-[1.25rem] font-extrabold">You are booked</h2>
-            <p className="text-muted mt-2 text-[0.875rem] font-semibold leading-[1.7]">
-              {status?.property} · {status?.unit}. Paid{' '}
-              {kes(status?.paidKes ?? status?.totalKes ?? 0)} by M-Pesa
-              {status?.paymentReference ? `, reference ${status.paymentReference}` : ''}. A
-              confirmation is on its way to your email, and your host will send the address and how
-              to get in before you arrive.
-            </p>
-          </>
-        )}
-        {status && !status.refundDue && summary}
+        <h2 className="mt-3 text-[1.25rem] font-extrabold">You are booked</h2>
+        <p className="text-muted mt-2 text-[0.875rem] font-semibold leading-[1.7]">
+          {status?.property} · {status?.unit}. Paid {kes(status?.paidKes ?? status?.totalKes ?? 0)}{' '}
+          by M-Pesa
+          {status?.paymentReference ? `, reference ${status.paymentReference}` : ''}. A confirmation
+          is on its way to your email, and your host will send the address and how to get in before
+          you arrive.
+        </p>
+        {status && summary}
         <div className="mt-6 flex flex-wrap gap-2">
-          {!status?.refundDue && (
-            <Button asChild>
-              <Link href="/account?tab=receipts">See your receipt</Link>
-            </Button>
-          )}
+          <Button asChild>
+            <Link href="/account?tab=receipts">See your receipt</Link>
+          </Button>
           <Button asChild variant="outline">
             <Link href="/stays">Back to stays</Link>
           </Button>

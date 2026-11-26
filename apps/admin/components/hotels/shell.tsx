@@ -45,7 +45,8 @@ export const TAB_TITLE: Record<string, { title: string; subtitle: string }> = {
   },
   refunds: {
     title: 'Stay refunds',
-    subtitle: 'Guests owed their money back for a stay · reverse in M-Pesa, record the reference',
+    subtitle:
+      'Cancel paid bookings and return guests’ money · Paystack refunds by button, others sent by M-Pesa or bank and recorded',
   },
   hotels: { title: 'Hotels', subtitle: 'Partner hotels, rooms and the prospect pipeline' },
   charge: {
