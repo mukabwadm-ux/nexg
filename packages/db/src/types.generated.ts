@@ -8607,6 +8607,130 @@ export type Database = {
         };
         Relationships: [];
       };
+      chat_report: {
+        Row: {
+          city_id: string | null;
+          context: string;
+          conversation_id: string;
+          created_at: string;
+          id: string;
+          member_removed: boolean;
+          message_id: string | null;
+          message_removed: boolean;
+          note: string | null;
+          reason: string;
+          reported_name: string;
+          reported_side: string;
+          reported_user_id: string | null;
+          reporter_user_id: string | null;
+          resolution_note: string | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          snapshot: NonNullable<Json>;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          city_id?: string | null;
+          context: string;
+          conversation_id: string;
+          created_at?: string;
+          id?: string;
+          member_removed?: boolean;
+          message_id?: string | null;
+          message_removed?: boolean;
+          note?: string | null;
+          reason: string;
+          reported_name: string;
+          reported_side: string;
+          reported_user_id?: string | null;
+          reporter_user_id?: string | null;
+          resolution_note?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          snapshot?: NonNullable<Json>;
+          status?: string;
+        };
+        Update: {
+          city_id?: string | null;
+          context?: string;
+          conversation_id?: string;
+          created_at?: string;
+          id?: string;
+          member_removed?: boolean;
+          message_id?: string | null;
+          message_removed?: boolean;
+          note?: string | null;
+          reason?: string;
+          reported_name?: string;
+          reported_side?: string;
+          reported_user_id?: string | null;
+          reporter_user_id?: string | null;
+          resolution_note?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          snapshot?: NonNullable<Json>;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'chat_report_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_conversation_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'chat_report_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_conversation';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'chat_report_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_inbox_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'chat_report_conversation_id_fkey';
+            columns: ['conversation_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_object_conversations_v';
+            referencedColumns: ['conversation_id'];
+          },
+          {
+            foreignKeyName: 'chat_report_message_id_fkey';
+            columns: ['message_id'];
+            isOneToOne: false;
+            referencedRelation: 'host_message_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'chat_report_message_id_fkey';
+            columns: ['message_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_message';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'chat_report_message_id_fkey';
+            columns: ['message_id'];
+            isOneToOne: false;
+            referencedRelation: 'msg_message_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'chat_report_resolved_by_fkey';
+            columns: ['resolved_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       city: {
         Row: {
           centre: unknown;
@@ -44271,7 +44395,7 @@ export type Database = {
         Row: {
           closed_at: string | null;
           created_at: string;
-          created_by: string;
+          created_by: string | null;
           id: string;
           invite_expires_at: string | null;
           invite_revoked_at: string | null;
@@ -44282,7 +44406,7 @@ export type Database = {
         Insert: {
           closed_at?: string | null;
           created_at?: string;
-          created_by: string;
+          created_by?: string | null;
           id: string;
           invite_expires_at?: string | null;
           invite_revoked_at?: string | null;
@@ -44292,7 +44416,7 @@ export type Database = {
         Update: {
           closed_at?: string | null;
           created_at?: string;
-          created_by?: string;
+          created_by?: string | null;
           id?: string;
           invite_expires_at?: string | null;
           invite_revoked_at?: string | null;
@@ -44749,6 +44873,28 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      user_block: {
+        Row: {
+          blocked_name: string;
+          blocked_user_id: string;
+          blocker_user_id: string;
+          created_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          blocked_name: string;
+          blocked_user_id: string;
+          blocker_user_id: string;
+          created_at?: string;
+        };
+        Update: {
+          blocked_name?: string;
+          blocked_user_id?: string;
+          blocker_user_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
       };
       user_notification: {
         Row: {
@@ -67130,6 +67276,30 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_chat_block: { Args: { p_group_id: string; p_user_id: string }; Returns: Json };
+      rpc_chat_blocked: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_chat_report: {
+        Args: {
+          p_message_id?: string;
+          p_note?: string;
+          p_reason: string;
+          p_thread_id: string;
+          p_user_id?: string;
+        };
+        Returns: Json;
+      };
+      rpc_chat_report_resolve: {
+        Args: {
+          p_note?: string;
+          p_outcome: string;
+          p_remove_member?: boolean;
+          p_remove_message?: boolean;
+          p_report_id: string;
+        };
+        Returns: Json;
+      };
+      rpc_chat_reports: { Args: { p_limit?: number; p_status?: string }; Returns: Json };
+      rpc_chat_unblock: { Args: { p_user_id: string }; Returns: Json };
       rpc_cinema_bookings_for_merchant: {
         Args: { p_limit?: number; p_merchant_id: string };
         Returns: Json;

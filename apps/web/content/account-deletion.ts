@@ -1,7 +1,7 @@
 /*
  * What happens when a customer deletes their NexG account, shown on
  * /account/delete. Word for word the lists the database gives the app
- * (rpc_my_account_deletion, 20270116000200_customer_account_deletion);
+ * (rpc_my_account_deletion, last defined in 20270327000200_chat_report_block_and_deletion);
  * account-deletion.test.ts keeps the two the same.
  */
 
@@ -21,6 +21,8 @@ export const KEPT_AFTER_DELETION = [
   'Receipts and payment records, for 7 years as Kenyan tax law requires, with your name, phone and addresses removed',
   'Reviews you wrote, shown without your name',
   'Support conversations, without your sign-in',
+  'Messages you sent in trip groups and stay chats, shown as from a former member. Trip groups you run are closed',
+  'Safety reports you sent, or that were sent about your messages',
 ];
 
 export const DELETION_REQUEST_MAILTO = `mailto:${PRIVACY_EMAIL}?subject=${encodeURIComponent(
