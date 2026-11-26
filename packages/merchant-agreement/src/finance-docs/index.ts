@@ -17,3 +17,4 @@ export {
   type TaxInvoiceLine,
   type TaxInvoiceVatRate,
 } from './tax-invoice';
+export { renderTableReport, type TableCell, type TableReportDocument } from './table-report';
