@@ -18,7 +18,7 @@ import type { Metadata } from 'next';
 
 import { ShareDonut } from '@/components/charts';
 import { ConsoleShell } from '@/components/console-shell';
-import { DashCanvas, DashCard, DashKpi, DashKpiGrid } from '@/components/portal/dash';
+import { DashCanvas, DashCard, DashKpi, DashKpiGrid, GoldTabs } from '@/components/portal/dash';
 import { BarLineChart } from '@/components/stays/charts';
 import {
   DataTable,
@@ -40,6 +40,7 @@ import {
   label,
   monthShort,
   n,
+  oneOf,
   pct,
   plainDelta,
   ppDelta,
@@ -47,6 +48,7 @@ import {
   SOURCE_LABEL,
   staysHref,
 } from '@/lib/stays-module';
+import { PERFORMANCE_TABS, PerformanceView } from '@/components/stays/tab-views';
 import { staysContext } from '@/lib/stays-server';
 
 export const metadata: Metadata = { title: 'Stays · Performance & Analytics' };
@@ -100,9 +102,14 @@ const pctChange = (now: number | null, before: number | null) => {
 export default async function PerformancePage({
   searchParams,
 }: {
-  searchParams?: { from?: string; to?: string; city?: string };
+  searchParams?: { from?: string; to?: string; city?: string; view?: string };
 }) {
   const ctx = await staysContext(searchParams);
+  const view = oneOf(
+    PERFORMANCE_TABS.map((t) => t.key),
+    searchParams?.view,
+    'overview',
+  );
   const { period, city } = ctx;
   const data = await ctx.read('rpc_console_stays_performance', {
     p_from: period.from,
@@ -218,255 +225,277 @@ export default async function PerformancePage({
                 explain="Stars on the period's stays."
               />
             </DashKpiGrid>
-
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,0.9fr)]">
-              <DashCard title="Bookings & Revenue Trend">
-                {trend.every((t) => asNumber(t.bookings) === 0) ? (
-                  <Empty>No bookings in the last six months.</Empty>
-                ) : (
-                  <BarLineChart
-                    data={trend.map((t) => ({
-                      month: t.month,
-                      bar: asNumber(t.bookings),
-                      line: asNumber(t.value_kes),
-                    }))}
-                    bar={{ label: 'Bookings' }}
-                    line={{ label: 'Booking Value', kes: true }}
-                  />
-                )}
-              </DashCard>
-              <DashCard title="Key Performance Indicators">
-                <ul>
-                  <KpiLine
-                    icon={TrendingUp}
-                    label="RevPAR (per available unit)"
-                    value={kesFull(asMaybe(k.revpar))}
-                    change={pctChange(asMaybe(k.revpar), asMaybe(k.revpar_prev))}
-                  />
-                  <KpiLine
-                    icon={Coins}
-                    label="ADR (Average Daily Rate)"
-                    value={kesFull(asMaybe(k.adr))}
-                    change={pctChange(asMaybe(k.adr), asMaybe(k.adr_prev))}
-                  />
-                  <KpiLine
-                    icon={Moon}
-                    label="Avg. Length of Stay"
-                    value={asMaybe(k.avg_nights) == null ? '—' : `${asMaybe(k.avg_nights)} nights`}
-                    change={pctChange(asMaybe(k.avg_nights), asMaybe(k.avg_nights_prev))}
-                  />
-                  <KpiLine
-                    icon={XCircle}
-                    label="Cancellation Rate"
-                    value={pct(asMaybe(k.cancel_pct))}
-                    change={ppDelta(asMaybe(k.cancel_pct), asMaybe(k.cancel_prev_pct))}
-                  />
-                  <KpiLine
-                    icon={Repeat}
-                    label="Repeat Guest Rate"
-                    value={pct(asMaybe(k.repeat_pct))}
-                  />
-                  <KpiLine
-                    icon={Smile}
-                    label="Guest Satisfaction (4–5★)"
-                    value={pct(asMaybe(k.satisfaction_pct))}
-                  />
-                </ul>
-                <Footnote>
-                  Repeat guests are matched by the name on the booking, so this is approximate.
-                </Footnote>
-              </DashCard>
-              <DashCard title="Occupancy Rate">
-                <ShareDonut
-                  stacked
-                  centre={pct(asMaybe(k.occupancy_pct))}
-                  data={[
-                    {
-                      key: 'occ',
-                      label: 'Booked nights',
-                      value: asMaybe(k.occupancy_pct) ?? 0,
-                      color: '#F5A623',
-                    },
-                    {
-                      key: 'free',
-                      label: 'Free nights',
-                      value: Math.max(0, 100 - (asMaybe(k.occupancy_pct) ?? 0)),
-                      color: '#EFEDE8',
-                    },
-                  ]}
-                />
-              </DashCard>
-              <DashCard title="Guest Ratings Overview">
-                <p className="mb-3 text-[1.5rem] font-extrabold">
-                  <span className="text-[#F5B400]">★</span>{' '}
-                  {asMaybe(k.rating) == null ? '—' : asMaybe(k.rating)!.toFixed(1)} / 5
-                  <span className="text-muted ml-2 text-[0.875rem] font-semibold">
-                    ({n(ratings)} reviews)
-                  </span>
-                </p>
-                <MeterRows
-                  empty="No ratings yet."
-                  rows={
-                    ratings === 0
-                      ? []
-                      : stars.map((s) => ({
-                          label: `${s.stars} ★`,
-                          value: shareOf(
-                            asNumber(s.n),
-                            Math.max(
-                              1,
-                              stars.reduce((a, b) => a + asNumber(b.n), 0),
-                            ),
-                          ),
-                          text: pct(
-                            shareOf(
-                              asNumber(s.n),
-                              Math.max(
-                                1,
-                                stars.reduce((a, b) => a + asNumber(b.n), 0),
+            <DashCard>
+              <GoldTabs
+                label="Performance"
+                active={view}
+                tabs={PERFORMANCE_TABS.map((t) => ({
+                  key: t.key,
+                  label: t.label,
+                  href: staysHref('/stays/performance', period, city, {
+                    view: t.key === 'overview' ? null : t.key,
+                  }),
+                }))}
+              />
+            </DashCard>
+            {view === 'overview' ? (
+              <>
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,0.9fr)]">
+                  <DashCard title="Bookings & Revenue Trend">
+                    {trend.every((t) => asNumber(t.bookings) === 0) ? (
+                      <Empty>No bookings in the last six months.</Empty>
+                    ) : (
+                      <BarLineChart
+                        data={trend.map((t) => ({
+                          month: t.month,
+                          bar: asNumber(t.bookings),
+                          line: asNumber(t.value_kes),
+                        }))}
+                        bar={{ label: 'Bookings' }}
+                        line={{ label: 'Booking Value', kes: true }}
+                      />
+                    )}
+                  </DashCard>
+                  <DashCard title="Key Performance Indicators">
+                    <ul>
+                      <KpiLine
+                        icon={TrendingUp}
+                        label="RevPAR (per available unit)"
+                        value={kesFull(asMaybe(k.revpar))}
+                        change={pctChange(asMaybe(k.revpar), asMaybe(k.revpar_prev))}
+                      />
+                      <KpiLine
+                        icon={Coins}
+                        label="ADR (Average Daily Rate)"
+                        value={kesFull(asMaybe(k.adr))}
+                        change={pctChange(asMaybe(k.adr), asMaybe(k.adr_prev))}
+                      />
+                      <KpiLine
+                        icon={Moon}
+                        label="Avg. Length of Stay"
+                        value={
+                          asMaybe(k.avg_nights) == null ? '—' : `${asMaybe(k.avg_nights)} nights`
+                        }
+                        change={pctChange(asMaybe(k.avg_nights), asMaybe(k.avg_nights_prev))}
+                      />
+                      <KpiLine
+                        icon={XCircle}
+                        label="Cancellation Rate"
+                        value={pct(asMaybe(k.cancel_pct))}
+                        change={ppDelta(asMaybe(k.cancel_pct), asMaybe(k.cancel_prev_pct))}
+                      />
+                      <KpiLine
+                        icon={Repeat}
+                        label="Repeat Guest Rate"
+                        value={pct(asMaybe(k.repeat_pct))}
+                      />
+                      <KpiLine
+                        icon={Smile}
+                        label="Guest Satisfaction (4–5★)"
+                        value={pct(asMaybe(k.satisfaction_pct))}
+                      />
+                    </ul>
+                    <Footnote>
+                      Repeat guests are matched by the name on the booking, so this is approximate.
+                    </Footnote>
+                  </DashCard>
+                  <DashCard title="Occupancy Rate">
+                    <ShareDonut
+                      stacked
+                      centre={pct(asMaybe(k.occupancy_pct))}
+                      data={[
+                        {
+                          key: 'occ',
+                          label: 'Booked nights',
+                          value: asMaybe(k.occupancy_pct) ?? 0,
+                          color: '#F5A623',
+                        },
+                        {
+                          key: 'free',
+                          label: 'Free nights',
+                          value: Math.max(0, 100 - (asMaybe(k.occupancy_pct) ?? 0)),
+                          color: '#EFEDE8',
+                        },
+                      ]}
+                    />
+                  </DashCard>
+                  <DashCard title="Guest Ratings Overview">
+                    <p className="mb-3 text-[1.5rem] font-extrabold">
+                      <span className="text-[#F5B400]">★</span>{' '}
+                      {asMaybe(k.rating) == null ? '—' : asMaybe(k.rating)!.toFixed(1)} / 5
+                      <span className="text-muted ml-2 text-[0.875rem] font-semibold">
+                        ({n(ratings)} reviews)
+                      </span>
+                    </p>
+                    <MeterRows
+                      empty="No ratings yet."
+                      rows={
+                        ratings === 0
+                          ? []
+                          : stars.map((s) => ({
+                              label: `${s.stars} ★`,
+                              value: shareOf(
+                                asNumber(s.n),
+                                Math.max(
+                                  1,
+                                  stars.reduce((a, b) => a + asNumber(b.n), 0),
+                                ),
                               ),
-                            ),
-                            0,
-                          ),
-                          tone: 'gold' as const,
-                        }))
-                  }
-                />
-              </DashCard>
-            </div>
-
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)]">
-              <DashCard title="Performance by Area (Top 5)">
-                <DataTable
-                  caption="Performance by area"
-                  isEmpty={areas.length === 0}
-                  empty="No bookings in this period."
-                  head={['Area', 'Bookings', 'Occupancy', 'Booking Value', 'Commission']}
-                >
-                  {areas.map((a) => (
-                    <tr key={a.area}>
-                      <td className="font-semibold">{a.area}</td>
-                      <td className="tabular-nums">{n(a.bookings)}</td>
-                      <td className="tabular-nums">{pct(a.occupancy_pct)}</td>
-                      <td className="tabular-nums">{kesCompact(a.value_kes)}</td>
-                      <td className="tabular-nums">{kesCompact(a.commission_kes)}</td>
-                    </tr>
-                  ))}
-                </DataTable>
-              </DashCard>
-              <DashCard title="Top Performing Properties">
-                <DataTable
-                  caption="Top performing properties"
-                  isEmpty={top.length === 0}
-                  empty="No bookings in this period."
-                  head={['Property', 'Occ.', 'ADR', 'Revenue']}
-                >
-                  {top.map((t) => (
-                    <tr key={t.property_id}>
-                      <td>
-                        <span className="block font-bold">{t.name}</span>
-                        <span className="text-muted text-[0.8125rem]">
-                          {n(t.units)} units{t.area ? ` · ${t.area}` : ''}
-                        </span>
-                      </td>
-                      <td className="tabular-nums">{pct(t.occupancy_pct, 0)}</td>
-                      <td className="whitespace-nowrap tabular-nums">{kesFull(t.adr)}</td>
-                      <td className="whitespace-nowrap tabular-nums">{kesCompact(t.value_kes)}</td>
-                    </tr>
-                  ))}
-                </DataTable>
-              </DashCard>
-              <DashCard title="Guest Segments">
-                {bookings === 0 ? (
-                  <Empty>No bookings in this period.</Empty>
-                ) : (
-                  <ShareDonut
-                    centre={n(bookings)}
-                    caption="Bookings"
-                    data={segments.map((s, i) => ({
-                      key: s.key,
-                      label: `${s.label} ${pct(shareOf(s.value, bookings), 0)}`,
-                      value: s.value,
-                      color: PALETTE[i],
-                    }))}
-                  />
-                )}
-              </DashCard>
-            </div>
-
-            <div className="grid gap-4 xl:grid-cols-3">
-              <DashCard title="Channel Performance">
-                <ShareBars
-                  empty="No bookings in this period."
-                  rows={channels.map((c) => ({
-                    label: label(SOURCE_LABEL, c.source),
-                    value: asNumber(c.n),
-                    text: pct(shareOf(asNumber(c.n), channelTotal), 0),
-                  }))}
-                />
-              </DashCard>
-              <DashCard title="Host & Property Performance">
-                <div className="grid grid-cols-2 gap-2 text-center">
-                  {[
-                    [Users, 'Active Hosts', n(asNumber(k.active_hosts))],
-                    [Building2, 'Property Managers', n(asNumber(k.managers))],
-                    [
-                      Star,
-                      'Avg. Host Rating',
-                      asMaybe(k.host_rating) == null
-                        ? '—'
-                        : `${asMaybe(k.host_rating)!.toFixed(1)} / 5`,
-                    ],
-                    [BedDouble, 'Active Units', n(asNumber(k.active_units))],
-                  ].map(([Icon, t, v]) => {
-                    const I = Icon as typeof Users;
-                    return (
-                      <div key={String(t)} className="rounded-xl bg-[#FFFBF0] p-3">
-                        <I aria-hidden="true" className="mx-auto h-5 w-5 text-[#E5A800]" />
-                        <p className="text-[1.0625rem] font-extrabold">{String(v)}</p>
-                        <p className="text-muted text-[0.75rem] font-semibold">{String(t)}</p>
-                      </div>
-                    );
-                  })}
+                              text: pct(
+                                shareOf(
+                                  asNumber(s.n),
+                                  Math.max(
+                                    1,
+                                    stars.reduce((a, b) => a + asNumber(b.n), 0),
+                                  ),
+                                ),
+                                0,
+                              ),
+                              tone: 'gold' as const,
+                            }))
+                      }
+                    />
+                  </DashCard>
                 </div>
-              </DashCard>
-              <DashCard title="Booked Ahead (Next 3 Months)">
-                <DataTable
-                  caption="Booked ahead"
-                  isEmpty={false}
-                  empty=""
-                  head={['Metric', ...ahead.map((a) => monthShort(a.month))]}
-                >
-                  <tr>
-                    <td className="font-semibold">Bookings</td>
-                    {ahead.map((a) => (
-                      <td key={a.month} className="tabular-nums">
-                        {n(a.bookings)}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="font-semibold">Booking Value</td>
-                    {ahead.map((a) => (
-                      <td key={a.month} className="tabular-nums">
-                        {kesCompact(a.value_kes)}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="font-semibold">NexG Commission</td>
-                    {ahead.map((a) => (
-                      <td key={a.month} className="tabular-nums">
-                        {kesCompact(a.commission_kes)}
-                      </td>
-                    ))}
-                  </tr>
-                </DataTable>
-                <Footnote>
-                  Confirmed stays already booked for those months, not a forecast.
-                </Footnote>
-              </DashCard>
-            </div>
+
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)]">
+                  <DashCard title="Performance by Area (Top 5)">
+                    <DataTable
+                      caption="Performance by area"
+                      isEmpty={areas.length === 0}
+                      empty="No bookings in this period."
+                      head={['Area', 'Bookings', 'Occupancy', 'Booking Value', 'Commission']}
+                    >
+                      {areas.map((a) => (
+                        <tr key={a.area}>
+                          <td className="font-semibold">{a.area}</td>
+                          <td className="tabular-nums">{n(a.bookings)}</td>
+                          <td className="tabular-nums">{pct(a.occupancy_pct)}</td>
+                          <td className="tabular-nums">{kesCompact(a.value_kes)}</td>
+                          <td className="tabular-nums">{kesCompact(a.commission_kes)}</td>
+                        </tr>
+                      ))}
+                    </DataTable>
+                  </DashCard>
+                  <DashCard title="Top Performing Properties">
+                    <DataTable
+                      caption="Top performing properties"
+                      isEmpty={top.length === 0}
+                      empty="No bookings in this period."
+                      head={['Property', 'Occ.', 'ADR', 'Revenue']}
+                    >
+                      {top.map((t) => (
+                        <tr key={t.property_id}>
+                          <td>
+                            <span className="block font-bold">{t.name}</span>
+                            <span className="text-muted text-[0.8125rem]">
+                              {n(t.units)} units{t.area ? ` · ${t.area}` : ''}
+                            </span>
+                          </td>
+                          <td className="tabular-nums">{pct(t.occupancy_pct, 0)}</td>
+                          <td className="whitespace-nowrap tabular-nums">{kesFull(t.adr)}</td>
+                          <td className="whitespace-nowrap tabular-nums">
+                            {kesCompact(t.value_kes)}
+                          </td>
+                        </tr>
+                      ))}
+                    </DataTable>
+                  </DashCard>
+                  <DashCard title="Guest Segments">
+                    {bookings === 0 ? (
+                      <Empty>No bookings in this period.</Empty>
+                    ) : (
+                      <ShareDonut
+                        centre={n(bookings)}
+                        caption="Bookings"
+                        data={segments.map((s, i) => ({
+                          key: s.key,
+                          label: `${s.label} ${pct(shareOf(s.value, bookings), 0)}`,
+                          value: s.value,
+                          color: PALETTE[i],
+                        }))}
+                      />
+                    )}
+                  </DashCard>
+                </div>
+
+                <div className="grid gap-4 xl:grid-cols-3">
+                  <DashCard title="Channel Performance">
+                    <ShareBars
+                      empty="No bookings in this period."
+                      rows={channels.map((c) => ({
+                        label: label(SOURCE_LABEL, c.source),
+                        value: asNumber(c.n),
+                        text: pct(shareOf(asNumber(c.n), channelTotal), 0),
+                      }))}
+                    />
+                  </DashCard>
+                  <DashCard title="Host & Property Performance">
+                    <div className="grid grid-cols-2 gap-2 text-center">
+                      {[
+                        [Users, 'Active Hosts', n(asNumber(k.active_hosts))],
+                        [Building2, 'Property Managers', n(asNumber(k.managers))],
+                        [
+                          Star,
+                          'Avg. Host Rating',
+                          asMaybe(k.host_rating) == null
+                            ? '—'
+                            : `${asMaybe(k.host_rating)!.toFixed(1)} / 5`,
+                        ],
+                        [BedDouble, 'Active Units', n(asNumber(k.active_units))],
+                      ].map(([Icon, t, v]) => {
+                        const I = Icon as typeof Users;
+                        return (
+                          <div key={String(t)} className="rounded-xl bg-[#FFFBF0] p-3">
+                            <I aria-hidden="true" className="mx-auto h-5 w-5 text-[#E5A800]" />
+                            <p className="text-[1.0625rem] font-extrabold">{String(v)}</p>
+                            <p className="text-muted text-[0.75rem] font-semibold">{String(t)}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </DashCard>
+                  <DashCard title="Booked Ahead (Next 3 Months)">
+                    <DataTable
+                      caption="Booked ahead"
+                      isEmpty={false}
+                      empty=""
+                      head={['Metric', ...ahead.map((a) => monthShort(a.month))]}
+                    >
+                      <tr>
+                        <td className="font-semibold">Bookings</td>
+                        {ahead.map((a) => (
+                          <td key={a.month} className="tabular-nums">
+                            {n(a.bookings)}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <td className="font-semibold">Booking Value</td>
+                        {ahead.map((a) => (
+                          <td key={a.month} className="tabular-nums">
+                            {kesCompact(a.value_kes)}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <td className="font-semibold">NexG Commission</td>
+                        {ahead.map((a) => (
+                          <td key={a.month} className="tabular-nums">
+                            {kesCompact(a.commission_kes)}
+                          </td>
+                        ))}
+                      </tr>
+                    </DataTable>
+                    <Footnote>
+                      Confirmed stays already booked for those months, not a forecast.
+                    </Footnote>
+                  </DashCard>
+                </div>
+              </>
+            ) : (
+              <PerformanceView view={view} data={data.data} />
+            )}
           </>
         )}
       </DashCanvas>

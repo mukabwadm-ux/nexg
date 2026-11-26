@@ -237,3 +237,51 @@ export async function setPropertyManager(propertyId: string, managerId: string):
     UUID.test(managerId) ? 'Building linked to the partner.' : 'Partner removed from the building.',
   );
 }
+
+/* ─────────────────────────────────────────────────────────── reservations */
+
+/**
+ * Enter a booking taken outside NexG checkout (a call, a walk-in, Airbnb,
+ * Booking.com) through the hosts' own rpc_stay_upsert, which hospitality
+ * staff may call: it locks the unit and flags a clash rather than refusing.
+ */
+export async function createReservation(input: {
+  unitId: string;
+  hostId: string;
+  checkIn: string;
+  checkOut: string;
+  guest: string;
+  phone: string;
+  adults: string;
+  children: string;
+  source: string;
+  rate: string;
+}): Promise<Outcome> {
+  if (!UUID.test(input.unitId) || !UUID.test(input.hostId))
+    return { ok: false, message: 'Pick a unit.' };
+  if (!DAY.test(input.checkIn) || !DAY.test(input.checkOut))
+    return { ok: false, message: 'Pick the check-in and check-out days.' };
+  if (input.checkOut <= input.checkIn)
+    return { ok: false, message: 'Check-out has to be after check-in.' };
+  if (!['entered', 'walk_in', 'airbnb', 'booking_com'].includes(input.source))
+    return { ok: false, message: 'Pick where the booking came from.' };
+  const rate = input.rate.trim() ? Math.round(Number(input.rate.replace(/[,\s]/g, ''))) : null;
+  return call(
+    'rpc_stay_upsert',
+    {
+      p_host_id: input.hostId,
+      p_stay: {
+        unit_id: input.unitId,
+        check_in: `${input.checkIn}T14:00:00+03:00`,
+        check_out: `${input.checkOut}T11:00:00+03:00`,
+        guest_first_name: input.guest.trim(),
+        phone: input.phone.trim(),
+        party_adults: input.adults || '1',
+        party_children: input.children || '0',
+        source: input.source,
+        rate_kes: rate != null && Number.isFinite(rate) ? String(rate) : '',
+      },
+    },
+    'Reservation entered.',
+  );
+}

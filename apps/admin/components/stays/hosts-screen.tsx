@@ -10,12 +10,16 @@ import {
   ShieldCheck,
   Users,
   XCircle,
+  Download,
+  Flag,
+  RefreshCw,
 } from 'lucide-react';
 import Link from 'next/link';
 
 import { DashCard, DashKpi, DashKpiGrid, GoldTabs, Pagination } from '@/components/portal/dash';
-import { DashClear, DashSearch } from '@/components/portal/dash-filters';
+import { DashClear, DashSearch, DashSelect } from '@/components/portal/dash-filters';
 import { HostDecision } from '@/components/stays/client';
+import { PanelTabs, QuickTiles } from '@/components/stays/extras';
 import {
   Chip,
   DataTable,
@@ -85,9 +89,20 @@ const VERIFY_TABS = [
   { key: 'verified', label: 'Verified' },
   { key: 'pending', label: 'Pending' },
   { key: 'non_compliant', label: 'Non-Compliant' },
+  { key: 'expiring', label: 'Expiring' },
   { key: 'sent_back', label: 'Sent Back' },
   { key: 'flagged', label: 'Risk / Flagged' },
 ] as const;
+
+const PANEL_TABS = [
+  { key: 'verification', label: 'Verification' },
+  { key: 'compliance', label: 'Compliance' },
+  { key: 'documents', label: 'Documents' },
+  { key: 'history', label: 'History' },
+  { key: 'notes', label: 'Notes' },
+];
+
+export const HOST_PANEL_TABS = PANEL_TABS.map((t) => t.key);
 
 export const HOST_TAB_KEYS = [...new Set([...HOSTS_TABS, ...VERIFY_TABS].map((t) => t.key))];
 
@@ -127,8 +142,11 @@ export function HostsScreen({
   size,
   selected,
   canDecide,
+  filters,
+  ptab,
 }: {
   variant: 'hosts' | 'verification';
+  /** Every host the reader returned for the tab (up to 500); filtered and paged here. */
   data: unknown;
   period: Period;
   city: string | null;
@@ -138,17 +156,42 @@ export function HostsScreen({
   size: number;
   selected: string | null;
   canDecide: boolean;
+  filters: { type: string | null; kyc: string | null; compliance: string | null };
+  ptab: string;
 }) {
   const o = asObject(data);
   const counts = asObject(o.counts);
   const k = asObject(o.kpis);
-  const rows = (Array.isArray(o.rows) ? o.rows : []) as HostRow[];
-  const total = asNumber(o.total);
-  const host = rows.find((r) => r.host_id === selected) ?? null;
+  const allRows = (Array.isArray(o.rows) ? o.rows : []) as HostRow[];
+  const compliant = (r: HostRow) => r.id_ok && r.authority_ok;
+  const filtered =
+    tab === 'expiring'
+      ? []
+      : allRows.filter(
+          (r) =>
+            (!filters.type || r.kind === filters.type) &&
+            (!filters.kyc ||
+              (filters.kyc === 'verified'
+                ? r.id_ok
+                : filters.kyc === 'rejected'
+                  ? r.docs_rejected > 0
+                  : !r.id_ok)) &&
+            (!filters.compliance ||
+              (filters.compliance === 'compliant' ? compliant(r) : !compliant(r))),
+        );
+  const rows = filtered.slice((page - 1) * size, page * size);
+  const total = filtered.length;
+  const host = allRows.find((r) => r.host_id === selected) ?? null;
   const path = variant === 'hosts' ? '/stays/hosts' : '/stays/verification';
   const tabs = variant === 'hosts' ? HOSTS_TABS : VERIFY_TABS;
   const all = asNumber(counts.all);
-  const keep = { tab: tab === 'all' ? null : tab, q: q || null };
+  const keep = {
+    tab: tab === 'all' ? null : tab,
+    q: q || null,
+    type: filters.type,
+    kyc: filters.kyc,
+    compliance: filters.compliance,
+  };
   const href = (params: Record<string, string | null>) =>
     staysHref(path, period, city, { ...keep, ...params });
 
@@ -263,48 +306,140 @@ export function HostsScreen({
                 sub={label(HOST_KIND_LABEL, host.kind)}
               />
               <div className="mt-3">
-                {host.phone && (
-                  <Fact icon={Phone} label="Phone">
-                    {host.phone}
+                <PanelTabs
+                  tabs={PANEL_TABS}
+                  active={ptab}
+                  href={(key) =>
+                    href({
+                      selected: host.host_id,
+                      page: String(page),
+                      ptab: key === 'verification' ? null : key,
+                    })
+                  }
+                />
+              </div>
+              {ptab === 'documents' ? (
+                <>
+                  <Fact icon={FileCheck2} label="Documents approved">
+                    {host.docs_approved} of {Math.max(host.docs_uploaded, 2)}
                   </Fact>
-                )}
-                {host.email && (
-                  <Fact icon={Mail} label="Email">
-                    {host.email}
+                  <Fact icon={XCircle} label="Documents rejected">
+                    {host.docs_rejected}
                   </Fact>
-                )}
-                <Fact icon={Building2} label="Properties / Units">
-                  {n(host.properties)} / {n(host.units)}
-                </Fact>
-                <Fact icon={Clock} label="Registered">
-                  {shortDate(host.created_at)}
-                </Fact>
-                <Fact icon={Clock} label="Submitted">
-                  {shortDate(host.submitted_at)}
-                </Fact>
-                {host.verified_at && (
+                  <Link
+                    className="mt-2 inline-block font-bold underline"
+                    href={`/hotels/hosts/${host.host_id}/verify`}
+                  >
+                    Open the documents to review them
+                  </Link>
+                </>
+              ) : ptab === 'compliance' ? (
+                <>
+                  <Fact label="Compliance">
+                    <Chip
+                      status={
+                        compliant(host)
+                          ? 'verified'
+                          : host.status === 'live'
+                            ? 'flagged'
+                            : 'under_review'
+                      }
+                      text={
+                        compliant(host)
+                          ? 'Compliant'
+                          : host.status === 'live'
+                            ? 'Non-compliant'
+                            : 'Under Review'
+                      }
+                    />
+                  </Fact>
+                  <Fact label="Open incidents / disputes">{n(host.open_cases)}</Fact>
+                  <Fact label="Payout details">
+                    {host.payout_ok ? 'Verified by Finance' : 'Not verified'}
+                  </Fact>
+                  <p className="text-muted mt-2 text-[0.8125rem] font-semibold">
+                    {compliant(host)
+                      ? 'All required checks completed.'
+                      : 'ID and proof of authority must both be approved.'}
+                  </p>
+                </>
+              ) : ptab === 'history' ? (
+                <>
+                  <Fact icon={Clock} label="Registered">
+                    {shortDate(host.created_at)}
+                  </Fact>
+                  <Fact icon={Clock} label="Submitted">
+                    {shortDate(host.submitted_at)}
+                  </Fact>
                   <Fact icon={BadgeCheck} label="Verified">
                     {shortDate(host.verified_at)}
                   </Fact>
-                )}
-              </div>
-              <h3 className="mt-3 text-[0.9375rem] font-extrabold">Verification Checklist</h3>
-              <ul className="mt-1">
-                <Check ok={host.id_ok} label="Identity (ID / passport)" />
-                <Check ok={host.authority_ok} label="Property ownership / authority" />
-                <Check ok={host.kra_ok} label="Tax (KRA PIN)" />
-                <Check ok={host.payout_ok} label="Payout details verified" />
-              </ul>
-              {host.status_reason && (
-                <p className="mt-3 rounded-lg bg-[#FFF4D6] p-3 text-[0.8125rem] font-semibold text-[#8A5C00]">
-                  Reason given: {host.status_reason}
+                  <Fact icon={BadgeCheck} label="Went live">
+                    {shortDate(host.went_live_at)}
+                  </Fact>
+                  <Fact icon={XCircle} label="Last sent back / declined">
+                    {shortDate(host.rejected_at)}
+                  </Fact>
+                </>
+              ) : ptab === 'notes' ? (
+                <p className="text-muted text-[0.875rem] font-semibold">
+                  {host.status_reason
+                    ? `Reason given to the host: ${host.status_reason}`
+                    : 'No reason or note recorded.'}{' '}
+                  Every decision is in the{' '}
+                  <Link className="underline" href="/audit">
+                    audit log
+                  </Link>
+                  .
                 </p>
-              )}
-              {host.open_cases > 0 && (
-                <p className="mt-2 text-[0.8125rem] font-semibold text-[#C62D22]">
-                  {n(host.open_cases)} open incident{host.open_cases === 1 ? '' : 's'} or dispute
-                  {host.open_cases === 1 ? '' : 's'}.
-                </p>
+              ) : (
+                <>
+                  <div className="mt-1">
+                    {host.phone && (
+                      <Fact icon={Phone} label="Phone">
+                        {host.phone}
+                      </Fact>
+                    )}
+                    {host.email && (
+                      <Fact icon={Mail} label="Email">
+                        {host.email}
+                      </Fact>
+                    )}
+                    <Fact icon={Building2} label="Properties / Units">
+                      {n(host.properties)} / {n(host.units)}
+                    </Fact>
+                    <Fact icon={Clock} label="Registered">
+                      {shortDate(host.created_at)}
+                    </Fact>
+                    <Fact icon={Clock} label="Submitted">
+                      {shortDate(host.submitted_at)}
+                    </Fact>
+                    {host.verified_at && (
+                      <Fact icon={BadgeCheck} label="Verified">
+                        {shortDate(host.verified_at)}
+                      </Fact>
+                    )}
+                  </div>
+                  <h3 className="mt-3 text-[0.9375rem] font-extrabold">Verification Checklist</h3>
+                  <ul className="mt-1">
+                    <Check ok={host.id_ok} label="Identity (ID / passport)" />
+                    <Check ok={host.authority_ok} label="Property ownership / authority" />
+                    <Check ok={host.kra_ok} label="Tax (KRA PIN)" />
+                    <Check ok={host.payout_ok} label="Payout details verified" />
+                  </ul>
+                  {host.status_reason && (
+                    <p className="mt-3 rounded-lg bg-[#FFF4D6] p-3 text-[0.8125rem] font-semibold text-[#8A5C00]">
+                      Reason given: {host.status_reason}
+                    </p>
+                  )}
+                  {host.open_cases > 0 && (
+                    <p className="mt-2 text-[0.8125rem] font-semibold text-[#C62D22]">
+                      {n(host.open_cases)} open incident{host.open_cases === 1 ? '' : 's'} or
+                      dispute
+                      {host.open_cases === 1 ? '' : 's'}.
+                    </p>
+                  )}
+                </>
               )}
               <div className="mt-4">
                 {canDecide && (host.status === 'applied' || host.status === 'verifying') ? (
@@ -323,10 +458,36 @@ export function HostsScreen({
                   </p>
                 )}
               </div>
+              <div className="mt-3">
+                <QuickTiles
+                  cols={3}
+                  tiles={[
+                    {
+                      label: 'Re-verify',
+                      icon: RefreshCw,
+                      href: `/hotels/hosts/${host.host_id}/verify`,
+                    },
+                    {
+                      label: 'Download Pack',
+                      icon: Download,
+                      unavailable:
+                        'A single download of all the host’s documents is not built yet; open them on the verification page.',
+                    },
+                    host.status === 'applied' || host.status === 'verifying'
+                      ? {
+                          label: 'Report / Flag',
+                          icon: Flag,
+                          href: href({ selected: host.host_id, ptab: 'notes' }),
+                        }
+                      : {
+                          label: 'Report / Flag',
+                          icon: Flag,
+                          href: staysHref('/stays/incidents', period, city, {}),
+                        },
+                  ]}
+                />
+              </div>
               <div className="mt-3 flex flex-wrap gap-3 text-[0.875rem] font-bold">
-                <Link className="underline" href={`/hotels/hosts/${host.host_id}/verify`}>
-                  Documents
-                </Link>
                 <Link className="underline" href={`/hotels?tab=hosts&selected=${host.host_id}`}>
                   Payouts & commission
                 </Link>
@@ -358,12 +519,46 @@ export function HostsScreen({
               label="Search hosts"
               placeholder="Search by host, property, phone or email…"
             />
-            <DashClear params={['q', 'tab', 'selected']} />
+            <DashSelect
+              label="Type"
+              param="type"
+              value={filters.type ?? 'all'}
+              options={Object.entries(HOST_KIND_LABEL).map(([value, text]) => ({
+                value,
+                label: text,
+              }))}
+            />
+            <DashSelect
+              label="Verification"
+              param="kyc"
+              value={filters.kyc ?? 'all'}
+              options={[
+                { value: 'verified', label: 'Verified' },
+                { value: 'pending', label: 'Pending' },
+                { value: 'rejected', label: 'Rejected' },
+              ]}
+            />
+            <DashSelect
+              label="Compliance"
+              param="compliance"
+              value={filters.compliance ?? 'all'}
+              options={[
+                { value: 'compliant', label: 'Compliant' },
+                { value: 'not', label: 'Not compliant' },
+              ]}
+            />
+            <DashClear params={['q', 'tab', 'type', 'kyc', 'compliance', 'selected']} />
           </FilterRow>
           <DataTable
             caption="Hosts"
             isEmpty={rows.length === 0}
-            empty={tab === 'pending' ? 'No host is waiting for approval.' : 'No hosts match.'}
+            empty={
+              tab === 'expiring'
+                ? 'Host documents carry no expiry date yet, so nothing is shown as expiring.'
+                : tab === 'pending'
+                  ? 'No host is waiting for approval.'
+                  : 'No hosts match.'
+            }
             head={
               variant === 'hosts'
                 ? [

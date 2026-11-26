@@ -1,11 +1,29 @@
-import { BedDouble, CalendarCheck, Coins, Layers, Moon } from 'lucide-react';
+import {
+  BedDouble,
+  CalendarCheck,
+  CalendarDays,
+  CalendarSync,
+  Coins,
+  Copy,
+  Layers,
+  Moon,
+  Sun,
+} from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { ConsoleShell } from '@/components/console-shell';
-import { DashCanvas, DashCard, DashKpi, DashKpiGrid, Pagination } from '@/components/portal/dash';
-import { DashClear, DashSearch } from '@/components/portal/dash-filters';
+import {
+  DashCanvas,
+  DashCard,
+  DashKpi,
+  DashKpiGrid,
+  GoldTabs,
+  Pagination,
+} from '@/components/portal/dash';
+import { DashClear, DashSearch, DashSelect } from '@/components/portal/dash-filters';
 import { UnitControls, UpdateAvailabilityButton } from '@/components/stays/client';
+import { NotYet, PanelLinks, PanelTabs, QuickTiles } from '@/components/stays/extras';
 import {
   DataTable,
   ErrorNote,
@@ -25,11 +43,15 @@ import {
   asMaybe,
   asNumber,
   asObject,
+  filterOf,
   kesCompact,
   kesFull,
   n,
+  oneOf,
+  optionsFrom,
   PAGE_SIZE,
   pageOf,
+  pageSlice,
   staysHref,
   uuidOrNull,
 } from '@/lib/stays-module';
@@ -37,6 +59,23 @@ import { staysContext } from '@/lib/stays-server';
 
 export const metadata: Metadata = { title: 'Stays · Availability & Rates' };
 export const dynamic = 'force-dynamic';
+
+const TABS = [
+  { key: 'rates', label: 'Availability & Rates' },
+  { key: 'calendar', label: 'Unit Calendar' },
+  { key: 'plans', label: 'Rate Plans' },
+  { key: 'seasonal', label: 'Seasonal Pricing' },
+  { key: 'restrictions', label: 'Restrictions' },
+  { key: 'bulk', label: 'Bulk Update' },
+  { key: 'rules', label: 'Rate Rules' },
+] as const;
+
+const PANEL_TABS = [
+  { key: 'rates', label: 'Rates & Plans' },
+  { key: 'availability', label: 'Availability' },
+  { key: 'restrictions', label: 'Restrictions' },
+  { key: 'history', label: 'History' },
+];
 
 interface CalendarRow {
   unit_id: string;
@@ -64,6 +103,12 @@ const CELL_LABEL: Record<string, string> = {
   hold: 'Hold',
   blocked: 'Blocked',
 };
+const LEGEND: Record<string, string> = {
+  available: 'Available',
+  booked: 'Booked',
+  hold: 'Hold (Pending)',
+  blocked: 'Blocked / Unavailable',
+};
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const shift = (iso: string, days: number) =>
@@ -75,11 +120,14 @@ const dayHead = (iso: string) => {
     date: d.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' }),
   };
 };
+const bedroomsText = (b: number | null) =>
+  b == null ? '—' : b === 0 ? 'Studio' : `${b} Bedroom${b === 1 ? '' : 's'}`;
 
 /**
  * Stays → Availability & Rates: a week of each live unit, booked, held,
- * blocked or free, at its nightly rate. Blocking dates and changing a rate
- * are on the unit's panel and in Update Availability.
+ * blocked or free, at its nightly rate; a four-week view of one unit; and
+ * the bulk tools. NexG keeps one nightly rate per unit, so rate plans,
+ * seasonal pricing, restrictions and rate rules say so rather than invent.
  */
 export default async function AvailabilityPage({
   searchParams,
@@ -88,48 +136,343 @@ export default async function AvailabilityPage({
     from?: string;
     to?: string;
     city?: string;
+    tab?: string;
     start?: string;
     q?: string;
+    building?: string;
+    type?: string;
     page?: string;
     selected?: string;
+    ptab?: string;
   };
 }) {
   const ctx = await staysContext(searchParams);
   const { period, city } = ctx;
+  const tab = oneOf(
+    TABS.map((t) => t.key),
+    searchParams?.tab,
+    'rates',
+  );
   const start =
     searchParams?.start && DAY.test(searchParams.start) ? searchParams.start : todayInNairobi();
   const q = (searchParams?.q ?? '').slice(0, 120);
+  const building = filterOf(searchParams?.building);
+  const type = filterOf(searchParams?.type);
   const page = pageOf(searchParams?.page);
   const selected = uuidOrNull(searchParams?.selected);
+  const ptab = oneOf(
+    PANEL_TABS.map((t) => t.key),
+    searchParams?.ptab,
+    'rates',
+  );
 
-  const [cal, all] = await Promise.all([
-    ctx.read('rpc_console_stays_calendar', {
-      p_start: start,
-      p_city: city,
-      p_q: q || null,
-      p_page: page,
-      p_size: PAGE_SIZE,
-    }),
-    ctx.read('rpc_console_stays_calendar', {
-      p_start: start,
-      p_city: city,
-      p_q: null,
-      p_page: 1,
-      p_size: 100,
-    }),
-  ]);
+  const cal = await ctx.read('rpc_console_stays_calendar', {
+    p_start: start,
+    p_city: city,
+    p_q: q || null,
+    p_page: 1,
+    p_size: 100,
+  });
   const o = asObject(cal.data);
   const k = asObject(o.kpis);
   const days = (Array.isArray(o.days) ? o.days : []) as string[];
-  const rows = (Array.isArray(o.rows) ? o.rows : []) as CalendarRow[];
-  const allRows = (
-    Array.isArray(asObject(all.data).rows) ? asObject(all.data).rows : []
-  ) as CalendarRow[];
-  const unit =
-    rows.find((r) => r.unit_id === selected) ?? allRows.find((r) => r.unit_id === selected) ?? null;
-  const keep = { start: searchParams?.start ?? null, q: q || null };
+  const allRows = (Array.isArray(o.rows) ? o.rows : []) as CalendarRow[];
+  const filtered = allRows.filter(
+    (r) =>
+      (!building || r.property_name === building) && (!type || String(r.bedrooms ?? '') === type),
+  );
+  const rows = pageSlice(filtered, page, PAGE_SIZE);
+  const unit = allRows.find((r) => r.unit_id === selected) ?? null;
+
+  /* The Unit Calendar: four weeks of the chosen unit, read a week at a time. */
+  const weeks =
+    tab === 'calendar' && unit
+      ? await Promise.all(
+          [0, 7, 14, 21].map((d) =>
+            ctx.read('rpc_console_stays_calendar', {
+              p_start: shift(start, d),
+              p_city: city,
+              p_q: unit.label,
+              p_page: 1,
+              p_size: 100,
+            }),
+          ),
+        )
+      : [];
+  const month = weeks.flatMap(
+    (w) =>
+      ((asObject(w.data).rows as CalendarRow[] | undefined) ?? []).find(
+        (r) => r.unit_id === unit?.unit_id,
+      )?.days ?? [],
+  );
+
+  const keep = {
+    tab: tab === 'rates' ? null : tab,
+    start: searchParams?.start ?? null,
+    q: q || null,
+    building,
+    type,
+  };
   const href = (params: Record<string, string | null>) =>
     staysHref('/stays/availability', period, city, { ...keep, ...params });
+  const unitOptions = allRows.map((r) => ({
+    id: r.unit_id,
+    label: `${r.label}${r.property_name ? ` · ${r.property_name}` : ''}`,
+  }));
+
+  const weekNav = (
+    <div className="flex gap-2 text-[0.875rem] font-bold">
+      <Link
+        className="border-border rounded-lg border px-3 py-2"
+        href={href({ start: shift(start, tab === 'calendar' ? -28 : -7), page: null })}
+      >
+        ‹ Before
+      </Link>
+      <Link
+        className="border-border rounded-lg border px-3 py-2"
+        href={href({ start: null, page: null })}
+      >
+        Today
+      </Link>
+      <Link
+        className="border-border rounded-lg border px-3 py-2"
+        href={href({ start: shift(start, tab === 'calendar' ? 28 : 7), page: null })}
+      >
+        After ›
+      </Link>
+    </div>
+  );
+
+  const legend = (
+    <div className="mt-3 flex flex-wrap gap-4 text-[0.8125rem] font-semibold">
+      {Object.entries(LEGEND).map(([key, text]) => (
+        <span key={key} className="flex items-center gap-1.5">
+          <span aria-hidden="true" className={`h-3 w-3 rounded-full ${CELL[key]}`} />
+          {text}
+        </span>
+      ))}
+    </div>
+  );
+
+  const notYet = (title: string, body: string) => (
+    <DashCard>
+      <NotYet
+        title={title}
+        action={
+          <Link
+            className="font-bold text-[#826D18] underline underline-offset-4"
+            href="/stays/configuration"
+          >
+            Open Stays Configuration
+          </Link>
+        }
+      >
+        {body}
+      </NotYet>
+    </DashCard>
+  );
+
+  let main: React.ReactNode;
+  if (tab === 'plans') {
+    main = notYet(
+      'One rate per unit for now',
+      'Every unit is quoted at its standard nightly rate. Flexible, non-refundable and other rate plans are not set up yet; the cancellation presets on Payout rules are what guests agree to.',
+    );
+  } else if (tab === 'seasonal') {
+    main = notYet(
+      'No seasonal pricing yet',
+      'High, mid and low season rates are not set up yet. Change a unit’s nightly rate on its panel, or for many units in Bulk Update.',
+    );
+  } else if (tab === 'restrictions') {
+    main = notYet(
+      'Minimum and maximum stays apply to every unit',
+      'The minimum stay, maximum stay and advance booking window are set once in Stays Configuration. Restrictions per unit or per date are not set up yet; block dates to close a unit.',
+    );
+  } else if (tab === 'rules') {
+    main = notYet(
+      'No automatic rate rules yet',
+      'Weekend, long-stay and demand-based rate rules are not set up yet. Each night is the unit’s standard rate.',
+    );
+  } else if (tab === 'bulk') {
+    main = (
+      <div className="grid gap-4 xl:grid-cols-2">
+        <DashCard title="Block dates on a unit">
+          <p className="text-muted mb-3 text-[0.875rem] font-semibold">
+            Close a unit to guests for some nights (repairs, owner stay). Refused where a booking or
+            hold is already there.
+          </p>
+          <UpdateAvailabilityButton units={unitOptions} />
+        </DashCard>
+        <DashCard title="Change a nightly rate">
+          <p className="text-muted mb-3 text-[0.875rem] font-semibold">
+            New bookings are quoted the new rate; bookings already made keep theirs.
+          </p>
+          <UnitControls units={unitOptions} />
+        </DashCard>
+      </div>
+    );
+  } else if (tab === 'calendar') {
+    main = (
+      <DashCard title={unit ? `Unit ${unit.label} — four weeks` : 'Unit Calendar'} aside={weekNav}>
+        {!unit ? (
+          <PanelHint>Choose a unit on Availability & Rates, then open its calendar.</PanelHint>
+        ) : (
+          <>
+            <ul className="grid grid-cols-7 gap-1.5">
+              {month.slice(0, 7).map((d) => (
+                <li key={`h-${d.day}`} className="text-muted text-center text-[0.75rem] font-bold">
+                  {dayHead(d.day).weekday}
+                </li>
+              ))}
+              {month.map((d) => (
+                <li
+                  key={d.day}
+                  className={`rounded-lg p-2 text-center text-[0.8125rem] font-bold ${CELL[d.state]}`}
+                >
+                  {dayHead(d.day).date}
+                  <span className="block text-[0.75rem] font-semibold">{CELL_LABEL[d.state]}</span>
+                </li>
+              ))}
+            </ul>
+            {legend}
+          </>
+        )}
+      </DashCard>
+    );
+  } else {
+    main = (
+      <DashCard className="min-w-0">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <FilterRow>
+            <DashSearch
+              value={q}
+              label="Search units"
+              placeholder="Search unit, building or host…"
+            />
+            <DashSelect
+              label="Building"
+              param="building"
+              value={building ?? 'all'}
+              options={optionsFrom(allRows, (r) => r.property_name)}
+            />
+            <DashSelect
+              label="Unit Type"
+              param="type"
+              value={type ?? 'all'}
+              options={[
+                ...new Set(allRows.map((r) => r.bedrooms).filter((b): b is number => b != null)),
+              ]
+                .sort((a, b) => a - b)
+                .map((b) => ({ value: String(b), label: bedroomsText(b) }))}
+            />
+            <DashClear params={['q', 'building', 'type', 'selected', 'start']} />
+          </FilterRow>
+          {weekNav}
+        </div>
+        <DataTable
+          caption="Unit availability by night"
+          isEmpty={rows.length === 0}
+          empty="No live units match."
+          head={[
+            `Unit (${n(filtered.length)})`,
+            'Base Rate',
+            ...days.map((d) => {
+              const h = dayHead(d);
+              return (
+                <span key={d} className="block text-center leading-tight">
+                  {h.weekday}
+                  <br />
+                  {h.date}
+                </span>
+              );
+            }),
+          ]}
+        >
+          {rows.map((r) => (
+            <tr key={r.unit_id} className={r.unit_id === selected ? 'bg-[#FFFBF0]' : undefined}>
+              <td>
+                <PlaceCell
+                  title={r.label}
+                  sub={`${bedroomsText(r.bedrooms)}${r.property_name ? ` • ${r.property_name}` : ''}`}
+                  photo={photoUrl(r.photo)}
+                  href={href({ selected: r.unit_id, page: String(page) })}
+                />
+              </td>
+              <td className="whitespace-nowrap font-bold tabular-nums">{kesFull(r.rate_kes)}</td>
+              {r.days.map((d) => (
+                <td key={d.day} className="px-1">
+                  <span
+                    className={`block rounded-md px-1.5 py-1 text-center text-[0.75rem] font-bold ${CELL[d.state]}`}
+                  >
+                    {d.rate_kes != null ? n(d.rate_kes) : '—'}
+                    <span className="block font-semibold">{CELL_LABEL[d.state]}</span>
+                  </span>
+                </td>
+              ))}
+            </tr>
+          ))}
+        </DataTable>
+        {legend}
+        <Pagination
+          page={page}
+          size={PAGE_SIZE}
+          total={filtered.length}
+          noun="units"
+          href={(p) => href({ page: p > 1 ? String(p) : null })}
+        />
+        <Footnote>
+          Each night starts at check-in time; a hold is a guest paying now.
+          {asNumber(o.total) > 100
+            ? ` Showing the first 100 of ${n(asNumber(o.total))} live units: search to reach the rest.`
+            : ''}
+        </Footnote>
+      </DashCard>
+    );
+  }
+
+  const panelBody =
+    unit &&
+    (ptab === 'availability' ? (
+      <ul className="grid grid-cols-7 gap-1">
+        {unit.days.map((d) => (
+          <li
+            key={d.day}
+            className={`rounded-md p-1 text-center text-[0.6875rem] font-bold ${CELL[d.state]}`}
+          >
+            {dayHead(d.day).weekday}
+            <span className="block">{CELL_LABEL[d.state]}</span>
+          </li>
+        ))}
+      </ul>
+    ) : ptab === 'restrictions' ? (
+      <p className="text-muted text-[0.875rem] font-semibold">
+        The minimum and maximum stay and the booking window from Stays Configuration apply; this
+        unit has no rules of its own.
+      </p>
+    ) : ptab === 'history' ? (
+      <p className="text-muted text-[0.875rem] font-semibold">
+        Rate changes and blocks are in the{' '}
+        <Link className="underline" href="/audit">
+          audit log
+        </Link>
+        .
+      </p>
+    ) : (
+      <>
+        <Fact icon={Coins} label="Standard Rate">
+          {kesFull(unit.rate_kes)} / night
+        </Fact>
+        <Fact icon={Sun} label="Weekend Rate (Fri – Sun)">
+          Same as standard
+        </Fact>
+        <Fact icon={Moon} label="Long Stay (7+ nights)">
+          Same as standard
+        </Fact>
+        <Fact icon={CalendarDays} label="Monthly (30+ nights)">
+          {unit.rate_kes ? `${kesFull(unit.rate_kes * 30)} at the standard rate` : '—'}
+        </Fact>
+      </>
+    ));
 
   return (
     <ConsoleShell staff={ctx.staff}>
@@ -140,14 +483,7 @@ export default async function AvailabilityPage({
         cities={ctx.cities}
         city={city}
         noPeriod
-        action={
-          <UpdateAvailabilityButton
-            units={allRows.map((r) => ({
-              id: r.unit_id,
-              label: `${r.label}${r.property_name ? ` · ${r.property_name}` : ''}`,
-            }))}
-          />
-        }
+        action={<UpdateAvailabilityButton units={unitOptions} />}
       />
       <DashCanvas>
         {cal.waiting ? (
@@ -178,7 +514,7 @@ export default async function AvailabilityPage({
               />
               <DashKpi
                 icon={Coins}
-                label="Avg. Nightly Rate"
+                label="Avg. Nightly Rate (ADR)"
                 value={asMaybe(k.avg_rate_kes) == null ? '—' : kesFull(asNumber(k.avg_rate_kes))}
                 explain="The units' standard nightly rates, averaged."
               />
@@ -189,6 +525,22 @@ export default async function AvailabilityPage({
                 explain="What confirmed future stays come to."
               />
             </DashKpiGrid>
+
+            <DashCard>
+              <GoldTabs
+                label="Availability and rates"
+                active={tab}
+                tabs={TABS.map((t) => ({
+                  key: t.key,
+                  label: t.label,
+                  href: staysHref('/stays/availability', period, city, {
+                    tab: t.key === 'rates' ? null : t.key,
+                    selected,
+                    start: searchParams?.start ?? null,
+                  }),
+                }))}
+              />
+            </DashCard>
 
             <WithPanel
               panel={
@@ -202,131 +554,66 @@ export default async function AvailabilityPage({
                         className="mb-3 h-36 w-full rounded-xl object-cover"
                       />
                     )}
-                    <Fact label="Building">{unit.property_name ?? '—'}</Fact>
-                    <Fact label="Bedrooms">{unit.bedrooms ?? '—'}</Fact>
-                    <h3 className="mt-3 text-[0.9375rem] font-extrabold">Rates & Plans</h3>
-                    <Fact label="Standard Rate">{kesFull(unit.rate_kes)} / night</Fact>
-                    <p className="text-muted mb-3 mt-1 text-[0.8125rem] font-semibold">
-                      Weekend, long-stay and seasonal rates are not set per unit yet: every night is
-                      quoted at the standard rate.
+                    <p className="text-muted mb-3 text-[0.875rem] font-semibold">
+                      {unit.property_name ?? 'No building'} · {bedroomsText(unit.bedrooms)}
                     </p>
+                    <PanelLinks
+                      links={[
+                        {
+                          label: 'View Calendar',
+                          icon: CalendarDays,
+                          href: href({ tab: 'calendar', selected: unit.unit_id }),
+                        },
+                        {
+                          label: 'View Unit',
+                          icon: BedDouble,
+                          href: staysHref('/stays/units', period, city, { selected: unit.unit_id }),
+                        },
+                      ]}
+                    />
                     <UnitControls unitId={unit.unit_id} rate={unit.rate_kes} />
-                    <div className="mt-3 text-[0.875rem] font-bold">
-                      <Link
-                        className="underline"
-                        href={staysHref('/stays/units', period, city, { selected: unit.unit_id })}
-                      >
-                        View unit
-                      </Link>
+                    <div className="mt-3">
+                      <PanelTabs
+                        tabs={PANEL_TABS}
+                        active={ptab}
+                        href={(key) =>
+                          href({ selected: unit.unit_id, ptab: key === 'rates' ? null : key })
+                        }
+                      />
+                      {panelBody}
                     </div>
+                    <h3 className="mb-2 mt-4 text-[0.9375rem] font-extrabold">Quick Actions</h3>
+                    <QuickTiles
+                      tiles={[
+                        {
+                          label: 'Bulk Update',
+                          icon: Layers,
+                          href: href({ tab: 'bulk', selected: unit.unit_id }),
+                        },
+                        {
+                          label: 'Copy Rates',
+                          icon: Copy,
+                          unavailable: 'Copying rates between units is not built yet.',
+                        },
+                        {
+                          label: 'Apply Seasonal',
+                          icon: Sun,
+                          unavailable: 'Seasonal pricing is not set up yet.',
+                        },
+                        {
+                          label: 'Sync Calendar',
+                          icon: CalendarSync,
+                          href: '/stays/configuration',
+                        },
+                      ]}
+                    />
                   </SidePanel>
                 ) : (
                   <PanelHint>Choose a unit to block dates or change its rate.</PanelHint>
                 )
               }
             >
-              <DashCard className="min-w-0">
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-                  <FilterRow>
-                    <DashSearch
-                      value={q}
-                      label="Search units"
-                      placeholder="Search unit or building…"
-                    />
-                    <DashClear params={['q', 'selected', 'start']} />
-                  </FilterRow>
-                  <div className="flex gap-2 text-[0.875rem] font-bold">
-                    <Link
-                      className="border-border rounded-lg border px-3 py-2"
-                      href={href({ start: shift(start, -7), page: null })}
-                    >
-                      ‹ Week before
-                    </Link>
-                    <Link
-                      className="border-border rounded-lg border px-3 py-2"
-                      href={href({ start: null, page: null })}
-                    >
-                      Today
-                    </Link>
-                    <Link
-                      className="border-border rounded-lg border px-3 py-2"
-                      href={href({ start: shift(start, 7), page: null })}
-                    >
-                      Week after ›
-                    </Link>
-                  </div>
-                </div>
-                <DataTable
-                  caption="Unit availability by night"
-                  isEmpty={rows.length === 0}
-                  empty="No live units match."
-                  head={[
-                    'Unit',
-                    'Base Rate',
-                    ...days.map((d) => {
-                      const h = dayHead(d);
-                      return (
-                        <span key={d} className="block text-center leading-tight">
-                          {h.weekday}
-                          <br />
-                          {h.date}
-                        </span>
-                      );
-                    }),
-                  ]}
-                >
-                  {rows.map((r) => (
-                    <tr
-                      key={r.unit_id}
-                      className={r.unit_id === selected ? 'bg-[#FFFBF0]' : undefined}
-                    >
-                      <td>
-                        <PlaceCell
-                          title={r.label}
-                          sub={r.property_name ?? undefined}
-                          photo={photoUrl(r.photo)}
-                          href={href({ selected: r.unit_id, page: String(page) })}
-                        />
-                      </td>
-                      <td className="whitespace-nowrap font-bold tabular-nums">
-                        {kesFull(r.rate_kes)}
-                      </td>
-                      {r.days.map((d) => (
-                        <td key={d.day} className="px-1">
-                          <span
-                            className={`block rounded-md px-1.5 py-1 text-center text-[0.75rem] font-bold ${CELL[d.state]}`}
-                          >
-                            {d.rate_kes != null ? n(d.rate_kes) : '—'}
-                            <span className="block font-semibold">{CELL_LABEL[d.state]}</span>
-                          </span>
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </DataTable>
-                <div className="mt-3 flex flex-wrap gap-4 text-[0.8125rem] font-semibold">
-                  {Object.entries(CELL_LABEL).map(([key, text]) => (
-                    <span key={key} className="flex items-center gap-1.5">
-                      <span aria-hidden="true" className={`h-3 w-3 rounded-full ${CELL[key]}`} />
-                      {text === 'Avail'
-                        ? 'Available'
-                        : text === 'Hold'
-                          ? 'Hold (pending payment)'
-                          : text}
-                    </span>
-                  ))}
-                </div>
-                <Pagination
-                  page={page}
-                  size={PAGE_SIZE}
-                  total={asNumber(o.total)}
-                  noun="units"
-                  href={(p) => href({ page: p > 1 ? String(p) : null })}
-                />
-                <Footnote>
-                  Each night starts at check-in time; a hold is a guest paying now.
-                </Footnote>
-              </DashCard>
+              {main}
             </WithPanel>
           </>
         )}

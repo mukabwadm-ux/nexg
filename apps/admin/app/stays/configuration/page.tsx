@@ -253,7 +253,30 @@ export default async function StaysConfigurationPage({
               onActivate={activateDue}
             />
 
-            <div className="grid gap-4 xl:grid-cols-4">
+            <DashCard>
+              <nav aria-label="Configuration sections" className="flex flex-wrap gap-1">
+                {[
+                  ['general', 'General'],
+                  ['booking', 'Booking & Stay Rules'],
+                  ['pricing', 'Pricing & Rates'],
+                  ['fees', 'Fees & Commissions'],
+                  ['checkin', 'Check-in & Check-out'],
+                  ['availability', 'Availability'],
+                  ['integrations', 'Integrations'],
+                  ['advanced', 'Advanced'],
+                ].map(([key, text]) => (
+                  <a
+                    key={key}
+                    href={`#${({ booking: 'general', pricing: 'general', fees: 'general', availability: 'checkin', integrations: 'checkin' } as Record<string, string>)[key] ?? key}`}
+                    className="rounded-lg px-3 py-2 text-[0.9375rem] font-bold text-[#1A1A1A] hover:bg-[#FFF4D6]"
+                  >
+                    {text}
+                  </a>
+                ))}
+              </nav>
+            </DashCard>
+
+            <div id="general" className="grid scroll-mt-4 gap-4 xl:grid-cols-4">
               <DashCard title="General Settings">
                 <ul>
                   <LinkRow href="/settings?tab=branding">Business details & contact</LinkRow>
@@ -293,7 +316,7 @@ export default async function StaysConfigurationPage({
               </DashCard>
             </div>
 
-            <div className="grid gap-4 xl:grid-cols-4">
+            <div id="checkin" className="grid scroll-mt-4 gap-4 xl:grid-cols-4">
               <DashCard title="Check-in & Check-out">
                 <div className="divide-border divide-y">{CHECKIN_KEYS.map(field)}</div>
                 <Footnote>
@@ -347,20 +370,64 @@ export default async function StaysConfigurationPage({
               </DashCard>
             </div>
 
-            <DashCard title="Advanced Settings">
-              <ul className="grid gap-x-6 sm:grid-cols-3">
-                <LinkRow href="/staff?tab=roles">User roles & permissions (Stays)</LinkRow>
-                <LinkRow href="/settings?tab=notifications">Notifications & alerts</LinkRow>
-                <LinkRow href="/audit">Audit log of stays changes</LinkRow>
-              </ul>
-              {!canEdit && (
-                <p className="text-muted mt-3 flex items-center gap-2 text-[0.8125rem] font-semibold">
-                  <Settings2 aria-hidden="true" className="h-4 w-4" />
-                  You can read these rules; changing them is Finance&rsquo;s and an ops
-                  manager&rsquo;s.
-                </p>
-              )}
-            </DashCard>
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,22rem)]">
+              <DashCard title="Accommodation Unit Setup">
+                <ul>
+                  <LinkRow href="/stays/units">Unit types (Studio, 1BR, 2BR…)</LinkRow>
+                  <LinkRow href="/stays/buildings">Unit categories and buildings</LinkRow>
+                  <LinkRow href="/stays/units">Amenities & facilities</LinkRow>
+                  <LinkRow href="/hotels?tab=listings&properties=review">
+                    Media requirements and listing review
+                  </LinkRow>
+                </ul>
+                <Footnote>
+                  Hosts describe each unit in their workspace; staff review the property before
+                  guests see it.
+                </Footnote>
+              </DashCard>
+              <div id="advanced" className="scroll-mt-4">
+                <DashCard title="Advanced Settings">
+                  <ul className="grid gap-x-6 sm:grid-cols-3">
+                    <LinkRow href="/staff?tab=roles">User roles & permissions (Stays)</LinkRow>
+                    <LinkRow href="/settings?tab=notifications">Notifications & alerts</LinkRow>
+                    <LinkRow href="/audit">Audit log of stays changes</LinkRow>
+                  </ul>
+                  {!canEdit && (
+                    <p className="text-muted mt-3 flex items-center gap-2 text-[0.8125rem] font-semibold">
+                      <Settings2 aria-hidden="true" className="h-4 w-4" />
+                      You can read these rules; changing them is Finance&rsquo;s and an ops
+                      manager&rsquo;s.
+                    </p>
+                  )}
+                </DashCard>
+              </div>
+              <DashCard title="Configuration Status">
+                {settings.length > 0 && settings.every((x) => x.value != null) ? (
+                  <>
+                    <p className="flex items-center gap-2 text-[1.0625rem] font-extrabold text-[#1E7B34]">
+                      <ShieldCheck aria-hidden="true" className="h-6 w-6" /> Stays Setup Complete
+                    </p>
+                    <p className="text-muted mt-1 text-[0.875rem] font-semibold">
+                      Every stays rule has a value
+                      {drafts.length > 0
+                        ? `; ${drafts.length} change${drafts.length === 1 ? ' is' : 's are'} waiting to be submitted`
+                        : ''}
+                      .
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-[1.0625rem] font-extrabold text-[#B57A00]">
+                    Some stays rules have no value yet
+                  </p>
+                )}
+                <a
+                  href="#booking"
+                  className="mt-3 inline-flex h-10 items-center rounded-xl border border-[#F5D27A] bg-[#FFFBF0] px-3 text-[0.875rem] font-bold text-[#8A5C00]"
+                >
+                  Edit Settings
+                </a>
+              </DashCard>
+            </div>
           </>
         )}
       </DashCanvas>

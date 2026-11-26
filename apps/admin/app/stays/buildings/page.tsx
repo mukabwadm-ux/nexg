@@ -18,6 +18,7 @@ import { OpsMap, type MapPoint } from '@/components/operations/ops-map';
 import { DashCanvas, DashCard, DashKpi, DashKpiGrid, GoldTabs } from '@/components/portal/dash';
 import { DashClear, DashSearch } from '@/components/portal/dash-filters';
 import { ManagerSelect } from '@/components/stays/client';
+import { PanelTabs } from '@/components/stays/extras';
 import {
   Chip,
   Empty,
@@ -25,6 +26,7 @@ import {
   Fact,
   FilterRow,
   Footnote,
+  GoldLink,
   photoUrl,
   ShareBars,
   SidePanel,
@@ -90,6 +92,43 @@ interface PropertyRow {
  * are, how many units each has on NexG and how full they were. Approving a
  * property stays on its own review page.
  */
+interface BuildingUnit {
+  unit_id: string;
+  label: string;
+  bedrooms: number | null;
+  nightly_rate_kes: number | null;
+  bucket: string;
+}
+
+/** The Units tab of a building's panel: each unit, its rate and state. */
+function BuildingUnits({
+  units,
+  hrefFor,
+}: {
+  units: BuildingUnit[];
+  hrefFor: (id: string) => string;
+}) {
+  if (units.length === 0) return <Empty>No units in this building yet.</Empty>;
+  return (
+    <ul>
+      {units.map((u) => (
+        <li
+          key={u.unit_id}
+          className="border-border flex items-center justify-between gap-2 border-b py-1.5 text-[0.875rem] last:border-b-0"
+        >
+          <Link className="font-semibold hover:underline" href={hrefFor(u.unit_id)}>
+            {u.label}
+          </Link>
+          <span className="flex items-center gap-2">
+            <span className="tabular-nums">{u.nightly_rate_kes ? n(u.nightly_rate_kes) : '—'}</span>
+            <Chip status={u.bucket} />
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default async function BuildingsPage({
   searchParams,
 }: {
@@ -100,6 +139,7 @@ export default async function BuildingsPage({
     tab?: string;
     q?: string;
     selected?: string;
+    ptab?: string;
   };
 }) {
   const ctx = await staysContext(searchParams);
@@ -134,6 +174,28 @@ export default async function BuildingsPage({
     }[]
   ).map((m) => ({ id: m.id, name: m.name }));
   const current = rows.find((r) => r.property_id === selected) ?? rows[0] ?? null;
+  const ptab = oneOf(
+    ['overview', 'units', 'hosts', 'reservations', 'revenue', 'documents'] as const,
+    searchParams?.ptab,
+    'overview',
+  );
+  const buildingUnits =
+    current && ptab === 'units'
+      ? ((asObject(
+          (
+            await ctx.read('rpc_console_stays_units', {
+              p_from: period.from,
+              p_to: period.to,
+              p_city: null,
+              p_tab: 'all',
+              p_q: null,
+              p_property: current.property_id,
+              p_page: 1,
+              p_size: 200,
+            })
+          ).data,
+        ).rows as BuildingUnit[] | undefined) ?? [])
+      : [];
   const totalAreas = areas.reduce((s, a) => s + asNumber(a.n), 0);
   const pins: MapPoint[] = rows
     .filter((r) => r.lat != null && r.lng != null)
@@ -157,6 +219,15 @@ export default async function BuildingsPage({
         cities={ctx.cities}
         city={city}
         exportHref={staysHref('/stays/export', period, city, { report: 'units' })}
+        action={
+          <GoldLink
+            href={`${(process.env.NEXT_PUBLIC_WEB_ORIGIN ?? 'https://nexgapp.com').replace(/\/$/, '')}/hosts`}
+            icon={Building2}
+            external
+          >
+            Add Building
+          </GoldLink>
+        }
       />
       <DashCanvas>
         {list.waiting ? (
@@ -316,59 +387,148 @@ export default async function BuildingsPage({
                       className="mb-3 h-40 w-full rounded-xl object-cover"
                     />
                   )}
-                  <p className="text-muted mb-2 flex items-center gap-1.5 text-[0.875rem] font-semibold">
-                    <MapPin aria-hidden="true" className="h-4 w-4" /> {current.area ?? 'No area'}
-                  </p>
-                  <h3 className="text-[0.9375rem] font-extrabold">Building Information</h3>
-                  <Fact icon={Building2} label="Property Type">
-                    {current.kind.replace(/_/g, ' ')}
-                  </Fact>
-                  <Fact icon={BedDouble} label="Total Units">
-                    {n(current.units)}
-                  </Fact>
-                  <Fact icon={Layers} label="NexG Listed Units">
-                    {n(current.listed_units)}
-                  </Fact>
-                  <Fact icon={UserCog} label="Host">
-                    {current.host_name ?? '—'}
-                  </Fact>
-                  <Fact icon={UserCog} label="Property Manager">
-                    {current.manager_name ?? 'None'}
-                  </Fact>
-                  <Fact icon={CalendarCheck} label="Onboarded">
-                    {shortDate(current.listed_at ?? current.created_at)}
-                  </Fact>
-                  <h3 className="mt-3 text-[0.9375rem] font-extrabold">Performance (period)</h3>
-                  <Fact label="Occupancy Rate">{pct(current.occupancy_pct)}</Fact>
-                  <Fact label="Booking Value">{kesCompact(current.value_kes)}</Fact>
-                  <h3 className="mt-3 text-[0.9375rem] font-extrabold">Amenities & Facilities</h3>
-                  <p className="text-muted mb-3 text-[0.875rem] font-semibold">
-                    {(current.amenities ?? []).length > 0
-                      ? current.amenities!.join(' · ')
-                      : 'None listed.'}
-                  </p>
-                  {managers.length > 0 ? (
-                    <ManagerSelect
-                      propertyId={current.property_id}
-                      managerId={current.manager_id}
-                      managers={managers}
-                    />
-                  ) : (
-                    <p className="text-muted text-[0.8125rem] font-semibold">
-                      Add a property manager on Property Managers & Partners to link this building.
-                    </p>
-                  )}
-                  <div className="mt-3 flex flex-wrap gap-3 text-[0.875rem] font-bold">
-                    <Link className="underline" href={`/hotels/properties/${current.property_id}`}>
-                      Review & edit building
-                    </Link>
+                  <p className="text-muted mb-2 flex items-center justify-between gap-1.5 text-[0.875rem] font-semibold">
+                    <span className="flex items-center gap-1.5">
+                      <MapPin aria-hidden="true" className="h-4 w-4" /> {current.area ?? 'No area'}
+                    </span>
                     <Link
-                      className="underline"
-                      href={staysHref('/stays/units', period, city, { q: current.name })}
+                      href={`/hotels/properties/${current.property_id}`}
+                      className="rounded-lg border border-[#F5D27A] bg-[#FFFBF0] px-3 py-1.5 text-[0.8125rem] font-bold text-[#8A5C00]"
                     >
-                      Units ({n(current.units)})
+                      Edit Building
                     </Link>
-                  </div>
+                  </p>
+                  <PanelTabs
+                    tabs={[
+                      { key: 'overview', label: 'Overview' },
+                      { key: 'units', label: `Units (${n(current.units)})` },
+                      { key: 'hosts', label: 'Hosts' },
+                      { key: 'reservations', label: 'Reservations' },
+                      { key: 'revenue', label: 'Revenue' },
+                      { key: 'documents', label: 'Documents' },
+                    ]}
+                    active={ptab}
+                    href={(key) =>
+                      href({ selected: current.property_id, ptab: key === 'overview' ? null : key })
+                    }
+                  />
+                  {ptab === 'units' ? (
+                    <BuildingUnits
+                      units={buildingUnits}
+                      hrefFor={(id) => staysHref('/stays/units', period, city, { selected: id })}
+                    />
+                  ) : ptab === 'hosts' ? (
+                    <>
+                      <Fact icon={UserCog} label="Host">
+                        <Link
+                          className="underline"
+                          href={staysHref('/stays/hosts', period, city, {
+                            q: current.host_name ?? '',
+                          })}
+                        >
+                          {current.host_name ?? '—'}
+                        </Link>
+                      </Fact>
+                      <Fact label="Host status">
+                        <Chip status={current.host_status} />
+                      </Fact>
+                      <Fact icon={UserCog} label="Property Manager">
+                        {current.manager_name ?? 'None'}
+                      </Fact>
+                    </>
+                  ) : ptab === 'reservations' ? (
+                    <Link
+                      className="font-bold underline"
+                      href={staysHref('/stays/reservations', period, city, {
+                        building: current.name,
+                      })}
+                    >
+                      Open this building&rsquo;s reservations
+                    </Link>
+                  ) : ptab === 'revenue' ? (
+                    <>
+                      <Fact label="Booking Value (period)">{kesCompact(current.value_kes)}</Fact>
+                      <Fact label="Booked nights (period)">{n(current.nights)}</Fact>
+                      <Fact label="Occupancy Rate">{pct(current.occupancy_pct)}</Fact>
+                      <Fact label="Avg. per night">
+                        {current.nights > 0 ? kesCompact(current.value_kes / current.nights) : '—'}
+                      </Fact>
+                    </>
+                  ) : ptab === 'documents' ? (
+                    <p className="text-muted text-[0.875rem] font-semibold">
+                      The host&rsquo;s ID and proof of authority are on{' '}
+                      <Link className="underline" href={`/hotels/hosts/${current.host_id}/verify`}>
+                        their verification page
+                      </Link>
+                      ; the property&rsquo;s review is on{' '}
+                      <Link
+                        className="underline"
+                        href={`/hotels/properties/${current.property_id}`}
+                      >
+                        its page
+                      </Link>
+                      .
+                    </p>
+                  ) : (
+                    <>
+                      <h3 className="text-[0.9375rem] font-extrabold">Building Information</h3>
+                      <Fact icon={Building2} label="Property Type">
+                        {current.kind.replace(/_/g, ' ')}
+                      </Fact>
+                      <Fact icon={BedDouble} label="Total Units">
+                        {n(current.units)}
+                      </Fact>
+                      <Fact icon={Layers} label="NexG Listed Units">
+                        {n(current.listed_units)}
+                      </Fact>
+                      <Fact icon={UserCog} label="Host">
+                        {current.host_name ?? '—'}
+                      </Fact>
+                      <Fact icon={UserCog} label="Property Manager">
+                        {current.manager_name ?? 'None'}
+                      </Fact>
+                      <Fact icon={CalendarCheck} label="Onboarded">
+                        {shortDate(current.listed_at ?? current.created_at)}
+                      </Fact>
+                      <h3 className="mt-3 text-[0.9375rem] font-extrabold">Performance (period)</h3>
+                      <Fact label="Occupancy Rate">{pct(current.occupancy_pct)}</Fact>
+                      <Fact label="Booking Value">{kesCompact(current.value_kes)}</Fact>
+                      <h3 className="mt-3 text-[0.9375rem] font-extrabold">
+                        Amenities & Facilities
+                      </h3>
+                      <p className="text-muted mb-3 text-[0.875rem] font-semibold">
+                        {(current.amenities ?? []).length > 0
+                          ? current.amenities!.join(' · ')
+                          : 'None listed.'}
+                      </p>
+                      {managers.length > 0 ? (
+                        <ManagerSelect
+                          propertyId={current.property_id}
+                          managerId={current.manager_id}
+                          managers={managers}
+                        />
+                      ) : (
+                        <p className="text-muted text-[0.8125rem] font-semibold">
+                          Add a property manager on Property Managers & Partners to link this
+                          building.
+                        </p>
+                      )}
+                      <div className="mt-3 flex flex-wrap gap-3 text-[0.875rem] font-bold">
+                        <Link
+                          className="underline"
+                          href={`/hotels/properties/${current.property_id}`}
+                        >
+                          Review & edit building
+                        </Link>
+                        <Link
+                          className="underline"
+                          href={staysHref('/stays/units', period, city, { q: current.name })}
+                        >
+                          Units ({n(current.units)})
+                        </Link>
+                      </div>
+                    </>
+                  )}
                 </SidePanel>
               ) : (
                 <DashCard>
