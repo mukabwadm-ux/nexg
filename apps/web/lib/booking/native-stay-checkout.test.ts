@@ -484,7 +484,7 @@ describe('a stay payment through Paystack, between the try and the webhook', () 
     vi.stubGlobal('fetch', fetch);
     for (const claim of [
       ok([]),
-      /* A database before 20270330000300 has no such function. */
+      /* A database before 20270334000100 has no such function. */
       { data: null, error: { code: 'PGRST202', message: 'not found' } },
     ]) {
       stub.rpc.mockClear();
@@ -527,20 +527,48 @@ describe('a stay payment through Paystack, between the try and the webhook', () 
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
-  it('hands back the open card page when another way is asked for, and charges nothing', async () => {
+  it('tells the apps a card page was left unfinished, on a short wait for Paystack', async () => {
+    const unfinished = { ...pending, lastTry: 'not_completed' };
     database({
-      rpc_stay_payment_check_claim: [ok([])],
+      rpc_native_stay_status: [ok(pending), ok(unfinished)],
+      rpc_stay_payment_check_claim: [ok(due)],
+      rpc_payment_paystack_verified: [ok({ ok: true, state: 'authorised' })],
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(
+            JSON.stringify({ status: true, data: { reference: 'NXP-S-1', status: 'abandoned' } }),
+          ),
+        ),
+    );
+    const timeout = vi.spyOn(AbortSignal, 'timeout');
+    expect(await (await stayStatus(request(), quoteId)).json()).toEqual(unfinished);
+    expect(timeout).toHaveBeenCalledWith(4_000);
+    timeout.mockRestore();
+  });
+
+  it('continuing hands back the same card page and opens no other', async () => {
+    database({
+      rpc_stay_payment_check_claim: [ok(due)],
+      rpc_payment_paystack_verified: [ok({ ok: true, state: 'authorised' })],
+      rpc_stay_payment_state: [ok({ status: 'pending', reference: 'NXP-S', is_test: true })],
       rpc_payment_begin_stay: [begun],
       rpc_payment_paystack_attempt: [
         attempt({ reused: true, authorization_url: 'https://checkout.paystack.com/s1' }),
       ],
     });
-    const fetch = vi.fn();
+    const fetch = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(
+          JSON.stringify({ status: true, data: { reference: 'NXP-S-1', status: 'abandoned' } }),
+        ),
+      );
     vi.stubGlobal('fetch', fetch);
-    const response = await stayPaymentById(
-      request({ method: 'mpesa_stk', phone: '0712 000 000' }),
-      stayId,
-    );
+    const response = await stayPaymentById(request({ method: 'card' }), stayId);
     expect(await response.json()).toEqual({
       status: 'pending',
       reference: 'NXP-S',
@@ -549,8 +577,57 @@ describe('a stay payment through Paystack, between the try and the webhook', () 
       reused: true,
       channel: 'card',
     });
-    expect(fetch).not.toHaveBeenCalled();
+    /* The verify only: no second page. */
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
+
+  it('starts nothing while a payment Paystack calls successful is not applied yet', async () => {
+    database({
+      rpc_stay_payment_check_claim: [ok(due)],
+      rpc_payment_paystack_verified: [ok({ ok: false, reason: 'awaiting_verify' })],
+      rpc_stay_payment_state: [ok({ status: 'pending', reference: 'NXP-S', is_test: true })],
+    });
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(verified)));
+    const response = await stayPaymentById(request({ method: 'card' }), stayId);
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({
+      code: 'PAYMENT_REFUSED',
+      title: 'We are checking an earlier payment. Do not pay again.',
+    });
+    expect(calls('rpc_payment_begin_stay')).toHaveLength(0);
+  });
+
+  it.each([
+    [
+      'another way',
+      { method: 'airtel_money', phone: '0733 000 000' },
+      {},
+      'An M-Pesa prompt is already waiting. Approve it, or try again in a few minutes.',
+    ],
+    [
+      'another number',
+      { method: 'mpesa_stk', phone: '0722 000 000' },
+      { same_request: false },
+      'A prompt is already waiting on the number you used first. Approve it there, or try again in a few minutes.',
+    ],
+  ])(
+    'refuses %s while a prompt is waiting, and sends nothing',
+    async (_what, body, more, title) => {
+      database({
+        rpc_stay_payment_check_claim: [ok([])],
+        rpc_payment_begin_stay: [begun],
+        rpc_payment_paystack_attempt: [
+          attempt({ channel: 'mpesa', reused: true, retry_after_seconds: 150, ...more }),
+        ],
+      });
+      const fetch = vi.fn();
+      vi.stubGlobal('fetch', fetch);
+      const response = await stayPaymentById(request(body), stayId);
+      expect(response.status).toBe(409);
+      expect(await response.json()).toMatchObject({ code: 'PAYMENT_REFUSED', title });
+      expect(fetch).not.toHaveBeenCalled();
+    },
+  );
 
   it('says a prompt still waiting was reused, with how long to wait', async () => {
     database({
@@ -655,8 +732,7 @@ describe('a stay payment through Paystack, between the try and the webhook', () 
           data: null,
           error: {
             code: '22023',
-            message:
-              'We have received money for this booking and are checking it. Do not pay again.',
+            message: 'This stay has already been paid for. Do not pay again.',
           },
         },
       ],
@@ -665,7 +741,7 @@ describe('a stay payment through Paystack, between the try and the webhook', () 
     expect(response.status).toBe(409);
     expect(await response.json()).toMatchObject({
       code: 'PAYMENT_REFUSED',
-      title: 'We have received money for this booking and are checking it. Do not pay again.',
+      title: 'This stay has already been paid for. Do not pay again.',
     });
   });
 });

@@ -1,5 +1,6 @@
 import { Check, CircleSlash, Landmark, Search, Smartphone, X } from 'lucide-react';
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
 import { AutoRefresh } from '@/components/pay/auto-refresh';
 import {
@@ -160,6 +161,23 @@ export default async function PaymentReturn({ params }: { params: { reference: s
             )}
           </PaymentStatusLayout>
         </>
+      );
+    }
+  }
+
+  /* A stay's payment is not readable by its guest, and Paystack's page comes
+     back here, paid or not: take the guest to that stay's checkout. The database
+     answers only for the caller's own stay (rpc_stay_payment_return, newer than
+     the generated types). */
+  if (!payment) {
+    const db = supabase as unknown as {
+      rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown }>;
+    };
+    const stay = (await db.rpc('rpc_stay_payment_return', { p_reference: params.reference }))
+      .data as { stay_id: string; property_slug: string } | null;
+    if (stay?.stay_id && stay.property_slug) {
+      redirect(
+        `/stays/${encodeURIComponent(stay.property_slug)}/book?stay=${encodeURIComponent(stay.stay_id)}`,
       );
     }
   }

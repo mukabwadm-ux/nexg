@@ -69,7 +69,7 @@ function cancelledNotice(status: CheckoutStatus, cancellation: Cancellation) {
     return {
       heading: 'Your payment arrived late',
       text:
-        'Your hold ran out before M-Pesa confirmed the payment, and the dates were taken in the ' +
+        'Your hold ran out before the payment was confirmed, and the dates were taken in the ' +
         'meantime. Nothing is booked. ' +
         (refunded
           ? `Your payment${reference} has been refunded in full.`
@@ -110,7 +110,8 @@ function priceLines(quote: StayQuote, baseKes: number) {
 /**
  * Dates, a hold, then M-Pesa. The price shown is the database's quote for
  * the dates (weekend rate, seasons, long-stay discount), the same total the
- * hold charges.
+ * hold charges. A card page left unfinished (opened in the app) can be
+ * continued here, on that same page.
  */
 export function StayCheckout({
   slug,
@@ -232,6 +233,10 @@ export function StayCheckout({
           : 'The payment did not go through. Try again.',
       );
       setStep('pay');
+    } else if (next.status === 'held' && next.lastTry) setStep('waiting');
+    else if (next.status === 'held' && next.paymentStatus === 'failed') {
+      setError('The payment did not go through. Try again.');
+      setStep('pay');
     } else if (next.status === 'held' && next.paymentState !== 'authorised') setStep('pay');
   }, [stayId]);
 
@@ -257,6 +262,16 @@ export function StayCheckout({
   useEffect(() => {
     if (step === 'pay' && expiresAt && secondsLeft === 0) setStep('expired');
   }, [step, expiresAt, secondsLeft]);
+
+  /* After the hold: keep reading until the database has closed it and no
+     payment is still being checked. */
+  const paymentOpen = status?.paymentStatus === 'pending' || status?.paymentState === 'authorised';
+  const afterHold = status !== null && status.status !== 'held';
+  useEffect(() => {
+    if (step !== 'expired' || !stayId || (afterHold && !paymentOpen)) return;
+    const timer = window.setInterval(() => void refresh(), 5000);
+    return () => window.clearInterval(timer);
+  }, [step, stayId, afterHold, paymentOpen, refresh]);
 
   async function hold() {
     setError('');
@@ -305,6 +320,34 @@ export function StayCheckout({
       setStep('waiting');
     } catch {
       setError('The M-Pesa prompt could not be sent. Check your connection and try again.');
+    } finally {
+      setBusyAction(false);
+    }
+  }
+
+  /* Back to the card page already open: the database hands back that same page,
+     so there is nothing new to pay twice. */
+  async function continueCard() {
+    setError('');
+    setBusyAction(true);
+    try {
+      const response = await fetch(
+        `/api/customer/checkout/stays/${encodeURIComponent(stayId)}/payment`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ method: 'card' }),
+        },
+      );
+      const body = (await response.json().catch(() => ({}))) as { title?: string; url?: string };
+      if (response.ok && body.url) {
+        window.location.assign(body.url);
+        return;
+      }
+      if (!response.ok) setError(body.title ?? 'The payment page could not be opened. Try again.');
+      await refresh();
+    } catch {
+      setError('The payment page could not be opened. Check your connection and try again.');
     } finally {
       setBusyAction(false);
     }
@@ -410,8 +453,7 @@ export function StayCheckout({
         <CalendarCheck aria-hidden="true" className="text-success h-8 w-8" />
         <h2 className="mt-3 text-[1.25rem] font-extrabold">You are booked</h2>
         <p className="text-muted mt-2 text-[0.875rem] font-semibold leading-[1.7]">
-          {status?.property} · {status?.unit}. Paid {kes(status?.paidKes ?? status?.totalKes ?? 0)}{' '}
-          by M-Pesa
+          {status?.property} · {status?.unit}. Paid {kes(status?.paidKes ?? status?.totalKes ?? 0)}
           {status?.paymentReference ? `, reference ${status.paymentReference}` : ''}. A confirmation
           is on its way to your email, and your host will send the address and how to get in before
           you arrive.
@@ -431,7 +473,7 @@ export function StayCheckout({
 
   /* A payment still being checked: nothing is claimed either way, and the
      guest is not asked to pay again. */
-  if (step === 'expired' && status?.paymentState === 'authorised') {
+  if (step === 'expired' && paymentOpen) {
     return (
       <Card className="p-6">
         <Clock aria-hidden="true" className="text-muted h-8 w-8" />
@@ -451,15 +493,19 @@ export function StayCheckout({
   }
 
   if (step === 'expired') {
+    /* Said only when the database, after the hold, shows no payment was tried.
+       Otherwise money may have left the account, or may still arrive. */
+    const nothingCharged = afterHold && !status?.paymentState && status?.paymentStatus === 'unpaid';
     return (
       <Card className="p-6">
         <Clock aria-hidden="true" className="text-muted h-8 w-8" />
         <h2 className="mt-3 text-[1.25rem] font-extrabold">Your hold ran out</h2>
         <p className="text-muted mt-2 text-[0.875rem] font-semibold leading-[1.7]">
-          {status?.paymentState
-            ? 'We have not received a payment. If money left your account, do not pay again: write to us from the help page.'
-            : 'Nothing was charged.'}{' '}
+          {nothingCharged ? 'Nothing was charged. ' : ''}
           The dates may still be free: choose them again to hold them for another 15 minutes.
+          {nothingCharged
+            ? ''
+            : ' If money left your account, do not pay again: write to us from the help page.'}
         </p>
         <Button className="mt-5" onClick={() => void release()}>
           Choose dates again
@@ -469,6 +515,7 @@ export function StayCheckout({
   }
 
   if (step === 'pay' || step === 'waiting') {
+    const cardUnfinished = step === 'waiting' && status?.lastTry === 'not_completed';
     const minutes = Math.floor(secondsLeft / 60);
     const seconds = String(secondsLeft % 60).padStart(2, '0');
     return (
@@ -477,10 +524,32 @@ export function StayCheckout({
           <Clock aria-hidden="true" className="h-3.5 w-3.5" />
           {expiresAt ? `Held for you for ${minutes}:${seconds}` : 'Held for you'}
         </p>
-        <h2 className="mt-2 text-[1.25rem] font-extrabold">Pay with M-Pesa</h2>
+        <h2 className="mt-2 text-[1.25rem] font-extrabold">
+          {cardUnfinished ? 'Payment not completed' : 'Pay with M-Pesa'}
+        </h2>
         {summary}
 
-        {step === 'waiting' ? (
+        {cardUnfinished ? (
+          <div className="bg-surface-muted mt-5 rounded-xl p-4" role="status" aria-live="polite">
+            <p className="text-muted text-[0.8125rem] font-semibold leading-[1.7]">
+              The card payment was not finished. Continue on the same payment page while your dates
+              are held. If you have just paid, wait a moment: this page updates by itself.
+            </p>
+            {error && (
+              <p role="alert" className="text-danger mt-3 text-[0.8125rem] font-semibold">
+                {error}
+              </p>
+            )}
+            <Button
+              type="button"
+              className="mt-4 w-full"
+              disabled={busyAction}
+              onClick={() => void continueCard()}
+            >
+              {busyAction ? 'Opening the payment page…' : 'Continue payment'}
+            </Button>
+          </div>
+        ) : step === 'waiting' ? (
           <div className="bg-surface-muted mt-5 rounded-xl p-4" role="status" aria-live="polite">
             <p className="inline-flex items-center gap-2 text-[0.9375rem] font-extrabold">
               <Smartphone aria-hidden="true" className="h-4 w-4" />

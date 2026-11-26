@@ -66,7 +66,7 @@ export function paystackProof(mode: PaystackMode): string | null {
 async function call<T>(
   mode: PaystackMode,
   path: string,
-  init: { method: 'GET' | 'POST'; body?: unknown },
+  init: { method: 'GET' | 'POST'; body?: unknown; timeoutMs?: number },
 ): Promise<PaystackResult<T>> {
   const secret = key(mode);
   if (!secret) return { ok: false, message: 'Paystack is not connected.' };
@@ -78,7 +78,7 @@ async function call<T>(
       headers: { Authorization: `Bearer ${secret}`, 'Content-Type': 'application/json' },
       body: init.body ? JSON.stringify(init.body) : undefined,
       cache: 'no-store',
-      signal: AbortSignal.timeout(15_000),
+      signal: AbortSignal.timeout(init.timeoutMs ?? 15_000),
     });
   } catch (error) {
     return {
@@ -232,11 +232,11 @@ export function deactivateSavedCard(mode: PaystackMode, authorizationCode: strin
 }
 
 /** Asks Paystack what happened to an attempt. The raw answer goes to the database. */
-export function verify(mode: PaystackMode, reference: string) {
+export function verify(mode: PaystackMode, reference: string, timeoutMs?: number) {
   return call<{ status: string; reference: string }>(
     mode,
     `/transaction/verify/${encodeURIComponent(reference)}`,
-    { method: 'GET' },
+    { method: 'GET', timeoutMs },
   );
 }
 

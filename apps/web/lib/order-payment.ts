@@ -192,22 +192,26 @@ export function stateFrom(result: RpcResult): PaymentState | Response {
 /**
  * Asks Paystack about a pending attempt and hands the answer to the database,
  * which alone decides. At most every 10 seconds per attempt, so a polling
- * screen cannot hammer Paystack.
+ * screen cannot hammer Paystack. Returns the transaction status Paystack gave,
+ * when it gave one. `timeoutMs`: how long to wait for Paystack, where somebody
+ * is waiting on the answer.
  */
 export async function checkWithPaystack(
   supabase: Client,
   attemptReference: string,
   mode: PaystackMode,
-): Promise<void> {
+  timeoutMs?: number,
+): Promise<string | undefined> {
   const proof = paystackProof(mode);
   if (!proof) return;
-  const answer = await verify(mode, attemptReference);
+  const answer = await verify(mode, attemptReference, timeoutMs);
   if (!answer.raw) return;
   await rpc(supabase, 'rpc_payment_paystack_verified', {
     p_attempt_reference: attemptReference,
     p_verify_body: answer.raw,
     p_proof: proof,
   });
+  return answer.ok ? answer.data?.status : undefined;
 }
 
 /**
@@ -323,6 +327,8 @@ interface Attempt {
   reused: boolean;
   authorization_url?: string;
   retry_after_seconds?: number;
+  /* A stay's waiting prompt handed back: false when another way or number was asked for. */
+  same_request?: boolean;
   /* Saved card only: what the server charges. Never sent on to the phone. */
   authorization_code?: string;
   email?: string;
@@ -413,6 +419,30 @@ export async function startPayment(
     });
     if (tried.error) return refused(tried.error);
     const attempt = tried.data as Attempt;
+
+    /* A stay's waiting prompt, when another way or number was asked for. A
+       refusal, because the apps read a pending answer as a prompt sent the way
+       just chosen. */
+    if (
+      found.stay &&
+      attempt.reused &&
+      (attempt.channel !== channel || attempt.same_request === false)
+    ) {
+      const waiting = attempt.channel === 'airtel' ? 'An Airtel Money' : 'An M-Pesa';
+      return problem(
+        409,
+        'PAYMENT_REFUSED',
+        attempt.channel !== channel
+          ? `${waiting} prompt is already waiting. Approve it, or try again in a few minutes.`
+          : 'A prompt is already waiting on the number you used first. Approve it there, or try again in a few minutes.',
+        {
+          reference: payment.reference,
+          ...(attempt.retry_after_seconds
+            ? { retryAfterSeconds: attempt.retry_after_seconds }
+            : {}),
+        },
+      );
+    }
 
     if (attempt.reused) {
       return Response.json(

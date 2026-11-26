@@ -1,66 +1,96 @@
--- Stay payments that tell the truth, and money that is never asked for twice
--- (Paystack went live; a trace of the apps against it found these).
+-- Stay payments through Paystack that end, and tell the truth (Paystack went
+-- live on 26 Nov 2026; a trace of the apps against it, and the owner's own try,
+-- found these). The id is a placeholder until the coordinator assigns one.
 --
 --  1. An unfinished stay payment ends. cron_expire_stay_payments closes a
---     Paystack stay payment once the hold is over and Paystack has been asked
---     and says it is not paid; with no such answer two hours after the last
---     try, it is closed and raised for a person. A success arriving later is
---     still recorded and ends in booked or refund due.
---  2. Money that does not match is never 'failed'. Fees charged on top
---     (requested_amount is what NexG asked, amount more) settle the payment and
---     are raised for a person. Anything else (less than asked, another
---     currency) is held on the payment (held_for_review_at): it reads pending
---     and no further try is started on the same thing.
+--     Paystack stay payment once the hold is over and Paystack, asked late
+--     enough, says no try on it is paid. With no such answer two hours after the
+--     last try it is closed and raised for a person, and the guest's screens go
+--     on reading pending until Paystack answers: nothing says money did not
+--     arrive. A success arriving later is still recorded and ends in booked or
+--     refund due.
+--  2. Fees charged on top of the price settle the payment: requested_amount as
+--     asked with a higher amount pays it for what was asked and is raised. A
+--     signed webhook with a higher amount and no requested_amount records
+--     nothing final, so Paystack's verify answer can still decide. Every other
+--     mismatch behaves as before.
 --  3. A refused payment, or a card page that never opened, no longer reads
 --     pending in the stay checkout.
---  4. A stay is paid one way at a time: while an earlier try could still take
---     the money, it is handed back instead of opening another. A second payment
---     for a stay already paid changes nothing on the stay and is raised.
---  5. The stay status read may ask Paystack about a try ten seconds old or
---     more, at most every ten seconds (rpc_stay_payment_check_claim).
---  6. A stay paid after its nights had gone is in the guest's list, cancelled
+--  4. A stay's phone prompt waiting (three minutes) is handed back, whichever
+--     phone method or number is asked for. Nothing is opened for a stay already
+--     paid, or while a success Paystack announced is being confirmed. Card and
+--     saved card are as before, except for 5.
+--  5. A card page closed unfinished: the status says lastTry 'not_completed'
+--     while the hold lasts, the try is left open (also when Paystack calls it
+--     failed), and paying by card again hands back the same page.
+--  6. The stay status read may ask Paystack about a try ten seconds old or more,
+--     at most every ten seconds (rpc_stay_payment_check_claim).
+--  7. A stay paid after its nights had gone is in the guest's list, cancelled
 --     with its refund due.
 --
--- Rollback: unschedule 'stay-payments-expire'; drop
--- cron_expire_stay_payments and rpc_stay_payment_check_claim; restore
--- rpc_payment_paystack_verified, rpc_order_payment_state and
--- rpc_payment_paystack_due from 20270129000200, fn_paystack_apply from
--- 20270215000100, rpc_payment_paystack_attempt and rpc_cinema_payment_state
--- from 20270320000200, rpc_payment_begin_stay from 20270116000400,
--- tg_payment_stay_settled from 20270315000100, rpc_stay_payment_state from
--- 20270222000200, rpc_engine_booking_payment_state from 20270222000100,
+-- Not here: holding mismatched money for a person, handing a card page back when
+-- another way to pay is asked for, and a guard against a second payment settling
+-- on one stay.
+--
+-- Rollback: unschedule 'stay-payments-expire'; restore
 -- fn_native_stay_checkout_view and rpc_stay_guest_stays from 20270328000100,
--- and cron_paystack_sweep from 20270310000100. The three new columns may stay.
+-- rpc_stay_checkout_status and rpc_payment_begin_stay from 20270116000400,
+-- rpc_payment_paystack_verified and rpc_payment_paystack_due from
+-- 20270129000200, fn_paystack_apply from 20270215000100,
+-- rpc_payment_paystack_attempt from 20270320000200 and cron_paystack_sweep from
+-- 20270310000100; then drop cron_expire_stay_payments,
+-- rpc_stay_payment_check_claim, rpc_stay_payment_return,
+-- fn_stay_payment_status, fn_stay_last_try and fn_paystack_try_unpaid, and the
+-- wiring_audit_exempt row. The two new paystack_attempt columns may stay. Put
+-- the web app back first or at the same time: it ignores a missing
+-- rpc_stay_payment_check_claim.
 
 -- ═══════════════════════════════════════════════ 0. audit actions
 
--- payment.amount_mismatch (20260101014800) is used again for money held here.
 insert into audit.action_registry (action, module, default_severity, needs_review, money, description) values
   ('payment.paystack_over_paid', 'orders', 'high', true, true,
    'Paystack charged more than NexG asked (fees passed to the customer); check the setting and refund the difference'),
-  ('stay.payment_not_applied', 'hotels', 'high', true, true,
-   'A payment arrived for a stay already paid or confirmed; refund it'),
   ('payment.stay_expired', 'hotels', 'info', false, true,
    'An unpaid stay payment was closed after its hold ran out'),
   ('payment.stay_unconfirmed', 'hotels', 'high', true, true,
    'A stay payment ran out with no clear answer from Paystack; check Paystack for the money')
 on conflict (action) do nothing;
 
--- ═══════════════════════════════════════════════ 1. what is kept
+-- ═══════════════════════════════════════════════ 1. what is kept about a try
 
-alter table public.payment
-  add column if not exists held_for_review_at timestamptz;
 alter table public.paystack_attempt
   add column if not exists provider_status text
     check (provider_status is null or length(provider_status) <= 40),
   add column if not exists claimed_at timestamptz;
 
-comment on column public.payment.held_for_review_at is
-  'Money arrived that could not be applied (less than asked, or another currency). While the payment is not paid or reversed it reads pending and nothing more is charged for the same thing; a person settles it.';
 comment on column public.paystack_attempt.provider_status is
-  'The transaction status in Paystack''s last verify answer about this try.';
+  'The transaction status in Paystack''s last verify answer about this try, or awaiting_verify: a signed success that could not be decided without one.';
 comment on column public.paystack_attempt.claimed_at is
   'When a stay status read last took this try to ask Paystack about it.';
+
+/*
+ * Whether a try with no outcome is settled as not paid: a card page never
+ * recorded as opened (a minute on, nothing could be paid on it), or Paystack,
+ * asked five minutes or more after a phone prompt began, or twenty-five after a
+ * card try, answering abandoned, failed or reversed.
+ */
+create or replace function public.fn_paystack_try_unpaid(p_try public.paystack_attempt)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select coalesce(
+    (p_try.opened_at is null and p_try.channel = 'card' and p_try.created_at <= now() - interval '1 minute')
+    or (p_try.provider_status in ('abandoned', 'failed', 'reversed')
+        and p_try.checked_at >= p_try.created_at
+          + case when p_try.channel in ('mpesa', 'airtel') then interval '5 minutes'
+                 else interval '25 minutes' end), false)
+$$;
+
+revoke execute on function public.fn_paystack_try_unpaid(public.paystack_attempt)
+  from public, anon, authenticated;
 
 -- ═══════════════════════════════════════════════ 2. what Paystack said
 
@@ -115,16 +145,18 @@ grant execute on function public.rpc_payment_paystack_verified(text, text, text)
 -- ═══════════════════════════════════════════════ 3. applying Paystack's answer
 
 /*
- * As 20270215000100, and for a success that does not match what was asked:
+ * As 20270215000100, and:
+ *   * a 'failed' answer about a stay's card page, while its hold lasts, ends
+ *     nothing: the guest goes back to that same page, and no second one opens;
  *   * Paystack's amount is what the customer was charged and requested_amount
  *     what NexG asked it to charge. requested_amount as asked with a larger
- *     amount (fees passed to the customer) pays the payment, for what was
- *     asked, and is raised as payment.paystack_over_paid.
- *   * Less than asked, more with no such requested_amount, or another currency:
- *     the money is real, so the payment is never 'failed'. It is held for a
- *     person (held_for_review_at), stays unpaid and is raised as
- *     payment.amount_mismatch.
- * A second success on a reversed payment is raised like one on a paid payment.
+ *     amount (fees passed to the customer) pays the payment, for what was asked,
+ *     and is raised as payment.paystack_over_paid;
+ *   * a signed webhook with a larger amount and no requested_amount cannot say
+ *     which it is. It records nothing final (no event under this transaction),
+ *     marks the try awaiting_verify and answers 'awaiting_verify'; the sweep and
+ *     the stay status read then ask Paystack, whose answer decides.
+ * Everything else, the other mismatches included, is as before.
  */
 
 create or replace function public.fn_paystack_apply(
@@ -149,7 +181,7 @@ declare
   v_auth jsonb := p_data->'authorization';
   v_card uuid;
   v_requested bigint;
-  v_why text;
+  v_over boolean := false;
 begin
   select * into a from public.paystack_attempt
    where reference = nullif(p_data->>'reference', '') for update;
@@ -162,6 +194,11 @@ begin
   select * into p from public.payment where id = a.payment_id for update;
 
   if v_status = 'failed' then
+    if a.outcome is null and a.channel = 'card' and a.authorization_url is not null
+       and exists (select 1 from public.stay s
+                    where s.id = p.stay_id and s.status = 'held' and s.hold_expires_at > now()) then
+      return jsonb_build_object('ok', true, 'state', 'pending', 'status', v_status);
+    end if;
     if a.outcome is null then
       update public.paystack_attempt
          set outcome = 'failed', checked_at = now(),
@@ -179,20 +216,15 @@ begin
     return jsonb_build_object('ok', false, 'reason', 'no_transaction_id');
   end if;
   if coalesce(p_data->>'currency', '') <> p.currency then
-    v_why := 'currency_mismatch';
-  elsif jsonb_typeof(p_data->'amount') is distinct from 'number'
+    return jsonb_build_object('ok', false, 'reason', 'currency_mismatch');
+  end if;
+  if jsonb_typeof(p_data->'amount') is distinct from 'number'
      or p_data->>'amount' !~ '^[1-9][0-9]{0,17}$' then
     return jsonb_build_object('ok', false, 'reason', 'invalid_amount');
   end if;
-  v_amount := case when p_data->>'amount' ~ '^[1-9][0-9]{0,17}$' then (p_data->>'amount')::bigint end;
-  v_requested := case when p_data->>'requested_amount' ~ '^[1-9][0-9]{0,17}$'
-                      then (p_data->>'requested_amount')::bigint end;
-  if v_why is null and v_amount <> p.amount_cents
-     and not coalesce(v_requested = p.amount_cents and v_amount > p.amount_cents, false) then
-    v_why := 'amount_mismatch';
-  end if;
+  v_amount := (p_data->>'amount')::bigint;
 
-  if p.state in ('paid', 'reversed') and p.provider_ref is distinct from v_id then
+  if p.state = 'paid' and p.provider_ref is distinct from v_id then
     insert into public.payment_event
       (payment_id, provider, event, dedupe_key, reference, payload, signature_ok, handled, handled_note)
     values (p.id, 'paystack', 'paystack.charge.success', 'paystack:' || v_id, p.reference,
@@ -212,39 +244,19 @@ begin
     return jsonb_build_object('ok', false, 'reason', 'already_paid_other_attempt');
   end if;
 
-  if v_why is not null then
-    if p.state in ('paid', 'reversed') then
-      return jsonb_build_object('ok', false, 'reason', v_why);
+  if v_amount > p.amount_cents and p.state not in ('paid', 'reversed') then
+    v_requested := case when p_data->>'requested_amount' ~ '^[1-9][0-9]{0,17}$'
+                        then (p_data->>'requested_amount')::bigint end;
+    if v_requested = p.amount_cents then
+      v_over := true;
+    elsif v_requested is null and p_event is not null then
+      -- A try ended earlier is opened again, so that Paystack is asked about it.
+      update public.paystack_attempt
+         set outcome = null, failure_reason = null, provider_status = 'awaiting_verify',
+             checked_at = null, claimed_at = null
+       where id = a.id and outcome is distinct from 'paid';
+      return jsonb_build_object('ok', false, 'reason', 'awaiting_verify');
     end if;
-    insert into public.payment_event
-      (payment_id, provider, event, dedupe_key, reference, payload, signature_ok, handled, handled_note)
-    values (p.id, 'paystack', 'paystack.' || coalesce(p_event, 'verify.success'), 'paystack:' || v_id,
-            p.reference, p_payload, true, false,
-            'held on attempt ' || a.reference || ': asked ' || p.amount_cents || ' ' || p.currency
-              || ', Paystack reports ' || left(coalesce(p_data->>'amount', '?'), 40) || ' '
-              || left(coalesce(p_data->>'currency', '?'), 10) || '; settle by hand')
-    on conflict (provider, dedupe_key) do nothing;
-    if found then
-      update public.paystack_attempt set outcome = 'paid', checked_at = now() where id = a.id;
-      -- Still live, so no second payment can be opened beside it.
-      update public.payment
-         set held_for_review_at = coalesce(held_for_review_at, now()),
-             state = case when state = 'pending' then 'authorised'::public.payment_state else state end,
-             authorised_at = coalesce(authorised_at, now()),
-             updated_at = now()
-       where id = p.id;
-      perform audit.log(
-        p_actor_type => 'system'::public.actor_type, p_module => 'orders',
-        p_action => 'payment.amount_mismatch', p_actor_label => '[System] · payments',
-        p_target_type => 'payment', p_target_id => p.id, p_city_id => p.city_id,
-        p_severity => 'high',
-        p_reason => 'Paystack took money that does not match what was asked. It is held and the customer is not asked to pay again. Check it in Paystack, then refund or settle it by hand.',
-        p_after => jsonb_build_object('why', v_why, 'reference', p.reference, 'attempt', a.reference,
-                                      'transaction', v_id, 'asked_cents', p.amount_cents,
-                                      'settled_cents', v_amount, 'requested_cents', v_requested,
-                                      'currency', left(p_data->>'currency', 10)));
-    end if;
-    return jsonb_build_object('ok', false, 'reason', v_why, 'held', true);
   end if;
 
   update public.paystack_attempt set outcome = 'paid', checked_at = now() where id = a.id;
@@ -262,12 +274,11 @@ begin
     p_payload => p_payload,
     p_paid => true,
     p_provider_ref => v_id,
-    -- Only reached when the money covers what was asked: the payment is for that.
-    p_amount_cents => p.amount_cents,
+    p_amount_cents => case when v_over then p.amount_cents else v_amount end,
     p_channel => coalesce(nullif(p_data->>'channel', ''),
                           case when a.channel in ('card', 'saved_card') then 'card' else 'mobile_money' end));
 
-  if v_result->>'state' = 'paid' and v_amount > p.amount_cents then
+  if v_over and v_result->>'state' = 'paid' then
     perform audit.log(
       p_actor_type => 'system'::public.actor_type, p_module => 'orders',
       p_action => 'payment.paystack_over_paid', p_actor_label => '[System] · payments',
@@ -338,18 +349,19 @@ $$;
 revoke execute on function public.fn_paystack_apply(text, text, jsonb, jsonb)
   from public, anon, authenticated, service_role;
 
--- ═══════════════════════════════════════════════ 4. one more try, never a second charge
+-- ═══════════════════════════════════════════════ 4. one more try
 
 /*
  * As 20270320000200, and:
- *   * nothing is tried while money received for the same order, booking, stay
- *     or seat hold is held for a person;
- *   * a stay is paid one way at a time. While an earlier try on its payment
- *     could still take the money, that try is handed back ('reused'), whatever
- *     way was asked for: a phone prompt for three minutes (Paystack's own limit
- *     is 180 seconds), a card page or a saved card for thirty minutes, a try
- *     still being opened for one minute, and one Paystack last called in
- *     progress for thirty minutes. A try Paystack says failed does not count.
+ *   * nothing is tried while a success Paystack announced on this payment is
+ *     waiting for its verify answer;
+ *   * a stay's phone prompt is handed back for three minutes (Paystack gives a
+ *     prompt 180 seconds), to any number and for M-Pesa or Airtel Money.
+ *     'same_request' says whether it is the way and number asked for. A prompt
+ *     Paystack said failed does not count;
+ *   * a stay's open card page is handed back for as long as it has no outcome,
+ *     whether or not the card is to be saved, so going back to pay by card never
+ *     opens a second one.
  */
 
 create or replace function public.rpc_payment_paystack_attempt(
@@ -416,12 +428,10 @@ begin
   if not (p.created_by is not distinct from v_uid or authz.reaches_module('orders')) then
     raise exception 'That payment is not yours.' using errcode = '42501';
   end if;
-  if exists (select 1 from public.payment h
-              where h.held_for_review_at is not null and h.state not in ('paid', 'reversed')
-                and (h.id = p.id or h.order_id = p.order_id or h.stay_id = p.stay_id
-                     or h.customer_engine_booking_id = p.customer_engine_booking_id
-                     or h.cinema_hold_id = p.cinema_hold_id)) then
-    raise exception 'We have received money for this and are checking it. Do not pay again.'
+  if exists (select 1 from public.paystack_attempt w
+              where w.payment_id = p.id and w.outcome is null
+                and w.provider_status = 'awaiting_verify') then
+    raise exception 'We have received your payment and are confirming it. Do not pay again.'
       using errcode = '22023';
   end if;
   if p.intent::text not in ('order', 'booking', 'stay', 'cinema') then
@@ -493,6 +503,22 @@ begin
     v_save := not coalesce((select u.is_anonymous from auth.users u where u.id = v_uid), true);
   end if;
 
+  -- A stay: a prompt still waiting is handed back, whichever phone way asks.
+  if p.intent::text = 'stay' and p_channel in ('mpesa', 'airtel') then
+    select * into a from public.paystack_attempt x
+     where x.payment_id = p.id and x.outcome is null and x.channel in ('mpesa', 'airtel')
+       and coalesce(x.opened_at, x.created_at) > now() - interval '3 minutes'
+     order by coalesce(x.opened_at, x.created_at) desc, x.reference desc limit 1;
+    if a.id is not null then
+      return jsonb_build_object(
+        'ok', true, 'reused', true, 'attempt_reference', a.reference, 'channel', a.channel,
+        'same_request', a.channel = p_channel and a.phone = p_phone,
+        'amount_cents', p.amount_cents, 'currency', p.currency, 'is_test', p.is_test,
+        'retry_after_seconds', greatest(1, ceil(extract(epoch from (
+          coalesce(a.opened_at, a.created_at) + interval '3 minutes' - now())))::integer));
+    end if;
+  end if;
+
   -- A prompt sent in the last minute, to any number: wait, so a double tap
   -- never sends two prompts.
   if p_channel in ('mpesa', 'airtel') then
@@ -515,42 +541,15 @@ begin
   if p_channel = 'card' then
     select * into a from public.paystack_attempt
      where payment_id = p.id and outcome is null and channel = 'card'
-       and authorization_url is not null and opened_at > now() - interval '30 minutes'
-       and save_card = v_save
+       and authorization_url is not null
+       and (p.intent::text = 'stay'
+            or (opened_at > now() - interval '30 minutes' and save_card = v_save))
      order by opened_at desc limit 1;
     if a.id is not null then
       return jsonb_build_object(
         'ok', true, 'reused', true, 'attempt_reference', a.reference, 'channel', 'card',
         'amount_cents', p.amount_cents, 'currency', p.currency, 'is_test', p.is_test,
         'authorization_url', a.authorization_url);
-    end if;
-  end if;
-
-  -- A stay: an earlier try that could still take the money is handed back.
-  if p.intent::text = 'stay' then
-    select * into a from public.paystack_attempt x
-     where x.payment_id = p.id and x.outcome is null
-       and ((x.channel in ('mpesa', 'airtel')
-              and coalesce(x.opened_at, x.created_at) > now() - interval '3 minutes')
-            or (x.channel in ('card', 'saved_card') and x.opened_at > now() - interval '30 minutes')
-            or (x.opened_at is null and x.created_at > now() - interval '1 minute')
-            or (x.provider_status in ('success', 'ongoing', 'pending', 'processing', 'queued')
-              and x.created_at > now() - interval '30 minutes'))
-     order by x.created_at desc, x.reference desc limit 1;
-    if a.id is not null then
-      v_wait := null;
-      if a.channel <> 'card' or a.authorization_url is null then
-        v_wait := greatest(1, ceil(extract(epoch from (
-                    case when a.channel in ('mpesa', 'airtel')
-                           then coalesce(a.opened_at, a.created_at) + interval '3 minutes'
-                         when a.opened_at is null then a.created_at + interval '1 minute'
-                         else a.opened_at + interval '30 minutes' end - now())))::integer);
-      end if;
-      return jsonb_strip_nulls(jsonb_build_object(
-        'ok', true, 'reused', true, 'attempt_reference', a.reference, 'channel', a.channel,
-        'amount_cents', p.amount_cents, 'currency', p.currency, 'is_test', p.is_test,
-        'authorization_url', case when a.channel = 'card' then a.authorization_url end,
-        'retry_after_seconds', v_wait));
     end if;
   end if;
 
@@ -639,7 +638,7 @@ grant execute on function public.rpc_payment_paystack_attempt(text, text, text, 
 
 -- ═══════════════════════════════════════════════ 5. opening a stay payment
 
--- As 20270116000400, and refused while money for the stay has already arrived.
+-- As 20270116000400, and refused for a stay a payment has already paid.
 
 create or replace function public.rpc_payment_begin_stay(p_stay_id uuid)
 returns jsonb
@@ -678,11 +677,8 @@ begin
   select * into v_unit from public.unit where id = v_stay.unit_id for update;
   select * into v_stay from public.stay where id = p_stay_id for update;
 
-  if exists (select 1 from public.payment h
-              where h.stay_id = p_stay_id
-                and (h.state = 'paid' or (h.held_for_review_at is not null and h.state <> 'reversed'))) then
-    raise exception 'We have received money for this booking and are checking it. Do not pay again.'
-      using errcode = '22023';
+  if exists (select 1 from public.payment where stay_id = p_stay_id and state = 'paid') then
+    raise exception 'This stay has already been paid for. Do not pay again.' using errcode = '22023';
   end if;
 
   update public.stay
@@ -726,439 +722,96 @@ begin
 end;
 $$;
 
-revoke execute on function public.rpc_payment_begin_stay(uuid) from public, anon;
-grant execute on function public.rpc_payment_begin_stay(uuid) to authenticated;
-
--- ═══════════════════════════════════════════════ 6. a stay is paid once
-
--- As 20270315000100, and money for a stay already paid by another payment, or
--- already confirmed without this one, leaves the stay as it is and is raised.
--- (Before, a second payment could cancel a stay in progress or book a cancelled
--- one again, and one on a booked stay passed without a word.)
-
-create or replace function public.tg_payment_stay_settled()
-returns trigger
-language plpgsql
-security definer
-set search_path = ''
-as $$
-declare
-  v_stay public.stay;
-  v_paid bigint := new.amount_cents / 100;
-  v_commission bigint;
-  v_pct numeric;
-  v_try public.paystack_attempt;
-  v_clash boolean;
-begin
-  perform 1 from public.unit u
-    join public.stay s on s.unit_id = u.id
-   where s.id = new.stay_id
-   for update of u;
-  select * into v_stay from public.stay where id = new.stay_id for update;
-  if v_stay.id is null then
-    return new;
-  end if;
-  if v_stay.payment_reference is distinct from new.reference
-     and (v_stay.payment_reference is not null
-          or v_stay.status in ('booked', 'in_stay', 'departed')) then
-    perform audit.log('system'::public.actor_type, 'hotels', 'stay.payment_not_applied',
-      p_target_type => 'stay', p_target_id => v_stay.id, p_city_id => new.city_id,
-      p_severity => 'high',
-      p_reason => 'A payment arrived for a stay already paid or confirmed. The stay is unchanged; refund this payment.',
-      p_after => jsonb_build_object('reference', new.reference, 'paid_kes', v_paid,
-                                    'stay_status', v_stay.status,
-                                    'stay_payment_reference', v_stay.payment_reference));
-    return new;
-  end if;
-  if v_stay.status = 'booked' then
-    return new;
-  end if;
-
-  select exists (
-    select 1 from public.stay s
-     where s.unit_id = v_stay.unit_id and s.id <> v_stay.id
-       and public.fn_stay_occupies(s.status, s.hold_expires_at)
-       and s.check_in < v_stay.check_out and s.check_out > v_stay.check_in
-  ) into v_clash;
-
-  if v_stay.status in ('held', 'cancelled') and not v_clash then
-    v_pct := coalesce((public.fn_host_commission(v_stay.host_id, v_stay.created_at) ->> 'pct')::numeric, 15);
-    v_commission := public.fn_stay_commission_kes(v_stay.id, v_paid);
-
-    /* Belt and braces: when Paystack was asked to split this payment, the
-       books take the split as it was sent, so what the host got and what
-       the stay says the host's share is agree to the cent. The rate is the
-       one the split was worked out at. */
-    select * into v_try from public.paystack_attempt a
-     where a.payment_id = new.id and a.outcome = 'paid'
-       and a.split_host_id is not null and a.split_share_cents is not null
-     order by a.created_at desc limit 1;
-    if v_try.id is not null and v_try.split_share_cents > 0
-       and v_try.split_share_cents <= v_paid * 100 then
-      v_commission := v_paid - v_try.split_share_cents / 100;
-      v_pct := coalesce(v_try.split_commission_pct, v_pct);
-    end if;
-
-    update public.stay
-       set status = 'booked', confirmed_at = now(), updated_at = now(),
-           paid_kes = v_paid, commission_kes = v_commission,
-           host_share_kes = v_paid - v_commission,
-           commission_pct = v_pct,
-           payment_reference = new.reference
-     where id = v_stay.id;
-
-    insert into public.host_message (host_id, direction, channel, subject, body)
-    values (v_stay.host_id, 'out', 'in_app', 'New NexG booking',
-            coalesce(v_stay.guest_first_name, 'A guest') || ' booked '
-            || to_char(v_stay.check_in at time zone 'Africa/Nairobi', 'DD Mon') || ' to '
-            || to_char(v_stay.check_out at time zone 'Africa/Nairobi', 'DD Mon YYYY')
-            || ' and paid KES ' || to_char(v_paid, 'FM999,999,999')
-            || '. Your share after NexG''s ' || trim_scale(v_pct)::text || '% is KES '
-            || to_char(v_paid - v_commission, 'FM999,999,999') || '.');
-
-    perform audit.log('system'::public.actor_type, 'hotels', 'stay.paid',
-      p_target_type => 'stay', p_target_id => v_stay.id, p_city_id => new.city_id,
-      p_after => jsonb_build_object('reference', new.reference, 'paid_kes', v_paid,
-                                    'commission_kes', v_commission,
-                                    'host_share_kes', v_paid - v_commission));
-  else
-    update public.stay
-       set status = 'cancelled', refund_due_at = now(), updated_at = now(),
-           paid_kes = v_paid, payment_reference = new.reference
-     where id = v_stay.id;
-
-    perform audit.log('system'::public.actor_type, 'hotels', 'stay.payment_refund_due',
-      p_target_type => 'stay', p_target_id => v_stay.id, p_city_id => new.city_id,
-      p_severity => 'high',
-      p_reason => 'The guest paid after the stay''s dates had gone to somebody else.',
-      p_after => jsonb_build_object('reference', new.reference, 'paid_kes', v_paid));
-  end if;
-  return new;
-end;
-$$;
-
-revoke execute on function public.tg_payment_stay_settled() from public, anon, authenticated;
-
--- ═══════════════════════════════════════════════ 7. what a payment screen shows
-
--- The four payment reads, each as before, and money held for a person reads
--- pending: never unpaid or failed, which would invite a second payment.
-
--- As 20270222000200, and a try still open speaks before a newer one that ended.
-
-create or replace function public.rpc_stay_payment_state(p_stay_id uuid)
-returns jsonb
-language plpgsql
-stable security definer
-set search_path = ''
-as $$
-declare
-  s public.stay;
-  p public.payment;
-  a public.paystack_attempt;
-  v_uid uuid := (select auth.uid());
-  v_wait integer;
-begin
-  if v_uid is null then
-    raise exception 'Start a session first.' using errcode = '42501';
-  end if;
-  select * into s from public.stay where id = p_stay_id;
-  if not found or s.guest_user_id is distinct from v_uid then
-    raise exception 'That stay is not yours.' using errcode = '42501';
-  end if;
-
-  select * into p from public.payment
-   where stay_id = s.id and (state <> 'abandoned' or held_for_review_at is not null)
-   order by (state = 'paid') desc,
-            (held_for_review_at is not null and state <> 'reversed') desc,
-            created_at desc
-   limit 1;
-  if p.id is null then
-    return jsonb_build_object('status', 'unpaid');
-  end if;
-  if p.state = 'paid' then
-    return jsonb_build_object('status', 'paid', 'reference', p.reference, 'channel', p.channel,
-      'is_test', p.is_test, 'paid_at', p.paid_at);
-  end if;
-  if p.held_for_review_at is not null and p.state <> 'reversed' then
-    return jsonb_build_object('status', 'pending', 'reference', p.reference, 'is_test', p.is_test);
-  end if;
-
-  select * into a from public.paystack_attempt where payment_id = p.id
-   order by (outcome is null and opened_at is not null
-             and opened_at > now() - interval '30 minutes') desc,
-            created_at desc
-   limit 1;
-  if p.state in ('pending', 'authorised') and (p.expires_at is null or p.expires_at > now()) then
-    if a.id is not null and a.outcome is null and a.opened_at is not null
-       and a.opened_at > now() - interval '30 minutes' then
-      if a.channel not in ('card', 'saved_card') then
-        v_wait := greatest(0, ceil(extract(epoch from (a.opened_at + interval '3 minutes' - now())))::integer);
-      end if;
-      return jsonb_build_object('status', 'pending', 'reference', p.reference,
-        'attempt_reference', a.reference, 'channel', a.channel, 'is_test', p.is_test,
-        'opened_seconds_ago', floor(extract(epoch from (now() - a.opened_at)))::integer,
-        'checked_seconds_ago', case when a.checked_at is not null
-          then floor(extract(epoch from (now() - a.checked_at)))::integer end,
-        'retry_after_seconds', v_wait,
-        'authorization_url', case when a.channel = 'card' then a.authorization_url end);
-    end if;
-    if a.id is not null and a.outcome = 'failed' then
-      return jsonb_build_object('status', 'failed', 'reference', p.reference);
-    end if;
-    return jsonb_build_object('status', 'unpaid', 'reference', p.reference);
-  end if;
-  if p.state = 'failed' then
-    return jsonb_build_object('status', 'failed', 'reference', p.reference);
-  end if;
-  return jsonb_build_object('status', 'unpaid');
-end;
-$$;
-
-revoke execute on function public.rpc_stay_payment_state(uuid) from public, anon;
-grant execute on function public.rpc_stay_payment_state(uuid) to authenticated;
-
--- As 20270129000200, and held money reads pending.
-
-create or replace function public.rpc_order_payment_state(p_order_id uuid)
-returns jsonb
-language plpgsql
-stable security definer
-set search_path = ''
-as $$
-declare
-  o public.order;
-  p public.payment;
-  a public.paystack_attempt;
-  v_uid uuid := (select auth.uid());
-  v_wait integer;
-begin
-  if v_uid is null then
-    raise exception 'Start a session first.' using errcode = '42501';
-  end if;
-  select * into o from public.order where id = p_order_id;
-  if not found then raise exception 'No such order.'; end if;
-  if not (
-    exists (select 1 from public.guest g where g.id = o.guest_id and g.user_id = v_uid)
-    or authz.is_merchant_member(o.merchant_id)
-    or authz.works_merchant(o.merchant_id)
-    or authz.reaches_module('orders')
-  ) then
-    raise exception 'That order is not yours.' using errcode = '42501';
-  end if;
-
-  if o.payment_status in ('paid', 'collected') then
-    select * into p from public.payment
-     where order_id = o.id and state = 'paid' order by paid_at desc nulls last limit 1;
-    return jsonb_build_object('status', 'paid', 'reference', p.reference,
-      'channel', p.channel, 'is_test', coalesce(p.is_test, false), 'paid_at', p.paid_at);
-  end if;
-
-  select * into p from public.payment
-   where order_id = o.id and held_for_review_at is not null and state not in ('paid', 'reversed')
-   order by created_at desc limit 1;
-  if p.id is not null then
-    return jsonb_build_object('status', 'pending', 'reference', p.reference, 'is_test', p.is_test);
-  end if;
-
-  select * into p from public.payment where order_id = o.id order by created_at desc limit 1;
-  if p.id is null then
-    return jsonb_build_object('status', 'unpaid');
-  end if;
-
-  select * into a from public.paystack_attempt where payment_id = p.id order by created_at desc limit 1;
-
-  if p.state in ('pending', 'authorised') and (p.expires_at is null or p.expires_at > now()) then
-    if a.id is not null and a.outcome is null and a.opened_at is not null
-       and a.opened_at > now() - interval '30 minutes' then
-      if a.channel <> 'card' then
-        v_wait := greatest(0, ceil(extract(epoch from (a.opened_at + interval '3 minutes' - now())))::integer);
-      end if;
-      return jsonb_build_object('status', 'pending', 'reference', p.reference,
-        'attempt_reference', a.reference, 'channel', a.channel, 'is_test', p.is_test,
-        'opened_seconds_ago', floor(extract(epoch from (now() - a.opened_at)))::integer,
-        'checked_seconds_ago', case when a.checked_at is not null
-          then floor(extract(epoch from (now() - a.checked_at)))::integer end,
-        'retry_after_seconds', v_wait,
-        'authorization_url', case when a.channel = 'card' then a.authorization_url end);
-    end if;
-    if a.id is not null and a.outcome = 'failed' then
-      return jsonb_build_object('status', 'failed', 'reference', p.reference,
-        'channel', a.channel, 'is_test', p.is_test);
-    end if;
-    return jsonb_build_object('status', 'unpaid', 'reference', p.reference);
-  end if;
-
-  if p.state = 'failed' then
-    return jsonb_build_object('status', 'failed', 'reference', p.reference);
-  end if;
-  return jsonb_build_object('status', 'unpaid');
-end;
-$$;
-
-revoke execute on function public.rpc_order_payment_state(uuid) from public, anon;
-grant execute on function public.rpc_order_payment_state(uuid) to authenticated;
-
--- As 20270222000100, and held money reads pending.
-
-create or replace function public.rpc_engine_booking_payment_state(p_booking uuid)
-returns jsonb
-language plpgsql
-stable security definer
-set search_path = ''
-as $$
-declare
-  b public.customer_engine_booking;
-  p public.payment;
-  a public.paystack_attempt;
-  v_uid uuid := (select auth.uid());
-  v_wait integer;
-begin
-  if v_uid is null then
-    raise exception 'Start a session first.' using errcode = '42501';
-  end if;
-  select * into b from public.customer_engine_booking where id = p_booking;
-  if not found or b.user_id is distinct from v_uid then
-    raise exception 'That booking is not yours.' using errcode = '42501';
-  end if;
-
-  select * into p from public.payment
-   where customer_engine_booking_id = b.id and held_for_review_at is not null
-     and state not in ('paid', 'reversed')
-   order by created_at desc limit 1;
-  if p.id is not null then
-    return jsonb_build_object('status', 'pending', 'reference', p.reference, 'step', p.booking_step,
-      'is_test', p.is_test);
-  end if;
-
-  select * into p from public.payment
-   where customer_engine_booking_id = b.id and state <> 'abandoned'
-   order by created_at desc limit 1;
-  if p.id is null then
-    return jsonb_build_object('status', 'unpaid');
-  end if;
-  if p.state = 'paid' then
-    return jsonb_build_object('status', 'paid', 'reference', p.reference, 'step', p.booking_step,
-      'channel', p.channel, 'is_test', p.is_test, 'paid_at', p.paid_at,
-      'settled', p.engine_settled_at is not null, 'refund_due', p.engine_settle_error is not null);
-  end if;
-
-  select * into a from public.paystack_attempt where payment_id = p.id order by created_at desc limit 1;
-  if p.state in ('pending', 'authorised') and (p.expires_at is null or p.expires_at > now()) then
-    if a.id is not null and a.outcome is null and a.opened_at is not null
-       and a.opened_at > now() - interval '30 minutes' then
-      if a.channel not in ('card', 'saved_card') then
-        v_wait := greatest(0, ceil(extract(epoch from (a.opened_at + interval '3 minutes' - now())))::integer);
-      end if;
-      return jsonb_build_object('status', 'pending', 'reference', p.reference, 'step', p.booking_step,
-        'attempt_reference', a.reference, 'channel', a.channel, 'is_test', p.is_test,
-        'opened_seconds_ago', floor(extract(epoch from (now() - a.opened_at)))::integer,
-        'checked_seconds_ago', case when a.checked_at is not null
-          then floor(extract(epoch from (now() - a.checked_at)))::integer end,
-        'retry_after_seconds', v_wait,
-        'authorization_url', case when a.channel = 'card' then a.authorization_url end);
-    end if;
-    if a.id is not null and a.outcome = 'failed' then
-      return jsonb_build_object('status', 'failed', 'reference', p.reference, 'step', p.booking_step);
-    end if;
-    return jsonb_build_object('status', 'unpaid', 'reference', p.reference, 'step', p.booking_step);
-  end if;
-  if p.state = 'failed' then
-    return jsonb_build_object('status', 'failed', 'reference', p.reference, 'step', p.booking_step);
-  end if;
-  return jsonb_build_object('status', 'unpaid');
-end;
-$$;
-
-revoke execute on function public.rpc_engine_booking_payment_state(uuid) from public, anon;
-grant execute on function public.rpc_engine_booking_payment_state(uuid) to authenticated;
-
--- As 20270320000200, and held money reads pending (an ended hold closes its
--- payment, so this looks at closed ones too).
-
-create or replace function public.rpc_cinema_payment_state(p_hold_id uuid)
-returns jsonb
-language plpgsql
-stable security definer
-set search_path = ''
-as $$
-declare
-  h cinema.hold;
-  p public.payment;
-  a public.paystack_attempt;
-  v_uid uuid := (select auth.uid());
-  v_wait integer;
-begin
-  if v_uid is null then
-    raise exception 'Start a session first.' using errcode = '42501';
-  end if;
-  select * into h from cinema.hold where id = p_hold_id;
-  if not found or h.guest_id is distinct from v_uid then
-    raise exception 'That seat hold is not yours.' using errcode = '42501';
-  end if;
-
-  select * into p from public.payment
-   where cinema_hold_id = h.id and held_for_review_at is not null
-     and state not in ('paid', 'reversed')
-   order by created_at desc limit 1;
-  if p.id is not null then
-    return jsonb_build_object('status', 'pending', 'reference', p.reference, 'is_test', p.is_test);
-  end if;
-
-  select * into p from public.payment
-   where cinema_hold_id = h.id and state <> 'abandoned' order by created_at desc limit 1;
-  if p.id is null then
-    return jsonb_build_object('status', 'unpaid');
-  end if;
-  if p.state = 'paid' then
-    return jsonb_build_object('status', 'paid', 'reference', p.reference, 'channel', p.channel,
-      'is_test', p.is_test, 'paid_at', p.paid_at);
-  end if;
-
-  select * into a from public.paystack_attempt where payment_id = p.id order by created_at desc limit 1;
-  if p.state in ('pending', 'authorised') and (p.expires_at is null or p.expires_at > now()) then
-    if a.id is not null and a.outcome is null and a.opened_at is not null
-       and a.opened_at > now() - interval '30 minutes' then
-      if a.channel not in ('card', 'saved_card') then
-        v_wait := greatest(0, ceil(extract(epoch from (a.opened_at + interval '3 minutes' - now())))::integer);
-      end if;
-      return jsonb_build_object('status', 'pending', 'reference', p.reference,
-        'attempt_reference', a.reference, 'channel', a.channel, 'is_test', p.is_test,
-        'opened_seconds_ago', floor(extract(epoch from (now() - a.opened_at)))::integer,
-        'checked_seconds_ago', case when a.checked_at is not null
-          then floor(extract(epoch from (now() - a.checked_at)))::integer end,
-        'retry_after_seconds', v_wait,
-        'authorization_url', case when a.channel = 'card' then a.authorization_url end);
-    end if;
-    if a.id is not null and a.outcome = 'failed' then
-      return jsonb_build_object('status', 'failed', 'reference', p.reference);
-    end if;
-    return jsonb_build_object('status', 'unpaid', 'reference', p.reference);
-  end if;
-  if p.state = 'failed' then
-    return jsonb_build_object('status', 'failed', 'reference', p.reference);
-  end if;
-  return jsonb_build_object('status', 'unpaid');
-end;
-$$;
-
-revoke execute on function public.rpc_cinema_payment_state(uuid) from public, anon;
-grant execute on function public.rpc_cinema_payment_state(uuid) to authenticated;
-
--- ═══════════════════════════════════════════════ 8. what the stay apps are told
+-- ═══════════════════════════════════════════════ 6. what a guest's stay screens are told
 
 /*
- * As 20270328000100, with paymentStatus from what really happened to a
- * Paystack payment (the same four values):
- *   pending  money received and held for a person, or a try that may still be
- *            paid: one that reached Paystack, or a phone prompt, with no
- *            outcome, or a card page being opened in the last minute;
- *   failed   every try ended unpaid (Paystack said it failed, or called a
- *            phone prompt abandoned five minutes or more after it began), or
- *            the payment's time ran out with nothing that could take money;
+ * A stay's paymentStatus, the four values the apps know. For a Paystack payment:
+ *   pending  a try may still bring money: one that reached Paystack, a phone
+ *            prompt, or a card page being opened in the last minute, with no
+ *            outcome; or a success waiting to be confirmed. A closed payment
+ *            stays pending while any try on it is not settled as unpaid
+ *            (fn_paystack_try_unpaid), as after two hours with no answer;
+ *   failed   every try ended unpaid, or the payment's time ran out with
+ *            nothing that could take money;
  *   unpaid   a payment opened with nothing tried yet.
  * Payments begun another way (Safaricom) read as before.
  */
+create or replace function public.fn_stay_payment_status(p_stay_id uuid)
+returns text
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select case
+    when s.paid_kes is not null and s.paid_kes > 0 then 'paid'
+    when p.state = 'paid' then 'paid'
+    when p.state in ('pending', 'authorised') and p.provider in ('paystack', 'unassigned') then
+      case when tries.may_pay then 'pending'
+           when tries.failed then 'failed'
+           when p.expires_at <= clock_timestamp() then 'failed'
+           else 'unpaid' end
+    when p.state = 'abandoned' and p.provider = 'paystack' and tries.unsettled then 'pending'
+    when p.state = 'pending' and p.provider_ref is null and p.expires_at <= clock_timestamp() then 'failed'
+    when p.state in ('pending', 'authorised') then 'pending'
+    when p.id is not null then 'failed'
+    else 'unpaid'
+  end
+  from public.stay s
+  left join lateral (
+    select id, state, provider, provider_ref, expires_at from public.payment
+     where stay_id = s.id order by created_at desc, id desc limit 1
+  ) p on true
+  left join lateral (
+    select bool_or(a.outcome = 'paid'
+                   or (a.outcome is null
+                       and (a.opened_at is not null or a.channel <> 'card'
+                            or a.created_at > clock_timestamp() - interval '1 minute'
+                            or a.provider_status = 'awaiting_verify'))) as may_pay,
+           bool_or(a.outcome = 'failed') as failed,
+           bool_or(a.outcome = 'paid'
+                   or (a.outcome is null and not public.fn_paystack_try_unpaid(a))) as unsettled
+      from public.paystack_attempt a
+     where a.payment_id = p.id
+  ) tries on true
+  where s.id = p_stay_id
+$$;
+
+revoke execute on function public.fn_stay_payment_status(uuid) from public, anon, authenticated;
+
+/*
+ * 'not_completed' while a held stay's newest try is a card page Paystack, when
+ * asked, called abandoned or failed: the guest can go back to that same page.
+ * Paystack calls a page abandoned from the moment it opens until it is paid, so
+ * this also holds while the guest is still on it. Null otherwise.
+ */
+create or replace function public.fn_stay_last_try(p_stay_id uuid)
+returns text
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select 'not_completed'::text
+    from public.stay s
+    join lateral (
+      select id, state from public.payment
+       where stay_id = s.id order by created_at desc, id desc limit 1
+    ) p on true
+    join lateral (
+      select channel, outcome, opened_at, provider_status from public.paystack_attempt
+       where payment_id = p.id order by created_at desc, reference desc limit 1
+    ) t on true
+   where s.id = p_stay_id and s.status = 'held' and s.hold_expires_at > clock_timestamp()
+     and p.state in ('pending', 'authorised')
+     and t.channel = 'card' and t.outcome is null and t.opened_at is not null
+     and t.provider_status in ('abandoned', 'failed')
+$$;
+
+revoke execute on function public.fn_stay_last_try(uuid) from public, anon, authenticated;
+
+-- As 20270328000100, with paymentStatus from fn_stay_payment_status and an
+-- optional 'lastTry'.
 
 create or replace function public.fn_native_stay_checkout_view(p_checkout_id uuid)
 returns jsonb
@@ -1175,24 +828,12 @@ as $$
     'totalMinor', c.total_minor,
     'status', case when s.status = 'held' and s.hold_expires_at <= clock_timestamp()
                    then 'expired' else s.status::text end,
-    'paymentStatus', case
-      when s.paid_kes is not null and s.paid_kes > 0 then 'paid'
-      when held.id is not null then 'pending'
-      when p.state = 'paid' then 'paid'
-      when p.state in ('pending', 'authorised') and p.provider in ('paystack', 'unassigned') then
-        case when tries.may_pay then 'pending'
-             when tries.failed then 'failed'
-             when p.expires_at <= clock_timestamp() then 'failed'
-             else 'unpaid' end
-      when p.state = 'pending' and p.provider_ref is null and p.expires_at <= clock_timestamp() then 'failed'
-      when p.state in ('pending', 'authorised') then 'pending'
-      when p.id is not null then 'failed'
-      else 'unpaid'
-    end,
+    'paymentStatus', public.fn_stay_payment_status(s.id),
+    'lastTry', public.fn_stay_last_try(s.id),
     'refundDue', s.refund_due_at is not null,
     'refunded', s.refunded_at is not null,
     'cancelledAfterBooking', s.status = 'cancelled' and s.confirmed_at is not null,
-    'reference', coalesce(s.payment_reference, held.reference, p.reference),
+    'reference', coalesce(s.payment_reference, p.reference),
     'providerPending', p.state = 'authorised' and p.provider = 'mpesa'))
   from public.native_stay_checkout c
   join public.stay s on s.id = c.stay_id and s.guest_user_id = c.guest_user_id
@@ -1200,36 +841,100 @@ as $$
     select id, state, provider, provider_ref, reference, expires_at from public.payment
      where stay_id = s.id order by created_at desc, id desc limit 1
   ) p on true
-  left join lateral (
-    select h.id, h.reference from public.payment h
-     where h.stay_id = s.id and h.held_for_review_at is not null
-       and h.state not in ('paid', 'reversed')
-     order by h.created_at desc, h.id desc limit 1
-  ) held on true
-  left join lateral (
-    select bool_or(a.outcome = 'paid'
-                   or (a.outcome is null and not x.lapsed
-                       and (a.opened_at is not null or a.channel <> 'card'
-                            or a.created_at > clock_timestamp() - interval '1 minute'))) as may_pay,
-           bool_or(a.outcome = 'failed' or (a.outcome is null and x.lapsed)) as failed
-      from public.paystack_attempt a
-     cross join lateral (
-       -- A prompt Paystack, asked five minutes or more after it began, calls abandoned.
-       select coalesce(a.channel in ('mpesa', 'airtel') and a.provider_status = 'abandoned'
-                       and a.checked_at >= a.created_at + interval '5 minutes', false) as lapsed
-     ) x
-     where a.payment_id = p.id
-  ) tries on true
   where c.id = p_checkout_id;
 $$;
 
 revoke execute on function public.fn_native_stay_checkout_view(uuid) from public, anon, authenticated;
 
+-- ═══════════════════════════════════════════════ 7. the website's stay checkout
+
+-- As 20270116000400, plus 'payment_status' and 'last_try', the two readings
+-- above.
+
+create or replace function public.rpc_stay_checkout_status(p_stay_id uuid)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+declare
+  v_stay public.stay;
+  v_zone text;
+  v_result jsonb;
+begin
+  select * into v_stay from public.stay where id = p_stay_id;
+  if v_stay.id is null or v_stay.guest_user_id is distinct from auth.uid() or auth.uid() is null then
+    raise exception 'That stay is not yours.' using errcode = '42501';
+  end if;
+  select coalesce(h.time_zone, 'Africa/Nairobi') into v_zone from public.host h where h.id = v_stay.host_id;
+
+  select jsonb_build_object(
+    'stay_id', v_stay.id,
+    'status', case when v_stay.status = 'held' and v_stay.hold_expires_at <= now()
+                   then 'expired' else v_stay.status end,
+    'hold_expires_at', v_stay.hold_expires_at,
+    'check_in', (v_stay.check_in at time zone v_zone)::date,
+    'check_out', (v_stay.check_out at time zone v_zone)::date,
+    'nights', (v_stay.check_out at time zone v_zone)::date - (v_stay.check_in at time zone v_zone)::date,
+    'adults', v_stay.party_adults,
+    'children', v_stay.party_children,
+    'total_kes', v_stay.quote_total_kes,
+    'paid_kes', v_stay.paid_kes,
+    'refund_due', v_stay.refund_due_at is not null,
+    'unit', coalesce(u.label_public, u.name),
+    'property', p.name,
+    'property_slug', p.slug,
+    'payment_state', (select pay.state::text from public.payment pay
+                       where pay.stay_id = v_stay.id order by pay.created_at desc limit 1),
+    'payment_failure', (select pay.failure_reason from public.payment pay
+                         where pay.stay_id = v_stay.id order by pay.created_at desc limit 1),
+    'payment_reference', v_stay.payment_reference,
+    'booking_code', public.rpc_my_stay_code(v_stay.id),
+    'reservation_name', v_stay.guest_first_name,
+    'payment_status', public.fn_stay_payment_status(v_stay.id),
+    'last_try', public.fn_stay_last_try(v_stay.id))
+  into v_result
+  from public.unit u
+  left join public.property p on p.id = u.property_id
+  where u.id = v_stay.unit_id;
+
+  return v_result;
+end;
+$$;
+
+revoke execute on function public.rpc_stay_checkout_status(uuid) from public, anon;
+grant execute on function public.rpc_stay_checkout_status(uuid) to authenticated;
+
 /*
- * As 20270328000100, plus a stay whose payment arrived after its nights had
- * gone: cancelled, never confirmed, refund due. Such a stay shows no way in and
- * no Wi-Fi.
+ * Paystack's page sends a guest back to /pay/{reference}, and a stay's payment
+ * is not readable by its guest: this says which of the caller's own stays that
+ * reference pays, so the website can take them to it. Null for anything else.
  */
+create or replace function public.rpc_stay_payment_return(p_reference text)
+returns jsonb
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select jsonb_build_object('stay_id', s.id, 'property_slug', pr.slug)
+    from public.payment p
+    join public.stay s on s.id = p.stay_id
+    left join public.unit u on u.id = s.unit_id
+    join public.property pr on pr.id = coalesce(s.property_id, u.property_id)
+   where p.reference = p_reference and p.intent = 'stay'
+     and (select auth.uid()) is not null and s.guest_user_id = (select auth.uid())
+$$;
+
+revoke execute on function public.rpc_stay_payment_return(text) from public, anon;
+grant execute on function public.rpc_stay_payment_return(text) to authenticated;
+
+-- ═══════════════════════════════════════════════ 8. money after the nights had gone
+
+-- As 20270328000100, plus a stay whose payment arrived after its nights had
+-- gone: cancelled, never confirmed, refund due. Such a stay shows no way in and
+-- no Wi-Fi.
 
 create or replace function public.rpc_stay_guest_stays(p_limit integer default 50)
 returns jsonb
@@ -1299,15 +1004,17 @@ $$;
 revoke execute on function public.rpc_stay_guest_stays(integer) from public, anon;
 grant execute on function public.rpc_stay_guest_stays(integer) to authenticated;
 
--- ═══════════════════════════════════════════════ 9. asking Paystack from the status read
+-- ═══════════════════════════════════════════════ 9. asking Paystack from a status read
 
 /*
- * The tries on the caller's own stay that are worth putting to Paystack now:
- * no outcome, under a day old, sent ten seconds ago or more (a phone prompt
- * never recorded as sent: a minute), and neither answered nor taken in the last
- * ten seconds. At most two. Taking them stamps claimed_at, so a polling screen
- * cannot hammer Paystack even while Paystack is not answering. checked_at is
- * left for Paystack's real answers, which the expiry below relies on.
+ * The tries on the caller's own stay that are worth putting to Paystack now: no
+ * outcome, and sent ten seconds ago or more (a phone prompt never recorded as
+ * sent: a minute; a success waiting to be confirmed: at once), neither answered
+ * nor taken in the last ten seconds. At most two. Taking them stamps
+ * claimed_at, so a polling screen cannot hammer Paystack even while Paystack is
+ * not answering. checked_at is left for Paystack's real answers, which the
+ * expiry below relies on. No age limit: a try left behind is still asked about
+ * when its guest looks.
  */
 create or replace function public.rpc_stay_payment_check_claim(p_stay_id uuid)
 returns jsonb
@@ -1331,11 +1038,10 @@ begin
       from public.paystack_attempt a
       join public.payment p on p.id = a.payment_id
      where p.stay_id = p_stay_id and p.intent = 'stay'
-       and p.state in ('pending', 'authorised', 'abandoned')
-       and p.held_for_review_at is null
+       and (p.state in ('pending', 'authorised', 'abandoned') or a.provider_status = 'awaiting_verify')
        and a.outcome is null
-       and a.created_at > now() - interval '24 hours'
        and (a.opened_at <= now() - interval '10 seconds'
+            or a.provider_status = 'awaiting_verify'
             or (a.opened_at is null and a.channel <> 'card'
                 and a.created_at <= now() - interval '1 minute'))
        and (a.checked_at is null or a.checked_at <= now() - interval '10 seconds')
@@ -1368,9 +1074,10 @@ on conflict (function_name) do nothing;
 
 -- ═══════════════════════════════════════════════ 10. the sweep
 
--- As 20270129000200, and a closed stay payment is still asked about for the
--- rest of its day, every half hour and after the live ones, so a late success
--- is found even if Paystack's webhook does not arrive.
+-- As 20270129000200, and: a closed stay payment is still asked about for the
+-- rest of its day, every half hour and after the live ones, so a late success is
+-- found even if Paystack's webhook does not arrive; and a success waiting to be
+-- confirmed is asked about whatever its age or its payment's state.
 
 create or replace function public.rpc_payment_paystack_due(p_proof text)
 returns table (attempt_reference text, is_test boolean)
@@ -1386,13 +1093,15 @@ begin
     select a.reference, a.is_test
       from public.paystack_attempt a
       join public.payment p on p.id = a.payment_id
-     where a.outcome is null and a.opened_at is not null
-       and a.opened_at < now() - interval '2 minutes'
-       and a.created_at > now() - interval '24 hours'
-       and ((p.state in ('pending', 'authorised')
-             and (a.checked_at is null or a.checked_at < now() - interval '5 minutes'))
-            or (p.intent = 'stay' and p.state = 'abandoned'
-             and (a.checked_at is null or a.checked_at < now() - interval '30 minutes')))
+     where a.outcome is null
+       and ((a.opened_at < now() - interval '2 minutes'
+             and a.created_at > now() - interval '24 hours'
+             and ((p.state in ('pending', 'authorised')
+                   and (a.checked_at is null or a.checked_at < now() - interval '5 minutes'))
+                  or (p.intent = 'stay' and p.state = 'abandoned'
+                   and (a.checked_at is null or a.checked_at < now() - interval '30 minutes'))))
+            or (a.provider_status = 'awaiting_verify'
+             and (a.checked_at is null or a.checked_at < now() - interval '5 minutes')))
      order by (p.state = 'abandoned'), a.opened_at
      limit 20;
 end;
@@ -1418,13 +1127,15 @@ declare
 begin
   select count(*) into v_due
     from public.paystack_attempt a join public.payment p on p.id = a.payment_id
-   where a.outcome is null and a.opened_at is not null
-     and a.opened_at < now() - interval '2 minutes'
-     and a.created_at > now() - interval '24 hours'
-     and ((p.state in ('pending', 'authorised')
-           and (a.checked_at is null or a.checked_at < now() - interval '5 minutes'))
-          or (p.intent = 'stay' and p.state = 'abandoned'
-           and (a.checked_at is null or a.checked_at < now() - interval '30 minutes')));
+   where a.outcome is null
+     and ((a.opened_at < now() - interval '2 minutes'
+           and a.created_at > now() - interval '24 hours'
+           and ((p.state in ('pending', 'authorised')
+                 and (a.checked_at is null or a.checked_at < now() - interval '5 minutes'))
+                or (p.intent = 'stay' and p.state = 'abandoned'
+                 and (a.checked_at is null or a.checked_at < now() - interval '30 minutes'))))
+          or (a.provider_status = 'awaiting_verify'
+           and (a.checked_at is null or a.checked_at < now() - interval '5 minutes')));
   v_due := v_due + (select count(*) from public.payment p
                      where p.customer_engine_booking_id is not null and p.state = 'paid'
                        and p.engine_settled_at is null and p.engine_settle_error is null
@@ -1474,17 +1185,16 @@ grant execute on function public.cron_paystack_sweep() to service_role;
 
 /*
  * Every two minutes: a stay payment through Paystack (or never started) whose
- * hold is over and whose own time has run out is closed ('abandoned') once no
- * try could be waiting for money:
- *   * every try failed, or was a card page that never opened; or
- *   * Paystack, asked five minutes or more after a phone prompt began, or
- *     twenty-five after a card try, answered abandoned, failed or reversed.
- * Otherwise it waits, but not past two hours from the last try: then it is
- * closed and raised for a person (payment.stay_unconfirmed). A try Paystack
- * called successful that was never applied is not closed: the payment is held
- * for a person. Closing records nothing about money; a success that arrives
- * later still pays the payment, and tg_payment_stay_settled books the stay or
- * marks a refund due.
+ * hold is over and whose own time has run out is closed ('abandoned') once every
+ * try on it failed or is settled as unpaid (fn_paystack_try_unpaid). Otherwise
+ * it waits, but not past two hours from the last try: then it is closed and
+ * raised for a person (payment.stay_unconfirmed), and goes on reading pending to
+ * the guest until Paystack answers.
+ * A payment with a success on it that was never applied (Paystack's verify said
+ * success, or a webhook is waiting for that answer) is never closed here; two
+ * hours after the last try it is raised, once.
+ * Closing says nothing about money: a success that arrives later still pays the
+ * payment, and tg_payment_stay_settled books the stay or marks a refund due.
  */
 create or replace function public.cron_expire_stay_payments()
 returns jsonb
@@ -1506,41 +1216,39 @@ begin
       join public.stay s on s.id = p.stay_id
      where p.intent = 'stay' and p.state in ('pending', 'authorised')
        and p.provider in ('paystack', 'unassigned')
-       and p.held_for_review_at is null
        and (p.expires_at is null or p.expires_at <= now())
        and (s.status <> 'held' or s.hold_expires_at <= now())
        and not exists (select 1 from public.payment_prompt pr
                         where pr.payment_id = p.id and pr.resolved_at is null)
-     order by p.created_at
+     order by p.created_at desc
      limit 200
      for update of p skip locked
   loop
     select max(a.created_at),
            coalesce(bool_or(a.outcome = 'paid'
-                            or (a.outcome is null and a.provider_status = 'success')), false),
-           coalesce(bool_or(a.outcome is null and not (
-             (a.opened_at is null and a.channel = 'card' and a.created_at <= now() - interval '1 minute')
-             or coalesce(a.provider_status in ('abandoned', 'failed', 'reversed')
-                         and a.checked_at >= a.created_at
-                           + case when a.channel in ('mpesa', 'airtel') then interval '5 minutes'
-                                  else interval '25 minutes' end, false))), false)
+                            or (a.outcome is null
+                                and a.provider_status in ('success', 'awaiting_verify'))), false),
+           coalesce(bool_or(a.outcome is null and not public.fn_paystack_try_unpaid(a)), false)
       into v_last, v_money, v_waiting
       from public.paystack_attempt a
      where a.payment_id = r.id;
 
     if v_money then
-      update public.payment
-         set held_for_review_at = now(), updated_at = now()
-       where id = r.id;
-      perform audit.log(
-        p_actor_type => 'system'::public.actor_type, p_module => 'hotels',
-        p_action => 'payment.stay_unconfirmed', p_actor_label => '[System] · payments',
-        p_target_type => 'payment', p_target_id => r.id, p_city_id => r.city_id,
-        p_severity => 'high',
-        p_reason => 'Paystack reports this stay payment successful, but it was never applied. It is held and the guest is not asked to pay again. Check it in Paystack.',
-        p_after => jsonb_build_object('stay', r.stay_id, 'reference', r.reference,
-                                      'amount_cents', r.amount_cents, 'test', r.is_test, 'held', true));
-      v_raised := v_raised + 1;
+      if v_last <= now() - interval '2 hours'
+         and not exists (select 1 from audit.audit_event e
+                          where e.target_type = 'payment' and e.target_id = r.id
+                            and e.action = 'payment.stay_unconfirmed') then
+        perform audit.log(
+          p_actor_type => 'system'::public.actor_type, p_module => 'hotels',
+          p_action => 'payment.stay_unconfirmed', p_actor_label => '[System] · payments',
+          p_target_type => 'payment', p_target_id => r.id, p_city_id => r.city_id,
+          p_severity => 'high',
+          p_reason => 'Paystack announced a success on this stay payment that was never applied. It is left open. Check it in Paystack.',
+          p_after => jsonb_build_object('stay', r.stay_id, 'reference', r.reference,
+                                        'amount_cents', r.amount_cents, 'test', r.is_test,
+                                        'closed', false));
+        v_raised := v_raised + 1;
+      end if;
       continue;
     end if;
 
@@ -1565,7 +1273,8 @@ begin
         then 'Closed with no final answer from Paystack. Check in Paystack whether money was taken.'
         else 'The hold ran out and no try could still be paid.' end,
       p_after => jsonb_build_object('stay', r.stay_id, 'reference', r.reference,
-                                    'amount_cents', r.amount_cents, 'test', r.is_test, 'held', false));
+                                    'amount_cents', r.amount_cents, 'test', r.is_test,
+                                    'closed', true));
     if v_waiting then
       v_raised := v_raised + 1;
     else
