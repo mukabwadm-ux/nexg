@@ -336,14 +336,37 @@ export function StayCheckout({
     );
   }
 
+  /* A payment still being checked: nothing is claimed either way, and the
+     guest is not asked to pay again. */
+  if (step === 'expired' && status?.paymentState === 'authorised') {
+    return (
+      <Card className="p-6">
+        <Clock aria-hidden="true" className="text-muted h-8 w-8" />
+        <h2 className="mt-3 text-[1.25rem] font-extrabold">We are checking your payment</h2>
+        <p className="text-muted mt-2 text-[0.875rem] font-semibold leading-[1.7]">
+          Your hold ran out before the payment was confirmed. If money left your account, do not pay
+          again: write to us from the help page.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Button onClick={() => void refresh()}>Check again</Button>
+          <Button asChild variant="outline">
+            <Link href="/stays">Back to stays</Link>
+          </Button>
+        </div>
+      </Card>
+    );
+  }
+
   if (step === 'expired') {
     return (
       <Card className="p-6">
         <Clock aria-hidden="true" className="text-muted h-8 w-8" />
         <h2 className="mt-3 text-[1.25rem] font-extrabold">Your hold ran out</h2>
         <p className="text-muted mt-2 text-[0.875rem] font-semibold leading-[1.7]">
-          Nothing was charged. The dates may still be free: choose them again to hold them for
-          another 15 minutes.
+          {status?.paymentState
+            ? 'We have not received a payment. If money left your account, do not pay again: write to us from the help page.'
+            : 'Nothing was charged.'}{' '}
+          The dates may still be free: choose them again to hold them for another 15 minutes.
         </p>
         <Button className="mt-5" onClick={() => void release()}>
           Choose dates again

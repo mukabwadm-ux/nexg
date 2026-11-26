@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const stub = vi.hoisted(() => ({
   getUser: vi.fn(),
@@ -208,6 +208,8 @@ describe('native stay checkout routes', () => {
       reference: 'NXP-S',
       url: 'https://checkout.paystack.com/s1',
       test: true,
+      reused: false,
+      channel: 'card',
     });
     expect(stub.rpc).toHaveBeenCalledWith('rpc_payment_begin_stay', { p_stay_id: stayId });
 
@@ -372,5 +374,260 @@ describe('native stay checkout routes', () => {
       'x',
     );
     expect(response.status).toBe(422);
+  });
+});
+
+describe('a stay payment through Paystack, between the try and the webhook', () => {
+  const TEST = 'sk_test_ci_only_0123456789';
+  const pending = { ...hold, paymentStatus: 'pending', reference: 'NXP-S' };
+  const booked = { ...pending, status: 'booked', paymentStatus: 'paid' };
+  const due = [{ attempt_reference: 'NXP-S-1', is_test: true }];
+  const verified = JSON.stringify({
+    status: true,
+    data: { reference: 'NXP-S-1', status: 'success', amount: 1400000, currency: 'KES' },
+  });
+  const calls = (fn: string) => stub.rpc.mock.calls.filter((call) => call[0] === fn);
+
+  type Answer = { data: unknown; error: { code: string; message: string } | null };
+  const ok = (data: unknown): Answer => ({ data, error: null });
+  /* Each function answers from its list, repeating the last. */
+  function database(answers: Record<string, Answer[]>) {
+    stub.rpc.mockImplementation(async (fn: string) => {
+      const list = answers[fn];
+      if (!list) throw new Error(`unexpected rpc ${fn}`);
+      return list.length > 1 ? list.shift()! : list[0]!;
+    });
+  }
+  const begun = ok({ reference: 'NXP-S', amount_cents: 1400000 });
+  const attempt = (more: object) =>
+    ok({
+      attempt_reference: 'NXP-S-1',
+      channel: 'card',
+      amount_cents: 1400000,
+      is_test: true,
+      reused: false,
+      ...more,
+    });
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    stub.getUser.mockResolvedValue({ data: { user: { id: 'guest' } }, error: null });
+    vi.stubEnv('PAYSTACK_TEST_SECRET_KEY', TEST);
+    vi.stubEnv('PAYSTACK_LIVE_SECRET_KEY', '');
+    vi.stubEnv('DARAJA_CONSUMER_KEY', '');
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://www.nexgapp.com');
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it('asks Paystack about a due try while pending, and answers what the database then says', async () => {
+    database({
+      rpc_native_stay_status: [ok(pending), ok(booked)],
+      rpc_stay_payment_check_claim: [ok(due)],
+      rpc_payment_paystack_verified: [ok({ ok: true, state: 'paid' })],
+    });
+    const fetch = vi.fn().mockResolvedValue(new Response(verified));
+    vi.stubGlobal('fetch', fetch);
+    expect(await (await stayStatus(request(), quoteId)).json()).toEqual(booked);
+    expect(String(fetch.mock.calls[0]![0])).toMatch(/\/transaction\/verify\/NXP-S-1$/);
+    expect(stub.rpc).toHaveBeenCalledWith('rpc_stay_payment_check_claim', { p_stay_id: stayId });
+    expect(stub.rpc).toHaveBeenCalledWith('rpc_payment_paystack_verified', {
+      p_attempt_reference: 'NXP-S-1',
+      p_verify_body: verified,
+      p_proof: TEST,
+    });
+    expect(calls('rpc_native_stay_status')).toHaveLength(2);
+  });
+
+  it('leaves Paystack alone when nothing is due, or the database cannot say', async () => {
+    const fetch = vi.fn();
+    vi.stubGlobal('fetch', fetch);
+    for (const claim of [
+      ok([]),
+      /* A database before 20270330000300 has no such function. */
+      { data: null, error: { code: 'PGRST202', message: 'not found' } },
+    ]) {
+      stub.rpc.mockClear();
+      database({
+        rpc_native_stay_status: [ok(pending)],
+        rpc_stay_payment_check_claim: [claim],
+      });
+      expect(await (await stayStatus(request(), quoteId)).json()).toEqual(pending);
+      expect(calls('rpc_native_stay_status')).toHaveLength(1);
+    }
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('asks nothing about a payment that is not pending', async () => {
+    for (const view of [hold, booked, { ...hold, paymentStatus: 'failed' }]) {
+      stub.rpc.mockClear();
+      database({ rpc_native_stay_status: [ok(view)] });
+      expect(await (await stayStatus(request(), quoteId)).json()).toEqual(view);
+      expect(stub.rpc).toHaveBeenCalledTimes(1);
+    }
+  });
+
+  it('starts nothing when the earlier try turns out to be paid', async () => {
+    database({
+      rpc_native_stay_status: [ok(pending)],
+      rpc_stay_payment_check_claim: [ok(due)],
+      rpc_payment_paystack_verified: [ok({ ok: true, state: 'paid' })],
+      rpc_stay_payment_state: [ok({ status: 'paid', reference: 'NXP-S', is_test: true })],
+    });
+    const fetch = vi.fn().mockResolvedValue(new Response(verified));
+    vi.stubGlobal('fetch', fetch);
+    const response = await stayPayment(
+      request({ method: 'mpesa_stk', phone: '0712 000 000' }),
+      quoteId,
+    );
+    expect(await response.json()).toEqual({ status: 'paid', reference: 'NXP-S', test: true });
+    expect(calls('rpc_payment_begin_stay')).toHaveLength(0);
+    expect(calls('rpc_payment_paystack_attempt')).toHaveLength(0);
+    /* The verify only: no charge. */
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('hands back the open card page when another way is asked for, and charges nothing', async () => {
+    database({
+      rpc_stay_payment_check_claim: [ok([])],
+      rpc_payment_begin_stay: [begun],
+      rpc_payment_paystack_attempt: [
+        attempt({ reused: true, authorization_url: 'https://checkout.paystack.com/s1' }),
+      ],
+    });
+    const fetch = vi.fn();
+    vi.stubGlobal('fetch', fetch);
+    const response = await stayPaymentById(
+      request({ method: 'mpesa_stk', phone: '0712 000 000' }),
+      stayId,
+    );
+    expect(await response.json()).toEqual({
+      status: 'pending',
+      reference: 'NXP-S',
+      url: 'https://checkout.paystack.com/s1',
+      test: true,
+      reused: true,
+      channel: 'card',
+    });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('says a prompt still waiting was reused, with how long to wait', async () => {
+    database({
+      rpc_stay_payment_check_claim: [ok([])],
+      rpc_payment_begin_stay: [begun],
+      rpc_payment_paystack_attempt: [
+        attempt({ channel: 'mpesa', reused: true, retry_after_seconds: 150 }),
+      ],
+    });
+    const response = await stayPaymentById(
+      request({ method: 'mpesa_stk', phone: '0712 000 000' }),
+      stayId,
+    );
+    expect(await response.json()).toEqual({
+      status: 'pending',
+      reference: 'NXP-S',
+      retryAfterSeconds: 150,
+      test: true,
+      reused: true,
+      channel: 'mpesa',
+    });
+  });
+
+  it('records a card page that never opened as a failed try', async () => {
+    database({
+      rpc_stay_payment_check_claim: [ok([])],
+      rpc_payment_begin_stay: [begun],
+      rpc_payment_paystack_attempt: [attempt({})],
+      rpc_payment_paystack_opened: [ok({ ok: true, outcome: 'failed' })],
+    });
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')));
+    const response = await stayPaymentById(request({ method: 'card' }), stayId);
+    expect(response.status).toBe(503);
+    expect((await response.json()).code).toBe('SERVICE_UNAVAILABLE');
+    expect(stub.rpc).toHaveBeenCalledWith('rpc_payment_paystack_opened', {
+      p_attempt_reference: 'NXP-S-1',
+      p_access_code: null,
+      p_authorization_url: null,
+      p_failure: 'No card page was opened.',
+      p_proof: TEST,
+    });
+  });
+
+  it('refuses, and records, a prompt Paystack answers as failed', async () => {
+    database({
+      rpc_stay_payment_check_claim: [ok([])],
+      rpc_payment_begin_stay: [begun],
+      rpc_payment_paystack_attempt: [attempt({ channel: 'mpesa' })],
+      rpc_payment_paystack_opened: [ok({ ok: true, outcome: 'failed' })],
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(JSON.stringify({ status: true, data: { status: 'failed' } })),
+        ),
+    );
+    const response = await stayPaymentById(
+      request({ method: 'mpesa_stk', phone: '0712 000 000' }),
+      stayId,
+    );
+    expect(response.status).toBe(409);
+    expect((await response.json()).code).toBe('PAYMENT_REFUSED');
+    expect(stub.rpc).toHaveBeenCalledWith(
+      'rpc_payment_paystack_opened',
+      expect.objectContaining({ p_failure: 'The payment prompt failed.' }),
+    );
+  });
+
+  it('keeps a prompt Paystack did not answer in time as sent', async () => {
+    database({
+      rpc_stay_payment_check_claim: [ok([])],
+      rpc_payment_begin_stay: [begun],
+      rpc_payment_paystack_attempt: [attempt({ channel: 'mpesa' })],
+      rpc_payment_paystack_opened: [ok({ ok: true, outcome: 'opened' })],
+    });
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')));
+    const response = await stayPaymentById(
+      request({ method: 'mpesa_stk', phone: '0712 000 000' }),
+      stayId,
+    );
+    expect(await response.json()).toEqual({
+      status: 'pending',
+      reference: 'NXP-S',
+      retryAfterSeconds: 180,
+      test: true,
+      reused: false,
+      channel: 'mpesa',
+    });
+    expect(stub.rpc).toHaveBeenCalledWith(
+      'rpc_payment_paystack_opened',
+      expect.objectContaining({ p_failure: null }),
+    );
+  });
+
+  it("passes the database's refusal to pay again to the guest", async () => {
+    database({
+      rpc_stay_payment_check_claim: [ok([])],
+      rpc_payment_begin_stay: [
+        {
+          data: null,
+          error: {
+            code: '22023',
+            message:
+              'We have received money for this booking and are checking it. Do not pay again.',
+          },
+        },
+      ],
+    });
+    const response = await stayPaymentById(request({ method: 'card' }), stayId);
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({
+      code: 'PAYMENT_REFUSED',
+      title: 'We have received money for this booking and are checking it. Do not pay again.',
+    });
   });
 });

@@ -1,4 +1,12 @@
-import { refused, rpc, startPayment, stateFrom, type PaymentTarget } from '@/lib/order-payment';
+import {
+  checkWithPaystack,
+  refused,
+  rpc,
+  startPayment,
+  stateFrom,
+  view as paymentView,
+  type PaymentTarget,
+} from '@/lib/order-payment';
 import { paystackMode } from '@/lib/paystack';
 import { customerApiClient } from '@/lib/supabase/customer-api';
 import { z } from 'zod';
@@ -227,6 +235,27 @@ export async function stayHold(request: Request) {
   }
 }
 
+/*
+ * Asks Paystack about the stay's tries that are due a question, so a late
+ * webhook does not keep a paid guest waiting. The database picks them: sent ten
+ * seconds ago or more, and not asked about in the last ten. True when something
+ * was asked. It never fails the caller: the webhook and the sweep still run.
+ */
+async function askPaystack(supabase: Client, stayId: string): Promise<boolean> {
+  try {
+    const due = await rpc(supabase, 'rpc_stay_payment_check_claim', { p_stay_id: stayId });
+    if (!Array.isArray(due.data) || due.data.length === 0) return false;
+    await Promise.all(
+      (due.data as { attempt_reference: string; is_test: boolean }[]).map((row) =>
+        checkWithPaystack(supabase, row.attempt_reference, row.is_test ? 'test' : 'live'),
+      ),
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function stayStatus(request: Request, operationId: string) {
   try {
     const supabase = await signedIn(request);
@@ -234,7 +263,17 @@ export async function stayStatus(request: Request, operationId: string) {
     const id = uuid.safeParse(operationId);
     if (!id.success) return invalid('Check the stay checkout ID.');
     const view = await readStatus(supabase, id.data);
-    return view instanceof Response ? view : response(view);
+    if (view instanceof Response) return view;
+    if (
+      view.paymentStatus === 'pending' &&
+      paystackMode() &&
+      (await askPaystack(supabase, view.stayId))
+    ) {
+      /* If the second read fails, the first answer still stands. */
+      const again = await readStatus(supabase, id.data);
+      return response(again instanceof Response ? view : again);
+    }
+    return response(view);
   } catch {
     return unavailable();
   }
@@ -245,7 +284,10 @@ export async function stayStatus(request: Request, operationId: string) {
  * full at booking). The body and the answer are the order route's:
  * {method:'mpesa_stk'|'airtel_money', phone} | {method:'card', saveCard?} |
  * {method:'saved_card', cardId} → {status, reference?, url?, retryAfterSeconds?,
- * test?}. GET /holds/{operationId} stays the proof that the stay is booked.
+ * test?}, plus {reused, channel} about the try started or handed back. While an
+ * earlier try could still take the money the database hands it back (reused),
+ * whatever way was asked for. GET /holds/{operationId} stays the proof that the
+ * stay is booked.
  */
 export async function stayPayment(request: Request, operationId: string) {
   const id = uuid.safeParse(operationId);
@@ -275,10 +317,21 @@ function stayTarget(supabase: Client, stayId: string): PaymentTarget {
     if (begun.error) return refused(begun.error);
     return begun.data as { reference: string; amount_cents: number; expires_at?: string };
   };
+  const readState = async () =>
+    stateFrom(await rpc(supabase, 'rpc_stay_payment_state', { p_stay_id: stayId }));
   return {
-    readState: async () =>
-      stateFrom(await rpc(supabase, 'rpc_stay_payment_state', { p_stay_id: stayId })),
-    begin,
+    readState,
+    /* Before another try, ask Paystack about the earlier one: it may have been
+       paid (nothing more is started) or have failed (the guest may try again). */
+    begin: async () => {
+      if (await askPaystack(supabase, stayId)) {
+        const state = await readState();
+        if (!(state instanceof Response) && state.status === 'paid')
+          return Response.json(paymentView(state), { headers });
+      }
+      return begin();
+    },
+    stay: true,
     metadata: { stay_id: stayId },
     daraja: {
       begin,
