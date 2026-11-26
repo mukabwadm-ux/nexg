@@ -77,11 +77,12 @@ export default async function VerifyHostPage({ params }: { params: { id: string 
     };
   };
   const columns = 'id, kind, file_name, status, rejection_reason, uploaded_at, storage_path';
+  const hostId = params.id;
   const read = (select: string) =>
     loose
       .from('host_document')
       .select(select)
-      .eq('host_id', host.id)
+      .eq('host_id', hostId)
       .is('superseded_at', null)
       .order('uploaded_at', { ascending: true });
   let { data: rows, error: documentsError } = await read(`${columns}, expires_on`);
