@@ -22,6 +22,7 @@ import {
   formatNairobi,
   formatPhone,
   type AgreementDocument,
+  type DpaExecutionBlock,
   type ExecutionBlock,
   type ResolvedParagraph,
   type ResolvedRun,
@@ -781,6 +782,66 @@ function drawExecution(w: Writer, e: ExecutionBlock, signature: PDFImage | null)
   w.advance(8);
 }
 
+/*
+ * The Data Processing Agreement's execution page: under each party's
+ * heading, the original's "Signed / Name / Title/Capacity / Date /
+ * Witness" lines filled in, with NexG's signature image on its "Signed"
+ * line when it has one; then the merchant's electronic acceptance record.
+ */
+function drawDpaExecution(w: Writer, e: DpaExecutionBlock, signature: PDFImage | null) {
+  const widths = [CONTENT_W * 0.3, CONTENT_W * 0.7];
+  const valueCell = (label: string, value: string, withSignature: boolean): CellItem[] => {
+    if (label === 'Signed' && withSignature && signature) {
+      const scale = Math.min(150 / signature.width, 44 / signature.height, 1);
+      return [
+        {
+          kind: 'image',
+          image: signature,
+          width: signature.width * scale,
+          height: signature.height * scale,
+        },
+        { kind: 'p', p: para(value) },
+      ];
+    }
+    return [{ kind: 'p', p: para(value) }];
+  };
+  for (const party of e.parties) {
+    w.gap(6);
+    // A party's heading never sits alone at the foot of a page.
+    w.ensure(120);
+    const rows: Row[] = [
+      {
+        header: true,
+        cells: [[{ kind: 'p', p: para(party.heading, { bold: true }) }], []],
+      },
+      ...party.rows.map(([label, value]) => ({
+        header: false,
+        cells: [[{ kind: 'p' as const, p: para(label) }], valueCell(label, value, party.signature)],
+      })),
+    ];
+    drawRows(w, widths, rows, true);
+    w.advance(8);
+  }
+  w.gap(6);
+  w.ensure(120);
+  drawRows(
+    w,
+    widths,
+    [
+      {
+        header: true,
+        cells: [[{ kind: 'p', p: para('Electronic acceptance record', { bold: true }) }], []],
+      },
+      ...e.record.map(([label, value]) => ({
+        header: false,
+        cells: [[{ kind: 'p' as const, p: para(label) }], [{ kind: 'p' as const, p: para(value) }]],
+      })),
+    ],
+    true,
+  );
+  w.advance(8);
+}
+
 /* -------------------------------------------------------- page furniture */
 
 /**
@@ -805,7 +866,9 @@ export function drawLetterhead(
     { text: COMPANY_NAME.toUpperCase(), font: fonts.bold, size: 11, color: INK },
     { text: letterhead.registeredOffice, font: fonts.regular, size: 8.5, color: MUTED },
     {
-      text: `P.O. Box ${letterhead.poBox}, Nairobi, Kenya`,
+      text: letterhead.poBox.trim()
+        ? `P.O. Box ${letterhead.poBox}, Nairobi, Kenya`
+        : 'Nairobi, Kenya',
       font: fonts.regular,
       size: 8.5,
       color: MUTED,
@@ -854,7 +917,7 @@ export function drawLetterhead(
   });
 }
 
-function drawRunningHeader(page: PDFPage, fonts: Fonts, title: string, logo: PDFImage | null) {
+function drawRunningHeader(page: PDFPage, fonts: Fonts, heading: string, logo: PDFImage | null) {
   const top = PAGE_H - 34;
   if (logo) {
     const height = 28;
@@ -865,7 +928,7 @@ function drawRunningHeader(page: PDFPage, fonts: Fonts, title: string, logo: PDF
       height,
     });
   }
-  const text = `Merchant Agreement – ${title}`;
+  const text = heading;
   const size = 8.5;
   drawString(page, text, {
     x: PAGE_W - MARGIN_X - widthOf(fonts.regular, text, size),
@@ -885,7 +948,7 @@ function drawRunningHeader(page: PDFPage, fonts: Fonts, title: string, logo: PDF
 function drawFooter(
   page: PDFPage,
   fonts: Fonts,
-  title: string,
+  heading: string,
   number: number,
   total: number,
   options: RenderOptions,
@@ -898,7 +961,7 @@ function drawFooter(
     thickness: 0.5,
     color: RULE,
   });
-  const left = `${COMPANY_NAME} | Merchant Agreement – ${title}`;
+  const left = `${COMPANY_NAME} | ${heading}`;
   drawString(page, left, { x: MARGIN_X, y, size, font: fonts.regular, color: MUTED });
   const right = `Page ${number} of ${total}`;
   drawString(page, right, {
@@ -974,19 +1037,21 @@ export async function renderAgreementPdf(
       const next = rest[index + 1];
       drawParagraph(w, block, next && next.kind === 'p' ? next : null);
     } else if (block.kind === 'table') drawTable(w, block);
+    else if (block.kind === 'dpa-execution') drawDpaExecution(w, block, signature);
     else drawExecution(w, block, signature);
   });
 
   const total = w.pages.length;
+  const heading = doc.heading ?? `Merchant Agreement – ${doc.title}`;
   w.pages.forEach((page, i) => {
     if (letterhead) {
       if (i === 0) drawLetterhead(page, fonts, letterhead, logo);
-      else drawRunningHeader(page, fonts, doc.title, logo);
+      else drawRunningHeader(page, fonts, heading, logo);
     }
-    drawFooter(page, fonts, doc.title, i + 1, total, options);
+    drawFooter(page, fonts, heading, i + 1, total, options);
   });
 
-  pdf.setTitle(`NexG Merchant Agreement – ${doc.title}`);
+  pdf.setTitle(`NexG ${heading}`);
   pdf.setAuthor(COMPANY_NAME);
   pdf.setCreator('NexG');
   pdf.setProducer('NexG');

@@ -40,7 +40,7 @@ export interface Paragraph {
   r: Run[];
 }
 
-export type TableRole = 'execution' | 'commission' | 'notices' | 'timetable';
+export type TableRole = 'execution' | 'commission' | 'notices' | 'timetable' | 'annex';
 
 export interface Table {
   k: 't';

@@ -301,6 +301,9 @@ importers:
       '@nexg/location':
         specifier: workspace:*
         version: link:../../packages/location
+      '@nexg/merchant-agreement':
+        specifier: workspace:*
+        version: link:../../packages/merchant-agreement
       '@nexg/ui':
         specifier: workspace:*
         version: link:../../packages/ui

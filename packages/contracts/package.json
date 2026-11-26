@@ -10,6 +10,7 @@
     "./merchant-application": "./src/merchant-application.ts",
     "./integration-connection": "./src/integration-connection.ts",
     "./merchant-agreements": "./src/merchant-agreements.ts",
+    "./merchant-dpa": "./src/merchant-dpa.ts",
     "./merchant-onboarding-details": "./src/merchant-onboarding-details.ts",
     "./email-design": "./src/email-design.ts",
     "./email-samples": "./src/email-samples.ts",

@@ -113,11 +113,26 @@ export interface ExecutionBlock {
   acceptance: AcceptanceRecord & { category: string };
 }
 
-export type ResolvedBlock = ResolvedParagraph | ResolvedTable | ExecutionBlock;
+/**
+ * The Data Processing Agreement's execution page, filled in: each party's
+ * particulars, NexG's signature (when its signatory is set up) and the
+ * merchant's electronic acceptance record. Built by dpa.ts.
+ */
+export interface DpaExecutionBlock {
+  kind: 'dpa-execution';
+  /** Rows of [label, value] under each party's heading, in order. */
+  parties: { heading: string; rows: [string, string][]; signature: boolean }[];
+  /** The electronic acceptance record, as [label, value] rows. */
+  record: [string, string][];
+}
+
+export type ResolvedBlock = ResolvedParagraph | ResolvedTable | ExecutionBlock | DpaExecutionBlock;
 
 export interface AgreementDocument {
   agreementId: string;
   title: string;
+  /** The running header and footer; "Merchant Agreement – {title}" when left out. */
+  heading?: string;
   blocks: ResolvedBlock[];
 }
 

@@ -29,6 +29,7 @@ const nextConfig = {
     '@nexg/ui',
     '@nexg/db',
     '@nexg/location',
+    '@nexg/merchant-agreement',
     '@nexg/contracts',
     '@nexg/booking-config',
   ],
