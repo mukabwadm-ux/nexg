@@ -68,6 +68,14 @@ export async function refundThroughPaystack(
     reference,
     note: `NexG refund ${reference}`,
   });
+  /* 409: our reference was already used, so an earlier send reached Paystack.
+     That is not a refusal: nothing is recorded, and Paystack's notice settles it. */
+  if (answer.status === 409) {
+    return {
+      ok: true,
+      message: 'Paystack already has this refund. It shows as refunded once Paystack confirms it.',
+    };
+  }
   if (!answer.answered || !answer.raw) return { ok: false, message: answer.message };
 
   const recorded = await client.rpc('rpc_paystack_refund_answered', {

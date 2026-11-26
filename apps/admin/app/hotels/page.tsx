@@ -9,6 +9,7 @@ import {
   type QrScanRow,
   type QrSummary,
 } from '@/components/hotels/qr-tab';
+import { toPaidBookings } from '@/components/hotels/paid-bookings-data';
 import { RefundsTab, type StayRefundRow } from '@/components/hotels/refunds';
 import { HOTEL_TABS, HotelTabs, TAB_TITLE } from '@/components/hotels/shell';
 import {
@@ -197,7 +198,18 @@ async function loadHosts(
 }
 
 async function loadRefunds(supabase: Supabase, filter: string) {
-  const { data, error } = await supabase.rpc('rpc_stay_refunds', { p_show: 'all' });
+  /* rpc_stay_paid_bookings is not in the generated types yet. If it fails, only
+     the paid bookings list says so; the refund queue still shows. */
+  const untyped = supabase as unknown as {
+    rpc: (fn: string) => PromiseLike<{ data: unknown; error: unknown }>;
+  };
+  const [{ data, error }, paid] = await Promise.all([
+    supabase.rpc('rpc_stay_refunds', { p_show: 'all' }),
+    Promise.resolve(untyped.rpc('rpc_stay_paid_bookings')).then(
+      (r) => (r.error ? null : toPaidBookings(r.data)),
+      () => null,
+    ),
+  ]);
   if (error) {
     return (
       <Card className="mt-6 p-5">
@@ -209,6 +221,7 @@ async function loadRefunds(supabase: Supabase, filter: string) {
   return (
     <RefundsTab
       rows={(data as unknown as StayRefundRow[] | null) ?? []}
+      paid={paid}
       filter={['due', 'refunded', 'all'].includes(filter) ? filter : 'due'}
       canRecord
     />

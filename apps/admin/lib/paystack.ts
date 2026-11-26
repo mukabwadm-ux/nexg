@@ -29,6 +29,8 @@ export function paystackProof(mode: PaystackMode): string | null {
 export interface PaystackAnswer {
   /** Paystack answered (any status); its raw answer goes to the database. */
   answered: boolean;
+  /** The HTTP status; absent when Paystack could not be reached. */
+  status?: number;
   raw?: string;
   message: string;
 }
@@ -53,9 +55,13 @@ async function call(
     try {
       message = (JSON.parse(raw) as { message?: string }).message?.slice(0, 300) ?? message;
     } catch {
-      return { answered: false, message: 'Paystack sent something we could not read.' };
+      return {
+        answered: false,
+        status: response.status,
+        message: 'Paystack sent something we could not read.',
+      };
     }
-    return { answered: true, raw, message };
+    return { answered: true, status: response.status, raw, message };
   } catch {
     return { answered: false, message: 'We could not reach Paystack. The refund is not sent yet.' };
   }

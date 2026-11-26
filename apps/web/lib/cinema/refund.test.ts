@@ -158,6 +158,26 @@ describe('refunding a cinema hold', () => {
     expect(db.calls.map((c) => c.fn)).toEqual(['fn_cinema_refund_open']);
   });
 
+  it('records nothing on a 409, since Paystack may already have this refund', async () => {
+    const db = fakeDb({ data: opened() });
+    const fetch = paystackSays(409, { status: false, message: 'Reference has already been used' });
+    vi.stubGlobal('fetch', fetch);
+    await expect(refundCinemaHold(db.rpc, HOLD, 'x')).rejects.toMatchObject({
+      name: 'CinemaRefundError',
+      message: 'Reference has already been used',
+      reference: REF,
+    });
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(db.calls.map((c) => c.fn)).toEqual(['fn_cinema_refund_open']);
+  });
+
+  it.each([401, 403])('records nothing on a key problem (%i)', async (status) => {
+    const db = fakeDb({ data: opened() });
+    vi.stubGlobal('fetch', paystackSays(status, { status: false, message: 'Invalid key' }));
+    await expect(refundCinemaHold(db.rpc, HOLD, 'x')).rejects.toThrow(/Invalid key/);
+    expect(db.calls.map((c) => c.fn)).toEqual(['fn_cinema_refund_open']);
+  });
+
   it('records a 400 from Paystack as its answer', async () => {
     const db = fakeDb({ data: opened() });
     vi.stubGlobal('fetch', paystackSays(400, { status: false, message: 'Invalid transaction' }));
