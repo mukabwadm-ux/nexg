@@ -27,7 +27,8 @@ export type NavIcon =
   | 'analytics'
   | 'reports'
   | 'company'
-  | 'system';
+  | 'system'
+  | 'integrations';
 
 export interface NavItem {
   label: string;
@@ -94,21 +95,56 @@ export const CONSOLE_NAV: NavGroup[] = [
   },
   {
     key: 'stays',
-    label: 'NEXG Stays',
+    label: 'Stays',
     icon: 'stays',
     items: [
+      { label: 'Overview', href: '/stays', module: 'hotels', home: true },
+      { label: 'Hosts', href: '/stays/hosts', module: 'hotels', home: true },
+      { label: 'Guests', href: '/hotels?tab=guests', module: 'hotels' },
+      { label: 'Buildings & Properties', href: '/stays/buildings', module: 'hotels', home: true },
+      { label: 'Accommodation Units', href: '/stays/units', module: 'hotels', home: true },
       {
-        label: 'Hosts & property managers',
-        href: '/hotels?tab=hosts',
+        label: 'Property Managers & Partners',
+        href: '/stays/partners',
         module: 'hotels',
         home: true,
       },
-      { label: 'Listings & properties', href: '/hotels?tab=listings', module: 'hotels' },
-      { label: 'Hotels', href: '/hotels?tab=hotels', module: 'hotels' },
-      { label: 'Stay refunds', href: '/hotels?tab=refunds', module: 'hotels' },
-      { label: 'Guests', href: '/hotels?tab=guests', module: 'hotels' },
-      { label: 'Charge to room', href: '/hotels?tab=charge', module: 'hotels' },
-      { label: 'QR & attribution', href: '/hotels?tab=qr', module: 'hotels' },
+      { label: 'Reservations', href: '/stays/reservations', module: 'hotels', home: true },
+      { label: 'Check-ins & Check-outs', href: '/stays/check-ins', module: 'hotels', home: true },
+      { label: 'Availability & Rates', href: '/stays/availability', module: 'hotels', home: true },
+      {
+        label: 'Guest Spending & Concierge',
+        href: '/stays/spending',
+        module: 'hotels',
+        home: true,
+      },
+      { label: 'Reviews & Ratings', href: '/stays/reviews', module: 'hotels', home: true },
+      {
+        label: 'Verification & Compliance',
+        href: '/stays/verification',
+        module: 'hotels',
+        home: true,
+      },
+      {
+        label: 'Acquisition & Referrals',
+        href: '/stays/acquisition',
+        module: 'hotels',
+        home: true,
+      },
+      { label: 'QR Codes & Marketing', href: '/stays/marketing', module: 'hotels', home: true },
+      { label: 'Finance & Commissions', href: '/stays/finance', module: 'hotels', home: true },
+      { label: 'Payouts & Settlements', href: '/stays/payouts', module: 'hotels', home: true },
+      { label: 'Incidents & Disputes', href: '/stays/incidents', module: 'hotels', home: true },
+      {
+        label: 'Performance & Analytics',
+        href: '/stays/performance',
+        module: 'hotels',
+        home: true,
+      },
+      { label: 'Reports', href: '/stays/reports', module: 'hotels', home: true },
+      { label: 'Stays Configuration', href: '/stays/configuration', module: 'hotels', home: true },
+      /* The earlier tabbed console: hotels, refunds, charge to room, KDPA requests. */
+      { label: 'Hotels & refunds console', href: '/hotels?tab=hotels', module: 'hotels' },
     ],
   },
   {
@@ -214,6 +250,14 @@ export const CONSOLE_NAV: NavGroup[] = [
       { label: 'Vendors & Suppliers', href: '/company/vendors', module: 'company', home: true },
       { label: 'Warehouses & Stores', href: '/company/warehouses', module: 'company', home: true },
     ],
+  },
+  {
+    key: 'integrations',
+    label: 'Integrations',
+    icon: 'integrations',
+    href: '/integrations',
+    module: 'settings',
+    items: [],
   },
   {
     key: 'system',
