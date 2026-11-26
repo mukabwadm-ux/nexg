@@ -74631,6 +74631,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_stay_cancel_refund_full: { Args: { p_reason: string; p_stay_id: string }; Returns: Json };
       rpc_stay_cancellation_policy: { Args: { p_unit_id: string }; Returns: Json };
       rpc_stay_chat_guest_ask_nexg: { Args: { p_thread_id: string }; Returns: Json };
       rpc_stay_chat_guest_messages: {
@@ -74833,7 +74834,34 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_stay_paid_bookings: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          check_in: string;
+          check_out: string;
+          guest_first_name: string;
+          host: string;
+          is_test: boolean;
+          paid_at: string;
+          paid_kes: number;
+          property: string;
+          provider: string;
+          status: string;
+          stay_id: string;
+          unit: string;
+        }[];
+      };
       rpc_stay_payment_state: { Args: { p_stay_id: string }; Returns: Json };
+      rpc_stay_paystack_refund_checked: {
+        Args: {
+          p_note: string;
+          p_outcome: string;
+          p_reference: string;
+          p_shown_reference: string;
+          p_stay_id: string;
+        };
+        Returns: Json;
+      };
       rpc_stay_refund_record: {
         Args: { p_note?: string; p_reference: string; p_stay_id: string };
         Returns: {
@@ -74895,11 +74923,15 @@ export type Database = {
           guest_email: string;
           guest_name: string;
           host: string;
+          is_test: boolean;
           mpesa_receipt: string;
           paid_kes: number;
           payer_phone: string;
           payment_reference: string;
+          paystack_reference: string;
+          paystack_state: string;
           property: string;
+          provider: string;
           reason: string;
           refund_due_at: string;
           refund_kes: number;
