@@ -250,7 +250,7 @@ export default async function PartnersPage({
         </>
       ) : (
         <>
-          <div className="grid gap-x-5 sm:grid-cols-2">
+          <div className="grid gap-x-5 2xl:grid-cols-2">
             <div>{facts}</div>
             <div>
               <h3 className="text-[0.9375rem] font-extrabold">Buildings</h3>
@@ -270,7 +270,7 @@ export default async function PartnersPage({
               </div>
             ))}
           </div>
-          <div className="grid gap-x-5 sm:grid-cols-2">
+          <div className="grid gap-x-5 2xl:grid-cols-2">
             <div>
               <h3 className="mb-1 text-[0.9375rem] font-extrabold">
                 Recent Host Leads ({p.recent_leads.length})

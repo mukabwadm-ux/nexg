@@ -175,7 +175,7 @@ export default async function PerformancePage({
           <ErrorNote message={data.error} />
         ) : (
           <>
-            <DashKpiGrid className="xl:grid-cols-7">
+            <DashKpiGrid className="xl:grid-cols-4 2xl:grid-cols-7">
               <DashKpi
                 featured
                 icon={CalendarCheck}

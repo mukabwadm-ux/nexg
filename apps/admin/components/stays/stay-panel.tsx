@@ -319,7 +319,7 @@ export function StayPanel({
     );
   } else {
     body = (
-      <div className="grid gap-x-5 sm:grid-cols-2">
+      <div className="grid gap-x-5 2xl:grid-cols-2">
         <div>
           {stayInfo}
           <div className="mt-3">{source}</div>

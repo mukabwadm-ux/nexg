@@ -297,7 +297,7 @@ export default async function UnitsPage({
       );
     } else {
       panelBody = (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 2xl:grid-cols-2">
           <div>
             <h3 className="text-[0.9375rem] font-extrabold">Unit Information</h3>
             <Fact icon={Layers} label="Unit ID">

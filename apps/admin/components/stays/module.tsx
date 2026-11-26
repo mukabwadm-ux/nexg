@@ -72,7 +72,7 @@ export function StaysHeader({
               param="city"
               value={city ?? 'all'}
               options={cities.map((c) => ({ value: c.id, label: c.name }))}
-              className="min-w-[11rem]"
+              className="min-w-[11rem] !border-white/40 !bg-transparent !text-white [&_option]:text-[#1A1A1A] [&_svg]:!text-white"
             />
           )}
           {!noPeriod && <RangeControl from={period.from} to={period.to} />}

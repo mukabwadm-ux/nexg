@@ -393,7 +393,9 @@ export default async function AvailabilityPage({
               <td>
                 <PlaceCell
                   title={r.label}
-                  sub={`${bedroomsText(r.bedrooms)}${r.property_name ? ` • ${r.property_name}` : ''}`}
+                  sub={[r.bedrooms != null ? bedroomsText(r.bedrooms) : null, r.property_name]
+                    .filter(Boolean)
+                    .join(' • ')}
                   photo={photoUrl(r.photo)}
                   href={href({ selected: r.unit_id, page: String(page) })}
                 />
