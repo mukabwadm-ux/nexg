@@ -35926,6 +35926,7 @@ export type Database = {
         Row: {
           accepts_test_payments: boolean;
           amenities: string[];
+          archived_at: string | null;
           area: string | null;
           cancellation_policy: string | null;
           cancellation_terms: Json | null;
@@ -35962,6 +35963,7 @@ export type Database = {
         Insert: {
           accepts_test_payments?: boolean;
           amenities?: string[];
+          archived_at?: string | null;
           area?: string | null;
           cancellation_policy?: string | null;
           cancellation_terms?: Json | null;
@@ -35997,6 +35999,7 @@ export type Database = {
         Update: {
           accepts_test_payments?: boolean;
           amenities?: string[];
+          archived_at?: string | null;
           area?: string | null;
           cancellation_policy?: string | null;
           cancellation_terms?: Json | null;
@@ -44169,6 +44172,7 @@ export type Database = {
           checkout_time: string | null;
           city_id: string | null;
           created_at: string;
+          deleted_at: string | null;
           delivery_hours: Json | null;
           floor: string | null;
           gate_code_encrypted: string | null;
@@ -44223,6 +44227,7 @@ export type Database = {
           checkout_time?: string | null;
           city_id?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           delivery_hours?: Json | null;
           floor?: string | null;
           gate_code_encrypted?: string | null;
@@ -44276,6 +44281,7 @@ export type Database = {
           checkout_time?: string | null;
           city_id?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           delivery_hours?: Json | null;
           floor?: string | null;
           gate_code_encrypted?: string | null;
@@ -72459,6 +72465,7 @@ export type Database = {
         Args: { p_approve: boolean; p_creative_id: string; p_reason?: string };
         Returns: Json;
       };
+      rpc_property_archive: { Args: { p_property: string }; Returns: Json };
       rpc_property_delete: {
         Args: { p_confirm_name: string; p_property_id: string };
         Returns: Json;
@@ -72468,6 +72475,7 @@ export type Database = {
         Returns: {
           accepts_test_payments: boolean;
           amenities: string[];
+          archived_at: string | null;
           area: string | null;
           cancellation_policy: string | null;
           cancellation_terms: Json | null;
@@ -72512,6 +72520,7 @@ export type Database = {
         Returns: {
           accepts_test_payments: boolean;
           amenities: string[];
+          archived_at: string | null;
           area: string | null;
           cancellation_policy: string | null;
           cancellation_terms: Json | null;
@@ -72556,6 +72565,7 @@ export type Database = {
         Returns: {
           accepts_test_payments: boolean;
           amenities: string[];
+          archived_at: string | null;
           area: string | null;
           cancellation_policy: string | null;
           cancellation_terms: Json | null;
@@ -72606,11 +72616,13 @@ export type Database = {
           user_id: string;
         }[];
       };
+      rpc_property_unarchive: { Args: { p_property: string }; Returns: Json };
       rpc_property_upsert: {
         Args: { p_host_id: string; p_property: Json; p_property_id?: string };
         Returns: {
           accepts_test_payments: boolean;
           amenities: string[];
+          archived_at: string | null;
           area: string | null;
           cancellation_policy: string | null;
           cancellation_terms: Json | null;
@@ -74933,6 +74945,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_unit_archive: { Args: { p_unit: string }; Returns: Json };
       rpc_unit_busy: {
         Args: { p_from: string; p_to: string; p_unit_id: string };
         Returns: {
@@ -74942,6 +74955,7 @@ export type Database = {
       };
       rpc_unit_caretaker_confirm: { Args: { p_token?: string; p_unit_id: string }; Returns: Json };
       rpc_unit_caretaker_invite: { Args: { p_unit_id: string }; Returns: Json };
+      rpc_unit_delete: { Args: { p_confirm_name: string; p_unit: string }; Returns: Json };
       rpc_unit_photos_set: {
         Args: { p_photos: Json; p_unit_id: string };
         Returns: {
@@ -74964,6 +74978,7 @@ export type Database = {
           checkout_time: string | null;
           city_id: string | null;
           created_at: string;
+          deleted_at: string | null;
           delivery_hours: Json | null;
           floor: string | null;
           gate_code_encrypted: string | null;
@@ -75009,6 +75024,7 @@ export type Database = {
         Returns: Json;
       };
       rpc_unit_set_published: { Args: { p_published: boolean; p_unit: string }; Returns: Json };
+      rpc_unit_unarchive: { Args: { p_unit: string }; Returns: Json };
       rpc_unit_upsert: {
         Args: { p_host_id: string; p_unit: Json; p_unit_id?: string };
         Returns: {
@@ -75031,6 +75047,7 @@ export type Database = {
           checkout_time: string | null;
           city_id: string | null;
           created_at: string;
+          deleted_at: string | null;
           delivery_hours: Json | null;
           floor: string | null;
           gate_code_encrypted: string | null;
@@ -75093,6 +75110,7 @@ export type Database = {
           checkout_time: string | null;
           city_id: string | null;
           created_at: string;
+          deleted_at: string | null;
           delivery_hours: Json | null;
           floor: string | null;
           gate_code_encrypted: string | null;
