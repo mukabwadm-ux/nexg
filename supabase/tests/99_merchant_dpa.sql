@@ -60,9 +60,9 @@ select is(
 
 select results_eq(
   $$select action collate "C", module, default_severity::text from audit.action_registry
-    where action in ('merchant.dpa_accepted', 'merchant.dpa_copy_stored') order by 1$$,
+    where action in ('merchant.dpa_accepted', 'merchant.dpa_signed') order by 1$$,
   $$values ('merchant.dpa_accepted' collate "C", 'merchants', 'notice'),
-           ('merchant.dpa_copy_stored', 'merchants', 'info')$$,
+           ('merchant.dpa_signed', 'merchants', 'notice')$$,
   'both DPA actions are registered');
 
 select is(
