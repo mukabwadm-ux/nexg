@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { unstable_noStore as noStore } from 'next/cache';
 import { notFound, redirect } from 'next/navigation';
 
+import { TrackEvent } from '@/components/analytics/google-analytics';
 import { StayCheckout } from '@/components/stays/stay-checkout';
 import { PhotoSlot } from '@/components/stays/listing';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import { stayBeginCheckout } from '@/lib/analytics/stay-events';
 import { createPublicClient } from '@/lib/supabase/public';
 import { createClient } from '@/lib/supabase/server';
 
@@ -95,6 +97,17 @@ export default async function BookPage({
     <>
       <SiteHeader signIn={{ label: 'All stays', href: '/stays' }} />
       <main id="main" className="mx-auto max-w-[72rem] px-4 pb-16 pt-6 sm:px-8">
+        {/* Not when coming back to a stay already held or paid for. */}
+        {!searchParams?.stay && (
+          <TrackEvent
+            event={stayBeginCheckout({
+              slug: property.slug,
+              property: property.name,
+              unit: unit.label_public ?? unit.name,
+              nightlyKes: unit.nightly_rate_kes,
+            })}
+          />
+        )}
         <Link
           href={`/stays/${property.slug}`}
           className="text-muted hover:text-ink inline-flex items-center gap-1.5 text-[0.75rem] font-bold"

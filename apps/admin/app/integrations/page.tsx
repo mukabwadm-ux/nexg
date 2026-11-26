@@ -37,6 +37,7 @@ import {
 import { Chip, Empty, ErrorNote, Footnote } from '@/components/stays/module';
 import { asNumber, asObject, isMissingFunction, n, oneOf, when } from '@/lib/stays-module';
 import { requireModule, requireStaff } from '@/lib/staff';
+import { GA_ENV_NAME, webAnalyticsStatus } from '@/lib/web-analytics';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { title: 'Integrations' };
@@ -117,6 +118,7 @@ export default async function IntegrationsPage({
   const o = asObject(data);
   const g = (k: string) => asObject(o[k]);
   const mapsKey = !!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const analytics = await webAnalyticsStatus();
 
   const list: Integration[] = [
     {
@@ -247,13 +249,27 @@ export default async function IntegrationsPage({
     },
     {
       key: 'analytics',
-      name: 'Web analytics',
-      blurb: 'User, booking and revenue analytics.',
+      name: 'Google Analytics 4',
+      blurb: 'Visits, stay views, checkouts and paid stays on nexgapp.com, with visitor consent.',
       icon: BarChart3,
       category: 'analytics',
-      state: 'not_connected',
-      detail: 'No analytics service is wired to NexG yet',
-      manage: '/settings?tab=api',
+      state:
+        analytics.kind === 'configured'
+          ? 'connected'
+          : analytics.kind === 'missing'
+            ? 'not_connected'
+            : 'setup',
+      detail:
+        analytics.kind === 'configured'
+          ? `Measurement ID ${analytics.measurementId} is set on the web project; it loads only for visitors who allow analytics`
+          : analytics.kind === 'missing'
+            ? `Set ${GA_ENV_NAME} on the nexg web project in Vercel`
+            : analytics.kind === 'invalid'
+              ? `${GA_ENV_NAME} on the web project is not a G-… measurement ID, so the site ignores it`
+              : analytics.reason === 'not_deployed'
+                ? `The live site does not answer this check yet; set ${GA_ENV_NAME} on the nexg web project in Vercel and redeploy`
+                : `Could not ask the live site (${analytics.reason}); check ${GA_ENV_NAME} on the nexg web project in Vercel`,
+      manage: 'https://analytics.google.com/',
     },
   ];
 

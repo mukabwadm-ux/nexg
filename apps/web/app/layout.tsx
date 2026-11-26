@@ -2,7 +2,11 @@ import '@nexg/ui/globals.css';
 
 import { ToastProvider } from '@nexg/ui';
 import type { Metadata, Viewport } from 'next';
+import { GoogleAnalytics } from '@/components/analytics/google-analytics';
+import { CookieConsent } from '@/components/consent/cookie-consent';
 import { RegisterServiceWorker } from '@/components/notifications/register-sw';
+import { consentDefaultScript } from '@/lib/analytics/gtag';
+import { isMeasurementId } from '@/lib/consent/cookie';
 import { REVEAL_SCRIPT } from '@/components/reveal-script';
 import { LOCALE_SCRIPT } from '@/lib/i18n/script';
 import { THEME_SCRIPT } from '@/components/theme/script';
@@ -38,7 +42,11 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
+/* Set in Vercel on the web project; without it nothing about Google Analytics is rendered. */
+const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const gaId = isMeasurementId(GA_ID) ? GA_ID : null;
   return (
     /* The theme class is set by THEME_SCRIPT before React loads, hence the warning opt-out. */
     <html lang="en" suppressHydrationWarning>
@@ -49,6 +57,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: LOCALE_SCRIPT }} />
         {/* Homepage entrances: their items first appear through the animation. */}
         <script dangerouslySetInnerHTML={{ __html: REVEAL_SCRIPT }} />
+        {/* Google Consent Mode v2: everything optional denied until the visitor chooses.
+            No Google script is loaded here; that waits for analytics consent. */}
+        {gaId && <script dangerouslySetInnerHTML={{ __html: consentDefaultScript() }} />}
         <link
           rel="preload"
           href="/fonts/manrope/v1/manrope-latin.woff2"
@@ -63,6 +74,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeSync />
         <ToastProvider>{children}</ToastProvider>
         <RegisterServiceWorker />
+        <CookieConsent />
+        {gaId && <GoogleAnalytics measurementId={gaId} />}
       </body>
     </html>
   );

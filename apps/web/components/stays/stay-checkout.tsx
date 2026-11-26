@@ -12,7 +12,9 @@ import {
   stayCheckoutStatus,
   type CheckoutStatus,
 } from '@/app/(customer)/stays/[slug]/book/actions';
+import { TrackEvent } from '@/components/analytics/google-analytics';
 import { ChargedInKesNote, ChargedPrice, Price } from '@/components/currency/price';
+import { stayPurchase } from '@/lib/analytics/stay-events';
 import { createClient } from '@/lib/supabase/client';
 
 interface UnitOption {
@@ -314,6 +316,19 @@ export function StayCheckout({
   if (step === 'done') {
     return (
       <Card className="p-6">
+        {status?.status === 'booked' && (
+          <TrackEvent
+            once={`purchase_${status.paymentReference ?? stayId}`}
+            event={stayPurchase({
+              reference: status.paymentReference ?? stayId,
+              slug,
+              property: status.property,
+              unit: status.unit,
+              nights: status.nights,
+              paidKes: status.paidKes ?? status.totalKes ?? 0,
+            })}
+          />
+        )}
         <CalendarCheck aria-hidden="true" className="text-success h-8 w-8" />
         <h2 className="mt-3 text-[1.25rem] font-extrabold">You are booked</h2>
         <p className="text-muted mt-2 text-[0.875rem] font-semibold leading-[1.7]">

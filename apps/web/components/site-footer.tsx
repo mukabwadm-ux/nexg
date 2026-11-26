@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { CookieSettingsLink } from '@/components/consent/cookie-settings-link';
 import { LanguageSwitcher } from '@/components/consent/language-switcher';
 import { availableLocales, getTranslations } from '@/lib/i18n';
 import { DATA_PROTECTION_POLICY_URL, NEW_TAB } from '@/lib/legal-documents';
@@ -20,6 +21,8 @@ type FooterLink = {
   href?: string;
   document?: boolean;
   external?: boolean;
+  /** Reopens the cookie preferences instead of navigating. */
+  cookieSettings?: boolean;
 };
 
 const COLUMNS: { key: string; links: FooterLink[] }[] = [
@@ -50,6 +53,7 @@ const COLUMNS: { key: string; links: FooterLink[] }[] = [
       { key: 'footer.privacy', href: '/legal/privacy' },
       { key: 'footer.dataProtection', href: DATA_PROTECTION_POLICY_URL, document: true },
       { key: 'footer.cookies', href: '/legal/cookies' },
+      { key: 'footer.cookieSettings', cookieSettings: true },
       { key: 'footer.contact', href: '/help' },
     ],
   },
@@ -104,7 +108,9 @@ export async function SiteFooter({
                 <ul className="mt-5 space-y-3.5">
                   {column.links.map((link) => (
                     <li key={link.key}>
-                      {!link.href ? (
+                      {link.cookieSettings ? (
+                        <CookieSettingsLink label={t(link.key)} className={LINK} />
+                      ) : !link.href ? (
                         <span className="inline-flex items-center gap-2 text-[0.9375rem] text-white/45 sm:text-base">
                           {t(link.key)}
                           <span className="rounded-full bg-white/10 px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide text-white/60">
