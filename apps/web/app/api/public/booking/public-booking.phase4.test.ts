@@ -47,8 +47,45 @@ describe('public booking proxy publication', () => {
       new Request(`https://merchant.test/api/public/booking/${businessId}/catalog`),
       { params: { businessId, path: ['catalog'] } },
     );
-    expect(await response.json()).toEqual({ business: { id: businessId }, offerings: [] });
+    expect(await response.json()).toEqual({ business: { id: businessId }, offerings: [], engineOnlyHandoff: true });
     expect(response.headers.get('set-cookie')).toContain('nexg_booking_session=');
     expect(mock.forward.mock.calls[0]?.[2]).toMatchObject({ businessId, role: 'customer' });
   });
+});
+
+it('marks only exact successful catalogue and preserves no-store plus customer session cookie', async () => {
+  mock.access.mockResolvedValue('available');
+  mock.forward.mockResolvedValue(Response.json({ business: { id: businessId }, offerings: [{ id: 'offering' }] }, {
+    headers: { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', etag: 'old-body' },
+  }));
+  const response = await GET(new Request(`https://merchant.test/api/public/booking/${businessId}/catalog`), { params: { businessId, path: ['catalog'] } });
+  expect((await response.json()).engineOnlyHandoff).toBe(true);
+  expect(response.headers.get('cache-control')).toBe('no-store');
+  expect(response.headers.get('x-content-type-options')).toBe('nosniff');
+  expect(response.headers.get('etag')).toBeNull();
+  expect(response.headers.get('set-cookie')).toContain('nexg_booking_session=');
+  expect(mock.access).toHaveBeenCalledWith(expect.any(Request), businessId, true);
+});
+
+it.each([
+  { status: 503, body: { detail: 'unavailable' } },
+  { status: 200, body: { business: { id: 'other-business' }, offerings: [] } },
+  { status: 200, body: { business: { id: businessId }, offerings: [{}] } },
+])('never marks an error or malformed/mismatched catalogue', async ({ status, body }) => {
+  mock.access.mockResolvedValue('available'); mock.forward.mockResolvedValue(Response.json(body, { status }));
+  const response = await GET(new Request(`https://merchant.test/api/public/booking/${businessId}/catalog`), { params: { businessId, path: ['catalog'] } });
+  expect(response.status).toBe(status); expect(await response.json()).toEqual(body);
+});
+
+it('does not mark availability or POST responses and does not override coexistence refusal', async () => {
+  mock.access.mockResolvedValue('available');
+  for (const [method, route] of [['GET','availability'], ['POST','catalog']] as const) {
+    const body = { business: { id: businessId }, offerings: [] };
+    mock.forward.mockResolvedValue(Response.json(body));
+    const response = await (method === 'GET' ? GET : POST)(new Request(`https://merchant.test/api/public/booking/${businessId}/${route}`, {method}), {params:{businessId,path:[route]}});
+    expect(await response.json()).toEqual(body);
+  }
+  mock.forward.mockClear(); mock.access.mockResolvedValue('not_found');
+  const response = await GET(new Request(`https://merchant.test/api/public/booking/${businessId}/catalog`), {params:{businessId,path:['catalog']}});
+  expect(response.status).toBe(404);expect((await response.json()).engineOnlyHandoff).toBeUndefined();expect(mock.forward).not.toHaveBeenCalled();
 });

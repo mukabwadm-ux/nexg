@@ -164,6 +164,7 @@ export async function createPayload(
         { name: 'publicId', type: 'text', unique: true },
         { name: 'capacity', type: 'number' },
         { name: 'resourceIds', type: 'json' },
+        { name: 'movies', type: 'json' },
         { name: 'published', type: 'checkbox', defaultValue: false },
         { name: 'version', type: 'number', defaultValue: 1 },
         { name: 'locationId', type: 'text' },

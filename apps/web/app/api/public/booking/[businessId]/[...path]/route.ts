@@ -1,4 +1,4 @@
-import { bookingCustomerSession, forwardBookingRequest, problem } from '@/lib/booking/bridge';
+import { bookingCustomerSession, forwardBookingRequest, MERCHANT_BOOKING_ID, problem } from '@/lib/booking/bridge';
 import { publicMerchantBookingAccess } from '@/lib/booking/public-access';
 
 export const runtime = 'nodejs';
@@ -33,12 +33,34 @@ async function route(
       'connection_setup_required',
     );
   const session = bookingCustomerSession(request.headers.get('cookie'), secret);
-  const response = await forwardBookingRequest(
+  let response = await forwardBookingRequest(
     request,
     context.params.path,
     { businessId, userId: session.userId, role: 'customer' },
     'customer',
   );
+  // Positive version marker only after the existing publication, coexistence and signed bridge checks.
+  if (request.method === 'GET' && MERCHANT_BOOKING_ID.test(businessId) && context.params.path.length === 1 &&
+      context.params.path[0] === 'catalog' && response.status === 200 &&
+      response.headers.get('content-type')?.split(';')[0]?.trim() === 'application/json') {
+    const catalog: unknown = await response.clone().json().catch(() => null);
+    if (catalog && typeof catalog === 'object' && !Array.isArray(catalog)) {
+      const value = catalog as Record<string, unknown>;
+      const business = value.business;
+      if (business && typeof business === 'object' && !Array.isArray(business) &&
+          (business as Record<string, unknown>).id === businessId &&
+          Array.isArray(value.offerings) && value.offerings.every(offering =>
+            offering && typeof offering === 'object' && !Array.isArray(offering) &&
+            typeof offering.id === 'string' && offering.id.length > 0)) {
+        const headers = new Headers(response.headers);
+        headers.delete('content-length');
+        headers.delete('etag');
+        response = Response.json({ ...value, engineOnlyHandoff: true }, {
+          status: response.status, statusText: response.statusText, headers,
+        });
+      }
+    }
+  }
   if (session.created)
     response.headers.append(
       'set-cookie',

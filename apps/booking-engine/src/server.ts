@@ -6,6 +6,10 @@ import { BookingEngine } from './engine.js';
 import { addOccurrence } from './occurrences.js';
 import { manageResource, manageOffering, createClosure } from './management.js';
 import { BookingError, type Identity } from './types.js';
+import { authenticatedMovieCustomer, createAuthenticatedMovieHold, readAuthenticatedMovieHold, readAuthenticatedMovieAvailability } from './movie-transport.js';
+import { authenticatedStayCustomer, createStayTransport } from './stay-transport.js';
+
+const stays = createStayTransport();
 
 const MAX_BODY = 128 * 1024;
 async function body(request: IncomingMessage): Promise<any> {
@@ -71,6 +75,52 @@ export function createBookingServer(engine: BookingEngine, secret: string) {
           ? req.headers['x-booking-customer-token']
           : undefined;
       const path = url.pathname;
+      if (path.startsWith('/v1/stays/')) {
+        const activity = path.match(/^\/v1\/stays\/([^/]+)\/holds\/([^/]+)\/activity$/);
+        if (activity) {
+          if (activity[1] !== identity.businessId)
+            throw new BookingError(404, 'This Stays page was not found.', 'not_found');
+          authenticatedStayCustomer(identity);
+          if (url.search) throw new BookingError(422, 'Activity does not accept query overrides.', 'invalid_stay_intent');
+          if (req.method !== 'GET') throw new BookingError(405, 'This Stays action is not supported.', 'method_not_allowed');
+          return respond(res, 200, await stays.activity(engine, identity, activity[2]!));
+        }
+        const match = path.match(/^\/v1\/stays\/([^/]+)\/(quote|holds|availability)(?:\/([^/]+))?$/);
+        if (!match || match[1] !== identity.businessId)
+          throw new BookingError(404, 'This Stays page was not found.', 'not_found');
+        authenticatedStayCustomer(identity);
+        if (match[2] === 'availability') {
+          if (match[3] || req.method !== 'GET') throw new BookingError(405, 'This Stays action is not supported.', 'method_not_allowed');
+          return respond(res, 200, await stays.availability(engine, identity, url.searchParams));
+        }
+        if (url.search) throw new BookingError(422, 'Stays commands do not accept query overrides.', 'invalid_stay_intent');
+        if (match[2] === 'quote' && !match[3] && req.method === 'POST')
+          return respond(res, 200, await stays.quote(engine, identity, await body(req), key));
+        if (match[2] === 'holds' && !match[3] && req.method === 'POST')
+          return respond(res, 201, await stays.hold(engine, identity, await body(req), key));
+        if (match[2] === 'holds' && match[3] && req.method === 'GET')
+          return respond(res, 200, await stays.read(engine, identity, match[3]));
+        throw new BookingError(405, 'This Stays action is not supported.', 'method_not_allowed');
+      }
+      if (path.startsWith('/v1/movies/')) {
+        const availability = path.match(/^\/v1\/movies\/([^/]+)\/availability$/);
+        if (availability) {
+          if (availability[1] !== identity.businessId)
+            throw new BookingError(404, 'This Movies page was not found.', 'not_found');
+          authenticatedMovieCustomer(identity);
+          if (req.method !== 'GET') throw new BookingError(405, 'This Movies action is not supported.', 'method_not_allowed');
+          return respond(res, 200, await readAuthenticatedMovieAvailability(engine, identity, url.searchParams));
+        }
+        const match = path.match(/^\/v1\/movies\/([^/]+)\/holds(?:\/([^/]+))?$/);
+        if (!match || match[1] !== identity.businessId)
+          throw new BookingError(404, 'This Movies page was not found.', 'not_found');
+        authenticatedMovieCustomer(identity);
+        if (!match[2] && req.method === 'POST')
+          return respond(res, 201, await createAuthenticatedMovieHold(engine, identity, await body(req), key));
+        if (match[2] && req.method === 'GET')
+          return respond(res, 200, await readAuthenticatedMovieHold(engine, identity, match[2]));
+        throw new BookingError(405, 'This Movies action is not supported.', 'method_not_allowed');
+      }
       const availabilityOptions = {
         resourceIds: url.searchParams.get('resourceId')
           ? [url.searchParams.get('resourceId')!]

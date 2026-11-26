@@ -1,5 +1,9 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import type { Payload } from 'payload';
+import { toMovieReservationItems } from './movie-reservation-items.js';
+import { movieHoldIntent, movieHoldCustomer, movieHoldView, type MovieHoldInput, type MoviesOccurrence } from './movies.js';
+import { hasNativeMovieAuthority } from './movie-authority.js';
+import { stayHoldView } from './stays.js';
 import { checkAvailability } from 'payload-reserve';
 import {
   normalizeBookingAnswers,
@@ -140,6 +144,8 @@ export class BookingEngine {
       audit: this.audit.bind(this),
       request: this.request.bind(this),
       now: this.clock,
+      scheduleAllows: this.scheduleAllows.bind(this),
+      expireHolds: this.expiredInTransaction.bind(this),
     };
   }
   specialistContext() {
@@ -469,6 +475,78 @@ export class BookingEngine {
       google: { connected: false, optional: true, state: 'not_connected' },
     };
   }
+  /** Internal candidate only: no route/publication/payment/ticket activation. */
+  async createMovieHold(identity: Identity, rawInput: MovieHoldInput, trustedCustomer?: import('./types.js').Customer) {
+    const input = movieHoldIntent(rawInput);
+    // Supplied by a future trusted authenticated/session adapter, never synthesized.
+    const customer = movieHoldCustomer(trustedCustomer);
+    if (!identity.userId) throw new BookingError(403, 'A scoped authenticated actor is required.', 'forbidden');
+    if (identity.role !== 'customer') requireManager(identity);
+    const result = await this.command(identity, input.requestId, 'movies.hold', { ...input, customer }, async (req) => {
+      const business = (await this.all('businesses', identity, req))[0];
+      const configuration = business?.configuration;
+      if (configuration?.categoryKey !== 'experiences' || configuration?.subcategoryId !== 'cinemas' || configuration?.published !== true)
+        throw new BookingError(409, 'A published experiences/cinemas owner configuration is required.', 'movie_owner_required');
+      const service = await this.own('services', input.offeringId, identity, req);
+      const occurrence = (await this.all('booking-sessions', identity, req)).find(row=>row.publicId===input.occurrenceId);
+      if (!occurrence) throw new BookingError(404,'This showing occurrence was not found.','not_found');
+      assertBranch(identity,{nexg:{locationId:occurrence.locationId}});
+      const movies = occurrence.movies as MoviesOccurrence | undefined;
+      if (service.active !== true || service.nexg?.bookingEnabled !== true || service.nexg?.model !== 'SESSION_CAPACITY' ||
+          occurrence.published !== true || occurrence.offeringId !== service.publicId || occurrence.locationId !== service.nexg.locationId || !movies || typeof movies !== 'object' || Array.isArray(movies) || movies.contractVersion !== 1 ||
+          movies.merchantId !== identity.businessId || movies.showingId !== input.showingId || movies.screenId !== input.screenId ||
+          !movies.pricesMinor || typeof movies.pricesMinor !== 'object' || Array.isArray(movies.pricesMinor) ||
+          !Array.isArray(movies.seats) || movies.seats.length<1 || movies.seats.length>5000 ||
+          movies.seats.some(s=>!s || typeof s!=='object' || Array.isArray(s)) ||
+          Object.entries(movies.pricesMinor).some(([key,value])=>!['standard','vip','wheelchair'].includes(key)||!Number.isSafeInteger(value)||Number(value)<=0))
+        throw new BookingError(409, 'Choose the exact published owner showing and screen.', 'movie_publication_required');
+      const scopedConfiguration = { ...configuration, scope: { businessId: identity.businessId, offeringId: service.publicId, sessionId: occurrence.publicId, locationId: occurrence.locationId } };
+      if (!hasNativeMovieAuthority(configuration, { businessId: identity.businessId, offeringId: service.publicId,
+            occurrenceId: occurrence.publicId, locationId: occurrence.locationId }) ||
+          this.sourceConfirmationRequired(scopedConfiguration))
+        throw new BookingError(409, 'Explicit native ownership of this showing inventory and price is required.', 'movie_authority_required');
+      const plan = toMovieReservationItems({ id: movies.showingId, merchantId: movies.merchantId, screenId: movies.screenId,
+        filmId: movies.filmId, occurrenceId: occurrence.publicId, startsAt: occurrence.startTime, endsAt: occurrence.endTime,
+        status: 'on_sale', pricesMinor: movies.pricesMinor, seats: movies.seats }, input,
+        { merchantId: identity.businessId, screenId: input.screenId, occurrenceId: occurrence.publicId }, this.clock());
+      if (!plan.ok) throw new BookingError(plan.reason==='price_changed'?409:422, 'The requested cinema hold is unavailable: '+plan.reason, 'movie_'+plan.reason);
+      const canonicalResources = movies.seats.map(s=>s.resourceId).sort();
+      if (!Array.isArray(occurrence.resourceIds) || [...occurrence.resourceIds].sort().join(',')!==canonicalResources.join(',') ||
+          !Array.isArray(service.nexg.resourceIds) || canonicalResources.some(id=>!service.nexg.resourceIds.includes(id)) ||
+          service.durationType!=='fixed' || service.duration*60000!==Date.parse(plan.endsAt)-Date.parse(plan.startsAt))
+        throw new BookingError(409, 'Published seat resources and showing duration must match their offering.', 'movie_inventory_required');
+      const resources = await Promise.all(plan.items.map(i=>this.own('resources',i.resourceId,identity,req)));
+      for (const resource of resources) {
+        if (resource.active!==true || resource.quantity!==1 || resource.capacityMode!=='per-reservation' || resource.resourceType!=='asset' ||
+            resource.nexg?.locationId!==occurrence.locationId || !resource.nexg?.schedule ||
+            !this.scheduleAllows(service,resource,Date.parse(plan.startsAt),Date.parse(plan.endsAt)))
+          throw new BookingError(409, 'Every chosen seat must be an active, scheduled, exclusive owner resource.', 'movie_resource_required');
+      }
+      await this.expiredInTransaction(identity,req);
+      await this.assertNoOverdueCustody(identity,resources,req);
+      // Same actual Reserve write path as allocate(): parent + items, shared req.
+      // Reserve locks every resource, checks conflicts and writes all items atomically.
+      if (Date.parse(plan.expiresAt) <= this.clock())
+        throw new BookingError(409, 'The showing cutoff was reached.', 'movie_not_on_sale');
+      const id = publicId();
+      const doc = await this.create('reservations', { publicId:id,service:service.id,resource:resources[0]!.id,
+        startTime:plan.startsAt,endTime:plan.endsAt,status:'held',guest:customer,guestCount:1,
+        items:resources.slice(1).map(r=>({resource:r.id,service:service.id,guestCount:1})),
+        nexg:{publicId:id,offeringId:service.publicId,model:'SESSION_CAPACITY',sessionId:String(occurrence.id),
+          locationId:occurrence.locationId,resourceIds:plan.items.map(i=>i.resourceId),quantity:plan.items.length,
+          version:1,expiresAt:plan.expiresAt,createdBy:identity.userId,
+          movieHold:{contractVersion:1,showingId:plan.showingId,screenId:plan.screenId,filmId:movies.filmId,
+            occurrenceId:occurrence.publicId,seatIds:plan.items.map(i=>i.seatId),totalMinor:plan.totalMinor}}
+      },identity,req);
+      if (Date.parse(doc.startTime)!==Date.parse(plan.startsAt)||Date.parse(doc.endTime)!==Date.parse(plan.endsAt))
+        throw new BookingError(409,'Reserve allocation must preserve the exact showing window.','movie_window_mismatch');
+      await this.audit(identity,req,'movie.hold.created',id,{status:'held'});
+      return {bookingId:id};
+    });
+    // Replays return the original record, including derived expiry; never reallocate.
+    return movieHoldView(await this.own('reservations',result.bookingId,identity),this.clock());
+  }
+
   async configure(identity: Identity, input: Doc, key?: string) {
     requireManager(identity);
     if (identity.branches)
@@ -616,6 +694,8 @@ export class BookingEngine {
   }
   bookingView(d: Doc) {
     const n = d.nexg ?? {};
+    if (n.movieHold) return movieHoldView(d, this.clock());
+    if (n.stayHold) return stayHoldView(d, this.clock());
     const holdExpired = this.isExpiredHold(d);
     const {
       customerTokenHash: _,
@@ -1924,6 +2004,10 @@ export class BookingEngine {
     const result = await this.command(identity, key, 'booking.create', input, async (req) => {
       await this.expiredInTransaction(identity, req);
       const service = await this.own('services', input.offeringId, identity, req);
+      if (service.nexg?.stayInventory)
+        throw new BookingError(422, 'Use the dedicated Stay quote and hold workflow.', 'stay_command_required');
+      if ((await this.all('booking-sessions', identity, req)).some(row => row.offeringId === service.publicId && row.movies))
+        throw new BookingError(422, 'A Movies offering cannot use generic booking creation.', 'movie_command_required');
       if (publicOnly) await this.assertPublished(identity, service, req);
       if (service.active === false)
         throw new BookingError(409, 'This offering is inactive.', 'inactive_offering');
@@ -1934,6 +2018,8 @@ export class BookingEngine {
           'nonblocking_request',
         );
       const b = await this.business(identity, req);
+      if (b.configuration?.subcategoryId === 'cinemas')
+        throw new BookingError(422, 'Use the exact-seat Movies command.', 'movie_command_required');
       const sourceRequired = this.sourceConfirmationRequired(b.configuration);
       const specialistPlan =
         service.nexg.specialistSetup && !sourceRequired
@@ -2184,6 +2270,8 @@ export class BookingEngine {
         input.occurrenceId,
         req,
       );
+      if (occurrence.movies)
+        throw new BookingError(422, 'Exact seats cannot use aggregate session capacity.', 'movie_command_required');
       sessionId = String(occurrence.id);
       if (
         [...occurrence.resourceIds].sort().join(',') !==
@@ -2352,6 +2440,10 @@ export class BookingEngine {
       if (identity.role === 'customer') this.assertCustomerToken(doc, customerToken);
       const n = doc.nexg ?? {},
         state = doc.status ?? n.status;
+      if (n.movieHold)
+        throw new BookingError(422, 'Movies lifecycle is not activated; generic changes are forbidden.', 'movie_command_required');
+      if (n.stayHold)
+        throw new BookingError(422, 'Use the dedicated Stay lifecycle workflow.', 'stay_command_required');
       if (n.recordRole === 'specialist_allocation')
         throw new BookingError(
           422,

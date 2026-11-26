@@ -5,7 +5,7 @@ import { CustomerBookingForm } from '@/components/booking/customer-booking-form'
 import { CustomerBooking } from '@/components/merchant/booking/customer-booking';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
-import { bookingEngineEnabledForMerchant } from '@/lib/booking/bridge';
+import { bookingEngineEnabledForMerchant, MERCHANT_BOOKING_ID } from '@/lib/booking/bridge';
 import { nairobiDate, PUBLIC_RESOURCE_COLUMNS, type PublicResource } from '@/lib/booking/customer';
 import { createClient } from '@/lib/supabase/server';
 import { discoverMerchantHref } from '@/lib/discover-links';
@@ -21,8 +21,16 @@ export default async function CustomerBookingPage({
   searchParams,
 }: {
   params: { businessId: string };
-  searchParams?: { resource?: string };
+  searchParams?: { resource?: string; source?: string | string[] };
 }) {
+  // Explicit native handoff never reaches the legacy reservation form.
+  // Its API still enforces publication and legacy-resource coexistence refusal.
+  if (searchParams?.source === 'engine') {
+    if (!MERCHANT_BOOKING_ID.test(params.businessId) || searchParams.resource ||
+        !bookingEngineEnabledForMerchant(params.businessId, process.env)) notFound();
+    return <CustomerBooking businessId={params.businessId} />;
+  }
+  if (Array.isArray(searchParams?.source) && searchParams.source.includes('engine')) notFound();
   const useEngine =
     !searchParams?.resource && bookingEngineEnabledForMerchant(params.businessId, process.env);
   if (useEngine && process.env.NODE_ENV !== 'production') {

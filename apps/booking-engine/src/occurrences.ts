@@ -212,6 +212,17 @@ export async function addOccurrence(
     );
   return c.command(identity, key, `offering.${offeringId}.occurrence`, input, async (req: any) => {
     const service = await c.own('services', offeringId, identity, req);
+    const rows = await c.all('booking-sessions', identity, req);
+    const existing = input.occurrenceId
+      ? rows.find((row) => row.publicId === input.occurrenceId && row.offeringId === offeringId)
+      : undefined;
+    // A cinema showing can only be changed by the dedicated publication command.
+    if (existing?.movies)
+      throw new BookingError(
+        409,
+        'Use the dedicated Movies publication workflow to change this showing.',
+        'movie_command_required',
+      );
     const sharedTour =
       service.nexg?.model === 'TOUR'
         ? normalizeSpecialistSetup('TOUR', service.nexg.specialistSetup)
@@ -323,10 +334,6 @@ export async function addOccurrence(
         `This occurrence can contain at most ${maximum} places.`,
         'occurrence_capacity',
       );
-    const rows = await c.all('booking-sessions', identity, req);
-    const existing = input.occurrenceId
-      ? rows.find((row) => row.publicId === input.occurrenceId && row.offeringId === offeringId)
-      : undefined;
     if (input.occurrenceId && !existing)
       throw new BookingError(404, 'This session occurrence was not found.', 'not_found');
     if (existing && input.expectedOccurrenceVersion !== (existing.version ?? 1))
