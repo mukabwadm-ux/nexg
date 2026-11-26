@@ -183,13 +183,20 @@ create policy merchant_dpa_staff_insert on storage.objects
   for insert to authenticated
   with check (bucket_id = 'merchant-agreements' and authz.merchant_dpa_object_writable(name));
 
--- Only an upload no acceptance records: what a failed signing left behind.
+/* Only an upload no acceptance records: what a failed signing left behind. */
+create or replace function authz.merchant_dpa_object_orphan(p_name text)
+returns boolean language sql stable security definer set search_path = '' as $$
+  select authz.merchant_dpa_path_merchant(p_name) is not null
+    and not exists (select 1 from public.merchant_dpa_acceptance x where x.storage_path = p_name);
+$$;
+revoke all on function authz.merchant_dpa_object_orphan(text) from public, anon;
+grant execute on function authz.merchant_dpa_object_orphan(text) to authenticated;
+
 drop policy if exists merchant_dpa_staff_delete on storage.objects;
 create policy merchant_dpa_staff_delete on storage.objects
   for delete to authenticated
   using (bucket_id = 'merchant-agreements' and authz.merchant_dpa_object_writable(name)
-         and not exists (select 1 from public.merchant_dpa_acceptance x
-                         where x.storage_path = storage.objects.name));
+         and authz.merchant_dpa_object_orphan(name));
 
 -- ══════════════════════════════════════════════════════════════ helpers
 
