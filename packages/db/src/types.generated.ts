@@ -67426,6 +67426,10 @@ export type Database = {
         Returns: string;
       };
       fn_group_order_payload: { Args: { p_group_id: string; p_payload: Json }; Returns: Json };
+      fn_guest_review_emails_allowed: {
+        Args: { p_email: string; p_user_id: string };
+        Returns: boolean;
+      };
       fn_handoff_code_new: { Args: Record<PropertyKey, never>; Returns: string };
       fn_handoff_sentence: { Args: { p_unit_id: string }; Returns: string };
       fn_health_green_streak: { Args: { p_merchant_id: string }; Returns: number };
