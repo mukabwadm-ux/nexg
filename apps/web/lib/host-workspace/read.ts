@@ -63,6 +63,44 @@ export function readingBeforeArchive<T>(
   };
 }
 
+type UntypedReader = {
+  from: (table: string) => {
+    select: (columns: string) => {
+      in: (
+        column: string,
+        values: string[],
+      ) => PromiseLike<{ data: Record<string, unknown>[] | null; error: unknown }>;
+    };
+  };
+};
+
+/**
+ * Each unit's weekend rate and long-stay discounts (20270331000100). Read
+ * apart from the unit rows, and empty if the columns are not there yet, so
+ * the workspace keeps loading on a database without them.
+ */
+export async function readRateRules(db: unknown, unitIds: string[]) {
+  const rules = new Map<
+    string,
+    { weekendRateKes?: number; weeklyDiscountPct?: number; monthlyDiscountPct?: number }
+  >();
+  if (unitIds.length === 0) return rules;
+  const { data, error } = await (db as UntypedReader)
+    .from('unit')
+    .select('id, weekend_rate_kes, weekly_discount_pct, monthly_discount_pct')
+    .in('id', unitIds);
+  if (error || !data) return rules;
+  const num = (value: unknown) => (typeof value === 'number' ? value : undefined);
+  for (const row of data) {
+    rules.set(String(row.id), {
+      weekendRateKes: num(row.weekend_rate_kes),
+      weeklyDiscountPct: num(row.weekly_discount_pct),
+      monthlyDiscountPct: num(row.monthly_discount_pct),
+    });
+  }
+  return rules;
+}
+
 /**
  * A pin from a PostGIS point as PostgREST returns it: GeoJSON, or the hex
  * EWKB string (byte order, type with an SRID flag, optional SRID, x, y).
@@ -432,6 +470,10 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
   const checklist = new Map(
     (loaded(await checklistLoad) ?? []).map((row) => [row.unit_id, row] as const),
   );
+  const rateRules = await readRateRules(
+    db,
+    units.map((unit) => unit.id),
+  );
   const settings = loaded(settingsResult);
   const profileRow = loaded(profileResult);
   const savedProfile = profileRow?.workspace_profile;
@@ -596,6 +638,7 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
             sizeSqm: row.size_sqm ?? undefined,
             summary: row.unit_summary ?? '',
             minNights: row.min_nights ?? 1,
+            ...rateRules.get(row.id),
             listing: listingOf(row.id),
             /* A unit of an archived property keeps its own value; the phone
                shows every unit of an archived property as archived. */

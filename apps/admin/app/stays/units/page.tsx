@@ -35,6 +35,7 @@ import {
 import { DashClear, DashSearch, DashSelect } from '@/components/portal/dash-filters';
 import { UnitControls } from '@/components/stays/client';
 import { PanelTabs } from '@/components/stays/extras';
+import { UnitRatesFacts } from '@/components/stays/rates';
 import {
   Chip,
   DataTable,
@@ -247,20 +248,7 @@ export default async function UnitsPage({
         </>
       );
     } else if (ptab === 'rates') {
-      panelBody = (
-        <>
-          <Fact label="Nightly Rate">{kesFull(unit.nightly_rate_kes)}</Fact>
-          <Fact label="Weekly Rate">
-            {unit.nightly_rate_kes ? `${kesFull(unit.nightly_rate_kes * 7)} (7 × nightly)` : '—'}
-          </Fact>
-          <Fact label="Monthly Rate">
-            {unit.nightly_rate_kes ? `${kesFull(unit.nightly_rate_kes * 30)} (30 × nightly)` : '—'}
-          </Fact>
-          <Footnote>
-            NexG keeps one nightly rate per unit; weekly and monthly are that rate times the nights.
-          </Footnote>
-        </>
-      );
+      panelBody = <UnitRatesFacts ctx={ctx} unitId={unit.unit_id} label={unit.label} />;
     } else if (ptab === 'bookings') {
       panelBody =
         bookings.length === 0 ? (
@@ -343,12 +331,9 @@ export default async function UnitsPage({
               ]}
             />
             <Fact label="Nightly Rate">{kesFull(unit.nightly_rate_kes)}</Fact>
-            <Fact label="Weekly Rate">
-              {unit.nightly_rate_kes ? kesFull(unit.nightly_rate_kes * 7) : '—'}
-            </Fact>
-            <Fact label="Monthly Rate">
-              {unit.nightly_rate_kes ? kesFull(unit.nightly_rate_kes * 30) : '—'}
-            </Fact>
+            <p className="text-muted mt-1 text-[0.8125rem] font-semibold">
+              Weekend, seasonal and long-stay prices are on the Rates &amp; Pricing tab.
+            </p>
           </div>
         </div>
       );

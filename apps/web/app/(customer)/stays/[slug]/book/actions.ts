@@ -158,3 +158,58 @@ export async function stayCheckoutStatus(stayId: string): Promise<CheckoutStatus
   }
   return status;
 }
+
+export interface StayQuote {
+  nights: number;
+  totalKes: number;
+  subtotalKes: number;
+  discountPct: number;
+  discountKes: number;
+  avgNightlyKes: number;
+  perNight: { day: string; rateKes: number; weekend: boolean; season: string | null }[];
+}
+
+type Untyped = {
+  rpc: (
+    fn: string,
+    args: Record<string, unknown>,
+  ) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
+};
+
+/**
+ * The price of these dates as the hold will charge it (fn_stay_quote: weekend
+ * rate, seasons, long-stay discount). Null when the unit is not bookable, the
+ * dates are not valid, or the database does not price stays this way yet.
+ */
+export async function quoteStay(input: {
+  unitId: string;
+  checkIn: string;
+  checkOut: string;
+}): Promise<StayQuote | null> {
+  if (!DAY.test(input.checkIn) || !DAY.test(input.checkOut)) return null;
+  if (!/^[0-9a-f-]{36}$/i.test(input.unitId)) return null;
+  /* rpc_stay_quote (20270331000100) is newer than the generated types. */
+  const db = createClient() as unknown as Untyped;
+  const { data, error } = await db.rpc('rpc_stay_quote', {
+    p_unit_id: input.unitId,
+    p_check_in: input.checkIn,
+    p_check_out: input.checkOut,
+  });
+  if (error || !data || typeof data !== 'object') return null;
+  const q = data as Record<string, unknown>;
+  const perNight = Array.isArray(q.per_night) ? (q.per_night as Record<string, unknown>[]) : [];
+  return {
+    nights: Number(q.nights),
+    totalKes: Number(q.total_kes),
+    subtotalKes: Number(q.subtotal_kes),
+    discountPct: Number(q.discount_pct ?? 0),
+    discountKes: Number(q.discount_kes ?? 0),
+    avgNightlyKes: Number(q.avg_nightly_kes),
+    perNight: perNight.map((n) => ({
+      day: String(n.day),
+      rateKes: Number(n.rate_kes),
+      weekend: Boolean(n.weekend),
+      season: typeof n.season === 'string' ? n.season : null,
+    })),
+  };
+}
