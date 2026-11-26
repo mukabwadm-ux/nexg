@@ -484,7 +484,7 @@ describe('a stay payment through Paystack, between the try and the webhook', () 
     vi.stubGlobal('fetch', fetch);
     for (const claim of [
       ok([]),
-      /* A database before 20270334000100 has no such function. */
+      /* A database before 20270335000100 has no such function. */
       { data: null, error: { code: 'PGRST202', message: 'not found' } },
     ]) {
       stub.rpc.mockClear();

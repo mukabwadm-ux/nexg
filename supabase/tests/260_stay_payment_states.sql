@@ -1,4 +1,4 @@
--- Stay payments through Paystack (20270334000100): a card page closed
+-- Stay payments through Paystack (20270335000100): a card page closed
 -- unfinished says so and is the page handed back; the stay screens read pending
 -- only while money may still come; an unfinished payment ends once Paystack,
 -- asked late enough, says it is unpaid, or after two hours with the case raised

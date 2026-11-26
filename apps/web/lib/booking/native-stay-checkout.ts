@@ -66,7 +66,7 @@ const holdView = z.object({
   providerPending: z.boolean().optional(),
   /* The newest try is a card page not finished, and the hold still lasts: paying
      by card again opens that same page. Absent otherwise, and from a database
-     before 20270334000100. */
+     before 20270335000100. */
   lastTry: z.enum(['not_completed']).optional(),
 });
 type HoldView = z.infer<typeof holdView>;

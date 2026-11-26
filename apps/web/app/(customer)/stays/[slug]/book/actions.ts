@@ -39,7 +39,7 @@ export interface CheckoutStatus {
   paymentState: string | null;
   paymentFailure: string | null;
   paymentReference: string | null;
-  /** unpaid, pending, failed or paid, as the apps are told; null before 20270334000100. */
+  /** unpaid, pending, failed or paid, as the apps are told; null before 20270335000100. */
   paymentStatus: string | null;
   /** The newest try is a card page not finished, and the hold still lasts. */
   lastTry: 'not_completed' | null;
