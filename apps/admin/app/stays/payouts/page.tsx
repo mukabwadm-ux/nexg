@@ -46,6 +46,7 @@ import {
   staysHref,
 } from '@/lib/stays-module';
 import { PAYOUT_TABS, PayoutsView } from '@/components/stays/tab-views';
+import { feeData } from '@/components/stays/management-fees';
 import { staysContext } from '@/lib/stays-server';
 
 export const metadata: Metadata = { title: 'Stays · Payouts & Settlements' };
@@ -95,11 +96,17 @@ export default async function PayoutsPage({
   const view = oneOf(['overview', 'payouts'] as const, searchParams?.view, 'overview');
   const { period, city } = ctx;
   const by = oneOf(['host', 'manager'] as const, searchParams?.by, 'host');
-  const fin = await ctx.read('rpc_console_stays_finance', {
-    p_from: period.from,
-    p_to: period.to,
-    p_city: city,
-  });
+  const args = { p_from: period.from, p_to: period.to, p_city: city };
+  const [fin, feeRead] = await Promise.all([
+    ctx.read('rpc_console_stays_finance', args),
+    ctx.read('rpc_console_stays_fee_invoices', args),
+  ]);
+  /* Management fee invoices and what payout runs took (20270331000600). */
+  const feeInfo = feeData(feeRead.data);
+  const feeTaken = (hostId: string) => {
+    const d = feeInfo.deductions[hostId];
+    return d ? asNumber(d.booked_kes) + asNumber(d.pending_kes) : 0;
+  };
   const o = asObject(fin.data);
   const k = asObject(o.kpis);
   const rules = asObject(o.rules);
@@ -109,7 +116,8 @@ export default async function PayoutsPage({
   const commission = asNumber(k.commission);
   const hostShare = asNumber(k.host_payouts);
   const pmShare = asNumber(k.pm_share);
-  const fees = asNumber(k.management_fees);
+  const fees = asNumber(feeInfo.kpis.invoiced_kes);
+  const feesCollected = asNumber(feeInfo.kpis.collected_kes);
   const settled = asNumber(k.settled_hosts);
   const inPeriod = asNumber(k.hosts_in_period);
 
@@ -170,8 +178,13 @@ export default async function PayoutsPage({
                 icon={CalendarClock}
                 label="Management Fees"
                 value={kesCompact(fees)}
-                explain={`${kesFull(asNumber(rules.management_fee_kes))} / property / month after the free trial; billable, not collected.`}
-              />
+                href={staysHref('/stays/finance', period, city, { view: 'fees' })}
+                explain={`Invoiced for the period's months (${kesFull(asNumber(rules.management_fee_kes))} / property / month after the free trial), and collected from payouts or by M-Pesa.`}
+              >
+                <span className="text-muted text-[0.8125rem] font-semibold">
+                  {kesCompact(feesCollected)} collected
+                </span>
+              </DashKpi>
               <DashKpi
                 icon={CheckCircle2}
                 label="Settlements Completed"
@@ -335,6 +348,7 @@ export default async function PayoutsPage({
                             'Booking Value (KES)',
                             'NexG Commission',
                             'Host Payout',
+                            'Fee Deducted',
                             'Status',
                             'Method',
                           ]}
@@ -351,6 +365,9 @@ export default async function PayoutsPage({
                               <td className="tabular-nums">{n(h.value_kes)}</td>
                               <td className="tabular-nums">{n(h.commission_kes)}</td>
                               <td className="font-bold tabular-nums">{n(h.host_share_kes)}</td>
+                              <td className="tabular-nums">
+                                {feeTaken(h.host_id) > 0 ? `− ${n(feeTaken(h.host_id))}` : '—'}
+                              </td>
                               <td>
                                 <Chip
                                   status={
@@ -402,14 +419,17 @@ export default async function PayoutsPage({
                     </div>
                     <Footnote>
                       Hosts are paid in Finance&rsquo;s weekly payout run once their payout details
-                      are verified (Hotels › Hosts).
+                      are verified (Hotels › Hosts). Fee Deducted is the management fee the
+                      period&rsquo;s runs take from the host&rsquo;s payout.
                     </Footnote>
                   </DashCard>
                   <div className="grid content-start gap-4">
                     <DashCard
                       title="Management Fee Status"
                       aside={
-                        <CardLink href={staysHref('/stays/finance', period, city)}>
+                        <CardLink
+                          href={staysHref('/stays/finance', period, city, { view: 'fees' })}
+                        >
                           View All
                         </CardLink>
                       }
@@ -418,8 +438,8 @@ export default async function PayoutsPage({
                         {[
                           [Coins, 'Active Properties (Paying)', n(asNumber(k.paying_properties))],
                           [Gift, 'On Free Trial', n(asNumber(k.trial_properties))],
-                          [CalendarClock, 'Management Fees (Billable)', kesCompact(fees)],
-                          [CheckCircle2, 'Active Properties', n(asNumber(k.active_properties))],
+                          [CalendarClock, 'Management Fees (Invoiced)', kesCompact(fees)],
+                          [CheckCircle2, 'Management Fees (Collected)', kesCompact(feesCollected)],
                         ].map(([Icon, t, v]) => {
                           const I = Icon as typeof Coins;
                           return (
@@ -443,7 +463,7 @@ export default async function PayoutsPage({
                 </div>
               </>
             ) : (
-              <PayoutsView data={fin.data} />
+              <PayoutsView data={fin.data} deductions={feeInfo.deductions} />
             )}
           </>
         )}
