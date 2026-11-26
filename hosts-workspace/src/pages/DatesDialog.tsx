@@ -29,6 +29,7 @@ export function DatesDialog({
     adults: 1,
     hours: 24,
     phone: '',
+    rate: '',
   });
   const [saving, setSaving] = useState(false),
     [error, setError] = useState('');
@@ -61,6 +62,7 @@ export function DatesDialog({
           adults: draft.adults,
           hours: draft.hours,
           phone: draft.phone.trim() || undefined,
+          rateKes: draft.rate ? Number(draft.rate) : undefined,
           arrivalTime: w.data.settings.checkIn,
           departTime: w.data.settings.checkOut,
         };
@@ -175,6 +177,17 @@ export function DatesDialog({
                         </option>
                       ))}
                     </select>
+                  </label>
+                  <label className="field">
+                    <span>Nightly rate · KES</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={1000000}
+                      step={1}
+                      value={draft.rate}
+                      onChange={(e) => set('rate', e.target.value)}
+                    />
                   </label>
                   <label className="field">
                     <span>Guest phone</span>
