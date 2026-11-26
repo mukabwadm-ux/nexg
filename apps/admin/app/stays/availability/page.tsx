@@ -137,7 +137,7 @@ const bedroomsText = (b: number | null) =>
 /**
  * Stays → Availability & Rates: a week of each live unit, booked, held,
  * blocked or free, at that night's rate; a four-week view of one unit; the
- * bulk tools; and weekend, seasonal and long-stay rates (20270331000100).
+ * bulk tools; and weekend, seasonal and long-stay rates (20270332000100).
  * Restrictions per unit are not set up, and the screen says so.
  */
 export default async function AvailabilityPage({

@@ -73,7 +73,7 @@ export interface HostRow {
   payout_ok: boolean;
   open_cases: number;
   bucket: string;
-  /** Document expiry (20270331000300); absent until that migration is applied. */
+  /** Document expiry (20270332000300); absent until that migration is applied. */
   earliest_expiry?: string | null;
   docs_expiring?: number;
   docs_expired?: number;

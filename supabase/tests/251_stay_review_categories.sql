@@ -1,4 +1,4 @@
--- Stay reviews by category (20270331000400): only the guest who booked can
+-- Stay reviews by category (20270332000400): only the guest who booked can
 -- rate, only after the stay, for 14 days; low ratings wait for staff; the
 -- console reader averages the categories; the daily ask emails once and
 -- reminds once.

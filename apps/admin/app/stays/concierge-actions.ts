@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 
 /*
  * Concierge orders for a staying guest, paid by a pay link
- * (20270331000500_concierge_pay_link.sql). The database prices the basket
+ * (20270332000500_concierge_pay_link.sql). The database prices the basket
  * from the catalogue exactly as a guest's web order, checks the caller works
  * in hospitality (or orders), sends the link and audits it.
  */

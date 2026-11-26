@@ -86,7 +86,7 @@ export default async function VerifyHostPage({ params }: { params: { id: string 
       .is('superseded_at', null)
       .order('uploaded_at', { ascending: true });
   let { data: rows, error: documentsError } = await read(`${columns}, expires_on`);
-  /* Before 20270331000300 reaches this database there is no expires_on: read without it. */
+  /* Before 20270332000300 reaches this database there is no expires_on: read without it. */
   if (documentsError && /expires_on/.test(documentsError.message)) {
     ({ data: rows, error: documentsError } = await read(columns));
   }

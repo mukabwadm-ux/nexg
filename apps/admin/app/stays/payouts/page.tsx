@@ -101,7 +101,7 @@ export default async function PayoutsPage({
     ctx.read('rpc_console_stays_finance', args),
     ctx.read('rpc_console_stays_fee_invoices', args),
   ]);
-  /* Management fee invoices and what payout runs took (20270331000600). */
+  /* Management fee invoices and what payout runs took (20270332000600). */
   const feeInfo = feeData(feeRead.data);
   const feeTaken = (hostId: string) => {
     const d = feeInfo.deductions[hostId];

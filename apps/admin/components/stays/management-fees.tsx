@@ -8,7 +8,7 @@ import { asNumber, asObject, kesFull, n, shortDate } from '@/lib/stays-module';
 
 /*
  * Stays › Finance › Management Fees: the monthly fee invoices
- * (rpc_console_stays_fee_invoices, 20270331000600), what was taken from
+ * (rpc_console_stays_fee_invoices, 20270332000600), what was taken from
  * payouts or paid by M-Pesa, and the two buttons. Server-safe.
  */
 

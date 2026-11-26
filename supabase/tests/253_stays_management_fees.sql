@@ -1,4 +1,4 @@
--- Stays management fees (20270331000600): last month's invoice per host, one
+-- Stays management fees (20270332000600): last month's invoice per host, one
 -- line per property past its free trial; raising again changes nothing; the
 -- payout run takes the fee from the host's line (all of it, or what the share
 -- covers, the rest carried to the next run), never paying a negative amount;

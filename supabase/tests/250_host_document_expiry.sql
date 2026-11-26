@@ -1,4 +1,4 @@
--- Host document expiry (20270331000300): staff and hosts set the date under
+-- Host document expiry (20270332000300): staff and hosts set the date under
 -- their rules, an expired required document makes the host non-compliant,
 -- the Verification reader's Expiring tab lists the host, and the daily
 -- notices are sent once.

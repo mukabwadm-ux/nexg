@@ -16,7 +16,7 @@ import { HeaderButton } from '@/components/portal/dash';
 
 /*
  * The forms behind weekend, seasonal and long-stay rates. Each goes through
- * app/stays/rates-actions (the RPCs in 20270331000100).
+ * app/stays/rates-actions (the RPCs in 20270332000100).
  */
 
 const linkButton =

@@ -716,7 +716,7 @@ begin
       end if;
 
       /*
-       * Management fees (owner, 26 Nov 2026; 20270331000600): what is still
+       * Management fees (owner, 26 Nov 2026; 20270332000600): what is still
        * owed on the host's fee invoices, oldest first, comes off this line,
        * never below zero. The line keeps its gross (it still re-sums to the
        * entries it claims); the fee is an adjustment. Deductions already

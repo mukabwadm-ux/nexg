@@ -188,7 +188,7 @@ export async function quoteStay(input: {
 }): Promise<StayQuote | null> {
   if (!DAY.test(input.checkIn) || !DAY.test(input.checkOut)) return null;
   if (!/^[0-9a-f-]{36}$/i.test(input.unitId)) return null;
-  /* rpc_stay_quote (20270331000100) is newer than the generated types. */
+  /* rpc_stay_quote (20270332000100) is newer than the generated types. */
   const db = createClient() as unknown as Untyped;
   const { data, error } = await db.rpc('rpc_stay_quote', {
     p_unit_id: input.unitId,

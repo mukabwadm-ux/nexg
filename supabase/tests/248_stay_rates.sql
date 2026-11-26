@@ -1,4 +1,4 @@
--- Weekend, seasonal and long-stay rates (20270331000100): fn_stay_quote prices
+-- Weekend, seasonal and long-stay rates (20270332000100): fn_stay_quote prices
 -- Friday and Saturday nights at the weekend rate, applies the most specific
 -- season, takes the weekly or monthly discount off the sum; the hold, the
 -- search, the guest quote and the native checkout all charge that total; the

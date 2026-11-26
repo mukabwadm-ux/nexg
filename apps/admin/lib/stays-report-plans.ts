@@ -1,5 +1,5 @@
 /*
- * Scheduled and saved Stays reports (20270331000200_stays_report_schedules):
+ * Scheduled and saved Stays reports (20270332000200_stays_report_schedules):
  * the shapes rpc_console_stays_report_plans returns, the period presets a
  * saved report keeps, and the dates each preset means on a given day.
  * Server- and client-safe.

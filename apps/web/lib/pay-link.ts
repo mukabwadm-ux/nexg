@@ -18,7 +18,7 @@ import { paystackMode } from '@/lib/paystack';
 import { createPublicClient } from '@/lib/supabase/public';
 
 /*
- * Pay links (supabase/migrations/20270331000500_concierge_pay_link.sql).
+ * Pay links (supabase/migrations/20270332000500_concierge_pay_link.sql).
  * NexG Concierge orders something for a staying guest and the guest is sent
  * https://nexgapp.com/pay/link/<token>. Anybody holding the token may pay that
  * one order, without an account:

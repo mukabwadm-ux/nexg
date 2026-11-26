@@ -75,7 +75,7 @@ type UntypedReader = {
 };
 
 /**
- * Each unit's weekend rate and long-stay discounts (20270331000100). Read
+ * Each unit's weekend rate and long-stay discounts (20270332000100). Read
  * apart from the unit rows, and empty if the columns are not there yet, so
  * the workspace keeps loading on a database without them.
  */

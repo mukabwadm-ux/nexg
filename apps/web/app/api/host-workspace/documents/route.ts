@@ -54,7 +54,7 @@ interface DocumentRow {
   rejection_reason: string | null;
   uploaded_at: string;
   storage_path: string;
-  /** From 20270331000300; missing until that migration is applied. */
+  /** From 20270332000300; missing until that migration is applied. */
   expires_on?: string | null;
 }
 

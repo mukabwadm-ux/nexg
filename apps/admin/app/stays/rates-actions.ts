@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { Outcome } from './actions';
 
 /*
- * Weekend, seasonal and long-stay rates (20270331000100). Each button goes
+ * Weekend, seasonal and long-stay rates (20270332000100). Each button goes
  * through an RPC that checks the caller works in hospitality, holds the
  * rules and writes the audit event in the same transaction.
  */

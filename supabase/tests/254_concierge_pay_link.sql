@@ -1,4 +1,4 @@
--- Concierge orders with a pay link (20270331000500): only staff place them,
+-- Concierge orders with a pay link (20270332000500): only staff place them,
 -- prices come from the catalogue as for a web order, the token is checked by
 -- its hash, the guest begins paying from the link without an account, the
 -- 30-minute M-Pesa close leaves link orders alone, and an expired link closes

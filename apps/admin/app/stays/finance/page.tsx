@@ -129,7 +129,7 @@ export default async function StaysFinancePage({
   const commission = asNumber(k.commission);
   const vat = asNumber(k.vat);
   const pmShare = asNumber(k.pm_share);
-  /* Management fees invoiced for the months in the period (20270331000600). */
+  /* Management fees invoiced for the months in the period (20270332000600). */
   const fees = asNumber(feeInfo.kpis.invoiced_kes);
   const guestOrders = asNumber(k.guest_orders_kes);
   const net = commission - vat - pmShare - asNumber(k.refunds) + fees;

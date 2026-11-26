@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 
 /*
  * The Management Fees tab's buttons, through the RPCs in
- * 20270331000600_stays_management_fees.sql. The database checks who may raise
+ * 20270332000600_stays_management_fees.sql. The database checks who may raise
  * (Finance or hospitality) and who may record a payment (Finance), and audits
  * both; nothing here writes a table.
  */

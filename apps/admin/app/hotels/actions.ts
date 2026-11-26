@@ -226,7 +226,7 @@ function isReviewDecision(v: string): v is ReviewDecision {
 
 const isoDate = /^\d{4}-\d{2}-\d{2}$/;
 
-/* rpc_host_document_set_expiry (20270331000300) is newer than the generated types. */
+/* rpc_host_document_set_expiry (20270332000300) is newer than the generated types. */
 async function saveDocumentExpiry(
   documentId: string,
   expiresOn: string,

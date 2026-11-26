@@ -715,7 +715,7 @@ export function PayoutsView({
   deductions = {},
 }: {
   data: unknown;
-  /** Management fees taken by payout runs, by host (20270331000600). */
+  /** Management fees taken by payout runs, by host (20270332000600). */
   deductions?: Record<string, { booked_kes: number; pending_kes: number }>;
 }) {
   const o = asObject(data);

@@ -170,7 +170,7 @@ export async function stayQuote(request: Request) {
       quote.checkOut !== input.checkOut ||
       quote.adults !== input.adults ||
       quote.children !== input.children ||
-      /* Weekend, seasonal and long-stay rates (20270331000100) make nights
+      /* Weekend, seasonal and long-stay rates (20270332000100) make nights
          differ, so the total is checked, not nightly × nights: nightlyMinor
          is the average night. */
       quote.nights !== nightsBetween(quote.checkIn, quote.checkOut) ||

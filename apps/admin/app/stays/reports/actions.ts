@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 
 /*
  * Stays › Reports: scheduled and saved reports. Each goes through an RPC in
- * 20270331000200_stays_report_schedules.sql, which checks the caller
+ * 20270332000200_stays_report_schedules.sql, which checks the caller
  * (anyone who reaches Hotels adds one; hospitality staff or whoever added it
  * change it), holds the rules and writes the audit event.
  */

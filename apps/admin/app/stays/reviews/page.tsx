@@ -98,7 +98,7 @@ interface ReviewRow {
   rating_value?: number | null;
 }
 
-/** The six things guests rate besides the overall stars (20270331000400). */
+/** The six things guests rate besides the overall stars (20270332000400). */
 const CATEGORIES: { key: string; label: string; icon: LucideIcon }[] = [
   { key: 'cleanliness', label: 'Cleanliness', icon: Sparkles },
   { key: 'location', label: 'Location', icon: MapPin },

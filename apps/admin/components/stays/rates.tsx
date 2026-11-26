@@ -13,7 +13,7 @@ import type { StaysContext } from '@/lib/stays-server';
 
 /*
  * Weekend, seasonal and long-stay rates on the Stays screens
- * (20270331000100). Every figure comes from fn_stay_quote, the same price
+ * (20270332000100). Every figure comes from fn_stay_quote, the same price
  * the guest's hold charges.
  */
 
