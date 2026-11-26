@@ -1,10 +1,22 @@
-import { refused, rpc, startPayment, stateFrom, type PaymentTarget } from '@/lib/order-payment';
+import {
+  checkWithPaystack,
+  refused,
+  rpc,
+  startPayment,
+  stateFrom,
+  view as paymentView,
+  type PaymentTarget,
+} from '@/lib/order-payment';
 import { paystackMode } from '@/lib/paystack';
 import { customerApiClient } from '@/lib/supabase/customer-api';
 import { z } from 'zod';
 
 /* Paystack takes M-Pesa and Airtel Money up to KES 150,000 a payment. */
 const MPESA_LIMIT_MINOR = 15_000_000;
+
+/* How long a request someone is waiting on gives Paystack's verify. The apps
+   give a request 15 seconds, and a payment still has its own call to make. */
+const INLINE_VERIFY_MS = 4_000;
 
 const headers = { 'Cache-Control': 'private, no-store' };
 const uuid = z
@@ -52,6 +64,10 @@ const holdView = z.object({
   cancelledAfterBooking: z.boolean().optional(),
   reference: z.string().min(1).max(128).optional(),
   providerPending: z.boolean().optional(),
+  /* The newest try is a card page not finished, and the hold still lasts: paying
+     by card again opens that same page. Absent otherwise, and from a database
+     before 20270335000100. */
+  lastTry: z.enum(['not_completed']).optional(),
 });
 type HoldView = z.infer<typeof holdView>;
 
@@ -66,6 +82,7 @@ type Code =
   | 'NOT_FOUND'
   | 'OPERATION_CONFLICT'
   | 'PAYMENT_UNAVAILABLE'
+  | 'PAYMENT_REFUSED'
   | 'SERVICE_UNAVAILABLE';
 
 function nightsBetween(checkIn: string, checkOut: string) {
@@ -236,6 +253,38 @@ export async function stayHold(request: Request) {
   }
 }
 
+/**
+ * Asks Paystack about the stay's tries that are due a question, so a late
+ * webhook does not keep a paid guest waiting and a closed card page is noticed.
+ * The database picks them: sent ten seconds ago or more, and not asked about in
+ * the last ten. `asked`: something was due; `success`: Paystack called one of
+ * them successful. It never fails the caller: the webhook and the sweep still
+ * run.
+ */
+export async function askPaystack(supabase: Client, stayId: string) {
+  const nothing = { asked: false, success: false };
+  try {
+    const due = await rpc(supabase, 'rpc_stay_payment_check_claim', { p_stay_id: stayId });
+    if (!Array.isArray(due.data) || due.data.length === 0) return nothing;
+    const answers = await Promise.allSettled(
+      (due.data as { attempt_reference: string; is_test: boolean }[]).map((row) =>
+        checkWithPaystack(
+          supabase,
+          row.attempt_reference,
+          row.is_test ? 'test' : 'live',
+          INLINE_VERIFY_MS,
+        ),
+      ),
+    );
+    return {
+      asked: true,
+      success: answers.some((a) => a.status === 'fulfilled' && a.value === 'success'),
+    };
+  } catch {
+    return nothing;
+  }
+}
+
 export async function stayStatus(request: Request, operationId: string) {
   try {
     const supabase = await signedIn(request);
@@ -243,7 +292,17 @@ export async function stayStatus(request: Request, operationId: string) {
     const id = uuid.safeParse(operationId);
     if (!id.success) return invalid('Check the stay checkout ID.');
     const view = await readStatus(supabase, id.data);
-    return view instanceof Response ? view : response(view);
+    if (view instanceof Response) return view;
+    if (
+      view.paymentStatus === 'pending' &&
+      paystackMode() &&
+      (await askPaystack(supabase, view.stayId)).asked
+    ) {
+      /* If the second read fails, the first answer still stands. */
+      const again = await readStatus(supabase, id.data);
+      return response(again instanceof Response ? view : again);
+    }
+    return response(view);
   } catch {
     return unavailable();
   }
@@ -254,7 +313,10 @@ export async function stayStatus(request: Request, operationId: string) {
  * full at booking). The body and the answer are the order route's:
  * {method:'mpesa_stk'|'airtel_money', phone} | {method:'card', saveCard?} |
  * {method:'saved_card', cardId} → {status, reference?, url?, retryAfterSeconds?,
- * test?}. GET /holds/{operationId} stays the proof that the stay is booked.
+ * test?}, plus {reused, channel} about the try started or handed back. Card
+ * asked again hands back the open page. A prompt still waiting is handed back to
+ * the same way and number, and refused (409) to any other. GET
+ * /holds/{operationId} stays the proof that the stay is booked.
  */
 export async function stayPayment(request: Request, operationId: string) {
   const id = uuid.safeParse(operationId);
@@ -284,10 +346,29 @@ function stayTarget(supabase: Client, stayId: string): PaymentTarget {
     if (begun.error) return refused(begun.error);
     return begun.data as { reference: string; amount_cents: number; expires_at?: string };
   };
+  const readState = async () =>
+    stateFrom(await rpc(supabase, 'rpc_stay_payment_state', { p_stay_id: stayId }));
   return {
-    readState: async () =>
-      stateFrom(await rpc(supabase, 'rpc_stay_payment_state', { p_stay_id: stayId })),
-    begin,
+    readState,
+    /* Before another try, ask Paystack about the earlier one: it may have been
+       paid (nothing more is started) or have failed (the guest may try again). */
+    begin: async () => {
+      const earlier = await askPaystack(supabase, stayId);
+      if (earlier.asked) {
+        const state = await readState();
+        if (!(state instanceof Response) && state.status === 'paid')
+          return Response.json(paymentView(state), { headers });
+        /* Paid by Paystack's word but not applied: never start another. */
+        if (earlier.success)
+          return problem(
+            409,
+            'PAYMENT_REFUSED',
+            'We are checking an earlier payment. Do not pay again.',
+          );
+      }
+      return begin();
+    },
+    stay: true,
     metadata: { stay_id: stayId },
     daraja: {
       begin,

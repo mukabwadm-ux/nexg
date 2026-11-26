@@ -34,7 +34,8 @@ import { createClient as cookieClient } from '@/lib/supabase/server';
  * Bookings and stays use the same start and read (lib/booking-payment.ts,
  * lib/booking/native-stay-checkout.ts), through Paystack only. Both answer
  * {status: unpaid|pending|failed|paid, reference?, retryAfterSeconds?, url?,
- * test?}. `url` is a page to open: Paystack's checkout for a card, or the
+ * test?}; starting a stay payment through Paystack also says `reused` and
+ * `channel`. `url` is a page to open: Paystack's checkout for a card, or the
  * bank's page for a bank transfer. Coming back from it never counts as paid:
  * only the provider's signed callback, or an answer this server fetched, marks
  * it paid. Which methods are on offer: lib/payment-methods.ts, served at
@@ -82,7 +83,13 @@ export interface OrderPaymentView {
   retryAfterSeconds?: number;
   url?: string;
   test?: boolean;
+  /** Stays: an earlier try is still open and was handed back; nothing new was sent or opened. */
+  reused?: boolean;
+  /** Stays: the way of paying the answer is about, which on a reused try may not be the one asked for. */
+  channel?: Channel;
 }
+
+type Channel = 'card' | 'mpesa' | 'airtel' | 'saved_card';
 
 export interface PaymentState {
   status: OrderPaymentView['status'];
@@ -185,22 +192,26 @@ export function stateFrom(result: RpcResult): PaymentState | Response {
 /**
  * Asks Paystack about a pending attempt and hands the answer to the database,
  * which alone decides. At most every 10 seconds per attempt, so a polling
- * screen cannot hammer Paystack.
+ * screen cannot hammer Paystack. Returns the transaction status Paystack gave,
+ * when it gave one. `timeoutMs`: how long to wait for Paystack, where somebody
+ * is waiting on the answer.
  */
 export async function checkWithPaystack(
   supabase: Client,
   attemptReference: string,
   mode: PaystackMode,
-): Promise<void> {
+  timeoutMs?: number,
+): Promise<string | undefined> {
   const proof = paystackProof(mode);
   if (!proof) return;
-  const answer = await verify(mode, attemptReference);
+  const answer = await verify(mode, attemptReference, timeoutMs);
   if (!answer.raw) return;
   await rpc(supabase, 'rpc_payment_paystack_verified', {
     p_attempt_reference: attemptReference,
     p_verify_body: answer.raw,
     p_proof: proof,
   });
+  return answer.ok ? answer.data?.status : undefined;
 }
 
 /**
@@ -254,6 +265,12 @@ export interface PaymentTarget {
   describe?: (state: PaymentState) => Promise<Record<string, unknown>>;
   /** M-Pesa straight to Safaricom while Paystack is not live (lib/payment-methods). */
   daraja?: DarajaTarget;
+  /**
+   * A stay: the answer carries `reused` and `channel`, and a card page that
+   * never opened or a prompt Paystack answers as failed is recorded as a failed
+   * try, so the stay's status stops reading pending.
+   */
+  stay?: boolean;
   /** Where Paystack's card page sends the customer back; /pay/{reference} when absent. */
   callbackUrl?: (site: string, paymentReference: string) => string;
 }
@@ -304,12 +321,14 @@ export async function readPayment(
 
 interface Attempt {
   attempt_reference: string;
-  channel: 'card' | 'mpesa' | 'airtel' | 'saved_card';
+  channel: Channel;
   amount_cents: number;
   is_test: boolean;
   reused: boolean;
   authorization_url?: string;
   retry_after_seconds?: number;
+  /* A stay's waiting prompt handed back: false when another way or number was asked for. */
+  same_request?: boolean;
   /* Saved card only: what the server charges. Never sent on to the phone. */
   authorization_code?: string;
   email?: string;
@@ -401,6 +420,30 @@ export async function startPayment(
     if (tried.error) return refused(tried.error);
     const attempt = tried.data as Attempt;
 
+    /* A stay's waiting prompt, when another way or number was asked for. A
+       refusal, because the apps read a pending answer as a prompt sent the way
+       just chosen. */
+    if (
+      found.stay &&
+      attempt.reused &&
+      (attempt.channel !== channel || attempt.same_request === false)
+    ) {
+      const waiting = attempt.channel === 'airtel' ? 'An Airtel Money' : 'An M-Pesa';
+      return problem(
+        409,
+        'PAYMENT_REFUSED',
+        attempt.channel !== channel
+          ? `${waiting} prompt is already waiting. Approve it, or try again in a few minutes.`
+          : 'A prompt is already waiting on the number you used first. Approve it there, or try again in a few minutes.',
+        {
+          reference: payment.reference,
+          ...(attempt.retry_after_seconds
+            ? { retryAfterSeconds: attempt.retry_after_seconds }
+            : {}),
+        },
+      );
+    }
+
     if (attempt.reused) {
       return Response.json(
         {
@@ -411,6 +454,7 @@ export async function startPayment(
             ? { retryAfterSeconds: attempt.retry_after_seconds }
             : {}),
           ...(attempt.is_test ? { test: true } : {}),
+          ...(found.stay ? { reused: true, channel: attempt.channel } : {}),
         } satisfies OrderPaymentView,
         { headers },
       );
@@ -453,19 +497,33 @@ export async function startPayment(
         ? (answer.data as { authorization_url?: string } | undefined)?.authorization_url
         : undefined;
 
-    if (answer.refused || (answer.ok && channel === 'card' && !url)) {
-      await rpc(supabase, 'rpc_payment_paystack_opened', {
+    const failed = (reason: string) =>
+      rpc(supabase, 'rpc_payment_paystack_opened', {
         p_attempt_reference: attempt.attempt_reference,
         p_access_code: null,
         p_authorization_url: null,
-        p_failure: answer.message || 'Paystack refused the payment.',
+        p_failure: reason,
         p_proof: proof,
       });
+
+    if (answer.refused || (answer.ok && channel === 'card' && !url)) {
+      await failed(answer.message || 'Paystack refused the payment.');
       return problem(409, 'PAYMENT_REFUSED', answer.message || 'Paystack refused the payment.');
     }
     if (!answer.ok && channel === 'card') {
       /* No page, so nothing to pay on; the next tap opens a fresh attempt. */
+      if (found.stay) await failed('No card page was opened.');
       return unavailable();
+    }
+    /* A prompt Paystack answered, saying it failed: no money can come of it. */
+    if (
+      found.stay &&
+      channel !== 'card' &&
+      answer.ok &&
+      (answer.data as { status?: string } | undefined)?.status === 'failed'
+    ) {
+      await failed('The payment prompt failed.');
+      return problem(409, 'PAYMENT_REFUSED', 'The payment did not go through. Try again.');
     }
 
     /* A prompt Paystack may have sent even if it did not answer in time is
@@ -485,6 +543,7 @@ export async function startPayment(
         reference: payment.reference,
         ...(url ? { url } : { retryAfterSeconds: 180 }),
         ...(attempt.is_test ? { test: true } : {}),
+        ...(found.stay ? { reused: false, channel } : {}),
       } satisfies OrderPaymentView,
       { headers },
     );
@@ -544,7 +603,11 @@ async function chargeSaved(
   const page =
     state.status === 'pending' ? checkoutPage(answer.data?.authorization_url) : undefined;
   return Response.json(
-    { ...view(state), ...(page ? { url: page } : {}) } satisfies OrderPaymentView,
+    {
+      ...view(state),
+      ...(page ? { url: page } : {}),
+      ...(target.stay ? { reused: false, channel: 'saved_card' as const } : {}),
+    } satisfies OrderPaymentView,
     { headers },
   );
 }

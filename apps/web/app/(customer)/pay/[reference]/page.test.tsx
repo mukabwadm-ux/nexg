@@ -3,21 +3,26 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import PaymentReturn from './page';
 
-const { from, state } = vi.hoisted(() => ({
+const { from, rpc, state } = vi.hoisted(() => ({
   from: vi.fn(),
+  rpc: vi.fn(),
   state: {
     payment: null as Record<string, unknown> | null,
     order: null as Record<string, unknown> | null,
+    stay: null as Record<string, unknown> | null,
   },
 }));
 
-vi.mock('@/lib/supabase/server', () => ({ createClient: () => ({ from }) }));
+vi.mock('@/lib/supabase/server', () => ({ createClient: () => ({ from, rpc }) }));
 vi.mock('@/lib/mpesa-prompt', () => ({ reconcileMpesaPrompts: async () => false }));
 vi.mock('@/lib/bank/payments', () => ({ reconcileBankPayment: async () => false }));
 vi.mock('@/lib/payment-methods', () => ({ offers: () => false }));
 vi.mock('@/components/site-header', () => ({ SiteHeader: () => null }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: () => undefined, push: () => undefined }),
+  redirect: (url: string) => {
+    throw new Error(`redirect ${url}`);
+  },
 }));
 
 function query(data: unknown) {
@@ -30,6 +35,8 @@ function query(data: unknown) {
 }
 
 beforeEach(() => {
+  state.stay = null;
+  rpc.mockImplementation(async () => ({ data: state.stay, error: null }));
   from.mockImplementation((table: string) =>
     query(
       table === 'payment'
@@ -136,5 +143,15 @@ describe('payment page', () => {
     state.order = null;
     const html = await render();
     expect(html).toContain('We cannot find that payment');
+  });
+
+  it("takes a guest back from Paystack to their stay's checkout", async () => {
+    state.payment = null;
+    state.order = null;
+    state.stay = { stay_id: 'stay-1', property_slug: 'the-emara' };
+    await expect(render()).rejects.toThrow('redirect /stays/the-emara/book?stay=stay-1');
+    expect(rpc).toHaveBeenCalledWith('rpc_stay_payment_return', {
+      p_reference: 'NXP-261110-868FF262DD',
+    });
   });
 });

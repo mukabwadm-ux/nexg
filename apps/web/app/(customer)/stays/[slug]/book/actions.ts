@@ -1,7 +1,10 @@
 'use server';
 
+import { askPaystack } from '@/lib/booking/native-stay-checkout';
 import { sendStayConfirmed } from '@/lib/email';
 import { reconcileMpesaPrompts } from '@/lib/mpesa-prompt';
+import type { Client } from '@/lib/order-payment';
+import { paystackMode } from '@/lib/paystack';
 import { createClient } from '@/lib/supabase/server';
 
 export interface HoldInput {
@@ -36,6 +39,10 @@ export interface CheckoutStatus {
   paymentState: string | null;
   paymentFailure: string | null;
   paymentReference: string | null;
+  /** unpaid, pending, failed or paid, as the apps are told; null before 20270335000100. */
+  paymentStatus: string | null;
+  /** The newest try is a card page not finished, and the hold still lasts. */
+  lastTry: 'not_completed' | null;
 }
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
@@ -117,6 +124,15 @@ export async function stayCheckoutStatus(stayId: string): Promise<CheckoutStatus
       if (!again.error && again.data) row = again.data as Record<string, unknown>;
     }
   }
+  /* Waiting on Paystack: ask it too, at most every ten seconds. */
+  if (
+    row.payment_status === 'pending' &&
+    paystackMode() &&
+    (await askPaystack(supabase as unknown as Client, stayId)).asked
+  ) {
+    const again = await supabase.rpc('rpc_stay_checkout_status', { p_stay_id: stayId });
+    if (!again.error && again.data) row = again.data as Record<string, unknown>;
+  }
   const status: CheckoutStatus = {
     status: String(row.status),
     holdExpiresAt: (row.hold_expires_at as string | null) ?? null,
@@ -131,6 +147,8 @@ export async function stayCheckoutStatus(stayId: string): Promise<CheckoutStatus
     paymentState: (row.payment_state as string | null) ?? null,
     paymentFailure: (row.payment_failure as string | null) ?? null,
     paymentReference: (row.payment_reference as string | null) ?? null,
+    paymentStatus: (row.payment_status as string | null) ?? null,
+    lastTry: row.last_try === 'not_completed' ? 'not_completed' : null,
   };
 
   if (status.status === 'booked') {

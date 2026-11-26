@@ -35983,6 +35983,7 @@ export type Database = {
           channel: string;
           check_count: number;
           checked_at: string | null;
+          claimed_at: string | null;
           created_at: string;
           created_by: string | null;
           customer_card_id: string | null;
@@ -35993,6 +35994,7 @@ export type Database = {
           outcome: string | null;
           payment_id: string;
           phone: string | null;
+          provider_status: string | null;
           reference: string;
           save_card: boolean;
           split_commission_pct: number | null;
@@ -36001,14 +36003,16 @@ export type Database = {
           split_recovery_cents: number;
           split_share_cents: number | null;
           split_subaccount: string | null;
+          fn_paystack_try_unpaid: boolean | null;
         };
-        ComputedFields: never;
+        ComputedFields: 'fn_paystack_try_unpaid';
         Insert: {
           access_code?: string | null;
           authorization_url?: string | null;
           channel: string;
           check_count?: number;
           checked_at?: string | null;
+          claimed_at?: string | null;
           created_at?: string;
           created_by?: string | null;
           customer_card_id?: string | null;
@@ -36019,6 +36023,7 @@ export type Database = {
           outcome?: string | null;
           payment_id: string;
           phone?: string | null;
+          provider_status?: string | null;
           reference: string;
           save_card?: boolean;
           split_commission_pct?: number | null;
@@ -36034,6 +36039,7 @@ export type Database = {
           channel?: string;
           check_count?: number;
           checked_at?: string | null;
+          claimed_at?: string | null;
           created_at?: string;
           created_by?: string | null;
           customer_card_id?: string | null;
@@ -36044,6 +36050,7 @@ export type Database = {
           outcome?: string | null;
           payment_id?: string;
           phone?: string | null;
+          provider_status?: string | null;
           reference?: string;
           save_card?: boolean;
           split_commission_pct?: number | null;
@@ -66841,6 +66848,7 @@ export type Database = {
       cron_app_email_reminders: { Args: Record<PropertyKey, never>; Returns: number };
       cron_cinema_worker: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_comms_tick: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_expire_stay_payments: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_expire_unpaid_mpesa_orders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_featured_activate: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_eligibility: { Args: Record<PropertyKey, never>; Returns: number };
@@ -68172,6 +68180,15 @@ export type Database = {
         Args: { p_data: Json; p_mode: string; p_source: string };
         Returns: Json;
       };
+      fn_paystack_try_unpaid: {
+        Args: {
+          p_try: Omit<
+            Database['public']['Tables']['paystack_attempt']['Row'],
+            Database['public']['Tables']['paystack_attempt']['ComputedFields']
+          >;
+        };
+        Returns: boolean;
+      };
       fn_phone_country_code: { Args: { p_phone: string }; Returns: string };
       fn_phone_key: { Args: { p_phone: string }; Returns: string };
       fn_pick_concierge: { Args: { p_city_id: string }; Returns: string };
@@ -68573,7 +68590,9 @@ export type Database = {
         Args: { p_check_in: string; p_check_out: string };
         Returns: undefined;
       };
+      fn_stay_last_try: { Args: { p_stay_id: string }; Returns: string };
       fn_stay_occupies: { Args: { p_hold_expires_at: string; p_status: string }; Returns: boolean };
+      fn_stay_payment_status: { Args: { p_stay_id: string }; Returns: string };
       fn_stay_quote: {
         Args: { p_check_in: string; p_check_out: string; p_unit_id: string };
         Returns: Json;
@@ -77828,6 +77847,8 @@ export type Database = {
           unit: string;
         }[];
       };
+      rpc_stay_payment_check_claim: { Args: { p_stay_id: string }; Returns: Json };
+      rpc_stay_payment_return: { Args: { p_reference: string }; Returns: Json };
       rpc_stay_payment_state: { Args: { p_stay_id: string }; Returns: Json };
       rpc_stay_paystack_refund_checked: {
         Args: {
