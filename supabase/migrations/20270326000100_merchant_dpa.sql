@@ -486,7 +486,7 @@ language plpgsql
 stable
 security definer
 set search_path = ''
-as $
+as $$
 declare
   m public.merchant;
   a public.merchant_application;
@@ -598,7 +598,7 @@ begin
 
   return v_items;
 end;
-$;
+$$;
 
 revoke all on function public.fn_merchant_go_live_missing(uuid) from public, anon, authenticated;
 grant execute on function public.fn_merchant_go_live_missing(uuid) to service_role;

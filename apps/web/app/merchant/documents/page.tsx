@@ -87,7 +87,9 @@ export default async function MerchantDocuments() {
         <DpaPanel
           merchantId={me.id}
           record={(dpa as unknown as DpaRecord | null) ?? null}
-          legalName={(details as unknown as AgreementDetailsRecord | null)?.details?.legal_name ?? null}
+          legalName={
+            (details as unknown as AgreementDetailsRecord | null)?.details?.legal_name ?? null
+          }
         />
       </div>
 

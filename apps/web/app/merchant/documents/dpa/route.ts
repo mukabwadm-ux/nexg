@@ -22,9 +22,11 @@ export async function GET(request: NextRequest) {
     p_merchant_id: merchant,
   });
   const found = (
-    (data as unknown as {
-      acceptances?: { id: string; storage_path: string | null; reference: string }[];
-    } | null)?.acceptances ?? []
+    (
+      data as unknown as {
+        acceptances?: { id: string; storage_path: string | null; reference: string }[];
+      } | null
+    )?.acceptances ?? []
   ).find((entry) => entry.id === copy);
   if (error || !found?.storage_path) return NextResponse.redirect(back);
   const { data: link } = await supabase.storage

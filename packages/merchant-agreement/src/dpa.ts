@@ -197,9 +197,7 @@ export function buildDpa(fill?: DpaFill): AgreementDocument {
   blocks.push(paragraph([run(DPA.heading, { bold: true })], { align: 'center' }));
   blocks.push(paragraph([run(DPA.subtitle, { italic: true })], { align: 'center' }));
   for (const p of DPA.preamble)
-    blocks.push(
-      paragraph([...(p.lead ? [run(p.lead, { bold: true })] : []), run(f(p.text))]),
-    );
+    blocks.push(paragraph([...(p.lead ? [run(p.lead, { bold: true })] : []), run(f(p.text))]));
 
   DPA.clauses.forEach((clause, c) => {
     blocks.push(
@@ -225,7 +223,9 @@ export function buildDpa(fill?: DpaFill): AgreementDocument {
       pageBreak: true,
     }),
   );
-  const cell = (text: string, bold = false) => [paragraph([run(text, { bold })], { align: 'left' })];
+  const cell = (text: string, bold = false) => [
+    paragraph([run(text, { bold })], { align: 'left' }),
+  ];
   blocks.push({
     kind: 'table',
     role: 'annex',
@@ -236,7 +236,9 @@ export function buildDpa(fill?: DpaFill): AgreementDocument {
     ],
   });
 
-  blocks.push(paragraph([run(DPA.annex2.heading, { bold: true })], { heading: true, align: 'left' }));
+  blocks.push(
+    paragraph([run(DPA.annex2.heading, { bold: true })], { heading: true, align: 'left' }),
+  );
   for (const measure of DPA.annex2.measures)
     blocks.push(paragraph([run(f(measure))], { label: '•', labelAt: 18, textAt: 36 }));
 

@@ -219,9 +219,7 @@ export function DpaPanel({
   const parsed = MerchantDpaAnnex.safeParse(annex);
   const values: Record<DpaField, string> = {
     ...DPA_BLANKS,
-    ...(name
-      ? { processor: name, processor_annex: name, processor_execution: name }
-      : {}),
+    ...(name ? { processor: name, processor_annex: name, processor_execution: name } : {}),
     ...(parsed.success ? annexValues(parsed.data) : {}),
   };
 
@@ -319,7 +317,7 @@ export function DpaPanel({
                 const box = event.currentTarget;
                 if (box.scrollTop + box.clientHeight >= box.scrollHeight - 24) setReadToEnd(true);
               }}
-              tabIndex={0}
+              role="region"
               aria-label={`The ${DPA_TITLE}`}
               className="border-border max-h-[26rem] overflow-y-auto rounded-xl border p-4"
               data-dpa-text

@@ -50,9 +50,9 @@ export async function acceptDpa(
   });
   if (error)
     return { ok: false, message: error.message || 'Your acceptance could not be saved. Retry.' };
-  const current = ((data as unknown as { acceptances?: Acceptance[] } | null)?.acceptances ?? []).find(
-    (entry) => entry.current,
-  );
+  const current = (
+    (data as unknown as { acceptances?: Acceptance[] } | null)?.acceptances ?? []
+  ).find((entry) => entry.current);
   revalidate();
   if (!current) return { ok: true, copyPending: true };
   if (current.storage_path) return { ok: true };
@@ -68,9 +68,9 @@ export async function makeDpaCopy(merchantId: string): Promise<DpaOutcome> {
     p_merchant_id: merchantId,
   });
   if (error) return { ok: false, message: error.message };
-  const current = ((data as unknown as { acceptances?: Acceptance[] } | null)?.acceptances ?? []).find(
-    (entry) => entry.current,
-  );
+  const current = (
+    (data as unknown as { acceptances?: Acceptance[] } | null)?.acceptances ?? []
+  ).find((entry) => entry.current);
   if (!current) return { ok: false, message: 'Accept the data processing agreement first.' };
   if (current.storage_path) return { ok: true };
   const copy = await storeDpaCopy(current.id);

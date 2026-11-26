@@ -452,10 +452,9 @@ export type MerchantDpaAnnexInput = z.input<typeof MerchantDpaAnnex>;
 export type MerchantDpaAnnex = z.output<typeof MerchantDpaAnnex>;
 
 /** The Annex 1 blanks filled from the merchant's answers. */
-export function annexValues(annex: MerchantDpaAnnex): Pick<
-  Record<DpaField, string>,
-  'sensitive_data' | 'dpo_contact' | 'odpc_registration'
-> {
+export function annexValues(
+  annex: MerchantDpaAnnex,
+): Pick<Record<DpaField, string>, 'sensitive_data' | 'dpo_contact' | 'odpc_registration'> {
   return {
     sensitive_data: annex.sensitive_data,
     dpo_contact: `${annex.dpo_name}, ${annex.dpo_email}, ${annex.dpo_phone}`,
