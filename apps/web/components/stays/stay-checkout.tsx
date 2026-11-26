@@ -548,6 +548,29 @@ export function StayCheckout({
             >
               {busyAction ? 'Opening the payment page…' : 'Continue payment'}
             </Button>
+            {/* M-Pesa takes up to KES 150,000 a payment. The card page stays
+                open at Paystack, so the guest is told not to finish both. */}
+            {(status?.totalKes ?? total ?? 0) <= 150000 && (
+              <button
+                type="button"
+                className="text-muted hover:text-ink mt-3 w-full text-center text-[0.75rem] font-bold underline"
+                disabled={busyAction}
+                onClick={() => {
+                  setError('');
+                  setStep('pay');
+                }}
+              >
+                Pay with M-Pesa instead
+              </button>
+            )}
+            <button
+              type="button"
+              className="text-muted hover:text-ink mt-2 w-full text-center text-[0.75rem] font-bold underline"
+              disabled={busyAction}
+              onClick={() => void release()}
+            >
+              Change dates
+            </button>
           </div>
         ) : step === 'waiting' ? (
           <div className="bg-surface-muted mt-5 rounded-xl p-4" role="status" aria-live="polite">
@@ -586,6 +609,12 @@ export function StayCheckout({
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
             />
+            {status?.lastTry === 'not_completed' && (
+              <p className="text-muted mt-3 text-[0.75rem] font-semibold leading-[1.6]">
+                If the card payment page is still open, close it without paying, so you are not
+                charged twice.
+              </p>
+            )}
             {error && (
               <p role="alert" className="text-danger mt-3 text-[0.8125rem] font-semibold">
                 {error}

@@ -14,7 +14,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(80);
+select plan(82);
 -- Property review (20270323000100): the homes in this file count as reviewed and approved.
 alter table public.property alter column review_status set default 'approved';
 
@@ -207,9 +207,23 @@ select is(
             'sk_live_ci_only_0123456789abcdef', true) x),
   'true:card:t:https://checkout.paystack.com/ci-260a',
   'Paying by card again hands back the same page, however long ago and whether or not the card is to be saved.');
+reset role;
+select is((select save_card from public.paystack_attempt where reference = pg_temp.k('r1') || '-2'), true,
+  'The page handed back keeps the guest''s latest choice to save the card.');
+set local role authenticated;
+select pg_temp.guest();
+select pg_temp.try(1, 'card');
+reset role;
+select is((select save_card from public.paystack_attempt where reference = pg_temp.k('r1') || '-2'), false,
+  'Unticked on the way back, the card is not saved.');
+set local role authenticated;
+select pg_temp.guest();
 select pg_temp.verified(pg_temp.k('r1') || '-2', 'failed');
+reset role;
 select is(pg_temp.try_row(pg_temp.k('r1') || '-2'), '-:failed',
   'Called failed while the hold lasts, the try is left open.');
+set local role authenticated;
+select pg_temp.guest();
 select is(pg_temp.told(1), 'pending:not_completed', 'Nothing is marked failed.');
 select is(pg_temp.try(1, 'card') ->> 'attempt_reference', pg_temp.k('r1') || '-2',
   'And the same page is handed back.');

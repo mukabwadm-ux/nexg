@@ -1,6 +1,6 @@
 -- Stay payments through Paystack that end, and tell the truth (Paystack went
 -- live on 26 Nov 2026; a trace of the apps against it, and the owner's own try,
--- found these). The id is a placeholder until the coordinator assigns one.
+-- found these).
 --
 --  1. An unfinished stay payment ends. cron_expire_stay_payments closes a
 --     Paystack stay payment once the hold is over and Paystack, asked late
@@ -361,7 +361,8 @@ revoke execute on function public.fn_paystack_apply(text, text, jsonb, jsonb)
  *     Paystack said failed does not count;
  *   * a stay's open card page is handed back for as long as it has no outcome,
  *     whether or not the card is to be saved, so going back to pay by card never
- *     opens a second one.
+ *     opens a second one. The page keeps the guest's latest choice about saving
+ *     the card, so a card unticked on the way back is not saved.
  */
 
 create or replace function public.rpc_payment_paystack_attempt(
@@ -546,6 +547,9 @@ begin
             or (opened_at > now() - interval '30 minutes' and save_card = v_save))
      order by opened_at desc limit 1;
     if a.id is not null then
+      if p.intent::text = 'stay' and a.save_card is distinct from v_save then
+        update public.paystack_attempt set save_card = v_save where id = a.id;
+      end if;
       return jsonb_build_object(
         'ok', true, 'reused', true, 'attempt_reference', a.reference, 'channel', 'card',
         'amount_cents', p.amount_cents, 'currency', p.currency, 'is_test', p.is_test,
