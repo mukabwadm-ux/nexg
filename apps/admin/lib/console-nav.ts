@@ -28,13 +28,14 @@ export type NavIcon =
   | 'reports'
   | 'company'
   | 'system'
-  | 'integrations';
+  | 'integrations'
+  | 'communications';
 
 export interface NavItem {
   label: string;
   href: string;
   module: string;
-  /** A second module that also reaches this entry. */
+  /** A second module that also reaches this entry ("settings:full": only at full access). */
   orModule?: string;
   home?: boolean;
 }
@@ -47,6 +48,8 @@ export interface NavGroup {
   href?: string;
   module?: string;
   items: NavItem[];
+  /** Drawn indented under another group (Communications under System). */
+  under?: string;
 }
 
 export const CONSOLE_NAV: NavGroup[] = [
@@ -272,6 +275,105 @@ export const CONSOLE_NAV: NavGroup[] = [
       { label: 'Integrations', href: '/settings?tab=api', module: 'settings' },
       { label: 'Agreement signing', href: '/settings?tab=signing', module: 'settings' },
       { label: 'Audit logs', href: '/audit', module: 'audit', home: true },
+    ],
+  },
+  {
+    key: 'communications',
+    label: 'Communications & Automations',
+    icon: 'communications',
+    under: 'system',
+    items: [
+      {
+        label: 'Overview',
+        href: '/communications',
+        module: 'communications',
+        orModule: 'settings:full',
+        home: true,
+      },
+      {
+        label: 'Email Configuration',
+        href: '/communications/email',
+        module: 'communications',
+        orModule: 'settings:full',
+        home: true,
+      },
+      {
+        label: 'SMS Configuration',
+        href: '/communications/sms',
+        module: 'communications',
+        orModule: 'settings:full',
+        home: true,
+      },
+      {
+        label: 'Push Notifications',
+        href: '/communications/push',
+        module: 'communications',
+        orModule: 'settings:full',
+        home: true,
+      },
+      {
+        label: 'WhatsApp Configuration',
+        href: '/communications/whatsapp',
+        module: 'communications',
+        orModule: 'settings:full',
+        home: true,
+      },
+      {
+        label: 'Message Templates',
+        href: '/communications/templates',
+        module: 'communications',
+        orModule: 'settings:full',
+        home: true,
+      },
+      {
+        label: 'Automated Workflows',
+        href: '/communications/workflows',
+        module: 'communications',
+        orModule: 'settings:full',
+        home: true,
+      },
+      {
+        label: 'Scheduled Messages',
+        href: '/communications/scheduled',
+        module: 'communications',
+        orModule: 'settings:full',
+        home: true,
+      },
+      {
+        label: 'Manual & Bulk Messaging',
+        href: '/communications/bulk',
+        module: 'communications',
+        orModule: 'settings:full',
+        home: true,
+      },
+      {
+        label: 'Message Queue',
+        href: '/communications/queue',
+        module: 'communications',
+        orModule: 'settings:full',
+        home: true,
+      },
+      {
+        label: 'Delivery Logs',
+        href: '/communications/logs',
+        module: 'communications',
+        orModule: 'settings:full',
+        home: true,
+      },
+      {
+        label: 'Analytics & Reports',
+        href: '/communications/analytics',
+        module: 'communications',
+        orModule: 'settings:full',
+        home: true,
+      },
+      {
+        label: 'Preferences & Consent',
+        href: '/communications/consent',
+        module: 'communications',
+        orModule: 'settings:full',
+        home: true,
+      },
     ],
   },
 ];

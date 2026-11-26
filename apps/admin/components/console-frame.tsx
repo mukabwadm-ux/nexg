@@ -18,6 +18,7 @@ import {
   LogOut,
   Megaphone,
   Menu,
+  MessageSquareText,
   Search,
   Settings,
   ShoppingBag,
@@ -66,6 +67,7 @@ const ICONS: Record<NavIcon, React.ComponentType<{ className?: string }>> = {
   company: Building2,
   system: Settings,
   integrations: Link2,
+  communications: MessageSquareText,
 };
 
 export interface FrameStaff {
@@ -368,7 +370,8 @@ function NavGroupRow({
   }
 
   return (
-    <li>
+    /* A group drawn inside another (Communications under System) sits indented. */
+    <li className={cn(group.under && 'ml-4')}>
       <GroupBody
         group={group}
         open={open}
