@@ -1,4 +1,17 @@
-import { Building2, Home, MessageSquare, Star, ThumbsDown, ThumbsUp } from 'lucide-react';
+import {
+  Building2,
+  ConciergeBell,
+  Home,
+  type LucideIcon,
+  MapPin,
+  MessageSquare,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  ThumbsDown,
+  ThumbsUp,
+  Wallet,
+} from 'lucide-react';
 import type { Metadata } from 'next';
 
 import { ShareDonut } from '@/components/charts';
@@ -77,7 +90,28 @@ interface ReviewRow {
   unit_id: string | null;
   nights: number;
   check_in: string;
+  rating_cleanliness?: number | null;
+  rating_location?: number | null;
+  rating_service?: number | null;
+  rating_facilities?: number | null;
+  rating_security?: number | null;
+  rating_value?: number | null;
 }
+
+/** The six things guests rate besides the overall stars (20270331000400). */
+const CATEGORIES: { key: string; label: string; icon: LucideIcon }[] = [
+  { key: 'cleanliness', label: 'Cleanliness', icon: Sparkles },
+  { key: 'location', label: 'Location', icon: MapPin },
+  { key: 'service', label: 'Service', icon: ConciergeBell },
+  { key: 'facilities', label: 'Facilities', icon: Building2 },
+  { key: 'security', label: 'Security', icon: ShieldCheck },
+  { key: 'value', label: 'Value', icon: Wallet },
+];
+
+const categoryOf = (row: ReviewRow, key: string) => {
+  const v = (row as unknown as Record<string, unknown>)[`rating_${key}`];
+  return typeof v === 'number' ? v : null;
+};
 
 function StarRow({ value }: { value: number }) {
   const v = Math.round(value);
@@ -161,6 +195,12 @@ export default async function ReviewsPage({
   const rows = pageSlice(filtered, page, PAGE_SIZE);
   const stars = (Array.isArray(o.stars) ? o.stars : []) as { stars: number; n: number }[];
   const themes = (Array.isArray(o.themes) ? o.themes : []) as { theme: string; n: number }[];
+  const cats = asObject(o.categories);
+  const categoryRows = CATEGORIES.map((c) => {
+    const v = asObject(cats[c.key]);
+    return { ...c, avg: asMaybe(v.avg), n: asNumber(v.n) };
+  });
+  const categoryRated = categoryRows.some((c) => c.n > 0);
   const reviews = asNumber(k.reviews);
   const avg = asMaybe(k.avg);
   const r = all.find((x) => x.stay_id === selected) ?? null;
@@ -205,6 +245,22 @@ export default async function ReviewsPage({
       <p className="mt-2">
         <StarRow value={x.rating} />
       </p>
+      {CATEGORIES.some((c) => categoryOf(x, c.key) !== null) && (
+        <ul className="mt-2 grid gap-1">
+          {CATEGORIES.filter((c) => categoryOf(x, c.key) !== null).map((c) => {
+            const Icon = c.icon;
+            return (
+              <li key={c.key} className="flex items-center justify-between gap-3 text-[0.8125rem]">
+                <span className="flex items-center gap-2 font-semibold">
+                  <Icon aria-hidden="true" className="h-4 w-4 text-[#E5A800]" />
+                  {c.label}
+                </span>
+                <StarRow value={categoryOf(x, c.key)!} />
+              </li>
+            );
+          })}
+        </ul>
+      )}
       <p className="mt-2 text-[0.9375rem] leading-relaxed">
         {x.text ? `“${x.text}”` : 'The guest left stars only.'}
       </p>
@@ -464,28 +520,41 @@ export default async function ReviewsPage({
                   )}
                 </DashCard>
                 <DashCard title="Ratings by Category">
-                  {themes.length === 0 ? (
+                  {!categoryRated ? (
                     <Empty>
-                      Guests give one overall rating; cleanliness, location, service and value are
-                      not rated separately yet.
+                      No guest has rated a category in this period yet. Guests rate cleanliness,
+                      location, service, facilities, security and value when they review a stay.
                     </Empty>
                   ) : (
                     <>
-                      <ul className="flex flex-wrap gap-2">
-                        {themes.map((t) => (
-                          <li
-                            key={t.theme}
-                            className="rounded-lg bg-[#FFF4D6] px-2.5 py-1 text-[0.8125rem] font-bold text-[#8A5C00]"
-                          >
-                            {t.theme} · {n(t.n)}
-                          </li>
-                        ))}
-                      </ul>
+                      <MeterRows
+                        empty="No ratings."
+                        rows={categoryRows.map((c) => ({
+                          label: c.label,
+                          icon: c.icon,
+                          value: c.avg == null ? 0 : (c.avg / 5) * 100,
+                          text: c.avg == null ? '—' : c.avg.toFixed(1),
+                          tone: 'gold' as const,
+                        }))}
+                      />
                       <Footnote>
-                        What guests mentioned most. Guests give one overall rating, not one per
-                        category.
+                        Average out of 5 from the guests who rated each category (
+                        {categoryRows.map((c) => `${c.label.toLowerCase()} ${n(c.n)}`).join(', ')}).
+                        Categories are optional; the overall rating is not.
                       </Footnote>
                     </>
+                  )}
+                  {themes.length > 0 && (
+                    <ul className="mt-3 flex flex-wrap gap-2">
+                      {themes.map((t) => (
+                        <li
+                          key={t.theme}
+                          className="rounded-lg bg-[#FFF4D6] px-2.5 py-1 text-[0.8125rem] font-bold text-[#8A5C00]"
+                        >
+                          {t.theme} · {n(t.n)}
+                        </li>
+                      ))}
+                    </ul>
                   )}
                 </DashCard>
                 {r ? (
