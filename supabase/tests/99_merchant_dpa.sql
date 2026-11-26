@@ -2,13 +2,14 @@
 --
 -- The owner reads and accepts the current DPA once its agreement details
 -- are saved; the acceptance records who, when, the address and device, and
--- the details the DPA is filled with; only the service role attaches the
--- signed copy, once; the merchant's members and its staff read it; going
+-- the details the DPA is filled with; merchant staff sign it once, with
+-- NexG's signatory, as they do the merchant agreement; the merchant's members
+-- and its staff read it; going
 -- live waits for it.
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(35);
+select plan(37);
 
 -- ------------------------------------------------------------------ fixtures
 
@@ -163,26 +164,17 @@ select throws_ok(
   'the table itself is read through the functions only');
 
 select ok(
-  authz.merchant_dpa_owner_writable(
-    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f3.pdf'),
-  'while the acceptance waits for its copy, the owner may upload one');
+  not authz.merchant_dpa_object_writable('dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f3.pdf'),
+  'the owner cannot upload a signed DPA');
 
 select throws_ok(
-  $$select public.fn_merchant_dpa_copy_record(
-    (public.rpc_merchant_dpa_read('9d000000-0000-4000-8000-0000000000c1') #>> '{acceptances,0,id}')::uuid,
-    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f1.pdf',
-    repeat('a', 64), 7, 'dpa-1', null)$$,
-  '42501', 'Attach only the copy you uploaded, without NexG''s signatory.',
-  'the owner cannot attach a file somebody else uploaded');
+  $$select public.rpc_merchant_dpa_sign_record('9d000000-0000-4000-8000-0000000000c1',
+    (public.rpc_merchant_dpa_read('9d000000-0000-4000-8000-0000000000c1') #>> '{acceptances,0,id}')::uuid, gen_random_uuid(),
+    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f1.pdf', repeat('a', 64), 7, 'dpa-1')$$,
+  '42501', 'Merchant staff only.',
+  'nor sign it');
 
-select is(
-  public.fn_merchant_dpa_copy_context(
-    (public.rpc_merchant_dpa_read('9d000000-0000-4000-8000-0000000000c1') #>> '{acceptances,0,id}')::uuid)
-    -> 'signer',
-  'null'::jsonb,
-  'asked with the owner''s token, NexG''s signatory is left out');
-
--- ------------------------------------------------------------- service role
+-- ------------------------------------------------------------ NexG signs it
 
 reset role;
 
@@ -201,69 +193,67 @@ select results_eq(
 select set_config('test.dpa_id', (select id::text from public.merchant_dpa_acceptance
   where merchant_id = '9d000000-0000-4000-8000-0000000000c1'), true);
 
-set local role service_role;
-select set_config('request.jwt.claims', '{"role":"service_role"}', true);
+set local role authenticated;
+select set_config('request.jwt.claims',
+  '{"sub":"9d000000-0000-4000-8000-0000000000a2","role":"authenticated"}', true);
+
+select ok(
+  (public.rpc_merchant_dpa_signing_context('9d000000-0000-4000-8000-0000000000c1') -> 'missing')
+    ? 'NexG''s signatory and signature are not set up yet (Settings › Agreement signing).',
+  'without NexG''s signatory and signature it cannot be signed yet');
+
+reset role;
+insert into public.merchant_agreement_signer (id, signatory_name, signatory_title,
+  representative_name, representative_title, po_box, registered_office, email, phone, website,
+  in_room_commission_pct, signature_path, signature_type, signature_sha256)
+values ('9d000000-0000-4000-8000-0000000000e1', 'Amina CEO', 'Director', 'Brian Ops', 'Head of Merchant Operations',
+  '12345-00100', 'Studio House, Marcus Garvey Road, Nairobi', 'legal@nexg.test', '+254 700 000 000',
+  'www.nexg.test', 10, 'signer/9d000000-0000-4000-8000-0000000000e1.png', 'image/png', repeat('c', 64));
+
+set local role authenticated;
+select set_config('request.jwt.claims',
+  '{"sub":"9d000000-0000-4000-8000-0000000000a2","role":"authenticated"}', true);
 
 select is(
-  public.fn_merchant_dpa_copy_context((select id from public.merchant_dpa_acceptance
-    where merchant_id = '9d000000-0000-4000-8000-0000000000c1')) #>> '{acceptance,details,address}',
-  'Shop 2, Kimathi Street, Nairobi',
-  'NexG''s server reads what the copy is filled with');
+  (select jsonb_build_object('ready', c -> 'ready', 'address', c #> '{acceptance,details,address}',
+     'signer', c #> '{signer,signatory_name}')
+   from public.rpc_merchant_dpa_signing_context('9d000000-0000-4000-8000-0000000000c1') c),
+  '{"ready": true, "address": "Shop 2, Kimathi Street, Nairobi", "signer": "Amina CEO"}'::jsonb,
+  'merchant staff see it is ready, with what it is filled with and NexG''s signatory');
+
+select ok(
+  authz.merchant_dpa_object_writable('dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f3.pdf'),
+  'merchant staff may upload the signed copy');
 
 select throws_ok(
-  $$select public.fn_merchant_dpa_copy_record((select id from public.merchant_dpa_acceptance
-    where merchant_id = '9d000000-0000-4000-8000-0000000000c1'),
+  $$select public.rpc_merchant_dpa_sign_record('9d000000-0000-4000-8000-0000000000c1', current_setting('test.dpa_id')::uuid, '9d000000-0000-4000-8000-0000000000e1',
     'dpa/9d000000-0000-4000-8000-0000000000c9/9d000000-0000-4000-8000-0000000000f1.pdf',
-    repeat('a', 64), 7, 'dpa-1', null)$$,
+    repeat('a', 64), 7, 'dpa-1')$$,
   '22023', 'Store the signed DPA in the merchant''s own folder.',
   'a copy in another merchant''s folder is refused');
 
 select throws_ok(
-  $$select public.fn_merchant_dpa_copy_record((select id from public.merchant_dpa_acceptance
-    where merchant_id = '9d000000-0000-4000-8000-0000000000c1'),
-    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f9.pdf',
-    repeat('a', 64), 7, 'dpa-1', null)$$,
-  'P0002', 'The signed DPA did not arrive in storage.',
+  $$select public.rpc_merchant_dpa_sign_record('9d000000-0000-4000-8000-0000000000c1', current_setting('test.dpa_id')::uuid, '9d000000-0000-4000-8000-0000000000e1',
+    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f9.pdf', repeat('a', 64), 7, 'dpa-1')$$,
+  'P0002', 'The signed DPA did not arrive in storage. Try again.',
   'a copy that is not in storage is refused');
 
+select throws_ok(
+  $$select public.rpc_merchant_dpa_sign_record('9d000000-0000-4000-8000-0000000000c1', current_setting('test.dpa_id')::uuid, gen_random_uuid(),
+    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f1.pdf', repeat('a', 64), 7, 'dpa-1')$$,
+  '40001', 'NexG''s signing details changed while signing. Reload and try again.',
+  'a copy made with other signing details is refused');
+
 select lives_ok(
-  $$select public.fn_merchant_dpa_copy_record((select id from public.merchant_dpa_acceptance
-    where merchant_id = '9d000000-0000-4000-8000-0000000000c1'),
-    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f1.pdf',
-    repeat('a', 64), 7, 'dpa-1', null)$$,
-  'the signed copy is attached');
+  $$select public.rpc_merchant_dpa_sign_record('9d000000-0000-4000-8000-0000000000c1', current_setting('test.dpa_id')::uuid, '9d000000-0000-4000-8000-0000000000e1',
+    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f1.pdf', repeat('a', 64), 7, 'dpa-1')$$,
+  'merchant staff sign and issue it');
 
 select throws_ok(
-  $$select public.fn_merchant_dpa_copy_record((select id from public.merchant_dpa_acceptance
-    where merchant_id = '9d000000-0000-4000-8000-0000000000c1'),
-    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f2.pdf',
-    repeat('b', 64), 7, 'dpa-1', null)$$,
-  '23505', 'This DPA already has its signed copy; it is never replaced.',
+  $$select public.rpc_merchant_dpa_sign_record('9d000000-0000-4000-8000-0000000000c1', current_setting('test.dpa_id')::uuid, '9d000000-0000-4000-8000-0000000000e1',
+    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f2.pdf', repeat('b', 64), 7, 'dpa-1')$$,
+  '23505', 'This DPA is already signed; the signed copy is never replaced.',
   'and never replaced');
-
--- ------------------------------------------------------------ who reads it
-
-set local role authenticated;
-select set_config('request.jwt.claims',
-  '{"sub":"9d000000-0000-4000-8000-0000000000a1","role":"authenticated"}', true);
-
-select ok(
-  authz.merchant_agreement_object_readable(
-    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f1.pdf'),
-  'the owner can download the signed copy');
-
-select ok(
-  not authz.merchant_agreement_object_readable(
-    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f2.pdf'),
-  'but not a file no acceptance records');
-
-select ok(
-  not authz.merchant_dpa_owner_writable(
-    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f3.pdf'),
-  'once the copy is attached, the owner can upload no other');
-
-select set_config('request.jwt.claims',
-  '{"sub":"9d000000-0000-4000-8000-0000000000a2","role":"authenticated"}', true);
 
 select is(
   public.rpc_merchant_dpa_read('9d000000-0000-4000-8000-0000000000c1') #>> '{acceptances,0,ip}',
@@ -271,9 +261,26 @@ select is(
   'merchant staff see the address it was accepted from');
 
 select ok(
-  authz.merchant_agreement_object_readable(
-    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f1.pdf'),
+  authz.merchant_agreement_object_readable('dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f1.pdf'),
   'and can download the signed copy');
+
+-- ------------------------------------------------------------ who reads it
+
+select set_config('request.jwt.claims',
+  '{"sub":"9d000000-0000-4000-8000-0000000000a1","role":"authenticated"}', true);
+
+select is(
+  public.rpc_merchant_dpa_read('9d000000-0000-4000-8000-0000000000c1') #>> '{acceptances,0,storage_path}',
+  'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f1.pdf',
+  'the owner sees the signed copy');
+
+select ok(
+  authz.merchant_agreement_object_readable('dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f1.pdf'),
+  'and can download it');
+
+select ok(
+  not authz.merchant_agreement_object_readable('dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f2.pdf'),
+  'but not a file no acceptance records');
 
 select set_config('request.jwt.claims',
   '{"sub":"9d000000-0000-4000-8000-0000000000a5","role":"authenticated"}', true);
@@ -284,14 +291,12 @@ select throws_ok(
   'somebody else cannot see the DPA record');
 
 select throws_ok(
-  $$select public.fn_merchant_dpa_copy_context(
-    current_setting('test.dpa_id')::uuid)$$,
-  '42501', null,
-  'nor read what its copy is filled with');
+  $$select public.rpc_merchant_dpa_signing_context('9d000000-0000-4000-8000-0000000000c1')$$,
+  '42501', 'Merchant staff only.',
+  'nor what it is filled with');
 
 select ok(
-  not authz.merchant_agreement_object_readable(
-    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f1.pdf'),
+  not authz.merchant_agreement_object_readable('dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f1.pdf'),
   'nor download the copy');
 
 -- ------------------------------------------------------------------ records

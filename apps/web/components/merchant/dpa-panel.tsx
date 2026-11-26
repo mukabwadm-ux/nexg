@@ -18,7 +18,7 @@ import { Download, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { acceptDpa, makeDpaCopy } from '@/app/merchant/documents/dpa-actions';
+import { acceptDpa } from '@/app/merchant/documents/dpa-actions';
 import { Panel } from '@/components/partner/bits';
 
 /** One acceptance, as rpc_merchant_dpa_read lists it. */
@@ -242,23 +242,8 @@ export function DpaPanel({
       }
       setMessage({
         ok: true,
-        text: outcome.copyPending
-          ? 'Accepted. Your signed copy is not ready yet; try “Make my signed copy” below.'
-          : 'Accepted. Your signed copy is below.',
+        text: 'Accepted. NexG signs it and your signed copy then appears here.',
       });
-      router.refresh();
-    });
-  }
-
-  function retryCopy() {
-    setMessage(null);
-    startTransition(async () => {
-      const outcome = await makeDpaCopy(merchantId);
-      setMessage(
-        outcome.ok
-          ? { ok: true, text: 'Your signed copy is ready.' }
-          : { ok: false, text: outcome.message ?? 'The signed copy could not be made. Retry.' },
-      );
       router.refresh();
     });
   }
@@ -294,19 +279,9 @@ export function DpaPanel({
                 Download your signed DPA (PDF{current.pages ? `, ${current.pages} pages` : ''})
               </a>
             ) : (
-              <div className="mt-2">
-                <p className="text-ink text-[0.8125rem] font-semibold">
-                  Your signed copy is not ready yet.
-                </p>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={retryCopy}
-                  className="bg-gold text-ink mt-2 rounded-lg px-3 py-2 text-[0.75rem] font-extrabold disabled:opacity-40"
-                >
-                  {busy ? 'Making it…' : 'Make my signed copy'}
-                </button>
-              </div>
+              <p className="text-ink mt-2 text-[0.8125rem] font-semibold">
+                NexG signs it with the details you gave; your signed copy then appears here.
+              </p>
             )}
           </div>
         ) : (

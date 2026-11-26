@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { issueSignedAgreement, issueSummary } from '@/lib/merchant-agreement-signing';
+import { dpaIssueSummary, issueSignedDpa } from '@/lib/merchant-dpa-signing';
 import { liveEmailStatus, liveEmailSummary } from '@/lib/merchant-live-email';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
@@ -59,4 +60,24 @@ export async function resendLiveEmail(
   return result.status === 'queued'
     ? { ok: true, message: 'Queued. It goes out within a minute or two.' }
     : { ok: false, message: result.reason ?? 'It was not queued.' };
+}
+
+/**
+ * Signs and issues the merchant's Data Processing Agreement now, with NexG's
+ * signatory and signature, once the merchant has accepted it: for a merchant
+ * that accepted after approval, or one whose signature setup was missing.
+ */
+export async function issueMerchantDpa(
+  merchantId: string,
+): Promise<{ ok: boolean; message: string }> {
+  const staff = await requireStaff();
+  requireModule(staff, 'merchants');
+  if (!UUID.test(merchantId)) return { ok: false, message: 'Unknown merchant.' };
+  const result = await issueSignedDpa(createClient(), merchantId);
+  revalidatePath(`/merchants/${merchantId}`);
+  revalidatePath(`/merchants/applications/${merchantId}`);
+  return {
+    ok: result.status === 'issued' || result.status === 'signed',
+    message: dpaIssueSummary(result),
+  };
 }
