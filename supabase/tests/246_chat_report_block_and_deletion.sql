@@ -3,7 +3,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(93);
+select plan(119);
 
 insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, created_at, updated_at, is_anonymous)
 select '00000000-0000-0000-0000-000000000000', u.id, 'authenticated', 'authenticated', u.email, now(), now(), now(),
@@ -16,6 +16,9 @@ from (values
   ('c2430000-0000-4000-8000-000000000005'::uuid, null),                      -- temporary session
   ('c2430000-0000-4000-8000-000000000006'::uuid, 'host243@example.test'),    -- host owner
   ('c2430000-0000-4000-8000-000000000007'::uuid, 'gita243@example.test'),    -- stay guest
+  ('c2430000-0000-4000-8000-000000000008'::uuid, 'vic243@example.test'),     -- organiser who blocks
+  ('c2430000-0000-4000-8000-000000000009'::uuid, 'mem243@example.test'),     -- member who is blocked
+  ('c2430000-0000-4000-8000-000000000010'::uuid, 'exmerchant243@example.test'), -- left a merchant's team
   ('c2430000-0000-4000-8000-0000000000a1'::uuid, 'concierge243@test.local'),
   ('c2430000-0000-4000-8000-0000000000a3'::uuid, 'partnerships243@test.local')
 ) as u (id, email);
@@ -207,6 +210,44 @@ select is((select count(*)::int from jsonb_array_elements(
             where m ->> 'author_id' = 'c2430000-0000-4000-8000-000000000002'), 3, 'His messages are back.');
 select public.rpc_chat_block(current_setting('t.group')::uuid, 'c2430000-0000-4000-8000-000000000001');
 
+-- ── leaving and coming back puts nothing in front of the blocker
+
+select set_config('request.jwt.claims', '{"sub":"c2430000-0000-4000-8000-000000000008","role":"authenticated"}', true);
+select set_config('t.created3', public.rpc_trip_group_create('Lamu', 'Vic')::text, true);
+select set_config('t.group3', current_setting('t.created3')::jsonb ->> 'group_id', true);
+select set_config('request.jwt.claims', '{"sub":"c2430000-0000-4000-8000-000000000009","role":"authenticated"}', true);
+select public.rpc_trip_group_join(current_setting('t.created3')::jsonb ->> 'invite_token', 'Mem');
+select set_config('request.jwt.claims', '{"sub":"c2430000-0000-4000-8000-000000000008","role":"authenticated"}', true);
+select public.rpc_chat_block(current_setting('t.group3')::uuid, 'c2430000-0000-4000-8000-000000000009');
+select set_config('request.jwt.claims', '{"sub":"c2430000-0000-4000-8000-000000000009","role":"authenticated"}', true);
+select public.rpc_trip_group_leave(current_setting('t.group3')::uuid);
+select public.rpc_trip_group_join(current_setting('t.created3')::jsonb ->> 'invite_token', 'Vic you are an idiot');
+select is(
+  (select jsonb_agg(jsonb_build_array(m -> 'body', m -> 'author', m -> 'author_id', m -> 'mine') order by (m ->> 'seq')::int)
+     from jsonb_array_elements(public.rpc_trip_group_messages(current_setting('t.group3')::uuid) -> 'messages') m
+    where m ->> 'kind' = 'system'),
+  '[["Mem joined", null, null, false], ["Mem left", null, null, false],
+    ["Vic you are an idiot joined", null, null, false]]'::jsonb,
+  'Others read the join and leave lines as before, with no author.');
+select set_config('request.jwt.claims', '{"sub":"c2430000-0000-4000-8000-000000000008","role":"authenticated"}', true);
+select is((select count(*)::int from jsonb_array_elements(
+             public.rpc_trip_group_messages(current_setting('t.group3')::uuid) -> 'messages') m
+            where m ->> 'body' like '%Mem %' or m ->> 'body' like '%idiot%'), 0,
+  'No join or leave line about a blocked person reaches the blocker.');
+select is((select m ->> 'name' from jsonb_array_elements(
+             public.rpc_trip_group_members(current_setting('t.group3')::uuid) -> 'members') m
+            where m ->> 'user_id' = 'c2430000-0000-4000-8000-000000000009'), 'Mem',
+  'And the member list keeps the name they were blocked under.');
+select public.rpc_trip_group_remove(current_setting('t.group3')::uuid, 'c2430000-0000-4000-8000-000000000009');
+select is((select count(*)::int from jsonb_array_elements(
+             public.rpc_trip_group_messages(current_setting('t.group3')::uuid) -> 'messages') m
+            where m ->> 'body' like '%idiot%'), 0, 'Nor does the removal line.');
+reset role;
+select is((select count(*)::int from public.msg_message
+            where conversation_id = current_setting('t.group3')::uuid and kind = 'system'
+              and author_participant_id is null), 0, 'Each of those lines records who it is about.');
+set local role authenticated;
+
 -- ── a stay chat: report, no block
 
 select set_config('request.jwt.claims', '{"sub":"c2430000-0000-4000-8000-000000000007","role":"authenticated"}', true);
@@ -321,6 +362,26 @@ select set_config('request.jwt.claims', '{"sub":"c2430000-0000-4000-8000-0000000
 select is(public.rpc_chat_report_resolve(current_setting('t.r6')::uuid, 'actioned', null, false, true) ->> 'group_closed',
   'true', 'Removing the organiser closes the group.');
 
+-- ── the host support functions stay out of groups, open or closed
+
+select set_config('request.jwt.claims', '{"sub":"c2430000-0000-4000-8000-000000000003","role":"authenticated"}', true);
+select throws_ok($$select public.rpc_host_message_reply(current_setting('t.group2')::uuid, repeat('x', 6000))$$,
+  '42501', null, 'Nobody writes into a group staff closed through the host support reply.');
+select throws_ok($$select public.rpc_host_message_reply(current_setting('t.group')::uuid, 'Around the rules')$$,
+  '42501', null, 'Nor into an open group.');
+select throws_ok($$select public.rpc_host_message_read(current_setting('t.group')::uuid)$$,
+  '42501', null, 'Nor marks one read that way.');
+reset role;
+select is((select status::text from public.msg_conversation where id = current_setting('t.group2')::uuid), 'closed',
+  'The closed group stays closed.');
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"c2430000-0000-4000-8000-000000000006","role":"authenticated"}', true);
+select set_config('t.support', public.rpc_host_message_start('c2430000-0000-4000-8000-00000000000a',
+  'hotel_or_airbnb', 'A card', 'Please help') ->> 'conversation_id', true);
+select lives_ok($$select public.rpc_host_message_reply(current_setting('t.support')::uuid, 'Any news?', 'sup-243')$$,
+  'The host support thread still takes replies.');
+select lives_ok($$select public.rpc_host_message_read(current_setting('t.support')::uuid)$$, 'And is still marked read.');
+
 -- ── the daily limit
 
 reset role;
@@ -359,8 +420,20 @@ select is((select string_agg(distinct display_name, ',') from public.msg_partici
             where user_id = 'c2430000-0000-4000-8000-000000000001'), 'Former member',
   'Their name is off their messages.');
 select is((select count(*)::int from public.user_block
-            where 'c2430000-0000-4000-8000-000000000001' in (blocker_user_id, blocked_user_id)), 0,
-  'Blocks by them and of them go with the account.');
+            where blocker_user_id = 'c2430000-0000-4000-8000-000000000001'), 0,
+  'Their own block list goes with the account.');
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"c2430000-0000-4000-8000-000000000003","role":"authenticated"}', true);
+select is((select count(*)::int from jsonb_array_elements(
+             public.rpc_trip_group_messages(current_setting('t.group')::uuid) -> 'messages') m
+            where m ->> 'author_id' = 'c2430000-0000-4000-8000-000000000001'), 0,
+  'Their messages stay hidden from someone who blocked them.');
+select is((select b ->> 'name' from jsonb_array_elements(public.rpc_chat_blocked() -> 'blocked') b
+            where b ->> 'user_id' = 'c2430000-0000-4000-8000-000000000001'), 'Former member',
+  'The block stays on their list, without the name.');
+select is(public.rpc_chat_unblock('c2430000-0000-4000-8000-000000000001') ->> 'already', 'false',
+  'And can still be lifted.');
+reset role;
 
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"c2430000-0000-4000-8000-000000000003","role":"authenticated"}', true);
@@ -389,12 +462,19 @@ select is(public.rpc_my_account_deletion_request() ->> 'status', 'fulfilled',
 reset role;
 select is((select count(*)::int from public.legal_acceptance where version = 'v-243'), 0,
   'Their own acceptance goes with them.');
+select is((select count(*)::int from public.msg_message
+            where conversation_id in (current_setting('t.group')::uuid, current_setting('t.group2')::uuid)
+              and kind = 'system' and body like '%Carol%'), 0, 'Their name leaves the join lines.');
+select is((select count(*)::int from public.msg_message
+            where conversation_id in (current_setting('t.group')::uuid, current_setting('t.group2')::uuid)
+              and body = 'Former member joined'), 2, 'The lines stay, unnamed.');
 set local role authenticated;
 
 -- ── the stay guest, once the stay is over
 
 select set_config('request.jwt.claims', '{"sub":"c2430000-0000-4000-8000-000000000007","role":"authenticated"}', true);
 select ok(public.rpc_my_account_deletion() -> 'blockers' ? 'upcoming_stay', 'An upcoming stay still comes first.');
+select public.rpc_stay_chat_guest_ask_nexg(current_setting('t.thread')::uuid);
 reset role;
 update public.stay set status = 'departed', check_in = now() - interval '4 days', check_out = now() - interval '2 days'
  where id = 'c2430000-0000-4000-8000-0000000000d1';
@@ -405,6 +485,20 @@ select is(
   (select m ->> 'author' from jsonb_array_elements(
       public.rpc_stay_chat_host_messages(current_setting('t.thread')::uuid) -> 'messages') m
     where m ->> 'id' = current_setting('t.m_gita')), 'Former member', 'The host keeps the chat, without the name.');
+select is(public.rpc_stay_chat_host_messages(current_setting('t.thread')::uuid) -> 'thread' ->> 'guest_name',
+  'Former member', 'Nor is the name in the chat''s header.');
+select is(
+  (select jsonb_build_array(m -> 'body', m -> 'redacted', m -> 'side') from jsonb_array_elements(
+      public.rpc_stay_chat_host_messages(current_setting('t.thread')::uuid) -> 'messages') m
+    where m ->> 'body' like '%asked NexG%'),
+  '["Former member asked NexG to help.", false, "system"]'::jsonb, 'Nor in the line saying they asked NexG.');
+reset role;
+select is((select count(*)::int from public.msg_message
+            where conversation_id = current_setting('t.thread')::uuid and body like '%Gita%'), 0,
+  'No line in the stay chat holds it.');
+select is((select guest_first_name from public.stay where id = 'c2430000-0000-4000-8000-0000000000d1'),
+  'Former member', 'Nor does the booking record.');
+set local role authenticated;
 
 -- ── a group member who is not the organiser, and someone who closed their group, can go as well
 
@@ -413,6 +507,34 @@ select is(public.rpc_my_account_deletion_request() ->> 'status', 'fulfilled',
   'Someone whose only group is already closed deletes too.');
 
 reset role;
+select is((select count(*)::int from public.msg_message
+            where conversation_id = current_setting('t.group2')::uuid and body = 'NexG removed Former member'), 1,
+  'The removal line loses the name too.');
+
+-- ── somebody who accepted a merchant's DPA and has left its team
+
+insert into public.merchant (id, legal_name, trading_name, category, contact_name, contact_phone,
+  contact_email, city_id)
+values ('c2430000-0000-4000-8000-0000000000f1', 'Dpa 243 Limited', 'Dpa 243', 'pharmacy', 'Owner',
+  '+254700243010', 'dpa243@example.test', (select id from public.city where slug = 'nairobi'));
+insert into public.merchant_dpa_acceptance (id, merchant_id, version, accepted_by, account_email, details, reference)
+values ('c2430000-0000-4000-8000-0000000000f2', 'c2430000-0000-4000-8000-0000000000f1',
+  (select version from public.merchant_dpa_version order by published_on desc limit 1),
+  'c2430000-0000-4000-8000-000000000010', 'exmerchant243@example.test', '{}'::jsonb, 'NXG-DPA-243243243243');
+select throws_ok($$update public.merchant_dpa_acceptance set accepted_by = null, account_email = null
+  where id = 'c2430000-0000-4000-8000-0000000000f2'$$, '42501', null,
+  'An acceptance still cannot be rewritten while dropping who accepted.');
+select throws_ok($$update public.merchant_dpa_acceptance set accepted_by = 'c2430000-0000-4000-8000-000000000009'
+  where id = 'c2430000-0000-4000-8000-0000000000f2'$$, '42501', null, 'Nor moved to another person.');
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"c2430000-0000-4000-8000-000000000010","role":"authenticated"}', true);
+select is((public.rpc_my_account_deletion() ->> 'eligible')::boolean, true, 'A former team member is eligible.');
+select lives_ok($$select public.rpc_my_account_deletion_request()$$,
+  'And deletes, where the DPA record used to stop it.');
+reset role;
+select ok((select accepted_by is null and account_email = 'exmerchant243@example.test'
+             from public.merchant_dpa_acceptance where id = 'c2430000-0000-4000-8000-0000000000f2'),
+  'The acceptance stays, with the email it was made from.');
 
 -- ── accounted for
 

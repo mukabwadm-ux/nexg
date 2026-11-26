@@ -16,30 +16,43 @@
 --
 -- Block (trip groups only):
 --   * A member blocks another member. The blocker no longer gets that person's messages, cards, unread count or push,
---     in any group they share. It is applied in the trip group read functions. The blocked person is not told and
+--     in any group they share, nor the lines saying they joined, left or were removed, and the member list keeps the
+--     name they were blocked under. It is applied in the trip group read functions. The blocked person is not told and
 --     still sees the group as before. Reading msg_message directly under its own row policy is unchanged: the app
 --     reads groups through these functions.
+--   * A block outlives the blocked person's account, so what they wrote stays hidden. It then reads "Former member".
 --   * No block in a stay chat between a guest and a host, on purpose. The two are parties to a booked stay: hiding
 --     either side's messages could lose arrival, access, safety or cancellation messages that the other relies on,
 --     and a dispute needs both sides to have been able to reach each other. Either side can report, ask NexG into the
 --     chat (rpc_stay_chat_*_ask_nexg), and NexG staff can remove a message.
 --
+-- Closed means closed:
+--   * rpc_host_message_reply and rpc_host_message_read (the host support thread) accepted any conversation the caller
+--     had a participant row in, trip groups included: a member could write into a closed group, past the length limit,
+--     and reopen its conversation. Both now refuse groups, as they already refuse stay chats.
+--
 -- Account deletion:
 --   * trip_group.created_by referenced auth.users with "on delete restrict", so anyone who had ever made a trip group
 --     got a database error (23503) when deleting their account. Their open groups are now closed with a line saying
 --     why, the organiser column empties, and their name on group and stay chat messages becomes "Former member". The
---     messages stay, as the rest of those conversations does.
+--     messages stay, as the rest of those conversations does. Their first name also leaves the lines in those chats
+--     (joined, left, removed, asked NexG to help) and their stays, which the stay chat's header reads.
 --   * The same request failed (23514) for anyone who had accepted a legal document as themselves: removing the sign-in
 --     emptied legal_acceptance.user_id, which its one-party check refuses. Those rows now go with the account.
+--   * And (42501) for someone who accepted a merchant's Data Processing Agreement and has since left its team: the
+--     record refused to let accepted_by empty. It may now do that and nothing else; the email on it stays.
 --   * Host sign-ins are still not deleted from the app, because listings, bookings and payouts would lose their owner.
 --     They now get their own reason (`host_account`) that says what to do, instead of the shared business one.
 --
 -- Rollback: drop public.rpc_chat_report, rpc_chat_block, rpc_chat_unblock, rpc_chat_blocked, rpc_chat_reports and
 -- rpc_chat_report_resolve; re-run authz.trip_group_thread, authz.trip_group_page, authz.trip_group_post and
--- public.rpc_trip_group_members from 20270315000300, and fn_customer_deletion_blockers, rpc_my_account_deletion and
--- rpc_my_account_deletion_request from 20270116000200; drop tables public.chat_report and public.user_block; delete
--- the audit.action_registry and wiring_audit_exempt rows added below. trip_group.created_by can go back to not null
--- and "on delete restrict" only while no row has an empty organiser.
+-- public.rpc_trip_group_members, rpc_trip_group_join, rpc_trip_group_leave and rpc_trip_group_remove from
+-- 20270315000300, rpc_host_message_reply and rpc_host_message_read from 20270314000700, authz.stay_chat_page from
+-- 20270314001000, tg_merchant_dpa_acceptance_immutable from 20270327000100, and fn_customer_deletion_blockers,
+-- rpc_my_account_deletion and rpc_my_account_deletion_request from 20270116000200; drop authz.trip_group_say_about
+-- and tables public.chat_report and public.user_block; delete the audit.action_registry and wiring_audit_exempt rows
+-- added below. trip_group.created_by can go back to not null and "on delete restrict" only while no row has an empty
+-- organiser. Names already taken out of chats and stays do not come back.
 
 -- ═══════════════════════════════════════════════════ reports
 
@@ -82,7 +95,8 @@ revoke all on public.chat_report from public, anon, authenticated;
 
 create table public.user_block (
   blocker_user_id uuid not null references auth.users (id) on delete cascade,
-  blocked_user_id uuid not null references auth.users (id) on delete cascade,
+  /* No foreign key on purpose: a block must outlast the blocked account, whose messages stay in the group. */
+  blocked_user_id uuid not null,
   /* The name they went by where they were blocked, for the blocker's own list. */
   blocked_name text not null,
   created_at timestamptz not null default now(),
@@ -146,7 +160,9 @@ as $$
 $$;
 
 /* As 20270315000300, without blocked people's messages, and with `author_id` so a message's writer can be reported
-   or blocked (members already see each other's ids in rpc_trip_group_members). */
+   or blocked (members already see each other's ids in rpc_trip_group_members). A system line about one person now
+   carries their participant id, so the block covers it; apps still get no author on it. A system line's words are
+   NexG's, so it is shown after account deletion has taken the name out of it. */
 create or replace function authz.trip_group_page(p_group uuid, p_before bigint, p_limit integer)
 returns jsonb
 language sql
@@ -172,13 +188,13 @@ as $$
     'messages', coalesce((
       select jsonb_agg(jsonb_build_object(
           'id', k.id, 'seq', k.seq, 'kind', k.kind,
-          'body', case when k.redacted_at is null then k.body end,
-          'redacted', k.redacted_at is not null,
+          'body', case when k.redacted_at is null or k.kind = 'system' then k.body end,
+          'redacted', k.redacted_at is not null and k.kind <> 'system',
           'links', case when k.redacted_at is null then k.object_links else '[]'::jsonb end,
           'at', k.created_at,
-          'mine', coalesce(k.user_id = (select auth.uid()), false),
-          'author', k.display_name,
-          'author_id', k.user_id) order by k.seq)
+          'mine', k.kind <> 'system' and coalesce(k.user_id = (select auth.uid()), false),
+          'author', case when k.kind <> 'system' then k.display_name end,
+          'author_id', case when k.kind <> 'system' then k.user_id end) order by k.seq)
         from kept k), '[]'::jsonb),
     'earlier_before', case
       when (select count(*) from page) > (select count(*) from kept) then (select min(seq) from kept) end)
@@ -253,7 +269,8 @@ exception
 end;
 $$;
 
-/** Who is in the group: first names only, and whether the caller has blocked each one. */
+/** Who is in the group: first names only, and whether the caller has blocked each one. A blocked person keeps the
+    name they were blocked under, so changing it puts nothing new in front of the blocker. */
 create or replace function public.rpc_trip_group_members(p_group_id uuid)
 returns jsonb
 language plpgsql
@@ -264,13 +281,140 @@ as $$
 begin
   perform authz.trip_group_me(p_group_id);
   return jsonb_build_object('members', coalesce((
-    select jsonb_agg(jsonb_build_object('user_id', m.user_id, 'name', m.display_name,
+    select jsonb_agg(jsonb_build_object('user_id', m.user_id, 'name', coalesce(b.blocked_name, m.display_name),
         'organiser', coalesce(m.user_id = g.created_by, false), 'me', m.user_id = (select auth.uid()),
-        'blocked', exists (select 1 from public.user_block b
-                            where b.blocker_user_id = (select auth.uid()) and b.blocked_user_id = m.user_id))
+        'blocked', b.blocked_user_id is not null)
         order by coalesce(m.user_id = g.created_by, false) desc, m.joined_at)
       from public.trip_group_member m join public.trip_group g on g.id = m.group_id
+      left join public.user_block b on b.blocker_user_id = (select auth.uid()) and b.blocked_user_id = m.user_id
      where m.group_id = p_group_id and m.status = 'active'), '[]'::jsonb));
+end;
+$$;
+
+-- ═══════════════════════════════════════════════════ lines about a person say who
+
+/* A system line about one member ("Amina joined"). The participant id lets a block hide it and account deletion
+   take the name out of it. */
+create or replace function authz.trip_group_say_about(p_group uuid, p_participant uuid, p_text text)
+returns void
+language sql
+security definer
+set search_path = ''
+as $$
+  insert into public.msg_message (
+    conversation_id, kind, author_participant_id, body, visibility, channel_out, delivery)
+  values (p_group, 'system', p_participant, p_text, 'external', 'guest_app', 'stored')
+$$;
+revoke all on function authz.trip_group_say_about(uuid, uuid, text) from public, anon, authenticated;
+
+/* The lines already written, where the name points at one participant only. */
+update public.msg_message m
+   set author_participant_id = a.id
+  from public.msg_conversation c, public.msg_participant a
+ where c.id = m.conversation_id and c.kind = 'group' and a.conversation_id = c.id
+   and m.kind = 'system' and m.author_participant_id is null
+   and m.body in (a.display_name || ' joined', a.display_name || ' left', a.display_name || ' was removed')
+   and not exists (select 1 from public.msg_participant o
+                    where o.conversation_id = c.id and o.id <> a.id and o.display_name = a.display_name);
+
+/* As 20270315000300, except that each of these lines records who it is about. */
+create or replace function public.rpc_trip_group_join(p_token text, p_my_name text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_uid uuid := (select auth.uid());
+  v_group uuid;
+  v_me text;
+  v_status text;
+begin
+  perform authz.trip_group_real_account();
+  v_me := authz.trip_group_clean_name(p_my_name, 40, 'your first name');
+  v_group := authz.trip_group_for_token(p_token);
+  if v_group is null then
+    raise exception 'This invite link no longer works.' using errcode = '22023';
+  end if;
+
+  perform pg_advisory_xact_lock(hashtextextended('trip-group:' || v_group::text, 0));
+  select m.status into v_status from public.trip_group_member m where m.group_id = v_group and m.user_id = v_uid;
+  if v_status = 'active' then
+    return jsonb_build_object('ok', true, 'group_id', v_group, 'joined', false,
+      'thread', authz.trip_group_thread(v_group));
+  end if;
+  if v_status = 'removed' then
+    raise exception 'You can''t join this group.' using errcode = '42501';
+  end if;
+  if (select count(*) from public.trip_group_member m where m.group_id = v_group and m.status = 'active') >= 20 then
+    raise exception 'This group is full (20 people).' using errcode = '22023';
+  end if;
+
+  perform authz.trip_group_add(v_group, v_uid, v_me);
+  perform authz.trip_group_say_about(v_group,
+    (select m.participant_id from public.trip_group_member m where m.group_id = v_group and m.user_id = v_uid),
+    v_me || ' joined');
+  perform audit.log('guest'::public.actor_type, 'messaging', 'trip_group.joined',
+    p_actor_id => v_uid, p_target_type => 'conversation', p_target_id => v_group);
+
+  return jsonb_build_object('ok', true, 'group_id', v_group, 'joined', true,
+    'thread', authz.trip_group_thread(v_group));
+end;
+$$;
+
+create or replace function public.rpc_trip_group_leave(p_group_id uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_uid uuid := (select auth.uid());
+  v_me uuid := authz.trip_group_me(p_group_id);
+  v_name text;
+begin
+  if authz.trip_group_is_admin(p_group_id) then
+    raise exception 'You run this group. Close it, or remove the others first.' using errcode = '22023';
+  end if;
+  update public.trip_group_member set status = 'left' where group_id = p_group_id and user_id = v_uid
+    returning display_name into v_name;
+  update public.msg_participant set left_at = now() where id = v_me;
+  perform authz.trip_group_say_about(p_group_id, v_me, v_name || ' left');
+  perform audit.log('guest'::public.actor_type, 'messaging', 'trip_group.left',
+    p_actor_id => v_uid, p_target_type => 'conversation', p_target_id => p_group_id);
+  return jsonb_build_object('ok', true);
+end;
+$$;
+
+create or replace function public.rpc_trip_group_remove(p_group_id uuid, p_user_id uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_name text;
+  v_part uuid;
+begin
+  perform authz.trip_group_me(p_group_id);
+  if not authz.trip_group_is_admin(p_group_id) then
+    raise exception 'Only the organiser can remove someone.' using errcode = '42501';
+  end if;
+  if p_user_id = (select auth.uid()) then
+    raise exception 'You can''t remove yourself. Close the group instead.' using errcode = '22023';
+  end if;
+  update public.trip_group_member set status = 'removed'
+   where group_id = p_group_id and user_id = p_user_id and status = 'active'
+  returning display_name, participant_id into v_name, v_part;
+  if v_part is null then
+    raise exception 'That person isn''t in the group.' using errcode = '22023';
+  end if;
+  update public.msg_participant set left_at = now() where id = v_part;
+  perform authz.trip_group_say_about(p_group_id, v_part, v_name || ' was removed');
+  perform audit.log('guest'::public.actor_type, 'messaging', 'trip_group.removed',
+    p_actor_id => (select auth.uid()), p_target_type => 'conversation', p_target_id => p_group_id,
+    p_after => jsonb_build_object('user_id', p_user_id));
+  return jsonb_build_object('ok', true);
 end;
 $$;
 
@@ -683,7 +827,7 @@ begin
       raise exception 'That person is no longer in the group.' using errcode = '22023';
     end if;
     update public.msg_participant set left_at = coalesce(left_at, now()) where id = v_part;
-    perform authz.trip_group_say(v_report.conversation_id, 'NexG removed ' || v_name);
+    perform authz.trip_group_say_about(v_report.conversation_id, v_part, 'NexG removed ' || v_name);
     v_member_removed := true;
 
     /* A group has one organiser and nobody to take over, so removing them closes it. */
@@ -713,6 +857,162 @@ begin
     'message_removed', v_message_removed, 'member_removed', v_member_removed, 'group_closed', v_group_closed,
     'message', case when p_outcome = 'dismissed' then 'Report dismissed.' else 'Report resolved.' end);
 end;
+$$;
+
+-- ═══════════════════════════════════════════════════ the host support functions stay out of groups
+
+/* As 20270314000700, refusing trip groups too: they are written and read through rpc_trip_group_* only, which hold
+   the closed, length and block rules. create or replace keeps the existing grants. */
+create or replace function public.rpc_host_message_reply(
+  p_conversation uuid,
+  p_body text,
+  p_idempotency_key text default null
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_uid uuid := (select auth.uid());
+  v_participant public.msg_participant;
+  v_existing public.msg_message;
+  v_id uuid;
+  v_seq bigint;
+begin
+  if coalesce(trim(p_body), '') = '' then
+    raise exception 'An empty message helps nobody.' using errcode = '22023';
+  end if;
+
+  select p.* into v_participant
+    from public.msg_participant p
+    join public.msg_conversation c on c.id = p.conversation_id
+   where p.conversation_id = p_conversation
+     and c.stay_id is null
+     and c.kind <> 'group'
+     and p.left_at is null
+     and p.user_id is not null
+     and p.user_id = v_uid
+   limit 1;
+
+  if not found then
+    raise exception 'You are not in this conversation.' using errcode = '42501';
+  end if;
+
+  /* A repeat of the same key is the same message. Somebody on
+     a bad connection pressing send twice must not send twice. */
+  if p_idempotency_key is not null then
+    select * into v_existing from public.msg_message
+     where conversation_id = p_conversation and idempotency_key = p_idempotency_key;
+    if found then
+      return jsonb_build_object('ok', true, 'message_id', v_existing.id,
+        'seq', v_existing.seq, 'repeat', true);
+    end if;
+  end if;
+
+  insert into public.msg_message (
+    conversation_id, kind, author_participant_id, body, visibility,
+    channel_out, delivery, idempotency_key)
+  values (
+    p_conversation, 'text', v_participant.id, trim(p_body), 'external',
+    'host_view', 'stored', p_idempotency_key)
+  returning id, seq into v_id, v_seq;
+
+  /* Reopen it: a host replying to something marked resolved is telling us it was not. */
+  update public.msg_conversation
+     set last_message_at = now(),
+         last_external_message_at = now(),
+         status = case when status in ('resolved', 'closed') then 'open' else status end,
+         resolved_at = case when status in ('resolved', 'closed') then null else resolved_at end,
+         first_response_due_at = case
+           when status in ('resolved', 'closed') then now() + interval '2 hours'
+           else first_response_due_at end
+   where id = p_conversation;
+
+  /* Their own message is not unread to them. */
+  update public.msg_participant
+     set last_read_seq = greatest(last_read_seq, v_seq)
+   where id = v_participant.id;
+
+  return jsonb_build_object('ok', true, 'message_id', v_id, 'seq', v_seq);
+end;
+$$;
+
+/** Mark a host support thread read. Stay chats use rpc_stay_chat_*_read, trip groups rpc_trip_group_read. */
+create or replace function public.rpc_host_message_read(p_conversation uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_uid uuid := (select auth.uid());
+  v_max bigint;
+begin
+  if exists (
+    select 1 from public.msg_conversation c
+     where c.id = p_conversation and (c.stay_id is not null or c.kind = 'group')) then
+    raise exception 'You are not in this conversation.' using errcode = '42501';
+  end if;
+
+  select max(seq) into v_max from public.msg_message
+   where conversation_id = p_conversation and visibility = 'external';
+
+  update public.msg_participant
+     set last_read_seq = greatest(last_read_seq, coalesce(v_max, 0))
+   where conversation_id = p_conversation
+     and user_id is not null and user_id = v_uid;
+
+  if not found then
+    raise exception 'You are not in this conversation.' using errcode = '42501';
+  end if;
+
+  return jsonb_build_object('ok', true, 'read_to', coalesce(v_max, 0));
+end;
+$$;
+
+-- ═══════════════════════════════════════════════════ stay chat lines stay readable
+
+/* As 20270314001000, showing a system line whose name account deletion took out. */
+create or replace function authz.stay_chat_page(p_conversation uuid, p_before bigint, p_limit integer)
+returns jsonb
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  with page as (
+    select m.id, m.seq, m.kind, m.body, m.redacted_at, m.created_at, a.kind as author_kind, a.user_id, a.display_name
+      from public.msg_message m
+      left join public.msg_participant a on a.id = m.author_participant_id
+     where m.conversation_id = p_conversation
+       and m.visibility = 'external'
+       and m.kind in ('text', 'system')
+       and (p_before is null or m.seq < p_before)
+     order by m.seq desc
+     limit greatest(1, least(coalesce(p_limit, 30), 100)) + 1
+  ), kept as (
+    select * from page order by seq desc limit greatest(1, least(coalesce(p_limit, 30), 100))
+  )
+  select jsonb_build_object(
+    'messages', coalesce((
+      select jsonb_agg(jsonb_build_object(
+          'id', k.id,
+          'seq', k.seq,
+          'body', case when k.redacted_at is null or k.kind = 'system' then k.body end,
+          'redacted', k.redacted_at is not null and k.kind <> 'system',
+          'at', k.created_at,
+          'side', case
+            when k.kind = 'system' then 'system'
+            when k.author_kind = 'guest' then 'guest'
+            when k.author_kind = 'staff' then 'nexg'
+            else 'host' end,
+          'mine', k.kind = 'text' and coalesce(k.user_id = (select auth.uid()), false),
+          'author', case when k.author_kind = 'staff' then 'NexG' else k.display_name end)
+        order by k.seq)
+        from kept k), '[]'::jsonb),
+    'earlier_before', case
+      when (select count(*) from page) > (select count(*) from kept) then (select min(seq) from kept) end)
 $$;
 
 -- ═══════════════════════════════════════════════════ account deletion
@@ -856,6 +1156,29 @@ begin
     v_closed := v_closed + 1;
   end loop;
 
+  /* Lines naming them (joined, left, removed, asked NexG to help). A stored body only changes as a redaction. Their
+     own `guest` rows only: a host member's line carries the host's name. */
+  update public.msg_message m
+     set body = case
+           when m.body like '% joined' then 'Former member joined'
+           when m.body like '% left' then 'Former member left'
+           when m.body like '% was removed' then 'Former member was removed'
+           when m.body like '% asked NexG to help.' then 'Former member asked NexG to help.'
+           else 'NexG removed Former member' end,
+         redacted_at = coalesce(m.redacted_at, now()),
+         redaction_reason = coalesce(m.redaction_reason, 'Account deleted')
+    from public.msg_participant p
+    join public.msg_conversation c on c.id = p.conversation_id
+   where m.author_participant_id = p.id and m.kind = 'system'
+     and p.user_id = p_user and p.kind = 'guest' and (c.kind = 'group' or c.stay_id is not null)
+     and m.body like any (array['% joined', '% left', '% was removed', '% asked NexG to help.', 'NexG removed %']);
+
+  /* Their stays are over (an upcoming one blocks deletion). The stay chat's header and the host read this name. */
+  update public.stay set guest_first_name = 'Former member' where guest_user_id = p_user;
+
+  /* Blocks of them stay, so their messages stay hidden, without their name. */
+  update public.user_block set blocked_name = 'Former member' where blocked_user_id = p_user;
+
   /* Group and stay chat messages stay; the name on them does not. */
   update public.msg_participant p
      set display_name = 'Former member', left_at = coalesce(p.left_at, now())
@@ -934,8 +1257,8 @@ begin
                                   'trip_groups_closed', v_groups),
     p_severity => 'high'::public.audit_severity);
 
-  /* Last: the sign-in itself. Saved items, preferences, notifications, blocks, group membership and push
-     subscriptions cascade; bookings, disputes, reviews, tickets, groups and reports keep their history with the
+  /* Last: the sign-in itself. Saved items, preferences, notifications, their own block list, group membership and
+     push subscriptions cascade; bookings, disputes, reviews, tickets, groups and reports keep their history with the
      link set to null. */
   delete from auth.users where id = v_me;
 
@@ -944,6 +1267,29 @@ end;
 $$;
 revoke execute on function public.rpc_my_account_deletion_request() from public, anon;
 grant execute on function public.rpc_my_account_deletion_request() to authenticated;
+
+-- ═══════════════════════════════════════════════════ a DPA record outlives its signer's account
+
+/* As 20270327000100, allowing accepted_by to empty. */
+create or replace function public.tg_merchant_dpa_acceptance_immutable()
+returns trigger language plpgsql set search_path = '' as $$
+begin
+  /* accepted_by empties when that sign-in is deleted (its foreign key). account_email stays on the record. */
+  if old.accepted_by is not null and new.accepted_by is null
+     and (to_jsonb(new) - 'accepted_by') = (to_jsonb(old) - 'accepted_by') then
+    return new;
+  end if;
+  if old.storage_path is null and new.storage_path is not null
+     and (to_jsonb(new) - array['storage_path', 'sha256', 'bytes', 'pages', 'render_version',
+                                'signer_id', 'signed_by', 'copy_stored_at'])
+       = (to_jsonb(old) - array['storage_path', 'sha256', 'bytes', 'pages', 'render_version',
+                                'signer_id', 'signed_by', 'copy_stored_at']) then
+    return new;
+  end if;
+  raise exception 'A DPA acceptance is never changed; its signed copy is attached once.'
+    using errcode = '42501';
+end;
+$$;
 
 -- ═══════════════════════════════════════════════════ who may call what
 

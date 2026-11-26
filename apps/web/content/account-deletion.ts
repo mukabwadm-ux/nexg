@@ -1,7 +1,7 @@
 /*
  * What happens when a customer deletes their NexG account, shown on
  * /account/delete. Word for word the lists the database gives the app
- * (rpc_my_account_deletion, last defined in 20270327000200_chat_report_block_and_deletion);
+ * (rpc_my_account_deletion, last defined in 20270328000200_chat_report_block_and_deletion);
  * account-deletion.test.ts keeps the two the same.
  */
 
