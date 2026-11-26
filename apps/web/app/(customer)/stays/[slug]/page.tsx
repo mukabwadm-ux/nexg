@@ -12,7 +12,9 @@ import {
   RateLabel,
   unitHref,
 } from '@/components/stays/listing';
+import { TrackEvent } from '@/components/analytics/google-analytics';
 import { SiteFooter } from '@/components/site-footer';
+import { stayViewItem } from '@/lib/analytics/stay-events';
 import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Price } from '@/components/currency/price';
@@ -121,6 +123,11 @@ export default async function PropertyPage({ params }: { params: { slug: string 
       />
 
       <main id="main" className="mx-auto max-w-[120rem] px-4 pb-16 pt-6 sm:px-[30px]">
+        {!sample && (
+          <TrackEvent
+            event={stayViewItem({ slug: p.slug, name: p.name, fromRateKes: p.from_rate_kes })}
+          />
+        )}
         <Link
           href="/stays"
           className="text-muted hover:text-ink inline-flex items-center gap-1.5 text-[0.75rem] font-bold"

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 
 import { useLocation } from '@nexg/location';
 
+import { useConsentState } from '@/lib/consent/client';
 import type { Locale } from '@/lib/i18n/dictionaries';
 
 const WelcomeConsent = dynamic(
@@ -21,7 +22,10 @@ export function WelcomeGate({ locale, canTranslate }: { locale: Locale; canTrans
   const pathname = usePathname();
   const { ready, sheetOpen, asked, place } = useLocation();
   const [showConsent, setShowConsent] = React.useState(false);
-  const settled = ready && !sheetOpen && (asked || place !== null);
+  /* The cookie banner comes first; the two cards never stack. */
+  const cookies = useConsentState();
+  const cookiesAnswered = cookies.ready && cookies.consent !== null && !cookies.reopened;
+  const settled = ready && !sheetOpen && (asked || place !== null) && cookiesAnswered;
 
   React.useEffect(() => {
     setShowConsent(!hasAnswered());
