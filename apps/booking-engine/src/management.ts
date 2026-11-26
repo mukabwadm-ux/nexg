@@ -226,6 +226,13 @@ export async function manageOffering(
       Object.assign(data.nexg, normalizePublicDetails(doc.nexg.model, data.nexg));
       for (const field of ['ticketTypes', 'rentalTerms', 'quoteRange'])
         if (input[field] === null) delete data.nexg[field];
+      // A quote is reserved against its range, so a quote offering keeps one (owner, 25 Nov 2026).
+      if (doc.nexg.model === 'REQUEST_QUOTE' && !data.nexg.quoteRange)
+        throw new BookingError(
+          422,
+          'Set the lowest and highest expected price. Customers reserve with half of the highest.',
+          'quote_range_required',
+        );
       integer(data.nexg.priceMinor, 'Price');
       if (
         !['per_booking', 'per_quantity', 'per_duration', 'per_night', 'indicative'].includes(
