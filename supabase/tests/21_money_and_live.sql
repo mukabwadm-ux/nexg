@@ -340,15 +340,22 @@ select is(
   'And a signed-in person can only read them.');
 
 /*
- * The webhook still works with no session, because it goes
- * through a security-definer function rather than a table grant.
- * That is the whole reason the grants could be taken away.
+ * The webhook trusts the signature verdict it is handed, so only the
+ * server that checked the signature may call it. With the public anon
+ * key anyone could otherwise claim a verified payment for their own
+ * reference (20261111001700).
  */
 select ok(
-  has_function_privilege('anon',
+  not has_function_privilege('anon',
+    'public.rpc_payment_webhook(text,text,text,boolean,jsonb,boolean,text,bigint,text)',
+    'EXECUTE')
+  and not has_function_privilege('authenticated',
+    'public.rpc_payment_webhook(text,text,text,boolean,jsonb,boolean,text,bigint,text)',
+    'EXECUTE')
+  and has_function_privilege('service_role',
     'public.rpc_payment_webhook(text,text,text,boolean,jsonb,boolean,text,bigint,text)',
     'EXECUTE'),
-  'The webhook can still be called by an unauthenticated provider.');
+  'Only the server can settle a payment: anon and signed-in callers cannot call the webhook.');
 
 select is(
   (select count(*)::int from pg_proc p

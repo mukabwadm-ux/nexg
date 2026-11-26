@@ -657,7 +657,7 @@ export const METRIC_DEFINITIONS: MetricDefinition[] = [
     ['work'],
     'RPT_REQUEST_QUOTES',
     'Total quoted amount for accepted requests in the selected cohort.',
-    'currency',
+    'money',
   ),
   def(
     'linked_windows_on_time',

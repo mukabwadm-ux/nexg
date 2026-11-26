@@ -12,7 +12,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(36);
+select plan(37);
 
 create temp table t (k text primary key, v text);
 do $grant$
@@ -187,9 +187,19 @@ select is(
   (select sum(credit) from ledger.entry e
      join ledger.transaction tx on tx.id = e.transaction_id
     where tx.order_id = 'bb000000-0000-4000-8000-000000000001'
-      and e.account_code like 'revenue.%')::bigint,
+      and (e.account_code like 'revenue.%' or e.account_code = 'tax.vat_output'))::bigint,
   48000::bigint,
-  'And ours is 180 commission + 250 delivery + 50 service = 480.');
+  'And ours is 180 commission + 250 delivery + 50 service = 480, VAT included.');
+
+/* Fees and commission are stored VAT-inclusive (20260101022300), so 16/116
+   of each is VAT: 24.83 + 34.48 + 6.90 = 66.21, leaving 413.79 as revenue. */
+select is(
+  (select sum(credit) from ledger.entry e
+     join ledger.transaction tx on tx.id = e.transaction_id
+    where tx.order_id = 'bb000000-0000-4000-8000-000000000001'
+      and e.account_code = 'tax.vat_output')::bigint,
+  6621::bigint,
+  'Of that, 66.21 is VAT owed to KRA rather than NexG revenue.');
 
 select is(
   (select merchant_net_cents from public.order_money_v

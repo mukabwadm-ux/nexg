@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { callbackSecretValid } from '@/lib/daraja';
-import { createPublicClient } from '@/lib/supabase/public';
+import { createServiceClient } from '@/lib/supabase/service';
 
 interface Item {
   Name: string;
@@ -43,7 +43,14 @@ export async function POST(request: Request) {
   const receipt = pick('MpesaReceiptNumber');
   const phone = pick('PhoneNumber');
 
-  const client = createPublicClient();
+  /* Service client: the RPC trusts p_secret_ok, so the database only lets
+     the server call it. See lib/supabase/service.ts. */
+  let client;
+  try {
+    client = createServiceClient();
+  } catch {
+    return NextResponse.json({ ResultCode: 1, ResultDesc: 'Retry' }, { status: 503 });
+  }
   const { error } = (await client.rpc(
     'rpc_payment_mpesa_callback' as never,
     {

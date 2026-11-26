@@ -115,8 +115,14 @@ select is(
 
 select is(
   (select sum(gross_cents) from public.fin_kpi_daily where city_id is not null),
-  (select sum(merchant_cost_cents + revenue_cents) from public.fin_kpi_daily where city_id is not null),
-  'Gross is exactly the merchant share plus ours — the tile cannot drift from its parts.');
+  (select sum(merchant_cost_cents + revenue_cents) from public.fin_kpi_daily where city_id is not null)
+    + (select coalesce(sum(e.credit - e.debit), 0) from ledger.entry e
+         join ledger.account a on a.code = e.account_code
+         join ledger.transaction tx on tx.id = e.transaction_id
+        where a.base = 'tax.vat_output' and tx.city_id is not null
+          and (e.effective_at at time zone 'Africa/Nairobi')::date in
+              (select day from public.fin_kpi_daily where city_id is not null)),
+  'Gross is exactly the merchant share plus ours plus the VAT on ours — the tile cannot drift from its parts.');
 
 select is(
   (select coalesce(sum(amount_cents), 0) from public.fin_revenue_line),

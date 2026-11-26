@@ -14,24 +14,23 @@ import { isBookingPage } from '@/lib/booking/routes';
  * asking twice — and the first thing a new visitor saw would be a
  * question instead of the site.
  */
+function hideLocationChrome(pathname: string) {
+  return isBookingPage(pathname) ||
+    pathname === '/sign-in' ||
+    pathname === '/host' ||
+    pathname.startsWith('/host/') ||
+    pathname === '/merchant-live-preview' ||
+    pathname.startsWith('/merchant-live-preview/');
+}
+
 export function LocationBannerSlot() {
   const pathname = usePathname();
-  if (
-    isBookingPage(pathname) ||
-    pathname === '/merchant-live-preview' ||
-    pathname.startsWith('/merchant-live-preview/')
-  )
-    return null;
+  if (hideLocationChrome(pathname)) return null;
   return <LocationBanner hidden={pathname === '/' || pathname === '/merchant-live-preview'} />;
 }
 
 export function LocationSheetSlot() {
   const pathname = usePathname();
-  if (
-    isBookingPage(pathname) ||
-    pathname === '/merchant-live-preview' ||
-    pathname.startsWith('/merchant-live-preview/')
-  )
-    return null;
+  if (hideLocationChrome(pathname)) return null;
   return <LocationSheet autoOpen={pathname !== '/' && pathname !== '/merchant-live-preview'} />;
 }

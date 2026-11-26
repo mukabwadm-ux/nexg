@@ -87,9 +87,10 @@ select is(
 
 select is(
   (settings.fn_get('fees.commission', 'city_category',
-     (select v::uuid from t where k = 'city'), null, 'food_drinks') ->> 'is_set')::boolean,
-  false,
-  'A commission nobody has set reports is_set false — the console shows [—] and the order service refuses.');
+     (select v::uuid from t where k = 'city'), null, 'food_drinks') ->> 'source'),
+  'global',
+  'A commission nobody set for this city and category falls back to the global standard '
+  '(20260101022300) and says so, rather than looking like a local decision.');
 
 -- ═══════════════════════════════════════════ inheritance
 
@@ -178,7 +179,7 @@ select ok(
 
 select is(
   settings.fn_num('fees.commission', (select v::uuid from t where k = 'city'), 'food_drinks'),
-  null,
+  14::numeric,  -- still the global standard; the staged 18 is not live
   'Nothing has changed yet. Approval has not happened.');
 
 -- ═══════════════════════════ the second person is a person
@@ -198,7 +199,7 @@ select is(
 
 select is(
   settings.fn_num('fees.commission', (select v::uuid from t where k = 'city'), 'food_drinks'),
-  null,
+  14::numeric,
   'Approved is still not live: it waits for the effective time.');
 
 -- ══════════════════════════════════════════ activation

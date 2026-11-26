@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { localHostWorkspaceEnabled, localHostBookmark } from '@/lib/host-workspace/routes';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
 /**
@@ -53,13 +54,23 @@ export const config = {
    * the number they are previewing. The guard for that is the first
    * thing in the function.
    */
-  matcher: ['/', '/q/:code*', '/merchant/:path*', '/merchants/register/:path*', '/merchants/verify-email/:path*', '/merchants/decision/:path*', '/api/merchant/:path*',
+  matcher: ['/', '/host/:path*', '/q/:code*', '/merchant/:path*', '/merchants/register/:path*', '/merchants/verify-email/:path*', '/merchants/decision/:path*', '/api/merchant/:path*',
     '/sign-in/:path*', '/auth/:path*', '/merchants/sign-in/:path*', '/riders/sign-in/:path*',
     '/forgot-password/:path*', '/reset-password/:path*'],
 };
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  if (pathname === '/host' || pathname.startsWith('/host/')) {
+    const location = (request.method === 'GET' || request.method === 'HEAD') && localHostWorkspaceEnabled()
+      ? localHostBookmark(pathname, request.nextUrl.searchParams)
+      : null;
+    if (!location) return NextResponse.next();
+    // The route handler issues a relative redirect so Next preserves the loopback origin.
+    const bookmark = new URL(location, request.url);
+    bookmark.searchParams.set('bookmark', '1');
+    return NextResponse.rewrite(bookmark);
+  }
   if (pathname === '/merchant' || pathname.startsWith('/merchant/') ||
       pathname === '/merchants/register' || pathname.startsWith('/merchants/register/') ||
       pathname === '/merchants/verify-email' || pathname.startsWith('/merchants/verify-email/') ||

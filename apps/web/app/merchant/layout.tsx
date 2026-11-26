@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
 import { merchantContext } from '@/components/merchant/frame';
-import { MerchantShell, StateControl } from '@/components/merchant/shell';
+import { StateControl } from '@/components/merchant/shell';
 import { MerchantAuthBoundary } from '@/components/merchant/auth-boundary';
 import {
   MerchantWorkspaceShell,
@@ -76,86 +76,68 @@ export interface MerchantHome {
  * reads it and one declaration beats fifteen.
  */
 export default async function MerchantLayout({ children }: { children: React.ReactNode }) {
-  const { m, live, nav, me } = await merchantContext({ setup: true });
+  const { m, live, me } = await merchantContext({ setup: true });
 
   /* `merchantContext` has already established who is asking. A
      session with no merchant row has nothing to frame. */
   if (!m) redirect('/merchants/apply');
 
-  if (me.access.state !== 'legacy') {
-    const destinations: MerchantWorkspaceNavItem[] = [
-      { label: 'Home', href: '/merchant' },
-      { label: 'Work', href: '/merchant/orders' },
-      { label: 'Offerings', href: '/merchant/menu' },
-      { label: 'Availability', href: '/merchant/hours' },
-      { label: 'Business', href: '/merchant/stores' },
-      { label: 'Money', href: '/merchant/money' },
-      { label: 'Promotions', href: '/merchant/promotions' },
-      { label: 'Insights', href: '/merchant/insights' },
-      { label: 'Settings', href: '/merchant/settings' },
-    ];
-    const approvalLabel = me.access.needs_resubmission
-      ? 'Resubmit your changes'
-      : me.access.state === 'approved'
-        ? 'Workspace approved'
-        : me.access.state === 'changes_requested'
-          ? 'Changes requested'
-          : 'Waiting for admin approval';
-    return (
-      <MerchantAuthBoundary merchantId={me.id} actorId={me.userId} access={me.access} isAnonymous={me.isAnonymous}>
-        <MerchantWorkspaceShell
-          businessName={m.name}
-          approvalLabel={approvalLabel}
-          setupDestinations={
-            me.access.setup
-              ? ['/merchant/menu', '/merchant/stores', '/merchant/hours', '/merchant/documents']
-              : []
-          }
-          nav={destinations.map((item) => ({
-            ...item,
-            locked: item.label !== 'Home' && !me.access.operations,
-          }))}
-          headerEnd={me.isAnonymous ? (
-            <Link href={process.env.MERCHANT_EMAIL_OTP_ENABLED === 'true' ? '/merchants/verify-email' : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'} className="bg-gold text-ink rounded-lg px-3 py-2 text-sm font-bold">
-              {process.env.MERCHANT_EMAIL_OTP_ENABLED === 'true' ? 'Verify email' : 'Create account'}
-            </Link>
-          ) : (
-            <span className="bg-ink inline-flex rounded-lg px-1 py-0.5"><SignOut /></span>
-          )}
-        >
-          {children}
-        </MerchantWorkspaceShell>
-      </MerchantAuthBoundary>
-    );
-  }
-
+  const destinations: MerchantWorkspaceNavItem[] = [
+    { label: 'Home', href: '/merchant' },
+    { label: 'Work', href: '/merchant/orders' },
+    { label: 'Offerings', href: '/merchant/menu' },
+    { label: 'Availability', href: '/merchant/hours' },
+    { label: 'Business', href: '/merchant/stores' },
+    { label: 'Money', href: '/merchant/money' },
+    { label: 'Promotions', href: '/merchant/featured' },
+    { label: 'Insights', href: '/merchant/insights' },
+    { label: 'Settings', href: '/merchant/settings' },
+  ];
+  const approvalLabel = me.access.state === 'legacy'
+    ? (live ? 'Live' : 'Setting up')
+    : me.access.needs_resubmission
+    ? 'Resubmit your changes'
+    : me.access.state === 'approved'
+      ? 'Workspace approved'
+      : me.access.state === 'changes_requested'
+        ? 'Changes requested'
+        : 'Waiting for admin approval';
   return (
     <MerchantAuthBoundary merchantId={me.id} actorId={me.userId} access={me.access} isAnonymous={me.isAnonymous}>
-      <MerchantShell
+      <MerchantWorkspaceShell
         businessName={m.name}
-        personName={firstName(m.contact_name, m.name)}
-        role="Owner"
-        live={live}
-        branchName={null}
-        unreadCount={m.unread_messages ?? 0}
-        nav={nav}
-        operationsAllowed={me.access.operations}
-        stateControl={
-          <StateControl
-            live={live}
-            accepting={m.accepting_orders ?? false}
-            busyUntil={m.busy_mode_until}
-          />
+        approvalLabel={approvalLabel}
+        relatedLinks={me.access.operations ? [
+          { label: 'Bookings', href: '/merchant/bookings' },
+          { label: 'Calendar', href: '/merchant/calendar' },
+          { label: 'Messages', href: '/merchant/messages' },
+          { label: 'Transactions', href: '/merchant/transactions' },
+          { label: 'Disputes', href: '/merchant/disputes' },
+          { label: 'Documents', href: '/merchant/documents' },
+          { label: 'Team', href: '/merchant/team' },
+        ] : []}
+        setupDestinations={
+          me.access.setup
+            ? ['/merchant/menu', '/merchant/stores', '/merchant/hours', '/merchant/documents']
+            : []
         }
+        nav={destinations.map((item) => ({
+          ...item,
+          locked: item.label !== 'Home' && !me.access.operations,
+        }))}
+        headerEnd={me.isAnonymous ? (
+          <Link href={process.env.MERCHANT_EMAIL_OTP_ENABLED === 'true' ? '/merchants/verify-email' : '/sign-in?tab=create&role=merchant&next=%2Fmerchant'} className="bg-gold text-ink rounded-lg px-3 py-2 text-sm font-bold">
+            {process.env.MERCHANT_EMAIL_OTP_ENABLED === 'true' ? 'Verify email' : 'Create account'}
+          </Link>
+        ) : (
+          <span className="bg-ink inline-flex items-center gap-2 rounded-lg px-1 py-0.5">
+            {me.access.state === 'legacy' && live && <StateControl live={live} accepting={m.accepting_orders} busyUntil={m.busy_mode_until} />}
+            <SignOut />
+          </span>
+        )}
       >
         {children}
-      </MerchantShell>
+      </MerchantWorkspaceShell>
     </MerchantAuthBoundary>
   );
-}
-
-/** "Amina Kamau" greets as Amina; a business name never does. */
-function firstName(contact: string | null, fallback: string): string {
-  const first = (contact ?? '').trim().split(/\s+/)[0];
-  return first && first.length > 1 ? first : fallback;
 }

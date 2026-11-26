@@ -25,6 +25,7 @@ export interface MerchantWorkspaceShellProps {
   /** Exact setup editor routes authorized by the authenticated server layout. */
   setupDestinations?: readonly string[];
   approvalLabel: string;
+  relatedLinks?: readonly { label: string; href: string }[];
   /** The authenticated layout supplies account/sign-out controls. */
   headerEnd?: ReactNode;
   children: ReactNode;
@@ -40,6 +41,7 @@ export function MerchantWorkspaceShell({
   accountInitials = 'ME',
   nav,
   setupDestinations = [],
+  relatedLinks = [],
   approvalLabel,
   headerEnd,
   children,
@@ -59,7 +61,7 @@ export function MerchantWorkspaceShell({
     (destination) => safeMerchantWorkspaceHref(destination) === pathname,
   );
   const lockedItem = selectedLock ?? (currentItem?.locked && !setupRoute ? currentItem : undefined);
-  const activeLabel = lockedItem?.label ?? currentItem?.label ?? 'Home';
+  const activeLabel = lockedItem?.label ?? currentItem?.label ?? relatedLinks.find((item) => isOn(pathname, item.href))?.label ?? 'Home';
   const navigation = (
     <nav aria-label="Merchant workspace navigation" className={styles.nav}>
       {nav.map((item) => {
@@ -101,6 +103,17 @@ export function MerchantWorkspaceShell({
             {content}
           </span>
         );
+      })}
+      {relatedLinks.map((item) => {
+        const href = safeMerchantWorkspaceHref(item.href);
+        return href ? (
+          <Link key={href} href={href} prefetch={false} className={styles.navLink}
+            aria-current={isOn(pathname, href) ? 'page' : undefined}
+            onClick={() => setLockSelection(null)}>
+            <ChevronRight size={16} aria-hidden="true" />
+            <span className={styles.navLabel}>{item.label}</span>
+          </Link>
+        ) : null;
       })}
     </nav>
   );

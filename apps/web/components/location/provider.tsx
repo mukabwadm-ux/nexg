@@ -110,6 +110,9 @@ export function SiteLocationProvider({
       initial={initial}
       maps={MAPS}
       passive={
+        pathname === '/sign-in' ||
+        pathname === '/host' ||
+        pathname.startsWith('/host/') ||
         isBookingPage(pathname) ||
         pathname === '/merchant-live-preview' ||
         pathname.startsWith('/merchant-live-preview/')

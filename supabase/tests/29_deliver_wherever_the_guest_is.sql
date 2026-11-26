@@ -108,9 +108,9 @@ select is(
 
 select is(
   (public.fn_price_order((select id from public.city where slug = 'nairobi'),
-     'restaurant', 100000, 4::smallint) -> 'missing') ? 'fees.delivery.band_4',
-  true,
-  'Band 4 prices from its own fee, and an unset one stops the order rather than charging nothing.');
+     'restaurant', 100000, 4::smallint) ->> 'delivery_fee_cents')::bigint,
+  43000::bigint,
+  'Band 4 prices from its own fee (KES 430, set in 20260101022200), not band 1''s.');
 
 select * from finish();
 rollback;

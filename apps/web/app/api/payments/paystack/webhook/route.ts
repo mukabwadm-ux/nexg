@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { dedupeKey, paystackConfigured, signatureValid } from '@/lib/paystack';
-import { createPublicClient } from '@/lib/supabase/public';
+import { createServiceClient } from '@/lib/supabase/service';
 
 /**
  * Paystack tells us what happened.
@@ -62,13 +62,19 @@ export async function POST(request: Request) {
   }
 
   /*
-   * The anon client, deliberately. The service-role key bypasses
-   * row security and has no business in a request handler — and
-   * the RPC this calls is narrow enough not to need it: it can
-   * only move a payment we created, named by a reference we
-   * generated, and only out of pending.
+   * The service client, and only here. The RPC trusts p_signature_ok,
+   * so it must not be callable with the public anon key: anyone could
+   * call it directly, name their own payment's reference and claim a
+   * verified success. The database grants it to service_role only.
    */
-  const { data, error } = await createPublicClient().rpc('rpc_payment_webhook', {
+  let client;
+  try {
+    client = createServiceClient();
+  } catch {
+    /* Misconfigured server: let Paystack retry once it is fixed. */
+    return NextResponse.json({ ok: false, reason: 'not_configured' }, { status: 503 });
+  }
+  const { data, error } = await client.rpc('rpc_payment_webhook', {
     p_event: event,
     p_reference: reference,
     /* The RPC's arguments all default to null; passing undefined

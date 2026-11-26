@@ -70,29 +70,6 @@ const PORTALS: Portal[] = [
       '/rider/support',
     ],
   },
-  {
-    name: 'host',
-    email: process.env.E2E_HOST_EMAIL ?? 'host.live@nexgapp.com',
-    boards: [
-      '/host',
-      '/host/bookings',
-      '/host/properties',
-      '/host/units',
-      '/host/qr',
-      '/host/requests',
-      '/host/packages',
-      '/host/deliveries',
-      '/host/operations',
-      '/host/analytics',
-      '/host/earnings',
-      '/host/messages',
-      '/host/refer',
-      '/host/team',
-      '/host/settings',
-      '/host/support',
-      '/host/privacy',
-    ],
-  },
 ];
 
 for (const portal of PORTALS) {
@@ -128,9 +105,7 @@ for (const portal of PORTALS) {
           `${path} rendered without navigation — this is the bare-page bug.`,
         ).toBeAttached();
 
-        /* A way out. The merchant and rider portals put it
-           behind an account menu; the host hero shows it
-           directly. Either is fine; neither is not. */
+        /* Sign-out can appear directly or in the account menu. */
         const accountMenu = page.locator('button[aria-haspopup="menu"]');
         const directSignOut = page.getByRole('button', { name: /sign out/i });
         const ways = (await accountMenu.count()) + (await directSignOut.count());
