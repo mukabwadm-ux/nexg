@@ -5,7 +5,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(20);
+select plan(22);
 
 insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, is_anonymous, created_at, updated_at)
 values ('00000000-0000-0000-0000-000000000000', 'c2480000-0000-4000-8000-000000000001',
@@ -104,6 +104,13 @@ select public.rpc_outbox_failed((select id from public.notification_outbox
 select is((select status from public.notification_outbox
   where recipient = 'host248@example.test' and template like 'comms.%' limit 1),
   'abandoned', 'with one attempt allowed, the first failure is final');
+
+-- ─────────────────────────────────────────── tidy-ups (20270333000100)
+
+select ok(not has_function_privilege('anon', 'public.fn_comms_render(text, jsonb)', 'execute'),
+  'the text helpers are closed to anon');
+select ok(exists (select 1 from pg_indexes where indexname = 'notification_outbox_email_sent_idx'),
+  'sent email is indexed for the email limits');
 
 select * from finish();
 rollback;
