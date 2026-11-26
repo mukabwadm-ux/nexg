@@ -8840,6 +8840,753 @@ export type Database = {
           },
         ];
       };
+      comms_campaign: {
+        Row: {
+          audiences: string[];
+          body: string | null;
+          channels: string[];
+          city_id: string | null;
+          completed_at: string | null;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          kind: string;
+          name: string;
+          people: number;
+          purpose: string;
+          queued: number;
+          ref: string;
+          schedule_id: string | null;
+          skipped_consent: number;
+          skipped_no_address: number;
+          skipped_suppressed: number;
+          status: string;
+          subject: string | null;
+          template_id: string | null;
+          workflow_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          audiences?: string[];
+          body?: string | null;
+          channels: string[];
+          city_id?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          kind: string;
+          name: string;
+          people?: number;
+          purpose: string;
+          queued?: number;
+          ref?: string;
+          schedule_id?: string | null;
+          skipped_consent?: number;
+          skipped_no_address?: number;
+          skipped_suppressed?: number;
+          status?: string;
+          subject?: string | null;
+          template_id?: string | null;
+          workflow_id?: string | null;
+        };
+        Update: {
+          audiences?: string[];
+          body?: string | null;
+          channels?: string[];
+          city_id?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          kind?: string;
+          name?: string;
+          people?: number;
+          purpose?: string;
+          queued?: number;
+          ref?: string;
+          schedule_id?: string | null;
+          skipped_consent?: number;
+          skipped_no_address?: number;
+          skipped_suppressed?: number;
+          status?: string;
+          subject?: string | null;
+          template_id?: string | null;
+          workflow_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'comms_campaign_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_bounds_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'waitlist_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_schedule_id_fkey';
+            columns: ['schedule_id'];
+            isOneToOne: false;
+            referencedRelation: 'comms_schedule';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_template_id_fkey';
+            columns: ['template_id'];
+            isOneToOne: false;
+            referencedRelation: 'comms_template';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_campaign_workflow_id_fkey';
+            columns: ['workflow_id'];
+            isOneToOne: false;
+            referencedRelation: 'comms_workflow';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      comms_consent: {
+        Row: {
+          at: string;
+          audience: string | null;
+          channel: string;
+          email: string | null;
+          evidence: string | null;
+          granted: boolean;
+          id: number;
+          ip_hash: string | null;
+          kind: string;
+          person_key: string | null;
+          phone: string | null;
+          source: string;
+          staff_id: string | null;
+          user_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          at?: string;
+          audience?: string | null;
+          channel?: string;
+          email?: string | null;
+          evidence?: string | null;
+          granted: boolean;
+          id?: never;
+          ip_hash?: string | null;
+          kind: string;
+          person_key?: string | null;
+          phone?: string | null;
+          source: string;
+          staff_id?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          at?: string;
+          audience?: string | null;
+          channel?: string;
+          email?: string | null;
+          evidence?: string | null;
+          granted?: boolean;
+          id?: never;
+          ip_hash?: string | null;
+          kind?: string;
+          person_key?: string | null;
+          phone?: string | null;
+          source?: string;
+          staff_id?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'comms_consent_staff_id_fkey';
+            columns: ['staff_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      comms_provider_status: {
+        Row: {
+          channel: string;
+          configured: boolean;
+          detail: NonNullable<Json>;
+          provider: string | null;
+          reported_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          channel: string;
+          configured: boolean;
+          detail?: NonNullable<Json>;
+          provider?: string | null;
+          reported_at?: string;
+        };
+        Update: {
+          channel?: string;
+          configured?: boolean;
+          detail?: NonNullable<Json>;
+          provider?: string | null;
+          reported_at?: string;
+        };
+        Relationships: [];
+      };
+      comms_schedule: {
+        Row: {
+          audiences: string[];
+          body: string | null;
+          channels: string[];
+          city_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          ends_on: string | null;
+          frequency: string | null;
+          id: string;
+          kind: string;
+          last_campaign_id: string | null;
+          last_run_at: string | null;
+          missed: number;
+          monthday: number | null;
+          name: string;
+          next_run_at: string | null;
+          runs: number;
+          starts_on: string | null;
+          status: string;
+          subject: string | null;
+          template_id: string | null;
+          time_of_day: string | null;
+          updated_at: string;
+          updated_by: string | null;
+          weekday: number | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          audiences: string[];
+          body?: string | null;
+          channels: string[];
+          city_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          ends_on?: string | null;
+          frequency?: string | null;
+          id?: string;
+          kind: string;
+          last_campaign_id?: string | null;
+          last_run_at?: string | null;
+          missed?: number;
+          monthday?: number | null;
+          name: string;
+          next_run_at?: string | null;
+          runs?: number;
+          starts_on?: string | null;
+          status?: string;
+          subject?: string | null;
+          template_id?: string | null;
+          time_of_day?: string | null;
+          updated_at?: string;
+          updated_by?: string | null;
+          weekday?: number | null;
+        };
+        Update: {
+          audiences?: string[];
+          body?: string | null;
+          channels?: string[];
+          city_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          ends_on?: string | null;
+          frequency?: string | null;
+          id?: string;
+          kind?: string;
+          last_campaign_id?: string | null;
+          last_run_at?: string | null;
+          missed?: number;
+          monthday?: number | null;
+          name?: string;
+          next_run_at?: string | null;
+          runs?: number;
+          starts_on?: string | null;
+          status?: string;
+          subject?: string | null;
+          template_id?: string | null;
+          time_of_day?: string | null;
+          updated_at?: string;
+          updated_by?: string | null;
+          weekday?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'comms_schedule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_schedule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_bounds_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_schedule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'city_public_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_schedule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_schedule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'fees_display_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_schedule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'payout_rules_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_schedule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_schedule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_dispatch_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_schedule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_pricing_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_schedule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'settings_settlement_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_schedule_city_id_fkey';
+            columns: ['city_id'];
+            isOneToOne: false;
+            referencedRelation: 'waitlist_city_v';
+            referencedColumns: ['city_id'];
+          },
+          {
+            foreignKeyName: 'comms_schedule_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_schedule_template_id_fkey';
+            columns: ['template_id'];
+            isOneToOne: false;
+            referencedRelation: 'comms_template';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_schedule_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      comms_setting: {
+        Row: {
+          key: string;
+          updated_at: string;
+          updated_by: string | null;
+          value: NonNullable<Json>;
+        };
+        ComputedFields: never;
+        Insert: {
+          key: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          value: NonNullable<Json>;
+        };
+        Update: {
+          key?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          value?: NonNullable<Json>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'comms_setting_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      comms_suppression: {
+        Row: {
+          address: string;
+          channel: string;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          note: string | null;
+          reason: string;
+          removed_at: string | null;
+          removed_by: string | null;
+          removed_reason: string | null;
+          source: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          address: string;
+          channel: string;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          note?: string | null;
+          reason: string;
+          removed_at?: string | null;
+          removed_by?: string | null;
+          removed_reason?: string | null;
+          source?: string;
+        };
+        Update: {
+          address?: string;
+          channel?: string;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          note?: string | null;
+          reason?: string;
+          removed_at?: string | null;
+          removed_by?: string | null;
+          removed_reason?: string | null;
+          source?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'comms_suppression_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_suppression_removed_by_fkey';
+            columns: ['removed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      comms_template: {
+        Row: {
+          audience: string;
+          category: string;
+          channels: string[];
+          created_at: string;
+          created_by: string | null;
+          email_body: string | null;
+          email_subject: string | null;
+          id: string;
+          name: string;
+          purpose: string;
+          push_body: string | null;
+          push_title: string | null;
+          sms_body: string | null;
+          status: string;
+          trigger_label: string | null;
+          updated_at: string;
+          updated_by: string | null;
+          whatsapp_body: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          audience?: string;
+          category?: string;
+          channels?: string[];
+          created_at?: string;
+          created_by?: string | null;
+          email_body?: string | null;
+          email_subject?: string | null;
+          id?: string;
+          name: string;
+          purpose?: string;
+          push_body?: string | null;
+          push_title?: string | null;
+          sms_body?: string | null;
+          status?: string;
+          trigger_label?: string | null;
+          updated_at?: string;
+          updated_by?: string | null;
+          whatsapp_body?: string | null;
+        };
+        Update: {
+          audience?: string;
+          category?: string;
+          channels?: string[];
+          created_at?: string;
+          created_by?: string | null;
+          email_body?: string | null;
+          email_subject?: string | null;
+          id?: string;
+          name?: string;
+          purpose?: string;
+          push_body?: string | null;
+          push_title?: string | null;
+          sms_body?: string | null;
+          status?: string;
+          trigger_label?: string | null;
+          updated_at?: string;
+          updated_by?: string | null;
+          whatsapp_body?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'comms_template_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_template_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      comms_unsubscribe: {
+        Row: {
+          campaign_id: string | null;
+          created_at: string;
+          email: string | null;
+          person_key: string | null;
+          phone: string | null;
+          token: string;
+          used_at: string | null;
+          user_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          campaign_id?: string | null;
+          created_at?: string;
+          email?: string | null;
+          person_key?: string | null;
+          phone?: string | null;
+          token: string;
+          used_at?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          campaign_id?: string | null;
+          created_at?: string;
+          email?: string | null;
+          person_key?: string | null;
+          phone?: string | null;
+          token?: string;
+          used_at?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'comms_unsubscribe_campaign_id_fkey';
+            columns: ['campaign_id'];
+            isOneToOne: false;
+            referencedRelation: 'comms_campaign';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      comms_workflow: {
+        Row: {
+          channels: string[];
+          condition: string;
+          created_at: string;
+          created_by: string | null;
+          delay_minutes: number;
+          enabled: boolean;
+          fired_count: number;
+          follow_up_after_minutes: number | null;
+          follow_up_template_id: string | null;
+          id: string;
+          last_fired_at: string | null;
+          name: string;
+          template_id: string;
+          trigger_kind: string;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          channels: string[];
+          condition?: string;
+          created_at?: string;
+          created_by?: string | null;
+          delay_minutes?: number;
+          enabled?: boolean;
+          fired_count?: number;
+          follow_up_after_minutes?: number | null;
+          follow_up_template_id?: string | null;
+          id?: string;
+          last_fired_at?: string | null;
+          name: string;
+          template_id: string;
+          trigger_kind: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          channels?: string[];
+          condition?: string;
+          created_at?: string;
+          created_by?: string | null;
+          delay_minutes?: number;
+          enabled?: boolean;
+          fired_count?: number;
+          follow_up_after_minutes?: number | null;
+          follow_up_template_id?: string | null;
+          id?: string;
+          last_fired_at?: string | null;
+          name?: string;
+          template_id?: string;
+          trigger_kind?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'comms_workflow_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_workflow_follow_up_template_id_fkey';
+            columns: ['follow_up_template_id'];
+            isOneToOne: false;
+            referencedRelation: 'comms_template';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_workflow_template_id_fkey';
+            columns: ['template_id'];
+            isOneToOne: false;
+            referencedRelation: 'comms_template';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'comms_workflow_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       company_asset: {
         Row: {
           assigned_at: string | null;
@@ -31361,8 +32108,9 @@ export type Database = {
           sent_at: string | null;
           status: string;
           template: string;
+          fn_comms_log_row: Json | null;
         };
-        ComputedFields: never;
+        ComputedFields: 'fn_comms_log_row';
         Insert: {
           channel: string;
           created_at?: string;
@@ -65079,6 +65827,7 @@ export type Database = {
       };
       cron_app_email_reminders: { Args: Record<PropertyKey, never>; Returns: number };
       cron_cinema_worker: { Args: Record<PropertyKey, never>; Returns: Json };
+      cron_comms_tick: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_expire_unpaid_mpesa_orders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_featured_activate: { Args: Record<PropertyKey, never>; Returns: number };
       cron_featured_eligibility: { Args: Record<PropertyKey, never>; Returns: number };
@@ -65293,6 +66042,89 @@ export type Database = {
         }[];
       };
       fn_cod_allowed: { Args: Record<PropertyKey, never>; Returns: boolean };
+      fn_comms_audience_of: { Args: { p_payload: Json; p_template: string }; Returns: string };
+      fn_comms_channels: { Args: Record<PropertyKey, never>; Returns: Json };
+      fn_comms_check_spec: { Args: { p: Json }; Returns: undefined };
+      fn_comms_consent: {
+        Args: {
+          p_channel: string;
+          p_email: string;
+          p_guest: string;
+          p_key: string;
+          p_kind: string;
+          p_phone: string;
+          p_user: string;
+        };
+        Returns: Json;
+      };
+      fn_comms_kpis: { Args: { p_channel: string; p_from: string; p_to: string }; Returns: Json };
+      fn_comms_log_row: {
+        Args: {
+          l: Omit<
+            Database['public']['Tables']['notification_log']['Row'],
+            Database['public']['Tables']['notification_log']['ComputedFields']
+          >;
+        };
+        Returns: Json;
+      };
+      fn_comms_mask: { Args: { p: string }; Returns: string };
+      fn_comms_next_run: {
+        Args: {
+          p: Omit<
+            Database['public']['Tables']['comms_schedule']['Row'],
+            Database['public']['Tables']['comms_schedule']['ComputedFields']
+          >;
+          p_after: string;
+        };
+        Returns: string;
+      };
+      fn_comms_norm: { Args: { p: string }; Returns: string };
+      fn_comms_people: {
+        Args: { p_audiences: string[]; p_city?: string };
+        Returns: {
+          audience: string;
+          city_id: string;
+          email: string;
+          guest_id: string;
+          name: string;
+          person_key: string;
+          phone: string;
+          user_id: string;
+        }[];
+      };
+      fn_comms_range: { Args: { p_from: string; p_to: string }; Returns: unknown };
+      fn_comms_reader_gate: { Args: Record<PropertyKey, never>; Returns: undefined };
+      fn_comms_render: { Args: { p_text: string; p_vars: Json }; Returns: string };
+      fn_comms_run: { Args: { p_campaign: string; p_spec: Json }; Returns: Json };
+      fn_comms_send_one: {
+        Args: {
+          p_body: string;
+          p_channel: string;
+          p_delay_minutes?: number;
+          p_payload: Json;
+          p_person: Json;
+          p_purpose: string;
+          p_subject: string;
+          p_template: string;
+        };
+        Returns: string;
+      };
+      fn_comms_setting: { Args: { p_key: string }; Returns: Json };
+      fn_comms_suppressed: { Args: { p_address: string; p_channel: string }; Returns: boolean };
+      fn_comms_trend: { Args: { p_channel: string; p_from: string; p_to: string }; Returns: Json };
+      fn_comms_words: {
+        Args: {
+          p_body: string;
+          p_channel: string;
+          p_subject: string;
+          p_template: Omit<
+            Database['public']['Tables']['comms_template']['Row'],
+            Database['public']['Tables']['comms_template']['ComputedFields']
+          >;
+        };
+        Returns: Json;
+      };
+      fn_comms_writer_gate: { Args: { p_full?: boolean }; Returns: string };
       fn_compact_reference: { Args: { p_reference: string }; Returns: string };
       fn_company_stock_add: {
         Args: {
@@ -67926,6 +68758,108 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      rpc_comms_analytics: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_comms_campaign_preview: { Args: { p: Json }; Returns: Json };
+      rpc_comms_campaign_send: { Args: { p: Json }; Returns: Json };
+      rpc_comms_campaigns: {
+        Args: { p_from: string; p_page?: number; p_per?: number; p_search?: string; p_to: string };
+        Returns: Json;
+      };
+      rpc_comms_channel: {
+        Args: { p_channel: string; p_from: string; p_to: string };
+        Returns: Json;
+      };
+      rpc_comms_consent: {
+        Args: {
+          p_from: string;
+          p_kind?: string;
+          p_page?: number;
+          p_per?: number;
+          p_search?: string;
+          p_to: string;
+        };
+        Returns: Json;
+      };
+      rpc_comms_consent_record: { Args: { p: Json }; Returns: Json };
+      rpc_comms_export_log: { Args: { p_kind: string; p_rows: number }; Returns: undefined };
+      rpc_comms_logs: {
+        Args: {
+          p_audience?: string;
+          p_channel?: string;
+          p_from: string;
+          p_page?: number;
+          p_per?: number;
+          p_search?: string;
+          p_selected?: string;
+          p_status?: string;
+          p_to: string;
+        };
+        Returns: Json;
+      };
+      rpc_comms_manual_send: { Args: { p: Json }; Returns: Json };
+      rpc_comms_overview: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_comms_provider_report: { Args: { p: Json }; Returns: undefined };
+      rpc_comms_queue: {
+        Args: {
+          p_audience?: string;
+          p_channel?: string;
+          p_page?: number;
+          p_per?: number;
+          p_search?: string;
+          p_status?: string;
+        };
+        Returns: Json;
+      };
+      rpc_comms_queue_action: { Args: { p_action: string; p_id: string }; Returns: Json };
+      rpc_comms_resend: { Args: { p_log_id: string }; Returns: Json };
+      rpc_comms_schedule_save: { Args: { p: Json }; Returns: Json };
+      rpc_comms_schedule_set_status: { Args: { p_id: string; p_status: string }; Returns: Json };
+      rpc_comms_schedules: {
+        Args: { p_month?: string; p_page?: number; p_per?: number; p_search?: string };
+        Returns: Json;
+      };
+      rpc_comms_sender_save: {
+        Args: { p_from_email: string; p_from_name: string; p_reply_to: string };
+        Returns: Json;
+      };
+      rpc_comms_setting_save: { Args: { p_key: string; p_value: Json }; Returns: Json };
+      rpc_comms_suppression_add: {
+        Args: { p_address: string; p_channel: string; p_note: string; p_reason: string };
+        Returns: Json;
+      };
+      rpc_comms_suppression_remove: { Args: { p_id: string; p_reason: string }; Returns: Json };
+      rpc_comms_suppressions: {
+        Args: { p_channel?: string; p_page?: number; p_per?: number; p_search?: string };
+        Returns: Json;
+      };
+      rpc_comms_template_save: { Args: { p: Json }; Returns: Json };
+      rpc_comms_templates: {
+        Args: {
+          p_audience?: string;
+          p_category?: string;
+          p_channel?: string;
+          p_page?: number;
+          p_per?: number;
+          p_search?: string;
+          p_status?: string;
+        };
+        Returns: Json;
+      };
+      rpc_comms_test_send: {
+        Args: {
+          p_body?: string;
+          p_channel: string;
+          p_recipient: string;
+          p_subject?: string;
+          p_template_id?: string;
+        };
+        Returns: Json;
+      };
+      rpc_comms_unsubscribe: { Args: { p_token: string }; Returns: Json };
+      rpc_comms_unsubscribe_lookup: { Args: { p_token: string }; Returns: Json };
+      rpc_comms_workflow_save: { Args: { p: Json }; Returns: Json };
+      rpc_comms_workflow_toggle: { Args: { p_enabled: boolean; p_key: string }; Returns: Json };
+      rpc_comms_workflows: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_company_asset_assign: {
         Args: { p_assignee_name?: string; p_id: string; p_note?: string; p_staff_id?: string };
         Returns: undefined;
