@@ -42,11 +42,6 @@ const pinComplete = (value: { lat?: number; lng?: number }) =>
 const scopeError = () =>
   new HostWorkspaceError(403, 'This record is outside your workspace access.');
 const invalid = (message: string) => new HostWorkspaceError(400, message);
-/* For an RPC whose migration is not in the generated types yet. */
-type UntypedRpc = (
-  fn: string,
-  args: Record<string, unknown>,
-) => PromiseLike<{ data: unknown; error: { code: string; message: string } | null }>;
 
 function checked(result: { error: { code: string; message: string } | null }, message: string) {
   const { error } = result;
@@ -320,19 +315,18 @@ async function archiveOrDelete(
     );
   if (!data) throw scopeError();
 
-  /* Not in the generated types until the migration is pushed. */
-  const rpc = (db as unknown as { rpc: UntypedRpc }).rpc.bind(db);
-  const call =
+  const result =
     collection === 'properties'
       ? type === 'delete'
-        ? db.rpc('rpc_property_delete', { p_property_id: id, p_confirm_name: confirmName! })
-        : rpc(type === 'archive' ? 'rpc_property_archive' : 'rpc_property_unarchive', {
-            p_property: id,
-          })
+        ? await db.rpc('rpc_property_delete', { p_property_id: id, p_confirm_name: confirmName! })
+        : type === 'archive'
+          ? await db.rpc('rpc_property_archive', { p_property: id })
+          : await db.rpc('rpc_property_unarchive', { p_property: id })
       : type === 'delete'
-        ? rpc('rpc_unit_delete', { p_unit: id, p_confirm_name: confirmName })
-        : rpc(type === 'archive' ? 'rpc_unit_archive' : 'rpc_unit_unarchive', { p_unit: id });
-  const result = await call;
+        ? await db.rpc('rpc_unit_delete', { p_unit: id, p_confirm_name: confirmName! })
+        : type === 'archive'
+          ? await db.rpc('rpc_unit_archive', { p_unit: id })
+          : await db.rpc('rpc_unit_unarchive', { p_unit: id });
   /* 23503: a guest has a stay that has not ended, a unit still on NEXG Stays
      or an unpaid invoice. The database's own words say what to do first. */
   if (result.error?.code === '23503') throw new HostWorkspaceError(409, result.error.message);

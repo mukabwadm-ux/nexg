@@ -144,9 +144,12 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
           const query = db
             .from('property')
             .select(
-              'id, name, area, kind, photos, description, listed, floors, summary, check_in_from, check_out_by, point, amenities, neighbourhood_note, house_rules, cancellation_policy',
+              'id, name, area, kind, photos, description, listed, floors, summary, check_in_from, check_out_by, point, amenities, neighbourhood_note, house_rules, cancellation_policy, archived_at',
             )
             .eq('host_id', hostId)
+            /* Archived properties are listed (the phone shows them under
+               Archived); deleted ones are gone. This and the units' deleted_at
+               need 20270326000100 pushed before this deploys. */
             .is('deleted_at', null);
           if (unitScope) query.in('id', propertyIds);
           return query.order('id').range(from, to);
@@ -472,23 +475,6 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
     for (const row of reviewRows ?? []) reviewOf.set(row.id, row.review_status);
   }
 
-  /* When the host archived each property (20270326000100). Not in the
-     generated types until that migration is pushed, hence the untyped read. */
-  const archivedOf = new Map<string, string>();
-  if (properties.length > 0) {
-    const archivedRows = loaded(
-      await db
-        .from('property' as never)
-        .select('id, archived_at')
-        .in(
-          'id',
-          properties.map((row) => row.id),
-        ),
-    ) as unknown as { id: string; archived_at: string | null }[] | null;
-    for (const row of archivedRows ?? [])
-      if (row.archived_at) archivedOf.set(row.id, row.archived_at);
-  }
-
   const data: WorkspaceData = {
     properties: properties
       .map((row) => ({
@@ -508,7 +494,7 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
         neighbourhoodNote: row.neighbourhood_note ?? '',
         houseRules: row.house_rules ?? '',
         cancellationPolicy: row.cancellation_policy ?? '',
-        archivedAt: archivedOf.get(row.id) ?? null,
+        archivedAt: row.archived_at ?? null,
       }))
       .sort((a, b) => a.name.localeCompare(b.name)),
     units: units

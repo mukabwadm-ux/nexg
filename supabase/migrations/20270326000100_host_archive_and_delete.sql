@@ -17,7 +17,9 @@
 --
 -- Archive and delete are refused (23503) while a guest has a stay that is not
 -- cancelled and has not ended (check_out >= now()). A hold that has lapsed is
--- released first, under the unit lock, and does not count.
+-- released first, under the unit lock, and does not count. Nor does a guest
+-- the host has already checked out (departed): an early check-out leaves
+-- check_out at the booked date.
 --
 -- New columns: property.archived_at and unit.deleted_at. A unit of a deleted
 -- property is deleted with it (and older ones are backfilled below).
@@ -31,16 +33,31 @@
 --     deleted and its property neither archived nor deleted.
 --   · fn_unit_listing_missing (20270320000100) also lists "The property is
 --     archived", so the publish switch refuses a unit in an archived property.
+--   · A placed card in a unit of an archived property: the guide by code
+--     (rpc_host_workspace_published_guide, 20261113001000, and the guide
+--     files that read through it) returns nothing, and rpc_resolve_qr
+--     (20260101010700) answers paused, as for an archived unit. The card is
+--     not voided, so both work again on restore.
+--   · host_attention_v (20270320000100) no longer asks for a QR card in a
+--     unit of an archived property.
 -- Host and staff reads of units are not changed.
 --
--- Known gap, as before: rpc_stay_hold checks property_unit_public before it
--- locks the unit and does not check again, so a guest hold that started just
--- before an archive commits can still land on the unit. The fix belongs in
--- rpc_stay_hold and is left as a follow-up.
+-- New stays: a trigger on public.stay refuses a new stay, hold or block (not
+-- a cancelled row) on a unit that is archived or deleted, or whose property
+-- is. It runs inside the insert, after rpc_stay_hold, rpc_stay_upsert,
+-- rpc_stay_block and rpc_stay_host_hold have taken the unit lock that archive
+-- and delete also take, so a guest hold that checked property_unit_public
+-- just before an archive committed is refused too.
 --
--- Rollback: drop the five new functions, restore rpc_property_delete,
--- fn_unit_listing_missing, authz.stay_guest_guide_unit and the two views from
--- their earlier migrations, then drop property.archived_at and unit.deleted_at.
+-- Deploy order: push this migration before the web change that reads
+-- property.archived_at and unit.deleted_at, or the Hosts Workspace snapshot
+-- fails on the older database.
+--
+-- Rollback: drop the five new functions and the stay trigger, restore
+-- rpc_property_delete, fn_unit_listing_missing, authz.stay_guest_guide_unit,
+-- rpc_host_workspace_published_guide, rpc_resolve_qr, host_attention_v and the
+-- two views from their earlier migrations, then drop property.archived_at and
+-- unit.deleted_at.
 
 -- ═══════════════════════════════════════════════ columns
 
@@ -109,7 +126,7 @@ begin
 
   perform public.fn_stay_release_expired_holds(v_unit.id);
   if exists (select 1 from public.stay s
-              where s.unit_id = v_unit.id and s.check_out >= now() and s.status <> 'cancelled') then
+              where s.unit_id = v_unit.id and s.check_out >= now() and s.status not in ('cancelled', 'departed')) then
     raise exception 'A guest has a stay here that hasn''t ended. You can do this after they check out, or once the stay is cancelled.'
       using errcode = '23503';
   end if;
@@ -218,7 +235,7 @@ begin
 
   perform public.fn_stay_release_expired_holds(v_unit.id);
   if exists (select 1 from public.stay s
-              where s.unit_id = v_unit.id and s.check_out >= now() and s.status <> 'cancelled') then
+              where s.unit_id = v_unit.id and s.check_out >= now() and s.status not in ('cancelled', 'departed')) then
     raise exception 'A guest has a stay here that hasn''t ended. You can do this after they check out, or once the stay is cancelled.'
       using errcode = '23503';
   end if;
@@ -279,7 +296,7 @@ begin
   if exists (select 1 from public.stay s
               where (s.property_id = v_property.id
                      or s.unit_id in (select id from public.unit where property_id = v_property.id))
-                and s.check_out >= now() and s.status <> 'cancelled') then
+                and s.check_out >= now() and s.status not in ('cancelled', 'departed')) then
     raise exception 'A guest has a stay here that hasn''t ended. You can do this after they check out, or once the stay is cancelled.'
       using errcode = '23503';
   end if;
@@ -395,7 +412,7 @@ begin
   if exists (select 1 from public.stay s
               where (s.property_id = p_property_id
                      or s.unit_id in (select id from public.unit where property_id = p_property_id))
-                and s.check_out >= now() and s.status <> 'cancelled') then
+                and s.check_out >= now() and s.status not in ('cancelled', 'departed')) then
     raise exception 'A guest has a stay here that hasn''t ended. You can do this after they check out, or once the stay is cancelled.'
       using errcode = '23503';
   end if;
@@ -644,3 +661,291 @@ as $$
 $$;
 
 revoke all on function authz.stay_guest_guide_unit(uuid) from public, anon, authenticated;
+
+-- ═══════════════════════════════════════════════ a card in an archived property
+
+-- rpc_host_workspace_published_guide: 20261113001000, plus the unit not
+-- deleted and its property neither archived nor deleted. The guide files
+-- (rpc_host_workspace_guide_asset, _asset_sign) read through it.
+create or replace function public.rpc_host_workspace_published_guide(p_code text)
+returns jsonb language sql stable security definer set search_path = ''
+as $$
+  select jsonb_build_object('unitName', coalesce(u.label_public, q.label, 'Your unit'),
+    'document', version.document, 'publishedAt', version.published_at)
+  from public.property_qr q
+  join public.unit u on u.id = q.owner_id and u.host_id = q.host_id
+  join public.host h on h.id = u.host_id
+  join public.host_unit_guide guide on guide.unit_id = u.id
+  join public.host_unit_guide_version version on version.id = guide.published_id and version.unit_id = guide.unit_id
+  where q.code = upper(trim(p_code)) and q.owner_type = 'unit' and q.voided_at is null
+    and q.state = 'placed' and q.placed_confirmed_at is not null
+    and h.status = 'live' and u.status = 'live' and u.archived_at is null
+    and u.deleted_at is null
+    and not exists (
+      select 1 from public.property p
+       where p.id = u.property_id and (p.archived_at is not null or p.deleted_at is not null))
+$$;
+
+-- rpc_resolve_qr: 20260101010700, plus an archived or deleted unit or
+-- property answers paused.
+create or replace function public.rpc_resolve_qr(
+  p_code text,
+  p_session_id text default null,
+  p_device jsonb default '{}'::jsonb,
+  p_referrer public.qr_referrer_kind default 'unknown',
+  p_ip_country text default null
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_code text := upper(trim(p_code));
+  v_qr public.property_qr;
+  v_session text := coalesce(nullif(trim(p_session_id), ''),
+                             encode(extensions.gen_random_bytes(16), 'hex'));
+  v_now timestamptz := clock_timestamp();
+  v_recent integer;
+  v_bot boolean := false;
+  v_token text;
+  v_scan_id bigint;
+  v_unit public.unit;
+  v_room public.hotel_room;
+  v_area public.hotel_area;
+  v_hotel public.hotel;
+  v_ctx jsonb;
+  v_outcome public.qr_scan_outcome;
+begin
+  if v_code !~ '^NXG-[0-9A-Z]{6}$' then
+    insert into public.qr_miss (code_attempted, session_id, ip_country, reason)
+    values (left(coalesce(v_code, ''), 32), v_session, p_ip_country, 'not_found');
+    return jsonb_build_object('ok', false, 'reason', 'not_found', 'session_id', v_session,
+      'message', 'That code is not one of ours. Check the card, or order to another address.');
+  end if;
+
+  select * into v_qr from public.property_qr where code = v_code;
+
+  if v_qr.id is null then
+    insert into public.qr_miss (code_attempted, session_id, ip_country, reason)
+    values (v_code, v_session, p_ip_country, 'not_found');
+    return jsonb_build_object('ok', false, 'reason', 'not_found', 'session_id', v_session,
+      'message', 'That code is not one of ours. Check the card, or order to another address.');
+  end if;
+
+  /* Sixty a minute on one card. A card on a hotel lobby table during
+     a conference can legitimately be busy; a thousand a minute is
+     somebody walking the keyspace. */
+  select count(*) into v_recent
+    from public.qr_scan s
+   where s.qr_id = v_qr.id and s.scanned_at > v_now - interval '1 minute';
+
+  if v_recent >= 60 then
+    insert into public.qr_miss (code_attempted, session_id, ip_country, reason)
+    values (v_code, v_session, p_ip_country, 'rate_limited');
+    return jsonb_build_object('ok', false, 'reason', 'busy', 'session_id', v_session,
+      'message', 'Too many requests for this card just now. Try again in a moment.');
+  end if;
+
+  v_bot := coalesce((p_device ->> 'is_headless')::boolean, false)
+        or coalesce(p_device ->> 'ua_family', '') in ('HeadlessChrome', 'PhantomJS', 'bot')
+        or v_recent >= 20;
+
+  /* What the scanner gets, decided before the row is written so the
+     row records the outcome rather than a guess at it. */
+  if v_qr.voided_at is not null then
+    v_outcome := 'voided';
+  else
+    if v_qr.owner_type = 'unit' then
+      select * into v_unit from public.unit where id = v_qr.owner_id;
+      /* An archived or deleted unit, or one in an archived or deleted
+         property (20270326000100), answers paused. */
+      v_outcome := case when v_unit.status = 'live' and v_unit.archived_at is null
+                          and v_unit.deleted_at is null
+                          and not exists (
+                            select 1 from public.property p
+                             where p.id = v_unit.property_id
+                               and (p.archived_at is not null or p.deleted_at is not null))
+                        then 'landed' else 'paused_unit' end;
+    elsif v_qr.owner_type = 'hotel_room' then
+      select * into v_room from public.hotel_room where id = v_qr.owner_id;
+      select * into v_hotel from public.hotel where id = v_room.hotel_id;
+      v_outcome := case when v_hotel.status = 'partner' and v_room.status = 'active'
+                        then 'landed' else 'paused_unit' end;
+    else
+      select * into v_area from public.hotel_area where id = v_qr.owner_id;
+      select * into v_hotel from public.hotel where id = v_area.hotel_id;
+      v_outcome := case when v_hotel.status = 'partner' and v_area.status = 'active'
+                        then 'landed' else 'paused_unit' end;
+    end if;
+  end if;
+
+  if v_bot then v_outcome := 'blocked'; end if;
+
+  insert into public.qr_scan (
+    scanned_at, qr_id, code, owner_type, owner_id, host_id, hotel_id, city_id,
+    placement, session_id, device, ip_country, referrer_kind, outcome, is_bot)
+  values (
+    v_now, v_qr.id, v_qr.code, v_qr.owner_type, v_qr.owner_id,
+    v_qr.host_id, v_qr.hotel_id, v_qr.city_id,
+    v_qr.placement, v_session, coalesce(p_device, '{}'::jsonb), p_ip_country,
+    p_referrer, v_outcome, v_bot)
+  returning id into v_scan_id;
+
+  /* Signed with this card's secret, over this session and this
+     moment. Written back onto the row so a replay can be recognised
+     rather than inferred. */
+  v_token := encode(extensions.hmac(
+    v_qr.id::text || '.' || v_session || '.' || extract(epoch from v_now)::bigint::text,
+    v_qr.secret_hash, 'sha256'), 'hex');
+
+  update public.qr_scan set scan_token = v_token
+   where id = v_scan_id and scanned_at = v_now;
+
+  /* A blocked or voided scan is still a scan: the counters move, so
+     "this old card is still being scanned" is answerable. */
+  update public.property_qr set
+    scans = scans + 1,
+    first_scanned_at = coalesce(first_scanned_at, v_now),
+    last_scanned_at = v_now,
+    placed_confirmed_at = coalesce(placed_confirmed_at, case when v_outcome = 'landed' then v_now end),
+    state = case when state in ('generated', 'sent') and v_outcome = 'landed'
+                 then 'scanned' else state end
+  where id = v_qr.id;
+
+  if v_outcome = 'blocked' then
+    return jsonb_build_object('ok', false, 'reason', 'busy', 'session_id', v_session,
+      'message', 'Try again in a moment.');
+  end if;
+
+  if v_outcome = 'voided' then
+    return jsonb_build_object('ok', false, 'reason', 'replaced', 'session_id', v_session,
+      'label', v_qr.label,
+      'message', 'This code was replaced — ask your host for the new card.');
+  end if;
+
+  if v_outcome = 'paused_unit' then
+    return jsonb_build_object('ok', false, 'reason', 'paused', 'session_id', v_session,
+      'label', v_qr.label,
+      'message', 'This place isn''t taking orders right now — you can still order to another address.');
+  end if;
+
+  if v_qr.owner_type = 'unit' then
+    select to_jsonb(c) into v_ctx from public.unit_context_v c where c.unit_id = v_unit.id;
+  else
+    select jsonb_build_object(
+      'hotel_id', h.hotel_id, 'hotel_name', h.hotel_name,
+      'charge_to_room', h.offer_charge_to_room,
+      'cap', h.charge_cap_per_stay,
+      'preferred_suppliers', h.preferred_suppliers,
+      'room_no', v_room.room_no,
+      'area_name', v_area.name,
+      'delivery_point_note', v_area.delivery_point_note
+    ) into v_ctx
+    from public.checkout_hotel_context_v h where h.hotel_id = v_hotel.id;
+  end if;
+
+  return jsonb_build_object(
+    'ok', true,
+    'kind', v_qr.owner_type,
+    'label', v_qr.label,
+    'placement', v_qr.placement,
+    'qr_id', v_qr.id,
+    'session_id', v_session,
+    'scan_token', v_token,
+    'context', v_ctx);
+end;
+$$;
+
+-- host_attention_v: 20270320000100, plus no card or setup reminders for a
+-- unit in an archived or deleted property.
+create or replace view public.host_attention_v
+with (security_invoker = true) as
+-- The caretaker card (sort 1) is gone: a caretaker no longer confirms.
+-- This branch now comes first, so it names the columns.
+-- a card that was replaced and is still in a guest's hand
+-- ('voided' is what the scan outcome is called; 'retired' is what
+--  the guest is shown, and they are the same event)
+select
+  s.host_id,
+  2 as sort,
+  'retired_card_scanned'::text as kind,
+  'A retired QR card is still being scanned'::text as title,
+  'A card that has been replaced was scanned again. Guests see "this card is '
+    || 'retired, ask your host". Place the new card or re-print it.' as body,
+  s.owner_id as unit_id,
+  null::text as unit_name
+from public.qr_scan s
+where s.outcome::text = 'voided'
+  and s.scanned_at > now() - interval '7 days'
+group by s.host_id, s.owner_id
+union all
+-- live, but a guest in the room has nothing to scan
+select
+  u.host_id, 3, 'no_qr_card',
+  'A live unit has no QR card',
+  u.name || ' is live but has no card placed, so guests there cannot order '
+    || 'from the room.',
+  u.id, u.name
+from public.unit u
+where u.archived_at is null and u.status = 'live'
+  and not exists (select 1 from public.property p
+                   where p.id = u.property_id
+                     and (p.archived_at is not null or p.deleted_at is not null))
+  and not coalesce((u.readiness ->> 'qr_placed')::boolean, false)
+union all
+-- stuck
+select
+  u.host_id, 4, 'unit_stuck',
+  'A unit has been in setup for over five days',
+  u.name || ' has not moved since it was created. Whatever is blocking it is '
+    || 'not going to clear on its own.',
+  u.id, u.name
+from public.unit u
+where u.archived_at is null and u.status = 'setting_up'
+  and not exists (select 1 from public.property p
+                   where p.id = u.property_id
+                     and (p.archived_at is not null or p.deleted_at is not null))
+  and u.created_at < now() - interval '5 days';
+
+-- ═══════════════════════════════════════════════ no new stays
+
+/*
+ * A new stay, hold or block on an archived or deleted unit, or on a unit of
+ * an archived or deleted property, is refused. Runs inside the insert, after
+ * the stay RPCs have locked the unit, so it sees an archive or delete that
+ * committed while they waited for that lock.
+ */
+create or replace function public.fn_stay_refuse_archived_unit()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  /* An edit that keeps the stay on its unit (rpc_stay_upsert sets unit_id
+     on every edit) is not a new stay there. */
+  if new.status = 'cancelled' or new.unit_id is null
+     or (tg_op = 'UPDATE' and old.unit_id = new.unit_id) then
+    return new;
+  end if;
+  if exists (
+    select 1 from public.unit u
+      left join public.property p on p.id = u.property_id
+     where u.id = new.unit_id
+       and (u.archived_at is not null or u.deleted_at is not null
+            or p.archived_at is not null or p.deleted_at is not null)
+  ) then
+    raise exception 'This unit is archived or deleted. Restore it before adding a stay.'
+      using errcode = '22023';
+  end if;
+  return new;
+end;
+$$;
+
+revoke execute on function public.fn_stay_refuse_archived_unit() from public, anon, authenticated;
+
+drop trigger if exists stay_refuse_archived_unit on public.stay;
+create trigger stay_refuse_archived_unit
+  before insert or update of unit_id on public.stay
+  for each row execute function public.fn_stay_refuse_archived_unit();

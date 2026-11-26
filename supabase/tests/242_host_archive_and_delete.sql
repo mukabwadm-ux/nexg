@@ -90,7 +90,8 @@ values ('unit','e2423000-0000-4000-8000-00000000000a','e2421000-0000-4000-8000-0
         'NXG-A2K4MW', 'test-242', 'placed', now());
 set local session_replication_role = origin;
 
-/* Unit A: a past stay and a cancelled future one, neither of which blocks.
+/* Unit A: a past stay, a cancelled future one and a guest checked out early
+   (booked until later in the week), none of which blocks.
    Unit B: a booking next week, which does. */
 insert into public.stay (id, host_id, property_id, unit_id, guest_first_name, check_in, check_out,
                          source, status)
@@ -98,6 +99,9 @@ values
   ('e2424000-0000-4000-8000-0000000000a1','e2421000-0000-4000-8000-00000000000a',
    'e2422000-0000-4000-8000-00000000000a','e2423000-0000-4000-8000-00000000000a','Amina',
    now() - interval '5 days', now() - interval '3 days', 'entered', 'departed'),
+  ('e2424000-0000-4000-8000-0000000000a3','e2421000-0000-4000-8000-00000000000a',
+   'e2422000-0000-4000-8000-00000000000a','e2423000-0000-4000-8000-00000000000a','Dina',
+   now() - interval '2 days', now() + interval '3 days', 'entered', 'departed'),
   ('e2424000-0000-4000-8000-0000000000a2','e2421000-0000-4000-8000-00000000000a',
    'e2422000-0000-4000-8000-00000000000a','e2423000-0000-4000-8000-00000000000a','Baraka',
    now() + interval '10 days', now() + interval '12 days', 'entered', 'cancelled'),
@@ -209,7 +213,7 @@ reset role;
 set local role authenticated;
 select pg_temp.as_user('e2420000-0000-4000-8000-000000000001');
 select lives_ok($$ select public.rpc_unit_archive('e2423000-0000-4000-8000-00000000000a') $$,
-  'A past stay and a cancelled one do not block the archive.');
+  'A past stay, a cancelled one and a guest checked out early do not block the archive.');
 reset role;
 
 select results_eq($$
@@ -234,7 +238,16 @@ $$, $$ values ('e2420000-0000-4000-8000-000000000001'::uuid) $$,
   'One audit row names the host.');
 select is((select count(*)::int from public.stay
             where unit_id = 'e2423000-0000-4000-8000-00000000000a'),
-  2, 'Its stays are kept.');
+  3, 'Its stays are kept.');
+
+select throws_ok($$
+  insert into public.stay (host_id, property_id, unit_id, guest_first_name, check_in, check_out,
+                           source, status)
+  values ('e2421000-0000-4000-8000-00000000000a','e2422000-0000-4000-8000-00000000000a',
+          'e2423000-0000-4000-8000-00000000000a','Late', now() + interval '20 days',
+          now() + interval '22 days', 'entered', 'held')
+$$, '22023', 'This unit is archived or deleted. Restore it before adding a stay.',
+  'No new stay or hold lands on an archived unit, whichever path writes it.');
 
 set local role authenticated;
 select pg_temp.as_user('e2420000-0000-4000-8000-000000000001');
@@ -311,7 +324,7 @@ select results_eq($$
 $$, $$ values ('1'::text) $$, 'One audit row counts the cards voided.');
 select is((select count(*)::int from public.stay
             where unit_id = 'e2423000-0000-4000-8000-00000000000a'),
-  2, 'Its stays are kept.');
+  3, 'Its stays are kept.');
 
 set local role authenticated;
 select pg_temp.as_user('e2420000-0000-4000-8000-000000000001');
@@ -382,6 +395,26 @@ select is((select count(*)::int from public.property_public
             where id = 'e2422000-0000-4000-8000-00000000000d'),
   1, 'Before: guests see Hill 242.');
 
+/* G has a published guide behind its placed card, and a guest the host
+   checked out early, whose booked check-out is still to come. */
+insert into public.host_unit_guide (unit_id) values ('e2423000-0000-4000-8000-000000000012');
+insert into public.host_unit_guide_version (id, unit_id, document)
+values ('e2425000-0000-4000-8000-000000000012','e2423000-0000-4000-8000-000000000012',
+        '{"articles":[{"title":"Wi-Fi"}]}');
+update public.host_unit_guide set published_id = 'e2425000-0000-4000-8000-000000000012'
+ where unit_id = 'e2423000-0000-4000-8000-000000000012';
+insert into public.stay (host_id, property_id, unit_id, guest_first_name, check_in, check_out,
+                         source, status)
+values ('e2421000-0000-4000-8000-00000000000a','e2422000-0000-4000-8000-00000000000d',
+        'e2423000-0000-4000-8000-000000000012','Faith', now() - interval '1 day',
+        now() + interval '4 days', 'entered', 'departed');
+
+set local role anon;
+select isnt(public.rpc_host_workspace_published_guide('NXG-H4R7TW'), null,
+  'Before: a guest scanning the card in G gets its guide.');
+select is(public.rpc_resolve_qr('NXG-H4R7TW') ->> 'ok', 'true', 'And the scan lands.');
+reset role;
+
 set local role authenticated;
 select pg_temp.as_user('e2420000-0000-4000-8000-000000000001');
 select lives_ok($$ select public.rpc_unit_archive('e2423000-0000-4000-8000-000000000013') $$,
@@ -390,8 +423,26 @@ select throws_ok($$ select public.rpc_property_archive('e2422000-0000-4000-8000-
   '23503', 'A guest has a stay here that hasn''t ended. You can do this after they check out, or once the stay is cancelled.',
   'A property with a guest still to come cannot be archived.');
 select lives_ok($$ select public.rpc_property_archive('e2422000-0000-4000-8000-00000000000d') $$,
-  'The host archives Hill 242.');
+  'The host archives Hill 242: a guest checked out early does not block it.');
+select throws_ok($$ select public.rpc_stay_block('e2421000-0000-4000-8000-00000000000a',
+    'e2423000-0000-4000-8000-000000000012', current_date + 20, current_date + 22) $$,
+  '22023', 'This unit is archived or deleted. Restore it before adding a stay.',
+  'The host cannot block dates in a unit of an archived property.');
 reset role;
+select lives_ok($$
+  update public.stay set unit_id = unit_id, guest_first_name = 'Faith W'
+   where unit_id = 'e2423000-0000-4000-8000-000000000012' and guest_first_name = 'Faith'
+$$, 'An edit to a stay already in that unit is still allowed.');
+
+set local role anon;
+select is(public.rpc_host_workspace_published_guide('NXG-H4R7TW'), null,
+  'The card in G no longer opens its guide while the property is archived.');
+select is(public.rpc_resolve_qr('NXG-H4R7TW') ->> 'reason', 'paused',
+  'And the scan answers paused, not landed.');
+reset role;
+select is((select count(*)::int from public.host_attention_v
+            where unit_id = 'e2423000-0000-4000-8000-000000000012' and kind = 'no_qr_card'),
+  0, 'The host is not asked for a card in a unit of an archived property.');
 
 select is((select archived_at is not null from public.property
             where id = 'e2422000-0000-4000-8000-00000000000d'),
@@ -450,6 +501,10 @@ $$, $$ values (true, false, false) $$, 'Restored, its units stay paused.');
 select is((select count(*)::int from public.property_public
             where id = 'e2422000-0000-4000-8000-00000000000d'),
   0, 'So guests do not see it until the host turns a unit back on.');
+set local role anon;
+select isnt(public.rpc_host_workspace_published_guide('NXG-H4R7TW'), null,
+  'Its card was kept, so the guide opens again after the restore.');
+reset role;
 
 -- ══════════════════════════════════════════ 8. delete a property
 
