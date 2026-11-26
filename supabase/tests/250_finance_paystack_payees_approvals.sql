@@ -138,9 +138,9 @@ select r.id::uuid, '[' || r.first || ']', '[Rider ' || r.last || ']', r.phone,
 insert into settings.version (key, scope_kind, scope_city_id, value, status, effective_from, activated_at, reason)
 values
   ('payouts.rider.mode', 'city', 'e2480000-0000-4000-8000-0000000000c1', '"daily"', 'active',
-   now() - interval '1 minute', now() - interval '1 minute', '[test 248]'),
+   now() - interval '1 minute', now() - interval '1 minute', '[test 250]'),
   ('payouts.rider.automatic_from', 'city', 'e2480000-0000-4000-8000-0000000000c1', '"2020-01-01"', 'active',
-   now() - interval '1 minute', now() - interval '1 minute', '[test 248]');
+   now() - interval '1 minute', now() - interval '1 minute', '[test 250]');
 insert into public.paystack_transfer
   (id, reference, kind, party_type, party_id, source_id, amount_cents, is_test, destination, state,
    fee_cents, fee_paid_by)

@@ -447,7 +447,7 @@ select is(
 -- The rule on: the worker sends the live cinema refund itself.
 insert into settings.version (key, scope_kind, value, status, effective_from, activated_at, reason)
 values ('payouts.cinema.automatic_live_refunds', 'global', 'true', 'active',
-        now() - interval '1 minute', now() - interval '1 minute', '[test 249]');
+        now() - interval '1 minute', now() - interval '1 minute', '[test 251]');
 set local role authenticated;
 select pg_temp.as_user('e2490000-0000-4000-8000-000000000001');
 insert into t select 'auto', public.rpc_finance_paystack_refunds('due');
