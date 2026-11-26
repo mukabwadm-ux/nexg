@@ -247,6 +247,55 @@ describe('saving a unit', () => {
   });
 });
 
+describe('archiving a unit', () => {
+  it('calls rpc_unit_archive', async () => {
+    const { access: a, rpc } = access({
+      data: { unit_id: UNIT, cards_voided: 1 },
+      error: null,
+    });
+    const result = await runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT });
+    expect(rpc).toHaveBeenCalledWith('rpc_unit_archive', { p_unit: UNIT });
+    expect(result.message).toMatch(/^Unit archived\./);
+  });
+
+  it('passes on why a unit with a guest still to come was kept', async () => {
+    const why =
+      'This unit has 1 booking(s), hold(s) or block(s) today or still to come. Cancel or move them first: those guests have the address.';
+    const { access: a } = access({ data: null, error: { code: '23503', message: why } });
+    await expect(
+      runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
+    ).rejects.toMatchObject({ status: 409, message: why });
+  });
+
+  it('passes on a second archive as a plain refusal', async () => {
+    const { access: a } = access({
+      data: null,
+      error: { code: '22023', message: 'This unit is already archived.' },
+    });
+    await expect(
+      runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
+    ).rejects.toMatchObject({ status: 400, message: 'This unit is already archived.' });
+  });
+
+  it('refuses a unit outside the workspace', async () => {
+    const { access: a } = access({
+      data: null,
+      error: { code: '42501', message: 'This unit is outside your workspace access.' },
+    });
+    await expect(
+      runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
+    ).rejects.toMatchObject({ status: 403 });
+  });
+
+  it('is not open to team members limited to some units', async () => {
+    const { access: a, rpc } = access({ data: {}, error: null }, [UNIT]);
+    await expect(
+      runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
+    ).rejects.toThrow('outside your workspace access');
+    expect(rpc).not.toHaveBeenCalled();
+  });
+});
+
 describe('the property badge', () => {
   it('puts NexG review before the listing switch', () => {
     expect(propertyStatus(true, 'pending')).toBe('Waiting for NexG review');

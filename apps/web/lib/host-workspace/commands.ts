@@ -42,6 +42,11 @@ const pinComplete = (value: { lat?: number; lng?: number }) =>
 const scopeError = () =>
   new HostWorkspaceError(403, 'This record is outside your workspace access.');
 const invalid = (message: string) => new HostWorkspaceError(400, message);
+/* For an RPC whose migration is not in the generated types yet. */
+type UntypedRpc = (
+  fn: string,
+  args: Record<string, unknown>,
+) => PromiseLike<{ data: unknown; error: { code: string; message: string } | null }>;
 
 function checked(result: { error: { code: string; message: string } | null }, message: string) {
   const { error } = result;
@@ -494,6 +499,22 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
     return checked(
       await db.rpc('rpc_property_delete', { p_property_id: id, p_confirm_name: confirmName }),
       'Property removed.',
+    );
+  }
+
+  /* Archive one unit. Owners and managers with every unit only, like the
+     publish switch. rpc_unit_archive is not in the generated types until
+     its migration is pushed, hence the untyped call. */
+  if (command.type === 'delete' && collection === 'units' && id) {
+    if (unitScope) throw scopeError();
+    const result = await (db as unknown as { rpc: UntypedRpc }).rpc('rpc_unit_archive', {
+      p_unit: id,
+    });
+    /* 23503: a booking, hold or block today or still to come. */
+    if (result.error?.code === '23503') throw new HostWorkspaceError(409, result.error.message);
+    return checked(
+      result,
+      'Unit archived. It is off NEXG Stays and its cards now tell a guest the card is retired.',
     );
   }
 
