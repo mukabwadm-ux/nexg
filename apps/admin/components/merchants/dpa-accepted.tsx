@@ -54,6 +54,8 @@ export async function MerchantDpaAccepted({ merchantId }: { merchantId: string }
   const { data, error } = await createClient().rpc('rpc_merchant_dpa_read', {
     p_merchant_id: merchantId,
   });
+  // Until 20270326000100 runs the function does not exist: show nothing.
+  if (error?.code === 'PGRST202') return null;
   const record = (data as unknown as DpaRecord | null) ?? null;
   const current = record?.acceptances.find((entry) => entry.current) ?? null;
   const earlier = record?.acceptances.filter((entry) => !entry.current) ?? [];
