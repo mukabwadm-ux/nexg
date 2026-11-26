@@ -151,17 +151,21 @@ export function DocumentsPanel() {
             ? 'Approved'
             : view.status === 'verifying'
               ? 'In review'
-              : 'Action needed'}
+              : view.status === 'offboarded'
+                ? 'Not approved'
+                : 'Action needed'}
         </Badge>
       </div>
       <p className="mg-small-note">
         {view.status === 'live'
           ? 'NexG approved your account. You can list and manage your properties.'
-          : view.status === 'verifying'
-            ? `Submitted${view.submittedAt ? ' ' + dateText(view.submittedAt) : ''}. NexG usually reviews documents within one working day. You can set up your properties meanwhile. They stay hidden from guests until NexG approves your account.`
-            : 'Upload these so NexG can approve your account. You can set up your properties meanwhile. They stay hidden from guests until NexG approves your account.'}
+          : view.status === 'offboarded'
+            ? 'NexG could not approve this host account, so your properties stay hidden from guests. Reply to the email NexG sent if you think this is a mistake.'
+            : view.status === 'verifying'
+              ? `Submitted${view.submittedAt ? ' ' + dateText(view.submittedAt) : ''}. NexG usually reviews documents within one working day. You can set up your properties meanwhile. They stay hidden from guests until NexG approves your account.`
+              : 'Upload these so NexG can approve your account. You can set up your properties meanwhile. They stay hidden from guests until NexG approves your account.'}
       </p>
-      {view.statusReason && view.status === 'applied' && (
+      {view.statusReason && (view.status === 'applied' || view.status === 'offboarded') && (
         <p className="mg-small-note">
           <strong>{view.statusReason}</strong>
         </p>

@@ -235,6 +235,7 @@ export default async function MessagingPage({
             })),
             /* Guest and host chats about a stay: their own page, since they are not desk conversations. */
             { href: '/messaging/stays', label: 'Stay chats', active: false },
+            { href: '/messaging/reports', label: 'Chat reports', active: false },
           ]}
         />
       </div>

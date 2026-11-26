@@ -27,6 +27,7 @@ import {
   UserRound,
   Users,
   X,
+  Link2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -64,6 +65,7 @@ const ICONS: Record<NavIcon, React.ComponentType<{ className?: string }>> = {
   reports: FolderOpen,
   company: Building2,
   system: Settings,
+  integrations: Link2,
 };
 
 export interface FrameStaff {
