@@ -22,7 +22,7 @@ In Google Cloud, on a project with billing enabled:
 
 1. **Maps JavaScript API** and **Places API (New)** — enable both. "Places API (New)" is a separate entry from the legacy "Places API"; address search needs the new one.
 2. **A browser key** → `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`, restricted to:
-   - *Application restrictions* → Websites → `https://nexg-zjkl.vercel.app/*` and `https://nexg-sepia.vercel.app/*`, plus each custom domain (e.g. `https://nexgapp.com/*`, `https://www.nexgapp.com/*`, `https://control.nexgapp.com/*`; keep `https://admin.nexgapp.com/*` too, it now only redirects), plus `http://localhost:3005/*` and `http://localhost:3006/*` for development
+   - *Application restrictions* → Websites → `https://nexg-zjkl.vercel.app/*` and `https://nexg-sepia.vercel.app/*`, plus each custom domain (e.g. `https://nexgapp.com/*`, `https://www.nexgapp.com/*`, `https://control.nexgapp.com/*`), plus `http://localhost:3005/*` and `http://localhost:3006/*` for development
    - *API restrictions* → Maps JavaScript API only
 3. **A server key** → `GOOGLE_MAPS_API_KEY`, restricted to:
    - *Application restrictions* → **None**. Vercel functions send no Referer and have no fixed IP, so a referrer-restricted key is refused with "Requests from referer <empty> are blocked".

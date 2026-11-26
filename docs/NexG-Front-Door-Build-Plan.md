@@ -289,7 +289,7 @@ Stop when all admin flows work on the preview and tell me the bootstrap command 
 - [ ] Chain verification failure sends an email to super admins (stub provider in staging)
 - [ ] All eight acceptance tests green on CI
 - [ ] Production Supabase project created by applying the same migrations; secrets in Vercel production env only
-- [ ] Domains: `nexgapp.com` → web, `control.nexgapp.com` → admin console (`admin.nexgapp.com` redirects there); HTTPS; Google OAuth redirect updated
+- [ ] Domains: `nexgapp.com` → web, `control.nexgapp.com` → admin console (`admin.nexgapp.com` is retired: a bare 404, no redirect); HTTPS; Google OAuth redirect updated
 - [ ] Backup restore into staging tested once and written down
 - [ ] `docs/RUNBOOK.md`: how to grant a role, add a document requirement, rotate a key, restore a backup, verify the audit chain
 
