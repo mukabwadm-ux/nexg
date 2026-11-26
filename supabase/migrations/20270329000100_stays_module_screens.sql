@@ -1735,6 +1735,9 @@ create trigger host_review_tells_host after update of status, rejected_at on pub
   for each row when (old.status is distinct from new.status or old.rejected_at is distinct from new.rejected_at)
   execute function public.tg_host_review_tells_host();
 
+/* The same days and rule as the host's check-in (20270328000200): from the
+   check-in date to before the check-out date in the host's time zone, and
+   not while another guest is still checked in to the unit. */
 create or replace function public.rpc_console_stay_check_in(p_stay_id uuid)
 returns jsonb
 language plpgsql
@@ -1744,13 +1747,47 @@ as $$
 declare
   v_staff uuid := public.fn_stays_writer_gate();
   v_stay public.stay;
+  v_zone text;
+  v_today date;
 begin
-  update public.stay set status = 'in_stay', checked_in_at = now(), checked_in_by = auth.uid(), updated_at = now()
-   where id = p_stay_id and status = 'booked' and check_out > now()
-  returning * into v_stay;
+  select * into v_stay from public.stay where id = p_stay_id for update;
   if v_stay.id is null then
-    raise exception 'Only a paid, booked stay that has not ended can be checked in.' using errcode = 'check_violation';
+    raise exception 'That stay is not there.' using errcode = 'no_data_found';
   end if;
+  if v_stay.status = 'in_stay' then
+    raise exception 'This guest is already checked in.' using errcode = '22023';
+  end if;
+  if v_stay.status <> 'booked' then
+    raise exception 'Only a confirmed, paid reservation can be checked in.' using errcode = '22023';
+  end if;
+
+  select time_zone into v_zone from public.host where id = v_stay.host_id;
+  if v_zone is null or not exists (select 1 from pg_catalog.pg_timezone_names where name = v_zone) then
+    v_zone := 'Africa/Nairobi';
+  end if;
+  v_today := (now() at time zone v_zone)::date;
+  if v_today < (v_stay.check_in at time zone v_zone)::date then
+    raise exception 'The guest can be checked in from %.',
+      to_char(v_stay.check_in at time zone v_zone, 'FMDD Mon YYYY') using errcode = '22023';
+  end if;
+  if v_today >= (v_stay.check_out at time zone v_zone)::date then
+    raise exception 'This stay has already ended.' using errcode = '22023';
+  end if;
+
+  if v_stay.unit_id is not null then
+    perform 1 from public.unit where id = v_stay.unit_id for update;
+    if exists (select 1 from public.stay o
+                where o.unit_id = v_stay.unit_id and o.id <> v_stay.id and o.status = 'in_stay') then
+      raise exception 'Another guest is still checked in to this unit. Check them out first.'
+        using errcode = '22023';
+    end if;
+  end if;
+
+  update public.stay set status = 'in_stay', checked_in_at = now(), checked_in_by = auth.uid(), updated_at = now()
+   where id = v_stay.id returning * into v_stay;
+  update public.reservation_code set used_at = now(), used_by = auth.uid()
+   where stay_id = v_stay.id and used_at is null;
+
   perform audit.log('staff'::public.actor_type, 'hotels', 'stay.checked_in_by_staff',
     p_target_type => 'stay', p_target_id => v_stay.id);
   return jsonb_build_object('stay_id', v_stay.id, 'status', v_stay.status, 'staff', v_staff);
