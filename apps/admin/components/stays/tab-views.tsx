@@ -644,12 +644,19 @@ export function ReportsView({
             To
             <input type="date" name="to" required defaultValue={period.to} className={control} />
           </label>
-          <div className="sm:col-span-2">
+          <label className="flex flex-col gap-1.5 text-sm font-bold">
+            Format
+            <select name="format" className={control} defaultValue="csv">
+              <option value="csv">Spreadsheet (CSV)</option>
+              <option value="pdf">PDF on the NexG letterhead</option>
+            </select>
+          </label>
+          <div className="self-end">
             <button
               type="submit"
               className="focus-visible:ring-gold inline-flex h-11 items-center rounded-xl bg-gradient-to-b from-[#FFD24D] to-[#F5B400] px-5 font-bold text-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2"
             >
-              Download report (CSV)
+              Download report
             </button>
           </div>
         </form>
