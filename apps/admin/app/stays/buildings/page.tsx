@@ -82,6 +82,8 @@ interface PropertyRow {
   listed_units: number;
   live_units: number;
   nights: number;
+  /** The nights as booked; more than `nights` after an early check-out. */
+  sold_nights?: number;
   value_kes: number;
   bucket: string;
   occupancy_pct: number | null;
@@ -451,7 +453,9 @@ export default async function BuildingsPage({
                       <Fact label="Booked nights (period)">{n(current.nights)}</Fact>
                       <Fact label="Occupancy Rate">{pct(current.occupancy_pct)}</Fact>
                       <Fact label="Avg. per night">
-                        {current.nights > 0 ? kesCompact(current.value_kes / current.nights) : '—'}
+                        {(current.sold_nights ?? current.nights) > 0
+                          ? kesCompact(current.value_kes / (current.sold_nights ?? current.nights))
+                          : '—'}
                       </Fact>
                     </>
                   ) : ptab === 'documents' ? (

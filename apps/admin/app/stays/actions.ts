@@ -93,7 +93,7 @@ export async function blockDates(input: {
 }): Promise<Outcome> {
   if (!UUID.test(input.unitId)) return { ok: false, message: 'Pick a unit.' };
   if (!DAY.test(input.from) || !DAY.test(input.to))
-    return { ok: false, message: 'Pick the first and last night.' };
+    return { ok: false, message: 'Pick the From day and the check-out day.' };
   return call(
     'rpc_console_stay_block',
     { p_unit_id: input.unitId, p_from: input.from, p_to: input.to, p_note: input.note.trim() },
