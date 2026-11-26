@@ -150,5 +150,6 @@ export const privacy: LegalDocument = {
     text: 'To see, correct, move or delete your data, write to our Data Protection Officer.',
     email: 'derrick@nexgapp.com',
     label: 'Email the privacy team',
+    link: { href: '/account/delete', label: 'Delete your account' },
   },
 };

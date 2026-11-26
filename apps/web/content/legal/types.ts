@@ -68,6 +68,8 @@ export interface LegalRequest {
   /** The address the operative text names for these requests. */
   email: string;
   label: string;
+  /** A page on the site where one of these requests can be made. */
+  link?: { href: string; label: string };
 }
 
 /** Who the legal hub's "Show documents for" filter is choosing between. */

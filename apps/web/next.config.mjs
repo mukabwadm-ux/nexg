@@ -53,6 +53,8 @@ const nextConfig = {
   async redirects() {
     return [
       { source: '/discover/index.html', destination: '/discover', permanent: false },
+      // The account deletion page's short address, for the app stores.
+      { source: '/delete-account', destination: '/account/delete', permanent: false },
       /*
        * On the retired admin.nexgapp.com, a link followed from its own 404 page
        * (the header, footer and "Ask the concierge desk") goes on to the same

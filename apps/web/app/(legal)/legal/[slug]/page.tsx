@@ -224,6 +224,14 @@ export default function LegalPage({ params }: { params: { slug: string } }) {
                               {document.request.label}
                             </a>
                           </Button>
+                          {document.request.link && (
+                            <Link
+                              href={document.request.link.href}
+                              className="inline-flex min-h-10 items-center text-sm font-extrabold underline underline-offset-4"
+                            >
+                              {document.request.link.label}
+                            </Link>
+                          )}
                         </div>
                       )}
                     </li>
