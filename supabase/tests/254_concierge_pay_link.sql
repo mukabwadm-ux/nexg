@@ -144,7 +144,7 @@ select is((select channel::text || '/' || payment_status::text || '/' || stage::
 select is((select created_by_staff_id from public.order where id = pg_temp.made('order_id')::uuid),
   'c2520000-0000-4000-8000-0000000000b1'::uuid, 'recorded against the staff member');
 select is((select property_qr_id from public.order where id = pg_temp.made('order_id')::uuid),
-  'c2520000-0000-4000-8000-0000000000aa'::uuid, 'tied to the unit''s QR card');
+  null::uuid, 'not tied to the unit''s QR card, so the host takes no share');
 select ok((select extensions.st_dwithin(dropoff_point, 'SRID=4326;POINT(36.6 -1.4)'::extensions.geography, 1)
              from public.order where id = pg_temp.made('order_id')::uuid), 'delivered to the unit''s pin');
 select is((select token_hash from public.order_pay_link where order_id = pg_temp.made('order_id')::uuid),

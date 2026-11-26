@@ -15,9 +15,11 @@
 --    staff pick a merchant and its catalogue items for a booked or in-stay
 --    stay; the order is priced by fn_web_order_quote exactly as a guest's web
 --    order, delivered to the stay's unit (its pin, label and address), channel
---    'concierge', property_qr_id = the unit's QR card if it has one (so it
---    counts as the unit's concierge spend, and the host share applies as for
---    any QR order), created_by_staff_id, payment pending. Writers are gated by
+--    'concierge', NO property_qr_id: the owner decided (26 Nov 2026) that guest
+--    orders staff place are NexG's alone and not shared with the host, unlike
+--    an order the guest places by scanning the unit's QR card; the order is
+--    tied to its stay through order_pay_link.stay_id instead, and
+--    console_stays_orders counts it in the guest's spending. created_by_staff_id, payment pending. Writers are gated by
 --    authz.works_hospitality(null) or the orders module and audited.
 -- 3. rpc_pay_link_view (anon): the order's summary and its payment state for a
 --    valid token, or why it cannot be paid (expired, replaced, cancelled, paid).
@@ -187,7 +189,9 @@ begin
     'address', nullif(concat_ws(', ', nullif(u.address_line, ''), nullif(u.building, ''),
                                 'Unit ' || nullif(u.unit_no, ''), 'Floor ' || nullif(u.floor, ''),
                                 coalesce(nullif(u.area, ''), nullif(pr.area, ''))), ''),
-    'property_qr_id', v_qr);
+    /* Not the unit's QR card: that would give the host a share (owner, 26 Nov 2026: no). */
+    'property_qr_id', null::uuid,
+    'unit_qr_id', v_qr);
 end;
 $$;
 revoke all on function public.fn_concierge_context(uuid) from public, anon, authenticated;
@@ -946,6 +950,41 @@ end;
 $$;
 revoke execute on function public.cron_expire_unpaid_mpesa_orders() from public, anon, authenticated;
 grant execute on function public.cron_expire_unpaid_mpesa_orders() to service_role;
+
+
+/* console_stays_orders (20270329000100), plus the concierge orders staff place
+   for a guest: those carry no QR card, so they are tied to the stay through
+   their pay link. */
+create or replace function public.console_stays_orders(p_from timestamptz, p_to timestamptz)
+returns table (stay_id uuid, order_id uuid, reference text, created_at timestamptz,
+               total_kes numeric, category text, merchant_name text)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select x.stay_id, o.id, o.reference, o.created_at, o.total_cents / 100.0,
+         coalesce(m.category_key, m.category::text, 'other'),
+         coalesce(m.trading_name, m.legal_name)
+  from (
+    select s.id as stay_id, o.id as order_id
+    from public."order" o
+    join public.property_qr q on q.id = o.property_qr_id and q.owner_type = 'unit'
+    join public.stay s on s.unit_id = q.owner_id
+      and o.created_at >= s.check_in and o.created_at < s.check_out
+      and s.status in ('booked', 'in_stay', 'departed')
+    where o.created_at >= p_from and o.created_at < p_to
+    union
+    select distinct l.stay_id, l.order_id
+    from public.order_pay_link l
+    join public."order" o on o.id = l.order_id
+    where l.stay_id is not null and o.created_at >= p_from and o.created_at < p_to
+  ) x
+  join public."order" o on o.id = x.order_id
+  left join public.merchant m on m.id = o.merchant_id
+  where o.payment_status in ('paid', 'collected', 'partially_refunded')
+$$;
+revoke all on function public.console_stays_orders(timestamptz, timestamptz) from public, anon, authenticated;
 
 -- ═══════════════════════════════════════════════════════════════ 6. grants
 
