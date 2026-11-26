@@ -30,6 +30,17 @@ const positiveInt = z.number().int().positive().max(1_000_000);
    means "not set": the field is left as it is rather than the whole save failing. */
 const unsetZero = <T extends z.ZodTypeAny>(schema: T) =>
   z.preprocess((value) => (value === 0 ? undefined : value), schema.optional());
+/* An optional rate rule: empty or 0 clears it (null), a number sets it. */
+const clearable = <T extends z.ZodTypeAny>(schema: T) =>
+  z.preprocess(
+    (value) => (value === '' || value === 0 || value === null ? null : value),
+    schema.nullable().optional(),
+  );
+/** The jsonb key for a rate rule, only when the form sent its field. */
+function rateRule(record: unknown, field: string, key: string, value: number | null | undefined) {
+  const sent = typeof record === 'object' && record !== null && field in record;
+  return sent ? { [key]: value ?? null } : {};
+}
 /* What a guest reads. An empty string clears the field. */
 const listingText = z.string().trim().max(LISTING_TEXT_MAX);
 const amenities = z.array(z.string().trim().min(1).max(80)).max(40);
@@ -590,6 +601,9 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
         sizeSqm: unsetZero(z.number().int().min(1).max(100_000)),
         summary: listingText.optional(),
         minNights: unsetZero(z.number().int().min(1).max(365)),
+        weekendRateKes: clearable(positiveInt.max(10_000_000)),
+        weeklyDiscountPct: clearable(z.number().int().min(1).max(90)),
+        monthlyDiscountPct: clearable(z.number().int().min(1).max(90)),
       })
       .refine(pinComplete, { message: 'Place the map pin again.', path: ['lat'] })
       .parse(record);
@@ -625,6 +639,15 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
           size_sqm: unit.sizeSqm,
           unit_summary: unit.summary,
           min_nights: unit.minNights,
+          /* Only the rules the form sent: a missing key keeps the saved value. */
+          ...rateRule(record, 'weekendRateKes', 'weekend_rate_kes', unit.weekendRateKes),
+          ...rateRule(record, 'weeklyDiscountPct', 'weekly_discount_pct', unit.weeklyDiscountPct),
+          ...rateRule(
+            record,
+            'monthlyDiscountPct',
+            'monthly_discount_pct',
+            unit.monthlyDiscountPct,
+          ),
           delivery_hours:
             unit.deliveryFrom && unit.deliveryTo
               ? { from: unit.deliveryFrom, to: unit.deliveryTo }

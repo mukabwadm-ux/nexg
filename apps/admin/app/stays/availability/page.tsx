@@ -7,7 +7,6 @@ import {
   Copy,
   Layers,
   Moon,
-  Sun,
 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -25,9 +24,16 @@ import { DashClear, DashSearch, DashSelect } from '@/components/portal/dash-filt
 import { UnitControls, UpdateAvailabilityButton } from '@/components/stays/client';
 import { NotYet, PanelLinks, PanelTabs, QuickTiles } from '@/components/stays/extras';
 import {
+  RatePlansCard,
+  RateRulesCard,
+  scopeOptions,
+  SeasonsCard,
+  UnitRatesFacts,
+} from '@/components/stays/rates';
+import { SeasonButton } from '@/components/stays/rates-client';
+import {
   DataTable,
   ErrorNote,
-  Fact,
   FilterRow,
   Footnote,
   PanelHint,
@@ -82,12 +88,17 @@ interface CalendarRow {
   label: string;
   bedrooms: number | null;
   rate_kes: number | null;
+  weekend_rate_kes?: number | null;
+  weekly_discount_pct?: number | null;
+  monthly_discount_pct?: number | null;
   property_name: string | null;
   photo: unknown;
   days: {
     day: string;
     state: 'available' | 'booked' | 'hold' | 'blocked';
+    /** That night's rate: the weekend rate and any season applied. */
     rate_kes: number | null;
+    season?: string | null;
   }[];
 }
 
@@ -125,9 +136,9 @@ const bedroomsText = (b: number | null) =>
 
 /**
  * Stays → Availability & Rates: a week of each live unit, booked, held,
- * blocked or free, at its nightly rate; a four-week view of one unit; and
- * the bulk tools. NexG keeps one nightly rate per unit, so rate plans,
- * seasonal pricing, restrictions and rate rules say so rather than invent.
+ * blocked or free, at that night's rate; a four-week view of one unit; the
+ * bulk tools; and weekend, seasonal and long-stay rates (20270332000100).
+ * Restrictions per unit are not set up, and the screen says so.
  */
 export default async function AvailabilityPage({
   searchParams,
@@ -215,6 +226,12 @@ export default async function AvailabilityPage({
   };
   const href = (params: Record<string, string | null>) =>
     staysHref('/stays/availability', period, city, { ...keep, ...params });
+  /* Seasons, for the Seasonal Pricing and Rate Rules tabs. */
+  const seasons =
+    tab === 'seasonal' || tab === 'rules'
+      ? await ctx.read('rpc_console_stays_seasons', { p_city: city })
+      : null;
+  const options = tab === 'seasonal' || unit ? await scopeOptions(ctx, allRows) : null;
   const unitOptions = allRows.map((r) => ({
     id: r.unit_id,
     label: `${r.label}${r.property_name ? ` · ${r.property_name}` : ''}`,
@@ -274,14 +291,15 @@ export default async function AvailabilityPage({
 
   let main: React.ReactNode;
   if (tab === 'plans') {
-    main = notYet(
-      'One rate per unit for now',
-      'Every unit is quoted at its standard nightly rate. Flexible, non-refundable and other rate plans are not set up yet; the cancellation presets on Payout rules are what guests agree to.',
-    );
+    main = <RatePlansCard rows={filtered} />;
   } else if (tab === 'seasonal') {
-    main = notYet(
-      'No seasonal pricing yet',
-      'High, mid and low season rates are not set up yet. Change a unit’s nightly rate on its panel, or for many units in Bulk Update.',
+    main = (
+      <SeasonsCard
+        seasons={seasons?.data}
+        waiting={Boolean(seasons?.waiting)}
+        error={seasons?.error ?? null}
+        options={options!}
+      />
     );
   } else if (tab === 'restrictions') {
     main = notYet(
@@ -289,9 +307,11 @@ export default async function AvailabilityPage({
       'The minimum stay, maximum stay and advance booking window are set once in Stays Configuration. Restrictions per unit or per date are not set up yet; block dates to close a unit.',
     );
   } else if (tab === 'rules') {
-    main = notYet(
-      'No automatic rate rules yet',
-      'Weekend, long-stay and demand-based rate rules are not set up yet. Each night is the unit’s standard rate.',
+    main = (
+      <RateRulesCard
+        rows={filtered}
+        seasonsRunning={Number(asObject(asObject(seasons?.data).counts).current ?? 0)}
+      />
     );
   } else if (tab === 'bulk') {
     main = (
@@ -327,10 +347,17 @@ export default async function AvailabilityPage({
               {month.map((d) => (
                 <li
                   key={d.day}
+                  title={d.season ?? undefined}
                   className={`rounded-lg p-2 text-center text-[0.8125rem] font-bold ${CELL[d.state]}`}
                 >
                   {dayHead(d.day).date}
                   <span className="block text-[0.75rem] font-semibold">{CELL_LABEL[d.state]}</span>
+                  {d.rate_kes != null && (
+                    <span className="block text-[0.6875rem] font-semibold">
+                      {n(d.rate_kes)}
+                      {d.season ? ' *' : ''}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -404,9 +431,11 @@ export default async function AvailabilityPage({
               {r.days.map((d) => (
                 <td key={d.day} className="px-1">
                   <span
+                    title={d.season ?? undefined}
                     className={`block rounded-md px-1.5 py-1 text-center text-[0.75rem] font-bold ${CELL[d.state]}`}
                   >
                     {d.rate_kes != null ? n(d.rate_kes) : '—'}
+                    {d.season ? ' *' : ''}
                     <span className="block font-semibold">{CELL_LABEL[d.state]}</span>
                   </span>
                 </td>
@@ -423,7 +452,9 @@ export default async function AvailabilityPage({
           href={(p) => href({ page: p > 1 ? String(p) : null })}
         />
         <Footnote>
-          Each night starts at check-in time; a hold is a guest paying now.
+          Each night starts at check-in time; a hold is a guest paying now. The figure is that
+          night&rsquo;s rate (weekend rate and seasons applied; * marks a season), before any
+          long-stay discount.
           {asNumber(o.total) > 100
             ? ` Showing the first 100 of ${n(asNumber(o.total))} live units: search to reach the rest.`
             : ''}
@@ -460,20 +491,7 @@ export default async function AvailabilityPage({
         .
       </p>
     ) : (
-      <>
-        <Fact icon={Coins} label="Standard Rate">
-          {kesFull(unit.rate_kes)} / night
-        </Fact>
-        <Fact icon={Sun} label="Weekend Rate (Fri – Sun)">
-          Same as standard
-        </Fact>
-        <Fact icon={Moon} label="Long Stay (7+ nights)">
-          Same as standard
-        </Fact>
-        <Fact icon={CalendarDays} label="Monthly (30+ nights)">
-          {unit.rate_kes ? `${kesFull(unit.rate_kes * 30)} at the standard rate` : '—'}
-        </Fact>
-      </>
+      <UnitRatesFacts ctx={ctx} unitId={unit.unit_id} label={unit.label} />
     ));
 
   return (
@@ -599,8 +617,14 @@ export default async function AvailabilityPage({
                         },
                         {
                           label: 'Apply Seasonal',
-                          icon: Sun,
-                          unavailable: 'Seasonal pricing is not set up yet.',
+                          icon: CalendarDays,
+                          node: (
+                            <SeasonButton
+                              trigger="tile"
+                              options={options!}
+                              initial={{ scope: 'unit', scopeId: unit.unit_id }}
+                            />
+                          ),
                         },
                         {
                           label: 'Sync Calendar',

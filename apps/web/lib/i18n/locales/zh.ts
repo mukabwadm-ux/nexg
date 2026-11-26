@@ -139,6 +139,7 @@ export const zh: Dictionary = {
   'footer.terms': '条款',
   'footer.privacy': '隐私',
   'footer.cookies': 'Cookie',
+  'footer.cookieSettings': 'Cookie 设置',
   'footer.dataProtection': '数据保护政策',
   'footer.contact': '联系我们',
   'footer.language': '语言',

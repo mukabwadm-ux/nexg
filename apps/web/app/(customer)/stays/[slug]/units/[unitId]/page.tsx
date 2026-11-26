@@ -14,7 +14,9 @@ import {
   unitBedsLabel,
   unitTitle,
 } from '@/components/stays/listing';
+import { TrackEvent } from '@/components/analytics/google-analytics';
 import { SiteFooter } from '@/components/site-footer';
+import { stayViewItem } from '@/lib/analytics/stay-events';
 import { SiteHeader } from '@/components/site-header';
 import { createPublicClient } from '@/lib/supabase/public';
 
@@ -124,6 +126,16 @@ export default async function UnitPage({ params }: { params: { slug: string; uni
       />
 
       <main id="main" className="mx-auto max-w-[120rem] px-4 pb-16 pt-6 sm:px-[30px]">
+        {!sample && (
+          <TrackEvent
+            event={stayViewItem({
+              slug: p.slug,
+              name: p.name,
+              unit: title,
+              fromRateKes: u.nightly_rate_kes,
+            })}
+          />
+        )}
         <nav
           aria-label="Breadcrumb"
           className="text-muted flex flex-wrap items-center gap-1.5 text-[0.75rem] font-bold"

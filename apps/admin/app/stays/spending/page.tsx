@@ -27,6 +27,8 @@ import {
   Pagination,
 } from '@/components/portal/dash';
 import { DashClear, DashSearch, DashSelect } from '@/components/portal/dash-filters';
+import { ConciergeTile } from '@/components/stays/concierge';
+import { ConciergeOrders, type ConciergeOrderRow } from '@/components/stays/concierge-orders';
 import { QuickTiles } from '@/components/stays/extras';
 import {
   Chip,
@@ -128,7 +130,7 @@ export default async function SpendingPage({
   const selected = uuidOrNull(searchParams?.selected);
   const ptab = oneOf(['spend', ...STAY_PANEL_TABS.map((t) => t.key)], searchParams?.ptab, 'spend');
 
-  const [list, detail, overview] = await Promise.all([
+  const [list, detail, overview, conciergeRead] = await Promise.all([
     ctx.read('rpc_console_stays_list', {
       p_from: period.from,
       p_to: period.to,
@@ -141,7 +143,19 @@ export default async function SpendingPage({
     }),
     selected ? ctx.read('rpc_console_stay_detail', { p_stay_id: selected }) : Promise.resolve(null),
     ctx.read('rpc_console_stays_overview', { p_from: period.from, p_to: period.to, p_city: city }),
+    selected
+      ? ctx.read('rpc_console_concierge_orders', { p_stay_id: selected })
+      : Promise.resolve(null),
   ]);
+  const picked = asObject(detail?.data);
+  const canOrder =
+    !!selected &&
+    (picked.status === 'booked' || picked.status === 'in_stay') &&
+    typeof picked.check_out === 'string' &&
+    Date.parse(picked.check_out) > Date.now();
+  const conciergeRows = Array.isArray(conciergeRead?.data)
+    ? (conciergeRead.data as ConciergeOrderRow[])
+    : [];
   const all = paged<StayRow>(list.data);
   const filtered = all.rows.filter(
     (r) =>
@@ -454,6 +468,11 @@ export default async function SpendingPage({
                         closeHref={href({ selected: null })}
                         tab={ptab}
                         tabHref={(k) => href({ selected, ptab: k === 'overview' ? 'spend' : k })}
+                        concierge={
+                          conciergeRead && !conciergeRead.waiting ? (
+                            <ConciergeOrders rows={conciergeRows} />
+                          ) : undefined
+                        }
                       />
                     ) : (
                       <PanelHint>Choose a guest to see their stay and orders.</PanelHint>
@@ -462,18 +481,42 @@ export default async function SpendingPage({
                       <QuickTiles
                         cols={3}
                         tiles={[
-                          { label: 'Airport Transfer', icon: Car },
-                          { label: 'Grocery Delivery', icon: ShoppingCart },
-                          { label: 'Food & Dining', icon: UtensilsCrossed },
-                          { label: 'Bookings (Tables, Spa)', icon: CalendarCheck },
-                          { label: 'Experiences & Tickets', icon: Ticket },
-                          { label: 'Other Requests', icon: LayoutGrid },
-                        ].map((t) => ({
-                          ...t,
-                          unavailable:
-                            'Ordering for a guest from the console is not built yet; guests order through the QR in their unit.',
-                        }))}
+                          { label: 'Airport Transfer', icon: Car, group: 'transfer' },
+                          { label: 'Grocery Delivery', icon: ShoppingCart, group: 'groceries' },
+                          { label: 'Food & Dining', icon: UtensilsCrossed, group: 'food' },
+                          {
+                            label: 'Bookings (Tables, Spa)',
+                            icon: CalendarCheck,
+                            group: 'bookings',
+                          },
+                          { label: 'Experiences & Tickets', icon: Ticket, group: 'experiences' },
+                          { label: 'Other Requests', icon: LayoutGrid, group: 'other' },
+                        ].map(({ group, ...t }) =>
+                          canOrder && selected && !conciergeRead?.waiting
+                            ? {
+                                ...t,
+                                node: (
+                                  <ConciergeTile
+                                    label={t.label}
+                                    group={group}
+                                    stayId={selected}
+                                    guestName={String(picked.guest_name ?? 'the guest')}
+                                  />
+                                ),
+                              }
+                            : {
+                                ...t,
+                                unavailable: conciergeRead?.waiting
+                                  ? 'Ordering for a guest needs the concierge pay link update on the database.'
+                                  : 'Choose a guest who is booked or staying now to order for them.',
+                              },
+                        )}
                       />
+                      <Footnote>
+                        The guest is sent a pay link by SMS (and email) and pays by M-Pesa or card
+                        before the merchant starts. Nothing is owed if they do not pay within 24
+                        hours.
+                      </Footnote>
                     </DashCard>
                   </div>
                 }

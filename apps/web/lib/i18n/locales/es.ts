@@ -145,6 +145,7 @@ export const es: Dictionary = {
   'footer.terms': 'Términos',
   'footer.privacy': 'Privacidad',
   'footer.cookies': 'Cookies',
+  'footer.cookieSettings': 'Configuración de cookies',
   'footer.dataProtection': 'Política de protección de datos',
   'footer.contact': 'Contacto',
   'footer.language': 'Idioma',

@@ -27,6 +27,8 @@ import {
  * POST JSON {action:'upload-url', kind, fileName, mime, size} returns a signed
  * upload URL, the client sends the file straight to Storage, and
  * POST JSON {action:'complete', kind, fileName, mime, size, path} records it.
+ * Either way an optional expiresOn (YYYY-MM-DD) records the expiry date
+ * printed on the document; NexG staff confirm or correct it when approving.
  */
 
 export const dynamic = 'force-dynamic';
@@ -52,6 +54,8 @@ interface DocumentRow {
   rejection_reason: string | null;
   uploaded_at: string;
   storage_path: string;
+  /** From 20270332000300; missing until that migration is applied. */
+  expires_on?: string | null;
 }
 
 /* host_document and the onboarding RPCs are newer than the generated types. */
@@ -88,15 +92,25 @@ function fullAccess(access: HostWorkspaceAccess) {
     );
 }
 
-async function view(access: HostWorkspaceAccess) {
+const DOCUMENT_COLUMNS = 'id, kind, file_name, status, rejection_reason, uploaded_at, storage_path';
+
+/* The current documents, with their expiry dates once the column exists. */
+async function currentDocuments(access: HostWorkspaceAccess) {
   const db = access.db as unknown as Loose;
-  const [{ data: rows, error }, host] = await Promise.all([
+  const read = (columns: string) =>
     db
       .from('host_document')
-      .select('id, kind, file_name, status, rejection_reason, uploaded_at, storage_path')
+      .select(columns)
       .eq('host_id', access.hostId)
       .is('superseded_at', null)
-      .order('uploaded_at', { ascending: false }),
+      .order('uploaded_at', { ascending: false });
+  const withExpiry = await read(`${DOCUMENT_COLUMNS}, expires_on`);
+  return withExpiry.error ? await read(DOCUMENT_COLUMNS) : withExpiry;
+}
+
+async function view(access: HostWorkspaceAccess) {
+  const [{ data: rows, error }, host] = await Promise.all([
+    currentDocuments(access),
     access.db
       .from('host')
       .select('status, status_reason, verification_submitted_at')
@@ -130,6 +144,7 @@ async function view(access: HostWorkspaceAccess) {
       status: row.status,
       rejectionReason: row.rejection_reason,
       uploadedAt: row.uploaded_at,
+      expiresOn: row.expires_on ?? null,
       url: urls.get(row.storage_path) ?? '',
     })),
   });
@@ -154,12 +169,31 @@ export async function GET(request: Request) {
 const BAD_FILE = 'Upload a PDF or photo (JPEG, PNG, WebP or HEIC) up to 10 MB.';
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 
+/* Optional expiry date printed on the document (YYYY-MM-DD); '' = none. */
+const expiresOnSchema = z
+  .union([z.literal(''), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)])
+  .nullish()
+  .transform((value) => value || null);
+
 const stepSchema = z.object({
   kind: z.enum(KINDS),
   fileName: z.string().max(400).optional().default(''),
   mime: z.string().max(100),
   size: z.number().int(),
+  expiresOn: expiresOnSchema,
 });
+
+/** A real calendar date, not before today in Nairobi. */
+function checkExpiry(expiresOn: string | null) {
+  if (!expiresOn) return null;
+  const parsed = new Date(`${expiresOn}T12:00:00Z`);
+  if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== expiresOn)
+    throw new HostWorkspaceError(400, 'Enter the expiry date as a full date, or leave it empty.');
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Nairobi' });
+  if (expiresOn < today)
+    throw new HostWorkspaceError(400, 'This document has already expired. Upload a current one.');
+  return expiresOn;
+}
 const uploadStepSchema = z.discriminatedUnion('action', [
   stepSchema.extend({ action: z.literal('upload-url') }),
   stepSchema.extend({ action: z.literal('complete'), path: z.string().max(400) }),
@@ -178,10 +212,12 @@ interface NewDocument {
   extension: string;
   mime: string;
   size: number;
+  expiresOn: string | null;
 }
 
 async function record(access: HostWorkspaceAccess, file: NewDocument) {
-  const { error } = await (access.db as unknown as Loose).rpc('rpc_host_document_add', {
+  const db = access.db as unknown as Loose;
+  const { data: documentId, error } = await db.rpc('rpc_host_document_add', {
     p_host_id: access.hostId,
     p_kind: file.kind,
     p_storage_path: file.path,
@@ -192,12 +228,25 @@ async function record(access: HostWorkspaceAccess, file: NewDocument) {
   if (error?.code === '42501') throw new HostWorkspaceError(403, error.message);
   if (error?.code === '22023') throw new HostWorkspaceError(400, error.message);
   if (error) throw new HostWorkspaceError(503, 'The document could not be saved. Try again.');
+  if (file.expiresOn && typeof documentId === 'string') {
+    const expiry = await db.rpc('rpc_host_document_set_expiry', {
+      p_document_id: documentId,
+      p_expires_on: file.expiresOn,
+    });
+    if (expiry.error?.code === '22023') throw new HostWorkspaceError(400, expiry.error.message);
+    if (expiry.error)
+      throw new HostWorkspaceError(
+        503,
+        'The document was uploaded, but its expiry date was not saved. NexG will add it when reviewing.',
+      );
+  }
   return await view(access);
 }
 
 /** The two JSON steps of a direct upload. */
 async function uploadStep(request: Request) {
   const step = uploadStepSchema.parse(await readUploadStep(request));
+  const expiresOn = checkExpiry(step.expiresOn);
   const extension = extensionFor(step.mime, step.size);
   const access = await hostWorkspaceAccess(request);
   fullAccess(access);
@@ -224,6 +273,7 @@ async function uploadStep(request: Request) {
     extension,
     mime: step.mime,
     size: object.size,
+    expiresOn,
   });
 }
 
@@ -246,6 +296,7 @@ export async function POST(request: Request) {
     fullAccess(access);
     const form = await request.formData();
     const kind = z.enum(KINDS).parse(form.get('kind'));
+    const expiresOn = checkExpiry(expiresOnSchema.parse(form.get('expiresOn')));
     const file = form.get('file');
     const extension = file instanceof File ? EXTENSIONS[file.type] : undefined;
     if (!(file instanceof File) || !extension || !file.size || file.size > maxBytes)
@@ -268,6 +319,7 @@ export async function POST(request: Request) {
       extension,
       mime: file.type,
       size: file.size,
+      expiresOn,
     });
   } catch (error) {
     return respond(error);

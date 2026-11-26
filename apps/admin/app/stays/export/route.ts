@@ -1,3 +1,4 @@
+import { documentCompany, renderTableReport } from '@nexg/merchant-agreement/documents';
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { periodFrom, toCsv } from '@/lib/portal';
@@ -27,8 +28,9 @@ type Untyped = {
 };
 
 /**
- * Stays reports as CSV: the same readers the screens use (they check the
- * module themselves), every row of the period, and a line in the report log
+ * Stays reports as CSV, or with ?format=pdf as a branded PDF of the same
+ * rows: the same readers the screens use (they check the module
+ * themselves), every row of the period, and a line in the report log
  * (rpc_console_stays_report_log) so Reports shows who exported what.
  */
 export async function GET(request: NextRequest) {
@@ -312,6 +314,42 @@ export async function GET(request: NextRequest) {
       p_rows: rows.length - 1,
     }),
   ).catch(() => null);
+
+  if (sp.get('format') === 'pdf') {
+    let scope = 'All cities';
+    if (city) {
+      const { data } = await createClient()
+        .from('city')
+        .select('name')
+        .eq('id', city)
+        .maybeSingle();
+      scope = (data as { name?: string } | null)?.name ?? scope;
+    }
+    /* The letterhead phone is Finance's to read; without it the default company block prints. */
+    const letterhead = await Promise.resolve(db.rpc('rpc_fin_letterhead')).catch(() => null);
+    const phone = (letterhead?.data as { phone?: string | null } | null)?.phone ?? null;
+    try {
+      const doc = await renderTableReport({
+        title: REPORTS.find((r) => r.key === report)?.title ?? report,
+        section: 'Stays',
+        from: period.from,
+        to: period.to,
+        scope,
+        generatedBy: staff.displayName,
+        rows,
+        company: documentCompany(phone),
+      });
+      return new NextResponse(Buffer.from(doc.bytes), {
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename="nexg-stays-${report}-${period.from}-to-${period.to}.pdf"`,
+          'Cache-Control': 'private, no-store',
+        },
+      });
+    } catch (e) {
+      return new NextResponse(`Could not make the PDF: ${(e as Error).message}`, { status: 500 });
+    }
+  }
 
   /* A byte-order mark first, so Excel reads the shillings and names as UTF-8. */
   return new NextResponse(String.fromCharCode(0xfeff) + toCsv(rows), {

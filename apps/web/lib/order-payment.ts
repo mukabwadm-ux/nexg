@@ -254,6 +254,8 @@ export interface PaymentTarget {
   describe?: (state: PaymentState) => Promise<Record<string, unknown>>;
   /** M-Pesa straight to Safaricom while Paystack is not live (lib/payment-methods). */
   daraja?: DarajaTarget;
+  /** Where Paystack's card page sends the customer back; /pay/{reference} when absent. */
+  callbackUrl?: (site: string, paymentReference: string) => string;
 }
 
 export interface DarajaTarget {
@@ -430,7 +432,9 @@ export async function startPayment(
             reference: attempt.attempt_reference,
             amountCents: attempt.amount_cents,
             email,
-            callbackUrl: `${site}/pay/${encodeURIComponent(payment.reference)}`,
+            callbackUrl:
+              found.callbackUrl?.(site, payment.reference) ??
+              `${site}/pay/${encodeURIComponent(payment.reference)}`,
             metadata,
             ...(attempt.split ? { split: attempt.split } : {}),
           })

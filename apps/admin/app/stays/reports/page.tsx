@@ -8,6 +8,7 @@ import {
   ConciergeBell,
   Download,
   FileSpreadsheet,
+  FileText,
   Handshake,
   LineChart,
   Percent,
@@ -45,6 +46,8 @@ import {
   type ReportKey,
 } from '@/lib/stays-module';
 import { REPORT_TABS, ReportsView } from '@/components/stays/tab-views';
+import { SavedReportsView, ScheduledReportsView } from '@/components/stays/report-plans-view';
+import { plansFrom } from '@/lib/stays-report-plans';
 import { staysContext } from '@/lib/stays-server';
 
 export const metadata: Metadata = { title: 'Stays · Reports' };
@@ -77,9 +80,9 @@ const shift = (iso: string, days: number) =>
   new Date(Date.parse(`${iso}T12:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);
 
 /**
- * Stays → Reports: the report library (each a CSV of the period with the
- * screen's own figures), quick reports for common periods, and every export
- * staff ran. Scheduled and saved reports are not built yet.
+ * Stays → Reports: the report library (each a CSV or a branded PDF of the
+ * period with the screen's own figures), quick reports for common periods,
+ * reports emailed on a schedule, saved reports, and every export staff ran.
  */
 export default async function ReportsPage({
   searchParams,
@@ -93,7 +96,8 @@ export default async function ReportsPage({
     'overview',
   );
   const { period, city } = ctx;
-  const [fin, perf, runs] = await Promise.all([
+  const plansNeeded = view === 'scheduled' || view === 'saved';
+  const [fin, perf, runs, plansRead] = await Promise.all([
     ctx.read('rpc_console_stays_finance', { p_from: period.from, p_to: period.to, p_city: city }),
     ctx.read('rpc_console_stays_performance', {
       p_from: period.from,
@@ -101,7 +105,9 @@ export default async function ReportsPage({
       p_city: city,
     }),
     ctx.read('rpc_console_stays_report_runs', { p_limit: 10 }),
+    plansNeeded ? ctx.read('rpc_console_stays_report_plans', {}) : null,
   ]);
+  const plans = plansFrom(plansRead?.data);
   const f = asObject(asObject(fin.data).kpis);
   const rules = asObject(asObject(fin.data).rules);
   const p = asObject(asObject(perf.data).kpis);
@@ -109,6 +115,8 @@ export default async function ReportsPage({
   const today = todayInNairobi();
   const exportHref = (report: string, from = period.from, to = period.to) =>
     staysHref('/stays/export', { from, to }, city, { report });
+  const pdfHref = (report: string) =>
+    staysHref('/stays/export', period, city, { report, format: 'pdf' });
   const quick: { label: string; href: string; icon: LucideIcon }[] = [
     { label: "Today's Bookings", href: exportHref('bookings', today, today), icon: CalendarCheck },
     {
@@ -137,7 +145,7 @@ export default async function ReportsPage({
     <ConsoleShell staff={ctx.staff}>
       <StaysHeader
         screen="Reports"
-        subtitle="Ready-to-use reports for the period, downloaded as spreadsheets."
+        subtitle="Ready-to-use reports for the period, downloaded as spreadsheets or PDFs."
         period={period}
         cities={ctx.cities}
         city={city}
@@ -216,31 +224,44 @@ export default async function ReportsPage({
                       {REPORTS.map((r) => {
                         const Icon = ICON[r.key];
                         return (
-                          <li key={r.key}>
-                            <a
-                              href={exportHref(r.key)}
-                              download
-                              className="flex h-full flex-col items-center rounded-xl border border-[#F5E2B0] bg-[#FFFBF0] p-3 text-center transition-colors hover:bg-[#FFF4D6]"
-                            >
-                              <Icon
-                                aria-hidden="true"
-                                className="h-8 w-8 text-[#E5A800]"
-                                strokeWidth={1.6}
-                              />
-                              <span className="mt-2 font-extrabold">{r.title}</span>
-                              <span className="text-muted mt-1 text-[0.8125rem] font-semibold">
-                                {r.blurb}
-                              </span>
-                              <span className="mt-2 inline-flex items-center gap-1 text-[0.8125rem] font-bold text-[#8A5C00]">
+                          <li
+                            key={r.key}
+                            className="flex h-full flex-col items-center rounded-xl border border-[#F5E2B0] bg-[#FFFBF0] p-3 text-center"
+                          >
+                            <Icon
+                              aria-hidden="true"
+                              className="h-8 w-8 text-[#E5A800]"
+                              strokeWidth={1.6}
+                            />
+                            <span className="mt-2 font-extrabold">{r.title}</span>
+                            <span className="text-muted mt-1 text-[0.8125rem] font-semibold">
+                              {r.blurb}
+                            </span>
+                            <span className="mt-auto flex gap-1 pt-2">
+                              <a
+                                href={exportHref(r.key)}
+                                download
+                                aria-label={`${r.title} as CSV`}
+                                className="inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-[0.8125rem] font-bold text-[#8A5C00] hover:bg-[#FFF4D6]"
+                              >
                                 <Download aria-hidden="true" className="h-3.5 w-3.5" /> CSV
-                              </span>
-                            </a>
+                              </a>
+                              <a
+                                href={pdfHref(r.key)}
+                                download
+                                aria-label={`${r.title} as PDF`}
+                                className="inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-[0.8125rem] font-bold text-[#8A5C00] hover:bg-[#FFF4D6]"
+                              >
+                                <FileText aria-hidden="true" className="h-3.5 w-3.5" /> PDF
+                              </a>
+                            </span>
                           </li>
                         );
                       })}
                     </ul>
                     <Footnote>
-                      Each opens in Excel or Google Sheets. Change the period in the header first.
+                      The CSV opens in Excel or Google Sheets; the PDF is the same rows on the NexG
+                      letterhead. Change the period in the header first.
                     </Footnote>
                   </DashCard>
                   <DashCard title="Quick Reports">
@@ -321,14 +342,47 @@ export default async function ReportsPage({
                         <FileSpreadsheet aria-hidden="true" className="h-4 w-4" /> Export to
                         spreadsheet (CSV)
                       </a>
+                      <a
+                        href={pdfHref('bookings')}
+                        download
+                        className="flex h-11 items-center gap-2 rounded-xl border border-[#F5D27A] bg-[#FFFBF0] px-3 font-bold text-[#8A5C00]"
+                      >
+                        <FileText aria-hidden="true" className="h-4 w-4" /> Export to PDF
+                      </a>
+                      <a
+                        href={staysHref('/stays/reports', period, city, { view: 'scheduled' })}
+                        className="flex h-11 items-center gap-2 rounded-xl border border-[#F5D27A] bg-[#FFFBF0] px-3 font-bold text-[#8A5C00]"
+                      >
+                        <CalendarCheck aria-hidden="true" className="h-4 w-4" /> Schedule a report
+                      </a>
+                      <a
+                        href={staysHref('/stays/reports', period, city, { view: 'saved' })}
+                        className="flex h-11 items-center gap-2 rounded-xl border border-[#F5D27A] bg-[#FFFBF0] px-3 font-bold text-[#8A5C00]"
+                      >
+                        <FileSpreadsheet aria-hidden="true" className="h-4 w-4" /> Saved reports
+                      </a>
                     </div>
                     <Footnote>
-                      PDF export, scheduled and saved reports are not built yet. Branded PDFs for
-                      invoices and settlements are in Finance.
+                      The exports are the Bookings Report for the period; every other report is in
+                      the library. Branded PDFs for invoices and settlements are in Finance.
                     </Footnote>
                   </DashCard>
                 </div>
               </>
+            ) : plansNeeded && plansRead?.waiting ? (
+              <WaitingForDatabase />
+            ) : plansNeeded && plansRead?.error ? (
+              <ErrorNote message={plansRead.error} />
+            ) : view === 'scheduled' ? (
+              <ScheduledReportsView plans={plans} cities={ctx.cities} city={city} />
+            ) : view === 'saved' ? (
+              <SavedReportsView
+                plans={plans}
+                cities={ctx.cities}
+                period={period}
+                city={city}
+                today={today}
+              />
             ) : (
               <ReportsView
                 view={view}

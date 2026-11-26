@@ -94,12 +94,15 @@ export function StayPanel({
   tab = 'overview',
   tabHref,
   variant = 'reservation',
+  concierge,
 }: {
   detail: unknown;
   closeHref: string;
   tab?: string;
   tabHref?: (key: string) => string;
   variant?: 'reservation' | 'checkin' | 'spending';
+  /** Orders staff placed for the guest (Guest Spending's Services tab). */
+  concierge?: React.ReactNode;
 }) {
   const d = asObject(detail) as unknown as Detail;
   if (!d.stay_id) {
@@ -153,6 +156,7 @@ export function StayPanel({
           </li>
         </ul>
       )}
+      {concierge}
     </>
   );
 
