@@ -109,6 +109,11 @@ describe('what a booking owes now', () => {
       pricing: { totalDueMinor: 20000000, dueNowMinor: 8000000, finalMinor: 20000000 },
     };
     expect(stepFor(accepted, false)).toEqual({ step: 'balance', amount: 8000000, expiresAt: null });
+    for (const status of ['in_progress', 'completed'])
+      expect(stepFor({ ...accepted, status }, false)).toMatchObject({
+        step: 'balance',
+        amount: 8000000,
+      });
     const lower = {
       ...accepted,
       pricing: { totalDueMinor: 10000000, dueNowMinor: 0, finalMinor: 10000000 },

@@ -82,6 +82,8 @@ const WINDOW_MODELS = new Set(['SERVICE_JOB', 'LINKED_WINDOWS']);
  */
 const QUOTE_DEPOSIT_BPS = 5000;
 const quoteDeposit = (topMinor: number) => Math.round((topMinor * QUOTE_DEPOSIT_BPS) / 10000);
+/** The balance of an accepted quote stays payable once the business starts or finishes the work. */
+const QUOTE_BALANCE_STATES = new Set(['accepted', 'in_progress', 'completed']);
 const reservableQuote = (n: Doc | undefined) =>
   n?.model === 'REQUEST_QUOTE' &&
   Number.isSafeInteger(n.quoteRange?.maxMinor) &&
@@ -3562,7 +3564,8 @@ export class BookingEngine {
   }
   /**
    * A reserved quote's payment: the deposit (half of the top of the range) while it waits for it, which sends the
-   * request to the business; then, once the business accepted it with its final price, exactly the balance.
+   * request to the business; then, once the business accepted it with its final price, exactly the balance, also
+   * after the work has started or finished.
    */
   private async settleQuotePayment(identity: Identity, req: any, id: string, doc: Doc, input: Doc) {
     const n = doc.nexg ?? {};
@@ -3589,7 +3592,7 @@ export class BookingEngine {
     const depositStep = state === 'held' && paidBefore === 0;
     const due = depositStep
       ? (n.pricing?.dueNowMinor ?? 0)
-      : state === 'accepted' && n.pricing?.finalMinor !== undefined
+      : QUOTE_BALANCE_STATES.has(state) && n.pricing?.finalMinor !== undefined
         ? Math.max(n.pricing.finalMinor - paidBefore + (n.refundedMinor ?? 0), 0)
         : 0;
     if (depositStep && expired)

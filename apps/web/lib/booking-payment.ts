@@ -81,6 +81,8 @@ async function engineBooking(row: SavedBooking): Promise<EngineBooking | null> {
   return body.booking && typeof body.booking === 'object' ? body.booking : body;
 }
 
+const QUOTE_BALANCE_STATES = new Set(['accepted', 'in_progress', 'completed']);
+
 type Step = { step: 'full' | 'deposit' | 'balance'; amount: number; expiresAt: string | null };
 
 /** What is due now, from the engine's own figures. */
@@ -95,7 +97,8 @@ export function stepFor(booking: EngineBooking, payInFull: boolean): Step | 'not
       ? new Date(booking.expiresAt).toISOString()
       : null;
   // A quote is reserved with half of the top of its range, never paid to the top (owner, 25 Nov 2026); once the
-  // business accepts it with its final price, the balance is the final price less what was paid.
+  // business accepts it with its final price, the balance is the final price less what was paid, and it stays
+  // payable after the work has started or finished.
   const quote = booking.model === 'REQUEST_QUOTE';
   if (booking.status === 'held') {
     const deposit = cents(booking.pricing?.dueNowMinor);
@@ -105,7 +108,9 @@ export function stepFor(booking: EngineBooking, payInFull: boolean): Step | 'not
     return { step: 'full', amount: remaining, expiresAt };
   }
   if (quote)
-    return booking.status === 'accepted' && cents(booking.pricing?.finalMinor) !== null && paid > 0
+    return QUOTE_BALANCE_STATES.has(String(booking.status)) &&
+      cents(booking.pricing?.finalMinor) !== null &&
+      paid > 0
       ? { step: 'balance', amount: remaining, expiresAt: null }
       : 'nothing';
   if (booking.status === 'confirmed' && paid > 0)

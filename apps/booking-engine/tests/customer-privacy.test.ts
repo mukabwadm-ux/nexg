@@ -740,6 +740,8 @@ test('a quote is reserved with half of the top of its range, then paid to its fi
       ),
     (e: any) => e.code === 'payment_amount_mismatch',
   );
+  // The business starts the work with the balance still open: the customer can still pay it.
+  await engine.changeBooking(owner, id, 'start', { expectedVersion: accepted.version }, key());
   const settled = (await engine.settlePayment(
     platform,
     id,
@@ -747,6 +749,7 @@ test('a quote is reserved with half of the top of its range, then paid to its fi
     key(),
   )) as any;
   assert.equal(settled.paidMinor, 20000000);
+  assert.equal(settled.status, 'in_progress', 'paying the balance leaves the work where it is');
   await assert.rejects(
     () =>
       engine.settlePayment(
