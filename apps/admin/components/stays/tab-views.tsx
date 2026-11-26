@@ -133,8 +133,8 @@ export function FinanceView({ view, data }: { view: string; data: unknown }) {
           ))}
         </DataTable>
         <Footnote>
-          Billable this period: {kesFull(asNumber(k.management_fees))}. Fees are worked out by the
-          rule; no fee invoices are raised automatically yet.
+          Billable this period by the rule: {kesFull(asNumber(k.management_fees))}. Invoices are
+          raised monthly and taken from host payouts.
         </Footnote>
       </DashCard>
     );
@@ -710,9 +710,18 @@ const RAIL: Record<string, string> = {
 };
 
 /** Payouts: every host's split for the period, and where they are paid. */
-export function PayoutsView({ data }: { data: unknown }) {
+export function PayoutsView({
+  data,
+  deductions = {},
+}: {
+  data: unknown;
+  /** Management fees taken by payout runs, by host (20270331000600). */
+  deductions?: Record<string, { booked_kes: number; pending_kes: number }>;
+}) {
   const o = asObject(data);
   const hosts = (Array.isArray(o.hosts) ? o.hosts : []) as HostPay[];
+  const feeTaken = (hostId: string) =>
+    asNumber(deductions[hostId]?.booked_kes) + asNumber(deductions[hostId]?.pending_kes);
   return (
     <DashCard title="Host Payouts (period)">
       <DataTable
@@ -725,6 +734,7 @@ export function PayoutsView({ data }: { data: unknown }) {
           'Booking Value (KES)',
           'NexG Commission',
           'Host Payout',
+          'Fee Deducted',
           'Payout details',
           'Method',
         ]}
@@ -741,6 +751,9 @@ export function PayoutsView({ data }: { data: unknown }) {
             <td className="tabular-nums">{n(h.value_kes)}</td>
             <td className="tabular-nums">{n(h.commission_kes)}</td>
             <td className="font-bold tabular-nums">{n(h.host_share_kes)}</td>
+            <td className="tabular-nums">
+              {feeTaken(h.host_id) > 0 ? `− ${n(feeTaken(h.host_id))}` : '—'}
+            </td>
             <td>
               <Chip
                 status={h.payout_verified ? 'resolved' : 'pending'}
@@ -752,7 +765,8 @@ export function PayoutsView({ data }: { data: unknown }) {
         ))}
       </DataTable>
       <Footnote>
-        Paying hosts is Finance&rsquo;s weekly payout run (Finance › Settlements & Payouts).
+        Paying hosts is Finance&rsquo;s weekly payout run (Finance › Settlements & Payouts). Fee
+        Deducted is the management fee the period&rsquo;s runs take from the host&rsquo;s payout.
       </Footnote>
     </DashCard>
   );
