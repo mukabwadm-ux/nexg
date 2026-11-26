@@ -5,7 +5,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(27);
+select plan(28);
 
 insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, is_anonymous, created_at, updated_at)
 values
@@ -55,6 +55,16 @@ values
 insert into public.stay_review (stay_id, rating, rating_cleanliness, answered_at)
 values ('c2510000-0000-4000-8000-0000000000d4', 4, 2, now() - interval '20 days');
 
+-- s7: a guest who left yesterday but switched booking emails off (owner, 26 Nov 2026).
+insert into public.stay (id, host_id, unit_id, guest_user_id, guest_first_name, check_in, check_out, status, source)
+values ('c2510000-0000-4000-8000-0000000000d7', 'c2510000-0000-4000-8000-0000000000a1', 'c2510000-0000-4000-8000-0000000000c1',
+        'c2510000-0000-4000-8000-000000000002', 'Akinyi', now() - interval '4 days', now() - interval '1 day', 'departed', 'nexg');
+insert into public.customer_notification_pref (user_id, choices)
+values ('c2510000-0000-4000-8000-000000000002', '{"booking_reminders": {"email": false}}');
+
+select ok(not public.fn_guest_review_emails_allowed('c2510000-0000-4000-8000-000000000002', 'other251@example.test'),
+  'a guest who switched booking emails off is not asked');
+
 -- ─────────────────────────────────────────── the daily ask: once, then one reminder
 
 select is((public.cron_stay_review_requests()) ->> 'asked', '1', 'the ask goes to the one guest who left yesterday');
@@ -86,7 +96,8 @@ set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"c2510000-0000-4000-8000-000000000002","role":"authenticated"}', true);
 select throws_ok($$ select public.rpc_stay_review_submit('c2510000-0000-4000-8000-0000000000d1', '{"rating":5}') $$,
   '42501', null, 'another customer cannot rate the stay');
-select is(jsonb_array_length(public.rpc_stay_review_mine()), 0, 'nor see it');
+select ok(not exists (select 1 from jsonb_array_elements(public.rpc_stay_review_mine()) e
+                 where e ->> 'stay_id' = 'c2510000-0000-4000-8000-0000000000d1'), 'nor see it');
 
 select set_config('request.jwt.claims', '{"sub":"c2510000-0000-4000-8000-000000000001","role":"authenticated"}', true);
 select throws_ok($$ select public.rpc_stay_review_submit('c2510000-0000-4000-8000-0000000000d2', '{"rating":5}') $$,

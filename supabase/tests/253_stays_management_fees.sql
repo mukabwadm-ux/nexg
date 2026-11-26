@@ -7,7 +7,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(31);
+select plan(32);
 
 create temporary table t (k text primary key, v text) on commit drop;
 grant all on t to authenticated;
@@ -151,8 +151,15 @@ select is(
   (select count(*)::int from ledger.entry e join ledger.transaction x on x.id = e.transaction_id
     where x.idempotency_key = 'host_invoice:' || (select id from public.host_invoice
             where host_id = 'c2530000-0000-4000-8000-0000000000c1' and period = (select v::date from t where k = 'm0'))
-      and e.account_code = 'revenue.stays_management_fee' and e.credit = 100000),
-  1, 'The invoice is revenue on the management fee account, not packages');
+      and e.account_code = 'revenue.stays_management_fee' and e.credit = 86207),
+  1, 'The invoice is revenue on the management fee account, not packages, net of VAT');
+
+select is(
+  (select count(*)::int from ledger.entry e join ledger.transaction x on x.id = e.transaction_id
+    where x.idempotency_key = 'host_invoice:' || (select id from public.host_invoice
+            where host_id = 'c2530000-0000-4000-8000-0000000000c1' and period = (select v::date from t where k = 'm0'))
+      and e.account_code = 'tax.vat_output' and e.credit = 13793),
+  1, 'The fee is VAT-inclusive: 16% VAT inside it goes to VAT output');
 
 select ok(
   exists (select 1 from public.notification_log where template = 'host_management_fee'

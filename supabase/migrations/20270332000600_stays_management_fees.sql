@@ -46,8 +46,9 @@
 --
 -- Revenue lands on a new account, revenue.stays_management_fee, not
 -- revenue.packages: ledger.fn_post_host_invoice picks the account by the
--- invoice's lines. The whole fee is posted as revenue (no VAT taken out); see
--- the report for the owner's decision.
+-- invoice's lines. The fee is VAT-inclusive (owner, 26 Nov 2026): the posting
+-- splits the VAT inside it (stays.commission_vat_pct, 16%) to tax.vat_output and
+-- the rest to revenue; the host still owes the invoice total.
 --
 -- Changes to existing functions (same signatures and grants):
 --   rpc_settlement_build            20270310000100: host branch only (the fee
@@ -207,6 +208,7 @@ declare
   v_inv public.host_invoice;
   v_city uuid;
   v_fee boolean;
+  v_vat bigint := 0;
 begin
   select * into v_inv from public.host_invoice where id = p_invoice_id;
   if not found then
@@ -218,6 +220,11 @@ begin
 
   select city_id into v_city from public.host where id = v_inv.host_id;
   v_fee := public.fn_host_invoice_is_management_fee(v_inv.lines);
+  /* A management fee is VAT-inclusive: take out the VAT inside it. */
+  if v_fee then
+    v_vat := round(v_inv.total * coalesce((public.fn_stays_setting('stays.commission_vat_pct') #>> '{}')::numeric, 16)
+                   / (100 + coalesce((public.fn_stays_setting('stays.commission_vat_pct') #>> '{}')::numeric, 16)));
+  end if;
 
   return ledger.post(
     p_kind => 'host_invoice_issued',
@@ -229,7 +236,11 @@ begin
                 || to_char(v_inv.period, 'Mon YYYY')),
       jsonb_build_object('account',
         case when v_fee then 'revenue.stays_management_fee' else 'revenue.packages' end,
-        'credit', v_inv.total)),
+        'credit', v_inv.total - v_vat))
+      || case when v_vat > 0
+           then jsonb_build_array(jsonb_build_object('account', 'tax.vat_output', 'credit', v_vat,
+                  'memo', 'VAT in management fee ' || to_char(v_inv.period, 'Mon YYYY')))
+           else '[]'::jsonb end,
     p_effective_at => v_inv.created_at,
     p_city_id => v_city,
     p_actor_kind => 'system',

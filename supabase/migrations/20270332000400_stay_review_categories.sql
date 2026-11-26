@@ -247,6 +247,34 @@ $$;
 
 -- ═══════════════════════════════════════════════════════════════ 4. asking
 
+/*
+ * Whether a guest still wants stay emails (owner, 26 Nov 2026: respect their
+ * email choice). No if they switched email, or every channel, off for booking
+ * reminders, stay updates, reviews or feedback in their notification choices,
+ * or if the address is on the communications suppression list.
+ */
+create or replace function public.fn_guest_review_emails_allowed(p_user_id uuid, p_email text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $fn$
+  select not exists (
+      select 1 from public.customer_notification_pref p,
+             lateral jsonb_each(p.choices) c(category, channels)
+       where p.user_id = p_user_id
+         and c.category in ('booking_reminders', 'stay_updates', 'reviews', 'feedback')
+         and jsonb_typeof(c.channels) = 'object'
+         and (c.channels ->> 'email' = 'false' or c.channels ->> 'all' = 'false'))
+    and not exists (
+      select 1 from public.comms_suppression x
+       where x.removed_at is null
+         and x.channel in ('email', 'all')
+         and lower(x.address) = lower(btrim(coalesce(p_email, ''))))
+$fn$;
+revoke all on function public.fn_guest_review_emails_allowed(uuid, text) from public, anon, authenticated;
+
 create or replace function public.cron_stay_review_requests()
 returns jsonb
 language plpgsql
@@ -278,6 +306,7 @@ begin
       and nullif(btrim(coalesce(u.email, '')), '') is not null
       and not coalesce(u.is_anonymous, false)
       and sr.rating is null
+      and public.fn_guest_review_emails_allowed(u.id, u.email)
       and (
         -- first ask: the day after check-out (up to three days late if a run was missed)
         (sr.asked_at is null
