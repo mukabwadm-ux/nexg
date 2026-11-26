@@ -138,6 +138,7 @@ export const ar: Dictionary = {
   'footer.terms': 'الشروط',
   'footer.privacy': 'الخصوصية',
   'footer.cookies': 'ملفات تعريف الارتباط',
+  'footer.cookieSettings': 'إعدادات ملفات تعريف الارتباط',
   'footer.dataProtection': 'سياسة حماية البيانات',
   'footer.contact': 'اتصل بنا',
   'footer.language': 'اللغة',

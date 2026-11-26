@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { reviewHostDocument, verifyHost } from '@/app/hotels/actions';
+import { reviewHostDocument, setHostDocumentExpiry, verifyHost } from '@/app/hotels/actions';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { HostDocumentReview, type ReviewDocument } from '@/components/hotels/host-document-review';
@@ -28,6 +28,7 @@ interface DocumentRow {
   status: ReviewDocument['status'];
   rejection_reason: string | null;
   uploaded_at: string;
+  expires_on: string | null;
   storage_path: string;
 }
 
@@ -75,12 +76,20 @@ export default async function VerifyHostPage({ params }: { params: { id: string 
       };
     };
   };
-  const { data: rows, error: documentsError } = await loose
-    .from('host_document')
-    .select('id, kind, file_name, status, rejection_reason, uploaded_at, storage_path')
-    .eq('host_id', host.id)
-    .is('superseded_at', null)
-    .order('uploaded_at', { ascending: true });
+  const columns = 'id, kind, file_name, status, rejection_reason, uploaded_at, storage_path';
+  const hostId = params.id;
+  const read = (select: string) =>
+    loose
+      .from('host_document')
+      .select(select)
+      .eq('host_id', hostId)
+      .is('superseded_at', null)
+      .order('uploaded_at', { ascending: true });
+  let { data: rows, error: documentsError } = await read(`${columns}, expires_on`);
+  /* Before 20270332000300 reaches this database there is no expires_on: read without it. */
+  if (documentsError && /expires_on/.test(documentsError.message)) {
+    ({ data: rows, error: documentsError } = await read(columns));
+  }
   if (documentsError) throw new Error(`Could not load documents: ${documentsError.message}`);
 
   const documentRows = rows ?? [];
@@ -99,6 +108,7 @@ export default async function VerifyHostPage({ params }: { params: { id: string 
     status: row.status,
     rejectionReason: row.rejection_reason,
     uploadedAt: row.uploaded_at,
+    expiresOn: row.expires_on ?? null,
     url: urls.get(row.storage_path) ?? null,
   }));
   const missing = Object.entries(DOCUMENT_KINDS)
@@ -141,6 +151,7 @@ export default async function VerifyHostPage({ params }: { params: { id: string 
             documents={documents}
             missing={missing}
             action={reviewHostDocument}
+            expiryAction={setHostDocumentExpiry}
           />
 
           {canVerify && documentsApproved ? (

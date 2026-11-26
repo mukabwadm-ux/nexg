@@ -45,7 +45,12 @@ export function ConsoleShell({
     ? 'Super admin'
     : staff.roles.map((r) => r.replace(/_/g, ' ')).join(' · ') || 'No role';
 
-  const nav = navFor(new Set(staff.modules.map((m) => m.key)));
+  /* "settings:full" lets an entry ask for full access to a module, not just any. */
+  const nav = navFor(
+    new Set(
+      staff.modules.flatMap((m) => (m.level === 'full' ? [m.key, `${m.key}:full`] : [m.key])),
+    ),
+  );
   const collapsed = cookies().get('console_rail')?.value === 'collapsed';
 
   return (

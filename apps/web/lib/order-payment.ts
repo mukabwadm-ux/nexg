@@ -267,6 +267,8 @@ export interface PaymentTarget {
    * try, so the stay's status stops reading pending.
    */
   stay?: boolean;
+  /** Where Paystack's card page sends the customer back; /pay/{reference} when absent. */
+  callbackUrl?: (site: string, paymentReference: string) => string;
 }
 
 export interface DarajaTarget {
@@ -444,7 +446,9 @@ export async function startPayment(
             reference: attempt.attempt_reference,
             amountCents: attempt.amount_cents,
             email,
-            callbackUrl: `${site}/pay/${encodeURIComponent(payment.reference)}`,
+            callbackUrl:
+              found.callbackUrl?.(site, payment.reference) ??
+              `${site}/pay/${encodeURIComponent(payment.reference)}`,
             metadata,
             ...(attempt.split ? { split: attempt.split } : {}),
           })

@@ -17,6 +17,7 @@ import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import type { MyBooking } from '@/lib/booking/customer';
 import { RECEIPT_COLUMNS, receiptAmount, receiptDate, toReceipts } from '@/lib/receipts';
+import { asMyStayReviews, type MyStayReview } from '@/lib/stay-review';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
@@ -63,6 +64,31 @@ function stayRefund(stay: StayRow) {
   return stay.refund_due_at ? 'Refund due' : null;
 }
 
+/** Under a past NexG stay: "Rate your stay", or the guest's stars linking to their rating. */
+function StayRating({ review }: { review: MyStayReview | null }) {
+  if (!review || (!review.can_rate && !review.review)) return null;
+  const href = `/account/stays/${review.stay_id}/review`;
+  return review.review ? (
+    <Link
+      href={href}
+      className="text-muted mt-1 block text-[0.75rem] font-bold"
+      aria-label={`You rated this stay ${review.review.rating} out of 5`}
+    >
+      <span aria-hidden="true" className="text-[#F5B400]">
+        {'★'.repeat(review.review.rating)}
+      </span>{' '}
+      Your rating
+    </Link>
+  ) : (
+    <Link
+      href={href}
+      className="bg-gold mt-1.5 inline-flex min-h-9 items-center rounded-full px-3.5 text-[0.75rem] font-extrabold text-[#141414] no-underline"
+    >
+      Rate your stay
+    </Link>
+  );
+}
+
 /**
  * A customer's own account: their receipts, orders, bookings and stays. Everything here
  * is read through row-level security, so it is theirs and nobody else's.
@@ -78,55 +104,66 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
   if (!user || user.is_anonymous)
     redirect(`/sign-in?next=${encodeURIComponent(`/account?tab=${tab}`)}`);
 
-  const [receipts, orders, stays, bookings, applications, savedJobs] = await Promise.all([
-    tab === 'receipts'
-      ? supabase
-          .from('receipt' as never)
-          .select(RECEIPT_COLUMNS)
-          .eq('party_type', 'guest')
-          .eq('party_id', user.id)
-          .order('issued_at', { ascending: false })
-          .limit(100)
-      : Promise.resolve({ data: [], error: null }),
-    tab === 'orders'
-      ? supabase
-          .from('order')
-          .select('id, reference, placed_at, total_cents, stage, payment_status')
-          .order('placed_at', { ascending: false })
-          .limit(50)
-      : Promise.resolve({ data: [], error: null }),
-    tab === 'stays'
-      ? supabase
-          .from('stay')
-          .select(
-            'id, check_in, check_out, status, paid_kes, quote_total_kes, payment_reference, refund_due_at, refunded_at, refund_amount_kes',
-          )
-          .eq('guest_user_id', user.id)
-          .order('check_in', { ascending: false })
-          .limit(50)
-      : Promise.resolve({ data: [], error: null }),
-    tab === 'bookings'
-      ? supabase.rpc('rpc_my_bookings')
-      : Promise.resolve({ data: [], error: null }),
-    tab === 'applications'
-      ? supabase
-          .from('my_job_applications_v')
-          .select(
-            'id, vacancy_id, status, employer_note, interview_at, created_at, cv_name, title, area, employer_name, city_name, timezone, still_open',
-          )
-          .order('created_at', { ascending: false })
-          .limit(100)
-      : Promise.resolve({ data: [], error: null }),
-    tab === 'saved'
-      ? supabase
-          .from('my_saved_jobs_v')
-          .select(
-            'vacancy_id, title, area, salary_min, salary_max, salary_period, currency, employer_name, city_name, still_open',
-          )
-          .order('saved_at', { ascending: false })
-          .limit(100)
-      : Promise.resolve({ data: [], error: null }),
-  ]);
+  const [receipts, orders, stays, bookings, applications, savedJobs, stayReviews] =
+    await Promise.all([
+      tab === 'receipts'
+        ? supabase
+            .from('receipt' as never)
+            .select(RECEIPT_COLUMNS)
+            .eq('party_type', 'guest')
+            .eq('party_id', user.id)
+            .order('issued_at', { ascending: false })
+            .limit(100)
+        : Promise.resolve({ data: [], error: null }),
+      tab === 'orders'
+        ? supabase
+            .from('order')
+            .select('id, reference, placed_at, total_cents, stage, payment_status')
+            .order('placed_at', { ascending: false })
+            .limit(50)
+        : Promise.resolve({ data: [], error: null }),
+      tab === 'stays'
+        ? supabase
+            .from('stay')
+            .select(
+              'id, check_in, check_out, status, paid_kes, quote_total_kes, payment_reference, refund_due_at, refunded_at, refund_amount_kes',
+            )
+            .eq('guest_user_id', user.id)
+            .order('check_in', { ascending: false })
+            .limit(50)
+        : Promise.resolve({ data: [], error: null }),
+      tab === 'bookings'
+        ? supabase.rpc('rpc_my_bookings')
+        : Promise.resolve({ data: [], error: null }),
+      tab === 'applications'
+        ? supabase
+            .from('my_job_applications_v')
+            .select(
+              'id, vacancy_id, status, employer_note, interview_at, created_at, cv_name, title, area, employer_name, city_name, timezone, still_open',
+            )
+            .order('created_at', { ascending: false })
+            .limit(100)
+        : Promise.resolve({ data: [], error: null }),
+      tab === 'saved'
+        ? supabase
+            .from('my_saved_jobs_v')
+            .select(
+              'vacancy_id, title, area, salary_min, salary_max, salary_period, currency, employer_name, city_name, still_open',
+            )
+            .order('saved_at', { ascending: false })
+            .limit(100)
+        : Promise.resolve({ data: [], error: null }),
+      /* Which past stays can be rated, and the guest's own ratings (rpc_stay_review_mine). */
+      tab === 'stays'
+        ? (
+            supabase.rpc as unknown as (
+              fn: string,
+              args: Record<string, unknown>,
+            ) => PromiseLike<{ data: unknown }>
+          )('rpc_stay_review_mine', {})
+        : Promise.resolve({ data: [] }),
+    ]);
+  const reviewOf = new Map(asMyStayReviews(stayReviews.data).map((r) => [r.stay_id, r]));
 
   return (
     <>
@@ -268,6 +305,7 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
                             {refund}
                           </span>
                         )}
+                        <StayRating review={reviewOf.get(stay.id) ?? null} />
                       </span>
                     </li>
                   );

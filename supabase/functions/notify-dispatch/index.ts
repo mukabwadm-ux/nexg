@@ -95,6 +95,17 @@ Deno.serve(async (request) => {
     auth: { persistSession: false },
   });
 
+  /*
+   * Tell the console which providers this deployment can send with, so
+   * Communications & Automations shows Connected only when it is. Names
+   * and true/false only, never a key. A database without the RPC yet
+   * (20270331000100) is fine: the send goes on.
+   */
+  await supabase.rpc('rpc_comms_provider_report', { p: providerReport() }).then(
+    () => undefined,
+    () => undefined,
+  );
+
   const { data: due, error } = await supabase.rpc('rpc_outbox_due', { p_limit: 50 });
   if (error) return json({ ok: false, error: error.message }, 500);
 
@@ -340,6 +351,33 @@ async function sendWhatsApp(to: string, body: string): Promise<Outcome> {
   } catch (e) {
     return { ok: false, provider: 'whatsapp', error: String(e) };
   }
+}
+
+/** Which providers are configured: provider names, sender names and booleans. */
+function providerReport(): Record<string, unknown> {
+  const at = !!(AT_API_KEY && AT_USERNAME);
+  const twilio = !!(TWILIO_SID && TWILIO_TOKEN && TWILIO_FROM);
+  return {
+    email: {
+      provider: 'resend',
+      configured: !!(RESEND_API_KEY && EMAIL_FROM),
+      detail: { from: EMAIL_FROM || null, html: EMAIL_HTML },
+    },
+    sms: {
+      provider: at ? 'africastalking' : twilio ? 'twilio' : null,
+      configured: at || twilio,
+      detail: {
+        africastalking: at,
+        twilio,
+        sender_id: at ? AT_SENDER || null : twilio ? TWILIO_FROM : null,
+      },
+    },
+    whatsapp: {
+      provider: 'meta',
+      configured: !!(WA_TOKEN && WA_PHONE_ID),
+      detail: { phone_number_id: WA_PHONE_ID || null },
+    },
+  };
 }
 
 function json(body: unknown, status = 200): Response {

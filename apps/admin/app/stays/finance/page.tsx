@@ -60,6 +60,7 @@ import {
   type StayRow,
 } from '@/lib/stays-module';
 import { FINANCE_TABS, FinanceView } from '@/components/stays/tab-views';
+import { feeData, ManagementFeesView } from '@/components/stays/management-fees';
 import { staysContext } from '@/lib/stays-server';
 
 export const metadata: Metadata = { title: 'Stays · Finance & Commissions' };
@@ -93,7 +94,7 @@ export default async function StaysFinancePage({
   const { period, city } = ctx;
   const q = (searchParams?.q ?? '').slice(0, 120);
   const page = pageOf(searchParams?.page);
-  const [fin, list] = await Promise.all([
+  const [fin, list, feeRead] = await Promise.all([
     ctx.read('rpc_console_stays_finance', { p_from: period.from, p_to: period.to, p_city: city }),
     ctx.read('rpc_console_stays_list', {
       p_from: period.from,
@@ -105,7 +106,13 @@ export default async function StaysFinancePage({
       p_page: page,
       p_size: PAGE_SIZE,
     }),
+    ctx.read('rpc_console_stays_fee_invoices', {
+      p_from: period.from,
+      p_to: period.to,
+      p_city: city,
+    }),
   ]);
+  const feeInfo = feeData(feeRead.data);
   const o = asObject(fin.data);
   const k = asObject(o.kpis);
   const rules = asObject(o.rules);
@@ -122,7 +129,8 @@ export default async function StaysFinancePage({
   const commission = asNumber(k.commission);
   const vat = asNumber(k.vat);
   const pmShare = asNumber(k.pm_share);
-  const fees = asNumber(k.management_fees);
+  /* Management fees invoiced for the months in the period (20270332000600). */
+  const fees = asNumber(feeInfo.kpis.invoiced_kes);
   const guestOrders = asNumber(k.guest_orders_kes);
   const net = commission - vat - pmShare - asNumber(k.refunds) + fees;
   const bookings = asNumber(k.bookings);
@@ -183,7 +191,7 @@ export default async function StaysFinancePage({
                 icon={Coins}
                 label="Net Revenue (NexG)"
                 value={kesCompact(net)}
-                explain="Commission less VAT, the property managers' share and refunds, plus management fees billable."
+                explain="Commission less VAT, the property managers' share and refunds, plus management fees invoiced for the period's months."
               />
               <DashKpi
                 icon={Handshake}
@@ -484,12 +492,15 @@ export default async function StaysFinancePage({
                     <Fact icon={CheckCircle2} label="In Trial (free month)">
                       {n(asNumber(k.trial_properties))}
                     </Fact>
-                    <Fact icon={Coins} label="Billable this period">
+                    <Fact icon={Coins} label="Invoiced">
                       {kesFull(fees)}
                     </Fact>
+                    <Fact icon={CheckCircle2} label="Collected">
+                      {kesFull(asNumber(feeInfo.kpis.collected_kes))}
+                    </Fact>
                     <Footnote>
-                      Billable by the rule, not yet invoiced or collected: no management fee
-                      invoices are raised automatically yet.{' '}
+                      Invoiced on the 1st for the month before and taken from the host&rsquo;s next
+                      payout (Management Fees tab).{' '}
                       {asMaybe(k.paying_properties) === 0
                         ? 'Every property is still in its free month.'
                         : ''}
@@ -497,6 +508,18 @@ export default async function StaysFinancePage({
                   </DashCard>
                 </div>
               </>
+            ) : view === 'fees' ? (
+              feeRead.waiting ? (
+                <WaitingForDatabase />
+              ) : feeRead.error ? (
+                <ErrorNote message={feeRead.error} />
+              ) : (
+                <ManagementFeesView
+                  data={feeInfo}
+                  feeKes={asNumber(rules.management_fee_kes)}
+                  trialMonths={asNumber(rules.trial_months)}
+                />
+              )
             ) : (
               <FinanceView view={view} data={fin.data} />
             )}

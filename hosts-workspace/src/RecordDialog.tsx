@@ -122,6 +122,13 @@ const connectedFields: Partial<Record<Collection, Field[]>> = {
     f('bedrooms', 'Bedrooms', 'number'),
     f('bathrooms', 'Bathrooms', 'decimal'),
     f('rateKes', 'Nightly rate · KES', 'number'),
+    f(
+      'weekendRateKes',
+      'Weekend rate · Friday and Saturday nights · KES (empty = nightly)',
+      'number',
+    ),
+    f('weeklyDiscountPct', 'Weekly discount · % off stays of 7+ nights', 'number'),
+    f('monthlyDiscountPct', 'Monthly discount · % off stays of 28+ nights', 'number'),
     f('labelPublic', 'Guest-facing label'),
     f('floor', 'Floor'),
     f('building', 'Building'),

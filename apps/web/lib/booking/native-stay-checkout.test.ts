@@ -121,6 +121,44 @@ describe('native stay checkout routes', () => {
     });
   });
 
+  it('accepts a total that is not nightly × nights (weekend and long-stay rates)', async () => {
+    stub.rpc.mockResolvedValue({
+      error: null,
+      data: {
+        ...quoteRequest,
+        quoteId,
+        expiresAt,
+        nights: 2,
+        currency: 'KES',
+        nightlyMinor: 750000,
+        roomSubtotalMinor: 1500000 - 100,
+        taxesMinor: 0,
+        totalMinor: 1500000 - 100,
+      },
+    });
+    const response = await stayQuote(request(quoteRequest));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ totalMinor: 1499900 });
+  });
+
+  it('refuses a quote whose nights do not match its dates', async () => {
+    stub.rpc.mockResolvedValue({
+      error: null,
+      data: {
+        ...quoteRequest,
+        quoteId,
+        expiresAt,
+        nights: 3,
+        currency: 'KES',
+        nightlyMinor: 700000,
+        roomSubtotalMinor: 2100000,
+        taxesMinor: 0,
+        totalMinor: 2100000,
+      },
+    });
+    expect((await stayQuote(request(quoteRequest))).status).toBe(503);
+  });
+
   it('uses the quote as the idempotency key and preserves explicit rejection states', async () => {
     const body = { quoteId, firstName: 'Amina' };
     expect((await stayHold(request(body, { 'Idempotency-Key': stayId }))).status).toBe(422);

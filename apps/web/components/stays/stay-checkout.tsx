@@ -8,11 +8,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
   holdStay,
+  quoteStay,
   releaseStayHold,
   stayCheckoutStatus,
   type CheckoutStatus,
+  type StayQuote,
 } from '@/app/(customer)/stays/[slug]/book/actions';
+import { TrackEvent } from '@/components/analytics/google-analytics';
 import { ChargedInKesNote, ChargedPrice, Price } from '@/components/currency/price';
+import { stayPurchase } from '@/lib/analytics/stay-events';
 import { createClient } from '@/lib/supabase/client';
 
 interface UnitOption {
@@ -90,9 +94,23 @@ function cancelledNotice(status: CheckoutStatus, cancellation: Cancellation) {
   };
 }
 
+/** Nights at the same rate (and season) together, in date order. */
+function priceLines(quote: StayQuote, baseKes: number) {
+  const lines: { key: string; rateKes: number; nights: number; note: string }[] = [];
+  for (const night of quote.perNight) {
+    const note = night.season ?? (night.weekend && night.rateKes !== baseKes ? 'Fri & Sat' : '');
+    const key = `${night.rateKes}|${note}`;
+    const line = lines.find((l) => l.key === key);
+    if (line) line.nights += 1;
+    else lines.push({ key, rateKes: night.rateKes, nights: 1, note });
+  }
+  return lines;
+}
+
 /**
- * Dates, a hold, then M-Pesa. The price shown is worked out here only as a
- * preview; what the guest pays is the total the database put on the hold.
+ * Dates, a hold, then M-Pesa. The price shown is the database's quote for
+ * the dates (weekend rate, seasons, long-stay discount), the same total the
+ * hold charges.
  */
 export function StayCheckout({
   slug,
@@ -131,7 +149,12 @@ export function StayCheckout({
   const [now, setNow] = useState(() => Date.now());
 
   const nights = nightsBetween(checkIn, checkOut);
-  const total = nights > 0 ? nights * unit.nightlyKes : 0;
+  const quoteKey = `${unit.id}|${checkIn}|${checkOut}`;
+  const [quoted, setQuoted] = useState<{ key: string; quote: StayQuote | null } | null>(null);
+  /* undefined: still asking; null: no server price (nights × rate stands in). */
+  const quote = quoted?.key === quoteKey ? quoted.quote : undefined;
+  const total = quote?.totalKes ?? (quote === null && nights > 0 ? nights * unit.nightlyKes : null);
+  const lines = quote ? priceLines(quote, unit.nightlyKes) : [];
   const taken = useMemo(() => {
     if (nights <= 0) return false;
     for (let i = 0; i < nights; i += 1) {
@@ -153,6 +176,24 @@ export function StayCheckout({
             : taken
               ? 'Some of those nights are already booked. Try other dates.'
               : '';
+
+  useEffect(() => {
+    if (step !== 'dates' || nights <= 0 || nights > 90) return;
+    let live = true;
+    const timer = window.setTimeout(() => {
+      quoteStay({ unitId: unit.id, checkIn, checkOut })
+        .then((q) => {
+          if (live) setQuoted({ key: quoteKey, quote: q });
+        })
+        .catch(() => {
+          if (live) setQuoted({ key: quoteKey, quote: null });
+        });
+    }, 250);
+    return () => {
+      live = false;
+      window.clearTimeout(timer);
+    };
+  }, [step, unit.id, checkIn, checkOut, nights, quoteKey]);
 
   const bookUrl = `/stays/${slug}/book?unit=${unit.id}&in=${checkIn}&out=${checkOut}&adults=${adults}`;
 
@@ -286,13 +327,52 @@ export function StayCheckout({
             : `${longDate(checkIn)} → ${longDate(checkOut)}`}
         </span>
       </p>
-      <p className="flex justify-between">
-        <span className="text-muted">
-          <Price kes={unit.nightlyKes} /> × {status?.nights ?? nights} night
-          {(status?.nights ?? nights) === 1 ? '' : 's'}
-        </span>
-        <ChargedPrice kes={status?.totalKes ?? total} className="font-extrabold" />
-      </p>
+      {status ? (
+        <p className="flex justify-between">
+          <span className="text-muted">
+            {status.nights} night{status.nights === 1 ? '' : 's'}
+          </span>
+          <ChargedPrice kes={status.totalKes ?? 0} className="font-extrabold" />
+        </p>
+      ) : quote && (lines.length > 1 || quote.discountKes > 0) ? (
+        <>
+          {lines.map((line) => (
+            <p key={line.key} className="flex justify-between gap-3">
+              <span className="text-muted">
+                <Price kes={line.rateKes} /> × {line.nights} night{line.nights === 1 ? '' : 's'}
+                {line.note ? ` · ${line.note}` : ''}
+              </span>
+              <Price kes={line.rateKes * line.nights} />
+            </p>
+          ))}
+          {quote.discountKes > 0 && (
+            <p className="flex justify-between gap-3">
+              <span className="text-muted">
+                {quote.nights >= 28 ? 'Monthly' : 'Weekly'} stay discount ({quote.discountPct}%)
+              </span>
+              <span>
+                − <Price kes={quote.discountKes} />
+              </span>
+            </p>
+          )}
+          <p className="flex justify-between">
+            <span className="text-muted">Total</span>
+            <ChargedPrice kes={quote.totalKes} className="font-extrabold" />
+          </p>
+        </>
+      ) : (
+        <p className="flex justify-between">
+          <span className="text-muted">
+            <Price kes={lines[0]?.rateKes ?? unit.nightlyKes} /> × {nights} night
+            {nights === 1 ? '' : 's'}
+          </span>
+          {total == null ? (
+            <span className="text-muted">Working out the price…</span>
+          ) : (
+            <ChargedPrice kes={total} className="font-extrabold" />
+          )}
+        </p>
+      )}
       <ChargedInKesNote className="text-muted text-xs" />
     </div>
   );
@@ -314,6 +394,19 @@ export function StayCheckout({
   if (step === 'done') {
     return (
       <Card className="p-6">
+        {status?.status === 'booked' && (
+          <TrackEvent
+            once={`purchase_${status.paymentReference ?? stayId}`}
+            event={stayPurchase({
+              reference: status.paymentReference ?? stayId,
+              slug,
+              property: status.property,
+              unit: status.unit,
+              nights: status.nights,
+              paidKes: status.paidKes ?? status.totalKes ?? 0,
+            })}
+          />
+        )}
         <CalendarCheck aria-hidden="true" className="text-success h-8 w-8" />
         <h2 className="mt-3 text-[1.25rem] font-extrabold">You are booked</h2>
         <p className="text-muted mt-2 text-[0.875rem] font-semibold leading-[1.7]">
@@ -430,7 +523,7 @@ export function StayCheckout({
               </p>
             )}
             <Button type="submit" className="mt-4 w-full" disabled={busyAction}>
-              {busyAction ? 'Sending the prompt…' : `Pay ${kes(status?.totalKes ?? total)}`}
+              {busyAction ? 'Sending the prompt…' : `Pay ${kes(status?.totalKes ?? total ?? 0)}`}
             </Button>
             <button
               type="button"
