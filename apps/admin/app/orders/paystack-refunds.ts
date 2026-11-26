@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { paystackProof, refund, type PaystackMode } from '@/lib/paystack';
+import { loadPaystackKeys } from '@/lib/paystack-keys';
 import { requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -34,10 +35,13 @@ export async function refundThroughPaystack(
     return { ok: false, message: 'That refund could not be found.' };
 
   const client = createClient() as unknown as { rpc: Rpc };
+  await loadPaystackKeys();
   /* Opened with whichever key is set; the database answers in the payment's own mode. */
   const modes: PaystackMode[] = ['test', 'live'];
   let opened: Record<string, unknown> | null = null;
   let mode: PaystackMode | null = null;
+  /* The key that opened it also records Paystack's answer. */
+  let openedWith: string | null = null;
   let lastError = 'Paystack is not connected on the console.';
   for (const candidate of modes) {
     const proof = paystackProof(candidate);
@@ -50,6 +54,7 @@ export async function refundThroughPaystack(
     if (!result.error) {
       opened = result.data as Record<string, unknown>;
       mode = candidate;
+      openedWith = proof;
       break;
     }
     lastError = result.error.message.replace(/^.*?:\s*/, '').slice(0, 300);
@@ -81,7 +86,7 @@ export async function refundThroughPaystack(
   const recorded = await client.rpc('rpc_paystack_refund_answered', {
     p_reference: reference,
     p_answer: answer.raw,
-    p_proof: paystackProof(mode),
+    p_proof: openedWith,
   });
   revalidatePath('/orders');
   revalidatePath('/live');

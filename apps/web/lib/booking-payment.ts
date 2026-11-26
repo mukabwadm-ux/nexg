@@ -17,6 +17,7 @@ import {
   type Session,
 } from '@/lib/order-payment';
 import { paystackMode, paystackProof } from '@/lib/paystack';
+import { loadPaystackKeys } from '@/lib/paystack-keys';
 
 /**
  * Paying for a booking made in the app (owner, 22 Nov 2026: "Deposits now"):
@@ -126,6 +127,7 @@ export function stepFor(booking: EngineBooking, payInFull: boolean): Step | 'not
 export async function settleBookings(
   client: Client,
 ): Promise<{ settled: number; refused: number }> {
+  await loadPaystackKeys();
   const mode = paystackMode();
   const proof = mode ? paystackProof(mode) : null;
   if (!proof) return { settled: 0, refused: 0 };

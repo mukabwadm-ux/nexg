@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { paystackConfigured, signatureMode } from '@/lib/paystack';
+import { loadPaystackKeys, refreshPaystackKeys } from '@/lib/paystack-keys';
 import { createPublicClient } from '@/lib/supabase/public';
 
 export const runtime = 'nodejs';
@@ -19,15 +20,18 @@ type Rpc = (
  * as the Test (and later Live) Webhook URL in Paystack's dashboard.
  */
 export async function POST(request: Request) {
-  if (!paystackConfigured()) {
-    /* 503, so Paystack retries: the keys may be minutes away. */
-    return NextResponse.json({ ok: false, reason: 'no_provider_configured' }, { status: 503 });
-  }
+  await loadPaystackKeys();
+  if (!paystackConfigured()) return notConfigured();
 
   const raw = await request.text();
   const signature = request.headers.get('x-paystack-signature');
   if (!signatureMode(raw, signature)) {
-    return NextResponse.json({ ok: false, reason: 'bad_signature' }, { status: 401 });
+    /* The key may just have been changed in the console. */
+    await refreshPaystackKeys();
+    if (!paystackConfigured()) return notConfigured();
+    if (!signatureMode(raw, signature)) {
+      return NextResponse.json({ ok: false, reason: 'bad_signature' }, { status: 401 });
+    }
   }
 
   const client = createPublicClient() as unknown as { rpc: Rpc };
@@ -42,10 +46,16 @@ export async function POST(request: Request) {
   return NextResponse.json({ ok: true, result: data }, { status: 200 });
 }
 
-export function GET() {
+export async function GET() {
+  await loadPaystackKeys();
   return NextResponse.json({
     ok: true,
     endpoint: 'paystack webhook',
     configured: paystackConfigured(),
   });
+}
+
+/* 503, so Paystack retries: the keys may be minutes away. */
+function notConfigured() {
+  return NextResponse.json({ ok: false, reason: 'no_provider_configured' }, { status: 503 });
 }

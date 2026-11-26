@@ -1,5 +1,6 @@
 import { refused, rpc, startPayment, stateFrom, type PaymentTarget } from '@/lib/order-payment';
 import { paystackMode } from '@/lib/paystack';
+import { loadPaystackKeys } from '@/lib/paystack-keys';
 import { customerApiClient } from '@/lib/supabase/customer-api';
 import { z } from 'zod';
 
@@ -176,15 +177,17 @@ export async function stayQuote(request: Request) {
         ? (policy.data as { text: string }).text
         : null;
 
+    await loadPaystackKeys();
+    const mode = paystackMode();
+
     return Response.json(
       {
         ...quote,
         // The apps read one method here, M-Pesa; empty while Paystack is off, or
         // above M-Pesa's KES 150,000 a payment. paystackMethods is the full list
         // for apps that take a card too.
-        paymentMethods:
-          paystackMode() && quote.totalMinor <= MPESA_LIMIT_MINOR ? ['mpesa_stk'] : [],
-        paystackMethods: paystackMode()
+        paymentMethods: mode && quote.totalMinor <= MPESA_LIMIT_MINOR ? ['mpesa_stk'] : [],
+        paystackMethods: mode
           ? [
               ...(quote.totalMinor <= MPESA_LIMIT_MINOR ? ['mpesa_stk', 'airtel_money'] : []),
               'card',

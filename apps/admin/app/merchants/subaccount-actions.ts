@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { fetchSubaccount, payoutMode } from '@/lib/paystack';
+import { loadPaystackKeys } from '@/lib/paystack-keys';
 import { requireModule, requireStaff } from '@/lib/staff';
 import { createClient } from '@/lib/supabase/server';
 
@@ -56,6 +57,7 @@ async function lookUp(
   | { ok: true; details: Record<string, unknown> & { test: boolean } }
   | { ok: false; message: string }
 > {
+  await loadPaystackKeys();
   const mode = payoutMode();
   if (!mode) return { ok: false, message: 'Paystack is unavailable at the moment.' };
   const looked = await fetchSubaccount(mode, code);

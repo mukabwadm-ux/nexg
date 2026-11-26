@@ -10,6 +10,7 @@ import {
   type PaystackMode,
   type PaystackResult,
 } from '@/lib/paystack';
+import { loadPaystackKeys } from '@/lib/paystack-keys';
 
 /**
  * Riders' automatic payouts (Payout rules: as soon as earnings clear, daily,
@@ -108,6 +109,7 @@ async function sendOne(client: Client, mode: PaystackMode, proof: string, item: 
 }
 
 export async function sendRiderPayouts(client: Client): Promise<RiderPayoutSweep> {
+  await loadPaystackKeys();
   const mode = paystackMode();
   const proof = mode ? paystackProof(mode) : null;
   if (!mode || !proof) return { sent: 0, checked: 0, skipped: 'no Paystack key' };

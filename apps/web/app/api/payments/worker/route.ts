@@ -6,6 +6,7 @@ import { sendQueuedPayouts } from '@/lib/mpesa-payout';
 import { settleBookings } from '@/lib/booking-payment';
 import { sweepPaystack } from '@/lib/order-payment';
 import { sweepSignatureValid } from '@/lib/paystack';
+import { loadPaystackKeys, refreshPaystackKeys } from '@/lib/paystack-keys';
 import { sendRiderPayouts } from '@/lib/rider-payouts';
 import { createPublicClient } from '@/lib/supabase/public';
 
@@ -30,8 +31,13 @@ export async function POST(request: Request) {
      of the Daraja token, so it works with Daraja switched off. */
   const paystackSweep = request.headers.get('x-paystack-worker');
   if (paystackSweep !== null) {
+    await loadPaystackKeys();
     if (!sweepSignatureValid(paystackSweep)) {
-      return NextResponse.json({ ok: false, message: 'Not allowed.' }, { status: 401 });
+      /* The key may just have been changed in the console. */
+      await refreshPaystackKeys();
+      if (!sweepSignatureValid(paystackSweep)) {
+        return NextResponse.json({ ok: false, message: 'Not allowed.' }, { status: 401 });
+      }
     }
     const client = createPublicClient() as unknown as Parameters<typeof sweepPaystack>[0];
     const paystack = await sweepPaystack(client);

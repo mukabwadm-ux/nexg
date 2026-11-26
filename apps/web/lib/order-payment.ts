@@ -17,6 +17,7 @@ import { startBankPayment } from '@/lib/bank/payments';
 import { callbackOrigin, normalisePhone } from '@/lib/daraja';
 import { sendMpesaPrompt } from '@/lib/mpesa-prompt';
 import { mpesaProvider, paymentSetup } from '@/lib/payment-methods';
+import { loadPaystackKeys } from '@/lib/paystack-keys';
 import { customerApiClient } from '@/lib/supabase/customer-api';
 import { createClient as cookieClient } from '@/lib/supabase/server';
 
@@ -192,6 +193,7 @@ export async function checkWithPaystack(
   attemptReference: string,
   mode: PaystackMode,
 ): Promise<void> {
+  await loadPaystackKeys();
   const proof = paystackProof(mode);
   if (!proof) return;
   const answer = await verify(mode, attemptReference);
@@ -210,6 +212,7 @@ export async function checkWithPaystack(
 export async function sweepPaystack(
   client: Client,
 ): Promise<{ checked: number; skipped?: string }> {
+  await loadPaystackKeys();
   const mode = paystackMode();
   const proof = mode ? paystackProof(mode) : null;
   if (!proof) return { checked: 0, skipped: 'no Paystack key' };
@@ -230,6 +233,7 @@ export async function sweepPaystack(
  * moves; it can then only pay at the test shops and property.
  */
 export async function customerMode(supabase: Client): Promise<PaystackMode | null> {
+  await loadPaystackKeys();
   const mode = paystackMode();
   if (mode !== 'live' || !paystackProof('test')) return mode;
   const reviewer = await rpc(supabase, 'rpc_payment_i_review');
@@ -360,6 +364,7 @@ export async function startPayment(
       if (!order) return problem(422, 'INVALID_REQUEST', 'Choose card, M-Pesa or Airtel Money.');
       return startBank(request, session, order.id);
     }
+    await loadPaystackKeys();
     if (choice.method === 'mpesa_stk' && mpesaProvider(paymentSetup()) === 'daraja') {
       if (order) return startDaraja(request, supabase, order.id, choice.phone);
       const found = await target(session);

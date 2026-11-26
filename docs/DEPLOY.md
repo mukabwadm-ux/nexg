@@ -4,7 +4,8 @@ Goal: a shareable link for testers. Sections 1–4 put the public site online
 and keep the staff console on your machine. Section 5 gives the console its
 own URL, which you need once other people are testing and registrations
 arrive while you are away from your laptop. Section 6 puts the public API and
-its developer docs at `api.nexgapp.com`.
+its developer docs at `api.nexgapp.com`. Section 7 sets up the Paystack keys
+for the site and the console.
 
 There are two accounts to create and roughly forty minutes of work, plus
 twenty for the console and twenty for the API. Supabase first: Vercel is useless without it, because
@@ -194,7 +195,8 @@ Two things you must get right, because they are the fence:
   never run on the hosted project and must not. Check before you share the
   URL: `select email from public.staff_user;` should list only real people.
 - **Never add `SUPABASE_SERVICE_ROLE_KEY`.** Nothing in the console uses it,
-  and it bypasses every policy above.
+  and it bypasses every policy above. The Paystack keys do not need it either
+  (section 7).
 
 ### Steps
 
@@ -347,6 +349,111 @@ In order:
    the Turnstile hostname first. The form shows that message for every
    refusal, including a failed bot check; the browser console shows
    Turnstile's error code.
+
+---
+
+## 7. Paystack keys (~10 min)
+
+The site and the console both need Paystack's secret keys.
+`PAYSTACK_KEYS_TOKEN` decides where each one gets them:
+
+| `PAYSTACK_KEYS_TOKEN` | Where the keys come from |
+| --- | --- |
+| not set | The project's own `PAYSTACK_TEST_SECRET_KEY` and `PAYSTACK_LIVE_SECRET_KEY`. Supabase Vault must hold the same values. |
+| set | Only the keys saved in the console under **Finance → Paystack → Keys**, which are kept in Supabase Vault. The two variables above are ignored, even when the keys cannot be fetched. |
+
+The token is a password that only the two servers and the database hold. With it
+a server fetches the keys using the anon key, so the console still holds **no
+service role key**. Anyone who has both the token and the anon key can read the
+Paystack secret keys: treat the token like the keys, and keep it out of the
+repository, chat, tickets and screenshots.
+
+### Switch it on, in this order
+
+1. Apply the `finance_paystack_screen` migration, then deploy the site and the
+   console with this code. Nothing changes yet.
+
+   Before any key is saved, run this in the Supabase SQL editor. It must return
+   no rows. Only a super admin whose role names no city may save keys, but
+   today a super admin for one city can still give someone a role with no city,
+   so take away any role this lists first.
+
+   ```sql
+   select su.email
+     from public.role_grant g
+     join public.role r on r.id = g.role_id
+     join public.staff_user su on su.id = g.staff_user_id
+    where r.key = 'super_admin' and g.city_id is not null and g.revoked_at is null
+      and (g.expires_at is null or g.expires_at > now());
+   ```
+
+2. In the console, signed in as a super admin whose role names no city, open
+   **Finance → Paystack → Keys**. Paste the test key and save it, and the live
+   key when you have one. Paste a key again even if it already shows as set:
+   saving it here removes stray spaces and line breaks.
+3. Make the token: 32 random bytes written as 64 hex characters, from
+   `openssl rand -hex 32` or a password manager. Put it in Vault once, in the
+   Supabase SQL editor, and do not save the query:
+
+   ```sql
+   select vault.create_secret('<the token>', 'paystack_keys_server_token');
+   ```
+
+   No screen or function can set this value or show it. The Keys tab then says
+   the server password is set.
+4. In Vercel, add `PAYSTACK_KEYS_TOKEN` with the same value to the site's
+   project (`nexg`) and to the console's project: **Production only**, marked
+   **Sensitive**. Never Preview, because preview builds run unmerged branch
+   code. Redeploy both.
+5. Check both:
+   - `curl https://www.nexgapp.com/api/payments/paystack/webhook` answers
+     `"configured":true` → **the site has the keys**.
+   - In the console, on a merchant's page, record the made-up Paystack
+     sub-account `ACCT_check`. The answer is "Paystack does not know
+     ACCT_check in test mode", with Paystack's own reason, and nothing is
+     recorded → **the console has the keys**. (In live mode it says "live
+     mode".) "Paystack is unavailable at the moment" means it has none; a
+     reason such as "Invalid key" means the saved key is wrong.
+6. Once both pass, delete `PAYSTACK_TEST_SECRET_KEY` and
+   `PAYSTACK_LIVE_SECRET_KEY` from both projects.
+
+If a check fails, the project's logs say `Paystack keys could not be loaded`
+with a code. `42501`: the token in Vercel and the one in Vault differ, or Vault
+has none, or it is shorter than 32 characters. `PGRST202`: the migration is not
+applied.
+
+### While the keys cannot be fetched
+
+Paystack counts as not connected: card and Airtel Money are not offered, the
+webhook answers `503` (Paystack sends it again later), the payments sweep is
+refused and the console sends nothing to Paystack. M-Pesa goes straight to
+Safaricom if Daraja is connected, also when Paystack is live.
+
+### Later changes
+
+- **A key:** save or remove it in the Keys tab. Both servers follow within 30
+  seconds, with no redeploy. A browser may keep the old list of payment methods
+  for another minute.
+- **The token:** change it in Vault, then in both Vercel projects, and redeploy
+  both. Paystack is not connected from the first step to the last, so do them
+  together.
+
+  ```sql
+  select vault.update_secret(
+    (select id from vault.secrets where name = 'paystack_keys_server_token'),
+    '<the new token>'
+  );
+  ```
+
+- **Going back:** set the two key variables on both projects again, remove
+  `PAYSTACK_KEYS_TOKEN` and redeploy.
+
+### What stays as it was
+
+- **Live payments** are switched on only by `NEXG_PAYSTACK_LIVE=1` on both
+  projects. Saving a live key does not switch them on.
+- **Webhook URL** in Paystack's dashboard:
+  `https://www.nexgapp.com/api/payments/paystack/webhook`.
 
 ---
 
