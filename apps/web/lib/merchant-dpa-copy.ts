@@ -9,7 +9,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 /*
  * The merchant's filled-in, signed Data Processing Agreement, made right
- * after the owner accepts it (20270326000100).
+ * after the owner accepts it (20270327000100).
  *
  * Preferably as NexG, with the service role: then the copy carries NexG's
  * signature (when its signatory is set up in Settings › Agreement signing)

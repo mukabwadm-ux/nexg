@@ -597,7 +597,7 @@ begin
         'label', 'Read and accept the merchant agreement');
     end if;
 
-    /* The Data Processing Agreement (20270326000100): the current version. */
+    /* The Data Processing Agreement (20270327000100): the current version. */
     if not exists (
       select 1 from public.merchant_dpa_acceptance x
       where x.merchant_id = p_merchant_id

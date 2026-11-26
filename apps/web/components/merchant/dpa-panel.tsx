@@ -185,7 +185,7 @@ export function DpaPanel({
   legalName = null,
 }: {
   merchantId: string;
-  /** Null until 20270326000100 runs: the panel then stays hidden. */
+  /** Null until 20270327000100 runs: the panel then stays hidden. */
   record: DpaRecord | null;
   /** The registered name saved in the agreement details, when there is one. */
   legalName?: string | null;

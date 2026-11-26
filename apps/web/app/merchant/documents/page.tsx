@@ -56,7 +56,7 @@ export default async function MerchantDocuments() {
     supabase.rpc('rpc_merchant_agreement_signed_list', { p_merchant_id: me.id }),
     // Null until 20270110410100 runs: the panel then stays hidden.
     supabase.rpc('rpc_merchant_onboarding_read', { p_merchant_id: me.id }),
-    // Null until 20270326000100 runs: the DPA panel then stays hidden.
+    // Null until 20270327000100 runs: the DPA panel then stays hidden.
     supabase.rpc('rpc_merchant_dpa_read', { p_merchant_id: me.id }),
   ]);
 

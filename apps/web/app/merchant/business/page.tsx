@@ -86,7 +86,7 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
     db.rpc('rpc_merchant_agreement_status', { p_merchant_id: me.id }),
     db.rpc('rpc_merchant_agreement_details_read', { p_merchant_id: me.id }),
     db.rpc('rpc_merchant_agreement_signed_list', { p_merchant_id: me.id }),
-    // The Data Processing Agreement; null until 20270326000100 runs.
+    // The Data Processing Agreement; null until 20270327000100 runs.
     db.rpc('rpc_merchant_dpa_read', { p_merchant_id: me.id }),
   ]);
 

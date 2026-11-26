@@ -31,7 +31,7 @@ returns void language sql as $f$
   insert into public.merchant_agreement_acceptance (merchant_id, category, agreement_id, version, accepted_by)
   select p_merchant, p_category, a.id, a.version, p_user
   from public.fn_merchant_agreement_for_category(p_category) a where a.id is not null;
-  -- The Data Processing Agreement (20270326000100).
+  -- The Data Processing Agreement (20270327000100).
   insert into public.merchant_dpa_acceptance (merchant_id, version, accepted_by, details, reference)
   select p_merchant, (public.fn_merchant_dpa_current_version()).version, p_user, '{}'::jsonb,
     'NXG-DPA-' || upper(left(md5(p_merchant::text), 12));
