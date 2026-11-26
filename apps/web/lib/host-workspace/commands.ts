@@ -106,6 +106,7 @@ async function holdDates(access: HostWorkspaceAccess, input: unknown) {
       departTime: time,
       adults: positiveInt.max(100),
       hours: z.number().int().min(1).max(168),
+      rateKes: positiveInt.optional(),
       phone: z.string().max(50).optional(),
     })
     .parse(input);
@@ -127,6 +128,7 @@ async function holdDates(access: HostWorkspaceAccess, input: unknown) {
         guest_first_name: hold.guest,
         party_adults: hold.adults,
         phone: hold.phone,
+        rate_kes: hold.rateKes,
         check_in: hold.start + ' ' + hold.arrivalTime + ':00 ' + zone,
         check_out: hold.end + ' ' + hold.departTime + ':00 ' + zone,
       },
