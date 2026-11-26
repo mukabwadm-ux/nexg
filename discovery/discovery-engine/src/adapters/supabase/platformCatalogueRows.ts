@@ -1,28 +1,30 @@
 import type { BridgeMapRow } from './catalogBridge.js';
 
-/** Platform groups for the operator catalog. The bridge fields preserve its existing wire IDs. */
+/** Master taxonomy source groups. Mapping is navigation, never booking capability.
+ * Legacy flights rows must be migrated by the source, not silently exposed here.
+ * Scenic/safari share Flight & Hotel Bookings; helicopter/private share Private Jet Charters.
+ */
 const groups = [
-  ['flights', 'Flights', 'helicopter_charters', 'Helicopter Charters'],
-  ['flights', 'Flights', 'scenic_flights', 'Scenic Flights'],
-  ['flights', 'Flights', 'safari_flights', 'Safari Flights'],
-  ['flights', 'Flights', 'private_charters', 'Private Charters'],
+  ['travel_tours', 'Travels & Tours', 'flight_hotel_bookings', 'Flight & Hotel Bookings'],
+  ['premium_services', 'Premium Services & Reservations', 'private_jet_charters', 'Private Jet Charters'],
   ['experiences', 'Experiences', 'cinemas', 'Cinemas'],
 ] as const;
 
 export const platformCatalogueRows: readonly BridgeMapRow[] = groups.map(([category, categoryLabel, subcategory, label]) => {
   const slug = subcategory.replaceAll('_', '-');
+  const discoveryCategory = category.replaceAll('_', '-');
   return {
-    demoSubcategoryId: category + '_' + slug,
+    demoSubcategoryId: discoveryCategory + '_' + slug,
     demoLabel: label,
-    demoCategoryId: category,
+    demoCategoryId: discoveryCategory,
     demoCategoryLabel: categoryLabel,
     supabase: { category, subcategory },
-    discovery: { categoryId: category, subcategoryId: category + ':' + slug },
+    discovery: { categoryId: discoveryCategory, subcategoryId: discoveryCategory + ':' + slug },
     status: 'mapped',
   };
 });
 
-/** Add operator-owned groups after parsing the reviewed source map and its console aliases. */
+/** Keep reviewed source rows; append missing canonical groups only. Applying twice is stable. */
 export function withPlatformCatalogueRows(rows: readonly BridgeMapRow[]): BridgeMapRow[] {
   const key = (row: BridgeMapRow) => row.supabase.category + '/' + row.supabase.subcategory;
   const existing = new Set(rows.map(key));
