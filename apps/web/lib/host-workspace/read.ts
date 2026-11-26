@@ -95,10 +95,12 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
           const query = db
             .from('unit')
             .select(
-              'id, property_id, name, status, max_guests, bedrooms, bathrooms, nightly_rate_kes, photos, caretaker_name, handoff, label_public, floor, address_line, building, unit_no, handoff_note, delivery_hours, checkin_time, checkout_time, point, unit_amenities, bed_setup, size_sqm, unit_summary, min_nights',
+              'id, property_id, name, status, max_guests, bedrooms, bathrooms, nightly_rate_kes, photos, caretaker_name, handoff, label_public, floor, address_line, building, unit_no, handoff_note, delivery_hours, checkin_time, checkout_time, point, unit_amenities, bed_setup, size_sqm, unit_summary, min_nights, archived_at',
             )
             .eq('host_id', hostId)
-            .is('archived_at', null);
+            /* Archived units are listed (the phone shows them under Archived);
+               deleted ones are gone (20270326000100). */
+            .is('deleted_at', null);
           if (unitScope) query.in('id', unitScope);
           return query.order('id').range(from, to);
         });
@@ -470,6 +472,23 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
     for (const row of reviewRows ?? []) reviewOf.set(row.id, row.review_status);
   }
 
+  /* When the host archived each property (20270326000100). Not in the
+     generated types until that migration is pushed, hence the untyped read. */
+  const archivedOf = new Map<string, string>();
+  if (properties.length > 0) {
+    const archivedRows = loaded(
+      await db
+        .from('property' as never)
+        .select('id, archived_at')
+        .in(
+          'id',
+          properties.map((row) => row.id),
+        ),
+    ) as unknown as { id: string; archived_at: string | null }[] | null;
+    for (const row of archivedRows ?? [])
+      if (row.archived_at) archivedOf.set(row.id, row.archived_at);
+  }
+
   const data: WorkspaceData = {
     properties: properties
       .map((row) => ({
@@ -489,6 +508,7 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
         neighbourhoodNote: row.neighbourhood_note ?? '',
         houseRules: row.house_rules ?? '',
         cancellationPolicy: row.cancellation_policy ?? '',
+        archivedAt: archivedOf.get(row.id) ?? null,
       }))
       .sort((a, b) => a.name.localeCompare(b.name)),
     units: units
@@ -539,6 +559,9 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
             summary: row.unit_summary ?? '',
             minNights: row.min_nights ?? 1,
             listing: listingOf(row.id),
+            /* A unit of an archived property keeps its own value; the phone
+               shows every unit of an archived property as archived. */
+            archivedAt: row.archived_at ?? null,
           },
         ];
       })

@@ -247,9 +247,9 @@ describe('saving a unit', () => {
   });
 });
 
-describe('archiving a unit', () => {
-  /* The workspace's own unit lookup answers `found`; the RPC answers `result`. */
-  function archiveAccess(
+describe('archive, restore and delete', () => {
+  /* The workspace's own record lookup answers `found`; the RPC answers `result`. */
+  function recordAccess(
     result: { data: unknown; error: { code: string; message: string } | null },
     found: { data: unknown; error: { message: string } | null } = {
       data: { id: UNIT },
@@ -265,6 +265,10 @@ describe('archiving a unit', () => {
         filters.push([column, value]);
         return query;
       },
+      is: (column: string, value: unknown) => {
+        filters.push([column, value]);
+        return query;
+      },
       maybeSingle: async () => found,
     };
     const from = vi.fn(() => query);
@@ -272,81 +276,153 @@ describe('archiving a unit', () => {
     return { ...made, from, filters };
   }
 
-  it('calls rpc_unit_archive on a unit of this workspace', async () => {
-    const {
-      access: a,
-      rpc,
-      from,
-      filters,
-    } = archiveAccess({
-      data: { unit_id: UNIT, cards_voided: 1 },
-      error: null,
+  const STAY_NOT_ENDED =
+    "A guest has a stay here that hasn't ended. You can do this after they check out, or once the stay is cancelled.";
+
+  it.each([
+    ['archive', 'units', 'rpc_unit_archive', { p_unit: UNIT }, /^Unit archived\./],
+    ['unarchive', 'units', 'rpc_unit_unarchive', { p_unit: UNIT }, /^Unit restored\./],
+    ['archive', 'properties', 'rpc_property_archive', { p_property: UNIT }, /^Property archived\./],
+    [
+      'unarchive',
+      'properties',
+      'rpc_property_unarchive',
+      { p_property: UNIT },
+      /^Property restored\./,
+    ],
+  ])('%s %s calls %s', async (type, collection, fn, args, message) => {
+    const { access: a, rpc, from } = recordAccess({ data: {}, error: null });
+    const result = await runHostCommand(a, { type, collection, id: UNIT });
+    expect(from).toHaveBeenCalledWith(collection === 'units' ? 'unit' : 'property');
+    expect(rpc).toHaveBeenCalledWith(fn, args);
+    expect(result.message).toMatch(message);
+  });
+
+  it('deletes a unit with the typed name', async () => {
+    const { access: a, rpc, filters } = recordAccess({ data: {}, error: null });
+    const result = await runHostCommand(a, {
+      type: 'delete',
+      collection: 'units',
+      id: UNIT,
+      record: { confirmName: ' Studio 2 ' },
     });
-    const result = await runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT });
-    expect(from).toHaveBeenCalledWith('unit');
     expect(filters).toEqual([
       ['host_id', HOST],
       ['id', UNIT],
     ]);
-    expect(rpc).toHaveBeenCalledWith('rpc_unit_archive', { p_unit: UNIT });
-    expect(result.message).toMatch(/^Unit archived\./);
+    expect(rpc).toHaveBeenCalledWith('rpc_unit_delete', {
+      p_unit: UNIT,
+      p_confirm_name: 'Studio 2',
+    });
+    expect(result).toEqual({ message: 'Unit deleted.' });
   });
 
-  it('refuses a unit of another host before calling the database', async () => {
-    const { access: a, rpc } = archiveAccess(
-      { data: {}, error: null },
-      { data: null, error: null },
-    );
+  it('deletes a property with the typed name, looking only at ones not deleted', async () => {
+    const { access: a, rpc, filters } = recordAccess({ data: {}, error: null });
+    const result = await runHostCommand(a, {
+      type: 'delete',
+      collection: 'properties',
+      id: PROPERTY,
+      record: { confirmName: 'Block' },
+    });
+    expect(filters).toEqual([
+      ['host_id', HOST],
+      ['id', PROPERTY],
+      ['deleted_at', null],
+    ]);
+    expect(rpc).toHaveBeenCalledWith('rpc_property_delete', {
+      p_property_id: PROPERTY,
+      p_confirm_name: 'Block',
+    });
+    expect(result).toEqual({ message: 'Property deleted.' });
+  });
+
+  it('needs the typed name to delete', async () => {
+    const { access: a, rpc } = recordAccess({ data: {}, error: null });
     await expect(
-      runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
-    ).rejects.toMatchObject({ status: 403 });
+      runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT, record: {} }),
+    ).rejects.toThrow();
     expect(rpc).not.toHaveBeenCalled();
   });
 
-  it('says so when the unit could not be checked', async () => {
-    const { access: a, rpc } = archiveAccess(
-      { data: {}, error: null },
-      { data: null, error: { message: 'timeout' } },
-    );
+  it('passes on a name that does not match as a 400', async () => {
+    const why = 'Type the unit name exactly to confirm: Studio 2';
+    const { access: a } = recordAccess({ data: null, error: { code: '22023', message: why } });
     await expect(
-      runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
-    ).rejects.toMatchObject({ status: 503 });
-    expect(rpc).not.toHaveBeenCalled();
+      runHostCommand(a, {
+        type: 'delete',
+        collection: 'units',
+        id: UNIT,
+        record: { confirmName: 'Studio' },
+      }),
+    ).rejects.toMatchObject({ status: 400, message: why });
   });
 
-  it('passes on why a unit with a guest still to come was kept', async () => {
-    const why =
-      'This unit has 1 booking(s), hold(s) or block(s) today or still to come. Cancel or move them first: those guests have the address.';
-    const { access: a } = archiveAccess({ data: null, error: { code: '23503', message: why } });
+  it.each([
+    ['archive', 'units'],
+    ['delete', 'units'],
+    ['archive', 'properties'],
+    ['delete', 'properties'],
+  ])('passes on a stay that has not ended (%s %s) as a 409', async (type, collection) => {
+    const { access: a } = recordAccess({
+      data: null,
+      error: { code: '23503', message: STAY_NOT_ENDED },
+    });
     await expect(
-      runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
-    ).rejects.toMatchObject({ status: 409, message: why });
+      runHostCommand(a, { type, collection, id: UNIT, record: { confirmName: 'A' } }),
+    ).rejects.toMatchObject({ status: 409, message: STAY_NOT_ENDED });
   });
 
   it('passes on a second archive as a plain refusal', async () => {
-    const { access: a } = archiveAccess({
+    const { access: a } = recordAccess({
       data: null,
       error: { code: '22023', message: 'This unit is already archived.' },
     });
     await expect(
-      runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
+      runHostCommand(a, { type: 'archive', collection: 'units', id: UNIT }),
     ).rejects.toMatchObject({ status: 400, message: 'This unit is already archived.' });
   });
 
   it('passes on a refusal from the database as outside the workspace', async () => {
-    const { access: a } = archiveAccess({
+    const { access: a } = recordAccess({
       data: null,
       error: { code: '42501', message: 'This unit is outside your workspace access.' },
     });
     await expect(
-      runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
+      runHostCommand(a, { type: 'unarchive', collection: 'units', id: UNIT }),
     ).rejects.toMatchObject({ status: 403 });
   });
 
-  it('is not open to team members limited to some units', async () => {
-    const { access: a, rpc, from } = archiveAccess({ data: {}, error: null }, undefined, [UNIT]);
+  it('refuses a record of another host before calling the database', async () => {
+    const { access: a, rpc } = recordAccess({ data: {}, error: null }, { data: null, error: null });
     await expect(
-      runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
+      runHostCommand(a, { type: 'archive', collection: 'properties', id: PROPERTY }),
+    ).rejects.toMatchObject({ status: 403 });
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it('says so when the record could not be checked', async () => {
+    const { access: a, rpc } = recordAccess(
+      { data: {}, error: null },
+      { data: null, error: { message: 'timeout' } },
+    );
+    await expect(
+      runHostCommand(a, { type: 'archive', collection: 'units', id: UNIT }),
+    ).rejects.toMatchObject({ status: 503 });
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['archive', 'units'],
+    ['unarchive', 'units'],
+    ['delete', 'units'],
+    ['archive', 'properties'],
+    ['unarchive', 'properties'],
+    ['delete', 'properties'],
+  ])('%s %s is not open to team members limited to some units', async (type, collection) => {
+    const { access: a, rpc, from } = recordAccess({ data: {}, error: null }, undefined, [UNIT]);
+    await expect(
+      runHostCommand(a, { type, collection, id: UNIT, record: { confirmName: 'A' } }),
     ).rejects.toThrow('outside your workspace access');
     expect(from).not.toHaveBeenCalled();
     expect(rpc).not.toHaveBeenCalled();

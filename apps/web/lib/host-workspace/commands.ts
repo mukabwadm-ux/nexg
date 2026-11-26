@@ -285,6 +285,72 @@ const settingsPatch = z
   .partial()
   .strict();
 
+/* One property or unit: archive (off the properties page and NEXG Stays),
+   restore (back, paused) or delete (gone for good, typed name to confirm). */
+async function archiveOrDelete(
+  access: HostWorkspaceAccess,
+  type: 'archive' | 'unarchive' | 'delete',
+  collection: 'properties' | 'units',
+  id: string,
+  record: unknown,
+) {
+  const { db, hostId, unitScope } = access;
+  if (unitScope) throw scopeError();
+  const confirmName =
+    type === 'delete' ? z.object({ confirmName: name }).parse(record).confirmName : undefined;
+  /* The record must be this workspace's: the RPCs check membership of the
+     record's own host, and a user can belong to more than one host. A deleted
+     unit is refused by the RPC. */
+  const { data, error } =
+    collection === 'properties'
+      ? await db
+          .from('property')
+          .select('id')
+          .eq('host_id', hostId)
+          .eq('id', id)
+          .is('deleted_at', null)
+          .maybeSingle()
+      : await db.from('unit').select('id').eq('host_id', hostId).eq('id', id).maybeSingle();
+  if (error)
+    throw new HostWorkspaceError(
+      503,
+      collection === 'properties'
+        ? 'The property could not be checked.'
+        : 'The unit could not be checked.',
+    );
+  if (!data) throw scopeError();
+
+  /* Not in the generated types until the migration is pushed. */
+  const rpc = (db as unknown as { rpc: UntypedRpc }).rpc.bind(db);
+  const call =
+    collection === 'properties'
+      ? type === 'delete'
+        ? db.rpc('rpc_property_delete', { p_property_id: id, p_confirm_name: confirmName! })
+        : rpc(type === 'archive' ? 'rpc_property_archive' : 'rpc_property_unarchive', {
+            p_property: id,
+          })
+      : type === 'delete'
+        ? rpc('rpc_unit_delete', { p_unit: id, p_confirm_name: confirmName })
+        : rpc(type === 'archive' ? 'rpc_unit_archive' : 'rpc_unit_unarchive', { p_unit: id });
+  const result = await call;
+  /* 23503: a guest has a stay that has not ended, a unit still on NEXG Stays
+     or an unpaid invoice. The database's own words say what to do first. */
+  if (result.error?.code === '23503') throw new HostWorkspaceError(409, result.error.message);
+  const done = {
+    properties: {
+      archive: 'Property archived. It is off NEXG Stays.',
+      unarchive: 'Property restored. Its units stay off NEXG Stays until you turn them on.',
+      delete: 'Property deleted.',
+    },
+    units: {
+      archive: 'Unit archived. It is off NEXG Stays.',
+      unarchive: 'Unit restored. It stays off NEXG Stays until you turn it on.',
+      delete: 'Unit deleted.',
+    },
+  };
+  return checked(result, done[collection][type]);
+}
+
 const commandSchema = z.object({
   type: z.enum([
     'save',
@@ -300,6 +366,8 @@ const commandSchema = z.object({
     'remove-guide-file',
     'save-house',
     'listing',
+    'archive',
+    'unarchive',
   ]),
   collection: z.string().optional(),
   id: uuid.optional(),
@@ -484,54 +552,15 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
     );
   }
 
-  if (command.type === 'delete' && collection === 'properties' && id) {
-    if (unitScope) throw scopeError();
-    const { confirmName } = z.object({ confirmName: name }).parse(record);
-    const { data, error } = await db
-      .from('property')
-      .select('id')
-      .eq('host_id', hostId)
-      .eq('id', id)
-      .is('deleted_at', null)
-      .maybeSingle();
-    if (error) throw new HostWorkspaceError(503, 'The property could not be checked.');
-    if (!data) throw scopeError();
-    const removed = await db.rpc('rpc_property_delete', {
-      p_property_id: id,
-      p_confirm_name: confirmName,
-    });
-    /* 23503: units still on NEXG Stays, a booking still to come or an unpaid
-       invoice. The database's own words tell the host what to do first. */
-    if (removed.error?.code === '23503') throw new HostWorkspaceError(409, removed.error.message);
-    return checked(removed, 'Property removed.');
-  }
-
-  /* Archive one unit. Owners and managers with every unit only, like the
-     publish switch. rpc_unit_archive is not in the generated types until
-     its migration is pushed, hence the untyped call. */
-  if (command.type === 'delete' && collection === 'units' && id) {
-    if (unitScope) throw scopeError();
-    /* The unit must be this workspace's: the RPC only checks membership of
-       the unit's own host, and a user can belong to more than one host.
-       Archived units are kept in the lookup so a second archive still reads
-       "already archived" from the RPC. */
-    const { data, error } = await db
-      .from('unit')
-      .select('id')
-      .eq('host_id', hostId)
-      .eq('id', id)
-      .maybeSingle();
-    if (error) throw new HostWorkspaceError(503, 'The unit could not be checked.');
-    if (!data) throw scopeError();
-    const result = await (db as unknown as { rpc: UntypedRpc }).rpc('rpc_unit_archive', {
-      p_unit: id,
-    });
-    /* 23503: a booking, hold or block today or still to come. */
-    if (result.error?.code === '23503') throw new HostWorkspaceError(409, result.error.message);
-    return checked(
-      result,
-      'Unit archived. It is off NEXG Stays and its cards now tell a guest the card is retired.',
-    );
+  /* Archive, restore and delete a property or a unit (20270326000100). Pausing
+     is the publish switch below. Owners and managers with every unit only, like
+     that switch. */
+  if (
+    (command.type === 'archive' || command.type === 'unarchive' || command.type === 'delete') &&
+    (collection === 'properties' || collection === 'units') &&
+    id
+  ) {
+    return archiveOrDelete(access, command.type, collection, id, record);
   }
 
   if (command.type === 'save' && collection === 'units') {
