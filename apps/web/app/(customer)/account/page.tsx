@@ -40,6 +40,29 @@ type Tab = (typeof TABS)[number]['key'];
 const label = (value: string | null) =>
   value ? value.charAt(0).toUpperCase() + value.slice(1).replaceAll('_', ' ') : '—';
 
+interface StayRow {
+  id: string;
+  check_in: string;
+  check_out: string;
+  status: string;
+  paid_kes: number | null;
+  quote_total_kes: number | null;
+  payment_reference: string | null;
+  refund_due_at: string | null;
+  refunded_at: string | null;
+  refund_amount_kes: number | null;
+}
+
+/** Where a cancelled stay's money stands, or null when no refund is owed or made. */
+function stayRefund(stay: StayRow) {
+  if (stay.status !== 'cancelled') return null;
+  if (stay.refunded_at) {
+    const kes = stay.refund_amount_kes ?? stay.paid_kes;
+    return kes != null ? `Refunded ${receiptAmount(kes * 100)}` : 'Refunded';
+  }
+  return stay.refund_due_at ? 'Refund due' : null;
+}
+
 /**
  * A customer's own account: their receipts, orders, bookings and stays. Everything here
  * is read through row-level security, so it is theirs and nobody else's.
@@ -75,7 +98,9 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
     tab === 'stays'
       ? supabase
           .from('stay')
-          .select('id, check_in, check_out, status, paid_kes, quote_total_kes, payment_reference')
+          .select(
+            'id, check_in, check_out, status, paid_kes, quote_total_kes, payment_reference, refund_due_at, refunded_at, refund_amount_kes',
+          )
           .eq('guest_user_id', user.id)
           .order('check_in', { ascending: false })
           .limit(50)
@@ -217,36 +242,36 @@ export default async function AccountPage({ searchParams }: { searchParams?: { t
               </p>
             ) : (
               <ul className="border-border divide-border bg-surface divide-y overflow-hidden rounded-xl border">
-                {(
-                  stays.data as {
-                    id: string;
-                    check_in: string;
-                    check_out: string;
-                    status: string;
-                    paid_kes: number | null;
-                    quote_total_kes: number | null;
-                    payment_reference: string | null;
-                  }[]
-                ).map((stay) => (
-                  <li key={stay.id} className="flex items-center justify-between gap-4 px-4 py-3">
-                    <span>
-                      <span className="block text-[0.8125rem] font-extrabold">
-                        {receiptDate(stay.check_in)} → {receiptDate(stay.check_out)}
+                {(stays.data as StayRow[]).map((stay) => {
+                  const refund = stayRefund(stay);
+                  return (
+                    <li key={stay.id} className="flex items-center justify-between gap-4 px-4 py-3">
+                      <span>
+                        <span className="block text-[0.8125rem] font-extrabold">
+                          {receiptDate(stay.check_in)} → {receiptDate(stay.check_out)}
+                        </span>
+                        <span className="text-muted block text-[0.75rem] font-semibold">
+                          {stay.status === 'held' ? 'On hold' : label(stay.status)}
+                          {stay.payment_reference ? ` · ${stay.payment_reference}` : ''}
+                        </span>
                       </span>
-                      <span className="text-muted block text-[0.75rem] font-semibold">
-                        {stay.status === 'held' ? 'On hold' : label(stay.status)}
-                        {stay.payment_reference ? ` · ${stay.payment_reference}` : ''}
+                      <span className="text-right">
+                        <span className="block text-[0.875rem] font-extrabold">
+                          {stay.paid_kes != null
+                            ? receiptAmount(stay.paid_kes * 100)
+                            : stay.quote_total_kes != null
+                              ? receiptAmount(stay.quote_total_kes * 100)
+                              : '—'}
+                        </span>
+                        {refund && (
+                          <span className="text-muted block text-[0.6875rem] font-bold">
+                            {refund}
+                          </span>
+                        )}
                       </span>
-                    </span>
-                    <span className="block text-[0.875rem] font-extrabold">
-                      {stay.paid_kes != null
-                        ? receiptAmount(stay.paid_kes * 100)
-                        : stay.quote_total_kes != null
-                          ? receiptAmount(stay.quote_total_kes * 100)
-                          : '—'}
-                    </span>
-                  </li>
-                ))}
+                    </li>
+                  );
+                })}
               </ul>
             ))}
 

@@ -142,6 +142,22 @@ describe('native stay checkout routes', () => {
     expect(stub.rpc).toHaveBeenCalledWith('rpc_native_stay_status', { p_operation_id: quoteId });
   });
 
+  it('says when a booked stay was cancelled and when its money went back', async () => {
+    const cancelled = {
+      ...hold,
+      status: 'cancelled',
+      paymentStatus: 'paid',
+      refundDue: true,
+      refunded: true,
+      cancelledAfterBooking: true,
+      reference: 'NXP-S',
+    };
+    stub.rpc.mockResolvedValue({ data: cancelled, error: null });
+    expect(await (await stayStatus(request(), quoteId)).json()).toEqual(cancelled);
+    stub.rpc.mockResolvedValue({ data: { ...cancelled, refunded: 'yes' }, error: null });
+    expect((await stayStatus(request(), quoteId)).status).toBe(503);
+  });
+
   it('keeps payment closed until Paystack is switched on, without touching the hold', async () => {
     vi.stubEnv('PAYSTACK_TEST_SECRET_KEY', '');
     stub.rpc.mockResolvedValue({ data: hold, error: null });

@@ -2,6 +2,9 @@ import { Card } from '@nexg/ui';
 
 import { PaystackRefundButton } from '@/components/refunds/paystack-refund-button';
 
+import { PaidBookings } from './paid-bookings';
+import { paidVia, shortDate, type PaidBookingRow } from './paid-bookings-data';
+import { PaystackRefundCheck } from './paystack-refund-check';
 import { RecordRefund } from './record-refund';
 import { Chip, DASH, EmptyRow, kes, Pill, Tile, when } from './shared';
 
@@ -28,6 +31,12 @@ export interface StayRefundRow {
   refund_kes: number | null;
   /** What the policy keeps, the host's less NexG's commission. */
   cancellation_fee_kes: number | null;
+  /* How the guest paid, and where Paystack's refund stands (20270328000100).
+     Absent while the database is older than that. */
+  provider?: string | null;
+  is_test?: boolean | null;
+  paystack_state?: string | null;
+  paystack_reference?: string | null;
 }
 
 /** What goes back to the guest: the policy's refund, or the whole payment. */
@@ -38,25 +47,85 @@ const REASON: Record<StayRefundRow['reason'], string> = {
   cancelled: 'Cancelled by NexG',
 };
 
-function shortDate(day: string) {
-  return new Date(day + 'T12:00:00Z').toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    timeZone: 'UTC',
-  });
+/** Where Paystack's refund stands, as the database last heard it. */
+const PAYSTACK_STATE: Record<string, { label: string; tone?: string }> = {
+  opened: { label: 'Started, no answer recorded', tone: 'bg-warning-bg text-warning' },
+  pending: { label: 'Sent to Paystack: pending' },
+  processing: { label: 'Sent to Paystack: processing' },
+  processed: { label: 'Processed by Paystack', tone: 'bg-success-bg text-success' },
+  'needs-attention': { label: 'Needs attention in Paystack', tone: 'bg-danger-bg text-danger' },
+  failed: { label: 'Failed', tone: 'bg-danger-bg text-danger' },
+};
+
+/**
+ * A Paystack payment is refunded with the button, and the row moves to Refunded
+ * when Paystack says so; a row that did not is given what the Paystack
+ * dashboard shows. Anything else is sent back by M-Pesa or bank and recorded
+ * here, and so is a Paystack payment returned that way, which the database
+ * allows only while no Paystack refund is open or processed.
+ */
+function DueRefund({ row }: { row: StayRefundRow }) {
+  const amount = kes(toRefund(row));
+  if (row.provider === undefined) {
+    /* The database does not say how it was paid yet: offer both, as before. */
+    return (
+      <div className="space-y-2">
+        <PaystackRefundButton kind="stay" targetId={row.stay_id} amount={amount} />
+        <RecordRefund stayId={row.stay_id} amount={amount} />
+      </div>
+    );
+  }
+  if (row.provider !== 'paystack') return <RecordRefund stayId={row.stay_id} amount={amount} />;
+
+  const state = row.paystack_state ? PAYSTACK_STATE[row.paystack_state] : undefined;
+  /* The state is of a refund that has not failed, when there is one. */
+  const noneLive = !row.paystack_state || row.paystack_state === 'failed';
+  return (
+    <div className="w-60 space-y-2">
+      {state && <Pill tone={state.tone}>{state.label}</Pill>}
+      <PaystackRefundButton kind="stay" targetId={row.stay_id} amount={amount} />
+      <details>
+        <summary className="text-muted cursor-pointer text-[0.6875rem] font-bold">
+          Paystack shows it refunded or failed but this row didn&rsquo;t update?
+        </summary>
+        <PaystackRefundCheck
+          stayId={row.stay_id}
+          amount={amount}
+          canFail={!noneLive && row.paystack_state !== 'processed'}
+          shownReference={row.paystack_reference ?? null}
+        />
+      </details>
+      {noneLive && (
+        <details>
+          <summary className="text-muted cursor-pointer text-[0.6875rem] font-bold">
+            Sent it by M-Pesa or bank instead?
+          </summary>
+          <div className="mt-2 space-y-2">
+            <p className="text-danger text-[0.6875rem] font-semibold">
+              Only for money you sent yourself, after checking that Paystack has not refunded it.
+            </p>
+            <RecordRefund stayId={row.stay_id} amount={amount} />
+          </div>
+        </details>
+      )}
+    </div>
+  );
 }
 
 /**
- * Stays that owe a guest their money back. Staff send the money back in the
- * M-Pesa portal (a reversal, using the receipt shown) and record the
- * reference here; the row then moves to Refunded.
+ * Paid stays NexG can cancel, then the stays that owe a guest their money back.
+ * Paystack payments are refunded through Paystack and update by themselves;
+ * other payments are sent by M-Pesa or bank and their reference recorded here.
  */
 export function RefundsTab({
   rows,
+  paid,
   filter,
   canRecord,
 }: {
   rows: StayRefundRow[];
+  /** Null when the paid bookings could not be loaded. */
+  paid: PaidBookingRow[] | null;
   filter: string;
   canRecord: boolean;
 }) {
@@ -85,6 +154,8 @@ export function RefundsTab({
         />
         <Tile label="Refunded" value={String(refunded.length)} />
       </div>
+
+      {canRecord && <PaidBookings rows={paid} />}
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
         {[
@@ -145,7 +216,10 @@ export function RefundsTab({
                   ) : null}
                 </td>
                 <td className="text-muted px-4 py-3 text-[0.6875rem] font-semibold">
-                  <p className="text-ink font-extrabold">{r.mpesa_receipt ?? DASH}</p>
+                  {r.provider !== undefined && (
+                    <p className="text-ink font-extrabold">{paidVia(r.provider, r.is_test)}</p>
+                  )}
+                  <p className="text-ink mt-0.5 font-extrabold">{r.mpesa_receipt ?? DASH}</p>
                   <p className="mt-0.5">{r.payer_phone ?? DASH}</p>
                   <p className="mt-0.5">{r.payment_reference ?? ''}</p>
                 </td>
@@ -165,14 +239,7 @@ export function RefundsTab({
                       {r.refund_note && <p className="text-muted mt-0.5">{r.refund_note}</p>}
                     </div>
                   ) : canRecord ? (
-                    <div className="space-y-2">
-                      <PaystackRefundButton
-                        kind="stay"
-                        targetId={r.stay_id}
-                        amount={kes(toRefund(r))}
-                      />
-                      <RecordRefund stayId={r.stay_id} amount={kes(toRefund(r))} />
-                    </div>
+                    <DueRefund row={r} />
                   ) : (
                     <span className="text-muted text-[0.6875rem] font-semibold">Due</span>
                   )}
@@ -198,11 +265,23 @@ export function RefundsTab({
             to somebody else, or when NexG cancelled a paid booking.
           </li>
           <li>
-            • Reverse the payment in the M-Pesa portal using the receipt shown, or send the amount
-            back by B2C to the number it came from.
+            • Paid through Paystack: press the refund button. The money goes back the way it was
+            paid, and the row moves to Refunded by itself once Paystack confirms it. Do not also
+            send it by M-Pesa or bank.
           </li>
           <li>
-            • Record the M-Pesa reference of the refund here. It is kept with the stay and audited.
+            • Needs attention in Paystack, or Failed: check the refund in the Paystack dashboard
+            before doing anything else.
+          </li>
+          <li>
+            • If the dashboard shows it processed or failed and the row did not update, record that
+            under the button. Processed marks the stay refunded; failed lets you send it again.
+            While Paystack may still send a refund, it cannot be recorded as sent by M-Pesa or bank.
+          </li>
+          <li>
+            • Not paid through Paystack: reverse the payment in the M-Pesa portal using the receipt
+            shown, or send the amount back by B2C to the number it came from, or by bank. Then
+            record the reference here. It is kept with the stay and audited.
           </li>
         </ul>
       </Card>
