@@ -21,8 +21,32 @@ interface HostDocument {
   status: 'uploaded' | 'approved' | 'rejected';
   rejectionReason: string | null;
   uploadedAt: string;
+  /** YYYY-MM-DD, null when the document does not expire (or no date was given). */
+  expiresOn?: string | null;
   url: string;
 }
+
+/** Today in Nairobi as YYYY-MM-DD. */
+const nairobiToday = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Nairobi' });
+
+/** Same rule as NexG's review: expired before today, expiring within 60 days once approved. */
+function expiryState(row: HostDocument | undefined): 'expired' | 'expiring' | null {
+  if (!row?.expiresOn || row.status === 'rejected') return null;
+  const today = nairobiToday();
+  if (row.expiresOn < today) return 'expired';
+  const soon = new Date(`${today}T12:00:00Z`);
+  soon.setUTCDate(soon.getUTCDate() + 60);
+  return row.status === 'approved' && row.expiresOn <= soon.toISOString().slice(0, 10)
+    ? 'expiring'
+    : null;
+}
+
+const longDate = (iso: string) =>
+  new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
 
 interface DocumentsView {
   status: 'applied' | 'verifying' | 'live' | 'paused' | 'offboarded';
@@ -67,6 +91,7 @@ export function DocumentsPanel() {
   const [loadError, setLoadError] = useState('');
   const [busy, setBusy] = useState<Kind | 'submit' | null>(null);
   const [progress, setProgress] = useState(0);
+  const [expiry, setExpiry] = useState<Partial<Record<Kind, string>>>({});
   const picker = useRef<HTMLInputElement>(null);
   const picking = useRef<Kind | null>(null);
 
@@ -90,11 +115,12 @@ export function DocumentsPanel() {
       setView(
         await uploadFile<DocumentsView>(
           '/documents',
-          { kind, fileName: file.name },
+          { kind, fileName: file.name, expiresOn: expiry[kind] || null },
           file,
           setProgress,
         ),
       );
+      setExpiry((current) => ({ ...current, [kind]: '' }));
       notify('Document uploaded.');
     } catch (error) {
       notify(errorMessage(error, 'The upload did not finish. Try again.'));
@@ -137,6 +163,9 @@ export function DocumentsPanel() {
       return (
         <Badge tone={required ? 'warning' : 'neutral'}>{required ? 'Needed' : 'Optional'}</Badge>
       );
+    const state = expiryState(row);
+    if (state === 'expired') return <Badge tone="danger">Expired</Badge>;
+    if (state === 'expiring') return <Badge tone="warning">Expires soon</Badge>;
     if (row.status === 'approved') return <Badge tone="success">Approved</Badge>;
     if (row.status === 'rejected') return <Badge tone="warning">Needs a new file</Badge>;
     return <Badge>{view.status === 'verifying' ? 'In review' : 'Uploaded'}</Badge>;
@@ -221,10 +250,34 @@ export function DocumentsPanel() {
                       <span className="mg-small-note">{row.rejectionReason}</span>
                     </>
                   )}
+                  {row?.expiresOn && row.status !== 'rejected' && (
+                    <>
+                      <br />
+                      <span className="mg-small-note">
+                        {expiryState(row) === 'expired' ? 'Expired' : 'Expires'}{' '}
+                        {longDate(row.expiresOn)}
+                        {expiryState(row) ? '. Upload the new one.' : ''}
+                      </span>
+                    </>
+                  )}
                 </td>
                 <td>{badge(row, required)}</td>
                 <td>
-                  {editable && row?.status !== 'approved' && (
+                  {editable && (row?.status !== 'approved' || expiryState(row) !== null) && (
+                    <label className="field">
+                      <span>Expiry date (if it has one)</span>
+                      <input
+                        type="date"
+                        min={nairobiToday()}
+                        value={expiry[kind] ?? ''}
+                        disabled={busy !== null}
+                        onChange={(event) =>
+                          setExpiry((current) => ({ ...current, [kind]: event.target.value }))
+                        }
+                      />
+                    </label>
+                  )}
+                  {editable && (row?.status !== 'approved' || expiryState(row) !== null) && (
                     <Button
                       disabled={busy !== null}
                       onClick={() => {

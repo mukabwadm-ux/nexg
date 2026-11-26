@@ -51,6 +51,8 @@ export async function reviewHostDocument(input: {
   documentId: string;
   approve: boolean;
   reason: string;
+  /** On approve: the document's expiry date (YYYY-MM-DD), '' when it does not expire. */
+  expiresOn?: string;
 }): Promise<{ error?: string; success?: boolean }> {
   const staff = await requireStaff();
   requireModule(staff, 'hotels');
@@ -59,6 +61,10 @@ export async function reviewHostDocument(input: {
   const reason = input.reason.trim();
   if (!input.approve && reason.length < 5)
     return { error: 'Tell the host what to fix (at least a few words).' };
+  if (input.approve && input.expiresOn !== undefined) {
+    const expiry = await saveDocumentExpiry(input.documentId, input.expiresOn);
+    if (expiry.error) return expiry;
+  }
 
   /* rpc_host_document_review is newer than the generated types. */
   const supabase = createClient();
@@ -75,6 +81,7 @@ export async function reviewHostDocument(input: {
 
   revalidatePath(`/hotels/hosts/${input.hostId}/verify`);
   revalidatePath('/hotels');
+  revalidatePath('/stays/verification');
   return { success: true };
 }
 
@@ -215,4 +222,45 @@ export async function reviewProperty(input: {
 
 function isReviewDecision(v: string): v is ReviewDecision {
   return (REVIEW_DECISIONS as readonly string[]).includes(v);
+}
+
+const isoDate = /^\d{4}-\d{2}-\d{2}$/;
+
+/* rpc_host_document_set_expiry (20270331000300) is newer than the generated types. */
+async function saveDocumentExpiry(
+  documentId: string,
+  expiresOn: string,
+): Promise<{ error?: string; success?: boolean }> {
+  const value = expiresOn.trim();
+  if (value && (!isoDate.test(value) || Number.isNaN(Date.parse(value))))
+    return { error: 'Enter the expiry date as a full date, or leave it empty.' };
+  const supabase = createClient();
+  const rpc = supabase.rpc as unknown as (
+    name: string,
+    args: Record<string, unknown>,
+  ) => PromiseLike<{ error: { message: string } | null }>;
+  const { error } = await rpc.call(supabase, 'rpc_host_document_set_expiry', {
+    p_document_id: documentId,
+    p_expires_on: value || null,
+  });
+  if (error) return { error: `Could not save the expiry date: ${error.message}` };
+  return { success: true };
+}
+
+/** Set, correct or clear a host document's expiry date ('' = does not expire). */
+export async function setHostDocumentExpiry(input: {
+  hostId: string;
+  documentId: string;
+  expiresOn: string;
+}): Promise<{ error?: string; success?: boolean }> {
+  const staff = await requireStaff();
+  requireModule(staff, 'hotels');
+  if (!uuid.test(input.hostId) || !uuid.test(input.documentId))
+    return { error: 'The document ID is invalid.' };
+  const result = await saveDocumentExpiry(input.documentId, input.expiresOn);
+  if (result.error) return result;
+  revalidatePath(`/hotels/hosts/${input.hostId}/verify`);
+  revalidatePath('/stays/verification');
+  revalidatePath('/stays/hosts');
+  return { success: true };
 }

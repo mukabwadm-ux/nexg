@@ -73,6 +73,36 @@ export interface HostRow {
   payout_ok: boolean;
   open_cases: number;
   bucket: string;
+  /** Document expiry (20270331000300); absent until that migration is applied. */
+  earliest_expiry?: string | null;
+  docs_expiring?: number;
+  docs_expired?: number;
+  documents?: HostDocumentRow[];
+}
+
+export interface HostDocumentRow {
+  id: string;
+  kind: string;
+  status: string;
+  file_name: string;
+  uploaded_at: string;
+  reviewed_at: string | null;
+  expires_on: string | null;
+  expiry_state: 'expired' | 'expiring' | 'valid' | null;
+}
+
+const DOCUMENT_LABEL: Record<string, string> = {
+  id_document: 'ID or passport',
+  authority: 'Proof of authority',
+  kra_pin: 'KRA PIN certificate',
+  business_registration: 'Business registration',
+};
+
+/** "Expired" / "Expires soon" chip for a host or a document; nothing when fine. */
+function ExpiryChip({ expired, expiring }: { expired: boolean; expiring: boolean }) {
+  if (expired) return <Chip status="flagged" text="Expired" />;
+  if (expiring) return <Chip status="pending" text="Expires soon" />;
+  return null;
 }
 
 const HOSTS_TABS = [
@@ -164,21 +194,17 @@ export function HostsScreen({
   const k = asObject(o.kpis);
   const allRows = (Array.isArray(o.rows) ? o.rows : []) as HostRow[];
   const compliant = (r: HostRow) => r.id_ok && r.authority_ok;
-  const filtered =
-    tab === 'expiring'
-      ? []
-      : allRows.filter(
-          (r) =>
-            (!filters.type || r.kind === filters.type) &&
-            (!filters.kyc ||
-              (filters.kyc === 'verified'
-                ? r.id_ok
-                : filters.kyc === 'rejected'
-                  ? r.docs_rejected > 0
-                  : !r.id_ok)) &&
-            (!filters.compliance ||
-              (filters.compliance === 'compliant' ? compliant(r) : !compliant(r))),
-        );
+  const filtered = allRows.filter(
+    (r) =>
+      (!filters.type || r.kind === filters.type) &&
+      (!filters.kyc ||
+        (filters.kyc === 'verified'
+          ? r.id_ok
+          : filters.kyc === 'rejected'
+            ? r.docs_rejected > 0
+            : !r.id_ok)) &&
+      (!filters.compliance || (filters.compliance === 'compliant' ? compliant(r) : !compliant(r))),
+  );
   const rows = filtered.slice((page - 1) * size, page * size);
   const total = filtered.length;
   const host = allRows.find((r) => r.host_id === selected) ?? null;
@@ -326,6 +352,43 @@ export function HostsScreen({
                   <Fact icon={XCircle} label="Documents rejected">
                     {host.docs_rejected}
                   </Fact>
+                  {host.documents && host.documents.length > 0 ? (
+                    <ul className="mt-2 divide-y divide-[#EEE7D8]">
+                      {host.documents.map((d) => (
+                        <li key={d.id} className="py-2 text-[0.8125rem]">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-bold">{label(DOCUMENT_LABEL, d.kind)}</span>
+                            <span className="flex gap-1">
+                              <ExpiryChip
+                                expired={d.expiry_state === 'expired'}
+                                expiring={d.expiry_state === 'expiring'}
+                              />
+                              <Chip
+                                status={d.status === 'uploaded' ? 'under_review' : d.status}
+                                text={
+                                  d.status === 'uploaded'
+                                    ? 'In review'
+                                    : d.status === 'approved'
+                                      ? 'Approved'
+                                      : 'Rejected'
+                                }
+                              />
+                            </span>
+                          </div>
+                          <p className="text-muted mt-0.5 font-semibold">
+                            {d.expires_on
+                              ? `Expires ${shortDate(`${d.expires_on}T12:00:00Z`)}`
+                              : 'No expiry date'}{' '}
+                            · uploaded {shortDate(d.uploaded_at)}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-muted mt-2 text-[0.8125rem] font-semibold">
+                      No documents uploaded yet.
+                    </p>
+                  )}
                   <Link
                     className="mt-2 inline-block font-bold underline"
                     href={`/hotels/hosts/${host.host_id}/verify`}
@@ -360,7 +423,7 @@ export function HostsScreen({
                   <p className="text-muted mt-2 text-[0.8125rem] font-semibold">
                     {compliant(host)
                       ? 'All required checks completed.'
-                      : 'ID and proof of authority must both be approved.'}
+                      : 'ID and proof of authority must both be approved and not expired.'}
                   </p>
                 </>
               ) : ptab === 'history' ? (
@@ -554,7 +617,7 @@ export function HostsScreen({
             isEmpty={rows.length === 0}
             empty={
               tab === 'expiring'
-                ? 'Host documents carry no expiry date yet, so nothing is shown as expiring.'
+                ? 'No approved host document expires in the next 60 days, and none has expired.'
                 : tab === 'pending'
                   ? 'No host is waiting for approval.'
                   : 'No hosts match.'
@@ -578,6 +641,7 @@ export function HostsScreen({
                     'KYC Status',
                     'Compliance',
                     'Documents',
+                    'Expiry',
                     'Verified On',
                   ]
             }
@@ -637,6 +701,15 @@ export function HostsScreen({
                     </td>
                     <td className="whitespace-nowrap tabular-nums">
                       {r.docs_approved}/{Math.max(r.docs_uploaded, 2)}
+                    </td>
+                    <td className="whitespace-nowrap">
+                      <span className="flex flex-col items-start gap-1">
+                        {r.earliest_expiry ? shortDate(`${r.earliest_expiry}T12:00:00Z`) : '—'}
+                        <ExpiryChip
+                          expired={(r.docs_expired ?? 0) > 0}
+                          expiring={(r.docs_expiring ?? 0) > 0}
+                        />
+                      </span>
                     </td>
                     <td className="whitespace-nowrap">{shortDate(r.verified_at)}</td>
                   </>
