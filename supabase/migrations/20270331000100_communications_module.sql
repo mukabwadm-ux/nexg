@@ -2855,3 +2855,9 @@ insert into public.wiring_audit_exempt (function_name, reason, recorded_in) valu
   ('rpc_comms_unsubscribe_lookup', 'Reading whether an opt-out link is real', 'comms_unsubscribe'),
   ('cron_comms_tick', 'The clock running scheduled messages staff set up (their save is audited)', 'comms_campaign')
 on conflict (function_name) do nothing;
+
+/* The opt-out link is used by people who are not signed in, by design. */
+insert into public.wiring_anon_allow (function_name, reason, guarded_by) values
+  ('rpc_comms_unsubscribe', 'A person stopping marketing from the link in a message they received',
+   'a 20-hex token issued per message; it only records a withdrawal for that token''s person')
+on conflict (function_name) do nothing;
