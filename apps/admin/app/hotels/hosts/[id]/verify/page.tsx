@@ -76,12 +76,19 @@ export default async function VerifyHostPage({ params }: { params: { id: string 
       };
     };
   };
-  const { data: rows, error: documentsError } = await loose
-    .from('host_document')
-    .select('id, kind, file_name, status, rejection_reason, uploaded_at, storage_path, expires_on')
-    .eq('host_id', host.id)
-    .is('superseded_at', null)
-    .order('uploaded_at', { ascending: true });
+  const columns = 'id, kind, file_name, status, rejection_reason, uploaded_at, storage_path';
+  const read = (select: string) =>
+    loose
+      .from('host_document')
+      .select(select)
+      .eq('host_id', host.id)
+      .is('superseded_at', null)
+      .order('uploaded_at', { ascending: true });
+  let { data: rows, error: documentsError } = await read(`${columns}, expires_on`);
+  /* Before 20270331000300 reaches this database there is no expires_on: read without it. */
+  if (documentsError && /expires_on/.test(documentsError.message)) {
+    ({ data: rows, error: documentsError } = await read(columns));
+  }
   if (documentsError) throw new Error(`Could not load documents: ${documentsError.message}`);
 
   const documentRows = rows ?? [];
