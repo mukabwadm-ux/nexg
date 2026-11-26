@@ -92,6 +92,34 @@ describe('what a booking owes now', () => {
       expiresAt: null,
     });
   });
+  it('a quote is reserved with half of its top, then pays its final price less the deposit', () => {
+    const quote = {
+      ...held,
+      model: 'REQUEST_QUOTE',
+      pricing: { totalDueMinor: 24000000, dueNowMinor: 12000000 },
+    };
+    expect(stepFor(quote, false)).toMatchObject({ step: 'deposit', amount: 12000000 });
+    // Never paid to the top of the range.
+    expect(stepFor(quote, true)).toMatchObject({ step: 'deposit', amount: 12000000 });
+    const waiting = { ...quote, status: 'pending', paidMinor: 12000000 };
+    expect(stepFor(waiting, false)).toBe('nothing');
+    const accepted = {
+      ...waiting,
+      status: 'accepted',
+      pricing: { totalDueMinor: 20000000, dueNowMinor: 8000000, finalMinor: 20000000 },
+    };
+    expect(stepFor(accepted, false)).toEqual({ step: 'balance', amount: 8000000, expiresAt: null });
+    for (const status of ['in_progress', 'completed'])
+      expect(stepFor({ ...accepted, status }, false)).toMatchObject({
+        step: 'balance',
+        amount: 8000000,
+      });
+    const lower = {
+      ...accepted,
+      pricing: { totalDueMinor: 10000000, dueNowMinor: 0, finalMinor: 10000000 },
+    };
+    expect(stepFor(lower, false)).toBe('nothing');
+  });
   it('nothing once paid in full; closed when expired or cancelled', () => {
     expect(stepFor({ ...held, status: 'confirmed', paidMinor: 150000 }, false)).toBe('nothing');
     expect(stepFor({ ...held, status: 'expired' }, false)).toBe('closed');

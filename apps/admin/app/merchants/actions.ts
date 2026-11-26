@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { issueSignedAgreement, issueSummary } from '@/lib/merchant-agreement-signing';
+import { dpaIssueSummary, issueSignedDpa } from '@/lib/merchant-dpa-signing';
 import { liveEmailStatus, liveEmailSummary } from '@/lib/merchant-live-email';
 import { createClient } from '@/lib/supabase/server';
 
@@ -72,6 +73,12 @@ export async function goLive(merchantId: string, reason: string): Promise<Review
   } catch {
     agreement =
       'The merchant agreement could not be signed. Use Issue signed agreement on this page.';
+  }
+  // The data processing agreement, signed the same way (20270327000100).
+  try {
+    agreement = `${agreement} ${dpaIssueSummary(await issueSignedDpa(supabase, merchantId))}`;
+  } catch {
+    agreement = `${agreement} The data processing agreement could not be signed. Use Issue signed DPA on this page.`;
   }
 
   revalidatePath(`/merchants/${merchantId}`);

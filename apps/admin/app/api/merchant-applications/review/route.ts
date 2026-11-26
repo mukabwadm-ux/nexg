@@ -1,5 +1,6 @@
 import { merchantApplicationReviewHandler } from '@/lib/merchant-application-review-http';
 import { issueSignedAgreement, issueSummary } from '@/lib/merchant-agreement-signing';
+import { dpaIssueSummary, issueSignedDpa } from '@/lib/merchant-dpa-signing';
 import { createClient } from '@/lib/supabase/server';
 import type { ReviewRpcResult } from '@/lib/merchant-application-review-contracts';
 
@@ -52,9 +53,13 @@ export async function POST(request: Request) {
     },
     issueAgreement: async (merchantId) => {
       const result = await issueSignedAgreement(client, merchantId);
+      // The DPA too, when the merchant has already accepted it.
+      const dpa = await issueSignedDpa(client, merchantId).catch(() => null);
       return {
         issued: result.status === 'issued' || result.status === 'signed',
-        detail: issueSummary(result),
+        detail: [issueSummary(result), dpa && dpa.status !== 'waiting' ? dpaIssueSummary(dpa) : '']
+          .filter(Boolean)
+          .join(' '),
       };
     },
   })(request);

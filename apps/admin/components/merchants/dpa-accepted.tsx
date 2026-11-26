@@ -1,4 +1,7 @@
+import { dpaSigningContext } from '@/lib/merchant-dpa-signing';
 import { createClient } from '@/lib/supabase/server';
+
+import { IssueDpaButton } from './issue-dpa-button';
 
 const day = (iso: string) =>
   new Date(iso).toLocaleString('en-KE', {
@@ -18,7 +21,6 @@ interface Acceptance {
   sha256: string | null;
   pages: number | null;
   copy_stored_at: string | null;
-  signed_by_nexg: boolean;
   ip: string | null;
   device_label: string | null;
   details: {
@@ -51,7 +53,8 @@ const href = (merchantId: string, copy: Acceptance) =>
  * it is not accepted yet.
  */
 export async function MerchantDpaAccepted({ merchantId }: { merchantId: string }) {
-  const { data, error } = await createClient().rpc('rpc_merchant_dpa_read', {
+  const client = createClient();
+  const { data, error } = await client.rpc('rpc_merchant_dpa_read', {
     p_merchant_id: merchantId,
   });
   // Until 20270327000100 runs the function does not exist: show nothing.
@@ -59,6 +62,8 @@ export async function MerchantDpaAccepted({ merchantId }: { merchantId: string }
   const record = (data as unknown as DpaRecord | null) ?? null;
   const current = record?.acceptances.find((entry) => entry.current) ?? null;
   const earlier = record?.acceptances.filter((entry) => !entry.current) ?? [];
+  const signing =
+    current && !current.storage_path ? (await dpaSigningContext(client, merchantId)).context : null;
   return (
     <section
       aria-labelledby="merchant-dpa"
@@ -95,21 +100,35 @@ export async function MerchantDpaAccepted({ merchantId }: { merchantId: string }
                   <span className="font-mono text-[0.75rem]">{current.sha256.slice(0, 16)}…</span>
                 </>
               ) : null}
-              {current.storage_path && !current.signed_by_nexg
-                ? ' · made without NexG’s signature'
-                : ''}
             </p>
             {current.storage_path ? (
-              <a
-                href={href(merchantId, current)}
-                className="text-ink mt-2 inline-flex min-h-11 items-center font-extrabold underline underline-offset-2"
-              >
-                Download signed DPA (PDF)
-              </a>
+              <>
+                <p className="text-success mt-1 text-[0.8125rem] font-bold">
+                  Signed by NexG{current.copy_stored_at ? ` ${day(current.copy_stored_at)}` : ''}
+                </p>
+                <a
+                  href={href(merchantId, current)}
+                  className="text-ink mt-2 inline-flex min-h-11 items-center font-extrabold underline underline-offset-2"
+                >
+                  Download signed DPA (PDF)
+                </a>
+              </>
+            ) : signing?.missing.length ? (
+              <div className="mt-2">
+                <p className="text-warning text-[0.8125rem] font-bold">Not signed by NexG yet</p>
+                <ul className="text-ink mt-1 list-disc space-y-1 pl-5 text-[0.8125rem] font-semibold">
+                  {signing.missing.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+              </div>
             ) : (
-              <p className="text-warning mt-2 text-[0.8125rem] font-bold">
-                The signed copy is not stored yet. The owner can make it from Business › Documents.
-              </p>
+              <div className="mt-2">
+                <p className="text-ink text-[0.8125rem] font-bold">
+                  Ready to sign with NexG’s signatory and signature.
+                </p>
+                <IssueDpaButton merchantId={merchantId} />
+              </div>
             )}
           </div>
           <dl className="grid gap-x-6 gap-y-1.5 sm:grid-cols-[max-content_1fr]">

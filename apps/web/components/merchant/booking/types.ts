@@ -209,6 +209,10 @@ export interface BookingQuote {
   balanceMinor?: number;
   binding?: boolean;
   sourceRequired?: boolean;
+  /** A reserved quote: the range it was reserved against, its final price once accepted, and what is owed back. */
+  quoteRange?: { minMinor: number; maxMinor: number; note?: string };
+  finalMinor?: number;
+  refundDueMinor?: number;
 }
 
 export interface BookingOccurrence {

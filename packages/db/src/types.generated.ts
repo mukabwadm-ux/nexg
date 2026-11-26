@@ -24904,6 +24904,7 @@ export type Database = {
           render_version: string | null;
           session_id: string | null;
           sha256: string | null;
+          signed_by: string | null;
           signer_id: string | null;
           storage_path: string | null;
           user_agent: string | null;
@@ -24927,6 +24928,7 @@ export type Database = {
           render_version?: string | null;
           session_id?: string | null;
           sha256?: string | null;
+          signed_by?: string | null;
           signer_id?: string | null;
           storage_path?: string | null;
           user_agent?: string | null;
@@ -24949,6 +24951,7 @@ export type Database = {
           render_version?: string | null;
           session_id?: string | null;
           sha256?: string | null;
+          signed_by?: string | null;
           signer_id?: string | null;
           storage_path?: string | null;
           user_agent?: string | null;
@@ -25059,6 +25062,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'merchant_week_money_v';
             referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_signed_by_fkey';
+            columns: ['signed_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
           },
           {
             foreignKeyName: 'merchant_dpa_acceptance_signer_id_fkey';
@@ -65051,20 +65061,7 @@ export type Database = {
       fn_merchant_category_label: { Args: { p_key: string }; Returns: string };
       fn_merchant_commission: { Args: { p_at?: string; p_merchant_id: string }; Returns: Json };
       fn_merchant_commission_decider: { Args: { p_city_id: string }; Returns: boolean };
-      fn_merchant_dpa_as_service: { Args: Record<PropertyKey, never>; Returns: boolean };
       fn_merchant_dpa_contact: { Args: { p_merchant_id: string }; Returns: Json };
-      fn_merchant_dpa_copy_context: { Args: { p_acceptance_id: string }; Returns: Json };
-      fn_merchant_dpa_copy_record: {
-        Args: {
-          p_acceptance_id: string;
-          p_pages: number;
-          p_render_version: string;
-          p_sha256: string;
-          p_signer_id: string;
-          p_storage_path: string;
-        };
-        Returns: Json;
-      };
       fn_merchant_dpa_current_version: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -70714,6 +70711,19 @@ export type Database = {
         Returns: Json;
       };
       rpc_merchant_dpa_read: { Args: { p_merchant_id: string }; Returns: Json };
+      rpc_merchant_dpa_sign_record: {
+        Args: {
+          p_acceptance_id: string;
+          p_merchant_id: string;
+          p_pages: number;
+          p_render_version: string;
+          p_sha256: string;
+          p_signer_id: string;
+          p_storage_path: string;
+        };
+        Returns: Json;
+      };
+      rpc_merchant_dpa_signing_context: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_featured_card_save: {
         Args: { p_blurb?: string; p_booking_id: string; p_media?: Json };
         Returns: Json;

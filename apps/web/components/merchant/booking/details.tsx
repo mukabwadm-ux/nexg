@@ -49,6 +49,10 @@ export function BookingDetails({
   const [finishing, setFinishing] = useState(false);
   const [recordingPayment, setRecordingPayment] = useState(false);
   const [recordingRefund, setRecordingRefund] = useState(false);
+  const [pricingQuote, setPricingQuote] = useState(false);
+  const [priceError, setPriceError] = useState('');
+  // A quote the customer reserved with half of the top of its range is accepted with the final price (owner, 25 Nov 2026).
+  const reservedQuote = booking.model === 'REQUEST_QUOTE' && !!booking.pricing?.quoteRange;
   const nonblocking = NONBLOCKING.has(booking.model);
   const captureOnly = booking.executionMode === 'request_capture';
   const custody = ['ASSET_INTERVAL', 'STORAGE', 'SPACE_RESERVATION'].includes(booking.model);
@@ -205,6 +209,51 @@ export function BookingDetails({
               setChangingTime(false);
           }}
         />
+      ) : pricingQuote && booking.pricing?.quoteRange ? (
+        <form
+          className="space-y-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            let finalPriceMinor: number;
+            try {
+              finalPriceMinor = kesInputToMinor(
+                String(new FormData(event.currentTarget).get('price') ?? ''),
+              );
+            } catch (e) {
+              setPriceError(e instanceof Error ? e.message : 'Enter the final price.');
+              return;
+            }
+            setPriceError('');
+            void onMutation(
+              'accept',
+              { expectedVersion: booking.version, finalPriceMinor },
+              'Request accepted with its final price.',
+            ).then((done) => {
+              if (done) setPricingQuote(false);
+            });
+          }}
+        >
+          <Field
+            label="Final price (KES)"
+            hint={`The customer reserved against ${money(booking.pricing.quoteRange.minMinor)} to ${money(booking.pricing.quoteRange.maxMinor)} and paid ${money(booking.paidMinor ?? 0)}. They pay the final price less that, or are owed back what they paid above it.`}
+          >
+            <input name="price" required inputMode="decimal" className={inputClass} />
+          </Field>
+          {priceError ? <p className="text-sm text-red-700">{priceError}</p> : null}
+          <div className="flex flex-wrap gap-2">
+            <button className={primaryClass} type="submit" disabled={disabled}>
+              Accept with this price
+            </button>
+            <button
+              className={buttonClass}
+              type="button"
+              disabled={disabled}
+              onClick={() => setPricingQuote(false)}
+            >
+              Back
+            </button>
+          </div>
+        </form>
       ) : recordingPayment ? (
         <PaymentForm
           booking={booking}
@@ -299,10 +348,16 @@ export function BookingDetails({
               disabled={disabled}
               className={primaryClass}
               onClick={() =>
-                void onMutation('accept', { expectedVersion: booking.version }, 'Request accepted.')
+                reservedQuote
+                  ? setPricingQuote(true)
+                  : void onMutation(
+                      'accept',
+                      { expectedVersion: booking.version },
+                      'Request accepted.',
+                    )
               }
             >
-              Accept request
+              {reservedQuote ? 'Accept with final price' : 'Accept request'}
             </button>
           ) : null}
           {!booking.specialist && nonblocking && booking.status === 'accepted' ? (
