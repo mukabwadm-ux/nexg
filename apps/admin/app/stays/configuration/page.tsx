@@ -267,7 +267,7 @@ export default async function StaysConfigurationPage({
                 ].map(([key, text]) => (
                   <a
                     key={key}
-                    href={`#${({ booking: 'general', pricing: 'general', fees: 'general', availability: 'checkin', integrations: 'checkin' } as Record<string, string>)[key] ?? key}`}
+                    href={`#${({ booking: 'general', pricing: 'general', fees: 'general', availability: 'checkin', integrations: 'checkin' } as Record<string, string>)[key ?? ''] ?? key}`}
                     className="rounded-lg px-3 py-2 text-[0.9375rem] font-bold text-[#1A1A1A] hover:bg-[#FFF4D6]"
                   >
                     {text}
