@@ -69,7 +69,7 @@ interface ReportsResult {
 /**
  * Operate → Messaging → Chat reports.
  *
- * What people reported in trip groups and stay chats (20270328000300), oldest open first, with the reported words as
+ * What people reported in trip groups and stay chats (20270330000100), oldest open first, with the reported words as
  * they were. Who may see a report is decided in the database: anyone else reaching this page gets nothing.
  */
 export default async function ChatReportsPage({

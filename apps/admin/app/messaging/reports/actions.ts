@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 
 /**
- * Acting on a chat report (20270328000300). Who may resolve it, what can be removed and the audit are decided in
+ * Acting on a chat report (20270330000100). Who may resolve it, what can be removed and the audit are decided in
  * the database; this only calls it.
  */
 

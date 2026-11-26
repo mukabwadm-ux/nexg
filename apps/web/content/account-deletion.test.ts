@@ -8,7 +8,7 @@ import { privacy } from './legal/privacy';
 const sql = readFileSync(
   fileURLToPath(
     new URL(
-      '../../../supabase/migrations/20270328000300_chat_report_block_and_deletion.sql',
+      '../../../supabase/migrations/20270330000100_chat_report_block_and_deletion.sql',
       import.meta.url,
     ),
   ),
