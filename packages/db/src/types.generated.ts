@@ -21579,9 +21579,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -21593,7 +21595,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -21601,6 +21606,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         ComputedFields: never;
@@ -21608,9 +21614,11 @@ export type Database = {
           acknowledged_at?: string | null;
           acknowledged_by?: string | null;
           assignee_id?: string | null;
+          case_type: string;
           compensation_kes?: number | null;
           created_at?: string;
           description?: string | null;
+          escalated_at?: string | null;
           evidence?: NonNullable<Json>;
           guest_user_id?: string | null;
           happened_at?: string;
@@ -21622,7 +21630,10 @@ export type Database = {
           location?: unknown;
           merchant_id?: string | null;
           order_reference?: string | null;
+          outcome?: string | null;
           police_ref?: string | null;
+          priority: string;
+          reason?: string | null;
           redispatched_order_reference?: string | null;
           reported_by_id?: string | null;
           reported_by_type: string;
@@ -21630,15 +21641,18 @@ export type Database = {
           resolved_at?: string | null;
           rider_id?: string | null;
           severity?: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status?: Database['public']['Enums']['incident_status'];
         };
         Update: {
           acknowledged_at?: string | null;
           acknowledged_by?: string | null;
           assignee_id?: string | null;
+          case_type?: string;
           compensation_kes?: number | null;
           created_at?: string;
           description?: string | null;
+          escalated_at?: string | null;
           evidence?: NonNullable<Json>;
           guest_user_id?: string | null;
           happened_at?: string;
@@ -21650,7 +21664,10 @@ export type Database = {
           location?: unknown;
           merchant_id?: string | null;
           order_reference?: string | null;
+          outcome?: string | null;
           police_ref?: string | null;
+          priority?: string;
+          reason?: string | null;
           redispatched_order_reference?: string | null;
           reported_by_id?: string | null;
           reported_by_type?: string;
@@ -21658,6 +21675,7 @@ export type Database = {
           resolved_at?: string | null;
           rider_id?: string | null;
           severity?: Database['public']['Enums']['incident_severity'];
+          sla_due_at?: string;
           status?: Database['public']['Enums']['incident_status'];
         };
         Relationships: [
@@ -24867,6 +24885,218 @@ export type Database = {
             referencedColumns: ['merchant_id'];
           },
         ];
+      };
+      merchant_dpa_acceptance: {
+        Row: {
+          accepted_at: string;
+          accepted_by: string | null;
+          account_email: string | null;
+          bytes: number | null;
+          copy_stored_at: string | null;
+          details: NonNullable<Json>;
+          device_id: string | null;
+          device_label: string | null;
+          id: string;
+          ip: unknown;
+          merchant_id: string;
+          pages: number | null;
+          reference: string;
+          render_version: string | null;
+          session_id: string | null;
+          sha256: string | null;
+          signer_id: string | null;
+          storage_path: string | null;
+          user_agent: string | null;
+          version: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          accepted_at?: string;
+          accepted_by?: string | null;
+          account_email?: string | null;
+          bytes?: number | null;
+          copy_stored_at?: string | null;
+          details: NonNullable<Json>;
+          device_id?: string | null;
+          device_label?: string | null;
+          id?: string;
+          ip?: unknown;
+          merchant_id: string;
+          pages?: number | null;
+          reference: string;
+          render_version?: string | null;
+          session_id?: string | null;
+          sha256?: string | null;
+          signer_id?: string | null;
+          storage_path?: string | null;
+          user_agent?: string | null;
+          version: string;
+        };
+        Update: {
+          accepted_at?: string;
+          accepted_by?: string | null;
+          account_email?: string | null;
+          bytes?: number | null;
+          copy_stored_at?: string | null;
+          details?: NonNullable<Json>;
+          device_id?: string | null;
+          device_label?: string | null;
+          id?: string;
+          ip?: unknown;
+          merchant_id?: string;
+          pages?: number | null;
+          reference?: string;
+          render_version?: string | null;
+          session_id?: string | null;
+          sha256?: string | null;
+          signer_id?: string | null;
+          storage_path?: string | null;
+          user_agent?: string | null;
+          version?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_signer_id_fkey';
+            columns: ['signer_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_agreement_signer';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'merchant_dpa_acceptance_version_fkey';
+            columns: ['version'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dpa_version';
+            referencedColumns: ['version'];
+          },
+        ];
+      };
+      merchant_dpa_version: {
+        Row: {
+          created_at: string;
+          published_on: string;
+          sha256: string;
+          version: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          published_on: string;
+          sha256: string;
+          version: string;
+        };
+        Update: {
+          created_at?: string;
+          published_on?: string;
+          sha256?: string;
+          version?: string;
+        };
+        Relationships: [];
       };
       merchant_fleet_rider: {
         Row: {
@@ -35908,6 +36138,7 @@ export type Database = {
         Row: {
           accepts_test_payments: boolean;
           amenities: string[];
+          archived_at: string | null;
           area: string | null;
           cancellation_policy: string | null;
           cancellation_terms: Json | null;
@@ -35944,6 +36175,7 @@ export type Database = {
         Insert: {
           accepts_test_payments?: boolean;
           amenities?: string[];
+          archived_at?: string | null;
           area?: string | null;
           cancellation_policy?: string | null;
           cancellation_terms?: Json | null;
@@ -35979,6 +36211,7 @@ export type Database = {
         Update: {
           accepts_test_payments?: boolean;
           amenities?: string[];
+          archived_at?: string | null;
           area?: string | null;
           cancellation_policy?: string | null;
           cancellation_terms?: Json | null;
@@ -44151,6 +44384,7 @@ export type Database = {
           checkout_time: string | null;
           city_id: string | null;
           created_at: string;
+          deleted_at: string | null;
           delivery_hours: Json | null;
           floor: string | null;
           gate_code_encrypted: string | null;
@@ -44205,6 +44439,7 @@ export type Database = {
           checkout_time?: string | null;
           city_id?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           delivery_hours?: Json | null;
           floor?: string | null;
           gate_code_encrypted?: string | null;
@@ -44258,6 +44493,7 @@ export type Database = {
           checkout_time?: string | null;
           city_id?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           delivery_hours?: Json | null;
           floor?: string | null;
           gate_code_encrypted?: string | null;
@@ -64090,6 +64326,53 @@ export type Database = {
         Args: { p_connection_id: string; p_error: string };
         Returns: undefined;
       };
+      console_my_riders: { Args: Record<PropertyKey, never>; Returns: string[] };
+      console_rider_facts: {
+        Args: { p_end: string; p_start: string };
+        Returns: {
+          accept_sec: number;
+          acceptance_pct: number;
+          activated_at: string;
+          adjustments_kes: number;
+          background_check: string;
+          bucket: string;
+          cancelled: number;
+          completion_pct: number;
+          created_at: string;
+          delivery_min: number;
+          docs_required: number;
+          docs_verified: number;
+          earned_all_kes: number;
+          earned_kes: number;
+          kyc: string;
+          last_active: string;
+          name: string;
+          offers_accepted: number;
+          offers_answered: number;
+          on_time: number;
+          on_time_pct: number;
+          payable_cents: number;
+          payout_method: string;
+          payout_paid_at: string;
+          payout_state: string;
+          phone: string;
+          plate_no: string;
+          presence: string;
+          rating_avg: number;
+          rating_count: number;
+          rider_id: string;
+          score: number;
+          status: string;
+          submitted_at: string;
+          timed: number;
+          trips: number;
+          trips_all: number;
+          trips_today: number;
+          vehicle: string;
+          zone_id: string;
+          zone_name: string;
+        }[];
+      };
       cron_app_email_reminders: { Args: Record<PropertyKey, never>; Returns: number };
       cron_cinema_worker: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_expire_unpaid_mpesa_orders: { Args: Record<PropertyKey, never>; Returns: Json };
@@ -64329,6 +64612,14 @@ export type Database = {
         Returns: number;
       };
       fn_compute_rider_health: { Args: { p_as_of?: string }; Returns: number };
+      fn_console_period: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          end_at: string;
+          prev_start: string;
+          start_at: string;
+        }[];
+      };
       fn_customer_deletion_blockers: { Args: { p_user_id: string }; Returns: Json };
       fn_customer_guest_ensure: { Args: { p_id: string }; Returns: string };
       fn_customer_is_partner: { Args: { p_user_id: string }; Returns: boolean };
@@ -64760,6 +65051,35 @@ export type Database = {
       fn_merchant_category_label: { Args: { p_key: string }; Returns: string };
       fn_merchant_commission: { Args: { p_at?: string; p_merchant_id: string }; Returns: Json };
       fn_merchant_commission_decider: { Args: { p_city_id: string }; Returns: boolean };
+      fn_merchant_dpa_as_service: { Args: Record<PropertyKey, never>; Returns: boolean };
+      fn_merchant_dpa_contact: { Args: { p_merchant_id: string }; Returns: Json };
+      fn_merchant_dpa_copy_context: { Args: { p_acceptance_id: string }; Returns: Json };
+      fn_merchant_dpa_copy_record: {
+        Args: {
+          p_acceptance_id: string;
+          p_pages: number;
+          p_render_version: string;
+          p_sha256: string;
+          p_signer_id: string;
+          p_storage_path: string;
+        };
+        Returns: Json;
+      };
+      fn_merchant_dpa_current_version: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          created_at: string;
+          published_on: string;
+          sha256: string;
+          version: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'merchant_dpa_version';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       fn_merchant_draft_for_write: {
         Args: { p_merchant_id: string };
         Returns: {
@@ -67276,9 +67596,92 @@ export type Database = {
         };
         Returns: Database['public']['Enums']['connector_connection_state'];
       };
+      rpc_console_rider_case_open: {
+        Args: {
+          p_case_type: string;
+          p_description: string;
+          p_order_reference?: string;
+          p_priority: string;
+          p_reason?: string;
+          p_reported_by?: string;
+          p_rider_id?: string;
+        };
+        Returns: string;
+      };
+      rpc_console_rider_case_resolve: {
+        Args: {
+          p_case_id: string;
+          p_compensation_kes?: number;
+          p_outcome: string;
+          p_resolution: string;
+        };
+        Returns: Json;
+      };
+      rpc_console_rider_case_update: {
+        Args: { p_action: string; p_case_id: string; p_note?: string; p_priority?: string };
+        Returns: Json;
+      };
       rpc_console_rider_profile: { Args: { p_rider_id: string }; Returns: Json };
       rpc_console_rider_stats: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_console_rider_trip: { Args: { p_order_id: string; p_rider_id: string }; Returns: Json };
+      rpc_console_riders_availability: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_console_riders_cases: {
+        Args: {
+          p_from: string;
+          p_page?: number;
+          p_priority?: string;
+          p_q?: string;
+          p_size?: number;
+          p_tab?: string;
+          p_to: string;
+          p_type?: string;
+        };
+        Returns: Json;
+      };
+      rpc_console_riders_deliveries: {
+        Args: {
+          p_from: string;
+          p_page?: number;
+          p_q?: string;
+          p_size?: number;
+          p_tab?: string;
+          p_to: string;
+          p_zone?: string;
+        };
+        Returns: Json;
+      };
+      rpc_console_riders_earnings: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_console_riders_list: {
+        Args: {
+          p_from: string;
+          p_kyc?: string;
+          p_page?: number;
+          p_q?: string;
+          p_size?: number;
+          p_sort?: string;
+          p_tab?: string;
+          p_to: string;
+          p_vehicle?: string;
+          p_zone?: string;
+        };
+        Returns: Json;
+      };
+      rpc_console_riders_onboarding: {
+        Args: {
+          p_from: string;
+          p_kyc?: string;
+          p_page?: number;
+          p_q?: string;
+          p_size?: number;
+          p_tab?: string;
+          p_to: string;
+          p_vehicle?: string;
+          p_zone?: string;
+        };
+        Returns: Json;
+      };
+      rpc_console_riders_overview: { Args: { p_from: string; p_to: string }; Returns: Json };
+      rpc_console_riders_performance: { Args: { p_from: string; p_to: string }; Returns: Json };
       rpc_coverage_lookup: { Args: { p_lat: number; p_lng: number }; Returns: Json };
       rpc_customer_list: {
         Args: {
@@ -69752,9 +70155,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -69766,7 +70171,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -69774,6 +70182,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         SetofOptions: {
@@ -69794,9 +70203,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -69808,7 +70219,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -69816,6 +70230,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         SetofOptions: {
@@ -69831,9 +70246,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -69845,7 +70262,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -69853,6 +70273,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         SetofOptions: {
@@ -69868,9 +70289,11 @@ export type Database = {
           acknowledged_at: string | null;
           acknowledged_by: string | null;
           assignee_id: string | null;
+          case_type: string;
           compensation_kes: number | null;
           created_at: string;
           description: string | null;
+          escalated_at: string | null;
           evidence: NonNullable<Json>;
           guest_user_id: string | null;
           happened_at: string;
@@ -69882,7 +70305,10 @@ export type Database = {
           location: unknown;
           merchant_id: string | null;
           order_reference: string | null;
+          outcome: string | null;
           police_ref: string | null;
+          priority: string;
+          reason: string | null;
           redispatched_order_reference: string | null;
           reported_by_id: string | null;
           reported_by_type: string;
@@ -69890,6 +70316,7 @@ export type Database = {
           resolved_at: string | null;
           rider_id: string | null;
           severity: Database['public']['Enums']['incident_severity'];
+          sla_due_at: string;
           status: Database['public']['Enums']['incident_status'];
         };
         SetofOptions: {
@@ -70282,6 +70709,11 @@ export type Database = {
         Returns: Json;
       };
       rpc_merchant_digital_orders: { Args: { p_order_ids: string[] }; Returns: Json };
+      rpc_merchant_dpa_accept: {
+        Args: { p_annex: Json; p_merchant_id: string; p_version: string };
+        Returns: Json;
+      };
+      rpc_merchant_dpa_read: { Args: { p_merchant_id: string }; Returns: Json };
       rpc_merchant_featured_card_save: {
         Args: { p_blurb?: string; p_booking_id: string; p_media?: Json };
         Returns: Json;
@@ -72279,6 +72711,7 @@ export type Database = {
         Args: { p_approve: boolean; p_creative_id: string; p_reason?: string };
         Returns: Json;
       };
+      rpc_property_archive: { Args: { p_property: string }; Returns: Json };
       rpc_property_delete: {
         Args: { p_confirm_name: string; p_property_id: string };
         Returns: Json;
@@ -72288,6 +72721,7 @@ export type Database = {
         Returns: {
           accepts_test_payments: boolean;
           amenities: string[];
+          archived_at: string | null;
           area: string | null;
           cancellation_policy: string | null;
           cancellation_terms: Json | null;
@@ -72332,6 +72766,7 @@ export type Database = {
         Returns: {
           accepts_test_payments: boolean;
           amenities: string[];
+          archived_at: string | null;
           area: string | null;
           cancellation_policy: string | null;
           cancellation_terms: Json | null;
@@ -72376,6 +72811,7 @@ export type Database = {
         Returns: {
           accepts_test_payments: boolean;
           amenities: string[];
+          archived_at: string | null;
           area: string | null;
           cancellation_policy: string | null;
           cancellation_terms: Json | null;
@@ -72426,11 +72862,13 @@ export type Database = {
           user_id: string;
         }[];
       };
+      rpc_property_unarchive: { Args: { p_property: string }; Returns: Json };
       rpc_property_upsert: {
         Args: { p_host_id: string; p_property: Json; p_property_id?: string };
         Returns: {
           accepts_test_payments: boolean;
           amenities: string[];
+          archived_at: string | null;
           area: string | null;
           cancellation_policy: string | null;
           cancellation_terms: Json | null;
@@ -74753,6 +75191,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      rpc_unit_archive: { Args: { p_unit: string }; Returns: Json };
       rpc_unit_busy: {
         Args: { p_from: string; p_to: string; p_unit_id: string };
         Returns: {
@@ -74762,6 +75201,7 @@ export type Database = {
       };
       rpc_unit_caretaker_confirm: { Args: { p_token?: string; p_unit_id: string }; Returns: Json };
       rpc_unit_caretaker_invite: { Args: { p_unit_id: string }; Returns: Json };
+      rpc_unit_delete: { Args: { p_confirm_name: string; p_unit: string }; Returns: Json };
       rpc_unit_photos_set: {
         Args: { p_photos: Json; p_unit_id: string };
         Returns: {
@@ -74784,6 +75224,7 @@ export type Database = {
           checkout_time: string | null;
           city_id: string | null;
           created_at: string;
+          deleted_at: string | null;
           delivery_hours: Json | null;
           floor: string | null;
           gate_code_encrypted: string | null;
@@ -74829,6 +75270,7 @@ export type Database = {
         Returns: Json;
       };
       rpc_unit_set_published: { Args: { p_published: boolean; p_unit: string }; Returns: Json };
+      rpc_unit_unarchive: { Args: { p_unit: string }; Returns: Json };
       rpc_unit_upsert: {
         Args: { p_host_id: string; p_unit: Json; p_unit_id?: string };
         Returns: {
@@ -74851,6 +75293,7 @@ export type Database = {
           checkout_time: string | null;
           city_id: string | null;
           created_at: string;
+          deleted_at: string | null;
           delivery_hours: Json | null;
           floor: string | null;
           gate_code_encrypted: string | null;
@@ -74913,6 +75356,7 @@ export type Database = {
           checkout_time: string | null;
           city_id: string | null;
           created_at: string;
+          deleted_at: string | null;
           delivery_hours: Json | null;
           floor: string | null;
           gate_code_encrypted: string | null;

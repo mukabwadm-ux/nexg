@@ -43,6 +43,27 @@ export async function allRows<T>(
 }
 
 /**
+ * Until 20270326000100 is on the database, property.archived_at and
+ * unit.deleted_at don't exist and the new read fails with 42703 (undefined
+ * column). Read the way it was before instead, so a web deploy that lands
+ * before the database push never stops the workspace loading.
+ */
+export function readingBeforeArchive<T>(
+  read: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>,
+  older: (from: number, to: number) => PromiseLike<{ data: unknown[] | null; error: unknown }>,
+): (from: number, to: number) => Promise<{ data: T[] | null; error: unknown }> {
+  let legacy = false;
+  return async (from, to) => {
+    if (!legacy) {
+      const result = await read(from, to);
+      if ((result.error as { code?: string } | null)?.code !== '42703') return result;
+      legacy = true;
+    }
+    return (await older(from, to)) as { data: T[] | null; error: unknown };
+  };
+}
+
+/**
  * A pin from a PostGIS point as PostgREST returns it: GeoJSON, or the hex
  * EWKB string (byte order, type with an SRID flag, optional SRID, x, y).
  */
@@ -91,17 +112,35 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
   const units =
     unitScope?.length === 0
       ? []
-      : await allRows((from, to) => {
-          const query = db
-            .from('unit')
-            .select(
-              'id, property_id, name, status, max_guests, bedrooms, bathrooms, nightly_rate_kes, photos, caretaker_name, handoff, label_public, floor, address_line, building, unit_no, handoff_note, delivery_hours, checkin_time, checkout_time, point, unit_amenities, bed_setup, size_sqm, unit_summary, min_nights',
-            )
-            .eq('host_id', hostId)
-            .is('archived_at', null);
-          if (unitScope) query.in('id', unitScope);
-          return query.order('id').range(from, to);
-        });
+      : await allRows(
+          readingBeforeArchive(
+            (from, to) => {
+              const query = db
+                .from('unit')
+                .select(
+                  'id, property_id, name, status, max_guests, bedrooms, bathrooms, nightly_rate_kes, photos, caretaker_name, handoff, label_public, floor, address_line, building, unit_no, handoff_note, delivery_hours, checkin_time, checkout_time, point, unit_amenities, bed_setup, size_sqm, unit_summary, min_nights, archived_at',
+                )
+                .eq('host_id', hostId)
+                /* Archived units are listed (the phone shows them under Archived);
+                   deleted ones are gone (20270326000100). */
+                .is('deleted_at', null);
+              if (unitScope) query.in('id', unitScope);
+              return query.order('id').range(from, to);
+            },
+            (from, to) => {
+              /* Before 20270326000100: archived units were hidden, as they were. */
+              const query = db
+                .from('unit')
+                .select(
+                  'id, property_id, name, status, max_guests, bedrooms, bathrooms, nightly_rate_kes, photos, caretaker_name, handoff, label_public, floor, address_line, building, unit_no, handoff_note, delivery_hours, checkin_time, checkout_time, point, unit_amenities, bed_setup, size_sqm, unit_summary, min_nights',
+                )
+                .eq('host_id', hostId)
+                .is('archived_at', null);
+              if (unitScope) query.in('id', unitScope);
+              return query.order('id').range(from, to);
+            },
+          ),
+        );
   const propertyIds = Array.from(
     new Set(units.flatMap((unit) => (unit.property_id ? [unit.property_id] : []))),
   );
@@ -138,17 +177,35 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
   ] = await Promise.all([
     unitScope && propertyIds.length === 0
       ? []
-      : allRows((from, to) => {
-          const query = db
-            .from('property')
-            .select(
-              'id, name, area, kind, photos, description, listed, floors, summary, check_in_from, check_out_by, point, amenities, neighbourhood_note, house_rules, cancellation_policy',
-            )
-            .eq('host_id', hostId)
-            .is('deleted_at', null);
-          if (unitScope) query.in('id', propertyIds);
-          return query.order('id').range(from, to);
-        }),
+      : allRows(
+          readingBeforeArchive(
+            (from, to) => {
+              const query = db
+                .from('property')
+                .select(
+                  'id, name, area, kind, photos, description, listed, floors, summary, check_in_from, check_out_by, point, amenities, neighbourhood_note, house_rules, cancellation_policy, archived_at',
+                )
+                .eq('host_id', hostId)
+                /* Archived properties are listed (the phone shows them under
+                   Archived); deleted ones are gone. */
+                .is('deleted_at', null);
+              if (unitScope) query.in('id', propertyIds);
+              return query.order('id').range(from, to);
+            },
+            (from, to) => {
+              /* Before 20270326000100: no archived_at column yet. */
+              const query = db
+                .from('property')
+                .select(
+                  'id, name, area, kind, photos, description, listed, floors, summary, check_in_from, check_out_by, point, amenities, neighbourhood_note, house_rules, cancellation_policy',
+                )
+                .eq('host_id', hostId)
+                .is('deleted_at', null);
+              if (unitScope) query.in('id', propertyIds);
+              return query.order('id').range(from, to);
+            },
+          ),
+        ),
     unitScope?.length === 0
       ? []
       : allRows((from, to) => {
@@ -489,6 +546,7 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
         neighbourhoodNote: row.neighbourhood_note ?? '',
         houseRules: row.house_rules ?? '',
         cancellationPolicy: row.cancellation_policy ?? '',
+        archivedAt: row.archived_at ?? null,
       }))
       .sort((a, b) => a.name.localeCompare(b.name)),
     units: units
@@ -539,6 +597,9 @@ export async function readHostWorkspace(access: HostWorkspaceAccess): Promise<Wo
             summary: row.unit_summary ?? '',
             minNights: row.min_nights ?? 1,
             listing: listingOf(row.id),
+            /* A unit of an archived property keeps its own value; the phone
+               shows every unit of an archived property as archived. */
+            archivedAt: row.archived_at ?? null,
           },
         ];
       })

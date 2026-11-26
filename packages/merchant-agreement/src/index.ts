@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { PDFDocument } from 'pdf-lib';
 
 import { buildAgreement, type AgreementFill } from './document';
+import { buildDpa, type DpaFill } from './dpa';
 import { NEXG_LOGO_PNG_BASE64 } from './logo.generated';
 import { renderAgreementPdf, type Letterhead } from './pdf';
 import { TEMPLATE } from './template.generated';
@@ -27,6 +28,7 @@ export {
   type MerchantParty,
 } from './document';
 export { COMPANY_NAME, COMPANY_NUMBER, renderAgreementPdf, type Letterhead } from './pdf';
+export { buildDpa, dpaFillValues, type DpaFill } from './dpa';
 export {
   formatAmount,
   renderInvoicePdf,
@@ -78,6 +80,33 @@ export async function renderSignedAgreement(
       subject: `Merchant agreement between NexGenius Concierge Limited and ${fill.merchant.legalName}`,
       createdAt: fill.issuedAt,
       keywords: [fill.reference, fill.version, TEMPLATE_VERSION],
+    },
+  });
+  return { bytes, sha256: createHash('sha256').update(bytes).digest('hex'), pages };
+}
+
+/** Which layout made a DPA copy: recorded with every copy. Bump when it changes. */
+export const DPA_RENDER_VERSION = 'dpa-1';
+
+/**
+ * The merchant's Data Processing Agreement, filled in from its onboarding
+ * details and accepted: on the NexG letterhead, with NexG's signature when
+ * its signatory is set up, and the electronic acceptance record.
+ */
+export async function renderSignedDpa(
+  fill: DpaFill,
+  assets: { letterhead: Letterhead; signature: { bytes: Uint8Array; type: 'png' | 'jpg' } | null },
+): Promise<SignedAgreement> {
+  const { bytes, pages } = await renderAgreementPdf(buildDpa(fill), {
+    letterhead: assets.letterhead,
+    logo: nexgLogo(),
+    signature: assets.signature ?? undefined,
+    reference: fill.reference,
+    version: fill.version,
+    metadata: {
+      subject: `Data Processing Agreement between NexGenius Concierge Limited and ${fill.merchant.legalName}`,
+      createdAt: fill.acceptedAt,
+      keywords: [fill.reference, fill.version, DPA_RENDER_VERSION],
     },
   });
   return { bytes, sha256: createHash('sha256').update(bytes).digest('hex'), pages };

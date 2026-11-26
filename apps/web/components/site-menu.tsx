@@ -23,6 +23,7 @@ import { LazySocialSignIn } from '@/components/auth/social-sign-in-lazy';
 import { DEFAULT_LOCALE, translator, type Locale } from '@/lib/i18n/dictionaries';
 
 import { Logo } from './logo';
+import { LanguageFlag } from './preferences/flags';
 import { CurrencyPill, LanguagePill } from './preferences/preference-selects';
 
 /**
@@ -340,24 +341,7 @@ export function SiteMenu({
               <LanguagePill
                 locale={locale}
                 label={t('prefs.language')}
-                icon={
-                  <svg viewBox="0 0 24 24" className="text-gold h-3.5 w-3.5" aria-hidden="true">
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="9"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M3 12h18M12 3c3 3.5 3 14 0 18-3-4-3-14.5 0-18Z"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                  </svg>
-                }
+                icon={<LanguageFlag locale={locale} className="!h-3 !w-[1.125rem]" />}
               />
               <CurrencyPill label={t('prefs.currency')} />
 

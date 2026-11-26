@@ -10,6 +10,8 @@ import { setDisplayCurrency, useDisplayCurrency } from '@/lib/currency/client';
 import { CURRENCIES } from '@/lib/currency/money';
 import { AUTHORED_LOCALES, dirFor, localeName } from '@/lib/i18n/dictionaries';
 
+import { CurrencyFlag } from './flags';
+
 /** The language part of a tag, as the lists use it: `pt-BR` → `pt`. */
 export const baseLocale = (locale: string) => locale.toLowerCase().split('-')[0] ?? locale;
 
@@ -96,7 +98,7 @@ export function LanguagePill({
         value={languageValue(locale)}
         disabled={busy !== null}
         onChange={(event) => void choose(event.target.value)}
-        className={`${pill} ${icon ? 'ps-8' : 'ps-3'}`}
+        className={`${pill} ${icon ? 'ps-9' : 'ps-3'}`}
       >
         {AUTHORED_LOCALES.map((option) => (
           <option key={option} value={option} lang={option}>
@@ -129,7 +131,7 @@ export function CurrencyOptions() {
 export function CurrencyPill({ label }: { label: string }) {
   const { currency } = useDisplayCurrency();
   return (
-    <Pill>
+    <Pill icon={<CurrencyFlag code={currency} className="!h-3 !w-[1.125rem]" />}>
       <select
         aria-label={label}
         value={currency}
@@ -140,7 +142,7 @@ export function CurrencyPill({ label }: { label: string }) {
       </select>
       <span
         aria-hidden="true"
-        className={`${pill} peer-focus-visible:ring-gold pointer-events-none inline-flex items-center ps-3 peer-focus-visible:ring-2`}
+        className={`${pill} peer-focus-visible:ring-gold pointer-events-none inline-flex items-center ps-9 peer-focus-visible:ring-2`}
       >
         {currency}
       </span>

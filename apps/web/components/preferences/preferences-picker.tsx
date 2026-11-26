@@ -1,17 +1,16 @@
 'use client';
 
-import { ChevronDown, Globe, Loader2 } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import * as React from 'react';
 
 import { setDisplayCurrency, useDisplayCurrency } from '@/lib/currency/client';
+import { CURRENCIES } from '@/lib/currency/money';
 import { AUTHORED_LOCALES, localeName } from '@/lib/i18n/dictionaries';
 
-import {
-  baseLocale,
-  CurrencyOptions,
-  languageValue,
-  useLanguageChoice,
-} from './preference-selects';
+import { FlagSelect, type FlagOption } from './flag-select';
+import { CurrencyFlag, LanguageFlag } from './flags';
+
+import { baseLocale, languageValue, useLanguageChoice } from './preference-selects';
 
 export interface PreferencesLabels {
   button: string;
@@ -20,17 +19,19 @@ export interface PreferencesLabels {
   currencyNote: string;
 }
 
-const field =
-  'border-border bg-bg text-ink focus-visible:ring-gold h-11 w-full appearance-none rounded-xl border pe-10 ps-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 disabled:opacity-60';
+const LANGUAGE_OPTIONS: FlagOption[] = AUTHORED_LOCALES.map((option) => ({
+  value: option,
+  label: localeName(option),
+  lang: option,
+  icon: <LanguageFlag locale={option} />,
+}));
 
-function Chevron({ busy }: { busy?: boolean }) {
-  const cls = 'text-muted pointer-events-none absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2';
-  return busy ? (
-    <Loader2 className={`${cls} animate-spin`} aria-hidden="true" />
-  ) : (
-    <ChevronDown className={cls} aria-hidden="true" />
-  );
-}
+const CURRENCY_OPTIONS: FlagOption[] = CURRENCIES.map((option) => ({
+  value: option.code,
+  label: option.code,
+  hint: option.name,
+  icon: <CurrencyFlag code={option.code} />,
+}));
 
 /**
  * Language and currency, side by side, in the site header.
@@ -82,6 +83,7 @@ export function PreferencesPicker({
         className="focus-visible:ring-gold flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-2.5 text-white transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 sm:h-11 sm:px-3"
       >
         <Globe className="h-5 w-5" aria-hidden="true" />
+        <LanguageFlag locale={locale} className="hidden sm:inline-block" />
         <span className="hidden text-xs font-bold uppercase tracking-wide sm:inline">
           {baseLocale(locale)} · {currency}
         </span>
@@ -94,48 +96,41 @@ export function PreferencesPicker({
           aria-label={labels.button}
           className="bg-surface text-ink absolute end-0 top-full z-[60] mt-2 w-[min(20rem,calc(100vw-2rem))] rounded-2xl border border-black/10 p-4 shadow-xl dark:border-white/10"
         >
-          <label
-            htmlFor={`${panelId}-language`}
+          <p
+            id={`${panelId}-language-label`}
             className="text-muted text-[0.6875rem] font-bold uppercase tracking-wider"
           >
             {labels.language}
-          </label>
-          <div className="relative mt-2">
-            <select
+          </p>
+          <div className="mt-2">
+            <FlagSelect
               id={`${panelId}-language`}
+              labelId={`${panelId}-language-label`}
               value={languageValue(locale)}
+              options={LANGUAGE_OPTIONS}
+              busy={busy !== null}
               disabled={busy !== null}
-              onChange={async (event) => {
-                await choose(event.target.value);
+              onChange={async (value) => {
+                await choose(value);
                 setOpen(false);
               }}
-              className={field}
-            >
-              {AUTHORED_LOCALES.map((option) => (
-                <option key={option} value={option} lang={option}>
-                  {localeName(option)}
-                </option>
-              ))}
-            </select>
-            <Chevron busy={busy !== null} />
+            />
           </div>
 
-          <label
-            htmlFor={`${panelId}-currency`}
-            className="text-muted mt-4 block text-[0.6875rem] font-bold uppercase tracking-wider"
+          <p
+            id={`${panelId}-currency-label`}
+            className="text-muted mt-4 text-[0.6875rem] font-bold uppercase tracking-wider"
           >
             {labels.currency}
-          </label>
-          <div className="relative mt-2">
-            <select
+          </p>
+          <div className="mt-2">
+            <FlagSelect
               id={`${panelId}-currency`}
+              labelId={`${panelId}-currency-label`}
               value={currency}
-              onChange={(event) => setDisplayCurrency(event.target.value)}
-              className={field}
-            >
-              <CurrencyOptions />
-            </select>
-            <Chevron />
+              options={CURRENCY_OPTIONS}
+              onChange={setDisplayCurrency}
+            />
           </div>
           <p className="text-muted mt-3 text-xs leading-snug">{labels.currencyNote}</p>
         </div>

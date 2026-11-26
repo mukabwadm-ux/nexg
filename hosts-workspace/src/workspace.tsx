@@ -29,8 +29,26 @@ function workspaceAction<T>(action: object) {
   });
 }
 
+/*
+ * The snapshot lists archived properties and units for the phone's Archived
+ * list. This workspace has no Archived list yet, so it leaves them out:
+ * archived properties, archived units and every unit of an archived property.
+ */
+export function withoutArchived(snapshot: WorkspaceSnapshot): WorkspaceSnapshot {
+  const { properties, units } = snapshot.data;
+  const archived = new Set(properties.filter((row) => row.archivedAt).map((row) => row.id));
+  return {
+    ...snapshot,
+    data: {
+      ...snapshot.data,
+      properties: properties.filter((row) => !row.archivedAt),
+      units: units.filter((row) => !row.archivedAt && !archived.has(row.propertyId)),
+    },
+  };
+}
+
 function useWorkspaceState(initial: WorkspaceSnapshot) {
-  const [snapshot, setSnapshot] = useState(initial);
+  const [snapshot, setSnapshot] = useState(() => withoutArchived(initial));
   const [scope, setScope] = useState('all');
   const [route, setRoute] = useState(() =>
     !window.location.hash &&
@@ -68,7 +86,7 @@ function useWorkspaceState(initial: WorkspaceSnapshot) {
 
   async function refresh() {
     try {
-      setSnapshot(await workspaceRequest<WorkspaceSnapshot>());
+      setSnapshot(withoutArchived(await workspaceRequest<WorkspaceSnapshot>()));
     } catch (error) {
       handleError(error, 'The latest workspace records could not be loaded.');
     }

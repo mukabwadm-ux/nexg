@@ -128,13 +128,16 @@ export const CONSOLE_NAV: NavGroup[] = [
     label: 'Riders',
     icon: 'riders',
     items: [
-      { label: 'All riders', href: '/riders?tab=directory', module: 'riders', home: true },
-      { label: 'Onboarding & KYC', href: '/riders?tab=pipeline', module: 'riders' },
-      { label: 'Supply & shifts', href: '/riders?tab=supply', module: 'riders' },
-      { label: 'Earnings & payouts', href: '/riders?tab=settlement', module: 'riders' },
-      { label: 'Cash ledger', href: '/riders?tab=cash', module: 'riders' },
-      { label: 'Health & safety', href: '/riders?tab=health', module: 'riders' },
-      { label: 'Documents', href: '/riders?tab=documents', module: 'riders' },
+      { label: 'Overview', href: '/riders', module: 'riders', home: true },
+      { label: 'All Riders', href: '/riders/all', module: 'riders' },
+      { label: 'Onboarding & KYC', href: '/riders/onboarding', module: 'riders' },
+      { label: 'Availability & Zones', href: '/riders/availability', module: 'riders' },
+      { label: 'Orders & Deliveries', href: '/riders/deliveries', module: 'riders' },
+      { label: 'Earnings & Payouts', href: '/riders/earnings', module: 'riders' },
+      { label: 'Performance', href: '/riders/performance', module: 'riders' },
+      { label: 'Incidents & Disputes', href: '/riders/incidents', module: 'riders', home: true },
+      /* Cash ledger, documents, rate card and comms: the tabbed rider console. */
+      { label: 'Rider console', href: '/riders/console', module: 'riders' },
     ],
   },
   {

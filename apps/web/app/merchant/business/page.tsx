@@ -9,6 +9,7 @@ import {
   type SignedAgreementCopy,
 } from '@/components/merchant/agreement-panel';
 import { AddBranch } from '@/components/merchant/branch-client';
+import { DpaPanel, type DpaRecord } from '@/components/merchant/dpa-panel';
 import {
   BusinessDocumentTools,
   BusinessLocationTools,
@@ -47,6 +48,7 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
     agreement,
     agreementDetails,
     agreementCopies,
+    dpa,
   ] = await Promise.all([
     db
       .from('merchant_home_v')
@@ -84,6 +86,8 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
     db.rpc('rpc_merchant_agreement_status', { p_merchant_id: me.id }),
     db.rpc('rpc_merchant_agreement_details_read', { p_merchant_id: me.id }),
     db.rpc('rpc_merchant_agreement_signed_list', { p_merchant_id: me.id }),
+    // The Data Processing Agreement; null until 20270327000100 runs.
+    db.rpc('rpc_merchant_dpa_read', { p_merchant_id: me.id }),
   ]);
 
   if (profile.error || !profile.data?.name || branches.error || members.error || reviews.error) {
@@ -347,6 +351,16 @@ export default async function BusinessPage({ searchParams }: { searchParams?: { 
                     : null
                 }
                 signed={(agreementCopies.data as unknown as SignedAgreementCopy[] | null) ?? null}
+              />
+            </div>
+            <div id="dpa" className="mb-4 scroll-mt-20">
+              <DpaPanel
+                merchantId={me.id}
+                record={(dpa.data as unknown as DpaRecord | null) ?? null}
+                legalName={
+                  (agreementDetails.data as unknown as AgreementDetailsRecord | null)?.details
+                    ?.legal_name ?? null
+                }
               />
             </div>
             {mayManageDocuments ? (

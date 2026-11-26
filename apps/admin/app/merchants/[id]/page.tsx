@@ -37,6 +37,7 @@ import { ApplicationReviewUnavailable } from '@/components/merchants/application
 import { MerchantActivityLog } from '@/components/merchants/activity-log';
 import { BookingReadiness } from '@/components/merchants/booking-readiness';
 import { MerchantAgreementSigned } from '@/components/merchants/agreement-signed';
+import { MerchantDpaAccepted } from '@/components/merchants/dpa-accepted';
 import { MerchantDocumentsSection } from '@/components/merchants/documents-section';
 import { MerchantCatalogue, MerchantOverview } from '@/components/merchants/merchant-overview';
 import { MerchantSearch } from '@/components/merchants/merchant-search';
@@ -329,6 +330,7 @@ export default async function MerchantApplicationPage({
             <MerchantDocumentsSection merchantId={params.id} {...documents} />
 
             <MerchantAgreementSigned merchantId={params.id} />
+            <MerchantDpaAccepted merchantId={params.id} />
 
             <MerchantCatalogue
               items={

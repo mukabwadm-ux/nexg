@@ -20,6 +20,12 @@ const nextConfig = {
     // `pnpm lint` runs ESLint as its own CI step; do not run it twice.
     ignoreDuringBuilds: true,
   },
+  /*
+   * Serve images as they are: Vercel's /_next/image optimizer answers
+   * "402 OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED" since the Hobby plan's
+   * quota ran out (2026-11-25), which broke the console logo.
+   */
+  images: { unoptimized: true },
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
@@ -29,22 +35,7 @@ const nextConfig = {
    * name the orders domain will want.
    */
   async redirects() {
-    return [
-      /*
-       * The console moved from admin.nexgapp.com to control.nexgapp.com.
-       * The old address stays attached to this project and answers every
-       * path with a 308 to the same path on the new one; Next keeps the
-       * query string. Staff sign in once on the new address: auth cookies
-       * are host-only, so a session on the old host does not carry over.
-       */
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'admin.nexgapp.com' }],
-        destination: 'https://control.nexgapp.com/:path*',
-        permanent: true,
-      },
-      { source: '/concierge', destination: '/support', permanent: true },
-    ];
+    return [{ source: '/concierge', destination: '/support', permanent: true }];
   },
 };
 

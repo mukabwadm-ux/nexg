@@ -10,6 +10,7 @@ import {
   type SignedAgreementCopy,
 } from '@/components/merchant/agreement-panel';
 import type { AgreementDetailsRecord } from '@/components/merchant/agreement-details';
+import { DpaPanel, type DpaRecord } from '@/components/merchant/dpa-panel';
 import { PageHead } from '@/components/merchant/frame';
 import { OnboardingDetailsPanel } from '@/components/merchant/onboarding-details-panel';
 import { parseOnboardingDetails } from '@nexg/contracts/merchant-onboarding-details';
@@ -34,6 +35,7 @@ export default async function MerchantDocuments() {
     { data: details },
     { data: signed },
     { data: onboarding, error: onboardingError },
+    { data: dpa },
   ] = await Promise.all([
     supabase.rpc('fn_merchant_required_docs', { p_merchant_id: me.id }),
     supabase
@@ -54,6 +56,8 @@ export default async function MerchantDocuments() {
     supabase.rpc('rpc_merchant_agreement_signed_list', { p_merchant_id: me.id }),
     // Null until 20270110410100 runs: the panel then stays hidden.
     supabase.rpc('rpc_merchant_onboarding_read', { p_merchant_id: me.id }),
+    // Null until 20270327000100 runs: the DPA panel then stays hidden.
+    supabase.rpc('rpc_merchant_dpa_read', { p_merchant_id: me.id }),
   ]);
 
   return (
@@ -76,6 +80,16 @@ export default async function MerchantDocuments() {
           status={agreement as unknown as AgreementStatus | null}
           details={(details as unknown as AgreementDetailsRecord | null) ?? null}
           signed={(signed as unknown as SignedAgreementCopy[] | null) ?? null}
+        />
+      </div>
+
+      <div id="dpa" className="scroll-mt-20">
+        <DpaPanel
+          merchantId={me.id}
+          record={(dpa as unknown as DpaRecord | null) ?? null}
+          legalName={
+            (details as unknown as AgreementDetailsRecord | null)?.details?.legal_name ?? null
+          }
         />
       </div>
 

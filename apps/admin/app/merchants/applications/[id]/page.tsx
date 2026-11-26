@@ -6,6 +6,7 @@ import { deleteMerchant } from '@/app/merchants/actions';
 import { ConsoleHeader } from '@/components/console-header';
 import { ConsoleShell } from '@/components/console-shell';
 import { MerchantAgreementSigned } from '@/components/merchants/agreement-signed';
+import { MerchantDpaAccepted } from '@/components/merchants/dpa-accepted';
 import { ApplicationAgreement } from '@/components/merchants/application-agreement';
 import { ApplicationReviewActor } from '@/components/merchants/application-review-actor';
 import {
@@ -133,6 +134,7 @@ export default async function ManagedMerchantApplicationPage({
           <ApplicationAgreement merchantId={params.id} />
           <MerchantOnboardingAnswers merchantId={params.id} />
           <MerchantAgreementSigned merchantId={params.id} />
+          <MerchantDpaAccepted merchantId={params.id} />
           <ApplicationReviewDetail {...source} />
           <div className="mt-10 max-w-4xl">
             <MerchantDocumentsSection merchantId={params.id} {...documents} />

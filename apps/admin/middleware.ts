@@ -16,6 +16,8 @@ import {
   newDeviceId,
 } from '@/lib/request-context';
 
+const RETIRED_HOSTS = new Set(['admin.nexgapp.com']);
+
 /**
  * Keeps the Supabase session fresh and keeps signed-out visitors out of the
  * console, and closes a session that has gone quiet.
@@ -32,6 +34,22 @@ import {
  * after the previous one ends the session, whatever the browser says.
  */
 export async function middleware(request: NextRequest) {
+  /*
+   * The console's old address. It stays attached to this project so nobody
+   * else can claim it, but it serves nothing and points nowhere: a bare 404
+   * with no redirect, link or branding, so it never leads anyone to the
+   * console's real address. The owner's decision, 2026-11-25.
+   */
+  if (RETIRED_HOSTS.has((request.headers.get('host') ?? '').toLowerCase())) {
+    return new NextResponse('Not found', {
+      status: 404,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-store',
+        'X-Robots-Tag': 'noindex, nofollow',
+      },
+    });
+  }
   let budget: ReturnType<typeof setTimeout> | undefined;
   const response =
     request.nextUrl.pathname === '/api/merchant-applications/review'

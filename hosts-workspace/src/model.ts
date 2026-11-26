@@ -19,6 +19,8 @@ export interface Property extends Base {
   neighbourhoodNote?: string;
   houseRules?: string;
   cancellationPolicy?: string;
+  /** When the host archived it (ISO); null or missing when it is on the properties page. */
+  archivedAt?: string | null;
 }
 /** The publish switch and what a unit still needs before it can go live. */
 export interface UnitListing {
@@ -56,6 +58,8 @@ export interface Unit extends Base {
   summary?: string;
   minNights?: number;
   listing?: UnitListing;
+  /** When the host archived it (ISO). Every unit of an archived property counts as archived. */
+  archivedAt?: string | null;
 }
 export interface Stay extends Base {
   ref: string;
@@ -228,7 +232,9 @@ export interface Command {
     | 'theme'
     | 'referral'
     | 'sign-out-others'
-    | 'listing';
+    | 'listing'
+    | 'archive'
+    | 'unarchive';
   collection?: Collection | 'workspace-task';
   id?: string;
   record?: Record<string, unknown>;
