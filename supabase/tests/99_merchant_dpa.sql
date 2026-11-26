@@ -8,7 +8,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(31);
+select plan(35);
 
 -- ------------------------------------------------------------------ fixtures
 
@@ -36,6 +36,12 @@ values ('9d000000-0000-4000-8000-0000000000c1', 'Afya Pharmacy Limited', 'Afya P
 
 insert into public.merchant_user (merchant_id, user_id, role)
 values ('9d000000-0000-4000-8000-0000000000c1', '9d000000-0000-4000-8000-0000000000a1', 'owner');
+
+/* What NexG's server would have uploaded. */
+insert into storage.objects (bucket_id, name, metadata)
+select 'merchant-agreements', 'dpa/9d000000-0000-4000-8000-0000000000c1/' || v.f || '.pdf',
+       '{"size": 52000, "mimetype": "application/pdf"}'
+from (values ('9d000000-0000-4000-8000-0000000000f1'), ('9d000000-0000-4000-8000-0000000000f2')) v (f);
 
 -- ------------------------------------------------------------------ wiring
 
@@ -156,10 +162,25 @@ select throws_ok(
   '42501', null,
   'the table itself is read through the functions only');
 
+select ok(
+  authz.merchant_dpa_owner_writable(
+    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f3.pdf'),
+  'while the acceptance waits for its copy, the owner may upload one');
+
 select throws_ok(
-  $$select public.fn_merchant_dpa_copy_record(gen_random_uuid(), 'dpa/x.pdf', repeat('a', 64), 5, 'dpa-1', null)$$,
-  '42501', null,
-  'the owner cannot attach a signed copy');
+  $$select public.fn_merchant_dpa_copy_record(
+    (public.rpc_merchant_dpa_read('9d000000-0000-4000-8000-0000000000c1') #>> '{acceptances,0,id}')::uuid,
+    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f1.pdf',
+    repeat('a', 64), 7, 'dpa-1', null)$$,
+  '42501', 'Attach only the copy you uploaded, without NexG''s signatory.',
+  'the owner cannot attach a file somebody else uploaded');
+
+select is(
+  public.fn_merchant_dpa_copy_context(
+    (public.rpc_merchant_dpa_read('9d000000-0000-4000-8000-0000000000c1') #>> '{acceptances,0,id}')::uuid)
+    -> 'signer',
+  'null'::jsonb,
+  'asked with the owner''s token, NexG''s signatory is left out');
 
 -- ------------------------------------------------------------- service role
 
@@ -177,12 +198,11 @@ select results_eq(
   $$values ('198.51.100.7'::text, 'Chrome · Windows'::text, true)$$,
   'the address and device the acceptance came from are recorded');
 
-insert into storage.objects (bucket_id, name, metadata)
-select 'merchant-agreements', 'dpa/9d000000-0000-4000-8000-0000000000c1/' || v.f || '.pdf',
-       '{"size": 52000, "mimetype": "application/pdf"}'
-from (values ('9d000000-0000-4000-8000-0000000000f1'), ('9d000000-0000-4000-8000-0000000000f2')) v (f);
+select set_config('test.dpa_id', (select id::text from public.merchant_dpa_acceptance
+  where merchant_id = '9d000000-0000-4000-8000-0000000000c1'), true);
 
 set local role service_role;
+select set_config('request.jwt.claims', '{"role":"service_role"}', true);
 
 select is(
   public.fn_merchant_dpa_copy_context((select id from public.merchant_dpa_acceptance
@@ -237,6 +257,11 @@ select ok(
     'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f2.pdf'),
   'but not a file no acceptance records');
 
+select ok(
+  not authz.merchant_dpa_owner_writable(
+    'dpa/9d000000-0000-4000-8000-0000000000c1/9d000000-0000-4000-8000-0000000000f3.pdf'),
+  'once the copy is attached, the owner can upload no other');
+
 select set_config('request.jwt.claims',
   '{"sub":"9d000000-0000-4000-8000-0000000000a2","role":"authenticated"}', true);
 
@@ -257,6 +282,12 @@ select throws_ok(
   $$select public.rpc_merchant_dpa_read('9d000000-0000-4000-8000-0000000000c1')$$,
   '42501', 'Not yours to look at.',
   'somebody else cannot see the DPA record');
+
+select throws_ok(
+  $$select public.fn_merchant_dpa_copy_context(
+    current_setting('test.dpa_id')::uuid)$$,
+  '42501', null,
+  'nor read what its copy is filled with');
 
 select ok(
   not authz.merchant_agreement_object_readable(

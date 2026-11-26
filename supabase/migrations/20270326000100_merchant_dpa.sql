@@ -22,10 +22,15 @@
 --
 --   * The signed copy lives in the existing private `merchant-agreements`
 --     bucket under dpa/{merchant}/{uuid}.pdf. NexG's web server renders it
---     right after the acceptance (packages/merchant-agreement) and stores it
---     with the service role: only fn_merchant_dpa_copy_record attaches it,
---     and only the service role may call that, so no merchant can put a PDF
---     of its own making there. The merchant's members and its staff read it.
+--     right after the acceptance (packages/merchant-agreement), deterministic
+--     from what the acceptance recorded, and attaches it with
+--     fn_merchant_dpa_copy_record. With the service role key it stores it
+--     as NexG, with NexG's signature when its signatory is set up. Without
+--     that key (the web project has none today) it stores it with the
+--     owner's own token: the owner may upload to dpa/{merchant}/ only while
+--     an acceptance waits for its copy, and the copy is attached once. The
+--     acceptance row stays the record; a copy can be checked by rendering it
+--     again from it. The merchant's members and its staff read it.
 --
 --   * Going live (fn_merchant_go_live_missing) now also waits for the
 --     current DPA: "Read and accept the data processing agreement". A
@@ -160,7 +165,41 @@ begin
 end;
 $$;
 
+/* The owner may upload a dpa/ copy while one of its acceptances waits for one. */
+create or replace function authz.merchant_dpa_owner_writable(p_name text)
+returns boolean language plpgsql stable security definer set search_path = '' as $$
+declare
+  v_merchant uuid := authz.merchant_dpa_path_merchant(p_name);
+begin
+  return v_merchant is not null and (select auth.uid()) is not null
+    and authz.merchant_application_owner(v_merchant)
+    and exists (select 1 from public.merchant_dpa_acceptance x
+                where x.merchant_id = v_merchant and x.storage_path is null)
+    and not exists (select 1 from public.merchant_dpa_acceptance x where x.storage_path = p_name);
+end;
+$$;
+revoke all on function authz.merchant_dpa_owner_writable(text) from public, anon;
+grant execute on function authz.merchant_dpa_owner_writable(text) to authenticated;
+
+drop policy if exists merchant_dpa_owner_insert on storage.objects;
+create policy merchant_dpa_owner_insert on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'merchant-agreements' and authz.merchant_dpa_owner_writable(name));
+
+-- A failed attempt's upload, which no acceptance records, is cleared by its uploader.
+drop policy if exists merchant_dpa_owner_delete on storage.objects;
+create policy merchant_dpa_owner_delete on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'merchant-agreements' and owner_id = (select auth.uid())::text
+         and authz.merchant_dpa_owner_writable(name));
+
 -- ══════════════════════════════════════════════════════════════ helpers
+
+/* Whether the call comes with the service role key: NexG's server. */
+create or replace function public.fn_merchant_dpa_as_service()
+returns boolean language sql stable set search_path = '' as $$
+  select coalesce((select auth.role()), '') = 'service_role';
+$$;
 
 /* The DPA version merchants accept now. */
 create or replace function public.fn_merchant_dpa_current_version()
@@ -190,6 +229,7 @@ $$;
 
 revoke all on function public.fn_merchant_dpa_current_version(),
   public.fn_merchant_dpa_contact(uuid),
+  public.fn_merchant_dpa_as_service(),
   public.tg_merchant_dpa_acceptance_immutable() from public, anon, authenticated;
 
 -- ═══════════════════════════════════════════════ the merchant's dashboard
@@ -369,8 +409,9 @@ $$;
 
 /*
  * What NexG's server needs to render an acceptance's signed copy: the
- * acceptance, and NexG's current signatory and letterhead when set up
- * (Settings › Agreement signing).
+ * acceptance, and (with the service role key) NexG's current signatory and
+ * letterhead when set up (Settings › Agreement signing). Asked with the
+ * owner's token it leaves NexG's signatory out.
  */
 create or replace function public.fn_merchant_dpa_copy_context(p_acceptance_id uuid)
 returns jsonb language plpgsql stable security definer set search_path = '' as $$
@@ -382,7 +423,11 @@ begin
   if x.id is null then
     raise exception 'DPA acceptance not found.' using errcode = 'P0002';
   end if;
-  select * into s from public.merchant_agreement_signer order by created_at desc limit 1;
+  if public.fn_merchant_dpa_as_service() then
+    select * into s from public.merchant_agreement_signer order by created_at desc limit 1;
+  elsif (select auth.uid()) is null or not authz.merchant_application_owner(x.merchant_id) then
+    raise exception 'Only the business owner or NexG makes the signed DPA.' using errcode = '42501';
+  end if;
   return jsonb_build_object(
     'acceptance', jsonb_build_object('id', x.id, 'merchant_id', x.merchant_id,
       'version', x.version, 'sha256', (select v.sha256 from public.merchant_dpa_version v
@@ -399,9 +444,10 @@ end;
 $$;
 
 /*
- * Attaches the signed copy NexG's server rendered and uploaded. Reads the
- * file's size and type from storage; an acceptance gets one copy, never a
- * second.
+ * Attaches the signed copy NexG's server rendered and uploaded, with the
+ * service role or the owner's token (then only a file the owner uploaded,
+ * without NexG's signatory). Reads the file's size and type from storage;
+ * an acceptance gets one copy, never a second.
  */
 create or replace function public.fn_merchant_dpa_copy_record(
   p_acceptance_id uuid,
@@ -415,10 +461,16 @@ returns jsonb language plpgsql security definer set search_path = '' as $$
 declare
   x public.merchant_dpa_acceptance;
   v_meta jsonb;
+  v_owner text;
+  v_service boolean := public.fn_merchant_dpa_as_service();
 begin
   select * into x from public.merchant_dpa_acceptance where id = p_acceptance_id for update;
   if x.id is null then
     raise exception 'DPA acceptance not found.' using errcode = 'P0002';
+  end if;
+  if not v_service and ((select auth.uid()) is null
+                        or not authz.merchant_application_owner(x.merchant_id)) then
+    raise exception 'Only the business owner or NexG makes the signed DPA.' using errcode = '42501';
   end if;
   if x.storage_path is not null then
     if x.storage_path = p_storage_path then
@@ -430,10 +482,14 @@ begin
   if authz.merchant_dpa_path_merchant(p_storage_path) is distinct from x.merchant_id then
     raise exception 'Store the signed DPA in the merchant''s own folder.' using errcode = '22023';
   end if;
-  select o.metadata into v_meta from storage.objects o
+  select o.metadata, o.owner_id into v_meta, v_owner from storage.objects o
     where o.bucket_id = 'merchant-agreements' and o.name = p_storage_path;
   if v_meta is null then
     raise exception 'The signed DPA did not arrive in storage.' using errcode = 'P0002';
+  end if;
+  if not v_service and (v_owner is distinct from (select auth.uid())::text or p_signer_id is not null) then
+    raise exception 'Attach only the copy you uploaded, without NexG''s signatory.'
+      using errcode = '42501';
   end if;
   if coalesce(v_meta ->> 'mimetype', '') <> 'application/pdf'
      or coalesce((v_meta ->> 'size')::bigint, 0) not between 1 and 5 * 1024 * 1024 then
@@ -455,10 +511,12 @@ begin
         copy_stored_at = now()
     where id = p_acceptance_id;
 
-  perform audit.log(p_actor_type => 'system'::public.actor_type, p_module => 'merchants',
-    p_action => 'merchant.dpa_copy_stored', p_target_type => 'merchant', p_target_id => x.merchant_id,
+  perform audit.log(
+    p_actor_type => case when v_service then 'system' else 'merchant_user' end::public.actor_type,
+    p_module => 'merchants', p_action => 'merchant.dpa_copy_stored', p_target_type => 'merchant', p_target_id => x.merchant_id,
     p_after => jsonb_build_object('acceptance_id', x.id, 'version', x.version,
-      'reference', x.reference, 'sha256', p_sha256, 'signer_id', p_signer_id));
+      'reference', x.reference, 'sha256', p_sha256, 'signer_id', p_signer_id,
+      'by', case when v_service then 'nexg' else 'owner' end));
   return jsonb_build_object('storage_path', p_storage_path, 'sha256', p_sha256);
 end;
 $$;
@@ -468,10 +526,10 @@ revoke all on function public.rpc_merchant_dpa_read(uuid),
 grant execute on function public.rpc_merchant_dpa_read(uuid),
   public.rpc_merchant_dpa_accept(uuid, text, jsonb) to authenticated;
 revoke all on function public.fn_merchant_dpa_copy_context(uuid),
-  public.fn_merchant_dpa_copy_record(uuid, text, text, integer, text, uuid)
-  from public, anon, authenticated;
+  public.fn_merchant_dpa_copy_record(uuid, text, text, integer, text, uuid) from public, anon;
 grant execute on function public.fn_merchant_dpa_copy_context(uuid),
-  public.fn_merchant_dpa_copy_record(uuid, text, text, integer, text, uuid) to service_role;
+  public.fn_merchant_dpa_copy_record(uuid, text, text, integer, text, uuid)
+  to authenticated, service_role;
 
 alter function public.rpc_merchant_dpa_accept(uuid, text, jsonb) set statement_timeout = '5s';
 alter function public.fn_merchant_dpa_copy_record(uuid, text, text, integer, text, uuid)

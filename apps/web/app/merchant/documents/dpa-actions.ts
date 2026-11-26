@@ -1,6 +1,7 @@
 'use server';
 
 import { MerchantDpaAnnex, type MerchantDpaAnnexInput } from '@nexg/contracts/merchant-dpa';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { revalidatePath } from 'next/cache';
 
 import { storeDpaCopy } from '@/lib/merchant-dpa-copy';
@@ -29,6 +30,9 @@ interface Acceptance {
   storage_path: string | null;
 }
 
+/* The caller's own client, for storing the copy when this server has no service role key. */
+const ownerClient = () => createClient() as unknown as SupabaseClient;
+
 function revalidate() {
   revalidatePath('/merchant/documents');
   revalidatePath('/merchant/business');
@@ -56,7 +60,7 @@ export async function acceptDpa(
   revalidate();
   if (!current) return { ok: true, copyPending: true };
   if (current.storage_path) return { ok: true };
-  const copy = await storeDpaCopy(current.id);
+  const copy = await storeDpaCopy(current.id, ownerClient());
   revalidate();
   return copy.status === 'stored' ? { ok: true } : { ok: true, copyPending: true };
 }
@@ -73,7 +77,7 @@ export async function makeDpaCopy(merchantId: string): Promise<DpaOutcome> {
   ).find((entry) => entry.current);
   if (!current) return { ok: false, message: 'Accept the data processing agreement first.' };
   if (current.storage_path) return { ok: true };
-  const copy = await storeDpaCopy(current.id);
+  const copy = await storeDpaCopy(current.id, ownerClient());
   revalidate();
   return copy.status === 'stored'
     ? { ok: true }

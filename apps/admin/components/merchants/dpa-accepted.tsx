@@ -94,7 +94,7 @@ export async function MerchantDpaAccepted({ merchantId }: { merchantId: string }
                 </>
               ) : null}
               {current.storage_path && !current.signed_by_nexg
-                ? ' · NexG’s signature was not set up when it was made'
+                ? ' · made without NexG’s signature'
                 : ''}
             </p>
             {current.storage_path ? (

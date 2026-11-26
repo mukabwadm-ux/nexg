@@ -5,19 +5,25 @@ import { randomUUID } from 'node:crypto';
 import { MerchantDpaAnnex } from '@nexg/contracts/merchant-dpa';
 import { NEXG_DOCUMENT_COMPANY } from '@nexg/merchant-agreement/documents';
 import { DPA_RENDER_VERSION, renderSignedDpa, type DpaFill } from '@nexg/merchant-agreement';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 /*
  * The merchant's filled-in, signed Data Processing Agreement, made right
  * after the owner accepts it (20270326000100).
  *
- * Why the service role: the copy must come from NexG's server, never from a
- * merchant's token, or a merchant could store a PDF of its own making as its
- * signed DPA. So the bucket takes dpa/ files from the service role only, and
- * only the service role may attach one to an acceptance. This client does
- * exactly that and nothing else: read what the copy needs, upload it, attach
- * it. Who may ask for a copy (the merchant's own members) is checked with
- * their own token before this runs.
+ * Preferably as NexG, with the service role: then the copy carries NexG's
+ * signature (when its signatory is set up in Settings › Agreement signing)
+ * and no merchant token touches it. That client does exactly this and
+ * nothing else: read what the copy needs, upload it, attach it. Who may ask
+ * for a copy (the merchant's own members) is checked with their own token
+ * before this runs.
+ *
+ * Where this server has no service role key (the web project has none
+ * today), the copy is stored with the owner's own token instead: the
+ * database lets the owner upload to its dpa/ folder only while an
+ * acceptance waits for its copy, attaches it once, and leaves NexG's
+ * signatory off it. Either way the copy is rendered from what the
+ * acceptance recorded, the same bytes every time.
  */
 
 const BUCKET = 'merchant-agreements';
@@ -65,7 +71,7 @@ export type DpaCopyResult =
   | { status: 'stored'; storagePath: string }
   | { status: 'unavailable'; message: string };
 
-function serviceClient() {
+function serviceClient(): SupabaseClient | null {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return null;
@@ -110,10 +116,12 @@ export function dpaFillFrom(context: CopyContext): DpaFill {
  * Renders, stores and attaches the signed copy of one acceptance. Safe to
  * call again: an acceptance that has its copy is left as it is.
  */
-export async function storeDpaCopy(acceptanceId: string): Promise<DpaCopyResult> {
-  const db = serviceClient();
-  if (!db)
-    return { status: 'unavailable', message: 'The signed copy cannot be made on this server.' };
+export async function storeDpaCopy(
+  acceptanceId: string,
+  /** The owner's own client: used only when there is no service role key. */
+  owner: SupabaseClient,
+): Promise<DpaCopyResult> {
+  const db = serviceClient() ?? owner;
   const { data, error } = await db.rpc('fn_merchant_dpa_copy_context', {
     p_acceptance_id: acceptanceId,
   });
