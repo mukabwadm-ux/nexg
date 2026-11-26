@@ -34,6 +34,7 @@ import { money, dateText, activeStay, totals, nights, type Stay } from '../model
 import { UnitGuideEditor, UnitGuideHistory } from './UnitGuide';
 
 import { DatesDialog } from './DatesDialog';
+import { calendarBars } from '../calendar-bars';
 import { StayChatButton } from './GuestInbox';
 
 import { underReview } from '../ListingPanel';
@@ -1004,11 +1005,9 @@ export function CalendarGrid({
               </div>
             )}
             {group.units.map((unit) => {
-              const stays = w.stays.filter(
-                  (stay) =>
-                    stay.unitId === unit.id &&
-                    stay.status !== 'Cancelled' &&
-                    stay.status !== 'Draft',
+              const bars = calendarBars(
+                  w.stays.filter((stay) => stay.unitId === unit.id),
+                  w.today,
                 ),
                 cleanings = compact
                   ? w.data.tasks.filter(
@@ -1063,16 +1062,16 @@ export function CalendarGrid({
                       }
                     />
                   ))}
-                  {stays.map((stay) => {
+                  {bars.map(({ stay, drawnEnd }) => {
                     const first = Math.max(
                         0,
                         Math.floor((Date.parse(stay.start) - Date.parse(start)) / 86400000),
                       ),
                       last = Math.min(
                         days,
-                        Math.ceil((Date.parse(stay.end) - Date.parse(start)) / 86400000),
+                        Math.ceil((Date.parse(drawnEnd) - Date.parse(start)) / 86400000),
                       );
-                    if (stay.end <= start || stay.start > dates[days - 1] || last <= first)
+                    if (drawnEnd <= start || stay.start > dates[days - 1] || last <= first)
                       return null;
                     return (
                       <button
