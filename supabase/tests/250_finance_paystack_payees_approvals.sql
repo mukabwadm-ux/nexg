@@ -1,5 +1,5 @@
 -- Who is paid through Paystack and what waits for a second person
--- (20270329000100, rpc_finance_paystack_payees and _approvals): every
+-- (20270330000200, rpc_finance_paystack_payees and _approvals): every
 -- merchant's and host's sub-account, rider transfers, how each city's riders
 -- are paid, and the four waiting lists with each decide function's own rule on
 -- who may decide. A commission is listed only to those its own read allows.

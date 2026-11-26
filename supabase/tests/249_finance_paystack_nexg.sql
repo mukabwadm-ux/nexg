@@ -1,4 +1,4 @@
--- NexG's own money on the Finance Paystack screen (20270329000100,
+-- NexG's own money on the Finance Paystack screen (20270330000200,
 -- rpc_finance_nexg): earnings from the ledger by account for Nairobi days, VAT
 -- apart, Paystack's fees, and the Paystack money not yet on the books.
 --

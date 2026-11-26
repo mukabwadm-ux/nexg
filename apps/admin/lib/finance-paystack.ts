@@ -1,6 +1,6 @@
 /**
  * What Finance › Paystack reads: the six database functions of
- * 20270329000100_finance_paystack_screen.sql and Paystack's two answers
+ * 20270330000200_finance_paystack_screen.sql and Paystack's two answers
  * (GET /balance, GET /settlement). Pure functions.
  *
  * The page may run before the migration is on the database, so nothing here
