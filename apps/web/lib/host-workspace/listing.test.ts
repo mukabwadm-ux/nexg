@@ -248,27 +248,83 @@ describe('saving a unit', () => {
 });
 
 describe('archiving a unit', () => {
-  it('calls rpc_unit_archive', async () => {
-    const { access: a, rpc } = access({
+  /* The workspace's own unit lookup answers `found`; the RPC answers `result`. */
+  function archiveAccess(
+    result: { data: unknown; error: { code: string; message: string } | null },
+    found: { data: unknown; error: { message: string } | null } = {
+      data: { id: UNIT },
+      error: null,
+    },
+    unitScope: string[] | null = null,
+  ) {
+    const made = access(result, unitScope);
+    const filters: [string, unknown][] = [];
+    const query = {
+      select: () => query,
+      eq: (column: string, value: unknown) => {
+        filters.push([column, value]);
+        return query;
+      },
+      maybeSingle: async () => found,
+    };
+    const from = vi.fn(() => query);
+    (made.access.db as unknown as { from: typeof from }).from = from;
+    return { ...made, from, filters };
+  }
+
+  it('calls rpc_unit_archive on a unit of this workspace', async () => {
+    const {
+      access: a,
+      rpc,
+      from,
+      filters,
+    } = archiveAccess({
       data: { unit_id: UNIT, cards_voided: 1 },
       error: null,
     });
     const result = await runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT });
+    expect(from).toHaveBeenCalledWith('unit');
+    expect(filters).toEqual([
+      ['host_id', HOST],
+      ['id', UNIT],
+    ]);
     expect(rpc).toHaveBeenCalledWith('rpc_unit_archive', { p_unit: UNIT });
     expect(result.message).toMatch(/^Unit archived\./);
+  });
+
+  it('refuses a unit of another host before calling the database', async () => {
+    const { access: a, rpc } = archiveAccess(
+      { data: {}, error: null },
+      { data: null, error: null },
+    );
+    await expect(
+      runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
+    ).rejects.toMatchObject({ status: 403 });
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it('says so when the unit could not be checked', async () => {
+    const { access: a, rpc } = archiveAccess(
+      { data: {}, error: null },
+      { data: null, error: { message: 'timeout' } },
+    );
+    await expect(
+      runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
+    ).rejects.toMatchObject({ status: 503 });
+    expect(rpc).not.toHaveBeenCalled();
   });
 
   it('passes on why a unit with a guest still to come was kept', async () => {
     const why =
       'This unit has 1 booking(s), hold(s) or block(s) today or still to come. Cancel or move them first: those guests have the address.';
-    const { access: a } = access({ data: null, error: { code: '23503', message: why } });
+    const { access: a } = archiveAccess({ data: null, error: { code: '23503', message: why } });
     await expect(
       runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
     ).rejects.toMatchObject({ status: 409, message: why });
   });
 
   it('passes on a second archive as a plain refusal', async () => {
-    const { access: a } = access({
+    const { access: a } = archiveAccess({
       data: null,
       error: { code: '22023', message: 'This unit is already archived.' },
     });
@@ -277,8 +333,8 @@ describe('archiving a unit', () => {
     ).rejects.toMatchObject({ status: 400, message: 'This unit is already archived.' });
   });
 
-  it('refuses a unit outside the workspace', async () => {
-    const { access: a } = access({
+  it('passes on a refusal from the database as outside the workspace', async () => {
+    const { access: a } = archiveAccess({
       data: null,
       error: { code: '42501', message: 'This unit is outside your workspace access.' },
     });
@@ -288,10 +344,11 @@ describe('archiving a unit', () => {
   });
 
   it('is not open to team members limited to some units', async () => {
-    const { access: a, rpc } = access({ data: {}, error: null }, [UNIT]);
+    const { access: a, rpc, from } = archiveAccess({ data: {}, error: null }, undefined, [UNIT]);
     await expect(
       runHostCommand(a, { type: 'delete', collection: 'units', id: UNIT }),
     ).rejects.toThrow('outside your workspace access');
+    expect(from).not.toHaveBeenCalled();
     expect(rpc).not.toHaveBeenCalled();
   });
 });

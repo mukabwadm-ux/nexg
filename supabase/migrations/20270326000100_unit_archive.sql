@@ -22,6 +22,12 @@
 --     fn_listing_sync then leaves an unpublished unit unlisted;
 --   · property_unit_public only shows units with status = 'live', listed and
 --     archived_at is null (20270323000100).
+-- Known gap, shared with rpc_property_delete: rpc_stay_hold checks
+-- property_unit_public before it locks the unit and does not check again, so a
+-- guest hold that started just before this archive commits can still land on
+-- the archived unit. The fix belongs in rpc_stay_hold (re-check status and
+-- archived_at after its FOR UPDATE) and is left as a follow-up.
+--
 -- The property itself is left listed, as rpc_unit_set_published leaves it
 -- when a host unpublishes its last unit.
 --
@@ -59,15 +65,21 @@ begin
     raise exception 'This unit is outside your workspace access.' using errcode = '42501';
   end if;
 
-  if v_unit.archived_at is not null or v_unit.status = 'archived' then
-    raise exception 'This unit is already archived.' using errcode = '22023';
-  end if;
-
+  /* Before the archived check: rpc_property_delete archives every unit with
+     the property, so this is the reason such a unit cannot be archived. */
   select * into v_property from public.property where id = v_unit.property_id;
   if v_property.id is not null and v_property.deleted_at is not null then
     raise exception 'This unit''s property has been removed, so the unit was archived with it.'
       using errcode = '22023';
   end if;
+
+  if v_unit.archived_at is not null or v_unit.status = 'archived' then
+    raise exception 'This unit is already archived.' using errcode = '22023';
+  end if;
+
+  /* A hold that has lapsed is not a reason to refuse: release it first, under
+     the unit lock, as the hold and block functions do (20261118000100). */
+  perform public.fn_stay_release_expired_holds(v_unit.id);
 
   select count(*) into v_bookings from public.stay s
    where s.unit_id = v_unit.id and s.check_out >= now()
@@ -103,3 +115,88 @@ $$;
 
 revoke execute on function public.rpc_unit_archive(uuid) from public, anon;
 grant execute on function public.rpc_unit_archive(uuid) to authenticated;
+
+/*
+ * rpc_property_delete (20260101019500) voided its units' QR cards without a reason, which
+ * property_qr_void_has_a_reason refuses: removing a property with a live card failed. Same function,
+ * now giving the reason. Nothing else changes.
+ */
+create or replace function public.rpc_property_delete(
+  p_property_id uuid,
+  p_confirm_name text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_property public.property;
+  v_live integer;
+  v_bookings integer;
+  v_unpaid integer;
+begin
+  select * into v_property from public.property
+   where id = p_property_id and deleted_at is null;
+
+  if v_property.id is null then
+    raise exception 'No such property.' using errcode = '22023';
+  end if;
+  if not authz.is_host_member(v_property.host_id) then
+    raise exception 'Not your property.' using errcode = 'insufficient_privilege';
+  end if;
+  if lower(trim(coalesce(p_confirm_name, ''))) <> lower(trim(v_property.name)) then
+    raise exception 'Type the property name exactly to confirm: %', v_property.name
+      using errcode = '22023';
+  end if;
+
+  /* Hosts pause a unit by taking it off NEXG Stays (host_published); its status
+     stays 'live', and no host path changes that. Counting status = 'live' here
+     meant a host could never remove a property. Only units still on NEXG Stays
+     block it now. Guests with bookings are protected by the check below. */
+  select count(*) into v_live from public.unit
+   where property_id = p_property_id and status = 'live' and archived_at is null
+     and (host_published or listed);
+  if v_live > 0 then
+    raise exception 'This property has % unit(s) still on NEXG Stays. Pause them first, then remove the property.', v_live
+      using errcode = '23503';
+  end if;
+
+  select count(*) into v_bookings from public.stay s
+   where s.property_id = p_property_id and s.check_out >= now()
+     and s.status <> 'cancelled';
+  if v_bookings > 0 then
+    raise exception 'There are % booking(s) here today or still to come. Those guests have the address.', v_bookings
+      using errcode = '23503';
+  end if;
+
+  select count(*) into v_unpaid from public.host_invoice
+   where host_id = v_property.host_id and paid_at is null;
+  if v_unpaid > 0 then
+    raise exception 'There is an unpaid invoice on this account. Settle it before removing a property.'
+      using errcode = '23503';
+  end if;
+
+  update public.property
+     set deleted_at = now(), deleted_by = (select auth.uid()), updated_at = now()
+   where id = p_property_id;
+
+  update public.unit set archived_at = now(), status = 'archived'
+   where property_id = p_property_id and archived_at is null;
+
+  update public.property_qr set voided_at = now(), void_reason = 'The property was removed'
+   where owner_type = 'unit'
+     and owner_id in (select id from public.unit where property_id = p_property_id)
+     and voided_at is null;
+
+  perform audit.log('host_user'::public.actor_type, 'hotels', 'property.deleted',
+    p_target_type => 'property', p_target_id => p_property_id,
+    p_city_id => v_property.city_id,
+    p_before => jsonb_build_object('name', v_property.name));
+
+  return jsonb_build_object(
+    'ok', true,
+    'note', 'Removed from your account. Statements and the audit trail are kept for seven years, '
+            'and the cards in those units now tell a guest the card is retired.');
+end;
+$$;

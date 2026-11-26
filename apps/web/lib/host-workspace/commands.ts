@@ -496,10 +496,14 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
       .maybeSingle();
     if (error) throw new HostWorkspaceError(503, 'The property could not be checked.');
     if (!data) throw scopeError();
-    return checked(
-      await db.rpc('rpc_property_delete', { p_property_id: id, p_confirm_name: confirmName }),
-      'Property removed.',
-    );
+    const removed = await db.rpc('rpc_property_delete', {
+      p_property_id: id,
+      p_confirm_name: confirmName,
+    });
+    /* 23503: units still on NEXG Stays, a booking still to come or an unpaid
+       invoice. The database's own words tell the host what to do first. */
+    if (removed.error?.code === '23503') throw new HostWorkspaceError(409, removed.error.message);
+    return checked(removed, 'Property removed.');
   }
 
   /* Archive one unit. Owners and managers with every unit only, like the
@@ -507,6 +511,18 @@ export async function runHostCommand(access: HostWorkspaceAccess, input: unknown
      its migration is pushed, hence the untyped call. */
   if (command.type === 'delete' && collection === 'units' && id) {
     if (unitScope) throw scopeError();
+    /* The unit must be this workspace's: the RPC only checks membership of
+       the unit's own host, and a user can belong to more than one host.
+       Archived units are kept in the lookup so a second archive still reads
+       "already archived" from the RPC. */
+    const { data, error } = await db
+      .from('unit')
+      .select('id')
+      .eq('host_id', hostId)
+      .eq('id', id)
+      .maybeSingle();
+    if (error) throw new HostWorkspaceError(503, 'The unit could not be checked.');
+    if (!data) throw scopeError();
     const result = await (db as unknown as { rpc: UntypedRpc }).rpc('rpc_unit_archive', {
       p_unit: id,
     });
