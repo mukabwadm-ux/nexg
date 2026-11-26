@@ -57,6 +57,11 @@ export interface Unit extends Base {
   sizeSqm?: number;
   summary?: string;
   minNights?: number;
+  /** Friday and Saturday nights; unset = the nightly rate. */
+  weekendRateKes?: number;
+  /** Percent off stays of 7+ nights, and of 28+ nights. */
+  weeklyDiscountPct?: number;
+  monthlyDiscountPct?: number;
   listing?: UnitListing;
   /** When the host archived it (ISO). Every unit of an archived property counts as archived. */
   archivedAt?: string | null;

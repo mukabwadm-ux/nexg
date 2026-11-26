@@ -68,6 +68,12 @@ type Code =
   | 'PAYMENT_UNAVAILABLE'
   | 'SERVICE_UNAVAILABLE';
 
+function nightsBetween(checkIn: string, checkOut: string) {
+  return Math.round(
+    (Date.parse(checkOut + 'T12:00:00Z') - Date.parse(checkIn + 'T12:00:00Z')) / 86_400_000,
+  );
+}
+
 function problem(status: number, code: Code, title: string) {
   return Response.json(
     { type: 'about:blank', title, status, code },
@@ -164,7 +170,10 @@ export async function stayQuote(request: Request) {
       quote.checkOut !== input.checkOut ||
       quote.adults !== input.adults ||
       quote.children !== input.children ||
-      quote.nightlyMinor * quote.nights !== quote.totalMinor ||
+      /* Weekend, seasonal and long-stay rates (20270331000100) make nights
+         differ, so the total is checked, not nightly × nights: nightlyMinor
+         is the average night. */
+      quote.nights !== nightsBetween(quote.checkIn, quote.checkOut) ||
       quote.roomSubtotalMinor !== quote.totalMinor
     )
       return unavailable();
