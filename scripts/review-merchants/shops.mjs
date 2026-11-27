@@ -1269,6 +1269,7 @@ export const shops = [
           },
           {
             name: 'Mountain Bike',
+            hidden: true, // car hire lists cars only (self-drive or with a driver)
             desc: 'Hardtail mountain bike with helmet and lock.',
             price: 1200,
             kind: 'rental',
@@ -1306,6 +1307,7 @@ export const shops = [
         items: [
           {
             name: 'Full Car Wash',
+            hidden: true, // car washes are sold by Ng'aa Car Wash (vehicle services)
             desc: 'Exterior wash, interior vacuum and tyre shine. About 45 minutes.',
             price: 1000,
             kind: 'service',
@@ -1322,6 +1324,7 @@ export const shops = [
           },
           {
             name: 'Monthly Car Wash Plan',
+            hidden: true, // car washes are sold by Ng'aa Car Wash (vehicle services)
             desc: 'Four full washes in 30 days.',
             price: 3200,
             kind: 'pass',
@@ -1794,6 +1797,133 @@ export const shops = [
               model: 'REQUEST_QUOTE',
               priceMinor: 22000000,
               quoteRange: { minMinor: 22000000, maxMinor: 34000000, note: 'Return flight.' },
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    n: 20,
+    slug: 'ngaa-car-wash',
+    hours: ['07:00', '19:00'],
+    name: "Ng'aa Car Wash",
+    legal: "Ng'aa Car Wash Limited",
+    owner: 'Kevin Otieno',
+    category: 'vehicle_services',
+    subcategory: 'car_wash',
+    engineProfile: 'car_wash',
+    engineAnswers: { BQ_MEMBERSHIP_PLAN_ENABLED: true, Q_SUBSCRIPTION_PLANS: true },
+    branch: {
+      ...westlands,
+      name: 'Westlands',
+      address: 'Waiyaki Way, Westlands, Nairobi',
+      lat: -1.2622,
+      lng: 36.8034,
+    },
+    prepMinutes: 0,
+    sections: [
+      {
+        name: 'Washes',
+        items: [
+          {
+            name: 'Full Car Wash',
+            desc: 'Exterior wash, interior vacuum and tyre shine. About 45 minutes.',
+            price: 1000,
+            kind: 'service',
+            popular: true,
+            photo: 'car-wash',
+            engine: {
+              model: 'SERVICE_JOB',
+              durationMinutes: 45,
+              priceMinor: 100000,
+              resources: [
+                ['Wash Bay 1', 'space', 1],
+                ['Wash Team', 'staff', 1],
+              ],
+            },
+          },
+          {
+            name: 'Express Exterior Wash',
+            desc: 'Foam wash, rinse and hand dry. About 20 minutes.',
+            price: 500,
+            kind: 'service',
+            photo: 'express-wash',
+            engine: {
+              model: 'SERVICE_JOB',
+              durationMinutes: 20,
+              priceMinor: 50000,
+              resources: [
+                ['Wash Bay 1', 'space', 1],
+                ['Wash Team', 'staff', 1],
+              ],
+            },
+          },
+          {
+            name: 'Interior Deep Clean',
+            desc: 'Seats shampooed, carpets and mats vacuumed, dashboard wiped. About 90 minutes.',
+            price: 2500,
+            kind: 'service',
+            photo: 'interior-clean',
+            engine: {
+              model: 'SERVICE_JOB',
+              durationMinutes: 90,
+              priceMinor: 250000,
+              resources: [
+                ['Wash Bay 1', 'space', 1],
+                ['Wash Team', 'staff', 1],
+              ],
+            },
+          },
+          {
+            name: 'Engine Bay Clean',
+            desc: 'Degrease and rinse of the engine bay, with plastics dressed. About 40 minutes.',
+            price: 1500,
+            kind: 'service',
+            photo: 'engine-clean',
+            engine: {
+              model: 'SERVICE_JOB',
+              durationMinutes: 40,
+              priceMinor: 150000,
+              resources: [
+                ['Wash Bay 1', 'space', 1],
+                ['Wash Team', 'staff', 1],
+              ],
+            },
+          },
+          {
+            name: 'Wax & Polish',
+            desc: 'Machine polish and a coat of hand wax. About 60 minutes.',
+            price: 3000,
+            kind: 'service',
+            photo: 'wax-polish',
+            engine: {
+              model: 'SERVICE_JOB',
+              durationMinutes: 60,
+              priceMinor: 300000,
+              resources: [
+                ['Wash Bay 1', 'space', 1],
+                ['Wash Team', 'staff', 1],
+              ],
+            },
+          },
+        ],
+      },
+      {
+        name: 'Plans',
+        items: [
+          {
+            name: 'Monthly Car Wash Plan',
+            desc: 'Four full washes in 30 days.',
+            price: 3200,
+            kind: 'pass',
+            photo: 'car-wash',
+            engine: {
+              model: 'ENTITLEMENT',
+              priceMinor: 320000,
+              validityDays: 30,
+              credits: 4,
+              childItem: 'Full Car Wash',
             },
           },
         ],
