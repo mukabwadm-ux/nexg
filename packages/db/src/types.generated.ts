@@ -67147,6 +67147,7 @@ export type Database = {
       cron_qr_scan_partitions: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_qr_scan_rollup: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_retention: { Args: Record<PropertyKey, never>; Returns: number };
+      cron_review_shop_orders: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_stay_review_requests: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_stays_fee_invoices: { Args: Record<PropertyKey, never>; Returns: Json };
       cron_stays_report_schedules: { Args: Record<PropertyKey, never>; Returns: number };
