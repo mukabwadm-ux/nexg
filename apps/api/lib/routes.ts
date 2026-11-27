@@ -25,6 +25,8 @@ export const V1_ROUTES: readonly V1Route[] = [
   { path: '/v1/orders', methods: ['GET', 'POST'] },
   { path: '/v1/orders/{id}', methods: ['GET'] },
   { path: '/v1/orders/{id}/cancel', methods: ['POST'] },
+  { path: '/v1/reservations', methods: ['GET'] },
+  { path: '/v1/reservations/{id}', methods: ['GET'] },
   { path: '/v1/services', methods: ['GET'] },
   { path: '/v1/test/orders/{id}/rider', methods: ['POST'] },
   { path: '/v1/test/orders/{id}/status', methods: ['POST'] },

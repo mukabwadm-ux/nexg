@@ -49,17 +49,18 @@ for await (const order of nexg.orders.listAll()) console.log(order.reference, or
 
 Every method returns the `data` of the answer, typed as the [reference](https://api.nexgapp.com/docs/reference) documents it. The types in `src/types.ts` are generated from `@nexg/contracts`, the schemas the API itself uses, as plain TypeScript, so the package needs neither the contracts nor zod. `src/types.test.ts` fails the type check when they no longer match; `pnpm --filter @nexg-org/api-client generate` writes them again.
 
-| Group         | Methods                                                       |
-| ------------- | ------------------------------------------------------------- |
-| `merchants`   | `list`, `listAll`, `get`                                      |
-| `catalogue`   | `list`, `update`, `updateMany`                                |
-| `zones`       | `list`                                                        |
-| `delivery`    | `check`                                                       |
-| `experiences` | `list`, `listAll`                                             |
-| `services`    | `list`                                                        |
-| `orders`      | `list`, `listAll`, `get`, `create`, `cancel`                  |
-| `sandbox`     | `moveOrder`, `assignRider` (test keys only)                   |
-| —             | `request(method, path, options)` for anything not named above |
+| Group          | Methods                                                       |
+| -------------- | ------------------------------------------------------------- |
+| `merchants`    | `list`, `listAll`, `get`                                      |
+| `catalogue`    | `list`, `update`, `updateMany`                                |
+| `zones`        | `list`                                                        |
+| `delivery`     | `check`                                                       |
+| `experiences`  | `list`, `listAll`                                             |
+| `services`     | `list`                                                        |
+| `orders`       | `list`, `listAll`, `get`, `create`, `cancel`                  |
+| `reservations` | `list`, `listAll`, `get`                                      |
+| `sandbox`      | `moveOrder`, `assignRider` (test keys only)                   |
+| —              | `request(method, path, options)` for anything not named above |
 
 ## Errors and retries
 

@@ -32,6 +32,35 @@ export const EVENT_EXAMPLE = {
   },
 } as const;
 
+/** A reservation event: the summary only, no name, addresses or notes. */
+export const RESERVATION_EVENT_EXAMPLE = {
+  id: '3e8d1c2b-6a5f-4e7d-9c8b-1a2f3e4d5c6b',
+  type: 'reservation.status_changed',
+  api_version: 'v1',
+  environment: 'live',
+  created_at: '2026-11-27T09:14:06.004+00:00',
+  data: {
+    reservation: {
+      id: '01a21c69-35e2-710e-98e3-6a142af6ded1',
+      kind: 'reservation',
+      status: 'confirmed',
+      stage: 'confirmed',
+      offering: {
+        id: '01a21c60-1b2c-7d3e-8f40-5a6b7c8d9e0f',
+        name: 'JKIA to Westlands',
+        model: 'TRANSFER',
+      },
+      starts_at: '2026-11-28T03:30:00.000Z',
+      ends_at: '2026-11-28T04:30:00.000Z',
+      quantity: 3,
+      payment_state: 'paid',
+      version: 2,
+      updated_at: '2026-11-27T09:14:05.221Z',
+    },
+    previous_status: 'requested',
+  },
+} as const;
+
 export const EVENT_REQUEST = `POST /nexg/events HTTP/1.1
 Host: example.com
 Content-Type: application/json

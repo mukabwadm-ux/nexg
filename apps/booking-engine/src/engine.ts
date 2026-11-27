@@ -40,6 +40,12 @@ import {
   publicDetailsView,
 } from './public-details.js';
 import {
+  apiReservation,
+  reservationPage,
+  type ApiReservation,
+  type ReservationPageOptions,
+} from './api-reservations.js';
+import {
   BookingError,
   type BookingInput,
   type Identity,
@@ -2597,6 +2603,39 @@ export class BookingEngine {
     const { doc } = await this.locateBooking(identity, id, this.request(identity));
     this.assertCustomerToken(doc, token);
     return this.bookingView(doc, 'customer');
+  }
+  /**
+   * NexG's API (GET /v1/reservations/{id}): one of the platform identity's
+   * business's bookings, as api-reservations.ts shapes it. Allocation records
+   * behind a session or specialist booking are not bookings of their own.
+   */
+  async platformReservation(identity: Identity, id: string): Promise<ApiReservation> {
+    requirePlatform(identity);
+    if (typeof id !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(id))
+      throw new BookingError(404, 'This record was not found.', 'not_found');
+    const { collection, doc } = await this.locateBooking(identity, id, this.request(identity));
+    if (doc.nexg?.recordRole)
+      throw new BookingError(404, 'This record was not found.', 'not_found');
+    return apiReservation(
+      this.bookingView(doc),
+      doc,
+      collection as 'reservations' | 'booking-requests',
+    );
+  }
+  /** NexG's API (GET /v1/reservations): a page of the business's bookings, oldest change first. */
+  async platformReservations(identity: Identity, options: ReservationPageOptions = {}) {
+    requirePlatform(identity);
+    const [reservations, requests] = await Promise.all([
+      this.all('reservations', identity),
+      this.all('booking-requests', identity),
+    ]);
+    const items = [
+      ...reservations.map((doc) => ({ doc, collection: 'reservations' as const })),
+      ...requests.map((doc) => ({ doc, collection: 'booking-requests' as const })),
+    ]
+      .filter(({ doc }) => !doc.nexg?.recordRole)
+      .map(({ doc, collection }) => apiReservation(this.bookingView(doc), doc, collection));
+    return reservationPage(items, options);
   }
   private assertCustomerToken(doc: Doc, token: string | undefined) {
     const expected = doc.nexg?.customerTokenHash;

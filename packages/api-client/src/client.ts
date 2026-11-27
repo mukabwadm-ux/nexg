@@ -1,6 +1,7 @@
 import { NexgApiError, NexgConnectionError } from './errors.js';
 import type {
   ApiOrder,
+  ApiReservation,
   ApiService,
   BookingReceipt,
   BookingRequest,
@@ -75,6 +76,14 @@ export interface MerchantListParams extends PageParams {
 export interface ExperienceListParams extends PageParams {
   city?: string;
   q?: string;
+}
+
+export interface ReservationListParams extends PageParams {
+  /**
+   * Only reservations changed after this time (ISO 8601). Pass the updated_at
+   * of the last reservation you stored.
+   */
+  updated_after?: string;
 }
 
 /** A change to one item: a price, availability, or both. */
@@ -244,6 +253,30 @@ export class NexgClient {
           ...(options.reason === undefined ? {} : { body: { reason: options.reason } }),
           retry: 'safe',
         },
+      ),
+  };
+
+  /**
+   * Your merchant's reservations: tour seats, transfers, rentals, appointments
+   * and requests, from NexG's booking engine. Needs merchant_read. Oldest
+   * change first; a test key reads none yet.
+   */
+  readonly reservations = {
+    /** GET /v1/reservations: one page, oldest change first. */
+    list: (params: ReservationListParams = {}) =>
+      this.call<Page<ApiReservation>>('GET', '/v1/reservations', {
+        query: { ...params },
+        retry: 'safe',
+      }),
+    /** Every reservation (changed after updated_after, if given), page after page. */
+    listAll: (params: Omit<ReservationListParams, 'cursor'> = {}) =>
+      this.walk((cursor) => this.reservations.list({ ...params, cursor })),
+    /** GET /v1/reservations/{id}: one reservation, with the guest's name and the trip. */
+    get: (id: string) =>
+      this.call<{ reservation: ApiReservation }>(
+        'GET',
+        `/v1/reservations/${encodeURIComponent(id)}`,
+        { retry: 'safe' },
       ),
   };
 

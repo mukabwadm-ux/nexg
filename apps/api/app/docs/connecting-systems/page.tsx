@@ -173,6 +173,14 @@ export default function ConnectingSystemsPage() {
             'Changing and cancelling bookings by API',
           ],
           [
+            'Reservations: tours, transfers, rentals, appointments',
+            'Customers book on nexgapp.com; your team enters them in the merchant console calendar',
+            <span key="o">
+              <C>GET /v1/reservations</C>, and reservation events pushed to you
+            </span>,
+            'Availability, prices and confirmations from your system',
+          ],
+          [
             'Payments',
             'Signed bank events (sandbox)',
             'payment_status on each order',
