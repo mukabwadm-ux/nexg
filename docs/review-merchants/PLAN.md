@@ -39,6 +39,27 @@
 - **App category mapping:** see below.
 - **Reviewer guide:** `REVIEWER_GUIDE.md`.
 
+## Booking-engine limits found on 27 Nov 2026
+
+The first live run left some bookings unusable in the app, so the setup was changed.
+
+**The limit behind it.** Each shop has one booking profile, and a profile hosts only some booking types (`candidateModelIds` in `packages/booking-config`). No profile combines tickets and quotes, tours and quotes, car hire and quotes, or laundry and home visits. Only the restaurant profile hosts tables and courts.
+
+**What changed:**
+- **Tables and courts.** Kijiji and Uwanja use the restaurant profile, with `BQ_OFFERS_TABLE_RESERVATIONS`, a real `BQ_SPACE_POLICY` (each table or court and its party size, with a 15-minute turnover) and "pick one" resource selection.
+- **Quotes** are only at Faraja and Anga, whose profiles host them.
+- **Hidden:** the Sauti, Mjini and Gari quotes, Uwanja karting and party, and Safi home and office cleaning. Their rows are kept, made unavailable, and their offerings switched off.
+- **Laundry** is collected and returned by the shop's van, so the windows have someone assigned.
+- **Meet & greet** is greeter-only, with no vehicle.
+- **Transfers** have a service area.
+- **Resources** have real hours per shop. Airport transfers stay 24 hours. Resources that already have sessions keep their hours.
+
+**Re-runs:**
+- Re-runs revise an offering only when its setup changes. The revised offering is created first, then the old one is switched off, so a refusal leaves the old one working.
+- Two further runs on the same engine made no changes.
+
+**App gap.** The app sends no `specialist` details for tours. The engine needs `{ "model": "TOUR", "occurrenceId": "<departure id>", "itineraryVersion": 1 }` on the booking, or a tour booking is refused. With it, a test booking is accepted (status pending).
+
 ## Running it
 
 ```

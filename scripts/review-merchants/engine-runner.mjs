@@ -25,7 +25,9 @@ for (const s of shops) {
   if (!items.length) continue;
   console.error(`Bookings: ${s.name}`);
   links.push(
-    ...(await setUpShop(bridge(service, secret, merchantId(s)), s, items, (m) => console.error(m))),
+    ...(await setUpShop(bridge(service, secret, merchantId(s)), s, merchantId(s), items, (m) =>
+      console.error(m),
+    )),
   );
 }
 console.log(JSON.stringify(links));
