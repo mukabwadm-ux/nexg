@@ -4744,6 +4744,184 @@ export type Database = {
           },
         ];
       };
+      api_test_reservation: {
+        Row: {
+          created_at: string;
+          driver: Json | null;
+          ends_at: string | null;
+          guest_name: string | null;
+          id: string;
+          kind: string;
+          merchant_id: string;
+          notes: string | null;
+          offering_model: string;
+          offering_name: string;
+          paid_cents: number;
+          payment_state: string;
+          quantity: number;
+          stage: string;
+          starts_at: string | null;
+          status: string;
+          total_cents: number | null;
+          trip: Json | null;
+          updated_at: string;
+          version: number;
+          fn_api_test_reservation_object: Json | null;
+          fn_api_test_reservation_summary: Json | null;
+        };
+        ComputedFields: 'fn_api_test_reservation_object' | 'fn_api_test_reservation_summary';
+        Insert: {
+          created_at?: string;
+          driver?: Json | null;
+          ends_at?: string | null;
+          guest_name?: string | null;
+          id?: string;
+          kind?: string;
+          merchant_id: string;
+          notes?: string | null;
+          offering_model?: string;
+          offering_name: string;
+          paid_cents?: number;
+          payment_state?: string;
+          quantity?: number;
+          stage?: string;
+          starts_at?: string | null;
+          status?: string;
+          total_cents?: number | null;
+          trip?: Json | null;
+          updated_at?: string;
+          version?: number;
+        };
+        Update: {
+          created_at?: string;
+          driver?: Json | null;
+          ends_at?: string | null;
+          guest_name?: string | null;
+          id?: string;
+          kind?: string;
+          merchant_id?: string;
+          notes?: string | null;
+          offering_model?: string;
+          offering_name?: string;
+          paid_cents?: number;
+          payment_state?: string;
+          quantity?: number;
+          stage?: string;
+          starts_at?: string | null;
+          status?: string;
+          total_cents?: number | null;
+          trip?: Json | null;
+          updated_at?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deactivated_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_deleted_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'console_merchant_directory_v';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'dispatch_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'fin_merchant_take_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'finance_merchant_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_dashboard_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_home_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_public';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_review_stats_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_settings_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_setup_progress_v';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_traits_public';
+            referencedColumns: ['merchant_id'];
+          },
+          {
+            foreignKeyName: 'api_test_reservation_merchant_id_fkey';
+            columns: ['merchant_id'];
+            isOneToOne: false;
+            referencedRelation: 'merchant_week_money_v';
+            referencedColumns: ['merchant_id'];
+          },
+        ];
+      };
       api_webhook_delivery: {
         Row: {
           attempts: number;
@@ -67240,6 +67418,28 @@ export type Database = {
         Args: { p_id: string; p_merchant_id: string; p_stage: string };
         Returns: Json;
       };
+      fn_api_test_reservation_key: {
+        Args: { p_api_key: string; p_scope: string };
+        Returns: string;
+      };
+      fn_api_test_reservation_object: {
+        Args: {
+          r: Omit<
+            Database['public']['Tables']['api_test_reservation']['Row'],
+            Database['public']['Tables']['api_test_reservation']['ComputedFields']
+          >;
+        };
+        Returns: Json;
+      };
+      fn_api_test_reservation_summary: {
+        Args: {
+          r: Omit<
+            Database['public']['Tables']['api_test_reservation']['Row'],
+            Database['public']['Tables']['api_test_reservation']['ComputedFields']
+          >;
+        };
+        Returns: Json;
+      };
       fn_api_webhook_can_manage: { Args: { p_merchant_id: string }; Returns: boolean };
       fn_api_webhook_dispatch: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_api_webhook_enqueue: {
@@ -76610,6 +76810,29 @@ export type Database = {
         };
       };
       rpc_request_review: { Args: { p_plan_id: string }; Returns: string };
+      rpc_reservation_act_api_test: {
+        Args: { p_action: string; p_api_key: string; p_id: string; p_input: Json };
+        Returns: Json;
+      };
+      rpc_reservation_create_api_test: {
+        Args: { p_api_key: string; p_reservation: Json };
+        Returns: Json;
+      };
+      rpc_reservation_move_api_test: {
+        Args: { p_api_key: string; p_id: string; p_status: string };
+        Returns: Json;
+      };
+      rpc_reservation_read_api_test: {
+        Args: {
+          p_api_key: string;
+          p_cursor_id?: string;
+          p_cursor_updated_at?: string;
+          p_id?: string;
+          p_limit?: number;
+          p_updated_after?: string;
+        };
+        Returns: Json;
+      };
       rpc_resolve_location: { Args: { p_context?: Json }; Returns: Json };
       rpc_resolve_qr: {
         Args: {
