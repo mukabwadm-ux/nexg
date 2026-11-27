@@ -558,6 +558,174 @@ export const RIDER_LOCATION_FIELDS: FieldDoc[] = [
   },
 ];
 
+export const RESERVATION_FIELDS: FieldDoc[] = [
+  {
+    name: 'id',
+    type: 'string',
+    description:
+      'NexG’s id for the reservation. Store it: events and GET /v1/reservations/{id} use it.',
+  },
+  {
+    name: 'kind',
+    type: 'string',
+    description:
+      'reservation: it holds a time, a seat or a vehicle. request: it waits for you to accept it, and holds nothing until then.',
+  },
+  {
+    name: 'status',
+    type: 'string',
+    description:
+      'The same five words as orders: requested, confirmed, in_progress, completed or cancelled. A reservation waiting for the customer’s payment is requested.',
+  },
+  {
+    name: 'stage',
+    type: 'string',
+    description:
+      'The booking engine’s own word, for detail: held (waiting for payment), pending, confirmed, accepted, in_progress, completed, cancelled, expired or no-show.',
+  },
+  {
+    name: 'offering',
+    type: 'object',
+    description:
+      'What was booked: the offering’s id, its name when it was booked, and how it is booked.',
+  },
+  {
+    name: 'starts_at',
+    type: 'timestamp',
+    nullable: true,
+    description: 'When it starts. Null for a request with no time yet.',
+  },
+  { name: 'ends_at', type: 'timestamp', nullable: true, description: 'When it ends.' },
+  {
+    name: 'quantity',
+    type: 'integer',
+    nullable: true,
+    description: 'Seats, passengers or units, as the offering counts them (see capacity_unit).',
+  },
+  {
+    name: 'payment_state',
+    type: 'string',
+    nullable: true,
+    description:
+      'For example awaiting_payment, paid or not_required. A customer booking on NexG is paid before it is confirmed.',
+  },
+  {
+    name: 'version',
+    type: 'integer',
+    description:
+      'Goes up with every change. Keep the highest you have seen and ignore an older copy.',
+  },
+  {
+    name: 'updated_at',
+    type: 'timestamp',
+    nullable: true,
+    description: 'When it last changed. Keep the last one you saw and pass it as updated_after.',
+  },
+  {
+    name: 'occurrence_id',
+    type: 'string',
+    nullable: true,
+    description: 'The departure or session it is on, for a tour or a class with set times.',
+  },
+  {
+    name: 'resource_ids',
+    type: 'string[]',
+    description: 'The vehicles, rooms, staff or places it holds, by your ids in the booking setup.',
+  },
+  {
+    name: 'ticket_type',
+    type: 'object',
+    nullable: true,
+    description: 'The ticket type chosen, for an offering that has them: its id and name.',
+  },
+  {
+    name: 'capacity_unit',
+    type: 'string',
+    nullable: true,
+    description: 'What quantity counts, for example place or asset.',
+  },
+  {
+    name: 'guest_name',
+    type: 'string',
+    nullable: true,
+    description:
+      'The name the booking is under, for the signboard at arrivals or the list at the gate. Never a phone number or an email address.',
+  },
+  {
+    name: 'trip',
+    type: 'object',
+    nullable: true,
+    description:
+      'A transfer’s pickup and drop-off, as the customer gave them. Null if it is not a trip.',
+  },
+  {
+    name: 'service_location',
+    type: 'object',
+    nullable: true,
+    description: 'Where you go to the customer, for a visit at their place: area and address.',
+  },
+  {
+    name: 'notes',
+    type: 'string',
+    nullable: true,
+    description: 'What the customer or your team wrote on the booking.',
+  },
+  { name: 'currency', type: 'string', description: 'Always KES.' },
+  {
+    name: 'total_cents',
+    type: 'integer',
+    nullable: true,
+    description:
+      'The price agreed when it was booked, in cents (KES 3,500 is 350000). Null while a request has no price yet.',
+  },
+  {
+    name: 'paid_cents',
+    type: 'integer',
+    description: 'What has been paid so far through NexG, in cents.',
+  },
+  {
+    name: 'checked_in_at',
+    type: 'timestamp',
+    nullable: true,
+    description: 'When the customer’s booking code was checked at your business.',
+  },
+  {
+    name: 'booked_on',
+    type: 'string',
+    description: 'nexg: the customer booked on NexG. merchant: your team entered it.',
+  },
+  { name: 'created_at', type: 'timestamp', nullable: true, description: 'When it was booked.' },
+];
+
+export const RESERVATION_OFFERING_FIELDS: FieldDoc[] = [
+  {
+    name: 'id',
+    type: 'string',
+    nullable: true,
+    description: 'The offering’s id in your booking setup.',
+  },
+  { name: 'name', type: 'string', nullable: true, description: 'Its name when it was booked.' },
+  {
+    name: 'model',
+    type: 'string',
+    nullable: true,
+    description:
+      'How it is booked, for example TRANSFER, TOUR, SESSION_CAPACITY, APPOINTMENT or ASSET_INTERVAL (a rental).',
+  },
+];
+
+export const RESERVATION_TRIP_FIELDS: FieldDoc[] = [
+  {
+    name: 'pickup_area',
+    type: 'string',
+    nullable: true,
+    description: 'The pickup area, for example JKIA.',
+  },
+  { name: 'pickup_address', type: 'string', nullable: true, description: 'The pickup address.' },
+  { name: 'dropoff_area', type: 'string', nullable: true, description: 'The drop-off area.' },
+  { name: 'dropoff_address', type: 'string', nullable: true, description: 'The drop-off address.' },
+];
+
 export const BOOKING_REQUEST_FIELDS: FieldDoc[] = [
   { name: 'service', type: 'string', description: 'A service code from GET /v1/services.' },
   {

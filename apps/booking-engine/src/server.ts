@@ -5,6 +5,7 @@ import { createPayload } from './payload.js';
 import { BookingEngine } from './engine.js';
 import { addOccurrence } from './occurrences.js';
 import { manageResource, manageOffering, createClosure } from './management.js';
+import { EventDelivery } from './event-delivery.js';
 import { BookingError, type Identity } from './types.js';
 
 const MAX_BODY = 128 * 1024;
@@ -128,8 +129,28 @@ export function createBookingServer(engine: BookingEngine, secret: string) {
           );
         throw new BookingError(405, 'This action is not supported.', 'method_not_allowed');
       }
-      // NexG platform calls: payment confirmation and account erasure.
+      // NexG platform calls: payment confirmation, account erasure, and the
+      // reservations NexG's public API reads for the business that owns them.
       if (path.startsWith('/v1/platform/')) {
+        if (path === '/v1/platform/reservations' && req.method === 'GET')
+          return respond(
+            res,
+            200,
+            await engine.platformReservations(identity, {
+              updatedAfter: url.searchParams.get('updated_after') ?? undefined,
+              cursor: url.searchParams.get('cursor') ?? undefined,
+              limit: url.searchParams.has('limit')
+                ? Number(url.searchParams.get('limit'))
+                : undefined,
+            }),
+          );
+        const reservation = path.match(/^\/v1\/platform\/reservations\/([^/]+)$/);
+        if (reservation && req.method === 'GET')
+          return respond(
+            res,
+            200,
+            await engine.platformReservation(identity, decodeURIComponent(reservation[1]!)),
+          );
         const settle = path.match(/^\/v1\/platform\/bookings\/([^/]+)\/settle$/);
         if (settle && req.method === 'POST')
           return respond(
@@ -282,7 +303,13 @@ async function main() {
       `NEXG booking runtime listening at http://${host}:${port}; Google Calendar is optional.`,
     ),
   );
+  // Booking changes to NexG's API, for businesses' webhooks: off until the address is set.
+  const eventsUrl = process.env.NEXG_BOOKING_EVENTS_URL;
+  const stopEvents = eventsUrl
+    ? new EventDelivery(payload, engine, { url: eventsUrl, secret }).start()
+    : () => undefined;
   const shutdown = () => {
+    stopEvents();
     server.close(async () => {
       await payload.destroy();
       process.exit(0);

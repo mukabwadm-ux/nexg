@@ -10,6 +10,17 @@ import type { ChangelogEntry } from './types';
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-11-27',
+    kind: 'added',
+    title: 'Reservations: tours, transfers, rentals and appointments',
+    body: [
+      'GET /v1/reservations lists what customers booked with your business on NexG and what your team entered in the calendar: tour seats, transfers, rentals, appointments, and requests waiting for you. They come oldest change first, and updated_after asks only for what changed since your last call. GET /v1/reservations/{id} reads one, with the name it is under, the trip’s pickup and drop-off, and the notes.',
+      'Three new events tell your endpoints as reservations change: reservation.created, reservation.status_changed and reservation.updated. They carry the reservation’s summary; read the guest’s name and the trip with GET /v1/reservations/{id} when one arrives.',
+      'A reservation never carries a phone number or an email address. A test key reads none yet.',
+    ],
+    endpoints: ['list-reservations', 'get-reservation'],
+  },
+  {
     date: '2026-11-24',
     kind: 'changed',
     title: 'Bookings show their rider',

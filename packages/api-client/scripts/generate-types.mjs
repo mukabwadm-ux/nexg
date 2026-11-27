@@ -18,6 +18,8 @@ const TYPES = {
   ApiBookingRider: 'C.ApiBookingRider',
   ApiBookingRiderLocation: 'C.ApiBookingRiderLocation',
   ApiOrder: 'C.ApiOrder',
+  ApiReservation: 'C.ApiReservation',
+  ApiReservationSummary: 'C.ApiReservationSummary',
   ApiService: 'C.ApiService',
   BookingReceipt: 'C.BookingReceipt',
   BookingRequest: 'z.input<typeof C.ServiceBooking>',
