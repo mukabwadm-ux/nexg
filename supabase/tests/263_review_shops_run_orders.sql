@@ -27,7 +27,7 @@ delete from public.order_event where order_id in (select id from public.order wh
 create function pg_temp.tick() returns text language plpgsql as $$
 begin
   perform public.cron_review_shop_orders();
-  update public.order_event set at = at - interval '2 minutes'
+  update public.order_event set at = at - interval '4 minutes'
    where order_id in (select id from public.order where reference in ('PS263-1', 'PS263-2'));
   return (select stage::text from public.order where reference = 'PS263-1');
 end $$;
