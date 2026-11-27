@@ -17,6 +17,7 @@ export const EXPENSE_CATEGORIES: Record<string, { label: string; color: string }
   repairs_maintenance: { label: 'Repairs & Maintenance', color: '#1F9D55' },
   insurance: { label: 'Insurance', color: '#A855F7' },
   bank_charges: { label: 'Bank Charges', color: '#6F6A61' },
+  staff_welfare: { label: 'Staff Welfare', color: '#D9467A' },
   other: { label: 'Other', color: '#E9E3D4' },
 };
 
@@ -173,4 +174,21 @@ export function budgetFor(budgets: BudgetLike[], months: string[], category?: st
 export function utilisation(spendCents: number, budgetCents: number): number | null {
   if (budgetCents <= 0) return null;
   return (spendCents / budgetCents) * 100;
+}
+
+/**
+ * The expense date written out in words, shown under the date field. The
+ * browser lays the field out month-first or day-first by its own settings,
+ * so 03/11/2026 typed as 3 November can be saved as 11 March. Spelling it
+ * out makes the month impossible to miss.
+ */
+export function spelledDay(iso: string): string | undefined {
+  if (!/^d{4}-d{2}-d{2}$/.test(iso)) return undefined;
+  return new Date(`${iso}T12:00:00+03:00`).toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Africa/Nairobi',
+  });
 }

@@ -24,14 +24,38 @@ import { STAFF_IDLE_TIMEOUT_MS } from '@/lib/idle';
 /** Warn this long before the timeout, so the sign-out is never a surprise. */
 const WARN_BEFORE_MS = 30_000;
 
+/**
+ * How often activity is passed on to the server. The middleware only sees
+ * requests, and typing into a form makes none; without this, a person
+ * filling in a form for five minutes is signed out the moment they save.
+ */
+const TELL_SERVER_EVERY_MS = 60_000;
+
+/** True when the console still has a signed-in session (no sign-in redirect). */
+export async function stillSignedIn(): Promise<boolean> {
+  try {
+    const r = await fetch('/api/still-here', { cache: 'no-store', redirect: 'manual' });
+    return r.status === 204;
+  } catch {
+    return true;
+  }
+}
+
 export function IdleTimer() {
   const last = React.useRef(Date.now());
+  /* Loading the page was itself a request the server saw. */
+  const told = React.useRef(Date.now());
   const [warned, setWarned] = React.useState(false);
 
   React.useEffect(() => {
     const touch = () => {
-      last.current = Date.now();
+      const now = Date.now();
+      last.current = now;
       setWarned(false);
+      if (now - told.current >= TELL_SERVER_EVERY_MS) {
+        told.current = now;
+        void stillSignedIn();
+      }
     };
 
     /*

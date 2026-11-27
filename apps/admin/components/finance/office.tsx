@@ -16,6 +16,7 @@ import {
   Receipt,
   Shield,
   Users,
+  UtensilsCrossed,
   Wallet,
   Wrench,
   type LucideIcon,
@@ -51,6 +52,7 @@ import {
   EXPENSE_STATUS,
   expenseStatus,
   PAYMENT_METHODS,
+  spelledDay,
 } from '@/lib/office-finance';
 import { day, kes, shillings, todayInNairobi } from '@/lib/portal';
 import { createClient } from '@/lib/supabase/client';
@@ -97,6 +99,7 @@ const CATEGORY_ICON: Record<string, LucideIcon> = {
   repairs_maintenance: Wrench,
   insurance: Shield,
   bank_charges: Landmark,
+  staff_welfare: UtensilsCrossed,
   other: Receipt,
 };
 
@@ -561,6 +564,7 @@ function ExpensePanel({
           max={todayInNairobi()}
           value={f.spentOn}
           onChange={(e) => set('spentOn', e.target.value)}
+          hint={spelledDay(f.spentOn)}
         />
         <TextField
           label="Paid To"

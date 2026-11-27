@@ -20,6 +20,7 @@ import { Download, MoreHorizontal, Search, X } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
+import { stillSignedIn } from '@/components/idle-timer';
 import { toCsv } from '@/lib/portal';
 
 export interface Outcome {
@@ -50,11 +51,15 @@ export function useRunner() {
         startTransition(() => router.refresh());
         return true;
       } catch {
+        /* A closed session answers a save with the sign-in page, which
+           reads here as a failure to reach the server. Say which it was. */
+        const signedIn = await stillSignedIn();
         toast({
           tone: 'danger',
           title: 'Not saved',
-          description:
-            'The console could not reach the server. Check the connection and try again.',
+          description: signedIn
+            ? 'The console could not reach the server. Check the connection and try again.'
+            : 'You were signed out after 5 minutes without activity, so this was not saved. Sign in again in a new tab, then come back and save.',
         });
         return false;
       } finally {
