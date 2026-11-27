@@ -4759,6 +4759,7 @@ export type Database = {
           paid_cents: number;
           payment_state: string;
           quantity: number;
+          refund_state: string | null;
           stage: string;
           starts_at: string | null;
           status: string;
@@ -4784,6 +4785,7 @@ export type Database = {
           paid_cents?: number;
           payment_state?: string;
           quantity?: number;
+          refund_state?: string | null;
           stage?: string;
           starts_at?: string | null;
           status?: string;
@@ -4806,6 +4808,7 @@ export type Database = {
           paid_cents?: number;
           payment_state?: string;
           quantity?: number;
+          refund_state?: string | null;
           stage?: string;
           starts_at?: string | null;
           status?: string;
@@ -67379,6 +67382,16 @@ export type Database = {
           retry_after: number;
         }[];
       };
+      fn_api_reservation_driver_notice: {
+        Args: {
+          p_driver: Json;
+          p_id: string;
+          p_merchant: string;
+          p_reservation: Json;
+          p_version: number;
+        };
+        Returns: number;
+      };
       fn_api_sandbox_key: {
         Args: { p_api_key: string };
         Returns: {
@@ -69402,6 +69415,7 @@ export type Database = {
       };
       rpc_api_webhook_endpoints: { Args: Record<PropertyKey, never>; Returns: Json };
       rpc_api_webhook_ping: { Args: { p_id: string }; Returns: string };
+      rpc_api_webhook_sample: { Args: { p_id: string; p_type: string }; Returns: string };
       rpc_app_email_preview: { Args: { p_key: string; p_vars?: Json }; Returns: Json };
       rpc_approval_decide: {
         Args: { p_approve: boolean; p_note?: string; p_request_id: string };
@@ -76831,6 +76845,10 @@ export type Database = {
           p_limit?: number;
           p_updated_after?: string;
         };
+        Returns: Json;
+      };
+      rpc_reservation_step_api_test: {
+        Args: { p_api_key: string; p_id: string; p_input: Json; p_step: string };
         Returns: Json;
       };
       rpc_resolve_location: { Args: { p_context?: Json }; Returns: Json };
