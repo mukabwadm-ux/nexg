@@ -686,6 +686,10 @@ export async function platformDriver(
     await engine.forgetDriverPosition(manager, id, req);
     await c.audit(manager, req, driver ? 'booking.driver_assigned' : 'booking.driver_cleared', id, {
       version: current + 1,
+      // NexG tells the customer who is coming (event-delivery.ts).
+      ...(driver
+        ? { driver: { first_name: driver.firstName, vehicle: driver.vehicle, plate: driver.plate } }
+        : {}),
     });
     return { id };
   });

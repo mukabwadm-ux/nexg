@@ -299,7 +299,7 @@ describe('reservation actions with a live key', () => {
     expect(engineCall().body).toEqual(position);
   });
 
-  it('refuses a position out of range, an extra field, and a test key', async () => {
+  it('refuses a position out of range or with an extra field', async () => {
     const put = (body: unknown) =>
       driverLocation(send('PUT', `/v1/reservations/${ID}/driver/location`, body), {
         params: { id: ID },
@@ -308,8 +308,6 @@ describe('reservation actions with a live key', () => {
     expect((await put({ latitude: -1.3, longitude: 36.9, phone: '+254700000000' })).status).toBe(
       400,
     );
-    keys({ ...KEY, environment: 'test' });
-    expect((await put({ latitude: -1.3, longitude: 36.9 })).status).toBe(403);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
@@ -370,13 +368,6 @@ describe('running bookings from the business’s system', () => {
     );
     expect(cancelled.status).toBe(200);
     expect((await cancelled.json()).data.reservation.refund_state).toBe('review_required');
-
-    keys({ ...KEY, environment: 'test' });
-    const test = await cancel(
-      send('POST', `/v1/reservations/${ID}/cancel`, { expected_version: 3, reason: 'Broke down' }),
-      { params: { id: ID } },
-    );
-    expect(test.status).toBe(403);
   });
 });
 
@@ -402,6 +393,56 @@ describe('reservation actions with a test key', () => {
       p_action: 'driver',
       p_input: { expected_version: 1, driver: null },
     });
+  });
+
+  it('takes the other steps and the driver’s position in the sandbox too', async () => {
+    const TEST = {
+      ...RESERVATION,
+      id: '5b9e1c2d-3f4a-4b6c-8d7e-9f0a1b2c3d4e',
+      status: 'cancelled',
+      refund_state: 'review_required',
+    };
+    keys({ ...KEY, environment: 'test' }, () => ({
+      data: { ok: true, reservation: TEST },
+      error: null,
+    }));
+
+    const cancelled = await cancel(
+      send('POST', `/v1/reservations/${TEST.id}/cancel`, {
+        expected_version: 3,
+        reason: 'The vehicle broke down.',
+      }),
+      { params: { id: TEST.id } },
+    );
+    expect(cancelled.status).toBe(200);
+    expect((await cancelled.json()).data.reservation.refund_state).toBe('review_required');
+    expect(rpc.mock.calls.find(([name]) => name === 'rpc_reservation_step_api_test')?.[1]).toEqual({
+      p_api_key: 'a-changing-key',
+      p_id: TEST.id,
+      p_step: 'cancel',
+      p_input: { expected_version: 3, reason: 'The vehicle broke down.' },
+    });
+
+    rpc.mockClear();
+    keys({ ...KEY, environment: 'test' }, () => ({
+      data: { ok: true, reservation: { ...TEST, status: 'confirmed', refund_state: null } },
+      error: null,
+    }));
+    const followed = await driverLocation(
+      send('PUT', `/v1/reservations/${TEST.id}/driver/location`, {
+        latitude: -1.3192,
+        longitude: 36.9278,
+      }),
+      { params: { id: TEST.id } },
+    );
+    expect(followed.status).toBe(200);
+    expect(rpc.mock.calls.find(([name]) => name === 'rpc_reservation_step_api_test')?.[1]).toEqual({
+      p_api_key: 'a-changing-key',
+      p_id: TEST.id,
+      p_step: 'location',
+      p_input: { latitude: -1.3192, longitude: 36.9278 },
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('turns the sandbox’s refusals into the API’s errors', async () => {

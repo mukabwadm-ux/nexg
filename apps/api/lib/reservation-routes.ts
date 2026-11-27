@@ -6,7 +6,7 @@
  * - Live keys reach the engine (lib/booking-engine.ts) for the key's merchant.
  *   A change runs as that business's manager under the key's id, so the
  *   engine's rules, audit and events are the merchant console's.
- * - Test keys reach the sandbox (api_test_reservation, 20270339000100) for
+ * - Test keys reach the sandbox (api_test_reservation, 20270340000100) for
  *   reservations. They read the real offerings and resources, and their
  *   changes to them are dry runs in the engine: checked under the live rules
  *   and answered as they would be, with applied false, but never saved.
@@ -235,6 +235,7 @@ export const SANDBOX = {
   create: 'rpc_reservation_create_api_test',
   read: 'rpc_reservation_read_api_test',
   act: 'rpc_reservation_act_api_test',
+  step: 'rpc_reservation_step_api_test',
   move: 'rpc_reservation_move_api_test',
 } as const;
 
@@ -279,7 +280,11 @@ export function sandboxReservation(data: unknown) {
   return checkReservation(row?.reservation);
 }
 
-/** The actions the sandbox can do to a test reservation. */
+/**
+ * What the sandbox does to a test reservation: accept, decline and driver
+ * (rpc_reservation_act_api_test, 20270340000100), and the steps reschedule,
+ * start, complete and cancel (rpc_reservation_step_api_test, 20270341000100).
+ */
 const SANDBOX_ACTIONS = new Set(['accept', 'decline', 'driver']);
 
 /**
@@ -312,20 +317,20 @@ export async function reservationAction<S extends z.ZodTypeAny>(
   if (body instanceof Response) return body;
 
   if (credential.environment === 'test') {
-    if (!SANDBOX_ACTIONS.has(action)) {
-      return jsonError(
-        'not_found',
-        `A test reservation cannot be sent to ${action} yet. Move it with POST /v1/test/reservations/{id}/status.`,
-        { status: 403 },
-      );
-    }
     if (!UUID.test(id)) return jsonError('not_found', 'Reservation not found');
-    const { data, error } = await sandbox().rpc(SANDBOX.act, {
-      p_api_key: credential.rawKey,
-      p_id: id,
-      p_action: action,
-      p_input: body,
-    });
+    const { data, error } = SANDBOX_ACTIONS.has(action)
+      ? await sandbox().rpc(SANDBOX.act, {
+          p_api_key: credential.rawKey,
+          p_id: id,
+          p_action: action,
+          p_input: body,
+        })
+      : await sandbox().rpc(SANDBOX.step, {
+          p_api_key: credential.rawKey,
+          p_id: id,
+          p_step: action,
+          p_input: body,
+        });
     if (error) return sandboxRefusal(error);
     const reservation = sandboxReservation(data);
     if (!reservation.success) {
@@ -380,11 +385,21 @@ export async function driverLocation(request: Request, id: string): Promise<Resp
   const body = await jsonBody(request, DriverLocationRequest);
   if (body instanceof Response) return body;
   if (credential.environment === 'test') {
-    return jsonError(
-      'not_found',
-      'Test reservations do not take a driver location yet. Use a live key.',
-      { status: 403 },
-    );
+    if (!UUID.test(id)) return jsonError('not_found', 'Reservation not found');
+    const { data, error } = await sandbox().rpc(SANDBOX.step, {
+      p_api_key: credential.rawKey,
+      p_id: id,
+      p_step: 'location',
+      p_input: body,
+    });
+    if (error) return sandboxRefusal(error);
+    const reservation = sandboxReservation(data);
+    if (!reservation.success) {
+      return jsonError('internal_error', 'The test reservation could not be read back.', {
+        detail: reservation.error.issues,
+      });
+    }
+    return answer({ reservation: reservation.data }, rate, credential);
   }
   let result: EngineResult;
   try {

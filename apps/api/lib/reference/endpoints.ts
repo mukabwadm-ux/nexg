@@ -2489,7 +2489,7 @@ export const ENDPOINTS: EndpointDoc[] = [
         required: true,
         description: 'The reservation’s id.',
       },
-      keyHeader('merchant_write', 'A live key: test reservations do not take a location yet.'),
+      keyHeader('merchant_write', 'A test key shares a test reservation’s driver position.'),
     ],
     example: {
       path: { id: SAMPLE_RESERVATION.id },
@@ -2540,7 +2540,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 403,
         code: 'not_found',
-        when: 'The key is a test key, or it is not bound to a merchant.',
+        when: 'The key is not bound to a merchant.',
       },
       { status: 404, code: 'not_found', when: 'Your merchant has no reservation with that id.' },
       {
@@ -2566,7 +2566,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     summary: 'A sandbox reservation for trying your integration with a test key.',
     description: [
       'With a test key, makes a test reservation: a transfer for tomorrow under the name Test Guest unless you say otherwise. reservation.created goes to your test endpoints, and GET /v1/reservations with the same key lists it. Nothing real is booked or charged.',
-      'Accept, decline, set its driver and move it with POST /v1/test/reservations/{id}/status, under the same rules as real reservations. A total_cents above 0 makes it wait for payment, as a customer booking does. Test reservations are kept 30 days.',
+      'Accept, decline, reschedule, start, complete or cancel it, set its driver and share where they are, under the same rules as real reservations, or move it on with POST /v1/test/reservations/{id}/status. The developer console also sends a sample reservation event to a test endpoint. A total_cents above 0 makes it wait for payment, as a customer booking does. Test reservations are kept 30 days.',
     ],
     auth: { kind: 'key', scope: 'merchant_write', merchantBound: true },
     rateCost: 5,
@@ -2994,7 +2994,7 @@ export const ENDPOINTS: EndpointDoc[] = [
         required: true,
         description: 'The reservation’s id.',
       },
-      keyHeader('merchant_write', 'A live key.'),
+      keyHeader('merchant_write', 'A test key does this to test reservations.'),
       CHANGE_KEY,
     ],
     example: {
@@ -3046,7 +3046,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 403,
         code: 'not_found',
-        when: 'The key is a test key, or it is not bound to a merchant.',
+        when: 'The key is not bound to a merchant.',
       },
       { status: 404, code: 'not_found', when: 'Your merchant has no reservation with that id.' },
       ...ENGINE_ERRORS,
@@ -3080,7 +3080,7 @@ export const ENDPOINTS: EndpointDoc[] = [
         required: true,
         description: 'The reservation’s id.',
       },
-      keyHeader('merchant_write', 'A live key.'),
+      keyHeader('merchant_write', 'A test key does this to test reservations.'),
       CHANGE_KEY,
     ],
     example: { path: { id: SAMPLE_RESERVATION.id }, body: { expected_version: 3 } },
@@ -3098,7 +3098,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 403,
         code: 'not_found',
-        when: 'The key is a test key, or it is not bound to a merchant.',
+        when: 'The key is not bound to a merchant.',
       },
       { status: 404, code: 'not_found', when: 'Your merchant has no reservation with that id.' },
       ...ENGINE_ERRORS,
@@ -3132,7 +3132,7 @@ export const ENDPOINTS: EndpointDoc[] = [
         required: true,
         description: 'The reservation’s id.',
       },
-      keyHeader('merchant_write', 'A live key.'),
+      keyHeader('merchant_write', 'A test key does this to test reservations.'),
       CHANGE_KEY,
     ],
     example: {
@@ -3164,7 +3164,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 403,
         code: 'not_found',
-        when: 'The key is a test key, or it is not bound to a merchant.',
+        when: 'The key is not bound to a merchant.',
       },
       { status: 404, code: 'not_found', when: 'Your merchant has no reservation with that id.' },
       ...ENGINE_ERRORS,
@@ -3199,7 +3199,7 @@ export const ENDPOINTS: EndpointDoc[] = [
         required: true,
         description: 'The reservation’s id.',
       },
-      keyHeader('merchant_write', 'A live key.'),
+      keyHeader('merchant_write', 'A test key does this to test reservations.'),
       CHANGE_KEY,
     ],
     example: {
@@ -3241,7 +3241,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 403,
         code: 'not_found',
-        when: 'The key is a test key, or it is not bound to a merchant.',
+        when: 'The key is not bound to a merchant.',
       },
       { status: 404, code: 'not_found', when: 'Your merchant has no reservation with that id.' },
       ...ENGINE_ERRORS,

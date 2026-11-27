@@ -14,6 +14,8 @@
  *   event batch or the other way round.
  * - A booking event carries the reservation's summary as it is when the batch
  *   is sent: no guest name, addresses or notes (see api-reservations.ts).
+ *   booking.driver_assigned also carries the driver as set (first name,
+ *   vehicle, plate), so NexG can tell the customer who is coming.
  *   Other events (setup, resources, offerings) carry only their type and id.
  * - NexG answers which event keys it accepted. Those become `delivered`; ones
  *   it rejected as malformed become `failed`; the rest are retried with
@@ -56,6 +58,20 @@ export interface ReservationReader {
 }
 
 const SYSTEM = { nexgSystem: true };
+
+/** The driver an event names: a first name, a vehicle and maybe a plate, nothing else. */
+function driverOf(
+  value: unknown,
+): { first_name: string; vehicle: string; plate: string | null } | null {
+  if (!value || typeof value !== 'object') return null;
+  const driver = value as Doc;
+  if (typeof driver.first_name !== 'string' || typeof driver.vehicle !== 'string') return null;
+  return {
+    first_name: driver.first_name,
+    vehicle: driver.vehicle,
+    plate: typeof driver.plate === 'string' ? driver.plate : null,
+  };
+}
 
 export class EventDelivery {
   private running = false;
@@ -199,6 +215,9 @@ export class EventDelivery {
       record_id: recordId,
       occurred_at: new Date(row.createdAt ?? now).toISOString(),
       reservation,
+      ...(row.eventType === 'booking.driver_assigned' && driverOf(row.payload?.driver)
+        ? { driver: driverOf(row.payload.driver) }
+        : {}),
     };
   }
 }

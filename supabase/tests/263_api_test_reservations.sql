@@ -1,4 +1,4 @@
--- Test reservations (20270339000100): a test key makes, reads, accepts,
+-- Test reservations (20270340000100): a test key makes, reads, accepts,
 -- declines, gives a driver to and moves sandbox reservations, under the live
 -- rules, with reservation.* events to the merchant's test endpoints. A live
 -- key, another merchant's key and a key without the scope are refused.

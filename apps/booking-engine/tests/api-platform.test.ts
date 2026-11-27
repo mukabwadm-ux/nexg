@@ -263,6 +263,18 @@ test('what NexG API may change for a business', async (t) => {
     const seen = await engine.customerBooking(guest, id, booked.customerToken);
     assert.equal((seen as any).driver.firstName, 'Juma');
     assert.equal((seen as any).driver.plate, 'KDA 123A');
+    // The event NexG receives names the driver, so it can tell the customer.
+    const outbox = await payload.find({
+      collection: 'booking-outbox' as any,
+      where: { eventType: { equals: 'booking.driver_assigned' } },
+      overrideAccess: true,
+      limit: 1,
+    } as any);
+    assert.deepEqual((outbox.docs[0] as any)?.payload?.driver, {
+      first_name: 'Juma',
+      vehicle: 'White Toyota Noah',
+      plate: 'KDA 123A',
+    });
     const cleared = await platformDriver(
       engine,
       platform,
