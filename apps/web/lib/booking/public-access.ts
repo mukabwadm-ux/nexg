@@ -40,7 +40,10 @@ export async function publicMerchantBookingAccess(
       .eq('id', businessId)
       .maybeSingle();
     if (error) return 'unavailable';
-    if (data?.id !== businessId) return 'not_found';
+    if (data?.id !== businessId) {
+      const tenant = await testTenantAccess(request, url, key, businessId);
+      if (tenant !== 'available') return tenant;
+    }
     if (
       checkLegacyInventory &&
       process.env.NODE_ENV === 'production' &&
@@ -59,4 +62,51 @@ export async function publicMerchantBookingAccess(
   } catch {
     return 'unavailable';
   }
+}
+
+/**
+ * A test tenant (a review shop, 20270228000300) is hidden from anon, so the
+ * lookup above misses it. Reading its booking catalogue and free times is
+ * allowed for anyone who has its id (rpc_booking_test_tenant_open,
+ * 20270336000100): the app reads them without a sign-in, and reading moves no
+ * money. Anything else (creating, quoting, changing a booking) needs the
+ * caller's own token to see the shop in merchant_public: staff and accounts in
+ * payment_reviewer.
+ */
+async function testTenantAccess(
+  request: Request,
+  url: string,
+  key: string,
+  businessId: string,
+): Promise<'available' | 'not_found' | 'unavailable'> {
+  const reading = request.method === 'GET' || request.method === 'HEAD';
+  const bearer = request.headers.get('authorization')?.match(/^Bearer\s+(.+)$/i)?.[1];
+  const options = (token?: string) => ({
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    global: {
+      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        fetch(input, { ...init, cache: 'no-store' }),
+      ...(token ? { headers: { Authorization: `Bearer ${token}` } } : {}),
+    },
+  });
+  if (bearer) {
+    const caller = createClient<Database>(url, key, options(bearer));
+    const { data, error } = await caller
+      .from('merchant_public')
+      .select('id')
+      .eq('id', businessId)
+      .maybeSingle();
+    if (!error && data?.id === businessId) return 'available';
+  }
+  if (!reading) return 'not_found';
+  const anon = createClient<Database>(url, key, options());
+  /* Newer than the generated types. */
+  const { data, error } = await (
+    anon.rpc as unknown as (
+      name: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: unknown }>
+  )('rpc_booking_test_tenant_open', { p_merchant_id: businessId });
+  if (error) return 'unavailable';
+  return data === true ? 'available' : 'not_found';
 }
