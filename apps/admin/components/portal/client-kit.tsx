@@ -14,9 +14,10 @@ import {
   PopoverAnchor,
   PopoverContent,
   PopoverTrigger,
+  RangeCalendar,
   useToast,
 } from '@nexg/ui';
-import { Download, MoreHorizontal, Search, X } from 'lucide-react';
+import { CalendarDays, Download, MoreHorizontal, Search, X } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
@@ -541,6 +542,85 @@ export function TextField({
         className={cn(control, 'h-11')}
         {...props}
       />
+      {hint && (
+        <p id={`${id}-hint`} className="text-muted-light text-xs">
+          {hint}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * One day, picked on a calendar. The browser's own date field lays itself
+ * out by the computer's settings, month first on the office machines, so a
+ * date typed day first was saved with the month and day swapped. Here the
+ * day is clicked, and the field reads it back in words ("Tue, 3 Nov 2026"),
+ * so there is no order to get wrong. `value` and `onChange` are ISO days.
+ */
+export function DateField({
+  label,
+  value,
+  onChange,
+  max,
+  min,
+  required,
+  hint,
+  className,
+}: {
+  label: string;
+  value: string;
+  onChange: (day: string) => void;
+  max?: string;
+  min?: string;
+  required?: boolean;
+  hint?: string;
+  className?: string;
+}) {
+  const id = React.useId();
+  const [open, setOpen] = React.useState(false);
+  const shown = /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ? new Date(`${value}T12:00:00+03:00`).toLocaleDateString('en-GB', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'Africa/Nairobi',
+      })
+    : 'Pick a date';
+  return (
+    <div className={cn('flex flex-col gap-1.5', className)}>
+      <span id={`${id}-label`} className="text-sm font-bold">
+        {label}
+        {required && <span className="text-danger ml-0.5">*</span>}
+      </span>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            aria-labelledby={`${id}-label ${id}-value`}
+            aria-describedby={hint ? `${id}-hint` : undefined}
+            className={cn(control, 'flex h-11 items-center justify-between gap-2 text-left')}
+          >
+            <span id={`${id}-value`}>{shown}</span>
+            <CalendarDays aria-hidden="true" className="text-muted h-4 w-4 shrink-0" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent align="start" className="w-auto p-3">
+          <RangeCalendar
+            months={1}
+            max={max}
+            min={min}
+            value={{ from: value || null, to: value || null }}
+            onChange={(next) => {
+              if (next.from) {
+                onChange(next.from);
+                setOpen(false);
+              }
+            }}
+          />
+        </PopoverContent>
+      </Popover>
       {hint && (
         <p id={`${id}-hint`} className="text-muted-light text-xs">
           {hint}
