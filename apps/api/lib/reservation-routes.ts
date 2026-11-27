@@ -106,18 +106,33 @@ export function answer(
   data: Record<string, unknown>,
   rate: RateLimitResult,
   credential: ApiCredential,
+  status: 200 | 201 = 200,
 ) {
   return NextResponse.json(
     { ok: true, data, meta: { api_version: 'v1' as const } },
-    { headers: privateHeaders(rate, credential) },
+    { status, headers: privateHeaders(rate, credential) },
   );
 }
 
-/** A reservation from the engine, against the contract. An engine without drivers yet sends none. */
+/**
+ * A reservation against the contract. Fields added later (the driver and its
+ * location, the flight number, the refund state) read as null when an older
+ * booking engine, or a sandbox row, does not have them yet.
+ */
 export function checkReservation(value: unknown) {
-  return ApiReservation.safeParse(
-    value && typeof value === 'object' ? { driver: null, ...(value as object) } : value,
-  );
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return ApiReservation.safeParse(value);
+  }
+  const reservation: Record<string, unknown> = {
+    driver: null,
+    refund_state: null,
+    ...(value as Record<string, unknown>),
+  };
+  const trip = reservation.trip as Record<string, unknown> | null | undefined;
+  if (trip && typeof trip === 'object') reservation.trip = { flight_number: null, ...trip };
+  const driver = reservation.driver as Record<string, unknown> | null;
+  if (driver && typeof driver === 'object') reservation.driver = { location: null, ...driver };
+  return ApiReservation.safeParse(reservation);
 }
 
 /* ═══════════════════════════════════════════════════════ the engine */
@@ -253,18 +268,21 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** One sandbox reservation from a function's answer, against the contract. */
 export function sandboxReservation(data: unknown) {
   const row = (Array.isArray(data) ? data[0] : data) as { reservation?: unknown } | null;
-  return ApiReservation.safeParse(row?.reservation);
+  return checkReservation(row?.reservation);
 }
 
+/** The actions the sandbox can do to a test reservation. */
+const SANDBOX_ACTIONS = new Set(['accept', 'decline', 'driver']);
+
 /**
- * POST /v1/reservations/{id}/accept, /decline and PUT /driver: the engine for
- * a live key, the sandbox for a test key. Every one carries the version read
- * and an Idempotency-Key.
+ * POST /v1/reservations/{id}/accept, /decline, /reschedule, /start,
+ * /complete, /cancel and PUT /driver: the engine for a live key, the sandbox
+ * for a test key. Every one carries the version read and an Idempotency-Key.
  */
 export async function reservationAction<S extends z.ZodTypeAny>(
   request: Request,
   id: string,
-  action: 'accept' | 'decline' | 'driver',
+  action: 'accept' | 'decline' | 'driver' | 'reschedule' | 'start' | 'complete' | 'cancel',
   schema: S,
 ): Promise<Response> {
   const auth = await authorize(
@@ -286,6 +304,13 @@ export async function reservationAction<S extends z.ZodTypeAny>(
   if (body instanceof Response) return body;
 
   if (credential.environment === 'test') {
+    if (!SANDBOX_ACTIONS.has(action)) {
+      return jsonError(
+        'not_found',
+        `A test reservation cannot be sent to ${action} yet. Move it with POST /v1/test/reservations/{id}/status.`,
+        { status: 403 },
+      );
+    }
     if (!UUID.test(id)) return jsonError('not_found', 'Reservation not found');
     const { data, error } = await sandbox().rpc(SANDBOX.act, {
       p_api_key: credential.rawKey,
@@ -322,6 +347,59 @@ export async function reservationAction<S extends z.ZodTypeAny>(
     });
   }
   return answer({ reservation: reservation.data }, rate, credential);
+}
+
+/**
+ * POST /v1/reservations, /v1/reservations/check-in, /v1/offerings and
+ * /v1/resources: a live key only, with the scope, an Idempotency-Key and a
+ * body checked against its schema, sent to the engine; the answer is checked
+ * against the contract.
+ */
+export async function engineWrite<S extends z.ZodTypeAny, R extends z.ZodTypeAny>(
+  request: Request,
+  options: {
+    scope: 'merchant_write' | 'catalogue_write';
+    path: string;
+    body: S;
+    result: R;
+    name: 'reservation' | 'offering' | 'resource';
+    status: 200 | 201;
+    testRefusal: string;
+    notFound: string;
+  },
+): Promise<Response> {
+  const auth = await authorize(
+    request,
+    options.scope,
+    options.scope,
+    `change its ${options.name}s`,
+  );
+  if (auth instanceof Response) return auth;
+  const { credential, rate } = auth;
+  if (credential.environment === 'test') {
+    return jsonError('not_found', options.testRefusal, { status: 403 });
+  }
+  const key = idempotencyKey(request);
+  if (key instanceof Response) return key;
+  const body = await jsonBody(request, options.body);
+  if (body instanceof Response) return body;
+  let result: EngineResult;
+  try {
+    result = await engineRequest('POST', options.path, credential, { body, idempotencyKey: key });
+  } catch (error) {
+    return engineUnavailable(error);
+  }
+  if (!result.ok) return engineRefusal(result, options.notFound);
+  const checked =
+    options.name === 'reservation'
+      ? checkReservation(result.body)
+      : options.result.safeParse(result.body);
+  if (!checked.success) {
+    return jsonError('internal_error', `The ${options.name} could not be read back.`, {
+      detail: checked.error.issues,
+    });
+  }
+  return answer({ [options.name]: checked.data }, rate, credential, options.status);
 }
 
 /**

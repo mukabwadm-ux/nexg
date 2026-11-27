@@ -642,6 +642,8 @@ export const ApiReservationTrip = z
     pickup_address: z.string().nullable(),
     dropoff_area: z.string().nullable(),
     dropoff_address: z.string().nullable(),
+    /** The customer's flight for an airport pickup, as airlines print it: `KQ 101`. */
+    flight_number: z.string().nullable(),
   })
   .strict();
 
@@ -658,6 +660,8 @@ export const ApiReservationDriver = z
     vehicle: z.string(),
     plate: z.string().nullable(),
     assigned_at: z.string().nullable(),
+    /** Where the driver last was, as your system sent it. Null until it sends one. */
+    location: ApiBookingRiderLocation.nullable(),
   })
   .strict();
 
@@ -702,6 +706,8 @@ export const ApiReservation = ApiReservationSummary.extend({
   created_at: z.string().nullable(),
   /** Who is coming, once the business sets it. Null until then. */
   driver: ApiReservationDriver.nullable(),
+  /** `review_required`: it was paid and then cancelled, and NexG refunds the customer. */
+  refund_state: z.string().nullable(),
 }).strict();
 
 export type ApiReservation = z.infer<typeof ApiReservation>;
@@ -871,6 +877,155 @@ export const ReservationDriverRequest = z
   .strict();
 
 export type ReservationDriverRequest = z.infer<typeof ReservationDriverRequest>;
+
+/** POST /v1/reservations/{id}/reschedule: another time, before it starts. */
+export const ReservationReschedule = z
+  .object({
+    expected_version: ExpectedVersion,
+    starts_at: z.string().datetime({ offset: true }),
+    /** For a booking whose length you choose, such as a rental. */
+    ends_at: z.string().datetime({ offset: true }).optional(),
+    /** The price you expect, in cents: if the new time costs more, the answer is 409. */
+    expected_total_cents: z.number().int().min(0).optional(),
+  })
+  .strict();
+
+export type ReservationReschedule = z.infer<typeof ReservationReschedule>;
+
+/** POST /v1/reservations/{id}/start: the trip or work begins; a rental is handed over. */
+export const ReservationStart = z.object({ expected_version: ExpectedVersion }).strict();
+
+export type ReservationStart = z.infer<typeof ReservationStart>;
+
+/** POST /v1/reservations/{id}/complete: done; a rental is returned. */
+export const ReservationComplete = z
+  .object({
+    expected_version: ExpectedVersion,
+    /** How it went, kept with the booking: `Dropped at the hotel at 10:42`. */
+    note: z.string().min(1).max(2000),
+  })
+  .strict();
+
+export type ReservationComplete = z.infer<typeof ReservationComplete>;
+
+/** POST /v1/reservations/{id}/cancel: before it starts, paid or not. */
+export const ReservationCancel = z
+  .object({
+    expected_version: ExpectedVersion,
+    /** Shown to the customer on their booking. */
+    reason: z.string().min(1).max(500),
+  })
+  .strict();
+
+export type ReservationCancel = z.infer<typeof ReservationCancel>;
+
+/** POST /v1/reservations/check-in: the customer shows their booking code. */
+export const ReservationCheckIn = z
+  .object({
+    /** The six-character code on the customer's booking. */
+    code: z.string().min(6).max(20),
+    /** The name the customer gives, checked against the booking. */
+    name: z.string().min(1).max(120).optional(),
+  })
+  .strict();
+
+export type ReservationCheckIn = z.infer<typeof ReservationCheckIn>;
+
+/** POST /v1/reservations: a booking your team took elsewhere, so NexG's calendar holds the time. */
+export const ReservationCreate = z
+  .object({
+    offering_id: z.string().min(1).max(128),
+    starts_at: z.string().datetime({ offset: true }).optional(),
+    ends_at: z.string().datetime({ offset: true }).optional(),
+    quantity: z.number().int().min(1).max(1000).optional(),
+    resource_ids: z.array(z.string().min(1).max(128)).max(50).optional(),
+    occurrence_id: z.string().min(1).max(128).optional(),
+    ticket_type_id: z.string().min(1).max(128).optional(),
+    /** The guest. An email or a phone number is required, kept for your business only. */
+    guest: z
+      .object({
+        name: z.string().min(1).max(120),
+        email: z.string().email().max(200).optional(),
+        phone: z.string().min(7).max(32).optional(),
+      })
+      .strict()
+      .refine((guest) => guest.email !== undefined || guest.phone !== undefined, {
+        message: 'Give the guest’s email or phone number.',
+      }),
+    notes: z.string().max(2000).optional(),
+    trip: z
+      .object({
+        pickup_area: z.string().min(1).max(200),
+        pickup_address: z.string().min(1).max(500),
+        dropoff_area: z.string().min(1).max(200).optional(),
+        dropoff_address: z.string().min(1).max(500).optional(),
+        flight_number: z.string().min(3).max(10).optional(),
+      })
+      .strict()
+      .optional(),
+    service_location: z
+      .object({ area: z.string().min(1).max(200), address: z.string().min(1).max(500) })
+      .strict()
+      .optional(),
+    /** true: hold the time, waiting for you to accept it. */
+    hold: z.boolean().optional(),
+  })
+  .strict();
+
+export type ReservationCreate = z.input<typeof ReservationCreate>;
+
+/** POST /v1/offerings: a new offering, with NexG's standard booking terms. */
+export const OfferingCreate = z
+  .object({
+    name: z.string().min(1).max(200),
+    description: z.string().max(2000).optional(),
+    /** TRANSFER, SESSION_CAPACITY, APPOINTMENT, ASSET_INTERVAL and others. */
+    model: z.string().regex(/^[A-Z_]{2,40}$/),
+    duration_minutes: z.number().int().min(1).max(527_040).optional(),
+    price_cents: z.number().int().min(0).max(100_000_000_000),
+    pricing_basis: z.enum(['per_booking', 'per_quantity', 'per_duration', 'per_night']).optional(),
+    resource_ids: z.array(z.string().min(1).max(128)).min(1).max(50),
+    capacity: z.number().int().min(1).max(100_000).optional(),
+    capacity_unit: z.string().min(1).max(40).optional(),
+    /** For a transfer or a visit: the areas you serve, such as JKIA or Westlands. */
+    service_areas: z.array(z.string().min(1).max(200)).max(100).optional(),
+    transport_included: z.boolean().optional(),
+    with_driver: z.boolean().optional(),
+    /** For a transfer or a visit: minutes kept free after each one to travel back. Default 0. */
+    travel_minutes: z.number().int().min(0).max(720).optional(),
+    booking_enabled: z.boolean().optional(),
+    active: z.boolean().optional(),
+    /** How long before it starts a booking must be made. Default 60. */
+    lead_time_minutes: z.number().int().min(0).max(525_600).optional(),
+    /** How far ahead it can be booked. Default 365. */
+    horizon_days: z.number().int().min(1).max(3650).optional(),
+  })
+  .strict();
+
+export type OfferingCreate = z.infer<typeof OfferingCreate>;
+
+/** POST /v1/resources: a new vehicle, room, guide or pool of places. */
+export const ResourceCreate = z
+  .object({
+    name: z.string().min(1).max(200),
+    kind: z.enum(['staff', 'asset', 'vehicle', 'room', 'space', 'equipment', 'capacity_pool']),
+    quantity: z.number().int().min(1).max(100_000),
+    /** Working days (0 is Sunday) and hours, in Nairobi time: { days: [1,2,3,4,5], start: '06:00', end: '22:00' }. */
+    schedule: z
+      .object({
+        days: z.array(z.number().int().min(0).max(6)).min(1).max(7),
+        start: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
+        end: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
+      })
+      .strict(),
+    capacity_mode: z.enum(['per-reservation', 'per-guest']).optional(),
+    capacity_unit: z.string().min(1).max(40).optional(),
+    party_capacity: z.number().int().min(1).max(1000).optional(),
+    active: z.boolean().optional(),
+  })
+  .strict();
+
+export type ResourceCreate = z.infer<typeof ResourceCreate>;
 
 /** POST /v1/test/reservations: a sandbox reservation, made with a test key. */
 export const TestReservationRequest = z

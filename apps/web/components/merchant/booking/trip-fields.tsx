@@ -21,6 +21,16 @@ export function TripFields({ offering }: { offering: BookingOffering }) {
       <Field label={transport ? 'Pickup address' : 'Meeting address or arrival point'}>
         <textarea name="pickupAddress" className={inputClass} required maxLength={1000} rows={2} />
       </Field>
+      <Field label="Flight number (if you are landing)">
+        <input
+          name="flightNumber"
+          className={inputClass}
+          maxLength={10}
+          placeholder="KQ 101"
+          autoCapitalize="characters"
+          autoComplete="off"
+        />
+      </Field>
       {transport ? (
         <>
           <Field label="Drop-off area">
@@ -54,5 +64,7 @@ export function tripFromForm(form: FormData) {
     pickupAddress: form.get('pickupAddress'),
     dropoffArea: form.get('dropoffArea') || undefined,
     dropoffAddress: form.get('dropoffAddress') || undefined,
+    // The booking engine checks it and keeps it as airlines print it: KQ 101.
+    flightNumber: String(form.get('flightNumber') ?? '').trim() || undefined,
   };
 }

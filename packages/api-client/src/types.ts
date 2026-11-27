@@ -160,6 +160,8 @@ export type ApiReservation = {
     pickup_address: string | null;
     dropoff_area: string | null;
     dropoff_address: string | null;
+    /** The customer's flight for an airport pickup, as airlines print it: `KQ 101`. */
+    flight_number: string | null;
   } | null;
   /** Where the business goes to the customer, for a visit at their place. */
   service_location: {
@@ -180,7 +182,16 @@ export type ApiReservation = {
     vehicle: string;
     plate: string | null;
     assigned_at: string | null;
+    /** Where the driver last was, as your system sent it. Null until it sends one. */
+    location: {
+      /** When the rider's app sent this position. */
+      at: string;
+      latitude: number;
+      longitude: number;
+    } | null;
   } | null;
+  /** `review_required`: it was paid and then cancelled, and NexG refunds the customer. */
+  refund_state: string | null;
 };
 
 export type ApiReservationDriver = {
@@ -189,6 +200,13 @@ export type ApiReservationDriver = {
   vehicle: string;
   plate: string | null;
   assigned_at: string | null;
+  /** Where the driver last was, as your system sent it. Null until it sends one. */
+  location: {
+    /** When the rider's app sent this position. */
+    at: string;
+    latitude: number;
+    longitude: number;
+  } | null;
 };
 
 export type ApiReservationSummary = {
@@ -263,11 +281,82 @@ export type DepartureRequest = {
   expected_departure_version?: number;
 };
 
+export type OfferingCreate = {
+  name: string;
+  /** TRANSFER, SESSION_CAPACITY, APPOINTMENT, ASSET_INTERVAL and others. */
+  model: string;
+  resource_ids: string[];
+  price_cents: number;
+  description?: string;
+  with_driver?: boolean;
+  active?: boolean;
+  capacity_unit?: string;
+  capacity?: number;
+  booking_enabled?: boolean;
+  pricing_basis?: 'per_booking' | 'per_quantity' | 'per_duration' | 'per_night';
+  duration_minutes?: number;
+  /** For a transfer or a visit: the areas you serve, such as JKIA or Westlands. */
+  service_areas?: string[];
+  transport_included?: boolean;
+  /** For a transfer or a visit: minutes kept free after each one to travel back. Default 0. */
+  travel_minutes?: number;
+  /** How long before it starts a booking must be made. Default 60. */
+  lead_time_minutes?: number;
+  /** How far ahead it can be booked. Default 365. */
+  horizon_days?: number;
+};
+
 export type OfferingUpdate = {
   expected_version: number;
   active?: boolean;
   booking_enabled?: boolean;
   price_cents?: number;
+};
+
+export type ReservationCreate = {
+  offering_id: string;
+  /** The guest. An email or a phone number is required, kept for your business only. */
+  guest: {
+    name: string;
+    phone?: string;
+    email?: string;
+  };
+  starts_at?: string;
+  ends_at?: string;
+  quantity?: number;
+  occurrence_id?: string;
+  resource_ids?: string[];
+  trip?: {
+    pickup_area: string;
+    pickup_address: string;
+    dropoff_area?: string;
+    dropoff_address?: string;
+    flight_number?: string;
+  };
+  service_location?: {
+    address: string;
+    area: string;
+  };
+  notes?: string;
+  ticket_type_id?: string;
+  /** true: hold the time, waiting for you to accept it. */
+  hold?: boolean;
+};
+
+export type ResourceCreate = {
+  name: string;
+  quantity: number;
+  kind: 'vehicle' | 'staff' | 'asset' | 'room' | 'space' | 'equipment' | 'capacity_pool';
+  /** Working days (0 is Sunday) and hours, in Nairobi time: { days: [1,2,3,4,5], start: '06:00', end: '22:00' }. */
+  schedule: {
+    days: number[];
+    start: string;
+    end: string;
+  };
+  active?: boolean;
+  capacity_unit?: string;
+  capacity_mode?: 'per-reservation' | 'per-guest';
+  party_capacity?: number;
 };
 
 export type TestReservationRequest = {
@@ -283,6 +372,8 @@ export type TestReservationRequest = {
     pickup_address?: string | null;
     dropoff_area?: string | null;
     dropoff_address?: string | null;
+    /** The customer's flight for an airport pickup, as airlines print it: `KQ 101`. */
+    flight_number?: string | null;
   };
   notes?: string;
   offering_name?: string;

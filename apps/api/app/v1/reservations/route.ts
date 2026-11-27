@@ -24,8 +24,14 @@ import {
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
 import { privateHeaders } from '@/lib/cache';
 import { BookingEngineUnavailable, engineDetail, engineGet } from '@/lib/booking-engine';
-import { SANDBOX, checkReservation, sandbox, sandboxRefusal } from '@/lib/reservation-routes';
-import { ApiReservation, ReservationListRequest } from '@nexg/contracts/api';
+import {
+  SANDBOX,
+  checkReservation,
+  engineWrite,
+  sandbox,
+  sandboxRefusal,
+} from '@/lib/reservation-routes';
+import { ApiReservation, ReservationCreate, ReservationListRequest } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -83,7 +89,7 @@ export const GET = withErrorEnvelope(async (request: Request) => {
       next_cursor?: { updated_at: string; id: string } | null;
     } | null;
     const tested = Array.isArray(result?.items)
-      ? result.items.map((item) => ApiReservation.safeParse(item))
+      ? result.items.map((item) => checkReservation(item))
       : null;
     if (!tested || tested.some((entry) => !entry.success)) {
       return jsonError('internal_error', 'The test reservations could not be read.', {
@@ -154,3 +160,22 @@ export const GET = withErrorEnvelope(async (request: Request) => {
     nextCursor,
   );
 });
+
+/**
+ * POST /v1/reservations: a booking your team took elsewhere (by phone, at
+ * the desk), so NexG's calendar holds the time and nobody books it twice. It
+ * needs the guest's email or phone, kept for your business only and never
+ * returned. A live key with merchant_write and an Idempotency-Key. Answers 201.
+ */
+export const POST = withErrorEnvelope(async (request: Request) =>
+  engineWrite(request, {
+    scope: 'merchant_write',
+    path: '/v1/platform/reservations',
+    body: ReservationCreate,
+    result: ApiReservation,
+    name: 'reservation',
+    status: 201,
+    testRefusal: 'With a test key, make test reservations with POST /v1/test/reservations.',
+    notFound: 'The offering was not found.',
+  }),
+);

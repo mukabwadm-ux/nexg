@@ -58,6 +58,7 @@ const RESERVATION = {
     pickup_address: 'Terminal 1A',
     dropoff_area: 'Westlands',
     dropoff_address: 'Woodvale Grove',
+    flight_number: 'KQ 101',
   },
   service_location: null,
   notes: 'Two suitcases.',
@@ -68,6 +69,7 @@ const RESERVATION = {
   booked_on: 'nexg',
   created_at: '2026-11-27T09:02:44.903Z',
   driver: null,
+  refund_state: null,
 };
 /** A sandbox reservation, as rpc_reservation_read_api_test answers it. */
 const TEST_RESERVATION = {

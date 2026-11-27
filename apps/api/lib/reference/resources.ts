@@ -702,6 +702,13 @@ export const RESERVATION_FIELDS: FieldDoc[] = [
     description:
       'Who is coming, once you set it with PUT /v1/reservations/{id}/driver: first name, vehicle and plate. The customer sees it on their booking.',
   },
+  {
+    name: 'refund_state',
+    type: 'string',
+    nullable: true,
+    description:
+      'review_required: the customer paid and the booking was cancelled, so NexG Finance refunds them in full.',
+  },
 ];
 
 export const RESERVATION_OFFERING_FIELDS: FieldDoc[] = [
@@ -731,6 +738,12 @@ export const RESERVATION_TRIP_FIELDS: FieldDoc[] = [
   { name: 'pickup_address', type: 'string', nullable: true, description: 'The pickup address.' },
   { name: 'dropoff_area', type: 'string', nullable: true, description: 'The drop-off area.' },
   { name: 'dropoff_address', type: 'string', nullable: true, description: 'The drop-off address.' },
+  {
+    name: 'flight_number',
+    type: 'string',
+    nullable: true,
+    description: 'The customer’s flight for an airport pickup, as airlines print it: KQ 101.',
+  },
 ];
 
 export const RESERVATION_DRIVER_FIELDS: FieldDoc[] = [
@@ -751,6 +764,13 @@ export const RESERVATION_DRIVER_FIELDS: FieldDoc[] = [
     type: 'timestamp',
     nullable: true,
     description: 'When the driver was set.',
+  },
+  {
+    name: 'location',
+    type: 'object',
+    nullable: true,
+    description:
+      'Where the driver last was, as your system sent it: latitude, longitude and at. Null until it sends one.',
   },
 ];
 

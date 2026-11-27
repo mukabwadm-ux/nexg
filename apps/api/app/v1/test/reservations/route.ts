@@ -46,6 +46,7 @@ export const POST = withErrorEnvelope(async (request: Request) => {
           pickup_address: body.trip.pickup_address ?? null,
           dropoff_area: body.trip.dropoff_area ?? null,
           dropoff_address: body.trip.dropoff_address ?? null,
+          flight_number: body.trip.flight_number ?? null,
         },
       }
     : body;
