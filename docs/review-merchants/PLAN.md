@@ -16,7 +16,28 @@
 - Shop 18 is adult wellness, because the master list has no tobacco.
 - Payouts are held on every review shop.
 
-Still open: A1 to A3 and A6 (backend), A7 and A8 (app), the review account, and the app's category mapping (see below).
+**Still open (27 Nov 2026):**
+
+- **A1, booking check:** fixed in mukabwadm-ux/nexg#244.
+  - The fix is a migration plus a website change.
+  - Catalogue and free-time reads are served for review shops.
+  - Booking needs a staff or reviewer sign-in.
+  - Live needs the migration pushed and the website deployed.
+- **A2, Discovery cannot list review shops:** this is not fixable in the backend alone.
+  - The app never sends the signed-in user to Discovery (`providers/engine/transport.ts`), so Discovery cannot tell a reviewer from the public.
+  - It needs an app change. Either the app adds the shops a signed-in account can see in `merchant_public` (test tenants for reviewers) to Home and categories, or it forwards the user's token to Discovery.
+- **A3, item facts:** Discovery still sends no photos, `kind`, booking links or rental facts for anyone. This matters for real merchants too.
+- **A6, cinema sync:** off on live, so the review cinema has no showtimes.
+  - The `cinema-worker` cron runs every minute.
+  - Vault has no `cinema_worker_url` or `cinema_worker_secret`.
+  - `POST https://www.nexgapp.com/api/internal/cinema/worker` answers 503 `not_configured`.
+  - Fix:
+    1. On Vercel (production), set `CINEMA_WORKER_SECRET` (at least 16 random characters) and `SUPABASE_SERVICE_ROLE_KEY`, then redeploy.
+    2. In the live SQL editor, add the same value to Vault: `select vault.create_secret('<same value>', 'cinema_worker_secret');` and `select vault.create_secret('https://www.nexgapp.com/api/internal/cinema/worker', 'cinema_worker_url');`.
+- **Review account:** create it and add it to `payment_reviewer`.
+- **A7 and A8 (app):** the two build switches, and hiding screens that have nothing behind them.
+- **App category mapping:** see below.
+- **Reviewer guide:** `REVIEWER_GUIDE.md`.
 
 ## Running it
 
