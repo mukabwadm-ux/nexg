@@ -69424,6 +69424,7 @@ export type Database = {
           starts_at: string;
         }[];
       };
+      rpc_booking_test_tenant_open: { Args: { p_merchant_id: string }; Returns: boolean };
       rpc_bootstrap_super_admin: { Args: Record<PropertyKey, never>; Returns: string };
       rpc_branch_delete: { Args: { p_branch_id: string; p_confirm_name: string }; Returns: Json };
       rpc_branch_pause: {
