@@ -46,6 +46,7 @@ export function platformHeaders(
   keyId: string,
   secret: string,
   now = Date.now(),
+  sandbox = false,
 ): Record<string, string> {
   const context = Buffer.from(
     JSON.stringify({
@@ -53,6 +54,9 @@ export function platformHeaders(
       userId: `api_key_${keyId}`,
       role: 'platform',
       expiresAt: now + 60_000,
+      // A test key: the engine lets it read offerings and resources and try
+      // changes to them as dry runs, and nothing else (engine server.ts).
+      ...(sandbox ? { sandbox: true } : {}),
     }),
   ).toString('base64url');
   return {

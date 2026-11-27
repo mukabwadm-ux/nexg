@@ -7,7 +7,9 @@
  *   A change runs as that business's manager under the key's id, so the
  *   engine's rules, audit and events are the merchant console's.
  * - Test keys reach the sandbox (api_test_reservation, 20270339000100) for
- *   reservations, and never change a real offering or resource.
+ *   reservations. They read the real offerings and resources, and their
+ *   changes to them are dry runs in the engine: checked under the live rules
+ *   and answered as they would be, with applied false, but never saved.
  */
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
@@ -157,7 +159,13 @@ export async function engineRequest(
     response = await fetch(`${config.url}${path}`, {
       method,
       headers: {
-        ...platformHeaders(credential.merchantId, credential.keyId, config.secret),
+        ...platformHeaders(
+          credential.merchantId,
+          credential.keyId,
+          config.secret,
+          Date.now(),
+          credential.environment === 'test',
+        ),
         accept: 'application/json',
         ...(options.body !== undefined ? { 'content-type': 'application/json' } : {}),
         // Scoped to this key by the engine, so two keys can never share a change.
@@ -351,9 +359,10 @@ export async function reservationAction<S extends z.ZodTypeAny>(
 
 /**
  * POST /v1/reservations, /v1/reservations/check-in, /v1/offerings and
- * /v1/resources: a live key only, with the scope, an Idempotency-Key and a
- * body checked against its schema, sent to the engine; the answer is checked
- * against the contract.
+ * /v1/resources: with the scope, an Idempotency-Key and a body checked
+ * against its schema, sent to the engine; the answer is checked against the
+ * contract. A test key may try an offering or resource (a dry run, applied
+ * false), but not a reservation.
  */
 export async function engineWrite<S extends z.ZodTypeAny, R extends z.ZodTypeAny>(
   request: Request,
@@ -364,7 +373,8 @@ export async function engineWrite<S extends z.ZodTypeAny, R extends z.ZodTypeAny
     result: R;
     name: 'reservation' | 'offering' | 'resource';
     status: 200 | 201;
-    testRefusal: string;
+    /** Why a test key cannot make a reservation here. */
+    testRefusal?: string;
     notFound: string;
   },
 ): Promise<Response> {
@@ -376,8 +386,11 @@ export async function engineWrite<S extends z.ZodTypeAny, R extends z.ZodTypeAny
   );
   if (auth instanceof Response) return auth;
   const { credential, rate } = auth;
-  if (credential.environment === 'test') {
-    return jsonError('not_found', options.testRefusal, { status: 403 });
+  const test = credential.environment === 'test';
+  if (test && options.name === 'reservation') {
+    return jsonError('not_found', options.testRefusal ?? 'A test key cannot do this.', {
+      status: 403,
+    });
   }
   const key = idempotencyKey(request);
   if (key instanceof Response) return key;
@@ -399,13 +412,23 @@ export async function engineWrite<S extends z.ZodTypeAny, R extends z.ZodTypeAny
       detail: checked.error.issues,
     });
   }
-  return answer({ [options.name]: checked.data }, rate, credential, options.status);
+  return answer(
+    {
+      [options.name]: checked.data,
+      // A test key's offering or resource is what it would be: nothing was saved.
+      ...(options.name === 'reservation' ? {} : { applied: !test }),
+    },
+    rate,
+    credential,
+    options.status,
+  );
 }
 
 /**
- * A change to the business's offerings or resources: a live key only, with
- * catalogue_write and an Idempotency-Key, checked against the schema, then
- * sent to the engine; the answer is checked against `result`.
+ * A change to the business's offerings or resources, with catalogue_write
+ * and an Idempotency-Key, checked against the schema, then sent to the
+ * engine; the answer is checked against `result`. A test key's change is a
+ * dry run there: the answer shows it as it would be, with applied false.
  */
 export async function setupChange<S extends z.ZodTypeAny, R extends z.ZodTypeAny>(
   request: Request,
@@ -427,13 +450,6 @@ export async function setupChange<S extends z.ZodTypeAny, R extends z.ZodTypeAny
   );
   if (auth instanceof Response) return auth;
   const { credential, rate } = auth;
-  if (credential.environment === 'test') {
-    return jsonError(
-      'not_found',
-      'A test key changes no offering or resource: the sandbox has none. Use a live key, or try reservations with POST /v1/test/reservations.',
-      { status: 403 },
-    );
-  }
   if (!ENGINE_ID.test(options.id)) {
     return jsonError('invalid_request', `Invalid ${options.name} ID`, {
       fields: { id: `An ${options.name} id is the id from GET /v1/${options.name}s.` },
@@ -469,7 +485,12 @@ export async function setupChange<S extends z.ZodTypeAny, R extends z.ZodTypeAny
       detail: checked.error.issues,
     });
   }
-  return answer({ [options.name]: checked.data }, rate, credential);
+  return answer(
+    // With a test key the engine ran it as a dry run: nothing was saved.
+    { [options.name]: checked.data, applied: credential.environment !== 'test' },
+    rate,
+    credential,
+  );
 }
 
 /** GET /v1/offerings and /v1/resources: the business's setup, from the engine. */

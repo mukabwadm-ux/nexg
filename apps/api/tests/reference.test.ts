@@ -335,13 +335,13 @@ describe('the documented shapes match @nexg/contracts/api', () => {
     }
     expect(() => OfferingCreate.parse(endpoint('create-offering').example.body)).not.toThrow();
     expect(() =>
-      envelope(z.object({ offering: ApiOffering }).strict()).parse(
+      envelope(z.object({ offering: ApiOffering, applied: z.boolean() }).strict()).parse(
         endpoint('create-offering').responseExample,
       ),
     ).not.toThrow();
     expect(() => ResourceCreate.parse(endpoint('create-resource').example.body)).not.toThrow();
     expect(() =>
-      envelope(z.object({ resource: ApiResource }).strict()).parse(
+      envelope(z.object({ resource: ApiResource, applied: z.boolean() }).strict()).parse(
         endpoint('create-resource').responseExample,
       ),
     ).not.toThrow();
@@ -358,8 +358,8 @@ describe('the documented shapes match @nexg/contracts/api', () => {
         endpoint('list-resources').responseExample,
       ),
     ).not.toThrow();
-    const offering = envelope(z.object({ offering: ApiOffering }).strict());
-    const resource = envelope(z.object({ resource: ApiResource }).strict());
+    const offering = envelope(z.object({ offering: ApiOffering, applied: z.boolean() }).strict());
+    const resource = envelope(z.object({ resource: ApiResource, applied: z.boolean() }).strict());
     expect(() => OfferingUpdate.parse(endpoint('update-offering').example.body)).not.toThrow();
     expect(() => offering.parse(endpoint('update-offering').responseExample)).not.toThrow();
     expect(() => DepartureRequest.parse(endpoint('add-departure').example.body)).not.toThrow();

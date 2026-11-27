@@ -30,7 +30,6 @@ export const POST = withErrorEnvelope(async (request: Request) =>
     result: ApiOffering,
     name: 'offering',
     status: 201,
-    testRefusal: 'A test key makes no offering: the sandbox has none. Use a live key.',
     notFound: 'A resource it names was not found.',
   }),
 );

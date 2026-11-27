@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import type { Payload } from 'payload';
 import { checkAvailability } from 'payload-reserve';
@@ -188,6 +189,12 @@ function codeUsable(n: Doc, state: string) {
 /** SQLite admits one writer; queue the entire command, then let Payload's real
  * transaction and resource-lock hooks enforce allocation. PostgreSQL relies on
  * those database locks and may process unrelated transactions concurrently. */
+/**
+ * The open transaction of a dry run (BookingEngine.dryRun). Every read and
+ * write inside joins it, so they see the change, and it is always rolled back.
+ */
+const dryRunScope = new AsyncLocalStorage<{ tx: unknown }>();
+
 export class BookingEngine {
   private writer: Promise<unknown> = Promise.resolve();
   constructor(
@@ -233,7 +240,11 @@ export class BookingEngine {
     };
   }
   private request(identity: Identity, transactionID?: any): any {
-    return { payload: this.payload, context: scope(identity), transactionID };
+    return {
+      payload: this.payload,
+      context: scope(identity),
+      transactionID: transactionID ?? dryRunScope.getStore()?.tx,
+    };
   }
   private async all(collection: string, identity: Identity, req?: any): Promise<Doc[]> {
     const docs: Doc[] = [];
@@ -300,6 +311,9 @@ export class BookingEngine {
     } as any)) as Doc;
   }
   private async transaction<T>(identity: Identity, fn: (req: any) => Promise<T>): Promise<T> {
+    // Inside a dry run: join its transaction, which is rolled back, never committed.
+    const dry = dryRunScope.getStore();
+    if (dry) return fn(this.request(identity, dry.tx));
     const run = async () => {
       const tx = await this.payload.db.beginTransaction();
       if (tx === null)
@@ -327,6 +341,37 @@ export class BookingEngine {
       } catch (e) {
         await this.payload.db.rollbackTransaction(tx);
         throw e;
+      }
+    };
+    if (!this.sqlite) return run();
+    const result = this.writer.then(run, run);
+    this.writer = result.then(
+      () => undefined,
+      () => undefined,
+    );
+    return result;
+  }
+  /**
+   * Runs `fn` exactly as it would run, then undoes it. Every rule and version
+   * is checked and the answer is what would be saved, but nothing is saved:
+   * the records, the audit, the idempotency record and the outbox (so no
+   * event) all roll back together. NexG API test keys change offerings and
+   * resources this way (server.ts).
+   */
+  async dryRun<T>(fn: () => Promise<T>): Promise<T> {
+    if (dryRunScope.getStore()) return fn();
+    const run = async () => {
+      const tx = await this.payload.db.beginTransaction();
+      if (tx === null)
+        throw new BookingError(
+          503,
+          'Reservation storage is not transaction-safe.',
+          'transactions_required',
+        );
+      try {
+        return await dryRunScope.run({ tx }, fn);
+      } finally {
+        await this.payload.db.rollbackTransaction(tx);
       }
     };
     if (!this.sqlite) return run();

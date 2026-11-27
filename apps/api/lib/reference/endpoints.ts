@@ -193,7 +193,7 @@ const EXPECTED_VERSION_FIELD = {
 const ENGINE_WARNING =
   'Being switched on: until NexG connects the booking engine, this answers 503.';
 const ENGINE_ISSUES = [
-  'Until NexG connects the API to its booking engine, every call with a live key answers 503 internal_error. The changelog says when it is on.',
+  'Until NexG connects the API to its booking engine, these calls answer 503 internal_error: with a live key, and for offerings and resources with a test key too. Test reservations already work. The changelog says when it is on.',
 ];
 
 const ENGINE_ERRORS: ErrorDoc[] = [
@@ -352,6 +352,24 @@ const RESOURCE_RESOURCES = (at: string) => [
     fields: CLOSURE_FIELDS,
   },
 ];
+
+/** The answer's applied flag: a test key's change to the setup is a dry run. */
+const SETUP_APPLIED = {
+  title: 'Saved',
+  at: 'data',
+  fields: [
+    {
+      name: 'applied',
+      type: 'boolean',
+      description:
+        'true when the change was saved, with a live key. false with a test key: the answer shows the change as it would be, and nothing was saved.',
+    },
+  ],
+};
+const SETUP_TEST_KEY =
+  'A test key (nexg_test_…) tries the change on your real setup and saves nothing.';
+const SETUP_DRY_RUN =
+  'With a test key it is a dry run: every rule is checked against your real setup and the answer shows the change as it would be, with applied false, but nothing is saved and no event is sent.';
 
 /* ─────────────────────────────────────────────────────────────── the endpoints */
 
@@ -3154,15 +3172,13 @@ export const ENDPOINTS: EndpointDoc[] = [
     description: [
       'Adds something your business sells as a booking, using resources you already have. It takes NexG’s standard terms: customers pay through NexG before a booking confirms, and a booking can change before it starts.',
       'Each kind has its own needs: a transfer needs a vehicle and a driver together and the areas you serve; a class or tour needs its capacity and then departures. The answer says what is missing.',
+      SETUP_DRY_RUN,
     ],
     auth: { kind: 'key', scope: 'catalogue_write', merchantBound: true },
     rateCost: 1,
     cache: 'no-store',
     paginated: false,
-    params: [
-      keyHeader('catalogue_write', 'A live key: a test key makes nothing here (403).'),
-      CHANGE_KEY,
-    ],
+    params: [keyHeader('catalogue_write', SETUP_TEST_KEY), CHANGE_KEY],
     example: {
       body: {
         name: 'JKIA to Westlands',
@@ -3246,10 +3262,10 @@ export const ENDPOINTS: EndpointDoc[] = [
     responseStatus: '201 Created',
     responseExample: {
       ok: true,
-      data: { offering: { ...SAMPLE_OFFERING, version: 1 } },
+      data: { offering: { ...SAMPLE_OFFERING, version: 1 }, applied: true },
       meta: { api_version: 'v1' },
     },
-    responseResources: OFFERING_RESOURCES('data.offering'),
+    responseResources: [...OFFERING_RESOURCES('data.offering'), SETUP_APPLIED],
     errors: [
       ...credentialErrors('catalogue_write', false),
       {
@@ -3260,7 +3276,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 403,
         code: 'not_found',
-        when: 'The key is a test key, or it is not bound to a merchant.',
+        when: 'The key is not bound to a merchant.',
       },
       { status: 404, code: 'not_found', when: 'A resource it names was not found.' },
       ...ENGINE_ERRORS,
@@ -3281,15 +3297,13 @@ export const ENDPOINTS: EndpointDoc[] = [
     summary: 'A new vehicle, room, guide or pool of places, with its hours.',
     description: [
       'Adds something your bookings hold: a vehicle, a driver or guide (staff), a room, a pool of places. Give its working days and hours in Nairobi time. Then name it in an offering’s resource_ids.',
+      SETUP_DRY_RUN,
     ],
     auth: { kind: 'key', scope: 'catalogue_write', merchantBound: true },
     rateCost: 1,
     cache: 'no-store',
     paginated: false,
-    params: [
-      keyHeader('catalogue_write', 'A live key: a test key makes nothing here (403).'),
-      CHANGE_KEY,
-    ],
+    params: [keyHeader('catalogue_write', SETUP_TEST_KEY), CHANGE_KEY],
     example: {
       body: {
         name: 'Van one (KDA 123A)',
@@ -3337,10 +3351,10 @@ export const ENDPOINTS: EndpointDoc[] = [
     responseStatus: '201 Created',
     responseExample: {
       ok: true,
-      data: { resource: { ...SAMPLE_RESOURCE, closures: [], version: 1 } },
+      data: { resource: { ...SAMPLE_RESOURCE, closures: [], version: 1 }, applied: true },
       meta: { api_version: 'v1' },
     },
-    responseResources: RESOURCE_RESOURCES('data.resource'),
+    responseResources: [...RESOURCE_RESOURCES('data.resource'), SETUP_APPLIED],
     errors: [
       ...credentialErrors('catalogue_write', false),
       {
@@ -3351,7 +3365,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 403,
         code: 'not_found',
-        when: 'The key is a test key, or it is not bound to a merchant.',
+        when: 'The key is not bound to a merchant.',
       },
       ...ENGINE_ERRORS,
     ],
@@ -3413,6 +3427,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     description: [
       'Changes an offering’s price (price_cents), switches it off (active: false) or stops new bookings while it stays visible (booking_enabled: false). Send the version you read; the answer is the offering as it is now.',
       'Bookings already made keep the price they were made at. While an offering has open bookings its price cannot change (409): make a new offering with the new price, as in the merchant console.',
+      SETUP_DRY_RUN,
     ],
     auth: { kind: 'key', scope: 'catalogue_write', merchantBound: true },
     rateCost: 1,
@@ -3426,7 +3441,7 @@ export const ENDPOINTS: EndpointDoc[] = [
         required: true,
         description: 'The offering’s id, from List your offerings.',
       },
-      keyHeader('catalogue_write', 'A live key: a test key changes nothing here (403).'),
+      keyHeader('catalogue_write', SETUP_TEST_KEY),
       CHANGE_KEY,
     ],
     example: {
@@ -3450,8 +3465,12 @@ export const ENDPOINTS: EndpointDoc[] = [
       },
     ],
     responseStatus: '200 OK',
-    responseExample: { ok: true, data: { offering: SAMPLE_OFFERING }, meta: { api_version: 'v1' } },
-    responseResources: OFFERING_RESOURCES('data.offering'),
+    responseExample: {
+      ok: true,
+      data: { offering: SAMPLE_OFFERING, applied: true },
+      meta: { api_version: 'v1' },
+    },
+    responseResources: [...OFFERING_RESOURCES('data.offering'), SETUP_APPLIED],
     errors: [
       ...credentialErrors('catalogue_write', false),
       {
@@ -3462,7 +3481,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 403,
         code: 'not_found',
-        when: 'The key is a test key, or it is not bound to a merchant.',
+        when: 'The key is not bound to a merchant.',
       },
       { status: 404, code: 'not_found', when: 'Your business has no offering with that id.' },
       ...ENGINE_ERRORS,
@@ -3484,6 +3503,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     description: [
       'Adds a departure to a tour or class: when it starts and ends, how many places, and whether customers can book it. To change one, send its departure_id and its version; published: false closes it to new bookings.',
       'Send the offering’s version as expected_version. The answer is the offering with its departures.',
+      SETUP_DRY_RUN,
     ],
     auth: { kind: 'key', scope: 'catalogue_write', merchantBound: true },
     rateCost: 1,
@@ -3497,7 +3517,7 @@ export const ENDPOINTS: EndpointDoc[] = [
         required: true,
         description: 'The offering’s id: a tour or class.',
       },
-      keyHeader('catalogue_write', 'A live key: a test key changes nothing here (403).'),
+      keyHeader('catalogue_write', SETUP_TEST_KEY),
       CHANGE_KEY,
     ],
     example: {
@@ -3539,8 +3559,12 @@ export const ENDPOINTS: EndpointDoc[] = [
       },
     ],
     responseStatus: '200 OK',
-    responseExample: { ok: true, data: { offering: SAMPLE_TOUR }, meta: { api_version: 'v1' } },
-    responseResources: OFFERING_RESOURCES('data.offering'),
+    responseExample: {
+      ok: true,
+      data: { offering: SAMPLE_TOUR, applied: true },
+      meta: { api_version: 'v1' },
+    },
+    responseResources: [...OFFERING_RESOURCES('data.offering'), SETUP_APPLIED],
     errors: [
       ...credentialErrors('catalogue_write', false),
       {
@@ -3551,7 +3575,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 403,
         code: 'not_found',
-        when: 'The key is a test key, or it is not bound to a merchant.',
+        when: 'The key is not bound to a merchant.',
       },
       { status: 404, code: 'not_found', when: 'Your business has no offering with that id.' },
       ...ENGINE_ERRORS,
@@ -3609,6 +3633,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     description: [
       'Marks a resource as busy or closed between two times: a booking on your own website, maintenance, time off. NexG takes no booking that needs it then.',
       'A closure cannot cover a booking you have already accepted (409): decline or move that booking first. Send the version you read; the answer is the resource with its closures.',
+      SETUP_DRY_RUN,
     ],
     auth: { kind: 'key', scope: 'catalogue_write', merchantBound: true },
     rateCost: 1,
@@ -3622,7 +3647,7 @@ export const ENDPOINTS: EndpointDoc[] = [
         required: true,
         description: 'The resource’s id, from List your resources.',
       },
-      keyHeader('catalogue_write', 'A live key: a test key changes nothing here (403).'),
+      keyHeader('catalogue_write', SETUP_TEST_KEY),
       CHANGE_KEY,
     ],
     example: {
@@ -3651,8 +3676,12 @@ export const ENDPOINTS: EndpointDoc[] = [
       },
     ],
     responseStatus: '200 OK',
-    responseExample: { ok: true, data: { resource: SAMPLE_RESOURCE }, meta: { api_version: 'v1' } },
-    responseResources: RESOURCE_RESOURCES('data.resource'),
+    responseExample: {
+      ok: true,
+      data: { resource: SAMPLE_RESOURCE, applied: true },
+      meta: { api_version: 'v1' },
+    },
+    responseResources: [...RESOURCE_RESOURCES('data.resource'), SETUP_APPLIED],
     errors: [
       ...credentialErrors('catalogue_write', false),
       {
@@ -3663,7 +3692,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 403,
         code: 'not_found',
-        when: 'The key is a test key, or it is not bound to a merchant.',
+        when: 'The key is not bound to a merchant.',
       },
       { status: 404, code: 'not_found', when: 'Your business has no resource with that id.' },
       ...ENGINE_ERRORS,
@@ -3684,6 +3713,7 @@ export const ENDPOINTS: EndpointDoc[] = [
     summary: 'Remove a closure, so the time can be booked again.',
     description: [
       'Removes one of a resource’s closures. Send the resource’s version as ?expected_version= (a DELETE has no body). The answer is the resource with its remaining closures.',
+      SETUP_DRY_RUN,
     ],
     auth: { kind: 'key', scope: 'catalogue_write', merchantBound: true },
     rateCost: 1,
@@ -3705,7 +3735,7 @@ export const ENDPOINTS: EndpointDoc[] = [
         required: true,
         description: 'The resource’s version you read.',
       },
-      keyHeader('catalogue_write', 'A live key: a test key changes nothing here (403).'),
+      keyHeader('catalogue_write', SETUP_TEST_KEY),
       CHANGE_KEY,
     ],
     example: {
@@ -3715,10 +3745,10 @@ export const ENDPOINTS: EndpointDoc[] = [
     responseStatus: '200 OK',
     responseExample: {
       ok: true,
-      data: { resource: { ...SAMPLE_RESOURCE, closures: [], version: 7 } },
+      data: { resource: { ...SAMPLE_RESOURCE, closures: [], version: 7 }, applied: true },
       meta: { api_version: 'v1' },
     },
-    responseResources: RESOURCE_RESOURCES('data.resource'),
+    responseResources: [...RESOURCE_RESOURCES('data.resource'), SETUP_APPLIED],
     errors: [
       ...credentialErrors('catalogue_write', false),
       {
@@ -3729,7 +3759,7 @@ export const ENDPOINTS: EndpointDoc[] = [
       {
         status: 403,
         code: 'not_found',
-        when: 'The key is a test key, or it is not bound to a merchant.',
+        when: 'The key is not bound to a merchant.',
       },
       { status: 404, code: 'not_found', when: 'No such resource or closure.' },
       ...ENGINE_ERRORS,

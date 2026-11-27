@@ -20,7 +20,7 @@ import { PUT as driver } from '../app/v1/reservations/[id]/driver/route';
 import { POST as cancel } from '../app/v1/reservations/[id]/cancel/route';
 import { POST as checkIn } from '../app/v1/reservations/check-in/route';
 import { POST as createReservation } from '../app/v1/reservations/route';
-import { GET as offerings } from '../app/v1/offerings/route';
+import { GET as offerings, POST as createOffering } from '../app/v1/offerings/route';
 import { PATCH as updateOffering } from '../app/v1/offerings/[id]/route';
 import { DELETE as reopen } from '../app/v1/resources/[id]/closures/[closure_id]/route';
 import { POST as createTest } from '../app/v1/test/reservations/route';
@@ -146,6 +146,12 @@ const engineCall = (n = 0) => {
     body: init.body ? JSON.parse(init.body as string) : undefined,
   };
 };
+
+/** The signed context the API sent the engine, decoded. */
+const context = (call: { headers: Record<string, string> }) =>
+  JSON.parse(
+    Buffer.from(call.headers['x-nexg-booking-context']!, 'base64url').toString('utf8'),
+  ) as Record<string, unknown>;
 
 let errorLog: ReturnType<typeof vi.spyOn>;
 
@@ -391,19 +397,48 @@ describe('the booking setup', () => {
     );
 
     expect(res.status).toBe(200);
-    expect((await res.json()).data.offering.price_cents).toBe(500000);
+    const data = (await res.json()).data;
+    expect(data.offering.price_cents).toBe(500000);
+    expect(data.applied).toBe(true);
     expect(engineCall().method).toBe('PATCH');
     expect(engineCall().body).toEqual({ expected_version: 4, price_cents: 500000 });
+    expect(context(engineCall()).sandbox).toBeUndefined();
   });
 
-  it('refuses a test key, a key without catalogue_write, and an empty change', async () => {
+  it('sends a test key’s change as a dry run, and says nothing was saved', async () => {
     keys({ ...KEY, environment: 'test' });
-    const test = await updateOffering(
+    engineAnswers(200, { ...OFFERING, active: false, version: 5 });
+    const tried = await updateOffering(
       send('PATCH', '/v1/offerings/off-1', { expected_version: 4, active: false }),
       { params: { id: 'off-1' } },
     );
-    expect(test.status).toBe(403);
+    expect(tried.status).toBe(200);
+    const data = (await tried.json()).data;
+    expect(data).toEqual({ offering: { ...OFFERING, active: false, version: 5 }, applied: false });
+    // The engine is told, in the signed context, that this is a test key.
+    expect(context(engineCall())).toMatchObject({
+      businessId: MERCHANT_ID,
+      userId: `api_key_${KEY_ID}`,
+      role: 'platform',
+      sandbox: true,
+    });
 
+    fetchMock.mockClear();
+    engineAnswers(201, { ...OFFERING, id: 'off-2', version: 1 });
+    const made = await createOffering(
+      send('POST', '/v1/offerings', {
+        name: 'City run',
+        model: 'APPOINTMENT',
+        price_cents: 350000,
+        resource_ids: ['van-1'],
+      }),
+    );
+    expect(made.status).toBe(201);
+    expect((await made.json()).data.applied).toBe(false);
+    expect(context(engineCall()).sandbox).toBe(true);
+  });
+
+  it('refuses a key without catalogue_write, and an empty change', async () => {
     keys({ ...KEY, scopes: ['merchant_read', 'merchant_write'] });
     const scoped = await updateOffering(
       send('PATCH', '/v1/offerings/off-1', { expected_version: 4, active: false }),
@@ -437,7 +472,7 @@ describe('the booking setup', () => {
       },
     );
     expect(res.status).toBe(200);
-    expect((await res.json()).data).toEqual({ resource: RESOURCE });
+    expect((await res.json()).data).toEqual({ resource: RESOURCE, applied: true });
     expect(engineCall().method).toBe('DELETE');
     expect(engineCall().url).toBe(
       `${ENGINE}/v1/platform/resources/van-1/closures/c-1?expected_version=6`,

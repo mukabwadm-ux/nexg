@@ -400,17 +400,24 @@ export class NexgClient {
 
   /**
    * Your booking setup: what you sell as bookings and the resources they hold.
-   * Reads need merchant_read; changes need a live key with catalogue_write.
+   * Reads need merchant_read; changes need catalogue_write. With a test key a
+   * change is a dry run on your real setup: checked, answered with applied
+   * false, never saved.
    */
   readonly offerings = {
     /** GET /v1/offerings: every offering, with its departures. */
     list: () => this.call<{ items: ApiOffering[] }>('GET', '/v1/offerings', { retry: 'safe' }),
     /** POST /v1/offerings: a new offering, on NexG's standard terms. */
     create: (offering: OfferingCreate, options: ChangeOptions = {}) =>
-      this.change<{ offering: ApiOffering }>('POST', '/v1/offerings', offering, options),
+      this.change<{ offering: ApiOffering; applied: boolean }>(
+        'POST',
+        '/v1/offerings',
+        offering,
+        options,
+      ),
     /** PATCH /v1/offerings/{id}: a price, switching it off, or stopping new bookings. */
     update: (id: string, change: OfferingUpdate, options: ChangeOptions = {}) =>
-      this.change<{ offering: ApiOffering }>(
+      this.change<{ offering: ApiOffering; applied: boolean }>(
         'PATCH',
         `/v1/offerings/${encodeURIComponent(id)}`,
         change,
@@ -418,7 +425,7 @@ export class NexgClient {
       ),
     /** POST /v1/offerings/{id}/departures: add a departure, or change or close one. */
     saveDeparture: (id: string, departure: DepartureRequest, options: ChangeOptions = {}) =>
-      this.change<{ offering: ApiOffering }>(
+      this.change<{ offering: ApiOffering; applied: boolean }>(
         'POST',
         `/v1/offerings/${encodeURIComponent(id)}/departures`,
         departure,
@@ -431,10 +438,15 @@ export class NexgClient {
     list: () => this.call<{ items: ApiResource[] }>('GET', '/v1/resources', { retry: 'safe' }),
     /** POST /v1/resources: a new vehicle, room, guide or pool of places. */
     create: (resource: ResourceCreate, options: ChangeOptions = {}) =>
-      this.change<{ resource: ApiResource }>('POST', '/v1/resources', resource, options),
+      this.change<{ resource: ApiResource; applied: boolean }>(
+        'POST',
+        '/v1/resources',
+        resource,
+        options,
+      ),
     /** POST /v1/resources/{id}/closures: busy or closed for a time. */
     close: (id: string, closure: ClosureRequest, options: ChangeOptions = {}) =>
-      this.change<{ resource: ApiResource }>(
+      this.change<{ resource: ApiResource; applied: boolean }>(
         'POST',
         `/v1/resources/${encodeURIComponent(id)}/closures`,
         closure,
@@ -442,7 +454,7 @@ export class NexgClient {
       ),
     /** DELETE /v1/resources/{id}/closures/{closureId}: open the time again. */
     reopen: (id: string, closureId: string, expectedVersion: number, options: ChangeOptions = {}) =>
-      this.change<{ resource: ApiResource }>(
+      this.change<{ resource: ApiResource; applied: boolean }>(
         'DELETE',
         `/v1/resources/${encodeURIComponent(id)}/closures/${encodeURIComponent(closureId)}?expected_version=${expectedVersion}`,
         undefined,

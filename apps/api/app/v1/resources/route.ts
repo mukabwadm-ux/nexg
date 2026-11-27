@@ -29,7 +29,6 @@ export const POST = withErrorEnvelope(async (request: Request) =>
     result: ApiResource,
     name: 'resource',
     status: 201,
-    testRefusal: 'A test key makes no resource: the sandbox has none. Use a live key.',
     notFound: 'Not found.',
   }),
 );
