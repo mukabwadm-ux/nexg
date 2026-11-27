@@ -207,22 +207,25 @@ insert into public.api_webhook_endpoint (merchant_id, environment, url, secret_r
 select id, 'test', 'https://hooks.partner.co.ke/steps/test', 'api_webhook:steps-test', 'whsec_stp002' from t_m;
 insert into public.api_webhook_endpoint (merchant_id, environment, url, secret_ref, secret_prefix)
 select id, 'test', 'https://hooks.partner.co.ke/steps/other', 'api_webhook:steps-other', 'whsec_stp003' from t_m;
-create function pg_temp.endpoint(p_url text) returns uuid language sql as $$
-  select e.id from public.api_webhook_endpoint e where e.url = p_url
+insert into t
+select 'endpoint:' || split_part(e.url, '/', 5), to_jsonb(e.id)
+from public.api_webhook_endpoint e
+where e.url like 'https://hooks.partner.co.ke/steps/%';
+create function pg_temp.endpoint(p_name text) returns uuid language sql as $$
+  select (v #>> '{}')::uuid from t where k = 'endpoint:' || p_name
 $$;
-grant execute on function pg_temp.endpoint(text) to authenticated;
 
 select set_config('request.jwt.claims',
   '{"sub":"c9400000-0000-4000-8000-000000000002","role":"authenticated",'
   || '"session_id":"c9500000-0000-4000-8000-000000000001","is_anonymous":false}', true);
 set local role authenticated;
-select throws_ok($$ select public.rpc_api_webhook_sample(pg_temp.endpoint('https://hooks.partner.co.ke/steps/live'), 'reservation.created') $$,
+select throws_ok($$ select public.rpc_api_webhook_sample(pg_temp.endpoint('live'), 'reservation.created') $$,
   '22023', null, 'a live endpoint never gets a sample booking');
-select throws_ok($$ select public.rpc_api_webhook_sample(pg_temp.endpoint('https://hooks.partner.co.ke/steps/test'), 'booking.created') $$,
+select throws_ok($$ select public.rpc_api_webhook_sample(pg_temp.endpoint('test'), 'booking.created') $$,
   '22023', null, 'only reservation events have samples');
 insert into t values ('sample', to_jsonb(public.rpc_api_webhook_sample(
-  pg_temp.endpoint('https://hooks.partner.co.ke/steps/test'), 'reservation.status_changed')));
-select throws_ok($$ select public.rpc_api_webhook_sample(pg_temp.endpoint('https://hooks.partner.co.ke/steps/test'), 'reservation.created') $$,
+  pg_temp.endpoint('test'), 'reservation.status_changed')));
+select throws_ok($$ select public.rpc_api_webhook_sample(pg_temp.endpoint('test'), 'reservation.created') $$,
   '22023', 'A test event was just sent. Wait a few seconds.', 'samples cannot be sent back to back');
 reset role;
 
