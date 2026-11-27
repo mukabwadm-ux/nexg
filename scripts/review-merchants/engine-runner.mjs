@@ -19,9 +19,13 @@ const only = process.argv[2]?.split(',');
 const links = [];
 for (const s of shops) {
   if (only && !only.includes(s.slug)) continue;
-  const items = itemsOf(s).filter((i) => i.engine).map((i) => ({ ...i, id: itemId(s, i) }));
+  const items = itemsOf(s)
+    .filter((i) => i.engine)
+    .map((i) => ({ ...i, id: itemId(s, i) }));
   if (!items.length) continue;
   console.error(`Bookings: ${s.name}`);
-  links.push(...(await setUpShop(bridge(service, secret, merchantId(s)), s, items, (m) => console.error(m))));
+  links.push(
+    ...(await setUpShop(bridge(service, secret, merchantId(s)), s, items, (m) => console.error(m))),
+  );
 }
 console.log(JSON.stringify(links));

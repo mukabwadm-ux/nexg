@@ -16,7 +16,13 @@ export function pdfPlaceholder(title, holder) {
     ['F1', 11, 'App Store and Google Play review. It is not issued by any authority.'],
   ];
   let y = 760;
-  const content = lines.map(([f, size, text]) => { const out = `BT /${f} ${size} Tf 72 ${y} Td (${esc(text)}) Tj ET`; y -= size + 10; return out; }).join('\n');
+  const content = lines
+    .map(([f, size, text]) => {
+      const out = `BT /${f} ${size} Tf 72 ${y} Td (${esc(text)}) Tj ET`;
+      y -= size + 10;
+      return out;
+    })
+    .join('\n');
   const objects = [
     '<< /Type /Catalog /Pages 2 0 R >>',
     '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
@@ -27,7 +33,10 @@ export function pdfPlaceholder(title, holder) {
   ];
   let out = '%PDF-1.4\n';
   const offsets = [];
-  objects.forEach((o, i) => { offsets.push(Buffer.byteLength(out)); out += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+  objects.forEach((o, i) => {
+    offsets.push(Buffer.byteLength(out));
+    out += `${i + 1} 0 obj\n${o}\nendobj\n`;
+  });
   const xref = Buffer.byteLength(out);
   out += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n${offsets.map((o) => `${String(o).padStart(10, '0')} 00000 n \n`).join('')}`;
   out += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;

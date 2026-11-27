@@ -33,7 +33,22 @@ import { resolve } from 'node:path';
 import { createInterface } from 'node:readline';
 
 import { shops } from './shops.mjs';
-import { seedSql, bannerSql, bannerPath, linkSql, removeSql, requiredDocsSql, documentSql, itemsOf, itemId, merchantId, photoPath, loginEmail, rid, KIND } from './sql.mjs';
+import {
+  seedSql,
+  bannerSql,
+  bannerPath,
+  linkSql,
+  removeSql,
+  requiredDocsSql,
+  documentSql,
+  itemsOf,
+  itemId,
+  merchantId,
+  photoPath,
+  loginEmail,
+  rid,
+  KIND,
+} from './sql.mjs';
 import { bridge, setUpShop } from './engine.mjs';
 import { pdfPlaceholder } from './pdf.mjs';
 
@@ -43,7 +58,10 @@ mkdirSync(local, { recursive: true });
 
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(`--${name}`);
-const option = (name) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : undefined; };
+const option = (name) => {
+  const i = args.indexOf(`--${name}`);
+  return i >= 0 ? args[i + 1] : undefined;
+};
 const target = option('target');
 if (!['local', 'live'].includes(target)) {
   console.error('Choose --target local or --target live.');
@@ -64,9 +82,31 @@ function runSql(sql, { pw, tuples = false } = {}) {
     const input = readFileSync(file);
     const result =
       target === 'local'
-        ? spawnSync('docker', ['exec', '-i', process.env.REVIEW_DB_CONTAINER ?? 'supabase_db_nexg-review', 'psql', '-U', 'postgres', ...flags, ...vars], { input, encoding: 'utf8' })
-        : spawnSync(process.env.REVIEW_BASH ?? 'bash', [process.env.REVIEW_PROD_SQL ?? resolve(root, 'scripts/query-production.sh'), ...flags, ...vars], { input, encoding: 'utf8', cwd: root });
-    if (result.status !== 0 || /ERROR:/.test(result.stderr ?? '')) throw new Error((result.stderr || result.stdout || '').trim().slice(0, 2000));
+        ? spawnSync(
+            'docker',
+            [
+              'exec',
+              '-i',
+              process.env.REVIEW_DB_CONTAINER ?? 'supabase_db_nexg-review',
+              'psql',
+              '-U',
+              'postgres',
+              ...flags,
+              ...vars,
+            ],
+            { input, encoding: 'utf8' },
+          )
+        : spawnSync(
+            process.env.REVIEW_BASH ?? 'bash',
+            [
+              process.env.REVIEW_PROD_SQL ?? resolve(root, 'scripts/query-production.sh'),
+              ...flags,
+              ...vars,
+            ],
+            { input, encoding: 'utf8', cwd: root },
+          );
+    if (result.status !== 0 || /ERROR:/.test(result.stderr ?? ''))
+      throw new Error((result.stderr || result.stdout || '').trim().slice(0, 2000));
     return result.stdout;
   } finally {
     rmSync(file, { force: true });
@@ -78,19 +118,31 @@ async function askPassword() {
   // git-ignored file on this computer for the owner to open. It is not printed.
   if (flag('generate-password')) {
     const file = resolve(local, `review-portal-logins-${target}.txt`);
-    const pw = existsSync(file) ? readFileSync(file, 'utf8').match(/^Password: (.+)$/m)?.[1] : undefined;
+    const pw = existsSync(file)
+      ? readFileSync(file, 'utf8').match(/^Password: (.+)$/m)?.[1]
+      : undefined;
     const chosen = pw ?? (await import('node:crypto')).randomBytes(15).toString('base64url');
-    const lines = ['NexG review merchant portal logins (' + target + ')', 'Password: ' + chosen, '', ...list.map((s) => s.name + ': ' + loginEmail(s))];
+    const lines = [
+      'NexG review merchant portal logins (' + target + ')',
+      'Password: ' + chosen,
+      '',
+      ...list.map((s) => s.name + ': ' + loginEmail(s)),
+    ];
     writeFileSync(file, lines.join('\n') + '\n', { mode: 0o600 });
     log(`Logins and password saved to ${file} (git-ignored, this computer only).`);
     return chosen;
   }
-  if (target === 'local' && existsSync(resolve(local, 'review-password'))) return readFileSync(resolve(local, 'review-password'), 'utf8').trim();
+  if (target === 'local' && existsSync(resolve(local, 'review-password')))
+    return readFileSync(resolve(local, 'review-password'), 'utf8').trim();
   const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
-  const muted = (q) => new Promise((done) => {
-    rl.question(q, (a) => { process.stdout.write('\n'); done(a); });
-    rl._writeToOutput = () => {};
-  });
+  const muted = (q) =>
+    new Promise((done) => {
+      rl.question(q, (a) => {
+        process.stdout.write('\n');
+        done(a);
+      });
+      rl._writeToOutput = () => {};
+    });
   process.stdout.write('Password for the review portal logins (not shown): ');
   const a = await muted('');
   process.stdout.write('Again, to be sure: ');
@@ -121,13 +173,21 @@ async function fetchRetry(url, init) {
 // URL and its public (anon) key are used.
 function storageAccess() {
   if (target === 'live') {
-    const url = process.env.SUPABASE_URL, anon = process.env.SUPABASE_ANON_KEY;
-    if (!url || !anon) throw new Error('Set SUPABASE_URL and SUPABASE_ANON_KEY (the public key) for the uploads, or pass --skip-files.');
+    const url = process.env.SUPABASE_URL,
+      anon = process.env.SUPABASE_ANON_KEY;
+    if (!url || !anon)
+      throw new Error(
+        'Set SUPABASE_URL and SUPABASE_ANON_KEY (the public key) for the uploads, or pass --skip-files.',
+      );
     return { url, anon };
   }
   const workdir = process.env.REVIEW_SUPABASE_WORKDIR;
-  if (!workdir) throw new Error('Set REVIEW_SUPABASE_WORKDIR (the folder `supabase start` ran in).');
-  const env = execFileSync(process.env.SUPABASE_CLI ?? 'supabase', ['status', '-o', 'env'], { cwd: workdir, encoding: 'utf8' });
+  if (!workdir)
+    throw new Error('Set REVIEW_SUPABASE_WORKDIR (the folder `supabase start` ran in).');
+  const env = execFileSync(process.env.SUPABASE_CLI ?? 'supabase', ['status', '-o', 'env'], {
+    cwd: workdir,
+    encoding: 'utf8',
+  });
   const read = (name) => env.match(new RegExp('^' + name + '="?([^"\n]+)"?', 'm'))?.[1];
   return { url: read('API_URL'), anon: read('ANON_KEY') };
 }
@@ -139,7 +199,8 @@ async function signIn({ url, anon }, shop, pw) {
     body: JSON.stringify({ email: loginEmail(shop), password: pw }),
   });
   const j = await r.json();
-  if (!r.ok || !j.access_token) throw new Error(shop.name + ': could not sign in (' + r.status + ')');
+  if (!r.ok || !j.access_token)
+    throw new Error(shop.name + ': could not sign in (' + r.status + ')');
   return { url, anon, token: j.access_token };
 }
 
@@ -147,13 +208,20 @@ async function signIn({ url, anon }, shop, pw) {
 async function upload(session, bucket, path, bytes, type) {
   const response = await fetchRetry(session.url + '/storage/v1/object/' + bucket + '/' + path, {
     method: 'POST',
-    headers: { authorization: 'Bearer ' + session.token, apikey: session.anon, 'content-type': type, 'cache-control': 'max-age=31536000' },
+    headers: {
+      authorization: 'Bearer ' + session.token,
+      apikey: session.anon,
+      'content-type': type,
+      'cache-control': 'max-age=31536000',
+    },
     body: bytes,
   });
   if (response.ok) return;
   const text = await response.text();
   if (/exists|duplicate/i.test(text)) return;
-  throw new Error('upload ' + bucket + '/' + path + ': ' + response.status + ' ' + text.slice(0, 200));
+  throw new Error(
+    'upload ' + bucket + '/' + path + ': ' + response.status + ' ' + text.slice(0, 200),
+  );
 }
 
 async function uploadFiles(storage, pw) {
@@ -164,12 +232,17 @@ async function uploadFiles(storage, pw) {
     if (!p) throw new Error('No photo for ' + key);
     if (!cache.has(p.url)) {
       const r = await fetchRetry(p.url);
-      if (!r.ok || !String(r.headers.get('content-type')).startsWith('image/')) throw new Error('photo ' + key + ': ' + r.status);
+      if (!r.ok || !String(r.headers.get('content-type')).startsWith('image/'))
+        throw new Error('photo ' + key + ': ' + r.status);
       cache.set(p.url, Buffer.from(await r.arrayBuffer()));
     }
     return cache.get(p.url);
   };
-  const rows = runSql(requiredDocsSql(), { tuples: true }).trim().split('\n').filter(Boolean).map((l) => JSON.parse(l));
+  const rows = runSql(requiredDocsSql(), { tuples: true })
+    .trim()
+    .split('\n')
+    .filter(Boolean)
+    .map((l) => JSON.parse(l));
   const docsOf = new Map(rows.map((r) => [r.merchant, r.docs]));
   const banners = [];
   let docSql = '\\set ON_ERROR_STOP on\nbegin;\n';
@@ -177,7 +250,14 @@ async function uploadFiles(storage, pw) {
   for (const s of list) {
     const session = await signIn(storage, s, pw);
     const items = itemsOf(s);
-    for (const it of items) await upload(session, 'catalogue-images', photoPath(s, it), await image(it.photo), 'image/jpeg');
+    for (const it of items)
+      await upload(
+        session,
+        'catalogue-images',
+        photoPath(s, it),
+        await image(it.photo),
+        'image/jpeg',
+      );
     // A banner for the shop page: the photo of its first "Popular" item.
     const pick = items.find((i) => i.popular) ?? items[0];
     await upload(session, 'merchant-brand', bannerPath(s), await image(pick.photo), 'image/jpeg');
@@ -196,7 +276,15 @@ async function uploadFiles(storage, pw) {
   }
   runSql(bannerSql(storage.url, banners));
   runSql(docSql + 'commit;');
-  log('Photos: ' + cache.size + ' images for ' + list.reduce((a, s) => a + itemsOf(s).length, 0) + ' items, and ' + banners.length + ' shop banners.');
+  log(
+    'Photos: ' +
+      cache.size +
+      ' images for ' +
+      list.reduce((a, s) => a + itemsOf(s).length, 0) +
+      ' items, and ' +
+      banners.length +
+      ' shop banners.',
+  );
   log('Documents: ' + docCount + ' placeholder documents, verified.');
 }
 
@@ -206,7 +294,9 @@ async function main() {
   if (flag('remove')) {
     runSql(removeSql());
     log('Removed the review merchants and their logins from the database.');
-    log('Their booking-engine setups stay in the engine, unpublished from the app because the merchants are gone.');
+    log(
+      'Their booking-engine setups stay in the engine, unpublished from the app because the merchants are gone.',
+    );
     return;
   }
   const pw = await askPassword();
@@ -223,12 +313,20 @@ async function main() {
     runSql(linkSql(links));
     log(`Bookings: ${links.length} items linked to their booking offerings.`);
   } else if (!flag('skip-engine')) {
-    const service = process.env.BOOKING_ENGINE_URL ?? (target === 'local' ? 'http://127.0.0.1:3013' : undefined);
-    const secret = process.env.BOOKING_BRIDGE_SECRET ?? (target === 'local' ? readFileSync(resolve(local, 'bridge-secret'), 'utf8').trim() : undefined);
-    if (!service || !secret) throw new Error('Set BOOKING_ENGINE_URL and BOOKING_BRIDGE_SECRET, or pass --skip-engine.');
+    const service =
+      process.env.BOOKING_ENGINE_URL ?? (target === 'local' ? 'http://127.0.0.1:3013' : undefined);
+    const secret =
+      process.env.BOOKING_BRIDGE_SECRET ??
+      (target === 'local'
+        ? readFileSync(resolve(local, 'bridge-secret'), 'utf8').trim()
+        : undefined);
+    if (!service || !secret)
+      throw new Error('Set BOOKING_ENGINE_URL and BOOKING_BRIDGE_SECRET, or pass --skip-engine.');
     const links = [];
     for (const s of list) {
-      const items = itemsOf(s).filter((i) => i.engine).map((i) => ({ ...i, id: itemId(s, i) }));
+      const items = itemsOf(s)
+        .filter((i) => i.engine)
+        .map((i) => ({ ...i, id: itemId(s, i) }));
       if (!items.length) continue;
       log(`Bookings: ${s.name}`);
       links.push(...(await setUpShop(bridge(service, secret, merchantId(s)), s, items, log)));

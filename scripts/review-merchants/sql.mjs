@@ -9,8 +9,23 @@ import { shops } from './shops.mjs';
 
 const hex = (n, width) => n.toString(16).padStart(width, '0');
 /** ae7e<kind>-00<shop>-4000-8000-<n> : kind is one hex digit per table. */
-export const rid = (kind, shop, n = 0) => `ae7e000${kind}-00${hex(shop, 2)}-4000-8000-${hex(n, 12)}`;
-export const KIND = { user: 1, merchant: 2, branch: 3, section: 4, item: 5, group: 6, option: 7, attribute: 8, value: 9, variant: 'a', promotion: 'b', document: 'c', connection: 'd' };
+export const rid = (kind, shop, n = 0) =>
+  `ae7e000${kind}-00${hex(shop, 2)}-4000-8000-${hex(n, 12)}`;
+export const KIND = {
+  user: 1,
+  merchant: 2,
+  branch: 3,
+  section: 4,
+  item: 5,
+  group: 6,
+  option: 7,
+  attribute: 8,
+  value: 9,
+  variant: 'a',
+  promotion: 'b',
+  document: 'c',
+  connection: 'd',
+};
 export const merchantId = (s) => rid(KIND.merchant, s.n);
 export const userId = (s) => rid(KIND.user, s.n);
 export const loginEmail = (s) => `${s.slug}@partners.nexgapp.com`;
@@ -24,7 +39,9 @@ const arr = (xs) => `array[${xs.map(q).join(', ')}]::text[]`;
 /** Every item of a shop with its stable number (1-based, in file order). */
 export function itemsOf(shop) {
   let n = 0;
-  return shop.sections.flatMap((section, si) => section.items.map((item) => ({ ...item, n: ++n, sectionIndex: si })));
+  return shop.sections.flatMap((section, si) =>
+    section.items.map((item) => ({ ...item, n: ++n, sectionIndex: si })),
+  );
 }
 export const itemId = (shop, item) => rid(KIND.item, shop.n, item.n);
 // Where the portal itself puts an item photo: catalogue-images/<merchant>/<opaque id>.<ext>
@@ -171,7 +188,10 @@ on conflict (id) do update set name = excluded.name;`);
     );
   });
   // Every combination of the attribute values.
-  const combos = valueIds.reduce((acc, vals) => acc.flatMap((c) => vals.map((v) => [...c, v])), [[]]);
+  const combos = valueIds.reduce(
+    (acc, vals) => acc.flatMap((c) => vals.map((v) => [...c, v])),
+    [[]],
+  );
   combos.forEach((combo, ci) => {
     const names = combo.map(([v]) => v);
     const soldOut = (it.variants.soldOut ?? []).some((so) => so.every((v, i) => names[i] === v));
@@ -266,8 +286,10 @@ end $f$;`;
 
 /** The banner as a public URL, which is how rpc_merchant_set_brand_image stores it. */
 export function bannerSql(base, rows) {
-  const updates = rows.map(({ id, path }) =>
-    `update public.merchant set cover_photo_path = ${q(`${base}/storage/v1/object/public/merchant-brand/${path}`)} where id = ${q(id)};`);
+  const updates = rows.map(
+    ({ id, path }) =>
+      `update public.merchant set cover_photo_path = ${q(`${base}/storage/v1/object/public/merchant-brand/${path}`)} where id = ${q(id)};`,
+  );
   return ['\\set ON_ERROR_STOP on', 'begin;', ...updates, 'commit;'].join('\n');
 }
 
