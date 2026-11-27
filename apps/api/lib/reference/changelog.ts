@@ -16,7 +16,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     body: [
       'POST /v1/reservations records a booking your team took by phone or at the desk, so NexG’s calendar holds the time. POST /v1/reservations/{id}/reschedule moves one before it starts; /start and /complete mark the trip begun and done; /cancel cancels one before it starts, and when the customer has paid, NexG refunds them in full (refund_state review_required). POST /v1/reservations/check-in checks the code a customer shows.',
       'POST /v1/offerings and POST /v1/resources add offerings and vehicles, rooms or guides on NexG’s standard terms.',
-      'A transfer now carries the customer’s flight number in trip.flight_number, and the driver has a location field for where they are.',
+      'A transfer now carries the customer’s flight number in trip.flight_number. PUT /v1/reservations/{id}/driver/location shares where the driver is, and the customer follows it on their booking while the trip is on; it shows in driver.location.',
       'A test key now tries changes to offerings and resources as dry runs: every rule is checked against your real setup and the answer shows the change as it would be, with applied false, but nothing is saved and no event is sent. Live answers carry applied true.',
     ],
     endpoints: [
@@ -28,6 +28,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'cancel-reservation',
       'create-offering',
       'create-resource',
+      'share-driver-location',
     ],
   },
   {

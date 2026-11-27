@@ -878,6 +878,21 @@ export const ReservationDriverRequest = z
 
 export type ReservationDriverRequest = z.infer<typeof ReservationDriverRequest>;
 
+/**
+ * PUT /v1/reservations/{id}/driver/location: where the driver is now, for the
+ * customer to follow. `at` is when the driver was there (default now), at
+ * most 30 minutes ago.
+ */
+export const DriverLocationRequest = z
+  .object({
+    latitude: z.number().min(-90).max(90),
+    longitude: z.number().min(-180).max(180),
+    at: z.string().datetime({ offset: true }).optional(),
+  })
+  .strict();
+
+export type DriverLocationRequest = z.infer<typeof DriverLocationRequest>;
+
 /** POST /v1/reservations/{id}/reschedule: another time, before it starts. */
 export const ReservationReschedule = z
   .object({

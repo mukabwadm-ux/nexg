@@ -99,6 +99,11 @@ const reservableQuote = (n: Doc | undefined) =>
 const CUSTODY_MODELS = new Set(['ASSET_INTERVAL', 'STORAGE', 'SPACE_RESERVATION']);
 const KINDS = new Set(['staff', 'asset', 'vehicle', 'room', 'space', 'equipment', 'capacity_pool']);
 const BLOCKING = new Set(['held', 'confirmed']);
+/** A driver's position is shown while under 30 minutes old: after that it misleads. */
+const DRIVER_POSITION_FRESH_MS = 30 * 60_000;
+/** Positions are deleted once a day old. */
+const DRIVER_POSITION_KEEP_MS = 24 * 60 * 60_000;
+type DriverPosition = { latitude: number; longitude: number; at: string };
 const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const hash = (s: string) => createHash('sha256').update(s).digest('hex');
 /**
@@ -2652,7 +2657,158 @@ export class BookingEngine {
   async customerBooking(identity: Identity, id: string, token: string | undefined) {
     const { doc } = await this.locateBooking(identity, id, this.request(identity));
     this.assertCustomerToken(doc, token);
-    return this.bookingView(doc, 'customer');
+    const positions = await this.driverPositions(identity, [doc]);
+    return this.withPosition(
+      this.bookingView(doc, 'customer'),
+      positions.get(String(doc.publicId)),
+    );
+  }
+  /**
+   * Where the drivers of these bookings are, for those still confirmed (or
+   * under way) with a driver and a position under 30 minutes old.
+   */
+  private async driverPositions(
+    identity: Identity,
+    docs: Doc[],
+    req?: any,
+  ): Promise<Map<string, DriverPosition>> {
+    const ids = docs
+      .filter((doc) => doc.status === 'confirmed' && doc.nexg?.driver && !doc.nexg?.recordRole)
+      .map((doc) => String(doc.publicId));
+    const found = new Map<string, DriverPosition>();
+    if (!ids.length) return found;
+    const r = await this.payload.find({
+      collection: 'driver-locations' as any,
+      where: {
+        and: [{ businessId: { equals: identity.businessId } }, { reservationId: { in: ids } }],
+      },
+      limit: ids.length,
+      depth: 0,
+      overrideAccess: false,
+      req: req ?? this.request(identity),
+    } as any);
+    const oldest = this.clock() - DRIVER_POSITION_FRESH_MS;
+    for (const position of r.docs as Doc[]) {
+      const at = Date.parse(position.observedAt);
+      if (Number.isFinite(at) && at >= oldest)
+        found.set(String(position.reservationId), {
+          latitude: Number(position.latitude),
+          longitude: Number(position.longitude),
+          at: new Date(at).toISOString(),
+        });
+    }
+    return found;
+  }
+  /** The view with the driver's position on its driver, when there is one to show. */
+  private withPosition(view: Doc, position: DriverPosition | undefined): Doc {
+    return position && view.driver && typeof view.driver === 'object'
+      ? { ...view, driver: { ...view.driver, location: position } }
+      : view;
+  }
+  /**
+   * NexG's API (PUT /v1/reservations/{id}/driver/location): where the
+   * reservation's driver is now, from the business's own system. Kept apart
+   * from the booking, so it changes no version, sends no event and never races
+   * a change to the booking. Taken only while the booking is confirmed or under
+   * way and has a driver; shown while under 30 minutes old; deleted once a day
+   * old or when the driver changes.
+   */
+  async saveDriverPosition(
+    identity: Identity,
+    id: string,
+    input: { latitude: number; longitude: number; at?: string },
+  ): Promise<ApiReservation> {
+    requirePlatform(identity);
+    if (typeof id !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(id))
+      throw new BookingError(404, 'This record was not found.', 'not_found');
+    const { latitude, longitude } = input;
+    if (
+      typeof latitude !== 'number' ||
+      typeof longitude !== 'number' ||
+      !(Math.abs(latitude) <= 90) ||
+      !(Math.abs(longitude) <= 180)
+    )
+      throw new BookingError(
+        422,
+        'Send latitude (-90 to 90) and longitude (-180 to 180) as numbers.',
+        'invalid_location',
+      );
+    const now = this.clock();
+    const observedAt = input.at === undefined ? now : Date.parse(input.at);
+    if (
+      !Number.isFinite(observedAt) ||
+      observedAt > now + 120_000 ||
+      observedAt < now - DRIVER_POSITION_FRESH_MS
+    )
+      throw new BookingError(
+        422,
+        'at is when the driver was there: a time in the last 30 minutes.',
+        'invalid_location',
+      );
+    return this.transaction(identity, async (req) => {
+      const doc = await this.own('reservations', id, identity, req);
+      if (doc.nexg?.recordRole)
+        throw new BookingError(404, 'This record was not found.', 'not_found');
+      if (!doc.nexg?.driver)
+        throw new BookingError(409, 'Set a driver on this reservation first.', 'driver_required');
+      if (doc.status !== 'confirmed')
+        throw new BookingError(
+          409,
+          'A driver’s location is shared only while the booking is confirmed or under way.',
+          'reservation_not_active',
+        );
+      const found = await this.payload.find({
+        collection: 'driver-locations' as any,
+        where: {
+          and: [{ businessId: { equals: identity.businessId } }, { reservationId: { equals: id } }],
+        },
+        limit: 1,
+        depth: 0,
+        overrideAccess: false,
+        req,
+      } as any);
+      const data = {
+        reservationId: id,
+        latitude,
+        longitude,
+        observedAt: new Date(observedAt).toISOString(),
+      };
+      const kept = found.docs[0] as Doc | undefined;
+      // Updates can arrive out of order: an older position never replaces a newer one.
+      if (!kept) await this.create('driver-locations', data, identity, req);
+      else if (Date.parse(kept.observedAt) <= observedAt)
+        await this.update('driver-locations', kept.id, data, identity, req);
+      await this.payload.delete({
+        collection: 'driver-locations' as any,
+        where: {
+          and: [
+            { businessId: { equals: identity.businessId } },
+            { observedAt: { less_than: new Date(now - DRIVER_POSITION_KEEP_MS).toISOString() } },
+          ],
+        },
+        depth: 0,
+        overrideAccess: false,
+        req,
+      } as any);
+      const positions = await this.driverPositions(identity, [doc], req);
+      return apiReservation(
+        this.withPosition(this.bookingView(doc), positions.get(id)),
+        doc,
+        'reservations',
+      );
+    });
+  }
+  /** The driver changed or left: forget where the last one was. */
+  async forgetDriverPosition(identity: Identity, id: string, req: any) {
+    await this.payload.delete({
+      collection: 'driver-locations' as any,
+      where: {
+        and: [{ businessId: { equals: identity.businessId } }, { reservationId: { equals: id } }],
+      },
+      depth: 0,
+      overrideAccess: false,
+      req,
+    } as any);
   }
   /**
    * NexG's API (GET /v1/reservations/{id}): one of the platform identity's
@@ -2666,8 +2822,9 @@ export class BookingEngine {
     const { collection, doc } = await this.locateBooking(identity, id, this.request(identity));
     if (doc.nexg?.recordRole)
       throw new BookingError(404, 'This record was not found.', 'not_found');
+    const positions = await this.driverPositions(identity, [doc]);
     return apiReservation(
-      this.bookingView(doc),
+      this.withPosition(this.bookingView(doc), positions.get(String(doc.publicId))),
       doc,
       collection as 'reservations' | 'booking-requests',
     );
@@ -2682,10 +2839,21 @@ export class BookingEngine {
     const items = [
       ...reservations.map((doc) => ({ doc, collection: 'reservations' as const })),
       ...requests.map((doc) => ({ doc, collection: 'booking-requests' as const })),
-    ]
-      .filter(({ doc }) => !doc.nexg?.recordRole)
-      .map(({ doc, collection }) => apiReservation(this.bookingView(doc), doc, collection));
-    return reservationPage(items, options);
+    ].filter(({ doc }) => !doc.nexg?.recordRole);
+    const positions = await this.driverPositions(
+      identity,
+      items.map(({ doc }) => doc),
+    );
+    return reservationPage(
+      items.map(({ doc, collection }) =>
+        apiReservation(
+          this.withPosition(this.bookingView(doc), positions.get(String(doc.publicId))),
+          doc,
+          collection,
+        ),
+      ),
+      options,
+    );
   }
   private assertCustomerToken(doc: Doc, token: string | undefined) {
     const expected = doc.nexg?.customerTokenHash;

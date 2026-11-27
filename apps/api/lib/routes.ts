@@ -37,6 +37,7 @@ export const V1_ROUTES: readonly V1Route[] = [
   { path: '/v1/reservations/{id}/complete', methods: ['POST'] },
   { path: '/v1/reservations/{id}/decline', methods: ['POST'] },
   { path: '/v1/reservations/{id}/driver', methods: ['PUT'] },
+  { path: '/v1/reservations/{id}/driver/location', methods: ['PUT'] },
   { path: '/v1/reservations/{id}/reschedule', methods: ['POST'] },
   { path: '/v1/reservations/{id}/start', methods: ['POST'] },
   { path: '/v1/resources', methods: ['GET', 'POST'] },

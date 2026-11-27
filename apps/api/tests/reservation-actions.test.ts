@@ -17,6 +17,7 @@ vi.mock('@supabase/supabase-js', () => ({ createClient }));
 import { POST as accept } from '../app/v1/reservations/[id]/accept/route';
 import { POST as decline } from '../app/v1/reservations/[id]/decline/route';
 import { PUT as driver } from '../app/v1/reservations/[id]/driver/route';
+import { PUT as driverLocation } from '../app/v1/reservations/[id]/driver/location/route';
 import { POST as cancel } from '../app/v1/reservations/[id]/cancel/route';
 import { POST as checkIn } from '../app/v1/reservations/check-in/route';
 import { POST as createReservation } from '../app/v1/reservations/route';
@@ -266,6 +267,50 @@ describe('reservation actions with a live key', () => {
     expect((await res.json()).data.reservation.driver).toBeNull();
     expect(engineCall().method).toBe('PUT');
     expect(engineCall().url).toBe(`${ENGINE}/v1/platform/reservations/${ID}/driver`);
+  });
+
+  it('shares where the driver is, without an Idempotency-Key', async () => {
+    const location = { latitude: -1.3192, longitude: 36.9278, at: '2026-11-28T03:21:30.000Z' };
+    engineAnswers(200, {
+      ...RESERVATION,
+      driver: {
+        first_name: 'Juma',
+        vehicle: 'White Toyota Noah',
+        plate: 'KDA 123A',
+        assigned_at: '2026-11-28T02:40:00.000Z',
+        location,
+      },
+    });
+    const position = { latitude: -1.3192, longitude: 36.9278, at: '2026-11-28T06:21:30+03:00' };
+
+    const res = await driverLocation(
+      new Request(`https://api.test/v1/reservations/${ID}/driver/location`, {
+        method: 'PUT',
+        headers: { 'x-api-key': 'k', 'content-type': 'application/json' },
+        body: JSON.stringify(position),
+      }),
+      { params: { id: ID } },
+    );
+
+    expect(res.status).toBe(200);
+    expect((await res.json()).data.reservation.driver.location).toEqual(location);
+    expect(engineCall().method).toBe('PUT');
+    expect(engineCall().url).toBe(`${ENGINE}/v1/platform/reservations/${ID}/driver/location`);
+    expect(engineCall().body).toEqual(position);
+  });
+
+  it('refuses a position out of range, an extra field, and a test key', async () => {
+    const put = (body: unknown) =>
+      driverLocation(send('PUT', `/v1/reservations/${ID}/driver/location`, body), {
+        params: { id: ID },
+      });
+    expect((await put({ latitude: 91, longitude: 36.9 })).status).toBe(400);
+    expect((await put({ latitude: -1.3, longitude: 36.9, phone: '+254700000000' })).status).toBe(
+      400,
+    );
+    keys({ ...KEY, environment: 'test' });
+    expect((await put({ latitude: -1.3, longitude: 36.9 })).status).toBe(403);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
 

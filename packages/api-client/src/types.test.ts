@@ -23,6 +23,7 @@ it('matches the schemas the API uses', () => {
   expectTypeOf<T.ApiResource>().toEqualTypeOf<C.ApiResource>();
   expectTypeOf<T.ClosureRequest>().toEqualTypeOf<C.ClosureRequest>();
   expectTypeOf<T.DepartureRequest>().toEqualTypeOf<C.DepartureRequest>();
+  expectTypeOf<T.DriverLocationRequest>().toEqualTypeOf<C.DriverLocationRequest>();
   expectTypeOf<T.OfferingCreate>().toEqualTypeOf<C.OfferingCreate>();
   expectTypeOf<T.OfferingUpdate>().toEqualTypeOf<C.OfferingUpdate>();
   expectTypeOf<T.ReservationCreate>().toEqualTypeOf<z.input<typeof C.ReservationCreate>>();

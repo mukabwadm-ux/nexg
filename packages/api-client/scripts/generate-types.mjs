@@ -27,6 +27,7 @@ const TYPES = {
   ApiResource: 'C.ApiResource',
   ClosureRequest: 'C.ClosureRequest',
   DepartureRequest: 'C.DepartureRequest',
+  DriverLocationRequest: 'C.DriverLocationRequest',
   OfferingCreate: 'C.OfferingCreate',
   OfferingUpdate: 'C.OfferingUpdate',
   ReservationCreate: 'z.input<typeof C.ReservationCreate>',

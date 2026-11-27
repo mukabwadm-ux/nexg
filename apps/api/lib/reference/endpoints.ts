@@ -2464,6 +2464,98 @@ export const ENDPOINTS: EndpointDoc[] = [
     source: 'apps/api/app/v1/reservations/[id]/driver/route.ts',
   },
   {
+    slug: 'share-driver-location',
+    method: 'PUT',
+    host: 'api',
+    path: '/v1/reservations/{id}/driver/location',
+    status: 'live',
+    group: 'Reservations',
+    title: 'Share where the driver is',
+    summary:
+      'Let the customer follow the driver on their booking, the way NexG riders show theirs.',
+    description: [
+      'Send the driver’s position as often as your system has it, every 10 to 30 seconds while they drive. The customer sees it on their booking, with the time it was taken, while the booking is confirmed or under way and the position is under 30 minutes old.',
+      'Set the driver first. A position changes no version and sends no event, so it never clashes with your other changes; a position older than the one NexG holds is ignored. A new driver starts with none, and NexG deletes positions once a day old.',
+    ],
+    auth: { kind: 'key', scope: 'merchant_write', merchantBound: true },
+    rateCost: 1,
+    cache: 'no-store',
+    paginated: false,
+    params: [
+      {
+        name: 'id',
+        in: 'path',
+        type: 'string',
+        required: true,
+        description: 'The reservation’s id.',
+      },
+      keyHeader('merchant_write', 'A live key: test reservations do not take a location yet.'),
+    ],
+    example: {
+      path: { id: SAMPLE_RESERVATION.id },
+      body: { latitude: -1.3192, longitude: 36.9278, at: '2026-12-04T06:21:30+03:00' },
+    },
+    requestResources: [
+      {
+        title: 'Position',
+        at: 'body',
+        fields: [
+          { name: 'latitude', type: 'number', description: 'From -90 to 90.' },
+          { name: 'longitude', type: 'number', description: 'From -180 to 180.' },
+          {
+            name: 'at',
+            type: 'string',
+            nullable: true,
+            description:
+              'When the driver was there, with its offset. At most 30 minutes ago; leave it out for now.',
+          },
+        ],
+      },
+    ],
+    responseStatus: '200 OK',
+    responseExample: {
+      ok: true,
+      data: {
+        reservation: {
+          ...SAMPLE_RESERVATION,
+          driver: {
+            first_name: 'Juma',
+            vehicle: 'White Toyota Noah',
+            plate: 'KDA 123A',
+            assigned_at: '2026-12-04T05:40:00.000Z',
+            location: { latitude: -1.3192, longitude: 36.9278, at: '2026-12-04T03:21:30.000Z' },
+          },
+        },
+      },
+      meta: { api_version: 'v1' },
+    },
+    responseResources: RESERVATION_RESOURCES,
+    errors: [
+      ...credentialErrors('merchant_write', false),
+      {
+        status: 400,
+        code: 'invalid_request',
+        when: 'A coordinate is out of range, at is more than 30 minutes ago, or the body has another field.',
+      },
+      {
+        status: 403,
+        code: 'not_found',
+        when: 'The key is a test key, or it is not bound to a merchant.',
+      },
+      { status: 404, code: 'not_found', when: 'Your merchant has no reservation with that id.' },
+      {
+        status: 409,
+        code: 'conflict',
+        when: 'The reservation has no driver yet, or it is not confirmed or under way.',
+      },
+      ...ENGINE_ERRORS,
+    ],
+    warning: ENGINE_WARNING,
+    knownIssues: ENGINE_ISSUES,
+    since: '2026-11-27',
+    source: 'apps/api/app/v1/reservations/[id]/driver/location/route.ts',
+  },
+  {
     slug: 'create-test-reservation',
     method: 'POST',
     host: 'api',

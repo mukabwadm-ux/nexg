@@ -15,7 +15,7 @@ import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import type { z } from 'zod';
 import { parse } from '@nexg/contracts';
-import { ApiReservation, IdempotencyKey } from '@nexg/contracts/api';
+import { ApiReservation, DriverLocationRequest, IdempotencyKey } from '@nexg/contracts/api';
 import type { Database } from '@nexg/db';
 
 import {
@@ -343,6 +343,56 @@ export async function reservationAction<S extends z.ZodTypeAny>(
       `/v1/platform/reservations/${encodeURIComponent(id)}/${action}`,
       credential,
       { body, idempotencyKey: key },
+    );
+  } catch (error) {
+    return engineUnavailable(error);
+  }
+  if (!result.ok) return engineRefusal(result, 'Reservation not found');
+  const reservation = checkReservation(result.body);
+  if (!reservation.success) {
+    return jsonError('internal_error', 'The reservation could not be read back.', {
+      detail: reservation.error.issues,
+    });
+  }
+  return answer({ reservation: reservation.data }, rate, credential);
+}
+
+/**
+ * PUT /v1/reservations/{id}/driver/location: where the driver is now, sent on
+ * to the engine, which keeps it apart from the booking (no version, no event)
+ * and shows it to the customer while the trip is on. A PUT sets the same
+ * position however often it is sent, so no Idempotency-Key is needed.
+ */
+export async function driverLocation(request: Request, id: string): Promise<Response> {
+  const auth = await authorize(
+    request,
+    'merchant_write',
+    'merchant_write',
+    'share where its drivers are',
+  );
+  if (auth instanceof Response) return auth;
+  const { credential, rate } = auth;
+  if (!ENGINE_ID.test(id)) {
+    return jsonError('invalid_request', 'Invalid reservation ID', {
+      fields: { id: 'A reservation id is the id from a reservation or a reservation event.' },
+    });
+  }
+  const body = await jsonBody(request, DriverLocationRequest);
+  if (body instanceof Response) return body;
+  if (credential.environment === 'test') {
+    return jsonError(
+      'not_found',
+      'Test reservations do not take a driver location yet. Use a live key.',
+      { status: 403 },
+    );
+  }
+  let result: EngineResult;
+  try {
+    result = await engineRequest(
+      'PUT',
+      `/v1/platform/reservations/${encodeURIComponent(id)}/driver/location`,
+      credential,
+      { body },
     );
   } catch (error) {
     return engineUnavailable(error);

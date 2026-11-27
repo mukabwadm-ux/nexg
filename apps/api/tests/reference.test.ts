@@ -29,6 +29,7 @@ import {
   ReservationCreate,
   ReservationDecline,
   ReservationDriverRequest,
+  DriverLocationRequest,
   ReservationReschedule,
   ReservationStart,
   ResourceCreate,
@@ -303,6 +304,7 @@ describe('the documented shapes match @nexg/contracts/api', () => {
       ['accept-reservation', ReservationAccept],
       ['decline-reservation', ReservationDecline],
       ['set-reservation-driver', ReservationDriverRequest],
+      ['share-driver-location', DriverLocationRequest],
       ['create-test-reservation', TestReservationRequest],
     ] as const;
     for (const [slug, request] of cases) {

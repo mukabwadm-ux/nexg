@@ -43,6 +43,7 @@ export type {
   BookingReceipt,
   ClosureRequest,
   DepartureRequest,
+  DriverLocationRequest,
   OfferingCreate,
   OfferingUpdate,
   ReservationCreate,

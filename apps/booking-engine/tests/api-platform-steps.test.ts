@@ -13,6 +13,8 @@ import {
   platformCreateOffering,
   platformCreateReservation,
   platformCreateResource,
+  platformDriver,
+  platformDriverLocation,
   platformReschedule,
   platformStart,
 } from '../src/api-platform.js';
@@ -285,5 +287,85 @@ test('a business runs its bookings from its own system', async (t) => {
     );
     assert.equal(booked.trip?.flight_number, 'KQ 101');
     assert.equal(booked.trip?.pickup_area, 'JKIA');
+  });
+
+  await t.test('lets the customer follow the driver while the trip is on', async () => {
+    const made = await paidBooking('2030-01-01T05:00:00+03:00', 'PSK-STEP-3');
+    const id = made.booking.id;
+    const where = { latitude: -1.3192, longitude: 36.9278, at: '2029-12-31T23:55:00Z' };
+    await assert.rejects(
+      platformDriverLocation(engine, platform, id, where),
+      refused(409, 'driver_required'),
+    );
+    const current = await engine.platformReservation(platform, id);
+    const assigned = await platformDriver(
+      engine,
+      platform,
+      id,
+      {
+        expected_version: current.version,
+        driver: { first_name: 'Juma', vehicle: 'White Toyota Noah', plate: 'KDA 123A' },
+      },
+      randomUUID(),
+    );
+    assert.equal(assigned.driver?.location, null);
+
+    const followed = await platformDriverLocation(engine, platform, id, where);
+    assert.deepEqual(followed.driver?.location, {
+      latitude: -1.3192,
+      longitude: 36.9278,
+      at: '2029-12-31T23:55:00.000Z',
+    });
+    assert.equal(followed.version, assigned.version, 'a position changes no version');
+    // An older position that arrives late never replaces a newer one.
+    await platformDriverLocation(engine, platform, id, {
+      latitude: -1.2,
+      longitude: 36.8,
+      at: '2029-12-31T23:50:00Z',
+    });
+    const seen = (await engine.customerBooking(guest, id, made.customerToken)) as any;
+    assert.deepEqual(seen.driver.location, followed.driver?.location);
+    assert.deepEqual(
+      (await engine.platformReservations(platform)).items.find((item) => item.id === id)?.driver
+        ?.location,
+      followed.driver?.location,
+    );
+
+    await assert.rejects(
+      platformDriverLocation(engine, platform, id, { ...where, at: '2029-12-31T23:00:00Z' }),
+      refused(422, 'invalid_location'),
+    );
+    await assert.rejects(
+      platformDriverLocation(engine, platform, id, { latitude: 91, longitude: 36.9 }),
+      refused(422, 'invalid_location'),
+    );
+    await assert.rejects(
+      platformDriverLocation(engine, platform, id, { ...where, phone: '+254700000000' }),
+      refused(422),
+    );
+
+    // A new driver starts with no position; a cancelled booking takes none.
+    const changed = await platformDriver(
+      engine,
+      platform,
+      id,
+      {
+        expected_version: followed.version,
+        driver: { first_name: 'Otieno', vehicle: 'Silver Probox', plate: 'KDB 456B' },
+      },
+      randomUUID(),
+    );
+    assert.equal(changed.driver?.location, null);
+    const cancelled = await platformCancel(
+      engine,
+      platform,
+      id,
+      { expected_version: changed.version, reason: 'The flight was cancelled.' },
+      randomUUID(),
+    );
+    await assert.rejects(
+      platformDriverLocation(engine, platform, cancelled.id, where),
+      refused(409, 'reservation_not_active'),
+    );
   });
 });

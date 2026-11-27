@@ -187,7 +187,14 @@ export interface BookingRecord {
   /** Why it was cancelled, as the business wrote it. */
   cancelReason?: string;
   /** Who is coming, as the business set it through the API: never a phone number. */
-  driver?: { firstName: string; vehicle: string; plate: string | null; assignedAt?: string } | null;
+  driver?: {
+    firstName: string;
+    vehicle: string;
+    plate: string | null;
+    assignedAt?: string;
+    /** Where the driver was last seen: under 30 minutes old, while the trip is on. */
+    location?: { latitude: number; longitude: number; at: string } | null;
+  } | null;
   paymentEvidence?: Array<{
     amountMinor: number;
     method: string;

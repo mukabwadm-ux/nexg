@@ -7,6 +7,7 @@ import type {
   ApiService,
   ClosureRequest,
   DepartureRequest,
+  DriverLocationRequest,
   OfferingCreate,
   OfferingUpdate,
   ReservationCreate,
@@ -395,6 +396,17 @@ export class NexgClient {
         `/v1/reservations/${encodeURIComponent(id)}/driver`,
         { expected_version: expectedVersion, driver },
         options,
+      ),
+    /**
+     * PUT /v1/reservations/{id}/driver/location: where the driver is now, for
+     * the customer to follow while the trip is on. Send it every 10 to 30
+     * seconds; setting the same position twice is harmless, so it is retried.
+     */
+    shareDriverLocation: (id: string, position: DriverLocationRequest) =>
+      this.call<{ reservation: ApiReservation }>(
+        'PUT',
+        `/v1/reservations/${encodeURIComponent(id)}/driver/location`,
+        { body: position, retry: 'safe' },
       ),
   };
 

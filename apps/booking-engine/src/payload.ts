@@ -159,6 +159,16 @@ export async function createPayload(
         { name: 'attempts', type: 'number', defaultValue: 0 },
         { name: 'lastError', type: 'text' },
       ]),
+      // Where a reservation's driver is, as the business's system last said
+      // (PUT /v1/reservations/{id}/driver/location on NexG's API): one row per
+      // reservation, overwritten by each update, kept at most a day. Apart from
+      // the booking, so a position never races a change to the booking itself.
+      collection('driver-locations', [
+        { name: 'reservationId', type: 'text', required: true, unique: true },
+        { name: 'latitude', type: 'number', required: true },
+        { name: 'longitude', type: 'number', required: true },
+        { name: 'observedAt', type: 'date', required: true, index: true },
+      ]),
       collection('booking-sessions', [
         { name: 'sessionKey', type: 'text', required: true, unique: true },
         { name: 'publicId', type: 'text', unique: true },

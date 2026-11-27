@@ -18,6 +18,7 @@ import {
   platformDecline,
   platformDeparture,
   platformDriver,
+  platformDriverLocation,
   platformOfferings,
   platformRemoveClosure,
   platformReschedule,
@@ -222,6 +223,18 @@ export function createBookingServer(engine: BookingEngine, secret: string) {
                 await platformDriver(engine, identity, id, await body(req), key),
               );
           }
+          const position = path.match(/^\/v1\/platform\/reservations\/([^/]+)\/driver\/location$/);
+          if (position && req.method === 'PUT')
+            return respond(
+              res,
+              200,
+              await platformDriverLocation(
+                engine,
+                identity,
+                decodeURIComponent(position[1]!),
+                await body(req),
+              ),
+            );
           if (path === '/v1/platform/offerings' && req.method === 'GET')
             return respond(res, 200, await platformOfferings(engine, identity));
           if (path === '/v1/platform/offerings' && req.method === 'POST')

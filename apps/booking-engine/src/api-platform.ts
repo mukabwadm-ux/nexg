@@ -615,6 +615,30 @@ export async function platformCreateResource(
 }
 
 /** PUT /v1/reservations/{id}/driver: who is coming, or null to clear it. */
+/**
+ * PUT /v1/reservations/{id}/driver/location: where the driver is now, for the
+ * customer to follow (BookingEngine.saveDriverPosition).
+ */
+export async function platformDriverLocation(
+  engine: BookingEngine,
+  identity: Identity,
+  id: string,
+  input: unknown,
+): Promise<ApiReservation> {
+  const body = fields(input, ['latitude', 'longitude', 'at'], ['latitude', 'longitude']);
+  if (body.at !== undefined && typeof body.at !== 'string')
+    throw new BookingError(
+      422,
+      'at is a time, such as 2030-01-02T09:41:00+03:00.',
+      'invalid_location',
+    );
+  return engine.saveDriverPosition(identity, id, {
+    latitude: body.latitude,
+    longitude: body.longitude,
+    ...(body.at !== undefined ? { at: body.at } : {}),
+  });
+}
+
 export async function platformDriver(
   engine: BookingEngine,
   identity: Identity,
@@ -658,6 +682,8 @@ export async function platformDriver(
       manager,
       req,
     );
+    // A new driver, or none: where the last one was no longer says anything.
+    await engine.forgetDriverPosition(manager, id, req);
     await c.audit(manager, req, driver ? 'booking.driver_assigned' : 'booking.driver_cleared', id, {
       version: current + 1,
     });

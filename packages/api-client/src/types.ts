@@ -281,6 +281,12 @@ export type DepartureRequest = {
   expected_departure_version?: number;
 };
 
+export type DriverLocationRequest = {
+  latitude: number;
+  longitude: number;
+  at?: string;
+};
+
 export type OfferingCreate = {
   name: string;
   /** TRANSFER, SESSION_CAPACITY, APPOINTMENT, ASSET_INTERVAL and others. */
