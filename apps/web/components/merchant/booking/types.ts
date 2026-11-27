@@ -182,6 +182,8 @@ export interface BookingRecord {
     dropoffArea?: string;
     dropoffAddress?: string;
   };
+  /** Who is coming, as the business set it through the API: never a phone number. */
+  driver?: { firstName: string; vehicle: string; plate: string | null; assignedAt?: string } | null;
   paymentEvidence?: Array<{
     amountMinor: number;
     method: string;

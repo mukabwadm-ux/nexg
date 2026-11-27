@@ -12,6 +12,29 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-27',
     kind: 'added',
+    title: 'Your booking setup and reservations, from your own system',
+    body: [
+      'Your system can now keep NexG in step. GET /v1/offerings and GET /v1/resources read what you sell and the vehicles, rooms and guides it uses, each with a version. PATCH /v1/offerings/{id} changes a price or stops new bookings, POST /v1/offerings/{id}/departures adds, changes or closes a tour’s departures, and POST /v1/resources/{id}/closures marks a vehicle busy (DELETE opens the time again). Each change needs the version you read and an Idempotency-Key.',
+      'POST /v1/reservations/{id}/accept confirms a waiting reservation and /decline declines one that is still unpaid. PUT /v1/reservations/{id}/driver tells the customer who is coming: first name, vehicle and plate, never a phone number. Reservations now carry driver.',
+      'Test keys get a sandbox: POST /v1/test/reservations makes a test reservation, POST /v1/test/reservations/{id}/status moves it, and accept, decline, driver and GET /v1/reservations work on it, with events to your test endpoints.',
+    ],
+    endpoints: [
+      'list-offerings',
+      'update-offering',
+      'add-departure',
+      'list-resources',
+      'close-resource',
+      'reopen-resource',
+      'accept-reservation',
+      'decline-reservation',
+      'set-reservation-driver',
+      'create-test-reservation',
+      'move-test-reservation',
+    ],
+  },
+  {
+    date: '2026-11-27',
+    kind: 'added',
     title: 'Reservations: tours, transfers, rentals and appointments',
     body: [
       'GET /v1/reservations lists what customers booked with your business on NexG and what your team entered in the calendar: tour seats, transfers, rentals, appointments, and requests waiting for you. They come oldest change first, and updated_after asks only for what changed since your last call. GET /v1/reservations/{id} reads one, with the name it is under, the trip’s pickup and drop-off, and the notes.',

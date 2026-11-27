@@ -695,6 +695,13 @@ export const RESERVATION_FIELDS: FieldDoc[] = [
     description: 'nexg: the customer booked on NexG. merchant: your team entered it.',
   },
   { name: 'created_at', type: 'timestamp', nullable: true, description: 'When it was booked.' },
+  {
+    name: 'driver',
+    type: 'object',
+    nullable: true,
+    description:
+      'Who is coming, once you set it with PUT /v1/reservations/{id}/driver: first name, vehicle and plate. The customer sees it on their booking.',
+  },
 ];
 
 export const RESERVATION_OFFERING_FIELDS: FieldDoc[] = [
@@ -724,6 +731,162 @@ export const RESERVATION_TRIP_FIELDS: FieldDoc[] = [
   { name: 'pickup_address', type: 'string', nullable: true, description: 'The pickup address.' },
   { name: 'dropoff_area', type: 'string', nullable: true, description: 'The drop-off area.' },
   { name: 'dropoff_address', type: 'string', nullable: true, description: 'The drop-off address.' },
+];
+
+export const RESERVATION_DRIVER_FIELDS: FieldDoc[] = [
+  {
+    name: 'first_name',
+    type: 'string',
+    description: 'The driver’s first name, shown to the customer. No surname, no phone number.',
+  },
+  { name: 'vehicle', type: 'string', description: 'The vehicle, for example White Toyota Noah.' },
+  {
+    name: 'plate',
+    type: 'string',
+    nullable: true,
+    description: 'The number plate, in capitals, so the customer finds the right car.',
+  },
+  {
+    name: 'assigned_at',
+    type: 'timestamp',
+    nullable: true,
+    description: 'When the driver was set.',
+  },
+];
+
+export const OFFERING_FIELDS: FieldDoc[] = [
+  {
+    name: 'id',
+    type: 'string',
+    description: 'The offering’s id, as reservations name it in offering.id.',
+  },
+  { name: 'name', type: 'string', nullable: true, description: 'Its name, as customers see it.' },
+  {
+    name: 'model',
+    type: 'string',
+    nullable: true,
+    description:
+      'How it is booked: TRANSFER, TOUR, SESSION_CAPACITY, APPOINTMENT, ASSET_INTERVAL (a rental) and others.',
+  },
+  { name: 'active', type: 'boolean', description: 'false: switched off and not shown.' },
+  {
+    name: 'booking_enabled',
+    type: 'boolean',
+    description: 'false: shown, but not taking new bookings.',
+  },
+  { name: 'currency', type: 'string', description: 'Always KES.' },
+  {
+    name: 'price_cents',
+    type: 'integer',
+    nullable: true,
+    description: 'The price in cents (KES 3,500 is 350000), per pricing_basis.',
+  },
+  {
+    name: 'pricing_basis',
+    type: 'string',
+    description: 'per_booking, per_quantity, per_duration, per_night or indicative.',
+  },
+  {
+    name: 'duration_minutes',
+    type: 'integer',
+    nullable: true,
+    description: 'How long one booking lasts, when it is fixed.',
+  },
+  {
+    name: 'capacity',
+    type: 'integer',
+    nullable: true,
+    description: 'Places per booking or session, where it has one.',
+  },
+  {
+    name: 'capacity_unit',
+    type: 'string',
+    nullable: true,
+    description: 'What capacity counts, for example place.',
+  },
+  {
+    name: 'resource_ids',
+    type: 'string[]',
+    description: 'The resources it books, from GET /v1/resources.',
+  },
+  {
+    name: 'version',
+    type: 'integer',
+    description: 'Send it back as expected_version when you change the offering or its departures.',
+  },
+  {
+    name: 'departures',
+    type: 'object[]',
+    description: 'For a tour or class: its departures that have not ended. Empty otherwise.',
+  },
+];
+
+export const DEPARTURE_FIELDS: FieldDoc[] = [
+  { name: 'id', type: 'string', description: 'The departure’s id, as departure_id.' },
+  { name: 'starts_at', type: 'timestamp', description: 'When it leaves or starts.' },
+  { name: 'ends_at', type: 'timestamp', description: 'When it ends.' },
+  { name: 'capacity', type: 'integer', description: 'Seats or places on it.' },
+  { name: 'published', type: 'boolean', description: 'false: closed to new bookings.' },
+  {
+    name: 'resource_ids',
+    type: 'string[]',
+    description: 'The guides, vehicles or places it uses.',
+  },
+  {
+    name: 'version',
+    type: 'integer',
+    description: 'Send it back as expected_departure_version when you change it.',
+  },
+];
+
+export const RESOURCE_FIELDS: FieldDoc[] = [
+  {
+    name: 'id',
+    type: 'string',
+    description: 'The resource’s id, as reservations name it in resource_ids.',
+  },
+  { name: 'name', type: 'string', nullable: true, description: 'Its name, for example Van one.' },
+  {
+    name: 'kind',
+    type: 'string',
+    nullable: true,
+    description: 'staff, asset, vehicle, room, space, equipment or capacity_pool.',
+  },
+  {
+    name: 'quantity',
+    type: 'integer',
+    nullable: true,
+    description: 'How many it holds: 1 for a vehicle or room, the places in a pool.',
+  },
+  { name: 'active', type: 'boolean', description: 'false: not in use.' },
+  {
+    name: 'schedule',
+    type: 'object',
+    nullable: true,
+    description: 'Its working days (0 is Sunday) and its start and end time, in Nairobi time.',
+  },
+  {
+    name: 'closures',
+    type: 'object[]',
+    description: 'Times it is closed that have not ended: busy elsewhere, maintenance, time off.',
+  },
+  {
+    name: 'version',
+    type: 'integer',
+    description: 'Send it back as expected_version when you add or remove a closure.',
+  },
+];
+
+export const CLOSURE_FIELDS: FieldDoc[] = [
+  { name: 'id', type: 'string', description: 'The closure’s id, to remove it.' },
+  { name: 'starts_at', type: 'timestamp', description: 'When it starts.' },
+  { name: 'ends_at', type: 'timestamp', description: 'When it ends.' },
+  {
+    name: 'reason',
+    type: 'string',
+    nullable: true,
+    description: 'Why, as your team wrote it. Customers never see it.',
+  },
 ];
 
 export const BOOKING_REQUEST_FIELDS: FieldDoc[] = [

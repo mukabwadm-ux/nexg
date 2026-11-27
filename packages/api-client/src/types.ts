@@ -64,6 +64,57 @@ export type ApiOrder = {
   } | null;
 };
 
+export type ApiClosure = {
+  id: string;
+  starts_at: string;
+  ends_at: string;
+  reason: string | null;
+};
+
+export type ApiDeparture = {
+  id: string;
+  starts_at: string;
+  ends_at: string;
+  version: number;
+  resource_ids: string[];
+  /** Seats or places on it. */
+  capacity: number;
+  /** false: closed, customers cannot book it. */
+  published: boolean;
+};
+
+export type ApiOffering = {
+  id: string;
+  name: string | null;
+  currency: 'KES';
+  /** false: switched off, not shown. */
+  active: boolean;
+  model: string | null;
+  /** Send it back as expected_version when you change the offering. */
+  version: number;
+  resource_ids: string[];
+  capacity_unit: string | null;
+  capacity: number | null;
+  /** false: shown, but not taking new bookings. */
+  booking_enabled: boolean;
+  price_cents: number | null;
+  /** per_booking, per_quantity, per_duration, per_night or indicative. */
+  pricing_basis: string;
+  duration_minutes: number | null;
+  /** Departures that have not ended, for tours and classes. Empty otherwise. */
+  departures: {
+    id: string;
+    starts_at: string;
+    ends_at: string;
+    version: number;
+    resource_ids: string[];
+    /** Seats or places on it. */
+    capacity: number;
+    /** false: closed, customers cannot book it. */
+    published: boolean;
+  }[];
+};
+
 export type ApiReservation = {
   id: string;
   /** requested, confirmed, in_progress, completed or cancelled. */
@@ -122,6 +173,22 @@ export type ApiReservation = {
   checked_in_at: string | null;
   /** `nexg`: the customer booked on NexG. `merchant`: the business entered it. */
   booked_on: 'nexg' | 'merchant';
+  /** Who is coming, once the business sets it. Null until then. */
+  driver: {
+    first_name: string;
+    /** For example `White Toyota Noah`. */
+    vehicle: string;
+    plate: string | null;
+    assigned_at: string | null;
+  } | null;
+};
+
+export type ApiReservationDriver = {
+  first_name: string;
+  /** For example `White Toyota Noah`. */
+  vehicle: string;
+  plate: string | null;
+  assigned_at: string | null;
 };
 
 export type ApiReservationSummary = {
@@ -147,6 +214,80 @@ export type ApiReservationSummary = {
   /** Goes up with every change, so an older copy can be told from a newer one. */
   version: number;
   updated_at: string | null;
+};
+
+export type ApiResource = {
+  id: string;
+  name: string | null;
+  quantity: number | null;
+  /** staff, asset, vehicle, room, space, equipment or capacity_pool. */
+  kind: string | null;
+  active: boolean;
+  /** Send it back as expected_version when you change the resource. */
+  version: number;
+  /** Weekdays (0 is Sunday) and the opening and closing time, in Nairobi time. */
+  schedule: {
+    days: number[];
+    start: string;
+    end: string;
+  } | null;
+  /** Closures that have not ended. */
+  closures: {
+    id: string;
+    starts_at: string;
+    ends_at: string;
+    reason: string | null;
+  }[];
+};
+
+export type ClosureRequest = {
+  starts_at: string;
+  ends_at: string;
+  /** Seen by the business only, for example `Booked on our own website`. */
+  reason: string;
+  expected_version: number;
+};
+
+export type DepartureRequest = {
+  starts_at: string;
+  ends_at: string;
+  capacity: number;
+  /** false closes it to new bookings. */
+  published: boolean;
+  /** The offering's version. */
+  expected_version: number;
+  resource_ids?: string[];
+  /** To change an existing departure. Leave it out to add one. */
+  departure_id?: string;
+  /** The departure's version, when changing one. */
+  expected_departure_version?: number;
+};
+
+export type OfferingUpdate = {
+  expected_version: number;
+  active?: boolean;
+  booking_enabled?: boolean;
+  price_cents?: number;
+};
+
+export type TestReservationRequest = {
+  starts_at?: string;
+  ends_at?: string;
+  quantity?: number;
+  /** Above 0, the test reservation waits for payment, as a customer booking does. */
+  total_cents?: number;
+  kind?: 'reservation' | 'request';
+  guest_name?: string;
+  trip?: {
+    pickup_area?: string | null;
+    pickup_address?: string | null;
+    dropoff_area?: string | null;
+    dropoff_address?: string | null;
+  };
+  notes?: string;
+  offering_name?: string;
+  /** For example TRANSFER (the default), TOUR or APPOINTMENT. */
+  offering_model?: string;
 };
 
 export type ApiService = {

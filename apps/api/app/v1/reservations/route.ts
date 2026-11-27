@@ -7,16 +7,24 @@
  * the last `updated_at` it saw for `updated_after` next time.
  *
  * - The key decides the merchant; the request never names one.
- * - A test key reads no reservations yet: the sandbox has none.
+ * - A test key reads its test reservations (POST /v1/test/reservations).
  * - Each item is checked against the contract before it is sent, so a field
  *   the engine adds by mistake never reaches a client.
  */
 import { NextResponse } from 'next/server';
 
-import { jsonError, parseQuery, withErrorEnvelope } from '@/lib/http';
+import {
+  decodeKeysetCursor,
+  encodeCursor,
+  invalidCursor,
+  jsonError,
+  parseQuery,
+  withErrorEnvelope,
+} from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
 import { privateHeaders } from '@/lib/cache';
 import { BookingEngineUnavailable, engineDetail, engineGet } from '@/lib/booking-engine';
+import { SANDBOX, checkReservation, sandbox, sandboxRefusal } from '@/lib/reservation-routes';
 import { ApiReservation, ReservationListRequest } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
@@ -58,7 +66,37 @@ export const GET = withErrorEnvelope(async (request: Request) => {
       { headers: privateHeaders(rate, credential) },
     );
 
-  if (credential.environment === 'test') return page([], null);
+  if (credential.environment === 'test') {
+    // A test key reads its sandbox reservations (POST /v1/test/reservations).
+    const after = cursor ? decodeKeysetCursor(cursor) : null;
+    if (cursor && !after) return invalidCursor();
+    const { data, error } = await sandbox().rpc(SANDBOX.read, {
+      p_api_key: credential.rawKey,
+      p_limit: limit,
+      p_cursor_updated_at: after?.at ?? null,
+      p_cursor_id: after?.id ?? null,
+      p_updated_after: updated_after ?? null,
+    });
+    if (error) return sandboxRefusal(error);
+    const result = (Array.isArray(data) ? data[0] : data) as {
+      items?: unknown;
+      next_cursor?: { updated_at: string; id: string } | null;
+    } | null;
+    const tested = Array.isArray(result?.items)
+      ? result.items.map((item) => ApiReservation.safeParse(item))
+      : null;
+    if (!tested || tested.some((entry) => !entry.success)) {
+      return jsonError('internal_error', 'The test reservations could not be read.', {
+        detail: tested?.find((entry) => !entry.success),
+      });
+    }
+    return page(
+      tested.map((entry) => (entry.success ? entry.data : null)),
+      result?.next_cursor
+        ? encodeCursor(result.next_cursor.updated_at, result.next_cursor.id)
+        : null,
+    );
+  }
 
   const search = new URLSearchParams({ limit: String(limit) });
   if (cursor) search.set('cursor', cursor);
@@ -104,7 +142,7 @@ export const GET = withErrorEnvelope(async (request: Request) => {
 
   const body = answer.body as { items?: unknown; next_cursor?: unknown } | null;
   const items = Array.isArray(body?.items) ? body.items : null;
-  const checked = items?.map((item) => ApiReservation.safeParse(item));
+  const checked = items?.map((item) => checkReservation(item));
   if (!checked || checked.some((result) => !result.success)) {
     return jsonError('internal_error', 'The reservations could not be read.', {
       detail: checked?.find((result) => !result.success),

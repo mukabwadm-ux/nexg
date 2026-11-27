@@ -648,6 +648,22 @@ export const ApiReservationTrip = z
 export type ApiReservationTrip = z.infer<typeof ApiReservationTrip>;
 
 /**
+ * Who is coming for a reservation, as the business set it: a first name, the
+ * vehicle and its plate. The customer sees it too. Never a phone number.
+ */
+export const ApiReservationDriver = z
+  .object({
+    first_name: z.string(),
+    /** For example `White Toyota Noah`. */
+    vehicle: z.string(),
+    plate: z.string().nullable(),
+    assigned_at: z.string().nullable(),
+  })
+  .strict();
+
+export type ApiReservationDriver = z.infer<typeof ApiReservationDriver>;
+
+/**
  * A reservation: a tour seat, a transfer, a rental, an appointment, or a
  * request waiting for the business, booked by a customer on NexG or entered
  * by the business itself. These live in NexG's booking engine, not among
@@ -684,9 +700,207 @@ export const ApiReservation = ApiReservationSummary.extend({
   /** `nexg`: the customer booked on NexG. `merchant`: the business entered it. */
   booked_on: z.enum(['nexg', 'merchant']),
   created_at: z.string().nullable(),
+  /** Who is coming, once the business sets it. Null until then. */
+  driver: ApiReservationDriver.nullable(),
 }).strict();
 
 export type ApiReservation = z.infer<typeof ApiReservation>;
+
+/** A dated departure or session of an offering: a tour's departure, a class. */
+export const ApiDeparture = z
+  .object({
+    id: z.string(),
+    starts_at: z.string(),
+    ends_at: z.string(),
+    /** Seats or places on it. */
+    capacity: z.number().int(),
+    /** false: closed, customers cannot book it. */
+    published: z.boolean(),
+    resource_ids: z.array(z.string()),
+    version: z.number().int(),
+  })
+  .strict();
+
+export type ApiDeparture = z.infer<typeof ApiDeparture>;
+
+/**
+ * Something the business sells as a booking: a transfer, a tour, a rental,
+ * an appointment. Its price is fixed into each booking when it is made.
+ */
+export const ApiOffering = z
+  .object({
+    id: z.string(),
+    name: z.string().nullable(),
+    model: z.string().nullable(),
+    /** false: switched off, not shown. */
+    active: z.boolean(),
+    /** false: shown, but not taking new bookings. */
+    booking_enabled: z.boolean(),
+    currency: z.literal('KES'),
+    price_cents: Money.nullable(),
+    /** per_booking, per_quantity, per_duration, per_night or indicative. */
+    pricing_basis: z.string(),
+    duration_minutes: z.number().int().nullable(),
+    capacity: z.number().int().nullable(),
+    capacity_unit: z.string().nullable(),
+    resource_ids: z.array(z.string()),
+    /** Send it back as expected_version when you change the offering. */
+    version: z.number().int(),
+    /** Departures that have not ended, for tours and classes. Empty otherwise. */
+    departures: z.array(ApiDeparture),
+  })
+  .strict();
+
+export type ApiOffering = z.infer<typeof ApiOffering>;
+
+/** A time a resource is closed: busy elsewhere, maintenance, time off. */
+export const ApiClosure = z
+  .object({
+    id: z.string(),
+    starts_at: z.string(),
+    ends_at: z.string(),
+    reason: z.string().nullable(),
+  })
+  .strict();
+
+export type ApiClosure = z.infer<typeof ApiClosure>;
+
+/** A vehicle, room, guide or pool of places that bookings hold. */
+export const ApiResource = z
+  .object({
+    id: z.string(),
+    name: z.string().nullable(),
+    /** staff, asset, vehicle, room, space, equipment or capacity_pool. */
+    kind: z.string().nullable(),
+    quantity: z.number().int().nullable(),
+    active: z.boolean(),
+    /** Weekdays (0 is Sunday) and the opening and closing time, in Nairobi time. */
+    schedule: z
+      .object({ days: z.array(z.number().int()), start: z.string(), end: z.string() })
+      .strict()
+      .nullable(),
+    /** Closures that have not ended. */
+    closures: z.array(ApiClosure),
+    /** Send it back as expected_version when you change the resource. */
+    version: z.number().int(),
+  })
+  .strict();
+
+export type ApiResource = z.infer<typeof ApiResource>;
+
+/** The version you read, sent back with a change, so a change made meanwhile is not lost. */
+const ExpectedVersion = z.number().int().min(1);
+
+/** PATCH /v1/offerings/{id}: a price, switching it off, or stopping new bookings. */
+export const OfferingUpdate = z
+  .object({
+    expected_version: ExpectedVersion,
+    price_cents: z.number().int().min(0).max(100_000_000_000).optional(),
+    active: z.boolean().optional(),
+    booking_enabled: z.boolean().optional(),
+  })
+  .strict()
+  .refine(
+    (body) =>
+      body.price_cents !== undefined ||
+      body.active !== undefined ||
+      body.booking_enabled !== undefined,
+    { message: 'Send price_cents, active or booking_enabled.' },
+  );
+
+export type OfferingUpdate = z.infer<typeof OfferingUpdate>;
+
+/** POST /v1/offerings/{id}/departures: add a departure, or change or close one. */
+export const DepartureRequest = z
+  .object({
+    /** The offering's version. */
+    expected_version: ExpectedVersion,
+    /** To change an existing departure. Leave it out to add one. */
+    departure_id: z.string().min(1).max(128).optional(),
+    /** The departure's version, when changing one. */
+    expected_departure_version: ExpectedVersion.optional(),
+    starts_at: z.string().datetime({ offset: true }),
+    ends_at: z.string().datetime({ offset: true }),
+    capacity: z.number().int().min(1).max(100_000),
+    /** false closes it to new bookings. */
+    published: z.boolean(),
+    resource_ids: z.array(z.string().min(1).max(128)).max(50).optional(),
+  })
+  .strict();
+
+export type DepartureRequest = z.infer<typeof DepartureRequest>;
+
+/** POST /v1/resources/{id}/closures: the resource is busy or closed for a time. */
+export const ClosureRequest = z
+  .object({
+    expected_version: ExpectedVersion,
+    starts_at: z.string().datetime({ offset: true }),
+    ends_at: z.string().datetime({ offset: true }),
+    /** Seen by the business only, for example `Booked on our own website`. */
+    reason: z.string().min(1).max(300),
+  })
+  .strict();
+
+export type ClosureRequest = z.infer<typeof ClosureRequest>;
+
+/** POST /v1/reservations/{id}/accept. */
+export const ReservationAccept = z.object({ expected_version: ExpectedVersion }).strict();
+
+export type ReservationAccept = z.infer<typeof ReservationAccept>;
+
+/** POST /v1/reservations/{id}/decline. */
+export const ReservationDecline = z
+  .object({ expected_version: ExpectedVersion, reason: z.string().max(500).optional() })
+  .strict();
+
+export type ReservationDecline = z.infer<typeof ReservationDecline>;
+
+/** PUT /v1/reservations/{id}/driver: who is coming, or null to clear it. */
+export const ReservationDriverRequest = z
+  .object({
+    expected_version: ExpectedVersion,
+    driver: z
+      .object({
+        first_name: z.string().min(1).max(60),
+        vehicle: z.string().min(1).max(80),
+        plate: z.string().min(2).max(20).nullable().optional(),
+      })
+      .strict()
+      .nullable(),
+  })
+  .strict();
+
+export type ReservationDriverRequest = z.infer<typeof ReservationDriverRequest>;
+
+/** POST /v1/test/reservations: a sandbox reservation, made with a test key. */
+export const TestReservationRequest = z
+  .object({
+    kind: z.enum(['reservation', 'request']).optional(),
+    offering_name: z.string().min(1).max(200).optional(),
+    /** For example TRANSFER (the default), TOUR or APPOINTMENT. */
+    offering_model: z
+      .string()
+      .regex(/^[A-Z_]{2,40}$/)
+      .optional(),
+    starts_at: z.string().datetime({ offset: true }).optional(),
+    ends_at: z.string().datetime({ offset: true }).optional(),
+    quantity: z.number().int().min(1).max(1000).optional(),
+    guest_name: z.string().min(1).max(120).optional(),
+    trip: ApiReservationTrip.partial().optional(),
+    notes: z.string().max(2000).optional(),
+    /** Above 0, the test reservation waits for payment, as a customer booking does. */
+    total_cents: z.number().int().min(0).max(100_000_000_000).optional(),
+  })
+  .strict();
+
+export type TestReservationRequest = z.infer<typeof TestReservationRequest>;
+
+/** POST /v1/test/reservations/{id}/status. */
+export const TestReservationMove = z
+  .object({ status: z.enum(['confirmed', 'in_progress', 'completed', 'cancelled']) })
+  .strict();
+
+export type TestReservationMove = z.infer<typeof TestReservationMove>;
 
 /**
  * The query `GET /v1/reservations` accepts. Reservations come oldest change

@@ -6,6 +6,17 @@ import { BookingEngine } from './engine.js';
 import { addOccurrence } from './occurrences.js';
 import { manageResource, manageOffering, createClosure } from './management.js';
 import { EventDelivery } from './event-delivery.js';
+import {
+  platformAccept,
+  platformClosure,
+  platformDecline,
+  platformDeparture,
+  platformDriver,
+  platformOfferings,
+  platformRemoveClosure,
+  platformResources,
+  platformUpdateOffering,
+} from './api-platform.js';
 import { BookingError, type Identity } from './types.js';
 
 const MAX_BODY = 128 * 1024;
@@ -150,6 +161,85 @@ export function createBookingServer(engine: BookingEngine, secret: string) {
             res,
             200,
             await engine.platformReservation(identity, decodeURIComponent(reservation[1]!)),
+          );
+        const act = path.match(/^\/v1\/platform\/reservations\/([^/]+)\/(accept|decline|driver)$/);
+        if (act) {
+          const id = decodeURIComponent(act[1]!);
+          if (act[2] === 'accept' && req.method === 'POST')
+            return respond(
+              res,
+              200,
+              await platformAccept(engine, identity, id, await body(req), key),
+            );
+          if (act[2] === 'decline' && req.method === 'POST')
+            return respond(
+              res,
+              200,
+              await platformDecline(engine, identity, id, await body(req), key),
+            );
+          if (act[2] === 'driver' && req.method === 'PUT')
+            return respond(
+              res,
+              200,
+              await platformDriver(engine, identity, id, await body(req), key),
+            );
+        }
+        if (path === '/v1/platform/offerings' && req.method === 'GET')
+          return respond(res, 200, await platformOfferings(engine, identity));
+        if (path === '/v1/platform/resources' && req.method === 'GET')
+          return respond(res, 200, await platformResources(engine, identity));
+        const offering = path.match(/^\/v1\/platform\/offerings\/([^/]+)(\/departures)?$/);
+        if (offering && !offering[2] && req.method === 'PATCH')
+          return respond(
+            res,
+            200,
+            await platformUpdateOffering(
+              engine,
+              identity,
+              decodeURIComponent(offering[1]!),
+              await body(req),
+              key,
+            ),
+          );
+        if (offering && offering[2] && req.method === 'POST')
+          return respond(
+            res,
+            200,
+            await platformDeparture(
+              engine,
+              identity,
+              decodeURIComponent(offering[1]!),
+              await body(req),
+              key,
+            ),
+          );
+        const closure = path.match(/^\/v1\/platform\/resources\/([^/]+)\/closures(?:\/([^/]+))?$/);
+        if (closure && !closure[2] && req.method === 'POST')
+          return respond(
+            res,
+            200,
+            await platformClosure(
+              engine,
+              identity,
+              decodeURIComponent(closure[1]!),
+              await body(req),
+              key,
+            ),
+          );
+        if (closure && closure[2] && req.method === 'DELETE')
+          return respond(
+            res,
+            200,
+            await platformRemoveClosure(
+              engine,
+              identity,
+              decodeURIComponent(closure[1]!),
+              decodeURIComponent(closure[2]),
+              url.searchParams.has('expected_version')
+                ? Number(url.searchParams.get('expected_version'))
+                : undefined,
+              key,
+            ),
           );
         const settle = path.match(/^\/v1\/platform\/bookings\/([^/]+)\/settle$/);
         if (settle && req.method === 'POST')

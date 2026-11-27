@@ -430,6 +430,15 @@ export function CustomerBooking({ businessId }: { businessId: string }) {
                 {record.booking.pricingBasis === 'indicative' ? 'Indicative amount' : 'Amount'}
               </dt>
               <dd>{money(record.booking.priceMinor)}</dd>
+              {record.booking.driver ? (
+                <>
+                  <dt className="text-muted">Your driver</dt>
+                  <dd>
+                    {record.booking.driver.firstName} · {record.booking.driver.vehicle}
+                    {record.booking.driver.plate ? ` · ${record.booking.driver.plate}` : ''}
+                  </dd>
+                </>
+              ) : null}
               <dt className="text-muted">Reference</dt>
               <dd className="break-all font-mono text-xs">{record.booking.id}</dd>
             </dl>
