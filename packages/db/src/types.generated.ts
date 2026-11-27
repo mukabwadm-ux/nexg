@@ -68435,6 +68435,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      fn_payment_at_test_tenant: { Args: { p_payment_id: string }; Returns: boolean };
       fn_payment_reference: { Args: Record<PropertyKey, never>; Returns: string };
       fn_payments_require: { Args: { p_city_id: string; p_what: string }; Returns: string };
       fn_payments_worker_poke: { Args: { p_body?: Json }; Returns: Json };
@@ -75739,6 +75740,7 @@ export type Database = {
       };
       rpc_pay_link_begin: { Args: { p_token: string }; Returns: Json };
       rpc_pay_link_view: { Args: { p_client?: string; p_token: string }; Returns: Json };
+      rpc_payment_at_test_tenant: { Args: { p_reference: string }; Returns: boolean };
       rpc_payment_bank_started: {
         Args: {
           p_checkout_url: string;

@@ -247,6 +247,20 @@ export async function customerMode(supabase: Client): Promise<PaystackMode | nul
   return reviewer.data === true ? 'test' : mode;
 }
 
+/** Whether the customer's own payment is at a test tenant (accepts_test_payments). */
+async function atTestTenant(supabase: Client, reference: string): Promise<boolean> {
+  const answer = await rpc(supabase, 'rpc_payment_at_test_tenant', { p_reference: reference });
+  return answer.data === true;
+}
+
+function testPaymentsUnavailable() {
+  return problem(
+    503,
+    'PAYMENT_UNAVAILABLE',
+    'This place takes test payments only, and they are not set up yet. Nothing was charged.',
+  );
+}
+
 /**
  * What is being paid for. `readState` is the customer's view of its latest
  * payment; `begin` opens or reuses the live payment and says its reference and
@@ -388,8 +402,8 @@ export async function startPayment(
       if (found.daraja) return sendDaraja(request, supabase, found.daraja, choice.phone);
     }
 
-    const mode = await customerMode(supabase);
-    const proof = mode ? paystackProof(mode) : null;
+    let mode = await customerMode(supabase);
+    let proof = mode ? paystackProof(mode) : null;
     if (!mode || !proof) return paymentUnavailable();
     /* The target answers for itself when there is nothing to start (an order already paid). */
     const found = await target(session);
@@ -397,6 +411,15 @@ export async function startPayment(
 
     const payment = await found.begin(choice, proof);
     if (payment instanceof Response) return payment;
+
+    /* A test tenant (a review shop, the test cinema) is paid with the test
+       keys whoever pays, so nobody is charged real money there. The database
+       refuses a live try on it, so without the test key it cannot be paid. */
+    if (mode === 'live' && (await atTestTenant(supabase, payment.reference))) {
+      mode = 'test';
+      proof = paystackProof('test');
+      if (!proof) return testPaymentsUnavailable();
+    }
 
     const channel =
       choice.method === 'card'
