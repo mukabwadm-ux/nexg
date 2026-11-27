@@ -37,6 +37,7 @@ export type EndpointGroup =
   | 'Experiences'
   | 'Services'
   | 'Orders'
+  | 'Reservations'
   | 'Callbacks to NexG';
 
 export type AuthDoc =
@@ -80,6 +81,9 @@ export interface ResourceDoc {
     | 'ApiOrder'
     | 'ApiBookingRider'
     | 'ApiBookingRiderLocation'
+    | 'ApiReservation'
+    | 'ApiReservationOffering'
+    | 'ApiReservationTrip'
     | 'PublicBranch'
     | 'ServiceBooking'
     | 'BookingReceipt'

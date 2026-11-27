@@ -1,6 +1,6 @@
 /**
  * The NexG API client: typed calls to https://api.nexgapp.com, and the check
- * for the order events NexG posts to your endpoints.
+ * for the order and reservation events NexG posts to your endpoints.
  *
  *   const nexg = new NexgClient({ apiKey: process.env.NEXG_API_KEY });
  *   const trip = await nexg.delivery.check({ pickup_lat, pickup_lng, dropoff_lat, dropoff_lng });
@@ -16,6 +16,7 @@ export {
   type NexgClientOptions,
   type Page,
   type PageParams,
+  type ReservationListParams,
   type TestStage,
   type TestStatus,
 } from './client.js';
@@ -30,6 +31,8 @@ export type {
   ApiBookingRider,
   ApiBookingRiderLocation,
   ApiOrder,
+  ApiReservation,
+  ApiReservationSummary,
   ApiService,
   BookingReceipt,
   BookingRequest,

@@ -8,6 +8,9 @@ import {
   ApiBookingRider,
   ApiBookingRiderLocation,
   ApiOrder,
+  ApiReservation,
+  ApiReservationOffering,
+  ApiReservationTrip,
   ApiService,
   BookingReceipt,
   CatalogueItem,
@@ -25,7 +28,7 @@ import {
   ServiceBooking,
   WebhookEvent,
 } from '@nexg/contracts/api';
-import { EVENT_EXAMPLE } from '../lib/reference/events';
+import { EVENT_EXAMPLE, RESERVATION_EVENT_EXAMPLE } from '../lib/reference/events';
 
 import { tokenize } from '../lib/highlight';
 import { jsonError, parseQuery } from '../lib/http';
@@ -85,6 +88,9 @@ const SCHEMAS = {
   ApiOrder,
   ApiBookingRider,
   ApiBookingRiderLocation,
+  ApiReservation,
+  ApiReservationOffering,
+  ApiReservationTrip,
   PublicBranch,
   ServiceBooking,
   BookingReceipt,
@@ -232,6 +238,28 @@ describe('the documented shapes match @nexg/contracts/api', () => {
 
   it('the order events example is a valid event', () => {
     expect(() => WebhookEvent.parse(EVENT_EXAMPLE)).not.toThrow();
+  });
+
+  it('the reservation event example is a valid event without the guest’s details', () => {
+    const event = WebhookEvent.parse(RESERVATION_EVENT_EXAMPLE);
+    expect(event.data.reservation).toBeDefined();
+    expect(event.data.reservation).not.toHaveProperty('guest_name');
+    expect(event.data.reservation).not.toHaveProperty('trip');
+    expect(event.data.reservation).not.toHaveProperty('notes');
+  });
+
+  it('the reservation examples follow their contracts', () => {
+    expect(() =>
+      PageEnvelope(ApiReservation).parse(endpoint('list-reservations').responseExample),
+    ).not.toThrow();
+    const one = z
+      .object({
+        ok: z.literal(true),
+        data: z.object({ reservation: ApiReservation }).strict(),
+        meta: z.object({ api_version: z.literal('v1') }).strict(),
+      })
+      .strict();
+    expect(() => one.parse(endpoint('get-reservation').responseExample)).not.toThrow();
   });
 
   it('the one-order example is a valid order', () => {

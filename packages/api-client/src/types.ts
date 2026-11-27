@@ -64,6 +64,91 @@ export type ApiOrder = {
   } | null;
 };
 
+export type ApiReservation = {
+  id: string;
+  /** requested, confirmed, in_progress, completed or cancelled. */
+  status: 'requested' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
+  currency: 'KES';
+  starts_at: string | null;
+  ends_at: string | null;
+  /** Seats, passengers or units, as the offering counts them. */
+  quantity: number | null;
+  /** The price agreed when it was booked. Null while a request has no price yet. */
+  total_cents: number | null;
+  /** `reservation` holds a time, seat or vehicle; `request` waits for the business to accept it. */
+  kind: 'reservation' | 'request';
+  /** The booking engine's own word, for example `held` (waiting for payment) or `expired`. */
+  stage: string;
+  created_at: string | null;
+  offering: {
+    id: string | null;
+    name: string | null;
+    /** How it is booked, for example `TRANSFER`, `TOUR`, `APPOINTMENT` or `ASSET_INTERVAL`. */
+    model: string | null;
+  };
+  /** For example `awaiting_payment`, `paid` or `not_required`. */
+  payment_state: string | null;
+  /** Goes up with every change, so an older copy can be told from a newer one. */
+  version: number;
+  updated_at: string | null;
+  /** The departure or session, for a tour or class with set times. */
+  occurrence_id: string | null;
+  /** The vehicles, rooms, staff or places it holds. */
+  resource_ids: string[];
+  ticket_type: {
+    id: string;
+    name: string | null;
+  } | null;
+  /** What quantity counts, for example `place` or `asset`. */
+  capacity_unit: string | null;
+  /** The name the booking is under. */
+  guest_name: string | null;
+  /** A transfer's pickup and drop-off. Null for anything that is not a trip. */
+  trip: {
+    pickup_area: string | null;
+    pickup_address: string | null;
+    dropoff_area: string | null;
+    dropoff_address: string | null;
+  } | null;
+  /** Where the business goes to the customer, for a visit at their place. */
+  service_location: {
+    address: string | null;
+    area: string | null;
+  } | null;
+  notes: string | null;
+  /** What has been paid so far through NexG. */
+  paid_cents: number;
+  /** When the customer's booking code was checked at the business. */
+  checked_in_at: string | null;
+  /** `nexg`: the customer booked on NexG. `merchant`: the business entered it. */
+  booked_on: 'nexg' | 'merchant';
+};
+
+export type ApiReservationSummary = {
+  id: string;
+  /** requested, confirmed, in_progress, completed or cancelled. */
+  status: 'requested' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
+  starts_at: string | null;
+  ends_at: string | null;
+  /** Seats, passengers or units, as the offering counts them. */
+  quantity: number | null;
+  /** `reservation` holds a time, seat or vehicle; `request` waits for the business to accept it. */
+  kind: 'reservation' | 'request';
+  /** The booking engine's own word, for example `held` (waiting for payment) or `expired`. */
+  stage: string;
+  offering: {
+    id: string | null;
+    name: string | null;
+    /** How it is booked, for example `TRANSFER`, `TOUR`, `APPOINTMENT` or `ASSET_INTERVAL`. */
+    model: string | null;
+  };
+  /** For example `awaiting_payment`, `paid` or `not_required`. */
+  payment_state: string | null;
+  /** Goes up with every change, so an older copy can be told from a newer one. */
+  version: number;
+  updated_at: string | null;
+};
+
 export type ApiService = {
   code: string;
   label: string;
@@ -261,6 +346,9 @@ export type WebhookEvent = {
     | 'booking.status_changed'
     | 'booking.stage_changed'
     | 'booking.rider_assigned'
+    | 'reservation.created'
+    | 'reservation.status_changed'
+    | 'reservation.updated'
     | 'ping';
   data: {
     message?: string;
@@ -301,7 +389,32 @@ export type WebhookEvent = {
     };
     /** booking.rider_assigned only: when the rider took the job. */
     assigned_at?: string;
-    /** booking.status_changed only. */
+    /** reservation.* only: the reservation's summary at this event. */
+    reservation?: {
+      id: string;
+      /** requested, confirmed, in_progress, completed or cancelled. */
+      status: 'requested' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
+      starts_at: string | null;
+      ends_at: string | null;
+      /** Seats, passengers or units, as the offering counts them. */
+      quantity: number | null;
+      /** `reservation` holds a time, seat or vehicle; `request` waits for the business to accept it. */
+      kind: 'reservation' | 'request';
+      /** The booking engine's own word, for example `held` (waiting for payment) or `expired`. */
+      stage: string;
+      offering: {
+        id: string | null;
+        name: string | null;
+        /** How it is booked, for example `TRANSFER`, `TOUR`, `APPOINTMENT` or `ASSET_INTERVAL`. */
+        model: string | null;
+      };
+      /** For example `awaiting_payment`, `paid` or `not_required`. */
+      payment_state: string | null;
+      /** Goes up with every change, so an older copy can be told from a newer one. */
+      version: number;
+      updated_at: string | null;
+    };
+    /** booking.status_changed and reservation.status_changed only. */
     previous_status?: 'requested' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
     /** booking.status_changed and booking.stage_changed. */
     previous_stage?: string;
@@ -318,4 +431,7 @@ export type WebhookEventType =
   | 'booking.status_changed'
   | 'booking.stage_changed'
   | 'booking.rider_assigned'
+  | 'reservation.created'
+  | 'reservation.status_changed'
+  | 'reservation.updated'
   | 'ping';

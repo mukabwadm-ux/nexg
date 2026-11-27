@@ -1,7 +1,12 @@
 import { CodeBlock, CodeTabs } from '@/components/docs/code';
 import { DocPage } from '@/components/docs/doc-page';
 import { A, C, Callout, H2, List, P, Strong, Table } from '@/components/docs/prose';
-import { EVENT_EXAMPLE, EVENT_REQUEST, VERIFY_EVENT } from '@/lib/reference/events';
+import {
+  EVENT_EXAMPLE,
+  EVENT_REQUEST,
+  RESERVATION_EVENT_EXAMPLE,
+  VERIFY_EVENT,
+} from '@/lib/reference/events';
 import { pageMetadata } from '@/lib/reference/navigation';
 
 export const metadata = pageMetadata('/docs/events');
@@ -90,6 +95,23 @@ export default function EventsPage() {
             </span>,
           ],
           [
+            <C key="t">reservation.created</C>,
+            'NexG hears of a new reservation: a tour seat, transfer, rental, appointment or request booked with you on NexG or entered by your team.',
+            <C key="d">reservation</C>,
+          ],
+          [
+            <C key="t">reservation.status_changed</C>,
+            'A reservation’s status changes, for example from requested to confirmed once the customer has paid, or to cancelled.',
+            <span key="d">
+              <C>reservation</C>, <C>previous_status</C>
+            </span>,
+          ],
+          [
+            <C key="t">reservation.updated</C>,
+            'Something else changes in the same status: its time, its payment, or its stage.',
+            <C key="d">reservation</C>,
+          ],
+          [
             <C key="t">ping</C>,
             'You press Send test event in the console.',
             <span key="d">
@@ -102,6 +124,21 @@ export default function EventsPage() {
         Ignore types you do not know: new ones are added without notice, and an unknown type is
         not an error.
       </P>
+      <P>
+        Reservation events go to live endpoints and carry the reservation&apos;s summary: what,
+        when, how many and where it stands. They leave out the guest&apos;s name, the trip&apos;s
+        addresses and the notes, because NexG keeps events for 30 days. Read those with{' '}
+        <A href="/docs/reference/get-reservation">GET /v1/reservations/{'{id}'}</A> when the event
+        arrives. Keep the highest <C>version</C> you have seen for each reservation and ignore an
+        event with a lower one.
+      </P>
+      <CodeBlock
+        className="mt-6"
+        code={JSON.stringify(RESERVATION_EVENT_EXAMPLE, null, 2)}
+        language="json"
+        title="A reservation event's body"
+        maxHeight
+      />
 
       <H2 id="event">An event</H2>
       <P>

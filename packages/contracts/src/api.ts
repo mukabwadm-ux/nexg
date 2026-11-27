@@ -592,6 +592,118 @@ export const ApiOrder = z
 
 export type ApiOrder = z.infer<typeof ApiOrder>;
 
+/* ════════════════════════════════════════════════════════════════════════════ reservations */
+
+/** What was booked: the business's offering, as it was named when the booking was made. */
+export const ApiReservationOffering = z
+  .object({
+    id: z.string().nullable(),
+    name: z.string().nullable(),
+    /** How it is booked, for example `TRANSFER`, `TOUR`, `APPOINTMENT` or `ASSET_INTERVAL`. */
+    model: z.string().nullable(),
+  })
+  .strict();
+
+export type ApiReservationOffering = z.infer<typeof ApiReservationOffering>;
+
+/**
+ * A reservation as a webhook event carries it: what, when, how many and
+ * where it stands. No name, addresses or notes: NexG keeps events for 30
+ * days, so read those with `GET /v1/reservations/{id}`.
+ */
+export const ApiReservationSummary = z
+  .object({
+    id: z.string(),
+    /** `reservation` holds a time, seat or vehicle; `request` waits for the business to accept it. */
+    kind: z.enum(['reservation', 'request']),
+    /** requested, confirmed, in_progress, completed or cancelled. */
+    status: BookingStatus,
+    /** The booking engine's own word, for example `held` (waiting for payment) or `expired`. */
+    stage: z.string(),
+    offering: ApiReservationOffering,
+    starts_at: z.string().nullable(),
+    ends_at: z.string().nullable(),
+    /** Seats, passengers or units, as the offering counts them. */
+    quantity: z.number().int().nullable(),
+    /** For example `awaiting_payment`, `paid` or `not_required`. */
+    payment_state: z.string().nullable(),
+    /** Goes up with every change, so an older copy can be told from a newer one. */
+    version: z.number().int(),
+    updated_at: z.string().nullable(),
+  })
+  .strict();
+
+export type ApiReservationSummary = z.infer<typeof ApiReservationSummary>;
+
+/** Where a transfer starts and ends, as the customer gave it. */
+export const ApiReservationTrip = z
+  .object({
+    pickup_area: z.string().nullable(),
+    pickup_address: z.string().nullable(),
+    dropoff_area: z.string().nullable(),
+    dropoff_address: z.string().nullable(),
+  })
+  .strict();
+
+export type ApiReservationTrip = z.infer<typeof ApiReservationTrip>;
+
+/**
+ * A reservation: a tour seat, a transfer, a rental, an appointment, or a
+ * request waiting for the business, booked by a customer on NexG or entered
+ * by the business itself. These live in NexG's booking engine, not among
+ * orders, and only the business that owns them can read them.
+ *
+ * Never a phone number or an email address: a customer booking keeps none,
+ * and the business has its own copy of a booking it entered.
+ */
+export const ApiReservation = ApiReservationSummary.extend({
+  /** The departure or session, for a tour or class with set times. */
+  occurrence_id: z.string().nullable(),
+  /** The vehicles, rooms, staff or places it holds. */
+  resource_ids: z.array(z.string()),
+  ticket_type: z.object({ id: z.string(), name: z.string().nullable() }).strict().nullable(),
+  /** What quantity counts, for example `place` or `asset`. */
+  capacity_unit: z.string().nullable(),
+  /** The name the booking is under. */
+  guest_name: z.string().nullable(),
+  /** A transfer's pickup and drop-off. Null for anything that is not a trip. */
+  trip: ApiReservationTrip.nullable(),
+  /** Where the business goes to the customer, for a visit at their place. */
+  service_location: z
+    .object({ area: z.string().nullable(), address: z.string().nullable() })
+    .strict()
+    .nullable(),
+  notes: z.string().nullable(),
+  currency: z.literal('KES'),
+  /** The price agreed when it was booked. Null while a request has no price yet. */
+  total_cents: Money.nullable(),
+  /** What has been paid so far through NexG. */
+  paid_cents: Money,
+  /** When the customer's booking code was checked at the business. */
+  checked_in_at: z.string().nullable(),
+  /** `nexg`: the customer booked on NexG. `merchant`: the business entered it. */
+  booked_on: z.enum(['nexg', 'merchant']),
+  created_at: z.string().nullable(),
+}).strict();
+
+export type ApiReservation = z.infer<typeof ApiReservation>;
+
+/**
+ * The query `GET /v1/reservations` accepts. Reservations come oldest change
+ * first, so a system can keep the last `updated_at` it saw and ask for what
+ * changed after it.
+ */
+export const ReservationListRequest = z
+  .object({
+    limit: z.coerce.number().int().min(1).max(100).default(25),
+    cursor: z.string().min(1).max(300).optional(),
+    /** Only reservations changed after this time. */
+    updated_after: z.string().datetime({ offset: true }).optional(),
+  })
+  .strict();
+
+export type ReservationListRequest = z.infer<typeof ReservationListRequest>;
+
 /**
  * An event NexG posts to a merchant's webhook endpoint.
  *
@@ -604,6 +716,9 @@ export const WebhookEventType = z.enum([
   'booking.status_changed',
   'booking.stage_changed',
   'booking.rider_assigned',
+  'reservation.created',
+  'reservation.status_changed',
+  'reservation.updated',
   'ping',
 ]);
 export type WebhookEventType = z.infer<typeof WebhookEventType>;
@@ -619,7 +734,9 @@ export const WebhookEvent = z
       .object({
         /** The booking as `GET /v1/orders/{id}` returns it, at this event. */
         booking: ApiOrder.optional(),
-        /** booking.status_changed only. */
+        /** reservation.* only: the reservation's summary at this event. */
+        reservation: ApiReservationSummary.optional(),
+        /** booking.status_changed and reservation.status_changed only. */
         previous_status: BookingStatus.optional(),
         /** booking.status_changed and booking.stage_changed. */
         previous_stage: z.string().optional(),
