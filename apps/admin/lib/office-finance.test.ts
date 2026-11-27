@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  fromDayFirst,
+  spelledDay,
+  toDayFirst,
   budgetFor,
   byCategory,
   lastMonths,
@@ -106,5 +109,30 @@ describe('budgets', () => {
   it('measures spend against budget, and says nothing without one', () => {
     expect(utilisation(194_860_000, 190_000_000)).toBeCloseTo(102.56, 1);
     expect(utilisation(5, 0)).toBeNull();
+  });
+});
+
+describe('day-first dates', () => {
+  it('spells a date out in words', () => {
+    expect(spelledDay('2026-11-03')).toBe('Tuesday, 3 November 2026');
+    expect(spelledDay('03/11/2026')).toBeUndefined();
+  });
+
+  it('reads 03/11/2026 as 3 November, not 11 March', () => {
+    expect(fromDayFirst('03/11/2026')).toBe('2026-11-03');
+    expect(fromDayFirst('3-11-26')).toBe('2026-11-03');
+    expect(fromDayFirst(' 3.11.2026 ')).toBe('2026-11-03');
+  });
+
+  it('turns away dates that do not exist or are not dates', () => {
+    expect(fromDayFirst('31/11/2026')).toBeNull();
+    expect(fromDayFirst('11/13/2026')).toBeNull();
+    expect(fromDayFirst('2026-11-03')).toBeNull();
+    expect(fromDayFirst('')).toBeNull();
+  });
+
+  it('writes an ISO date day first and back', () => {
+    expect(toDayFirst('2026-11-03')).toBe('03/11/2026');
+    expect(fromDayFirst(toDayFirst('2026-02-28'))).toBe('2026-02-28');
   });
 });

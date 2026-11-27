@@ -183,7 +183,7 @@ export function utilisation(spendCents: number, budgetCents: number): number | n
  * out makes the month impossible to miss.
  */
 export function spelledDay(iso: string): string | undefined {
-  if (!/^d{4}-d{2}-d{2}$/.test(iso)) return undefined;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return undefined;
   return new Date(`${iso}T12:00:00+03:00`).toLocaleDateString('en-GB', {
     weekday: 'long',
     day: 'numeric',
@@ -191,4 +191,34 @@ export function spelledDay(iso: string): string | undefined {
     year: 'numeric',
     timeZone: 'Africa/Nairobi',
   });
+}
+
+/** An ISO date as the office writes it: day first, 03/11/2026. */
+export function toDayFirst(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : '';
+}
+
+/**
+ * Reads a date typed day first (3/11/2026, 03-11-2026, 3.11.26) into ISO, or
+ * null when it is not a real date. The browser's own date field follows
+ * the computer's settings, which on the office machines put the month
+ * first, so 03/11/2026 meant for 3 November was saved as 11 March. A plain
+ * day-first field reads it the way people in Kenya write it.
+ */
+export function fromDayFirst(text: string): string | null {
+  const m = /^\s*(\d{1,2})[/.\-\s](\d{1,2})[/.\-\s](\d{2}|\d{4})\s*$/.exec(text);
+  if (!m) return null;
+  const day = Number(m[1]);
+  const month = Number(m[2]);
+  const year = m[3]!.length === 2 ? 2000 + Number(m[3]) : Number(m[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    return null;
+  }
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }

@@ -52,7 +52,9 @@ import {
   EXPENSE_STATUS,
   expenseStatus,
   PAYMENT_METHODS,
+  fromDayFirst,
   spelledDay,
+  toDayFirst,
 } from '@/lib/office-finance';
 import { day, kes, shillings, todayInNairobi } from '@/lib/portal';
 import { createClient } from '@/lib/supabase/client';
@@ -441,7 +443,7 @@ function ExpensePanel({
   onClose: () => void;
 }) {
   const [f, setF] = React.useState({
-    spentOn: expense?.spent_on ?? todayInNairobi(),
+    spentOn: toDayFirst(expense?.spent_on ?? todayInNairobi()),
     description: expense?.description ?? '',
     category: expense?.category ?? 'rent_utilities',
     amount: fromCents(expense?.amount_cents),
@@ -507,19 +509,30 @@ function ExpensePanel({
           toast({ tone: 'warning', title: 'Enter the amount in shillings' });
           return false;
         }
-        return run(() =>
-          saveExpense({
-            id: expense?.id,
-            spentOn: f.spentOn,
-            description: f.description,
-            category: f.category,
-            amountCents: cents,
-            payee: f.payee,
-            vendorId: f.vendorId || null,
-            locationId: f.locationId || null,
-            notes: f.notes,
-            receiptPath,
-          }),
+        const spentOn = fromDayFirst(f.spentOn);
+        if (!spentOn) {
+          toast({ tone: 'warning', title: 'Enter the date as day/month/year, e.g. 03/11/2026' });
+          return false;
+        }
+        if (spentOn > todayInNairobi()) {
+          toast({ tone: 'warning', title: 'The date is in the future' });
+          return false;
+        }
+        return run(
+          () =>
+            saveExpense({
+              id: expense?.id,
+              spentOn,
+              description: f.description,
+              category: f.category,
+              amountCents: cents,
+              payee: f.payee,
+              vendorId: f.vendorId || null,
+              locationId: f.locationId || null,
+              notes: f.notes,
+              receiptPath,
+            }),
+          `${expense ? 'Saved' : 'Recorded'} for ${spelledDay(spentOn)}`,
         );
       }}
     >
@@ -558,13 +571,17 @@ function ExpensePanel({
       </FieldRow>
       <FieldRow>
         <TextField
-          label="Spent On"
+          label="Spent On (Day/Month/Year)"
           required
-          type="date"
-          max={todayInNairobi()}
+          inputMode="numeric"
+          placeholder="03/11/2026"
           value={f.spentOn}
           onChange={(e) => set('spentOn', e.target.value)}
-          hint={spelledDay(f.spentOn)}
+          hint={
+            fromDayFirst(f.spentOn)
+              ? spelledDay(fromDayFirst(f.spentOn)!)
+              : 'Day first, then month, then year'
+          }
         />
         <TextField
           label="Paid To"
@@ -634,8 +651,9 @@ function ExpensePanel({
 function PayPanel({ expense: e, onClose }: { expense: ExpenseRow; onClose: () => void }) {
   const [method, setMethod] = React.useState('bank_transfer');
   const [reference, setReference] = React.useState('');
-  const [paidOn, setPaidOn] = React.useState(todayInNairobi());
+  const [paidOn, setPaidOn] = React.useState(toDayFirst(todayInNairobi()));
   const { run, busy } = useRunner();
+  const { toast } = useToast();
   return (
     <FormPanel
       open
@@ -644,7 +662,14 @@ function PayPanel({ expense: e, onClose }: { expense: ExpenseRow; onClose: () =>
       subtitle={`${e.number} · ${kes(e.amount_cents)} to ${e.payee}`}
       submitLabel="Mark Paid"
       busy={busy}
-      onSubmit={() => run(() => payExpense({ id: e.id, method, reference, paidOn }))}
+      onSubmit={async () => {
+        const paid = fromDayFirst(paidOn);
+        if (!paid || paid > todayInNairobi()) {
+          toast({ tone: 'warning', title: 'Enter the date paid as day/month/year' });
+          return false;
+        }
+        return run(() => payExpense({ id: e.id, method, reference, paidOn: paid }));
+      }}
     >
       <p className="bg-bg rounded-xl px-4 py-3 text-sm">
         Paid expenses are final and show in Transactions as office expenses.
@@ -657,9 +682,10 @@ function PayPanel({ expense: e, onClose }: { expense: ExpenseRow; onClose: () =>
           options={Object.entries(PAYMENT_METHODS).map(([k, v]) => ({ value: k, label: v }))}
         />
         <TextField
-          label="Paid On"
-          type="date"
-          max={todayInNairobi()}
+          label="Paid On (Day/Month/Year)"
+          inputMode="numeric"
+          placeholder="03/11/2026"
+          hint={fromDayFirst(paidOn) ? spelledDay(fromDayFirst(paidOn)!) : undefined}
           value={paidOn}
           onChange={(ev) => setPaidOn(ev.target.value)}
         />
