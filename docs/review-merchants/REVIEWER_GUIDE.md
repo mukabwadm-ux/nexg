@@ -92,7 +92,7 @@ Tables are open 11:00–22:00 Nairobi time, and there is no charge to reserve.
 1. Tap **Sedan: JKIA to Westlands**.
 2. Enter a pickup time, then book and pay.
 
-**15. Car or bike hire.** Car Hire → **Gari Car Hire**.
+**15. Car hire.** Car Hire → **Gari Car Hire**.
 1. Tap **Toyota Axio (Sedan)**.
 2. Choose pickup and return dates, self-drive or with a driver.
 3. Reserve and pay.
@@ -107,7 +107,7 @@ The refundable deposit is shown before you pay.
 
 Collections run 07:00–20:00 Nairobi time.
 
-**17. Car wash (a service job).** Car Hire → **Gari Car Hire**: tap **Full Car Wash**, choose a time and book. The **Monthly Car Wash Plan** works like the gym plan in step 8.
+**17. Car wash (a service job).** Vehicle Services → **Ng'aa Car Wash**: tap **Full Car Wash**, choose a time and book. The **Monthly Car Wash Plan** works like the gym plan in step 8.
 
 **18. Quote, then reserve with a 50% deposit.** Concierge → **Faraja Concierge**.
 1. Tap **Personal Assistant for a Day**.

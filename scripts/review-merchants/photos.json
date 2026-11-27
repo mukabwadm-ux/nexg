@@ -528,5 +528,50 @@
     "url": "https://images.unsplash.com/photo-1727252736081-5a6a32a05785?auto=format&fit=crop&w=1200&q=80",
     "page": "https://unsplash.com/photos/an-elephant-standing-in-a-field-with-a-mountain-in-the-background-GqmaKdC9EOs",
     "license": "Unsplash License"
+  },
+  "express-wash": {
+    "url": "https://images.unsplash.com/photo-1633014041037-f5446fb4ce99?auto=format&fit=crop&w=1200&q=80",
+    "page": "https://unsplash.com/photos/V4b2j7f1dfc",
+    "license": "Unsplash License"
+  },
+  "interior-clean": {
+    "url": "https://images.unsplash.com/photo-1771491237209-b89bc7290588?auto=format&fit=crop&w=1200&q=80",
+    "page": "https://unsplash.com/photos/pdMgepnEapo",
+    "license": "Unsplash License"
+  },
+  "engine-clean": {
+    "url": "https://images.unsplash.com/photo-1552656967-7a0991a13906?auto=format&fit=crop&w=1200&q=80",
+    "page": "https://unsplash.com/photos/6rF_Du5cn1Y",
+    "license": "Unsplash License"
+  },
+  "wax-polish": {
+    "url": "https://images.unsplash.com/photo-1708805282706-f44730b7e527?auto=format&fit=crop&w=1200&q=80",
+    "page": "https://unsplash.com/photos/CsZjHjFN3N8",
+    "license": "Unsplash License"
+  },
+  "stay-living": {
+    "url": "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=1200&q=80",
+    "page": "https://unsplash.com/photos/OtXADkUh3-I",
+    "license": "Unsplash License"
+  },
+  "stay-bedroom": {
+    "url": "https://images.unsplash.com/photo-1658218729615-167c32d70537?auto=format&fit=crop&w=1200&q=80",
+    "page": "https://unsplash.com/photos/a-bedroom-with-a-bed-and-a-chair-08ZgZuUwy2o",
+    "license": "Unsplash License"
+  },
+  "stay-kitchen": {
+    "url": "https://images.unsplash.com/photo-1721201337481-424a0300d0ba?auto=format&fit=crop&w=1200&q=80",
+    "page": "https://unsplash.com/photos/pU69J8G0kAo",
+    "license": "Unsplash License"
+  },
+  "stay-bathroom": {
+    "url": "https://images.unsplash.com/photo-1737233548198-d9147c0ce753?auto=format&fit=crop&w=1200&q=80",
+    "page": "https://unsplash.com/photos/mhVvY9DdXOM",
+    "license": "Unsplash License"
+  },
+  "stay-building": {
+    "url": "https://images.unsplash.com/photo-1651151084802-867d6a55dd25?auto=format&fit=crop&w=1200&q=80",
+    "page": "https://unsplash.com/photos/a-building-with-palm-trees-in-front-of-it-e-oZ4yQelik",
+    "license": "Unsplash License"
   }
 }

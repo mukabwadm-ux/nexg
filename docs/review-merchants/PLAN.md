@@ -49,6 +49,7 @@ The first live run left some bookings unusable in the app, so the setup was chan
 - **Tables and courts.** Kijiji and Uwanja use the restaurant profile, with `BQ_OFFERS_TABLE_RESERVATIONS`, a real `BQ_SPACE_POLICY` (each table or court and its party size, with a 15-minute turnover) and "pick one" resource selection.
 - **Quotes** are only at Faraja and Anga, whose profiles host them.
 - **Hidden:** the Sauti, Mjini and Gari quotes, Uwanja karting and party, and Safi home and office cleaning. Their rows are kept, made unavailable, and their offerings switched off.
+- **Car hire is cars only** (self-drive or with a driver), as NexG Stays lists car hire: Gari's mountain bike and car washes are hidden. The car washes and the wash plan moved to shop 20, **Ng'aa Car Wash** (vehicle_services / car_wash, the car wash booking profile). The bike is not sold anywhere: the master list has no bike-hire subcategory.
 - **Laundry** is collected and returned by the shop's van, so the windows have someone assigned.
 - **Meet & greet** is greeter-only, with no vehicle.
 - **Transfers** have a service area.
@@ -59,6 +60,24 @@ The first live run left some bookings unusable in the app, so the setup was chan
 - Two further runs on the same engine made no changes.
 
 **App gap.** The app sends no `specialist` details for tours. The engine needs `{ "model": "TOUR", "occurrenceId": "<departure id>", "itineraryVersion": 1 }` on the booking, or a tour booking is refused. With it, a test booking is accepted (status pending).
+
+## NexG Stays review property (added 27 Nov 2026)
+
+`scripts/review-merchants/stay.mjs` adds one Stays listing that app reviewers can book and pay for with Paystack test money:
+- **Property:** "NexG Review Apartment, Kilimani" (`nexg-review-apartment-kilimani`), with a map pin in Kilimani, Nairobi, house rules, the flexible cancellation text, and 2 photos. It is listed, review-approved and `accepts_test_payments`.
+- **Unit:** one live, published one-bedroom for 2 guests at KES 5,000 a night, with 5 photos.
+- **Host:** "NexG Review Stays", live and verified, owned by the review host account.
+- **Guest:** the review guest account is added to `payment_reviewer`, so it sees test listings and pays with test keys. Other accounts don't see the property (`property_public` uses `authz.sees_test_tenants()`).
+
+**The owner creates both accounts** (email and password) in the apps. The script never creates, stores or prints a password: it finds the accounts by email.
+
+```
+node scripts/review-merchants/stay.mjs --target live --host-email <host> --guest-email <guest>           # rows
+node scripts/review-merchants/stay.mjs --target live --host-email <host> --guest-email <guest> --photos  # and photos
+node scripts/review-merchants/stay.mjs --target live --remove --guest-email <guest>                     # unlist and archive
+```
+
+`--photos` signs in as the review host, because only a host's members may write to its folder in `host-photos`. It asks for that password at a hidden prompt (or reads `REVIEW_HOST_PASSWORD`) and does not keep it. Live needs `SUPABASE_URL` and `SUPABASE_ANON_KEY` (the public key), like the shop uploads.
 
 ## Running it
 
@@ -176,6 +195,7 @@ One per category. Shops 1 to 15 cover every workflow, every shop page and every 
 | 17 | (decide) Pharmacy | pharmacy | Shop | Prescription notice |
 | 18 | (decide) Adults only | adults_only / tobacco | Shop | Look only |
 | 19 | (decide) Flights | retired on the backend | — | Recommend hiding the category instead |
+| 20 | Ng'aa Car Wash | vehicle_services / car_wash | Shop | Car wash service jobs (pick a time), monthly wash plan. Added 27 Nov 2026 so car hire holds cars only |
 
 Exact subcategory ids are checked against live `category_config` when the script is built.
 
