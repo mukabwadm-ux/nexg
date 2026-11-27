@@ -256,6 +256,7 @@ test('what NexG API may change for a business', async (t) => {
         vehicle: 'White Toyota Noah',
         plate: 'KDA 123A',
         assigned_at: undefined,
+        location: null,
       },
     );
     assert.ok(assigned.driver?.assigned_at);

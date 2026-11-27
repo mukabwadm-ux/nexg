@@ -17,6 +17,9 @@ vi.mock('@supabase/supabase-js', () => ({ createClient }));
 import { POST as accept } from '../app/v1/reservations/[id]/accept/route';
 import { POST as decline } from '../app/v1/reservations/[id]/decline/route';
 import { PUT as driver } from '../app/v1/reservations/[id]/driver/route';
+import { POST as cancel } from '../app/v1/reservations/[id]/cancel/route';
+import { POST as checkIn } from '../app/v1/reservations/check-in/route';
+import { POST as createReservation } from '../app/v1/reservations/route';
 import { GET as offerings } from '../app/v1/offerings/route';
 import { PATCH as updateOffering } from '../app/v1/offerings/[id]/route';
 import { DELETE as reopen } from '../app/v1/resources/[id]/closures/[closure_id]/route';
@@ -68,7 +71,9 @@ const RESERVATION = {
     vehicle: 'White Toyota Noah',
     plate: 'KDA 123A',
     assigned_at: null,
+    location: null,
   },
+  refund_state: null,
 };
 const OFFERING = {
   id: 'off-1',
@@ -258,6 +263,72 @@ describe('reservation actions with a live key', () => {
   });
 });
 
+describe('running bookings from the business’s system', () => {
+  it('records a booking taken by phone, and answers 201', async () => {
+    engineAnswers(201, { ...RESERVATION, booked_on: 'merchant', driver: null });
+
+    const res = await createReservation(
+      send('POST', '/v1/reservations', {
+        offering_id: 'off-1',
+        starts_at: '2026-11-28T06:30:00+03:00',
+        guest: { name: 'Amina', phone: '+254700000000' },
+        trip: {
+          pickup_area: 'JKIA',
+          pickup_address: 'Terminal 1A',
+          flight_number: 'KQ101',
+        },
+      }),
+    );
+
+    expect(res.status).toBe(201);
+    expect((await res.json()).data.reservation.booked_on).toBe('merchant');
+    expect(engineCall().url).toBe(`${ENGINE}/v1/platform/reservations`);
+    expect(engineCall().body.guest).toEqual({ name: 'Amina', phone: '+254700000000' });
+  });
+
+  it('needs the guest’s email or phone before asking the engine', async () => {
+    const res = await createReservation(
+      send('POST', '/v1/reservations', { offering_id: 'off-1', guest: { name: 'Amina' } }),
+    );
+    expect(res.status).toBe(400);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('checks a customer in and never answers with the code', async () => {
+    engineAnswers(200, {
+      ...RESERVATION,
+      status: 'in_progress',
+      checked_in_at: '2026-11-28T03:41:10.502Z',
+    });
+
+    const res = await checkIn(
+      send('POST', '/v1/reservations/check-in', { code: 'K7M2QX', name: 'Amina' }),
+    );
+
+    expect(res.status).toBe(200);
+    const text = JSON.stringify(await res.json());
+    expect(text).not.toContain('K7M2QX');
+    expect(engineCall().url).toBe(`${ENGINE}/v1/platform/reservations/check-in`);
+  });
+
+  it('cancels with a reason, and test keys are refused steps the sandbox cannot do', async () => {
+    engineAnswers(200, { ...RESERVATION, status: 'cancelled', refund_state: 'review_required' });
+    const cancelled = await cancel(
+      send('POST', `/v1/reservations/${ID}/cancel`, { expected_version: 3, reason: 'Broke down' }),
+      { params: { id: ID } },
+    );
+    expect(cancelled.status).toBe(200);
+    expect((await cancelled.json()).data.reservation.refund_state).toBe('review_required');
+
+    keys({ ...KEY, environment: 'test' });
+    const test = await cancel(
+      send('POST', `/v1/reservations/${ID}/cancel`, { expected_version: 3, reason: 'Broke down' }),
+      { params: { id: ID } },
+    );
+    expect(test.status).toBe(403);
+  });
+});
+
 describe('reservation actions with a test key', () => {
   it('acts on the test reservation in the sandbox, never the engine', async () => {
     const TEST = { ...RESERVATION, id: '5b9e1c2d-3f4a-4b6c-8d7e-9f0a1b2c3d4e', driver: null };
@@ -390,7 +461,13 @@ describe('test reservations', () => {
     status: 'requested',
     stage: 'pending',
     offering: { id: null, name: 'Test transfer', model: 'TRANSFER' },
-    trip: { pickup_area: 'JKIA', pickup_address: null, dropoff_area: null, dropoff_address: null },
+    trip: {
+      pickup_area: 'JKIA',
+      pickup_address: null,
+      dropoff_area: null,
+      dropoff_address: null,
+      flight_number: null,
+    },
     driver: null,
   };
 
@@ -415,6 +492,7 @@ describe('test reservations', () => {
           pickup_address: null,
           dropoff_area: null,
           dropoff_address: null,
+          flight_number: null,
         },
       },
     });

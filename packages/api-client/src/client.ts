@@ -7,7 +7,10 @@ import type {
   ApiService,
   ClosureRequest,
   DepartureRequest,
+  OfferingCreate,
   OfferingUpdate,
+  ReservationCreate,
+  ResourceCreate,
   TestReservationRequest,
   BookingReceipt,
   BookingRequest,
@@ -319,6 +322,64 @@ export class NexgClient {
         },
         options,
       ),
+    /** POST /v1/reservations: a booking your team took elsewhere, so NexG's calendar holds the time. */
+    create: (booking: ReservationCreate, options: ChangeOptions = {}) =>
+      this.change<{ reservation: ApiReservation }>('POST', '/v1/reservations', booking, options),
+    /** POST /v1/reservations/check-in: the code a customer shows, with the name they give. */
+    checkIn: (code: string, options: ChangeOptions & { name?: string } = {}) =>
+      this.change<{ reservation: ApiReservation }>(
+        'POST',
+        '/v1/reservations/check-in',
+        { code, ...(options.name === undefined ? {} : { name: options.name }) },
+        options,
+      ),
+    /** POST /v1/reservations/{id}/reschedule: another time, before it starts. */
+    reschedule: (
+      id: string,
+      expectedVersion: number,
+      startsAt: string,
+      options: ChangeOptions & { endsAt?: string; expectedTotalCents?: number } = {},
+    ) =>
+      this.change<{ reservation: ApiReservation }>(
+        'POST',
+        `/v1/reservations/${encodeURIComponent(id)}/reschedule`,
+        {
+          expected_version: expectedVersion,
+          starts_at: startsAt,
+          ...(options.endsAt === undefined ? {} : { ends_at: options.endsAt }),
+          ...(options.expectedTotalCents === undefined
+            ? {}
+            : { expected_total_cents: options.expectedTotalCents }),
+        },
+        options,
+      ),
+    /** POST /v1/reservations/{id}/start: the trip or work has begun. */
+    start: (id: string, expectedVersion: number, options: ChangeOptions = {}) =>
+      this.change<{ reservation: ApiReservation }>(
+        'POST',
+        `/v1/reservations/${encodeURIComponent(id)}/start`,
+        { expected_version: expectedVersion },
+        options,
+      ),
+    /** POST /v1/reservations/{id}/complete: done, with a short note. */
+    complete: (id: string, expectedVersion: number, note: string, options: ChangeOptions = {}) =>
+      this.change<{ reservation: ApiReservation }>(
+        'POST',
+        `/v1/reservations/${encodeURIComponent(id)}/complete`,
+        { expected_version: expectedVersion, note },
+        options,
+      ),
+    /**
+     * POST /v1/reservations/{id}/cancel: before it starts, paid or not, with a
+     * reason the customer sees. A payment is refunded in full by NexG.
+     */
+    cancel: (id: string, expectedVersion: number, reason: string, options: ChangeOptions = {}) =>
+      this.change<{ reservation: ApiReservation }>(
+        'POST',
+        `/v1/reservations/${encodeURIComponent(id)}/cancel`,
+        { expected_version: expectedVersion, reason },
+        options,
+      ),
     /**
      * PUT /v1/reservations/{id}/driver: who is coming, shown to the customer.
      * Pass null to clear it. Never a phone number.
@@ -344,6 +405,9 @@ export class NexgClient {
   readonly offerings = {
     /** GET /v1/offerings: every offering, with its departures. */
     list: () => this.call<{ items: ApiOffering[] }>('GET', '/v1/offerings', { retry: 'safe' }),
+    /** POST /v1/offerings: a new offering, on NexG's standard terms. */
+    create: (offering: OfferingCreate, options: ChangeOptions = {}) =>
+      this.change<{ offering: ApiOffering }>('POST', '/v1/offerings', offering, options),
     /** PATCH /v1/offerings/{id}: a price, switching it off, or stopping new bookings. */
     update: (id: string, change: OfferingUpdate, options: ChangeOptions = {}) =>
       this.change<{ offering: ApiOffering }>(
@@ -365,6 +429,9 @@ export class NexgClient {
   readonly resources = {
     /** GET /v1/resources: every resource, with its hours and closures. */
     list: () => this.call<{ items: ApiResource[] }>('GET', '/v1/resources', { retry: 'safe' }),
+    /** POST /v1/resources: a new vehicle, room, guide or pool of places. */
+    create: (resource: ResourceCreate, options: ChangeOptions = {}) =>
+      this.change<{ resource: ApiResource }>('POST', '/v1/resources', resource, options),
     /** POST /v1/resources/{id}/closures: busy or closed for a time. */
     close: (id: string, closure: ClosureRequest, options: ChangeOptions = {}) =>
       this.change<{ resource: ApiResource }>(

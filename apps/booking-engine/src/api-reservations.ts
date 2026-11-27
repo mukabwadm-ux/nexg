@@ -49,7 +49,11 @@ export interface ApiReservation extends ApiReservationSummary {
     pickup_address: string | null;
     dropoff_area: string | null;
     dropoff_address: string | null;
+    /** The customer's flight, for a pickup at the airport. */
+    flight_number: string | null;
   } | null;
+  /** review_required: paid, then cancelled, and NexG Finance owes the customer a refund. */
+  refund_state: string | null;
   service_location: { area: string | null; address: string | null } | null;
   notes: string | null;
   currency: 'KES';
@@ -68,6 +72,8 @@ export interface ApiDriver {
   vehicle: string;
   plate: string | null;
   assigned_at: string | null;
+  /** The last position the business's system sent, while the trip is on. */
+  location: { latitude: number; longitude: number; at: string } | null;
 }
 
 const CANCELLED = new Set([
@@ -151,8 +157,10 @@ export function apiReservation(
           pickup_address: text(trip.pickupAddress, 500),
           dropoff_area: text(trip.dropoffArea, 200),
           dropoff_address: text(trip.dropoffAddress, 500),
+          flight_number: text(trip.flightNumber, 10),
         }
       : null,
+    refund_state: text(view.refundState, 40),
     service_location: place
       ? { area: text(place.area, 200), address: text(place.address, 500) }
       : null,
@@ -172,12 +180,32 @@ function driverOf(value: unknown): ApiDriver | null {
   const firstName = text(driver?.firstName, 60);
   const vehicle = text(driver?.vehicle, 80);
   if (!firstName || !vehicle) return null;
+  const spot = driver?.location && typeof driver.location === 'object' ? driver.location : null;
+  const at = instant(spot?.at);
   return {
     first_name: firstName,
     vehicle,
     plate: text(driver?.plate, 20),
     assigned_at: instant(driver?.assignedAt),
+    location:
+      spot && typeof spot.latitude === 'number' && typeof spot.longitude === 'number' && at
+        ? { latitude: spot.latitude, longitude: spot.longitude, at }
+        : null,
   };
+}
+
+/** A flight number as airlines print it: KQ 101, KQ101, EK 719. */
+export function normalizeFlightNumber(value: unknown): string | null {
+  if (value === undefined || value === null || value === '') return null;
+  const raw = typeof value === 'string' ? value.trim().toUpperCase().replace(/\s+/g, '') : '';
+  if (!/^[A-Z0-9]{2}[A-Z]?\d{1,4}[A-Z]?$/.test(raw))
+    throw new BookingError(
+      422,
+      'A flight number is the airline code and the number, for example KQ 101.',
+      'invalid_flight_number',
+    );
+  const match = /^([A-Z0-9]{2}[A-Z]?)(\d{1,4}[A-Z]?)$/.exec(raw)!;
+  return `${match[1]} ${match[2]}`;
 }
 
 /**

@@ -20,10 +20,18 @@ import {
   BookingReceipt,
   ClosureRequest,
   DepartureRequest,
+  OfferingCreate,
   OfferingUpdate,
   ReservationAccept,
+  ReservationCancel,
+  ReservationCheckIn,
+  ReservationComplete,
+  ReservationCreate,
   ReservationDecline,
   ReservationDriverRequest,
+  ReservationReschedule,
+  ReservationStart,
+  ResourceCreate,
   TestReservationMove,
   TestReservationRequest,
   CatalogueItem,
@@ -308,6 +316,34 @@ describe('the documented shapes match @nexg/contracts/api', () => {
       envelope(
         z.object({ reservation: ApiReservation, previous_status: z.string() }).strict(),
       ).parse(endpoint('move-test-reservation').responseExample),
+    ).not.toThrow();
+  });
+
+  it('the examples for running bookings follow their contracts', () => {
+    const one = envelope(z.object({ reservation: ApiReservation }).strict());
+    const cases = [
+      ['create-reservation', ReservationCreate],
+      ['check-in-reservation', ReservationCheckIn],
+      ['reschedule-reservation', ReservationReschedule],
+      ['start-reservation', ReservationStart],
+      ['complete-reservation', ReservationComplete],
+      ['cancel-reservation', ReservationCancel],
+    ] as const;
+    for (const [slug, request] of cases) {
+      expect(() => request.parse(endpoint(slug).example.body), slug).not.toThrow();
+      expect(() => one.parse(endpoint(slug).responseExample), slug).not.toThrow();
+    }
+    expect(() => OfferingCreate.parse(endpoint('create-offering').example.body)).not.toThrow();
+    expect(() =>
+      envelope(z.object({ offering: ApiOffering }).strict()).parse(
+        endpoint('create-offering').responseExample,
+      ),
+    ).not.toThrow();
+    expect(() => ResourceCreate.parse(endpoint('create-resource').example.body)).not.toThrow();
+    expect(() =>
+      envelope(z.object({ resource: ApiResource }).strict()).parse(
+        endpoint('create-resource').responseExample,
+      ),
     ).not.toThrow();
   });
 

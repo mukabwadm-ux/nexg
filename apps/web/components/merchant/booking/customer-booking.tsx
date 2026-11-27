@@ -430,6 +430,18 @@ export function CustomerBooking({ businessId }: { businessId: string }) {
                 {record.booking.pricingBasis === 'indicative' ? 'Indicative amount' : 'Amount'}
               </dt>
               <dd>{money(record.booking.priceMinor)}</dd>
+              {record.booking.trip?.flightNumber ? (
+                <>
+                  <dt className="text-muted">Your flight</dt>
+                  <dd className="font-mono">{record.booking.trip.flightNumber}</dd>
+                </>
+              ) : null}
+              {record.booking.cancelReason && record.booking.status === 'cancelled' ? (
+                <>
+                  <dt className="text-muted">Why it was cancelled</dt>
+                  <dd>{record.booking.cancelReason}</dd>
+                </>
+              ) : null}
               {record.booking.driver ? (
                 <>
                   <dt className="text-muted">Your driver</dt>

@@ -13,7 +13,6 @@ import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError 
 import { privateHeaders } from '@/lib/cache';
 import { BookingEngineUnavailable, engineDetail, engineGet } from '@/lib/booking-engine';
 import { SANDBOX, checkReservation, sandbox, sandboxRefusal } from '@/lib/reservation-routes';
-import { ApiReservation } from '@nexg/contracts/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -61,7 +60,7 @@ export const GET = withErrorEnvelope(
       });
       if (error) return sandboxRefusal(error);
       const row = (Array.isArray(data) ? data[0] : data) as { items?: unknown[] } | null;
-      const tested = ApiReservation.safeParse(row?.items?.[0]);
+      const tested = checkReservation(row?.items?.[0]);
       if (!tested.success) {
         return jsonError('internal_error', 'The test reservation could not be read.', {
           detail: tested.error.issues,

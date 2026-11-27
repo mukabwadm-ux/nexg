@@ -8,13 +8,21 @@ import { manageResource, manageOffering, createClosure } from './management.js';
 import { EventDelivery } from './event-delivery.js';
 import {
   platformAccept,
+  platformCancel,
+  platformCheckIn,
   platformClosure,
+  platformComplete,
+  platformCreateOffering,
+  platformCreateReservation,
+  platformCreateResource,
   platformDecline,
   platformDeparture,
   platformDriver,
   platformOfferings,
   platformRemoveClosure,
+  platformReschedule,
   platformResources,
+  platformStart,
   platformUpdateOffering,
 } from './api-platform.js';
 import { BookingError, type Identity } from './types.js';
@@ -155,6 +163,14 @@ export function createBookingServer(engine: BookingEngine, secret: string) {
                 : undefined,
             }),
           );
+        if (path === '/v1/platform/reservations' && req.method === 'POST')
+          return respond(
+            res,
+            201,
+            await platformCreateReservation(engine, identity, await body(req), key),
+          );
+        if (path === '/v1/platform/reservations/check-in' && req.method === 'POST')
+          return respond(res, 200, await platformCheckIn(engine, identity, await body(req), key));
         const reservation = path.match(/^\/v1\/platform\/reservations\/([^/]+)$/);
         if (reservation && req.method === 'GET')
           return respond(
@@ -162,9 +178,20 @@ export function createBookingServer(engine: BookingEngine, secret: string) {
             200,
             await engine.platformReservation(identity, decodeURIComponent(reservation[1]!)),
           );
-        const act = path.match(/^\/v1\/platform\/reservations\/([^/]+)\/(accept|decline|driver)$/);
+        const act = path.match(
+          /^\/v1\/platform\/reservations\/([^/]+)\/(accept|decline|driver|reschedule|start|complete|cancel)$/,
+        );
         if (act) {
           const id = decodeURIComponent(act[1]!);
+          const steps = {
+            reschedule: platformReschedule,
+            start: platformStart,
+            complete: platformComplete,
+            cancel: platformCancel,
+          } as const;
+          const step = steps[act[2] as keyof typeof steps];
+          if (step && req.method === 'POST')
+            return respond(res, 200, await step(engine, identity, id, await body(req), key));
           if (act[2] === 'accept' && req.method === 'POST')
             return respond(
               res,
@@ -186,8 +213,20 @@ export function createBookingServer(engine: BookingEngine, secret: string) {
         }
         if (path === '/v1/platform/offerings' && req.method === 'GET')
           return respond(res, 200, await platformOfferings(engine, identity));
+        if (path === '/v1/platform/offerings' && req.method === 'POST')
+          return respond(
+            res,
+            201,
+            await platformCreateOffering(engine, identity, await body(req), key),
+          );
         if (path === '/v1/platform/resources' && req.method === 'GET')
           return respond(res, 200, await platformResources(engine, identity));
+        if (path === '/v1/platform/resources' && req.method === 'POST')
+          return respond(
+            res,
+            201,
+            await platformCreateResource(engine, identity, await body(req), key),
+          );
         const offering = path.match(/^\/v1\/platform\/offerings\/([^/]+)(\/departures)?$/);
         if (offering && !offering[2] && req.method === 'PATCH')
           return respond(

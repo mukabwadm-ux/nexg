@@ -109,6 +109,8 @@ export interface BookingInput {
     pickupAddress: string;
     dropoffArea?: string;
     dropoffAddress?: string;
+    /** The customer's flight, for an airport pickup: KQ 101. */
+    flightNumber?: string;
   };
   customer: Customer;
   notes?: string;

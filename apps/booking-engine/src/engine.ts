@@ -41,6 +41,7 @@ import {
 } from './public-details.js';
 import {
   apiReservation,
+  normalizeFlightNumber,
   reservationPage,
   type ApiReservation,
   type ReservationPageOptions,
@@ -1048,6 +1049,10 @@ export class BookingEngine {
           'trip_details_required',
         );
       text(trip.pickupAddress, 'Pickup meeting point', 500);
+      // An airport pickup can carry the flight, written the way airlines print it.
+      const flight = normalizeFlightNumber(trip.flightNumber);
+      if (flight) trip.flightNumber = flight;
+      else delete trip.flightNumber;
       if (n.transportIncluded !== false) {
         if (!n.serviceArea?.areas?.includes(trip.dropoffArea))
           throw new BookingError(422, 'Select a supported dropoff area.', 'outside_service_area');
@@ -2767,6 +2772,12 @@ export class BookingEngine {
               ...n,
               status: 'cancelled',
               refundState: n.paidMinor > 0 ? 'review_required' : undefined,
+              // Why, for the customer's booking page; who cancelled stays in the audit.
+              cancelReason:
+                typeof input.reason === 'string' && input.reason.trim()
+                  ? input.reason.trim().slice(0, 500)
+                  : n.cancelReason,
+              cancelledAt: new Date(this.clock()).toISOString(),
               version: n.version + 1,
             },
           },

@@ -12,6 +12,26 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-27',
     kind: 'added',
+    title: 'Run your bookings from your own system',
+    body: [
+      'POST /v1/reservations records a booking your team took by phone or at the desk, so NexG’s calendar holds the time. POST /v1/reservations/{id}/reschedule moves one before it starts; /start and /complete mark the trip begun and done; /cancel cancels one before it starts, and when the customer has paid, NexG refunds them in full (refund_state review_required). POST /v1/reservations/check-in checks the code a customer shows.',
+      'POST /v1/offerings and POST /v1/resources add offerings and vehicles, rooms or guides on NexG’s standard terms.',
+      'A transfer now carries the customer’s flight number in trip.flight_number, and the driver has a location field for where they are.',
+    ],
+    endpoints: [
+      'create-reservation',
+      'check-in-reservation',
+      'reschedule-reservation',
+      'start-reservation',
+      'complete-reservation',
+      'cancel-reservation',
+      'create-offering',
+      'create-resource',
+    ],
+  },
+  {
+    date: '2026-11-27',
+    kind: 'added',
     title: 'Your booking setup and reservations, from your own system',
     body: [
       'Your system can now keep NexG in step. GET /v1/offerings and GET /v1/resources read what you sell and the vehicles, rooms and guides it uses, each with a version. PATCH /v1/offerings/{id} changes a price or stops new bookings, POST /v1/offerings/{id}/departures adds, changes or closes a tour’s departures, and POST /v1/resources/{id}/closures marks a vehicle busy (DELETE opens the time again). Each change needs the version you read and an Idempotency-Key.',
