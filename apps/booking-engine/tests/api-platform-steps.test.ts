@@ -1,10 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { mkdtemp, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { createPayload } from '../src/payload.js';
 import { BookingEngine } from '../src/engine.js';
 import {
   platformCancel,
@@ -19,6 +15,7 @@ import {
   platformStart,
 } from '../src/api-platform.js';
 import { BookingError, type Identity } from '../src/types.js';
+import { testPayload } from './test-database.js';
 
 // Each test file opens its own SQLite database; see booking.integration.test.ts.
 process.env.PAYLOAD_FORCE_DRIZZLE_PUSH = 'true';
@@ -29,19 +26,13 @@ function refused(status: number, code?: string) {
 }
 
 test('a business runs its bookings from its own system', async (t) => {
-  const directory = await mkdtemp(path.join(tmpdir(), 'nexg-api-steps-'));
-  const payload = await createPayload({
-    sqliteUrl: 'file:' + path.join(directory, 'test.db').replaceAll('\\', '/'),
-    secret: 'api-steps-payload-secret-0123456789abcdefgh',
-    cacheKey: randomUUID(),
-  });
-  t.after(async () => {
-    await payload.destroy();
-    await rm(directory, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }).catch(
-      () => undefined,
-    );
-  });
-  const engine = new BookingEngine(payload, true, () => Date.parse('2030-01-01T00:00:00Z'));
+  // SQLite here; PostgreSQL, the production storage, when BOOKING_TEST_POSTGRES_URL is set.
+  const { payload, sqlite, close } = await testPayload(
+    'api-steps',
+    'api-steps-payload-secret-0123456789abcdefgh',
+  );
+  t.after(close);
+  const engine = new BookingEngine(payload, sqlite, () => Date.parse('2030-01-01T00:00:00Z'));
   const owner: Identity = {
     businessId: 'api-steps-business',
     userId: 'steps-owner',

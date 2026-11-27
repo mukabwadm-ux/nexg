@@ -1,10 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { mkdtemp, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import path from 'node:path';
 import { createHmac, randomUUID } from 'node:crypto';
-import { createPayload } from '../src/payload.js';
 import { BookingEngine } from '../src/engine.js';
 import { createBookingServer } from '../src/server.js';
 import {
@@ -13,27 +9,24 @@ import {
   platformCreateResource,
 } from '../src/api-platform.js';
 import type { Identity } from '../src/types.js';
+import { testPayload } from './test-database.js';
 
 // Each test file opens its own SQLite database; see booking.integration.test.ts.
 process.env.PAYLOAD_FORCE_DRIZZLE_PUSH = 'true';
 
 test('a NexG API test key tries setup changes without saving them', async (t) => {
-  const directory = await mkdtemp(path.join(tmpdir(), 'nexg-api-sandbox-'));
-  const payload = await createPayload({
-    sqliteUrl: 'file:' + path.join(directory, 'test.db').replaceAll('\\', '/'),
-    secret: 'api-sandbox-payload-secret-0123456789abcdef',
-    cacheKey: randomUUID(),
-  });
+  // SQLite here; PostgreSQL, the production storage, when BOOKING_TEST_POSTGRES_URL is set.
+  const { payload, sqlite, close } = await testPayload(
+    'api-sandbox',
+    'api-sandbox-payload-secret-0123456789abcdef',
+  );
   const secret = 'api-sandbox-bridge-secret-0123456789';
-  const engine = new BookingEngine(payload, true, () => Date.parse('2030-01-01T00:00:00Z'));
+  const engine = new BookingEngine(payload, sqlite, () => Date.parse('2030-01-01T00:00:00Z'));
   const server = createBookingServer(engine, secret);
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
   t.after(async () => {
     await new Promise<void>((resolve) => server.close(() => resolve()));
-    await payload.destroy();
-    await rm(directory, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }).catch(
-      () => undefined,
-    );
+    await close();
   });
   const base = 'http://127.0.0.1:' + (server.address() as { port: number }).port;
 
