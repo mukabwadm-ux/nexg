@@ -16,7 +16,7 @@ import { HOSTS, type HttpMethod } from '@/lib/reference/types';
 
 export const metadata = pageMetadata('/docs/reference');
 
-const METHODS: HttpMethod[] = ['GET', 'POST', 'PATCH'];
+const METHODS: HttpMethod[] = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'];
 
 function methodSummary(method: HttpMethod) {
   const all = ENDPOINTS.filter((endpoint) => endpoint.method === method);

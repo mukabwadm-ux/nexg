@@ -6,10 +6,12 @@ const METHOD_TONE: Record<HttpMethod, string> = {
   GET: 'bg-info-bg text-info',
   POST: 'bg-success-bg text-success',
   PATCH: 'bg-warning-bg text-warning',
+  PUT: 'bg-warning-bg text-warning',
+  DELETE: 'bg-danger-bg text-danger',
 };
 
 /**
- * GET, POST or PATCH, in one fixed width so lists of paths line up. Its own
+ * GET, POST, PATCH, PUT or DELETE, in one fixed width so lists of paths line up. Its own
  * file because the sidebar (a client component) renders it, while the rest
  * of badges.tsx is only used by server components.
  */

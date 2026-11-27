@@ -108,7 +108,7 @@ export default function EventsPage() {
           ],
           [
             <C key="t">reservation.updated</C>,
-            'Something else changes in the same status: its time, its payment, or its stage.',
+            'Something else changes in the same status: its time, its payment, its stage or its driver.',
             <C key="d">reservation</C>,
           ],
           [

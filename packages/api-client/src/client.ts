@@ -1,8 +1,14 @@
 import { NexgApiError, NexgConnectionError } from './errors.js';
 import type {
+  ApiOffering,
   ApiOrder,
   ApiReservation,
+  ApiResource,
   ApiService,
+  ClosureRequest,
+  DepartureRequest,
+  OfferingUpdate,
+  TestReservationRequest,
   BookingReceipt,
   BookingRequest,
   BookingStatus,
@@ -76,6 +82,15 @@ export interface MerchantListParams extends PageParams {
 export interface ExperienceListParams extends PageParams {
   city?: string;
   q?: string;
+}
+
+export interface ChangeOptions {
+  /**
+   * 16 to 128 characters, kept with the change before you send it, so a retry
+   * after a crash cannot change anything twice. Defaults to a random UUID for
+   * this call, reused for its retries.
+   */
+  idempotencyKey?: string;
 }
 
 export interface ReservationListParams extends PageParams {
@@ -278,6 +293,94 @@ export class NexgClient {
         `/v1/reservations/${encodeURIComponent(id)}`,
         { retry: 'safe' },
       ),
+    /**
+     * POST /v1/reservations/{id}/accept: confirm one that is waiting for you.
+     * expectedVersion is the version you read; a newer one answers 409.
+     */
+    accept: (id: string, expectedVersion: number, options: ChangeOptions = {}) =>
+      this.change<{ reservation: ApiReservation }>(
+        'POST',
+        `/v1/reservations/${encodeURIComponent(id)}/accept`,
+        { expected_version: expectedVersion },
+        options,
+      ),
+    /** POST /v1/reservations/{id}/decline: decline one that is still waiting and unpaid. */
+    decline: (
+      id: string,
+      expectedVersion: number,
+      options: ChangeOptions & { reason?: string } = {},
+    ) =>
+      this.change<{ reservation: ApiReservation }>(
+        'POST',
+        `/v1/reservations/${encodeURIComponent(id)}/decline`,
+        {
+          expected_version: expectedVersion,
+          ...(options.reason === undefined ? {} : { reason: options.reason }),
+        },
+        options,
+      ),
+    /**
+     * PUT /v1/reservations/{id}/driver: who is coming, shown to the customer.
+     * Pass null to clear it. Never a phone number.
+     */
+    setDriver: (
+      id: string,
+      expectedVersion: number,
+      driver: { first_name: string; vehicle: string; plate?: string | null } | null,
+      options: ChangeOptions = {},
+    ) =>
+      this.change<{ reservation: ApiReservation }>(
+        'PUT',
+        `/v1/reservations/${encodeURIComponent(id)}/driver`,
+        { expected_version: expectedVersion, driver },
+        options,
+      ),
+  };
+
+  /**
+   * Your booking setup: what you sell as bookings and the resources they hold.
+   * Reads need merchant_read; changes need a live key with catalogue_write.
+   */
+  readonly offerings = {
+    /** GET /v1/offerings: every offering, with its departures. */
+    list: () => this.call<{ items: ApiOffering[] }>('GET', '/v1/offerings', { retry: 'safe' }),
+    /** PATCH /v1/offerings/{id}: a price, switching it off, or stopping new bookings. */
+    update: (id: string, change: OfferingUpdate, options: ChangeOptions = {}) =>
+      this.change<{ offering: ApiOffering }>(
+        'PATCH',
+        `/v1/offerings/${encodeURIComponent(id)}`,
+        change,
+        options,
+      ),
+    /** POST /v1/offerings/{id}/departures: add a departure, or change or close one. */
+    saveDeparture: (id: string, departure: DepartureRequest, options: ChangeOptions = {}) =>
+      this.change<{ offering: ApiOffering }>(
+        'POST',
+        `/v1/offerings/${encodeURIComponent(id)}/departures`,
+        departure,
+        options,
+      ),
+  };
+
+  readonly resources = {
+    /** GET /v1/resources: every resource, with its hours and closures. */
+    list: () => this.call<{ items: ApiResource[] }>('GET', '/v1/resources', { retry: 'safe' }),
+    /** POST /v1/resources/{id}/closures: busy or closed for a time. */
+    close: (id: string, closure: ClosureRequest, options: ChangeOptions = {}) =>
+      this.change<{ resource: ApiResource }>(
+        'POST',
+        `/v1/resources/${encodeURIComponent(id)}/closures`,
+        closure,
+        options,
+      ),
+    /** DELETE /v1/resources/{id}/closures/{closureId}: open the time again. */
+    reopen: (id: string, closureId: string, expectedVersion: number, options: ChangeOptions = {}) =>
+      this.change<{ resource: ApiResource }>(
+        'DELETE',
+        `/v1/resources/${encodeURIComponent(id)}/closures/${encodeURIComponent(closureId)}?expected_version=${expectedVersion}`,
+        undefined,
+        options,
+      ),
   };
 
   /** Moving test bookings, with a test key. Nothing is dispatched or charged. */
@@ -296,6 +399,22 @@ export class NexgClient {
         `/v1/test/orders/${encodeURIComponent(id)}/rider`,
         { retry: 'rate_limit_only' },
       ),
+    /** POST /v1/test/reservations: a test reservation, a transfer for tomorrow by default. */
+    createReservation: (reservation: TestReservationRequest = {}) =>
+      this.call<{ reservation: ApiReservation }>('POST', '/v1/test/reservations', {
+        body: reservation,
+        retry: 'rate_limit_only',
+      }),
+    /** POST /v1/test/reservations/{id}/status: move a test reservation forward. */
+    moveReservation: (
+      id: string,
+      status: 'confirmed' | 'in_progress' | 'completed' | 'cancelled',
+    ) =>
+      this.call<{ reservation: ApiReservation; previous_status: BookingStatus }>(
+        'POST',
+        `/v1/test/reservations/${encodeURIComponent(id)}/status`,
+        { body: { status }, retry: 'rate_limit_only' },
+      ),
   };
 
   /**
@@ -311,6 +430,20 @@ export class NexgClient {
     return this.call<T>(method, path, {
       ...options,
       retry: method === 'GET' ? 'safe' : 'rate_limit_only',
+    });
+  }
+
+  /** A change to a reservation or the booking setup: always with an Idempotency-Key, so retried like a read. */
+  private change<T>(
+    method: 'POST' | 'PATCH' | 'PUT' | 'DELETE',
+    path: string,
+    body: unknown,
+    options: ChangeOptions,
+  ): Promise<T> {
+    return this.call<T>(method, path, {
+      ...(body === undefined ? {} : { body }),
+      headers: { 'Idempotency-Key': options.idempotencyKey ?? crypto.randomUUID() },
+      retry: 'safe',
     });
   }
 

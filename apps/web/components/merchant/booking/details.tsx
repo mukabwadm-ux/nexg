@@ -115,6 +115,15 @@ export function BookingDetails({
             <dd className="break-all">{booking.customer.email}</dd>
           </>
         ) : null}
+        {booking.driver ? (
+          <>
+            <dt className="text-muted">Driver</dt>
+            <dd>
+              {booking.driver.firstName} · {booking.driver.vehicle}
+              {booking.driver.plate ? ` · ${booking.driver.plate}` : ''}
+            </dd>
+          </>
+        ) : null}
       </dl>
       {booking.custodyState ? (
         <p

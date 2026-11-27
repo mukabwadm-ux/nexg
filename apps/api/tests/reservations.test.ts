@@ -67,6 +67,14 @@ const RESERVATION = {
   checked_in_at: null,
   booked_on: 'nexg',
   created_at: '2026-11-27T09:02:44.903Z',
+  driver: null,
+};
+/** A sandbox reservation, as rpc_reservation_read_api_test answers it. */
+const TEST_RESERVATION = {
+  ...RESERVATION,
+  id: '5b9e1c2d-3f4a-4b6c-8d7e-9f0a1b2c3d4e',
+  offering: { ...RESERVATION.offering, id: null },
+  resource_ids: [],
 };
 
 const fetchMock = vi.fn();
@@ -80,6 +88,9 @@ function keys(key: object = KEY) {
     if (name === 'rpc_api_reservation_events_ingest') {
       const events = (args as { p_events: { event_key: string }[] }).p_events;
       return { data: { accepted: events.map((event) => event.event_key) }, error: null };
+    }
+    if (name === 'rpc_reservation_read_api_test') {
+      return { data: { ok: true, items: [TEST_RESERVATION], next_cursor: null }, error: null };
     }
     throw new Error(`unexpected rpc ${name}`);
   });
@@ -172,14 +183,22 @@ describe('GET /v1/reservations', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('answers a test key with no reservations, without asking the engine', async () => {
+  it('answers a test key with its test reservations, without asking the engine', async () => {
     keys({ ...KEY, environment: 'test' });
 
-    const res = await list(get('/v1/reservations'));
+    const res = await list(get('/v1/reservations?limit=10&updated_after=2026-11-27T08:00:00Z'));
 
     expect(res.status).toBe(200);
-    expect((await res.json()).data).toEqual({ items: [], next_cursor: null });
+    expect((await res.json()).data).toEqual({ items: [TEST_RESERVATION], next_cursor: null });
     expect(fetchMock).not.toHaveBeenCalled();
+    const call = rpc.mock.calls.find(([name]) => name === 'rpc_reservation_read_api_test');
+    expect(call?.[1]).toEqual({
+      p_api_key: 'a-reading-key',
+      p_limit: 10,
+      p_cursor_updated_at: null,
+      p_cursor_id: null,
+      p_updated_after: '2026-11-27T08:00:00Z',
+    });
   });
 
   it('refuses a key that is not bound to a merchant', async () => {
@@ -263,13 +282,17 @@ describe('GET /v1/reservations/{id}', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('answers a test key with 404, without asking the engine', async () => {
+  it('reads a test key’s test reservation, without asking the engine', async () => {
     keys({ ...KEY, environment: 'test' });
 
-    const res = await read(RESERVATION.id);
+    const res = await read(TEST_RESERVATION.id);
 
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(200);
+    expect((await res.json()).data).toEqual({ reservation: TEST_RESERVATION });
     expect(fetchMock).not.toHaveBeenCalled();
+
+    const notOurs = await read('01a21c69-not-a-uuid');
+    expect(notOurs.status).toBe(404);
   });
 });
 
