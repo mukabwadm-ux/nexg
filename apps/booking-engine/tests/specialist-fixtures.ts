@@ -25,10 +25,10 @@ export async function runSpecialistFixtures({
   const savedTime = clock.now();
   const initialTime = Date.parse('2030-01-01T00:00:00Z');
   const at = (value: string) => clock.set(Date.parse(value));
-  const identity = async (name: string, subcategoryId: string) => {
+  const identity = async (name: string, subcategoryId: string, businessId?: string) => {
     const merchant = {
       ...owner,
-      businessId: `specialist-${name}`,
+      businessId: businessId ?? `specialist-${name}`,
       userId: `owner-${name}`,
       branches: null,
     };
@@ -444,6 +444,116 @@ export async function runSpecialistFixtures({
         booking = await step(merchant, booking, 'AcceptTourScope', { approval: approval(900000) });
         booking = await step(merchant, booking, 'ConfirmTour');
         assert.equal(state(booking), 'READY_TO_DEPART', 'A NexG payment satisfies the operator.');
+      },
+    );
+
+    await t.test(
+      'a review shop tour confirms itself after payment and shows its details',
+      async () => {
+        clock.set(initialTime);
+        const merchant = await identity(
+          'review-tour',
+          'city_tours',
+          'ae7e0002-0011-4000-8000-000000000011',
+        );
+        const guide = await resource(merchant, 'Review tour guide');
+        const pool = await resource(merchant, 'Review tour places', 'capacity_pool', 6, 'place');
+        const service = await offering(
+          merchant,
+          'TOUR',
+          [guide.id, pool.id],
+          {
+            model: 'TOUR',
+            version: 1,
+            supplierComponents: [],
+            mode: 'shared',
+            itinerary: 'Review shop city departure',
+            itineraryVersion: 1,
+            resourceIds: [guide.id],
+            poolResourceId: pool.id,
+            minimumParticipants: 1,
+            maximumParticipants: 6,
+          },
+          {
+            durationMinutes: 120,
+            capacity: 6,
+            intakeMode: 'instant_after_requirements',
+            pricingBasis: 'per_quantity',
+            priceMinor: 450000,
+          },
+        );
+        const occurrence = (await addOccurrence(
+          engine,
+          merchant,
+          service.id,
+          {
+            expectedVersion: service.version,
+            startTime: '2030-01-03T14:00:00+03:00',
+            endTime: '2030-01-03T16:00:00+03:00',
+            capacity: 6,
+            published: true,
+          },
+          key(),
+        )) as any;
+        const traveller = { ...merchant, role: 'customer', userId: 'review-guest' };
+        const created = (await engine.createBooking(
+          traveller,
+          {
+            offeringId: service.id,
+            customer,
+            quantity: 1,
+            specialist: { model: 'TOUR', occurrenceId: occurrence.id, itineraryVersion: 1 },
+          } as any,
+          key(),
+          true,
+        )) as any;
+        const platform = { ...merchant, role: 'platform', userId: 'nexg-payments' } as Identity;
+        await engine.settlePayment(
+          platform,
+          created.booking.id,
+          { provider: 'paystack_test', reference: 'REVIEW-TOUR-1', amountMinor: 450000 },
+          key(),
+        );
+        const finished = (await engine.reviewFinish(platform, created.booking.id)) as any;
+        assert.equal(finished.specialist?.state, 'READY_TO_DEPART', 'No one has to confirm it.');
+        assert.equal(finished.details?.reviewShop, true);
+        assert.equal(finished.details.person.role, 'Your guide');
+        assert.ok(finished.details.person.name && finished.details.person.plate);
+        assert.match(finished.details.reference, /^NXG-/);
+        assert.ok(finished.details.rows.some((r: any) => r.label === 'Pickup time'));
+        assert.equal(
+          finished.details.pickup.at,
+          '2030-01-03T13:45:00+03:00',
+          'Fifteen minutes early.',
+        );
+        assert.equal(typeof finished.details.pickup.point.label, 'string');
+        const seen = (await engine.customerBooking(
+          traveller,
+          created.booking.id,
+          created.customerToken,
+        )) as any;
+        assert.deepEqual(seen.details, finished.details, 'The same details every time it is read.');
+        assert.equal(seen.reviewAutopilot, undefined, 'The internal mark stays internal.');
+        const merchantView = engine.bookingView(
+          (
+            await engine.payload.find({
+              collection: 'booking-requests',
+              where: { publicId: { equals: created.booking.id } },
+              overrideAccess: true,
+              depth: 0,
+            } as any)
+          ).docs[0] as any,
+        ) as any;
+        assert.equal(merchantView.reviewAutopilot?.reviewShop, true, 'Marked as review-shop data.');
+        await assert.rejects(
+          () =>
+            engine.reviewFinish(
+              { ...owner, businessId: 'specialist-tour-paid', role: 'platform' } as Identity,
+              'anything',
+            ),
+          /review shops/,
+          'Ordinary shops are never run automatically.',
+        );
       },
     );
 
