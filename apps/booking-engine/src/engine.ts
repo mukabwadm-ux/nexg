@@ -1610,7 +1610,25 @@ export class BookingEngine {
       throw new BookingError(422, 'A greeter must be assigned.', 'resource_bundle_required');
     return resources;
   }
+  /**
+   * How many of a rented thing one booking can take at once: the fewest units among the offering's vehicles and
+   * assets (each Gari car is one unit). Null when the quantity isn't a count of rented units.
+   */
+  private rentedUnits(service: Doc, resources: Doc[]): number | null {
+    if (service.nexg.model !== 'ASSET_INTERVAL') return null;
+    const units = resources.filter((r) => r.resourceType !== 'staff').map((r) => r.quantity ?? 1);
+    return units.length ? Math.min(...units) : null;
+  }
   private validateCapacity(service: Doc, resources: Doc[], quantity: number, configuration: Doc) {
+    const units = this.rentedUnits(service, resources);
+    if (units !== null && quantity > units)
+      throw new BookingError(
+        409,
+        units === 1
+          ? 'Only one of these can be booked at a time.'
+          : `Only ${units} of these can be booked at a time.`,
+        'insufficient_units',
+      );
     if (service.nexg.model === 'TRANSFER' && service.nexg.transportIncluded !== false) {
       const seats = resources
         .filter((r) => r.resourceType === 'vehicle')
@@ -1864,6 +1882,15 @@ export class BookingEngine {
       identity,
       req,
     );
+    // Asking for more cars than there are is an empty day, not a failed read.
+    const units = this.rentedUnits(service, resources);
+    if (units !== null && quantity > units)
+      return {
+        slots: [],
+        reason: 'No available times for this quantity and period.',
+        timezone: 'Africa/Nairobi',
+        quantity,
+      };
     this.validateCapacity(service, resources, quantity, b.configuration);
     await this.assertNoOverdueCustody(identity, resources, req);
     const readiness = this.readiness(b.configuration, service, resources);
@@ -1961,9 +1988,13 @@ export class BookingEngine {
           available = false;
           break;
         }
-        if (resource.capacityMode === 'per-guest')
+        if (
+          resource.capacityMode === 'per-guest' ||
+          (units !== null && resource.resourceType !== 'staff')
+        )
           remaining = Math.min(remaining, result.totalCapacity - result.currentCount);
       }
+      if (units !== null && remaining < quantity) available = false;
       if (available && pool && session) {
         const attendees = reservations.filter(
           (r) =>
@@ -2261,8 +2292,20 @@ export class BookingEngine {
       // before it is confirmed (owner, 19 Nov 2026; again 25 Nov 2026: "booking
       // means youve paid 100% same with reservations", which ends the 22 Nov
       // deposit exception). Free bookings have nothing to pay.
+      // A tour the customer books straight away is paid in full the same way,
+      // although the operator still confirms the departure: it is held until
+      // paid, then sent to the operator already paid.
+      const paidTour =
+        publicOnly &&
+        n.model === 'TOUR' &&
+        n.intakeMode === 'instant_after_requirements' &&
+        !externalPrice &&
+        !sourceRequired;
       const prepaid =
-        publicOnly && !requestOnly && !pricing.indicative && pricing.totalDueMinor > 0;
+        publicOnly &&
+        (!requestOnly || paidTour) &&
+        !pricing.indicative &&
+        pricing.totalDueMinor > 0;
       if (prepaid) {
         pricing.dueNowMinor = pricing.totalDueMinor;
         pricing.balanceMinor = 0;
@@ -2330,7 +2373,7 @@ export class BookingEngine {
         configurationRevision: b.configuration?.revision,
         acceptedConfiguration: structuredClone(b.configuration ?? {}),
         status:
-          input.hold || quoteReserve || (paymentRequired && !requestOnly)
+          input.hold || quoteReserve || (paymentRequired && (!requestOnly || prepaid))
             ? 'held'
             : requestOnly
               ? 'pending'
@@ -2363,10 +2406,12 @@ export class BookingEngine {
         createdBy: identity.userId,
         // The range the quote was reserved against: its deposit and its final price are read from it.
         ...(quoteReserve ? { quoteRange: { ...n.quoteRange } } : {}),
-        // A quote waits for its deposit as long as a prepaid booking waits for its payment.
-        ...(quoteReserve
+        // A request paid up front (a reserved quote, a paid tour) waits for its payment as long as a prepaid
+        // booking does.
+        ...(quoteReserve || (prepaid && requestOnly)
           ? { expiresAt: new Date(this.clock() + PREPAID_HOLD_MINUTES * 60000).toISOString() }
           : {}),
+        ...(prepaid && requestOnly ? { prepaidRequest: true } : {}),
       };
       let doc: Doc;
       if (requestOnly && !input.hold) {
@@ -3609,7 +3654,10 @@ export class BookingEngine {
   private async settleQuotePayment(identity: Identity, req: any, id: string, doc: Doc, input: Doc) {
     const n = doc.nexg ?? {};
     const state = doc.status ?? n.status;
-    if (!n.quoteRange || n.acceptedPolicies?.paymentPolicyId !== PREPAID_POLICY)
+    if (
+      !(n.quoteRange || n.prepaidRequest) ||
+      n.acceptedPolicies?.paymentPolicyId !== PREPAID_POLICY
+    )
       throw new BookingError(
         409,
         'This request is not paid through NexG.',

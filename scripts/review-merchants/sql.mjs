@@ -109,7 +109,13 @@ select ${q(id)}, d, '00:00', '23:59', false, 'monday_zero' from generate_series(
 function catalogueSql(s) {
   const mid = merchantId(s);
   const out = [];
+  // A section whose every item is hidden is not listed at all (after its items go, below).
+  const emptySections = [];
   s.sections.forEach((section, si) => {
+    if (section.items.every((item) => item.hidden)) {
+      emptySections.push(rid(KIND.section, s.n, si + 1));
+      return;
+    }
     out.push(`insert into public.catalogue_section (id, merchant_id, name, sort)
 values (${q(rid(KIND.section, s.n, si + 1))}, ${q(mid)}, ${q(section.name)}, ${si + 1})
 on conflict (id) do update set name = excluded.name, sort = excluded.sort;`);
@@ -130,6 +136,12 @@ on conflict (id) do update set name = excluded.name, extra_cents = excluded.extr
   });
   for (const it of itemsOf(s)) {
     const id = itemId(s, it);
+    // A hidden item can't be booked here, so the store doesn't list it: a listed item the customer can't
+    // open is a dead end ("Currently unavailable" with no button).
+    if (it.hidden) {
+      out.push(`delete from public.catalogue_item where id = ${q(id)};`);
+      continue;
+    }
     const w = it.weight;
     const kind = it.kind ?? 'buy';
     out.push(`insert into public.catalogue_item (id, merchant_id, section_id, name, description, price_kes, available,
@@ -167,6 +179,8 @@ values (${q(rid(KIND.promotion, s.n, 1))}, ${q(mid)}, ${q(s.promotion.name)}, ${
   ${q(itemId(s, target))}, now() - interval '1 day', now() + interval '120 days', 'active')
 on conflict (id) do update set name = excluded.name, value = excluded.value, ends_at = excluded.ends_at, status = 'active';`);
   }
+  for (const id of emptySections)
+    out.push(`delete from public.catalogue_section where id = ${q(id)};`);
   return out.join('\n');
 }
 

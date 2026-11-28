@@ -176,12 +176,17 @@ export async function settleBookings(
 function bookingTarget(rawId: string) {
   return async ({ supabase }: Session): Promise<PaymentTarget | Response> => {
     if (!validBookingId(rawId)) return problem(404, 'NOT_FOUND', 'No such booking.');
-    /* The saved booking's own id, or the engine's id the app knows it by. Row
+    /* The engine's id the app knows the booking by, or the saved booking's own
+       id. Engine ids are UUID-shaped too, so a UUID is tried as both. Row
        security shows the customer only their own bookings either way. */
     const found = await supabase
       .from('customer_engine_booking')
       .select('id, merchant_id, engine_booking_id, customer_token, customer_ref')
-      .eq(bookingId.safeParse(rawId).success ? 'id' : 'engine_booking_id', rawId)
+      .or(
+        bookingId.safeParse(rawId).success
+          ? `engine_booking_id.eq.${rawId},id.eq.${rawId}`
+          : `engine_booking_id.eq.${rawId}`,
+      )
       .maybeSingle();
     if (found.error) return unavailable();
     if (!found.data) return problem(404, 'NOT_FOUND', 'No such booking.');

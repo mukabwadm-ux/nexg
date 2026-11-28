@@ -1134,6 +1134,32 @@ test('native booking lifecycle, concurrency, scope and durable storage', async (
           ),
         (error: any) => error.code === 'outside_schedule',
       );
+      // One car is one unit: two of it is an empty day, not a failed read, and can't be held.
+      const one = (await engine.availability(rental, service.id, '2030-01-07', false, {
+        quantity: 1,
+      })) as any;
+      assert.ok(one.slots.length > 0);
+      assert.ok(one.slots.every((slot: any) => slot.remainingCapacity === 1));
+      const two = (await engine.availability(rental, service.id, '2030-01-07', false, {
+        quantity: 2,
+      })) as any;
+      assert.deepEqual(two.slots, []);
+      assert.equal(two.reason, 'No available times for this quantity and period.');
+      await assert.rejects(
+        () =>
+          engine.createBooking(
+            rental,
+            {
+              offeringId: service.id,
+              startTime: '2030-01-07T09:00:00+03:00',
+              endTime: '2030-01-08T09:00:00+03:00',
+              customer,
+              quantity: 2,
+            },
+            key(),
+          ),
+        (error: any) => error.code === 'insufficient_units',
+      );
       let hire = (await engine.createBooking(
         rental,
         {
