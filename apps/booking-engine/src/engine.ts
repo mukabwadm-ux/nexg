@@ -3561,7 +3561,42 @@ export class BookingEngine {
    * refused, so the payment side refunds it instead of a booking appearing
    * unannounced.
    */
+  /**
+   * A payment settles. A tour booked on a published departure is then
+   * confirmed straight away, for every business (owner, 28 Nov 2026): its date
+   * came from the operator's own availability, so the engine sends the
+   * operator's accept and confirm itself. If the operator's setup still needs
+   * something (a supplier confirmation), it stays pending for them.
+   */
   async settlePayment(identity: Identity, id: string, input: Doc, key?: string) {
+    const settled = (await this.settlePaymentOnly(identity, id, input, key)) as Doc;
+    if (settled?.model !== 'TOUR' || !settled.prepaidRequest || settled.status !== 'pending')
+      return settled;
+    const operator = {
+      ...identity,
+      userId: 'nexg-instant-confirm',
+      role: 'owner',
+      branches: null,
+    } as Identity;
+    let view = settled;
+    for (let i = 0; i < 3; i++) {
+      const step = nextReviewStep(view, this.clock());
+      if (!step || step.action !== 'workflow') break;
+      try {
+        view = (await this.changeBooking(
+          operator,
+          id,
+          step.action,
+          { ...step.input, expectedVersion: view.version },
+          `instant:${id}:${view.version}:${step.label}`,
+        )) as Doc;
+      } catch {
+        break;
+      }
+    }
+    return view;
+  }
+  private async settlePaymentOnly(identity: Identity, id: string, input: Doc, key?: string) {
     requirePlatform(identity);
     return this.command(identity, key, `booking.${id}.settle`, input, async (req) => {
       await this.expiredInTransaction(identity, req);
