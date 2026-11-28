@@ -179,7 +179,8 @@ values (${q(rid(KIND.promotion, s.n, 1))}, ${q(mid)}, ${q(s.promotion.name)}, ${
   ${q(itemId(s, target))}, now() - interval '1 day', now() + interval '120 days', 'active')
 on conflict (id) do update set name = excluded.name, value = excluded.value, ends_at = excluded.ends_at, status = 'active';`);
   }
-  for (const id of emptySections) out.push(`delete from public.catalogue_section where id = ${q(id)};`);
+  for (const id of emptySections)
+    out.push(`delete from public.catalogue_section where id = ${q(id)};`);
   return out.join('\n');
 }
 

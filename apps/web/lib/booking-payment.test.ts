@@ -286,9 +286,7 @@ describe('finding the booking the app pays for', () => {
       engineId,
     );
     expect(response.status).toBe(200);
-    expect(stub.filter).toHaveBeenCalledWith(
-      `engine_booking_id.eq.${engineId},id.eq.${engineId}`,
-    );
+    expect(stub.filter).toHaveBeenCalledWith(`engine_booking_id.eq.${engineId},id.eq.${engineId}`);
     expect(stub.rpc).toHaveBeenCalledWith('rpc_engine_booking_payment_state', {
       p_booking: BOOKING,
     });
