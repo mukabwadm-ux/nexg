@@ -1,0 +1,194 @@
+{
+  "about": "The 23 Nov 2026 rollout of main's migrations to the live database (project NexgApp). Read by scripts/check-migration-repeats.mjs and the live-rollout rehearsal in CI. See docs/database/live-rollout-2026-11-23.md.",
+  "liveHead": "20261111001700",
+  "revert": [
+    {
+      "version": "20261111000000",
+      "liveName": "activities_games_sports_enum",
+      "liveSqlMd5": "6da919dc4dc8034e8b0c1e594dbf8ba5",
+      "reason": "Live ran activities_games_sports_enum here (branch codex/derrick-local-work-20261105). Main's own 20261111000000 (connector_outbox_claim_audit_exemption) never ran live; after this revert the push runs it. The enum value stays."
+    },
+    {
+      "version": "20261111000100",
+      "liveName": "activities_games_sports_config",
+      "liveSqlMd5": "5c38f941a77d16b541bbe9947586a256",
+      "reason": "activities_games_sports_config: in no file on main. Its category_config row stays live."
+    },
+    {
+      "version": "20261111000200",
+      "liveName": "host_unit_portfolio_save",
+      "liveSqlMd5": "5ac94ecd7aac32e5bf5e82359ad0fe5f",
+      "reason": "Live ran host_unit_portfolio_save here; main has it as 20261113000100 (marked applied below). Main's own 20261111000200 (merchant_setup_storage_owner_grant) never ran; the push runs it."
+    },
+    {
+      "version": "20261111000300",
+      "liveName": "host_manual_finance",
+      "liveSqlMd5": "f8c990b024a783a45a1f954a8d3a35a2",
+      "reason": "Live ran host_manual_finance here; main has it as 20261113000200 (marked applied below). Main's own 20261111000300 (merchant_setup_write_audit) never ran; the push runs it."
+    },
+    {
+      "version": "20261111000400",
+      "liveName": "host_workspace_preferences",
+      "liveSqlMd5": "2f7f36afbf71c10c2ceb7d931d0bdc9a",
+      "reason": "host_workspace_preferences; main has it as 20261113000300 (marked applied below)."
+    },
+    {
+      "version": "20261111000500",
+      "liveName": "host_workspace_gallery",
+      "liveSqlMd5": "d18e92f6594a88ce443c8e2bcf7e8534",
+      "reason": "host_workspace_gallery; main has it as 20261113000400 (marked applied below)."
+    },
+    {
+      "version": "20261111000600",
+      "liveName": "scope_merchant_media_policy_check",
+      "liveSqlMd5": "7ed1c552c1abfde537140471e73ea563",
+      "reason": "scope_merchant_media_policy_check: in no file on main. authz.owns_merchant_offering_media and its two storage policies stay live."
+    },
+    {
+      "version": "20261111000700",
+      "liveName": "host_workspace_cancel_placement",
+      "liveSqlMd5": "220eda72c4805da1ed639bc5e7424a3f",
+      "reason": "host_workspace_cancel_placement; main has it as 20261113000600 (marked applied below)."
+    },
+    {
+      "version": "20261111000800",
+      "liveName": "retire_packages_with_valid_status",
+      "liveSqlMd5": "b49b4ca48ca53f830dee2e56ff50a11a",
+      "reason": "retire_packages_with_valid_status; main has it as 20261113000700 (marked applied below)."
+    },
+    {
+      "version": "20261111000900",
+      "liveName": "host_scoped_privacy_status",
+      "liveSqlMd5": "b5aa051699d128620be65b19b1efd46a",
+      "reason": "host_scoped_privacy_status; main has it as 20261113000800 (marked applied below)."
+    },
+    {
+      "version": "20261111001000",
+      "liveName": "host_workspace_tasks",
+      "liveSqlMd5": "3da82988d94c8a60835ddc5e62745d49",
+      "reason": "host_workspace_tasks; main has it as 20261113000900 (marked applied below)."
+    },
+    {
+      "version": "20261111001100",
+      "liveName": "host_workspace_guides",
+      "liveSqlMd5": "73cf5a281002df5048993a52749e7e75",
+      "reason": "host_workspace_guides; main has it as 20261113001000 (marked applied below)."
+    },
+    {
+      "version": "20261111001200",
+      "liveName": "unit_save_respects_unit_scope",
+      "liveSqlMd5": "677fef44204e98f052d4d0c9a1409b0e",
+      "reason": "unit_save_respects_unit_scope: in no file on main. rpc_unit_upsert_guarded is replaced by later main files (20261114000100, 20261223000700, 20270125000100, 20270220000100)."
+    },
+    {
+      "version": "20261111001300",
+      "liveName": "host_workspace_writes_are_audited",
+      "liveSqlMd5": "29ce2320ceca0f950dafc2869e9b6e68",
+      "reason": "host_workspace_writes_are_audited: in no file on main. Both functions are replaced by 20261114000100."
+    },
+    {
+      "version": "20261111001400",
+      "liveName": "gross_includes_vat",
+      "liveSqlMd5": "c645acc3a5df518c787f798ad873a9b4",
+      "reason": "gross_includes_vat: in no file on main. fn_fin_kpi_for keeps the VAT fix live; main never redefines it."
+    },
+    {
+      "version": "20261111001500",
+      "liveName": "api_console_module",
+      "liveSqlMd5": "c6761c796e6cee3f1201304ec2f62b0c",
+      "reason": "api_console_module: in no file on main. The console_module row 'api' stays live."
+    },
+    {
+      "version": "20261111001600",
+      "liveName": "business_types_for_activities",
+      "liveSqlMd5": "d8b8aebaa75fdeaeedcc2f7c782b172c",
+      "reason": "business_types_for_activities: reruns 20261106000000's idempotent update for the activities category; in no file on main."
+    },
+    {
+      "version": "20261111001700",
+      "liveName": "payment_callbacks_and_audit_wiring",
+      "liveSqlMd5": "92580e4c511709d666008016f1f04747",
+      "reason": "payment_callbacks_and_audit_wiring: in no file on main. Its functions are dropped or replaced by later main files (20261112000300, 20261204000100, 20261206000100 and others); the rehearsal checks anon still cannot call a payment callback."
+    }
+  ],
+  "markApplied": [
+    {
+      "version": "20261113000100",
+      "equalsLive": "20261111000200",
+      "liveSqlMd5": "5ac94ecd7aac32e5bf5e82359ad0fe5f"
+    },
+    {
+      "version": "20261113000200",
+      "equalsLive": "20261111000300",
+      "liveSqlMd5": "f8c990b024a783a45a1f954a8d3a35a2"
+    },
+    {
+      "version": "20261113000300",
+      "equalsLive": "20261111000400",
+      "liveSqlMd5": "2f7f36afbf71c10c2ceb7d931d0bdc9a"
+    },
+    {
+      "version": "20261113000400",
+      "equalsLive": "20261111000500",
+      "liveSqlMd5": "d18e92f6594a88ce443c8e2bcf7e8534"
+    },
+    {
+      "version": "20261113000600",
+      "equalsLive": "20261111000700",
+      "liveSqlMd5": "220eda72c4805da1ed639bc5e7424a3f"
+    },
+    {
+      "version": "20261113000700",
+      "equalsLive": "20261111000800",
+      "liveSqlMd5": "b49b4ca48ca53f830dee2e56ff50a11a"
+    },
+    {
+      "version": "20261113000800",
+      "equalsLive": "20261111000900",
+      "liveSqlMd5": "b5aa051699d128620be65b19b1efd46a"
+    },
+    {
+      "version": "20261113000900",
+      "equalsLive": "20261111001000",
+      "liveSqlMd5": "3da82988d94c8a60835ddc5e62745d49",
+      "differences": [
+        {
+          "object": "public.rpc_host_workspace_task_save(",
+          "why": "Main's file gives p_version and p_patch defaults; live's copy has none. 20261114000100 re-creates the function with them, so nothing else is needed."
+        }
+      ]
+    },
+    {
+      "version": "20261113001000",
+      "equalsLive": "20261111001100",
+      "liveSqlMd5": "73cf5a281002df5048993a52749e7e75",
+      "differences": [
+        {
+          "object": "public.rpc_host_workspace_guide_asset(",
+          "why": "Main's file gives p_code a default of null; live's copy has none. 20270228000100_host_guide_asset_code_optional adds it."
+        }
+      ]
+    }
+  ],
+  "sharedIds": [
+    {
+      "id": "20261111000000",
+      "names": [
+        "connector_outbox_claim_audit_exemption",
+        "activities_games_sports_enum",
+        "merchant_application_hardening"
+      ],
+      "reason": "Three files used this id. Live ran activities_games_sports_enum (branch codex/derrick-local-work-20261105); merchant_application_hardening is open PR #59. The rollout reverts live's row and runs main's file."
+    },
+    {
+      "id": "20261111000200",
+      "names": ["merchant_setup_storage_owner_grant", "host_unit_portfolio_save"],
+      "reason": "Live ran host_unit_portfolio_save under this id (now 20261113000100 on main). The rollout reverts it and runs main's file."
+    },
+    {
+      "id": "20261111000300",
+      "names": ["merchant_setup_write_audit", "host_manual_finance"],
+      "reason": "Live ran host_manual_finance under this id (now 20261113000200 on main). The rollout reverts it and runs main's file."
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "about": "Schema differences between live after the 23 Nov 2026 rollout and a database built fresh from main, found by the CI rehearsal. Each is a change live ran (in its 20261111 block) that main does not have: see docs/database/live-rollout-2026-11-23.md, section 7. scripts/live-rollout-schema-diff.mjs fails on any difference not listed here, and on any listed one that disappears.",
+  "onlyLive": [
+    {
+      "statement": "create type public.merchant_category as enum (",
+      "why": "Live's 20261111000000 added 'activities_games_sports' to the enum."
+    },
+    {
+      "statement": "create function authz.owns_merchant_offering_media(p_name text)",
+      "why": "Live's 20261111000600 (scope_merchant_media_policy_check), in no file on main: the owner check behind the merchant-offering-media storage policies."
+    },
+    {
+      "statement": "alter function authz.owns_merchant_offering_media(p_name text) owner to",
+      "why": "Live's 20261111000600 (scope_merchant_media_policy_check), in no file on main: the owner check behind the merchant-offering-media storage policies."
+    },
+    {
+      "statement": "revoke all on function authz.owns_merchant_offering_media(p_name text)",
+      "why": "Live's 20261111000600 (scope_merchant_media_policy_check), in no file on main: the owner check behind the merchant-offering-media storage policies."
+    },
+    {
+      "statement": "grant all on function authz.owns_merchant_offering_media(p_name text)",
+      "why": "Live's 20261111000600 (scope_merchant_media_policy_check), in no file on main: the owner check behind the merchant-offering-media storage policies."
+    },
+    {
+      "statement": "create policy merchant_offering_media_owner_insert on storage.objects",
+      "why": "Live's 20261111000600 (scope_merchant_media_policy_check), in no file on main: the owner check behind the merchant-offering-media storage policies."
+    },
+    {
+      "statement": "create policy merchant_offering_media_owner_read on storage.objects",
+      "why": "Live's 20261111000600 (scope_merchant_media_policy_check), in no file on main: the owner check behind the merchant-offering-media storage policies."
+    },
+    {
+      "statement": "create function public.fn_fin_kpi_for(p_day date, p_city_id uuid)",
+      "why": "Live's 20261111001400 (gross_includes_vat): gross includes VAT. Main never redefines fn_fin_kpi_for."
+    }
+  ],
+  "onlyMain": [
+    {
+      "statement": "create type public.merchant_category as enum (",
+      "why": "Main's enum without 'activities_games_sports'."
+    },
+    {
+      "statement": "create policy merchant_offering_media_owner_insert on storage.objects",
+      "why": "Main's original policy (live has 20261111000600's)."
+    },
+    {
+      "statement": "create policy merchant_offering_media_owner_read on storage.objects",
+      "why": "Main's original policy (live has 20261111000600's)."
+    },
+    {
+      "statement": "create function public.fn_fin_kpi_for(p_day date, p_city_id uuid)",
+      "why": "Main's body without the VAT fix (live has 20261111001400's)."
+    }
+  ]
+}
