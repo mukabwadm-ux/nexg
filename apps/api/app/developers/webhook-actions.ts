@@ -98,7 +98,7 @@ const SampleType = z.enum([
 
 /**
  * A sample reservation event for a TEST endpoint: rpc_api_webhook_sample
- * (20270341000100) makes a test reservation and sends the event about it to
+ * (20270344000200) makes a test reservation and sends the event about it to
  * that endpoint only. A live endpoint is refused there: it gets pings only.
  */
 export async function sendWebhookSample(endpointId: string, type: string): Promise<WebhookResult> {

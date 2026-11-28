@@ -6,7 +6,7 @@
  * - Live keys reach the engine (lib/booking-engine.ts) for the key's merchant.
  *   A change runs as that business's manager under the key's id, so the
  *   engine's rules, audit and events are the merchant console's.
- * - Test keys reach the sandbox (api_test_reservation, 20270340000100) for
+ * - Test keys reach the sandbox (api_test_reservation, 20270344000100) for
  *   reservations. They read the real offerings and resources, and their
  *   changes to them are dry runs in the engine: checked under the live rules
  *   and answered as they would be, with applied false, but never saved.
@@ -282,8 +282,8 @@ export function sandboxReservation(data: unknown) {
 
 /**
  * What the sandbox does to a test reservation: accept, decline and driver
- * (rpc_reservation_act_api_test, 20270340000100), and the steps reschedule,
- * start, complete and cancel (rpc_reservation_step_api_test, 20270341000100).
+ * (rpc_reservation_act_api_test, 20270344000100), and the steps reschedule,
+ * start, complete and cancel (rpc_reservation_step_api_test, 20270344000200).
  */
 const SANDBOX_ACTIONS = new Set(['accept', 'decline', 'driver']);
 
