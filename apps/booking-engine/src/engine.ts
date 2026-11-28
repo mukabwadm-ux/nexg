@@ -22,6 +22,7 @@ import {
   changeSpecialistWork,
 } from './specialist-runtime.js';
 import { requireManager } from './auth.js';
+import { isReviewBusiness, nextReviewStep, reviewDetails } from './review-shops.js';
 import {
   customerRecord,
   forgottenFields,
@@ -756,9 +757,10 @@ export class BookingEngine {
       entitlementRedemptions: _entitlementRedemptions,
       entitlementValidity: _entitlementValidity,
       entitlementOccurrenceKey: _entitlementOccurrenceKey,
+      reviewAutopilot: _reviewAutopilot,
       ...safe
     } = n;
-    return {
+    const view = {
       ...safe,
       customer: n.customer ? (({ ref: _ref, ...rest }) => rest)(n.customer) : undefined,
       // The customer's code, only while it can be used: paid, confirmed and
@@ -782,6 +784,15 @@ export class BookingEngine {
       quantity: n.quantity ?? d.guestCount,
       version: n.version ?? 1,
     };
+    // A review shop's booking, once the review autopilot ran: the details the
+    // customer would otherwise wait for (pretend; see review-shops.ts).
+    if (_reviewAutopilot && audience === 'customer')
+      return {
+        ...view,
+        details: reviewDetails(view, process.env.REVIEW_CONTACT_PHONE || undefined),
+      };
+    if (_reviewAutopilot) return { ...view, reviewAutopilot: _reviewAutopilot };
+    return view;
   }
   async validateOccurrence(
     identity: Identity,
@@ -3869,6 +3880,82 @@ export class BookingEngine {
       });
       return this.bookingView(result);
     });
+  }
+  /**
+   * Review shops only (ids starting `ae7e`, see review-shops.ts): after a
+   * payment, play the business. Runs the commands the business would send
+   * (accept, confirm) until the booking waits for the customer, then marks it
+   * `reviewAutopilot` so the customer sees its pretend details. Any other
+   * business is refused, and a step the engine refuses stops the run there.
+   */
+  async reviewFinish(identity: Identity, id: string) {
+    requirePlatform(identity);
+    if (!isReviewBusiness(identity.businessId))
+      throw new BookingError(403, 'Only NexG review shops are run automatically.', 'forbidden');
+    const merchant: Identity = {
+      ...identity,
+      userId: 'review-autopilot',
+      role: 'owner',
+      branches: null,
+    } as Identity;
+    const steps: string[] = [];
+    let stopped: string | undefined;
+    for (let i = 0; i < 6; i++) {
+      const { doc } = await this.locateBooking(merchant, id, this.request(merchant));
+      const view = this.bookingView(doc);
+      const step = nextReviewStep(view, this.clock());
+      if (!step) break;
+      try {
+        await this.changeBooking(
+          merchant,
+          id,
+          step.action,
+          { ...step.input, expectedVersion: view.version },
+          `review:${id}:${view.version}:${step.label}`,
+        );
+        steps.push(step.label);
+      } catch (error) {
+        stopped = `${step.label}: ${(error as Error).message}`.slice(0, 300);
+        break;
+      }
+    }
+    return this.command(
+      merchant,
+      `review-mark:${id}:${randomBytes(8).toString('hex')}`,
+      `booking.${id}.review`,
+      {},
+      async (req) => {
+        const { collection, doc } = await this.locateBooking(merchant, id, req);
+        const n = doc.nexg ?? {};
+        if (['held'].includes(doc.status ?? n.status) || n.paymentState === 'awaiting_payment')
+          return this.bookingView(doc, 'customer');
+        const at = new Date(this.clock()).toISOString();
+        const result = await this.update(
+          collection,
+          doc.id,
+          {
+            nexg: {
+              ...n,
+              reviewAutopilot: {
+                reviewShop: true,
+                at: n.reviewAutopilot?.at ?? at,
+                steps: [...(n.reviewAutopilot?.steps ?? []), ...steps],
+                ...(stopped ? { stopped } : {}),
+              },
+              version: (n.version ?? 1) + 1,
+            },
+          },
+          merchant,
+          req,
+        );
+        await this.audit(merchant, req, 'booking.review_autopilot', id, {
+          version: result.nexg?.version,
+          steps,
+          ...(stopped ? { stopped } : {}),
+        });
+        return this.bookingView(result, 'customer');
+      },
+    );
   }
   /**
    * A reserved quote's payment: the deposit (half of the top of the range) while it waits for it, which sends the

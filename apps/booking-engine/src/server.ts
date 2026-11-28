@@ -318,6 +318,13 @@ export function createBookingServer(engine: BookingEngine, secret: string) {
                 key,
               ),
             );
+          const review = path.match(/^\/v1\/platform\/bookings\/([^/]+)\/review-finish$/);
+          if (review && req.method === 'POST')
+            return respond(
+              res,
+              200,
+              await engine.reviewFinish(identity, decodeURIComponent(review[1]!)),
+            );
           if (path === '/v1/platform/customers/forget' && req.method === 'POST')
             return respond(
               res,

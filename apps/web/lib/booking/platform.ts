@@ -115,3 +115,27 @@ export function simulateEngineBookingPayment(merchantId: string, bookingId: stri
     `settle:simulated:${reference}`,
   );
 }
+
+/** NexG's own App Store and Google Play review shops: fixed ids with this prefix. */
+export function isReviewShop(merchantId: string) {
+  return /^ae7e[0-9a-f]{4}-/i.test(merchantId);
+}
+
+/**
+ * Review shops only (owner, 28 Nov 2026): nobody works their merchant portal,
+ * so once a test payment settles, the engine plays the business (accepts and
+ * confirms) and fills in the pretend details the customer would otherwise wait
+ * for. Any other merchant, or a real payment, is never sent; the engine refuses
+ * any business outside the review shops as well. Best effort: a failure leaves
+ * the paid booking as it was.
+ */
+export function finishReviewBooking(merchantId: string, bookingId: string, testPayment: boolean) {
+  if (!testPayment || !isReviewShop(merchantId) || !ID.test(bookingId))
+    return Promise.resolve<PlatformResult>({ ok: false, status: 422, code: 'not_a_review_shop' });
+  return platformCall(
+    merchantId,
+    `/v1/platform/bookings/${encodeURIComponent(bookingId)}/review-finish`,
+    {},
+    randomUUID(),
+  );
+}

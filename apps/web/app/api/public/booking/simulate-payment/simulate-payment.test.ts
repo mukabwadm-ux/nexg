@@ -2,13 +2,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { POST } from './route';
 
-const mock = vi.hoisted(() => ({ session: vi.fn(), token: vi.fn(), simulate: vi.fn() }));
+const mock = vi.hoisted(() => ({
+  session: vi.fn(),
+  token: vi.fn(),
+  simulate: vi.fn(),
+  finish: vi.fn(),
+}));
 vi.mock('../../../../../lib/booking/app-session', () => ({
   appBookingSession: mock.session,
   savedCustomerToken: mock.token,
 }));
 vi.mock('../../../../../lib/booking/platform', () => ({
   simulateEngineBookingPayment: mock.simulate,
+  finishReviewBooking: mock.finish,
 }));
 
 const merchantId = '12345678-1234-4234-8234-123456789abc';
@@ -26,6 +32,7 @@ beforeEach(() => {
   vi.stubEnv('NEXG_SIMULATED_PAYMENTS', '1');
   mock.session.mockResolvedValue({ kind: 'signed_in', userId: 'u', anonymous: true, client: {} });
   mock.token.mockResolvedValue('t'.repeat(43));
+  mock.finish.mockResolvedValue({ ok: false, status: 422, code: 'not_a_review_shop' });
 });
 afterEach(() => vi.unstubAllEnvs());
 

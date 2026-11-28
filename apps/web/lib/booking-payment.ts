@@ -3,7 +3,7 @@ import 'server-only';
 import { z } from 'zod';
 
 import { forwardBookingRequest } from '@/lib/booking/bridge';
-import { settleEngineBookingPayment } from '@/lib/booking/platform';
+import { finishReviewBooking, settleEngineBookingPayment } from '@/lib/booking/platform';
 import {
   problem,
   readPayment,
@@ -167,7 +167,10 @@ export async function settleBookings(
       p_refusal: refusal,
       p_proof: proof,
     });
-    if (result.ok) settled += 1;
+    if (result.ok) {
+      settled += 1;
+      await finishReviewBooking(row.merchant_id, row.engine_booking_id, row.is_test);
+    }
     if (refusal) refusedCount += 1;
   }
   return { settled, refused: refusedCount };
