@@ -417,7 +417,8 @@ export async function changeSpecialistWork(
   const paid = (n.paidMinor ?? 0) - (n.refundedMinor ?? 0);
   const paymentSatisfied =
     !n.requiresPayment ||
-    (paid >= (n.pricing.dueNowMinor ?? 0) && n.paymentState === 'merchant_recorded');
+    (paid >= (n.pricing.dueNowMinor ?? 0) &&
+      ['merchant_recorded', 'provider_verified', 'simulated'].includes(n.paymentState));
   if (command === 'RedeemEntitlement' || command === 'BookEntitledOffering') {
     const target = await c.own('services', transitionInput.offeringId, identity, req);
     const bookingInput = {

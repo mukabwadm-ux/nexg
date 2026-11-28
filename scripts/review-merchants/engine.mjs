@@ -157,6 +157,8 @@ function offeringBody(shop, item, e, resourceIds, extra) {
     case 'TOUR':
       return {
         ...base,
+        // Priced per traveller, as the store lists it (price_per 'person').
+        pricingBasis: 'per_quantity',
         durationMinutes: e.durationMinutes,
         capacity: e.capacity,
         capacityUnit: 'place',
@@ -255,6 +257,7 @@ function offeringBody(shop, item, e, resourceIds, extra) {
 
 /** Fields the engine only changes through a revised offering. */
 const SETUP_FIELDS = [
+  'pricingBasis',
   'durationMinutes',
   'resourceSelectionMode',
   'transportIncluded',

@@ -48,7 +48,8 @@ The first live run left some bookings unusable in the app, so the setup was chan
 **What changed:**
 - **Tables and courts.** Kijiji and Uwanja use the restaurant profile, with `BQ_OFFERS_TABLE_RESERVATIONS`, a real `BQ_SPACE_POLICY` (each table or court and its party size, with a 15-minute turnover) and "pick one" resource selection.
 - **Quotes** are only at Faraja and Anga, whose profiles host them.
-- **Hidden:** the Sauti, Mjini and Gari quotes, Uwanja karting and party, and Safi home and office cleaning. Their rows are kept, made unavailable, and their offerings switched off.
+- **Hidden:** the Sauti, Mjini and Gari quotes, Uwanja karting and party, and Safi home and office cleaning. Their offerings are switched off and they are taken off the store (their catalogue rows are deleted, and a section left with nothing in it goes too), because a listed item the customer can't open is a dead end.
+- **Tours are priced per traveller** (`per_quantity`), as the store lists them, and a tour booked straight away is paid in full before it goes to the operator.
 - **Car hire is cars only** (self-drive or with a driver), as NexG Stays lists car hire: Gari's mountain bike and car washes are hidden. The car washes and the wash plan moved to shop 20, **Ng'aa Car Wash** (vehicle_services / car_wash, the car wash booking profile). The bike is not sold anywhere: the master list has no bike-hire subcategory.
 - **Laundry** is collected and returned by the shop's van, so the windows have someone assigned.
 - **Meet & greet** is greeter-only, with no vehicle.
