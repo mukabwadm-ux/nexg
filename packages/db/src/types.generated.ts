@@ -8967,6 +8967,177 @@ export type Database = {
           },
         ];
       };
+      category_commission: {
+        Row: {
+          approval: string;
+          band_max_pct: number | null;
+          band_min_pct: number | null;
+          category: string;
+          fulfilment_methods: string[];
+          merchant_overrides: boolean;
+          rate_group: string | null;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          approval?: string;
+          band_max_pct?: number | null;
+          band_min_pct?: number | null;
+          category: string;
+          fulfilment_methods?: string[];
+          merchant_overrides?: boolean;
+          rate_group?: string | null;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          approval?: string;
+          band_max_pct?: number | null;
+          band_min_pct?: number | null;
+          category?: string;
+          fulfilment_methods?: string[];
+          merchant_overrides?: boolean;
+          rate_group?: string | null;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'category_commission_category_fkey';
+            columns: ['category'];
+            isOneToOne: true;
+            referencedRelation: 'category_config';
+            referencedColumns: ['category'];
+          },
+          {
+            foreignKeyName: 'category_commission_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      category_commission_log: {
+        Row: {
+          action: string;
+          actor: string | null;
+          after: Json | null;
+          at: string;
+          before: Json | null;
+          category: string;
+          id: number;
+          rate_id: string | null;
+          reason: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          action: string;
+          actor?: string | null;
+          after?: Json | null;
+          at?: string;
+          before?: Json | null;
+          category: string;
+          id?: never;
+          rate_id?: string | null;
+          reason?: string | null;
+        };
+        Update: {
+          action?: string;
+          actor?: string | null;
+          after?: Json | null;
+          at?: string;
+          before?: Json | null;
+          category?: string;
+          id?: never;
+          rate_id?: string | null;
+          reason?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'category_commission_log_actor_fkey';
+            columns: ['actor'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      category_commission_rate: {
+        Row: {
+          category: string;
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          ends_on: string | null;
+          id: string;
+          nexg_delivery_pct: number | null;
+          pct: number;
+          reason: string;
+          requested_at: string;
+          requested_by: string | null;
+          starts_on: string;
+          status: string;
+          vat_treatment: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          category: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          ends_on?: string | null;
+          id?: string;
+          nexg_delivery_pct?: number | null;
+          pct: number;
+          reason: string;
+          requested_at?: string;
+          requested_by?: string | null;
+          starts_on: string;
+          status?: string;
+          vat_treatment?: string;
+        };
+        Update: {
+          category?: string;
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          ends_on?: string | null;
+          id?: string;
+          nexg_delivery_pct?: number | null;
+          pct?: number;
+          reason?: string;
+          requested_at?: string;
+          requested_by?: string | null;
+          starts_on?: string;
+          status?: string;
+          vat_treatment?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'category_commission_rate_category_fkey';
+            columns: ['category'];
+            isOneToOne: false;
+            referencedRelation: 'category_config';
+            referencedColumns: ['category'];
+          },
+          {
+            foreignKeyName: 'category_commission_rate_decided_by_fkey';
+            columns: ['decided_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'category_commission_rate_requested_by_fkey';
+            columns: ['requested_by'];
+            isOneToOne: false;
+            referencedRelation: 'staff_user';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       category_config: {
         Row: {
           badge_rules: NonNullable<Json>;
@@ -67537,6 +67708,23 @@ export type Database = {
         Args: { p_current_price: number; p_kind: string; p_payload: Json };
         Returns: boolean;
       };
+      fn_category_commission: {
+        Args: { p_at?: string; p_category: string; p_city_id: string; p_own: boolean };
+        Returns: Json;
+      };
+      fn_category_commission_decider: { Args: Record<PropertyKey, never>; Returns: boolean };
+      fn_category_commission_editor: { Args: Record<PropertyKey, never>; Returns: boolean };
+      fn_category_commission_log: {
+        Args: {
+          p_action: string;
+          p_after: Json;
+          p_before: Json;
+          p_category: string;
+          p_rate_id?: string;
+          p_reason: string;
+        };
+        Returns: Json;
+      };
       fn_category_condition_matches: {
         Args: { p_answers: Json; p_condition: Json };
         Returns: boolean;
@@ -70225,6 +70413,22 @@ export type Database = {
       };
       rpc_catalogue_items_api: { Args: { p_api_key: string }; Returns: Json };
       rpc_catalogue_items_update_api: { Args: { p_api_key: string; p_items: Json }; Returns: Json };
+      rpc_category_commission_add: { Args: { p_category: string; p_payload: Json }; Returns: Json };
+      rpc_category_commission_decide: {
+        Args: { p_approve: boolean; p_note?: string; p_rate_id: string };
+        Returns: Json;
+      };
+      rpc_category_commission_history: {
+        Args: { p_category?: string; p_limit?: number };
+        Returns: Json;
+      };
+      rpc_category_commission_overrides: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_category_commission_overview: { Args: Record<PropertyKey, never>; Returns: Json };
+      rpc_category_commission_save: {
+        Args: { p_category: string; p_payload: Json };
+        Returns: Json;
+      };
+      rpc_category_commission_withdraw: { Args: { p_rate_id: string }; Returns: Json };
       rpc_category_config_save: { Args: { p_category: string; p_config: Json }; Returns: Json };
       rpc_category_tile_click: { Args: { p_tile: string }; Returns: undefined };
       rpc_category_tile_popularity: {

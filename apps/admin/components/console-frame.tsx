@@ -438,6 +438,7 @@ function GroupBody({
                   aria-current={active ? 'page' : undefined}
                   className={cn(
                     'flex min-h-9 items-center gap-2.5 rounded-lg px-2.5 text-[0.8125rem] font-medium transition-colors',
+                    item.sub && 'ml-4',
                     active
                       ? 'bg-gold/[0.16] text-white'
                       : 'text-white/65 hover:bg-white/[0.05] hover:text-white',

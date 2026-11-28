@@ -81,8 +81,8 @@ insert into public.merchant_user (merchant_id, user_id, role) values
 
 select is(pg_temp.rate('a1960000-0000-4000-8000-0000000000c1'), 28::numeric,
   'with no term, a merchant NexG riders deliver for is charged the NexG-delivery preset');
-select is(pg_temp.rate('a1960000-0000-4000-8000-0000000000c2'), 14::numeric,
-  'with no term, a merchant with its own riders is charged the standard preset');
+select is(pg_temp.rate('a1960000-0000-4000-8000-0000000000c2'), 15::numeric,
+  'with no term, a merchant with its own riders is charged its category rate (Beauty, 15% since 20270345000100)');
 select is(pg_temp.rate('a1960000-0000-4000-8000-0000000000c3'), 10::numeric,
   'an old undated negotiated rate still applies when the merchant has no term');
 select is(public.fn_merchant_commission('a1960000-0000-4000-8000-0000000000c3') ->> 'basis', 'negotiated',
@@ -229,7 +229,7 @@ select is(
     false, 'Below cost') #>> '{terms,0,status}',
   'rejected', 'Finance rejects a request, with a note');
 reset role;
-select is(pg_temp.rate('a1960000-0000-4000-8000-0000000000c2'), 14::numeric,
+select is(pg_temp.rate('a1960000-0000-4000-8000-0000000000c2'), 15::numeric,
   'a rejected request changes nothing');
 set local role authenticated;
 

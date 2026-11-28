@@ -38,6 +38,8 @@ export interface NavItem {
   /** A second module that also reaches this entry ("settings:full": only at full access). */
   orModule?: string;
   home?: boolean;
+  /** Drawn indented under the entry before it (Categories & Commissions under Configuration). */
+  sub?: boolean;
 }
 
 export interface NavGroup {
@@ -272,6 +274,14 @@ export const CONSOLE_NAV: NavGroup[] = [
       { label: 'Approvals', href: '/staff?tab=approvals', module: 'staff' },
       { label: 'Sessions & security', href: '/staff?tab=security', module: 'staff' },
       { label: 'Configuration', href: '/settings', module: 'settings', home: true },
+      {
+        label: 'Categories & Commissions',
+        href: '/settings/categories',
+        module: 'settings',
+        orModule: 'categories',
+        home: true,
+        sub: true,
+      },
       { label: 'Integrations', href: '/settings?tab=api', module: 'settings' },
       { label: 'Agreement signing', href: '/settings?tab=signing', module: 'settings' },
       { label: 'Audit logs', href: '/audit', module: 'audit', home: true },

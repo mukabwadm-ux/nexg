@@ -123,7 +123,9 @@ export function MerchantCommissionCard({
           ? `Charged now: ${pct(card.charged_now.pct)}, agreed with this merchant${
               card.in_force ? ` (${dates(card.in_force)})` : ' (no dates)'
             }.`
-          : `Charged now: ${pct(card.charged_now?.pct ?? null)}, the preset rate card.`}{' '}
+          : card.charged_now?.basis === 'category'
+            ? `Charged now: ${pct(card.charged_now.pct)}, its category's rate (System › Categories & Commissions).`
+            : `Charged now: ${pct(card.charged_now?.pct ?? null)}, the preset rate card.`}{' '}
         Orders already placed keep the rate they were charged.
       </p>
 
