@@ -329,7 +329,9 @@ async function main() {
         .map((i) => ({ ...i, id: itemId(s, i) }));
       if (!items.length) continue;
       log(`Bookings: ${s.name}`);
-      links.push(...(await setUpShop(bridge(service, secret, merchantId(s)), s, items, log)));
+      links.push(
+        ...(await setUpShop(bridge(service, secret, merchantId(s)), s, merchantId(s), items, log)),
+      );
     }
     if (links.length) runSql(linkSql(links));
     log(`Bookings: ${links.length} items linked to their booking offerings.`);

@@ -6,6 +6,7 @@ const stub = vi.hoisted(() => ({
   getUser: vi.fn(),
   rpc: vi.fn(),
   row: vi.fn(),
+  filter: vi.fn(),
   forward: vi.fn(),
   settle: vi.fn(),
 }));
@@ -13,7 +14,14 @@ vi.mock('@/lib/supabase/customer-api', () => ({
   customerApiClient: () => ({
     auth: { getUser: stub.getUser },
     rpc: stub.rpc,
-    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: stub.row }) }) }),
+    from: () => ({
+      select: () => ({
+        or: (filter: string) => {
+          stub.filter(filter);
+          return { maybeSingle: stub.row };
+        },
+      }),
+    }),
   }),
 }));
 vi.mock('@/lib/booking/bridge', () => ({ forwardBookingRequest: stub.forward }));
@@ -262,6 +270,38 @@ describe('settling paid bookings in the engine', () => {
       'rpc_payment_engine_settled',
       expect.objectContaining({ p_ok: false, p_refusal: null }),
     );
+  });
+});
+
+describe('finding the booking the app pays for', () => {
+  it('looks a UUID-shaped engine id up as the engine id, not only the row id', async () => {
+    const engineId = '01a21b27-88d2-7e15-b85b-4e43ee40a3fa';
+    stub.row.mockResolvedValue({ data: { ...row, engine_booking_id: engineId }, error: null });
+    stub.forward.mockResolvedValue(new Response(JSON.stringify(held)));
+    stub.rpc.mockResolvedValue({ data: { status: 'unpaid' }, error: null });
+    const response = await readBookingPayment(
+      new Request(`https://www.nexgapp.com/api/customer/checkout/bookings/${engineId}/payment`, {
+        headers: { Authorization: 'Bearer access.token' },
+      }),
+      engineId,
+    );
+    expect(response.status).toBe(200);
+    expect(stub.filter).toHaveBeenCalledWith(`engine_booking_id.eq.${engineId},id.eq.${engineId}`);
+    expect(stub.rpc).toHaveBeenCalledWith('rpc_engine_booking_payment_state', {
+      p_booking: BOOKING,
+    });
+  });
+
+  it('a non-UUID engine id is looked up by the engine id alone', async () => {
+    stub.forward.mockResolvedValue(new Response(JSON.stringify(held)));
+    stub.rpc.mockResolvedValue({ data: { status: 'unpaid' }, error: null });
+    await readBookingPayment(
+      new Request('https://www.nexgapp.com/api/customer/checkout/bookings/bk_123/payment', {
+        headers: { Authorization: 'Bearer access.token' },
+      }),
+      'bk_123',
+    );
+    expect(stub.filter).toHaveBeenCalledWith('engine_booking_id.eq.bk_123');
   });
 });
 

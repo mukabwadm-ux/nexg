@@ -379,6 +379,75 @@ export async function runSpecialistFixtures({
     );
 
     await t.test(
+      'a tour booked straight away is paid in full before it goes to the operator',
+      async () => {
+        clock.set(initialTime);
+        const merchant = await identity('tour-paid', 'city_tours');
+        const guide = await resource(merchant, 'Paid departure guide');
+        const pool = await resource(merchant, 'Paid departure places', 'capacity_pool', 6, 'place');
+        const setup = {
+          model: 'TOUR',
+          version: 1,
+          supplierComponents: [],
+          mode: 'shared',
+          itinerary: 'Published shared Nairobi city departure',
+          itineraryVersion: 1,
+          resourceIds: [guide.id],
+          poolResourceId: pool.id,
+          minimumParticipants: 1,
+          maximumParticipants: 6,
+        };
+        const service = await offering(merchant, 'TOUR', [guide.id, pool.id], setup, {
+          durationMinutes: 120,
+          capacity: 6,
+          intakeMode: 'instant_after_requirements',
+          pricingBasis: 'per_quantity',
+          priceMinor: 450000,
+        });
+        const occurrence = (await addOccurrence(
+          engine,
+          merchant,
+          service.id,
+          {
+            expectedVersion: service.version,
+            startTime: '2030-01-02T14:00:00+03:00',
+            endTime: '2030-01-02T16:00:00+03:00',
+            capacity: 6,
+            published: true,
+          },
+          key(),
+        )) as any;
+        const traveller = { ...merchant, role: 'customer', userId: 'tour-paid-guest' };
+        const created = (await engine.createBooking(
+          traveller,
+          {
+            offeringId: service.id,
+            customer,
+            quantity: 2,
+            specialist: { model: 'TOUR', occurrenceId: occurrence.id, itineraryVersion: 1 },
+          } as any,
+          key(),
+          true,
+        )) as any;
+        let booking = created.booking;
+        assert.equal(booking.status, 'held', 'The tour is held until it is paid.');
+        assert.equal(booking.paymentState, 'awaiting_payment');
+        assert.equal(booking.pricing.totalDueMinor, 900000, 'Priced per traveller.');
+        assert.equal(booking.pricing.dueNowMinor, 900000, 'Paid in full, not a deposit.');
+        booking = await engine.settlePayment(
+          { ...merchant, role: 'platform', userId: 'nexg-payments' },
+          booking.id,
+          { provider: 'paystack_test', reference: 'TOUR-PAID-1', amountMinor: 900000 },
+          key(),
+        );
+        assert.equal(booking.status, 'pending', 'Once paid it goes to the operator.');
+        booking = await step(merchant, booking, 'AcceptTourScope', { approval: approval(900000) });
+        booking = await step(merchant, booking, 'ConfirmTour');
+        assert.equal(state(booking), 'READY_TO_DEPART', 'A NexG payment satisfies the operator.');
+      },
+    );
+
+    await t.test(
       'firm collection-processing-return claims all legs atomically and releases only with actual return',
       async () => {
         clock.set(initialTime);

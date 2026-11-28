@@ -8,6 +8,12 @@
 // Prices are whole KES. `engine` describes the booking-engine offering a
 // bookable item opens (seed.mjs creates it and links the item to it).
 // `photo` names a photo in photos.mjs.
+//
+// `hours` are the opening hours of a shop's bookable resources (Nairobi time).
+// `engineAnswers` are the booking-profile answers that switch on its booking types.
+// `hidden: true` keeps an item's row but takes it out of the catalogue and switches off
+// its booking: each shop has one booking profile, and a profile hosts only some booking
+// types (packages/booking-config registry: candidateModelIds).
 
 const westlands = { area: 'Westlands', lat: -1.2648, lng: 36.8078 };
 const kilimani = { area: 'Kilimani', lat: -1.2905, lng: 36.7834 };
@@ -16,6 +22,8 @@ export const shops = [
   {
     n: 1,
     slug: 'kijiji-grill',
+    hours: ['11:00', '22:00'],
+    engineAnswers: { BQ_OFFERS_TABLE_RESERVATIONS: true },
     name: 'Kijiji Grill House',
     legal: 'Kijiji Grill House Limited',
     owner: 'Achieng Odhiambo',
@@ -36,7 +44,7 @@ export const shops = [
     promotion: { name: 'Lunch offer', kind: 'percent', value: 15, item: 'Nyama Choma Platter' },
     groups: [
       {
-        name: 'Choose your side',
+        name: 'Side',
         min: 1,
         max: 1,
         options: [
@@ -75,21 +83,21 @@ export const shops = [
             desc: 'Half a kilo of goat ribs, slow grilled over charcoal.',
             price: 1450,
             popular: true,
-            groups: ['Choose your side', 'Extras'],
+            groups: ['Side', 'Extras'],
             photo: 'nyama-choma',
           },
           {
             name: 'Grilled Tilapia',
             desc: 'Whole Lake Victoria tilapia, lemon and garlic.',
             price: 1350,
-            groups: ['Choose your side', 'Extras'],
+            groups: ['Side', 'Extras'],
             photo: 'tilapia',
           },
           {
             name: 'Chicken Tikka Skewers',
             desc: 'Three skewers in a yoghurt and spice marinade.',
             price: 950,
-            groups: ['Choose your side', 'Spice level'],
+            groups: ['Side', 'Spice level'],
             photo: 'skewers',
           },
         ],
@@ -108,7 +116,7 @@ export const shops = [
             name: 'Vegetable Curry',
             desc: 'Seasonal vegetables in a coconut curry.',
             price: 750,
-            groups: ['Choose your side', 'Spice level'],
+            groups: ['Side', 'Spice level'],
             photo: 'veg-curry',
           },
           {
@@ -550,6 +558,8 @@ export const shops = [
   {
     n: 7,
     slug: 'utulivu-spa',
+    hours: ['08:00', '20:00'],
+    engineAnswers: { BQ_MEMBERSHIP_PLAN_ENABLED: true },
     name: 'Utulivu Spa & Fitness',
     legal: 'Utulivu Wellness Limited',
     owner: 'Grace Wambui',
@@ -659,6 +669,7 @@ export const shops = [
   {
     n: 8,
     slug: 'sauti-live',
+    hours: ['10:00', '23:00'],
     name: 'Sauti Live Events',
     legal: 'Sauti Live Events Limited',
     owner: 'Kevin Mutua',
@@ -746,6 +757,7 @@ export const shops = [
         items: [
           {
             name: 'Private Event Package',
+            hidden: true, // its booking type is not in this shop's booking profile
             desc: 'Venue, sound, lighting and host for a birthday, launch or celebration. We confirm the exact price after your brief; reserve with a 50% deposit.',
             price: 50000,
             kind: 'request',
@@ -762,6 +774,7 @@ export const shops = [
           },
           {
             name: 'Corporate Event Package',
+            hidden: true, // its booking type is not in this shop's booking profile
             desc: 'Team nights, launches and year-end parties with catering, sound and a host. Reserve with a 50% deposit once we confirm the price.',
             price: 150000,
             kind: 'request',
@@ -814,12 +827,14 @@ export const shops = [
   {
     n: 10,
     slug: 'uwanja-arena',
+    hours: ['06:00', '22:00'],
+    engineAnswers: { BQ_OFFERS_TABLE_RESERVATIONS: true },
     name: 'Uwanja Courts & Karting',
     legal: 'Uwanja Sports Limited',
     owner: 'Dennis Omondi',
     category: 'games_sports',
     subcategory: 'football_basketball_tennis',
-    engineProfile: 'sports_activities',
+    engineProfile: 'restaurant', // the one profile with space reservations (courts, pitches)
     branch: {
       ...kilimani,
       name: 'Kilimani',
@@ -891,6 +906,7 @@ export const shops = [
         items: [
           {
             name: 'Go-Karting, 15-minute session',
+            hidden: true, // its booking type is not in this shop's booking profile
             desc: 'Sessions at 11:00, 14:00, 17:00 and 19:00. Helmet and briefing included.',
             price: 2000,
             kind: 'ticket',
@@ -906,6 +922,7 @@ export const shops = [
           },
           {
             name: 'Birthday Party Package',
+            hidden: true, // its booking type is not in this shop's booking profile
             desc: 'Karting, a court and a party room for up to 20 guests. We quote, you reserve with a 50% deposit.',
             price: 25000,
             kind: 'request',
@@ -927,6 +944,7 @@ export const shops = [
   {
     n: 11,
     slug: 'mjini-tours',
+    hours: ['05:30', '21:00'],
     name: 'Mjini Safaris & Tours',
     legal: 'Mjini Safaris Limited',
     owner: 'Joseph Lekishon',
@@ -1021,6 +1039,7 @@ export const shops = [
         items: [
           {
             name: 'Custom Safari Package',
+            hidden: true, // its booking type is not in this shop's booking profile
             desc: 'Maasai Mara, Amboseli or Naivasha, planned to your dates and budget. Reserve with a 50% deposit once we confirm the price.',
             price: 60000,
             kind: 'request',
@@ -1042,6 +1061,7 @@ export const shops = [
   {
     n: 12,
     slug: 'karibu-transfers',
+    hours: ['00:00', '23:59'], // airport transfers meet flights at any hour
     name: 'Karibu Airport Transfers',
     legal: 'Karibu Transfers Limited',
     owner: 'Hassan Abdi',
@@ -1166,6 +1186,7 @@ export const shops = [
   {
     n: 13,
     slug: 'gari-car-hire',
+    hours: ['07:00', '21:00'],
     name: 'Gari Car Hire',
     legal: 'Gari Car Hire Limited',
     owner: 'Moses Cheruiyot',
@@ -1248,6 +1269,7 @@ export const shops = [
           },
           {
             name: 'Mountain Bike',
+            hidden: true, // car hire lists cars only (self-drive or with a driver)
             desc: 'Hardtail mountain bike with helmet and lock.',
             price: 1200,
             kind: 'rental',
@@ -1263,6 +1285,7 @@ export const shops = [
           },
           {
             name: 'Corporate Fleet Hire',
+            hidden: true, // its booking type is not in this shop's booking profile
             desc: 'Several cars for a team or event, by the week or month. We quote, you reserve with a 50% deposit.',
             price: 50000,
             kind: 'request',
@@ -1284,6 +1307,7 @@ export const shops = [
         items: [
           {
             name: 'Full Car Wash',
+            hidden: true, // car washes are sold by Ng'aa Car Wash (vehicle services)
             desc: 'Exterior wash, interior vacuum and tyre shine. About 45 minutes.',
             price: 1000,
             kind: 'service',
@@ -1300,6 +1324,7 @@ export const shops = [
           },
           {
             name: 'Monthly Car Wash Plan',
+            hidden: true, // car washes are sold by Ng'aa Car Wash (vehicle services)
             desc: 'Four full washes in 30 days.',
             price: 3200,
             kind: 'pass',
@@ -1319,6 +1344,7 @@ export const shops = [
   {
     n: 14,
     slug: 'safi-laundry',
+    hours: ['07:00', '20:00'],
     name: 'Safi Laundry & Cleaning',
     legal: 'Safi Laundry Limited',
     owner: 'Lucy Akinyi',
@@ -1339,7 +1365,7 @@ export const shops = [
         items: [
           {
             name: 'Wash & Fold, per kg',
-            desc: 'Drop off or we collect; washed, dried and folded. Choose your drop-off and collection windows.',
+            desc: 'We collect from your door, wash, dry and fold, and bring it back. Choose your collection and return windows.',
             price: 250,
             kind: 'service',
             popular: true,
@@ -1369,6 +1395,7 @@ export const shops = [
         items: [
           {
             name: 'Home Cleaning, 3 hours',
+            hidden: true, // its booking type is not in this shop's booking profile
             desc: 'Two cleaners at your home with supplies. Kilimani, Westlands, Lavington and CBD.',
             price: 3500,
             kind: 'appointment',
@@ -1384,6 +1411,7 @@ export const shops = [
           },
           {
             name: 'Office Cleaning, 4 hours',
+            hidden: true, // its booking type is not in this shop's booking profile
             desc: 'Two cleaners for offices up to 150 m², supplies included.',
             price: 5500,
             kind: 'appointment',
@@ -1404,6 +1432,7 @@ export const shops = [
   {
     n: 15,
     slug: 'faraja-concierge',
+    hours: ['08:00', '20:00'],
     name: 'Faraja Concierge',
     legal: 'Faraja Concierge Limited',
     owner: 'Esther Chebet',
@@ -1682,6 +1711,7 @@ export const shops = [
   {
     n: 19,
     slug: 'anga-charters',
+    hours: ['06:00', '18:00'],
     name: 'Anga Air Charters',
     legal: 'Anga Air Charters Limited',
     owner: 'Captain Ian Mburu',
@@ -1767,6 +1797,133 @@ export const shops = [
               model: 'REQUEST_QUOTE',
               priceMinor: 22000000,
               quoteRange: { minMinor: 22000000, maxMinor: 34000000, note: 'Return flight.' },
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    n: 20,
+    slug: 'ngaa-car-wash',
+    hours: ['07:00', '19:00'],
+    name: "Ng'aa Car Wash",
+    legal: "Ng'aa Car Wash Limited",
+    owner: 'Kevin Otieno',
+    category: 'vehicle_services',
+    subcategory: 'car_wash',
+    engineProfile: 'car_wash',
+    engineAnswers: { BQ_MEMBERSHIP_PLAN_ENABLED: true, Q_SUBSCRIPTION_PLANS: true },
+    branch: {
+      ...westlands,
+      name: 'Westlands',
+      address: 'Waiyaki Way, Westlands, Nairobi',
+      lat: -1.2622,
+      lng: 36.8034,
+    },
+    prepMinutes: 0,
+    sections: [
+      {
+        name: 'Washes',
+        items: [
+          {
+            name: 'Full Car Wash',
+            desc: 'Exterior wash, interior vacuum and tyre shine. About 45 minutes.',
+            price: 1000,
+            kind: 'service',
+            popular: true,
+            photo: 'car-wash',
+            engine: {
+              model: 'SERVICE_JOB',
+              durationMinutes: 45,
+              priceMinor: 100000,
+              resources: [
+                ['Wash Bay 1', 'space', 1],
+                ['Wash Team', 'staff', 1],
+              ],
+            },
+          },
+          {
+            name: 'Express Exterior Wash',
+            desc: 'Foam wash, rinse and hand dry. About 20 minutes.',
+            price: 500,
+            kind: 'service',
+            photo: 'express-wash',
+            engine: {
+              model: 'SERVICE_JOB',
+              durationMinutes: 20,
+              priceMinor: 50000,
+              resources: [
+                ['Wash Bay 1', 'space', 1],
+                ['Wash Team', 'staff', 1],
+              ],
+            },
+          },
+          {
+            name: 'Interior Deep Clean',
+            desc: 'Seats shampooed, carpets and mats vacuumed, dashboard wiped. About 90 minutes.',
+            price: 2500,
+            kind: 'service',
+            photo: 'interior-clean',
+            engine: {
+              model: 'SERVICE_JOB',
+              durationMinutes: 90,
+              priceMinor: 250000,
+              resources: [
+                ['Wash Bay 1', 'space', 1],
+                ['Wash Team', 'staff', 1],
+              ],
+            },
+          },
+          {
+            name: 'Engine Bay Clean',
+            desc: 'Degrease and rinse of the engine bay, with plastics dressed. About 40 minutes.',
+            price: 1500,
+            kind: 'service',
+            photo: 'engine-clean',
+            engine: {
+              model: 'SERVICE_JOB',
+              durationMinutes: 40,
+              priceMinor: 150000,
+              resources: [
+                ['Wash Bay 1', 'space', 1],
+                ['Wash Team', 'staff', 1],
+              ],
+            },
+          },
+          {
+            name: 'Wax & Polish',
+            desc: 'Machine polish and a coat of hand wax. About 60 minutes.',
+            price: 3000,
+            kind: 'service',
+            photo: 'wax-polish',
+            engine: {
+              model: 'SERVICE_JOB',
+              durationMinutes: 60,
+              priceMinor: 300000,
+              resources: [
+                ['Wash Bay 1', 'space', 1],
+                ['Wash Team', 'staff', 1],
+              ],
+            },
+          },
+        ],
+      },
+      {
+        name: 'Plans',
+        items: [
+          {
+            name: 'Monthly Car Wash Plan',
+            desc: 'Four full washes in 30 days.',
+            price: 3200,
+            kind: 'pass',
+            photo: 'car-wash',
+            engine: {
+              model: 'ENTITLEMENT',
+              priceMinor: 320000,
+              validityDays: 30,
+              credits: 4,
+              childItem: 'Full Car Wash',
             },
           },
         ],

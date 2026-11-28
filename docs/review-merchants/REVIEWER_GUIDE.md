@@ -73,48 +73,48 @@ The activation code appears in **Activity**.
 
 **11. Court reservation.** Play → **Uwanja Courts & Karting**.
 1. Tap **Padel Court, 1 hour**.
-2. Choose a date, a free time and the number of players.
+2. Pick a court, a date, a free time and the number of players.
 3. Tap **Reserve**.
 
-**12. Timed session ticket.** Same shop: tap **Go-Karting, 15-minute session**, pick a session and book.
+Courts are open 06:00–22:00 Nairobi time.
 
-**13. Table reservation.** Food & Restaurants → **Kijiji Grill House**.
+**12. Table reservation.** Food & Restaurants → **Kijiji Grill House**.
 1. Tap **Reserve a table** at the top of the shop.
-2. Choose a date, a time and the number of guests, then tap **Reserve**.
+2. Pick a table, a date, a time and the number of guests, then tap **Reserve**.
 
-There is no charge to reserve.
+Tables are open 11:00–22:00 Nairobi time, and there is no charge to reserve.
 
-**14. Tour with departures.** Travel & Tours → **Mjini Safaris & Tours**.
+**13. Tour with departures.** Travel & Tours → **Mjini Safaris & Tours**.
 1. Tap **Nairobi City Highlights Tour**. It departs daily at 09:00 and 14:00.
 2. Choose a departure and the number of travellers, then book and pay.
 
-**15. Airport transfer.** Airport Transfers → choose **JKIA → Westlands** → **Karibu Airport Transfers**.
+**14. Airport transfer.** Airport Transfers → choose **JKIA → Westlands** → **Karibu Airport Transfers**.
 1. Tap **Sedan: JKIA to Westlands**.
 2. Enter a pickup time, then book and pay.
 
-**16. Car or bike hire.** Car Hire → **Gari Car Hire**.
+**15. Car hire.** Car Hire → **Gari Car Hire**.
 1. Tap **Toyota Axio (Sedan)**.
 2. Choose pickup and return dates, self-drive or with a driver.
 3. Reserve and pay.
 
 The refundable deposit is shown before you pay.
 
-**17. Service with drop-off and collection windows.** Laundry & Cleaning → **Safi Laundry & Cleaning**.
+**16. Service with collection and return windows.** Laundry & Cleaning → **Safi Laundry & Cleaning**.
 1. Tap **Wash & Fold, per kg**.
-2. Choose a drop-off window, a collection window and the weight.
-3. Book and pay.
+2. Enter a Westlands address.
+3. Choose a collection window, a return window and the weight.
+4. Book and pay.
 
-**18. Service at your address.** Same shop: tap **Home Cleaning, 3 hours**, choose a time, enter a Westlands address and book.
+Collections run 07:00–20:00 Nairobi time.
 
-**19. Quote, then reserve with a 50% deposit.** Experiences → **Sauti Live Events**.
-1. Tap **Private Event Package**.
-2. Describe the event (date, guests, budget).
+**17. Car wash (a service job).** Vehicle Services → **Ng'aa Car Wash**: tap **Full Car Wash**, choose a time and book. The **Monthly Car Wash Plan** works like the gym plan in step 8.
+
+**18. Quote, then reserve with a 50% deposit.** Concierge → **Faraja Concierge**.
+1. Tap **Personal Assistant for a Day**.
+2. Describe what you need (date, errands, budget).
 3. Tap **Reserve with deposit**.
 
-The deposit is half of the top of the shown price range (KES 75,000), as a test payment. The same flow works at:
-- **Faraja Concierge** (any service);
-- **Anga Air Charters** (any charter);
-- **Gari Car Hire** (Corporate Fleet Hire).
+The deposit is half of the top of the shown price range (KES 7,500), as a test payment. The same flow works at **Anga Air Charters**, for any charter.
 
 ### After ordering or booking
 
