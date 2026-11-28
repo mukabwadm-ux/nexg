@@ -9,6 +9,7 @@ const stub = vi.hoisted(() => ({
   filter: vi.fn(),
   forward: vi.fn(),
   settle: vi.fn(),
+  finish: vi.fn(),
 }));
 vi.mock('@/lib/supabase/customer-api', () => ({
   customerApiClient: () => ({
@@ -25,7 +26,10 @@ vi.mock('@/lib/supabase/customer-api', () => ({
   }),
 }));
 vi.mock('@/lib/booking/bridge', () => ({ forwardBookingRequest: stub.forward }));
-vi.mock('@/lib/booking/platform', () => ({ settleEngineBookingPayment: stub.settle }));
+vi.mock('@/lib/booking/platform', () => ({
+  settleEngineBookingPayment: stub.settle,
+  finishReviewBooking: stub.finish,
+}));
 
 import {
   readBookingPayment,
@@ -230,8 +234,12 @@ describe('settling paid bookings in the engine', () => {
     stub.settle
       .mockResolvedValueOnce({ ok: true, value: {} })
       .mockResolvedValueOnce({ ok: false, status: 409, code: 'hold_expired' });
+    stub.finish.mockResolvedValue({ ok: false, status: 422, code: 'not_a_review_shop' });
     const client = { rpc: stub.rpc } as never;
     expect(await settleBookings(client)).toEqual({ settled: 1, refused: 1 });
+    // Only a settled booking is offered to the review autopilot, with its test flag.
+    expect(stub.finish).toHaveBeenCalledTimes(1);
+    expect(stub.finish).toHaveBeenCalledWith('m1', 'b1', true);
     expect(stub.settle).toHaveBeenCalledWith({
       merchantId: 'm1',
       bookingId: 'b1',
