@@ -49,7 +49,11 @@ export interface ApiReservation extends ApiReservationSummary {
     pickup_address: string | null;
     dropoff_area: string | null;
     dropoff_address: string | null;
+    /** The customer's flight, for a pickup at the airport. */
+    flight_number: string | null;
   } | null;
+  /** review_required: paid, then cancelled, and NexG Finance owes the customer a refund. */
+  refund_state: string | null;
   service_location: { area: string | null; address: string | null } | null;
   notes: string | null;
   currency: 'KES';
@@ -59,6 +63,17 @@ export interface ApiReservation extends ApiReservationSummary {
   /** nexg: the customer booked on NexG. merchant: the business entered it. */
   booked_on: 'nexg' | 'merchant';
   created_at: string | null;
+  /** Who is coming, as the business set it: shown to the customer too. Never a phone number. */
+  driver: ApiDriver | null;
+}
+
+export interface ApiDriver {
+  first_name: string;
+  vehicle: string;
+  plate: string | null;
+  assigned_at: string | null;
+  /** The last position the business's system sent, while the trip is on. */
+  location: { latitude: number; longitude: number; at: string } | null;
 }
 
 const CANCELLED = new Set([
@@ -142,8 +157,10 @@ export function apiReservation(
           pickup_address: text(trip.pickupAddress, 500),
           dropoff_area: text(trip.dropoffArea, 200),
           dropoff_address: text(trip.dropoffAddress, 500),
+          flight_number: text(trip.flightNumber, 10),
         }
       : null,
+    refund_state: text(view.refundState, 40),
     service_location: place
       ? { area: text(place.area, 200), address: text(place.address, 500) }
       : null,
@@ -154,6 +171,215 @@ export function apiReservation(
     checked_in_at: instant(view.arrivedAt),
     booked_on: doc.nexg?.bookingCode ? 'nexg' : 'merchant',
     created_at: instant(doc.createdAt),
+    driver: driverOf(view.driver),
+  };
+}
+
+function driverOf(value: unknown): ApiDriver | null {
+  const driver = value && typeof value === 'object' ? (value as Doc) : null;
+  const firstName = text(driver?.firstName, 60);
+  const vehicle = text(driver?.vehicle, 80);
+  if (!firstName || !vehicle) return null;
+  const spot = driver?.location && typeof driver.location === 'object' ? driver.location : null;
+  const at = instant(spot?.at);
+  return {
+    first_name: firstName,
+    vehicle,
+    plate: text(driver?.plate, 20),
+    assigned_at: instant(driver?.assignedAt),
+    location:
+      spot && typeof spot.latitude === 'number' && typeof spot.longitude === 'number' && at
+        ? { latitude: spot.latitude, longitude: spot.longitude, at }
+        : null,
+  };
+}
+
+/** A flight number as airlines print it: KQ 101, KQ101, EK 719. */
+export function normalizeFlightNumber(value: unknown): string | null {
+  if (value === undefined || value === null || value === '') return null;
+  const raw = typeof value === 'string' ? value.trim().toUpperCase().replace(/\s+/g, '') : '';
+  if (!/^[A-Z0-9]{2}[A-Z]?\d{1,4}[A-Z]?$/.test(raw))
+    throw new BookingError(
+      422,
+      'A flight number is the airline code and the number, for example KQ 101.',
+      'invalid_flight_number',
+    );
+  const match = /^([A-Z0-9]{2}[A-Z]?)(\d{1,4}[A-Z]?)$/.exec(raw)!;
+  return `${match[1]} ${match[2]}`;
+}
+
+/**
+ * The driver a business sets on a reservation through the API: a first name,
+ * the vehicle and its plate. Anything else, a phone number above all, is
+ * refused, because the customer sees what is stored here.
+ */
+export function normalizeDriver(value: unknown): {
+  firstName: string;
+  vehicle: string;
+  plate: string | null;
+} {
+  if (!value || typeof value !== 'object' || Array.isArray(value))
+    throw new BookingError(
+      422,
+      'Send the driver as first_name, vehicle and plate, or null to remove the driver.',
+      'invalid_driver',
+    );
+  const input = value as Doc;
+  if (Object.keys(input).some((key) => !['first_name', 'vehicle', 'plate'].includes(key)))
+    throw new BookingError(
+      422,
+      'A driver has only first_name, vehicle and plate. Never send a phone number: the customer sees these.',
+      'invalid_driver',
+    );
+  const firstName = typeof input.first_name === 'string' ? input.first_name.trim() : '';
+  if (!firstName || firstName.length > 60 || /\d/.test(firstName))
+    throw new BookingError(
+      422,
+      'The driver’s first name is required: at most 60 characters, no digits.',
+      'invalid_driver',
+    );
+  const vehicle = typeof input.vehicle === 'string' ? input.vehicle.trim() : '';
+  if (!vehicle || vehicle.length > 80)
+    throw new BookingError(
+      422,
+      'Describe the vehicle in at most 80 characters, for example White Toyota Noah.',
+      'invalid_driver',
+    );
+  let plate: string | null = null;
+  if (input.plate !== undefined && input.plate !== null) {
+    const raw = typeof input.plate === 'string' ? input.plate.trim() : '';
+    if (!/^[A-Za-z0-9][A-Za-z0-9 -]{0,18}[A-Za-z0-9]$/.test(raw))
+      throw new BookingError(
+        422,
+        'A plate is 2 to 20 letters, digits, spaces or dashes, for example KDA 123A.',
+        'invalid_driver',
+      );
+    plate = raw.toUpperCase().replace(/\s+/g, ' ');
+  }
+  return { firstName, vehicle, plate };
+}
+
+/* ═══════════════════════════════════════════════════════ offerings and resources */
+
+export interface ApiDeparture {
+  id: string;
+  starts_at: string;
+  ends_at: string;
+  capacity: number;
+  published: boolean;
+  resource_ids: string[];
+  version: number;
+}
+
+export interface ApiOffering {
+  id: string;
+  name: string | null;
+  model: string | null;
+  active: boolean;
+  booking_enabled: boolean;
+  currency: 'KES';
+  price_cents: number | null;
+  pricing_basis: string;
+  duration_minutes: number | null;
+  capacity: number | null;
+  capacity_unit: string | null;
+  resource_ids: string[];
+  version: number;
+  /** Dated departures or sessions that have not ended, for tours and classes; empty otherwise. */
+  departures: ApiDeparture[];
+}
+
+export interface ApiClosure {
+  id: string;
+  starts_at: string;
+  ends_at: string;
+  reason: string | null;
+}
+
+export interface ApiResource {
+  id: string;
+  name: string | null;
+  kind: string | null;
+  quantity: number | null;
+  active: boolean;
+  schedule: { days: number[]; start: string; end: string } | null;
+  /** Times it is closed (busy elsewhere, maintenance) that have not ended. */
+  closures: ApiClosure[];
+  version: number;
+}
+
+/** An offering from BookingEngine.offeringView, with its current departures. */
+export function apiOffering(
+  view: Doc,
+  departures: {
+    id: string;
+    startTime: string;
+    endTime: string;
+    capacity: number;
+    published: boolean;
+    resourceIds: string[];
+    version: number;
+  }[],
+): ApiOffering {
+  return {
+    id: String(view.id),
+    name: text(view.name, 200),
+    model: text(view.model, 40),
+    active: view.active !== false,
+    booking_enabled: view.bookingEnabled !== false,
+    currency: 'KES',
+    price_cents: whole(view.priceMinor),
+    pricing_basis: text(view.pricingBasis, 40) ?? 'per_booking',
+    duration_minutes: whole(view.durationMinutes),
+    capacity: whole(view.capacity),
+    capacity_unit: text(view.capacityUnit, 40),
+    resource_ids: Array.isArray(view.resourceIds)
+      ? view.resourceIds.filter((id: unknown) => typeof id === 'string').slice(0, 50)
+      : [],
+    version: whole(view.version) ?? 1,
+    departures: departures
+      .map((d) => ({
+        id: d.id,
+        starts_at: d.startTime,
+        ends_at: d.endTime,
+        capacity: d.capacity,
+        published: d.published,
+        resource_ids: d.resourceIds,
+        version: d.version,
+      }))
+      .sort((a, b) => (a.starts_at < b.starts_at ? -1 : a.starts_at > b.starts_at ? 1 : 0))
+      .slice(0, 200),
+  };
+}
+
+/** A resource from BookingEngine.resourceView, with the closures that have not ended. */
+export function apiResource(view: Doc, now: number): ApiResource {
+  const hours = view.schedule && typeof view.schedule === 'object' ? view.schedule : null;
+  return {
+    id: String(view.id),
+    name: text(view.name, 200),
+    kind: text(view.kind, 40),
+    quantity: whole(view.quantity),
+    active: view.active !== false,
+    schedule:
+      hours && Array.isArray(hours.days) && typeof hours.start === 'string'
+        ? {
+            days: hours.days.filter((day: unknown) => Number.isInteger(day)),
+            start: hours.start,
+            end: String(hours.end),
+          }
+        : null,
+    closures: (Array.isArray(view.closures) ? view.closures : [])
+      .filter((closure: Doc) => Date.parse(closure?.endTime) > now)
+      .map((closure: Doc) => ({
+        id: String(closure.id),
+        starts_at: instant(closure.startTime) ?? '',
+        ends_at: instant(closure.endTime) ?? '',
+        reason: text(closure.reason, 300),
+      }))
+      .sort((a: ApiClosure, b: ApiClosure) => (a.starts_at < b.starts_at ? -1 : 1))
+      .slice(0, 200),
+    version: whole(view.version) ?? 1,
   };
 }
 

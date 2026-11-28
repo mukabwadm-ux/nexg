@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import type { Payload } from 'payload';
 import { checkAvailability } from 'payload-reserve';
@@ -21,6 +22,7 @@ import {
   changeSpecialistWork,
 } from './specialist-runtime.js';
 import { requireManager } from './auth.js';
+import { isReviewBusiness, nextReviewStep, reviewDetails } from './review-shops.js';
 import {
   customerRecord,
   forgottenFields,
@@ -41,6 +43,7 @@ import {
 } from './public-details.js';
 import {
   apiReservation,
+  normalizeFlightNumber,
   reservationPage,
   type ApiReservation,
   type ReservationPageOptions,
@@ -97,6 +100,11 @@ const reservableQuote = (n: Doc | undefined) =>
 const CUSTODY_MODELS = new Set(['ASSET_INTERVAL', 'STORAGE', 'SPACE_RESERVATION']);
 const KINDS = new Set(['staff', 'asset', 'vehicle', 'room', 'space', 'equipment', 'capacity_pool']);
 const BLOCKING = new Set(['held', 'confirmed']);
+/** A driver's position is shown while under 30 minutes old: after that it misleads. */
+const DRIVER_POSITION_FRESH_MS = 30 * 60_000;
+/** Positions are deleted once a day old. */
+const DRIVER_POSITION_KEEP_MS = 24 * 60 * 60_000;
+type DriverPosition = { latitude: number; longitude: number; at: string };
 const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const hash = (s: string) => createHash('sha256').update(s).digest('hex');
 /**
@@ -187,6 +195,12 @@ function codeUsable(n: Doc, state: string) {
 /** SQLite admits one writer; queue the entire command, then let Payload's real
  * transaction and resource-lock hooks enforce allocation. PostgreSQL relies on
  * those database locks and may process unrelated transactions concurrently. */
+/**
+ * The open transaction of a dry run (BookingEngine.dryRun). Every read and
+ * write inside joins it, so they see the change, and it is always rolled back.
+ */
+const dryRunScope = new AsyncLocalStorage<{ tx: unknown }>();
+
 export class BookingEngine {
   private writer: Promise<unknown> = Promise.resolve();
   constructor(
@@ -232,7 +246,11 @@ export class BookingEngine {
     };
   }
   private request(identity: Identity, transactionID?: any): any {
-    return { payload: this.payload, context: scope(identity), transactionID };
+    return {
+      payload: this.payload,
+      context: scope(identity),
+      transactionID: transactionID ?? dryRunScope.getStore()?.tx,
+    };
   }
   private async all(collection: string, identity: Identity, req?: any): Promise<Doc[]> {
     const docs: Doc[] = [];
@@ -299,6 +317,9 @@ export class BookingEngine {
     } as any)) as Doc;
   }
   private async transaction<T>(identity: Identity, fn: (req: any) => Promise<T>): Promise<T> {
+    // Inside a dry run: join its transaction, which is rolled back, never committed.
+    const dry = dryRunScope.getStore();
+    if (dry) return fn(this.request(identity, dry.tx));
     const run = async () => {
       const tx = await this.payload.db.beginTransaction();
       if (tx === null)
@@ -326,6 +347,37 @@ export class BookingEngine {
       } catch (e) {
         await this.payload.db.rollbackTransaction(tx);
         throw e;
+      }
+    };
+    if (!this.sqlite) return run();
+    const result = this.writer.then(run, run);
+    this.writer = result.then(
+      () => undefined,
+      () => undefined,
+    );
+    return result;
+  }
+  /**
+   * Runs `fn` exactly as it would run, then undoes it. Every rule and version
+   * is checked and the answer is what would be saved, but nothing is saved:
+   * the records, the audit, the idempotency record and the outbox (so no
+   * event) all roll back together. NexG API test keys change offerings and
+   * resources this way (server.ts).
+   */
+  async dryRun<T>(fn: () => Promise<T>): Promise<T> {
+    if (dryRunScope.getStore()) return fn();
+    const run = async () => {
+      const tx = await this.payload.db.beginTransaction();
+      if (tx === null)
+        throw new BookingError(
+          503,
+          'Reservation storage is not transaction-safe.',
+          'transactions_required',
+        );
+      try {
+        return await dryRunScope.run({ tx }, fn);
+      } finally {
+        await this.payload.db.rollbackTransaction(tx);
       }
     };
     if (!this.sqlite) return run();
@@ -705,9 +757,10 @@ export class BookingEngine {
       entitlementRedemptions: _entitlementRedemptions,
       entitlementValidity: _entitlementValidity,
       entitlementOccurrenceKey: _entitlementOccurrenceKey,
+      reviewAutopilot: _reviewAutopilot,
       ...safe
     } = n;
-    return {
+    const view = {
       ...safe,
       customer: n.customer ? (({ ref: _ref, ...rest }) => rest)(n.customer) : undefined,
       // The customer's code, only while it can be used: paid, confirmed and
@@ -731,6 +784,15 @@ export class BookingEngine {
       quantity: n.quantity ?? d.guestCount,
       version: n.version ?? 1,
     };
+    // A review shop's booking, once the review autopilot ran: the details the
+    // customer would otherwise wait for (pretend; see review-shops.ts).
+    if (_reviewAutopilot && audience === 'customer')
+      return {
+        ...view,
+        details: reviewDetails(view, process.env.REVIEW_CONTACT_PHONE || undefined),
+      };
+    if (_reviewAutopilot) return { ...view, reviewAutopilot: _reviewAutopilot };
+    return view;
   }
   async validateOccurrence(
     identity: Identity,
@@ -1048,6 +1110,10 @@ export class BookingEngine {
           'trip_details_required',
         );
       text(trip.pickupAddress, 'Pickup meeting point', 500);
+      // An airport pickup can carry the flight, written the way airlines print it.
+      const flight = normalizeFlightNumber(trip.flightNumber);
+      if (flight) trip.flightNumber = flight;
+      else delete trip.flightNumber;
       if (n.transportIncluded !== false) {
         if (!n.serviceArea?.areas?.includes(trip.dropoffArea))
           throw new BookingError(422, 'Select a supported dropoff area.', 'outside_service_area');
@@ -2647,7 +2713,158 @@ export class BookingEngine {
   async customerBooking(identity: Identity, id: string, token: string | undefined) {
     const { doc } = await this.locateBooking(identity, id, this.request(identity));
     this.assertCustomerToken(doc, token);
-    return this.bookingView(doc, 'customer');
+    const positions = await this.driverPositions(identity, [doc]);
+    return this.withPosition(
+      this.bookingView(doc, 'customer'),
+      positions.get(String(doc.publicId)),
+    );
+  }
+  /**
+   * Where the drivers of these bookings are, for those still confirmed (or
+   * under way) with a driver and a position under 30 minutes old.
+   */
+  private async driverPositions(
+    identity: Identity,
+    docs: Doc[],
+    req?: any,
+  ): Promise<Map<string, DriverPosition>> {
+    const ids = docs
+      .filter((doc) => doc.status === 'confirmed' && doc.nexg?.driver && !doc.nexg?.recordRole)
+      .map((doc) => String(doc.publicId));
+    const found = new Map<string, DriverPosition>();
+    if (!ids.length) return found;
+    const r = await this.payload.find({
+      collection: 'driver-locations' as any,
+      where: {
+        and: [{ businessId: { equals: identity.businessId } }, { reservationId: { in: ids } }],
+      },
+      limit: ids.length,
+      depth: 0,
+      overrideAccess: false,
+      req: req ?? this.request(identity),
+    } as any);
+    const oldest = this.clock() - DRIVER_POSITION_FRESH_MS;
+    for (const position of r.docs as Doc[]) {
+      const at = Date.parse(position.observedAt);
+      if (Number.isFinite(at) && at >= oldest)
+        found.set(String(position.reservationId), {
+          latitude: Number(position.latitude),
+          longitude: Number(position.longitude),
+          at: new Date(at).toISOString(),
+        });
+    }
+    return found;
+  }
+  /** The view with the driver's position on its driver, when there is one to show. */
+  private withPosition(view: Doc, position: DriverPosition | undefined): Doc {
+    return position && view.driver && typeof view.driver === 'object'
+      ? { ...view, driver: { ...view.driver, location: position } }
+      : view;
+  }
+  /**
+   * NexG's API (PUT /v1/reservations/{id}/driver/location): where the
+   * reservation's driver is now, from the business's own system. Kept apart
+   * from the booking, so it changes no version, sends no event and never races
+   * a change to the booking. Taken only while the booking is confirmed or under
+   * way and has a driver; shown while under 30 minutes old; deleted once a day
+   * old or when the driver changes.
+   */
+  async saveDriverPosition(
+    identity: Identity,
+    id: string,
+    input: { latitude: number; longitude: number; at?: string },
+  ): Promise<ApiReservation> {
+    requirePlatform(identity);
+    if (typeof id !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(id))
+      throw new BookingError(404, 'This record was not found.', 'not_found');
+    const { latitude, longitude } = input;
+    if (
+      typeof latitude !== 'number' ||
+      typeof longitude !== 'number' ||
+      !(Math.abs(latitude) <= 90) ||
+      !(Math.abs(longitude) <= 180)
+    )
+      throw new BookingError(
+        422,
+        'Send latitude (-90 to 90) and longitude (-180 to 180) as numbers.',
+        'invalid_location',
+      );
+    const now = this.clock();
+    const observedAt = input.at === undefined ? now : Date.parse(input.at);
+    if (
+      !Number.isFinite(observedAt) ||
+      observedAt > now + 120_000 ||
+      observedAt < now - DRIVER_POSITION_FRESH_MS
+    )
+      throw new BookingError(
+        422,
+        'at is when the driver was there: a time in the last 30 minutes.',
+        'invalid_location',
+      );
+    return this.transaction(identity, async (req) => {
+      const doc = await this.own('reservations', id, identity, req);
+      if (doc.nexg?.recordRole)
+        throw new BookingError(404, 'This record was not found.', 'not_found');
+      if (!doc.nexg?.driver)
+        throw new BookingError(409, 'Set a driver on this reservation first.', 'driver_required');
+      if (doc.status !== 'confirmed')
+        throw new BookingError(
+          409,
+          'A driver’s location is shared only while the booking is confirmed or under way.',
+          'reservation_not_active',
+        );
+      const found = await this.payload.find({
+        collection: 'driver-locations' as any,
+        where: {
+          and: [{ businessId: { equals: identity.businessId } }, { reservationId: { equals: id } }],
+        },
+        limit: 1,
+        depth: 0,
+        overrideAccess: false,
+        req,
+      } as any);
+      const data = {
+        reservationId: id,
+        latitude,
+        longitude,
+        observedAt: new Date(observedAt).toISOString(),
+      };
+      const kept = found.docs[0] as Doc | undefined;
+      // Updates can arrive out of order: an older position never replaces a newer one.
+      if (!kept) await this.create('driver-locations', data, identity, req);
+      else if (Date.parse(kept.observedAt) <= observedAt)
+        await this.update('driver-locations', kept.id, data, identity, req);
+      await this.payload.delete({
+        collection: 'driver-locations' as any,
+        where: {
+          and: [
+            { businessId: { equals: identity.businessId } },
+            { observedAt: { less_than: new Date(now - DRIVER_POSITION_KEEP_MS).toISOString() } },
+          ],
+        },
+        depth: 0,
+        overrideAccess: false,
+        req,
+      } as any);
+      const positions = await this.driverPositions(identity, [doc], req);
+      return apiReservation(
+        this.withPosition(this.bookingView(doc), positions.get(id)),
+        doc,
+        'reservations',
+      );
+    });
+  }
+  /** The driver changed or left: forget where the last one was. */
+  async forgetDriverPosition(identity: Identity, id: string, req: any) {
+    await this.payload.delete({
+      collection: 'driver-locations' as any,
+      where: {
+        and: [{ businessId: { equals: identity.businessId } }, { reservationId: { equals: id } }],
+      },
+      depth: 0,
+      overrideAccess: false,
+      req,
+    } as any);
   }
   /**
    * NexG's API (GET /v1/reservations/{id}): one of the platform identity's
@@ -2661,8 +2878,9 @@ export class BookingEngine {
     const { collection, doc } = await this.locateBooking(identity, id, this.request(identity));
     if (doc.nexg?.recordRole)
       throw new BookingError(404, 'This record was not found.', 'not_found');
+    const positions = await this.driverPositions(identity, [doc]);
     return apiReservation(
-      this.bookingView(doc),
+      this.withPosition(this.bookingView(doc), positions.get(String(doc.publicId))),
       doc,
       collection as 'reservations' | 'booking-requests',
     );
@@ -2677,10 +2895,21 @@ export class BookingEngine {
     const items = [
       ...reservations.map((doc) => ({ doc, collection: 'reservations' as const })),
       ...requests.map((doc) => ({ doc, collection: 'booking-requests' as const })),
-    ]
-      .filter(({ doc }) => !doc.nexg?.recordRole)
-      .map(({ doc, collection }) => apiReservation(this.bookingView(doc), doc, collection));
-    return reservationPage(items, options);
+    ].filter(({ doc }) => !doc.nexg?.recordRole);
+    const positions = await this.driverPositions(
+      identity,
+      items.map(({ doc }) => doc),
+    );
+    return reservationPage(
+      items.map(({ doc, collection }) =>
+        apiReservation(
+          this.withPosition(this.bookingView(doc), positions.get(String(doc.publicId))),
+          doc,
+          collection,
+        ),
+      ),
+      options,
+    );
   }
   private assertCustomerToken(doc: Doc, token: string | undefined) {
     const expected = doc.nexg?.customerTokenHash;
@@ -2812,6 +3041,12 @@ export class BookingEngine {
               ...n,
               status: 'cancelled',
               refundState: n.paidMinor > 0 ? 'review_required' : undefined,
+              // Why, for the customer's booking page; who cancelled stays in the audit.
+              cancelReason:
+                typeof input.reason === 'string' && input.reason.trim()
+                  ? input.reason.trim().slice(0, 500)
+                  : n.cancelReason,
+              cancelledAt: new Date(this.clock()).toISOString(),
               version: n.version + 1,
             },
           },
@@ -3550,7 +3785,42 @@ export class BookingEngine {
    * refused, so the payment side refunds it instead of a booking appearing
    * unannounced.
    */
+  /**
+   * A payment settles. A tour booked on a published departure is then
+   * confirmed straight away, for every business (owner, 28 Nov 2026): its date
+   * came from the operator's own availability, so the engine sends the
+   * operator's accept and confirm itself. If the operator's setup still needs
+   * something (a supplier confirmation), it stays pending for them.
+   */
   async settlePayment(identity: Identity, id: string, input: Doc, key?: string) {
+    const settled = (await this.settlePaymentOnly(identity, id, input, key)) as Doc;
+    if (settled?.model !== 'TOUR' || !settled.prepaidRequest || settled.status !== 'pending')
+      return settled;
+    const operator = {
+      ...identity,
+      userId: 'nexg-instant-confirm',
+      role: 'owner',
+      branches: null,
+    } as Identity;
+    let view = settled;
+    for (let i = 0; i < 3; i++) {
+      const step = nextReviewStep(view, this.clock());
+      if (!step || step.action !== 'workflow') break;
+      try {
+        view = (await this.changeBooking(
+          operator,
+          id,
+          step.action,
+          { ...step.input, expectedVersion: view.version },
+          `instant:${id}:${view.version}:${step.label}`,
+        )) as Doc;
+      } catch {
+        break;
+      }
+    }
+    return view;
+  }
+  private async settlePaymentOnly(identity: Identity, id: string, input: Doc, key?: string) {
     requirePlatform(identity);
     return this.command(identity, key, `booking.${id}.settle`, input, async (req) => {
       await this.expiredInTransaction(identity, req);
@@ -3645,6 +3915,82 @@ export class BookingEngine {
       });
       return this.bookingView(result);
     });
+  }
+  /**
+   * Review shops only (ids starting `ae7e`, see review-shops.ts): after a
+   * payment, play the business. Runs the commands the business would send
+   * (accept, confirm) until the booking waits for the customer, then marks it
+   * `reviewAutopilot` so the customer sees its pretend details. Any other
+   * business is refused, and a step the engine refuses stops the run there.
+   */
+  async reviewFinish(identity: Identity, id: string) {
+    requirePlatform(identity);
+    if (!isReviewBusiness(identity.businessId))
+      throw new BookingError(403, 'Only NexG review shops are run automatically.', 'forbidden');
+    const merchant: Identity = {
+      ...identity,
+      userId: 'review-autopilot',
+      role: 'owner',
+      branches: null,
+    } as Identity;
+    const steps: string[] = [];
+    let stopped: string | undefined;
+    for (let i = 0; i < 6; i++) {
+      const { doc } = await this.locateBooking(merchant, id, this.request(merchant));
+      const view = this.bookingView(doc);
+      const step = nextReviewStep(view, this.clock());
+      if (!step) break;
+      try {
+        await this.changeBooking(
+          merchant,
+          id,
+          step.action,
+          { ...step.input, expectedVersion: view.version },
+          `review:${id}:${view.version}:${step.label}`,
+        );
+        steps.push(step.label);
+      } catch (error) {
+        stopped = `${step.label}: ${(error as Error).message}`.slice(0, 300);
+        break;
+      }
+    }
+    return this.command(
+      merchant,
+      `review-mark:${id}:${randomBytes(8).toString('hex')}`,
+      `booking.${id}.review`,
+      {},
+      async (req) => {
+        const { collection, doc } = await this.locateBooking(merchant, id, req);
+        const n = doc.nexg ?? {};
+        if (['held'].includes(doc.status ?? n.status) || n.paymentState === 'awaiting_payment')
+          return this.bookingView(doc, 'customer');
+        const at = new Date(this.clock()).toISOString();
+        const result = await this.update(
+          collection,
+          doc.id,
+          {
+            nexg: {
+              ...n,
+              reviewAutopilot: {
+                reviewShop: true,
+                at: n.reviewAutopilot?.at ?? at,
+                steps: [...(n.reviewAutopilot?.steps ?? []), ...steps],
+                ...(stopped ? { stopped } : {}),
+              },
+              version: (n.version ?? 1) + 1,
+            },
+          },
+          merchant,
+          req,
+        );
+        await this.audit(merchant, req, 'booking.review_autopilot', id, {
+          version: result.nexg?.version,
+          steps,
+          ...(stopped ? { stopped } : {}),
+        });
+        return this.bookingView(result, 'customer');
+      },
+    );
   }
   /**
    * A reserved quote's payment: the deposit (half of the top of the range) while it waits for it, which sends the

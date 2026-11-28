@@ -24,7 +24,7 @@ export interface CommissionCard {
   own_riders: boolean;
   charged_now: {
     pct: number | null;
-    basis: 'negotiated' | 'own_riders' | 'nexg_delivery';
+    basis: 'negotiated' | 'category' | 'own_riders' | 'nexg_delivery';
     agreed: boolean;
     preset_pct: number | null;
   } | null;

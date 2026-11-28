@@ -24,6 +24,11 @@ export interface Identity {
   businessName?: string;
   subcategoryId?: string;
   answers?: Record<string, unknown>;
+  /**
+   * A NexG API test key (signed by the API like the rest). It reads the real
+   * offerings and resources; its changes to them are dry runs (server.ts).
+   */
+  sandbox?: boolean;
 }
 export interface Customer {
   /** For a customer booking: the name to reserve under. */
@@ -109,6 +114,8 @@ export interface BookingInput {
     pickupAddress: string;
     dropoffArea?: string;
     dropoffAddress?: string;
+    /** The customer's flight, for an airport pickup: KQ 101. */
+    flightNumber?: string;
   };
   customer: Customer;
   notes?: string;

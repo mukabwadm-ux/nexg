@@ -7,12 +7,34 @@ import { z } from 'zod';
 import {
   ApiBookingRider,
   ApiBookingRiderLocation,
+  ApiClosure,
+  ApiDeparture,
+  ApiOffering,
   ApiOrder,
   ApiReservation,
+  ApiReservationDriver,
   ApiReservationOffering,
   ApiReservationTrip,
+  ApiResource,
   ApiService,
   BookingReceipt,
+  ClosureRequest,
+  DepartureRequest,
+  OfferingCreate,
+  OfferingUpdate,
+  ReservationAccept,
+  ReservationCancel,
+  ReservationCheckIn,
+  ReservationComplete,
+  ReservationCreate,
+  ReservationDecline,
+  ReservationDriverRequest,
+  DriverLocationRequest,
+  ReservationReschedule,
+  ReservationStart,
+  ResourceCreate,
+  TestReservationMove,
+  TestReservationRequest,
   CatalogueItem,
   DeliveryCheck,
   DeliveryCheckRequest,
@@ -91,6 +113,11 @@ const SCHEMAS = {
   ApiReservation,
   ApiReservationOffering,
   ApiReservationTrip,
+  ApiReservationDriver,
+  ApiOffering,
+  ApiDeparture,
+  ApiResource,
+  ApiClosure,
   PublicBranch,
   ServiceBooking,
   BookingReceipt,
@@ -262,6 +289,88 @@ describe('the documented shapes match @nexg/contracts/api', () => {
     expect(() => one.parse(endpoint('get-reservation').responseExample)).not.toThrow();
   });
 
+  const envelope = (data: z.ZodTypeAny) =>
+    z
+      .object({
+        ok: z.literal(true),
+        data,
+        meta: z.object({ api_version: z.literal('v1') }).strict(),
+      })
+      .strict();
+
+  it('the reservation action examples follow their contracts', () => {
+    const one = envelope(z.object({ reservation: ApiReservation }).strict());
+    const cases = [
+      ['accept-reservation', ReservationAccept],
+      ['decline-reservation', ReservationDecline],
+      ['set-reservation-driver', ReservationDriverRequest],
+      ['share-driver-location', DriverLocationRequest],
+      ['create-test-reservation', TestReservationRequest],
+    ] as const;
+    for (const [slug, request] of cases) {
+      expect(() => request.parse(endpoint(slug).example.body), slug).not.toThrow();
+      expect(() => one.parse(endpoint(slug).responseExample), slug).not.toThrow();
+    }
+    expect(() =>
+      TestReservationMove.parse(endpoint('move-test-reservation').example.body),
+    ).not.toThrow();
+    expect(() =>
+      envelope(
+        z.object({ reservation: ApiReservation, previous_status: z.string() }).strict(),
+      ).parse(endpoint('move-test-reservation').responseExample),
+    ).not.toThrow();
+  });
+
+  it('the examples for running bookings follow their contracts', () => {
+    const one = envelope(z.object({ reservation: ApiReservation }).strict());
+    const cases = [
+      ['create-reservation', ReservationCreate],
+      ['check-in-reservation', ReservationCheckIn],
+      ['reschedule-reservation', ReservationReschedule],
+      ['start-reservation', ReservationStart],
+      ['complete-reservation', ReservationComplete],
+      ['cancel-reservation', ReservationCancel],
+    ] as const;
+    for (const [slug, request] of cases) {
+      expect(() => request.parse(endpoint(slug).example.body), slug).not.toThrow();
+      expect(() => one.parse(endpoint(slug).responseExample), slug).not.toThrow();
+    }
+    expect(() => OfferingCreate.parse(endpoint('create-offering').example.body)).not.toThrow();
+    expect(() =>
+      envelope(z.object({ offering: ApiOffering, applied: z.boolean() }).strict()).parse(
+        endpoint('create-offering').responseExample,
+      ),
+    ).not.toThrow();
+    expect(() => ResourceCreate.parse(endpoint('create-resource').example.body)).not.toThrow();
+    expect(() =>
+      envelope(z.object({ resource: ApiResource, applied: z.boolean() }).strict()).parse(
+        endpoint('create-resource').responseExample,
+      ),
+    ).not.toThrow();
+  });
+
+  it('the booking setup examples follow their contracts', () => {
+    expect(() =>
+      envelope(z.object({ items: z.array(ApiOffering) }).strict()).parse(
+        endpoint('list-offerings').responseExample,
+      ),
+    ).not.toThrow();
+    expect(() =>
+      envelope(z.object({ items: z.array(ApiResource) }).strict()).parse(
+        endpoint('list-resources').responseExample,
+      ),
+    ).not.toThrow();
+    const offering = envelope(z.object({ offering: ApiOffering, applied: z.boolean() }).strict());
+    const resource = envelope(z.object({ resource: ApiResource, applied: z.boolean() }).strict());
+    expect(() => OfferingUpdate.parse(endpoint('update-offering').example.body)).not.toThrow();
+    expect(() => offering.parse(endpoint('update-offering').responseExample)).not.toThrow();
+    expect(() => DepartureRequest.parse(endpoint('add-departure').example.body)).not.toThrow();
+    expect(() => offering.parse(endpoint('add-departure').responseExample)).not.toThrow();
+    expect(() => ClosureRequest.parse(endpoint('close-resource').example.body)).not.toThrow();
+    expect(() => resource.parse(endpoint('close-resource').responseExample)).not.toThrow();
+    expect(() => resource.parse(endpoint('reopen-resource').responseExample)).not.toThrow();
+  });
+
   it('the one-order example is a valid order', () => {
     const one = z
       .object({
@@ -417,7 +526,7 @@ describe('request samples', () => {
     }
   });
 
-  it.each(['GET', 'POST', 'PATCH'] as HttpMethod[])(
+  it.each(['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as HttpMethod[])(
     'writes %s calls with that method',
     (method) => {
       for (const e of ENDPOINTS.filter((item) => item.method === method && !item.samples)) {

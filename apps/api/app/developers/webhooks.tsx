@@ -13,9 +13,17 @@ import {
   createWebhookEndpoint,
   deleteWebhookEndpoint,
   readWebhookDeliveries,
+  sendWebhookSample,
   sendWebhookTest,
   setWebhookEndpointEnabled,
 } from './webhook-actions';
+
+/** The sample events a test endpoint can be sent (rpc_api_webhook_sample). */
+const SAMPLES = [
+  { type: 'reservation.created', label: 'Reservation created' },
+  { type: 'reservation.status_changed', label: 'Reservation confirmed' },
+  { type: 'reservation.updated', label: 'Driver set' },
+] as const;
 
 const when = (iso: string | null) =>
   iso
@@ -62,6 +70,7 @@ export function Webhooks({
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState<{ id: string; deliveries: WebhookDelivery[] } | null>(null);
+  const [sample, setSample] = useState<string>(SAMPLES[0].type);
 
   if (!initial.ok) {
     return (
@@ -196,6 +205,33 @@ export function Webhooks({
                   >
                     Send test event
                   </Button>
+                  {e.environment === 'test' && (
+                    <span className="inline-flex items-center gap-2">
+                      <label htmlFor={`sample_${e.id}`} className="sr-only">
+                        Sample reservation event
+                      </label>
+                      <select
+                        id={`sample_${e.id}`}
+                        className="rounded border px-2 py-1.5 text-sm"
+                        value={sample}
+                        onChange={(event) => setSample(event.target.value)}
+                        disabled={pending || !e.enabled}
+                      >
+                        {SAMPLES.map((s) => (
+                          <option key={s.type} value={s.type}>
+                            {s.label}
+                          </option>
+                        ))}
+                      </select>
+                      <Button
+                        type="button"
+                        disabled={pending || !e.enabled}
+                        onClick={() => run(() => sendWebhookSample(e.id, sample))}
+                      >
+                        Send sample reservation
+                      </Button>
+                    </span>
+                  )}
                   <Button type="button" disabled={pending} onClick={() => showDeliveries(e.id)}>
                     {open?.id === e.id ? 'Hide deliveries' : 'Recent deliveries'}
                   </Button>

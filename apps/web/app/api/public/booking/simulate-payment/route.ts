@@ -1,6 +1,6 @@
 import { appBookingSession, savedCustomerToken } from '@/lib/booking/app-session';
 import { problem } from '@/lib/booking/bridge';
-import { simulateEngineBookingPayment } from '@/lib/booking/platform';
+import { finishReviewBooking, simulateEngineBookingPayment } from '@/lib/booking/platform';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -46,7 +46,12 @@ export async function POST(request: Request) {
           : 'The test payment could not be made.',
       result.code,
     );
-  const booking = result.value as { status?: unknown; paymentState?: unknown } | null;
+  // A review shop's booking moves on by itself (see finishReviewBooking).
+  const finished = await finishReviewBooking(merchantId, bookingId, true);
+  const booking = (finished.ok ? finished.value : result.value) as {
+    status?: unknown;
+    paymentState?: unknown;
+  } | null;
   return Response.json(
     { ok: true, simulated: true, status: booking?.status, paymentState: booking?.paymentState },
     { headers: { 'cache-control': 'no-store' } },

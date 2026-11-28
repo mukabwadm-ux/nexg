@@ -174,11 +174,27 @@ export default function ConnectingSystemsPage() {
           ],
           [
             'Reservations: tours, transfers, rentals, appointments',
-            'Customers book on nexgapp.com; your team enters them in the merchant console calendar',
+            <span key="i">
+              Customers book on nexgapp.com; your system accepts or declines with{' '}
+              <C>POST /v1/reservations/{'{id}'}/accept</C> and <C>/decline</C>, and tells the
+              customer their driver with <C>PUT /v1/reservations/{'{id}'}/driver</C>
+            </span>,
             <span key="o">
               <C>GET /v1/reservations</C>, and reservation events pushed to you
             </span>,
-            'Availability, prices and confirmations from your system',
+            'Moving a booking to another time from your system',
+          ],
+          [
+            'Booking setup: prices, departures, busy times',
+            <span key="i">
+              <C>PATCH /v1/offerings/{'{id}'}</C> for prices,{' '}
+              <C>POST /v1/offerings/{'{id}'}/departures</C> for a tour&apos;s departures,{' '}
+              <C>POST /v1/resources/{'{id}'}/closures</C> when a vehicle is busy elsewhere
+            </span>,
+            <span key="o">
+              <C>GET /v1/offerings</C> and <C>GET /v1/resources</C>
+            </span>,
+            'New offerings and resources by API',
           ],
           [
             'Payments',

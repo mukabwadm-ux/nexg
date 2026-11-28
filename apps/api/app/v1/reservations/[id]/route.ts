@@ -12,7 +12,7 @@ import { jsonError, withErrorEnvelope } from '@/lib/http';
 import { authenticate, enforceRateLimit, requireScope, API_SCOPES, ApiAuthError } from '@/lib/auth';
 import { privateHeaders } from '@/lib/cache';
 import { BookingEngineUnavailable, engineDetail, engineGet } from '@/lib/booking-engine';
-import { ApiReservation } from '@nexg/contracts/api';
+import { SANDBOX, checkReservation, sandbox, sandboxRefusal } from '@/lib/reservation-routes';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -49,8 +49,28 @@ export const GET = withErrorEnvelope(
       });
     }
 
-    // The sandbox has no reservations yet.
-    if (credential.environment === 'test') return jsonError('not_found', 'Reservation not found');
+    // A test key reads one of its test reservations.
+    if (credential.environment === 'test') {
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.id)) {
+        return jsonError('not_found', 'Reservation not found');
+      }
+      const { data, error } = await sandbox().rpc(SANDBOX.read, {
+        p_api_key: credential.rawKey,
+        p_id: params.id,
+      });
+      if (error) return sandboxRefusal(error);
+      const row = (Array.isArray(data) ? data[0] : data) as { items?: unknown[] } | null;
+      const tested = checkReservation(row?.items?.[0]);
+      if (!tested.success) {
+        return jsonError('internal_error', 'The test reservation could not be read.', {
+          detail: tested.error.issues,
+        });
+      }
+      return NextResponse.json(
+        { ok: true, data: { reservation: tested.data }, meta: { api_version: 'v1' as const } },
+        { headers: privateHeaders(rate, credential) },
+      );
+    }
 
     let answer;
     try {
@@ -82,7 +102,7 @@ export const GET = withErrorEnvelope(
       );
     }
 
-    const reservation = ApiReservation.safeParse(answer.body);
+    const reservation = checkReservation(answer.body);
     if (!reservation.success) {
       return jsonError('internal_error', 'The reservation could not be read.', {
         detail: reservation.error.issues,

@@ -29,6 +29,7 @@ import {
   specialistBookingFromForm,
 } from './specialist-fields';
 import { SpecialistDetails } from './specialist-details';
+import { DriverLive } from './driver-live';
 import type { SpecialistBookingInput } from './types';
 
 interface Catalogue {
@@ -130,6 +131,36 @@ export function CustomerBooking({ businessId }: { businessId: string }) {
     setEnd('');
     setOccurrenceId('');
   }, [offeringId, date, resourceId]);
+  // While a driver is assigned to a confirmed booking, read it again every 20
+  // seconds, so the customer follows where the driver is.
+  const followBooking =
+    record?.booking.status === 'confirmed' && record.booking.driver ? record.booking.id : null;
+  const followToken = record?.customerToken ?? null;
+  useEffect(() => {
+    if (!followBooking || !followToken) return;
+    let live = true;
+    const timer = window.setInterval(() => {
+      void bookingRequest<BookingRecord>(
+        `/bookings/${encodeURIComponent(followBooking)}`,
+        { headers: { 'x-booking-customer-token': followToken } },
+        base,
+      ).then(
+        (booking) => {
+          if (live)
+            setRecord((current) =>
+              current && current.booking.id === booking.id ? { ...current, booking } : current,
+            );
+        },
+        () => {
+          /* The next read tries again; the page keeps what it showed. */
+        },
+      );
+    }, 20_000);
+    return () => {
+      live = false;
+      window.clearInterval(timer);
+    };
+  }, [followBooking, followToken, base]);
   useEffect(() => {
     let current = true;
     setSlots([]);
@@ -430,6 +461,32 @@ export function CustomerBooking({ businessId }: { businessId: string }) {
                 {record.booking.pricingBasis === 'indicative' ? 'Indicative amount' : 'Amount'}
               </dt>
               <dd>{money(record.booking.priceMinor)}</dd>
+              {record.booking.trip?.flightNumber ? (
+                <>
+                  <dt className="text-muted">Your flight</dt>
+                  <dd className="font-mono">{record.booking.trip.flightNumber}</dd>
+                </>
+              ) : null}
+              {record.booking.cancelReason && record.booking.status === 'cancelled' ? (
+                <>
+                  <dt className="text-muted">Why it was cancelled</dt>
+                  <dd>{record.booking.cancelReason}</dd>
+                </>
+              ) : null}
+              {record.booking.driver ? (
+                <>
+                  <dt className="text-muted">Your driver</dt>
+                  <dd>
+                    {record.booking.driver.firstName} · {record.booking.driver.vehicle}
+                    {record.booking.driver.plate ? ` · ${record.booking.driver.plate}` : ''}
+                  </dd>
+                </>
+              ) : null}
+              {record.booking.driver?.location ? (
+                <dd className="col-span-full">
+                  <DriverLive position={record.booking.driver.location} />
+                </dd>
+              ) : null}
               <dt className="text-muted">Reference</dt>
               <dd className="break-all font-mono text-xs">{record.booking.id}</dd>
             </dl>

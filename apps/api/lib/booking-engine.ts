@@ -46,6 +46,7 @@ export function platformHeaders(
   keyId: string,
   secret: string,
   now = Date.now(),
+  sandbox = false,
 ): Record<string, string> {
   const context = Buffer.from(
     JSON.stringify({
@@ -53,6 +54,9 @@ export function platformHeaders(
       userId: `api_key_${keyId}`,
       role: 'platform',
       expiresAt: now + 60_000,
+      // A test key: the engine lets it read offerings and resources and try
+      // changes to them as dry runs, and nothing else (engine server.ts).
+      ...(sandbox ? { sandbox: true } : {}),
     }),
   ).toString('base64url');
   return {
@@ -144,6 +148,15 @@ export const EngineEvent = z
     occurred_at: z.string().datetime({ offset: true }),
     /** For a booking event: the reservation as it is now. */
     reservation: ApiReservationSummary.nullable(),
+    /** booking.driver_assigned: the driver as set, so NexG can tell the customer. */
+    driver: z
+      .object({
+        first_name: z.string().min(1).max(60),
+        vehicle: z.string().min(1).max(80),
+        plate: z.string().max(20).nullable(),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 

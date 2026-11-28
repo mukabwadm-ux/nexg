@@ -115,6 +115,15 @@ export function BookingDetails({
             <dd className="break-all">{booking.customer.email}</dd>
           </>
         ) : null}
+        {booking.driver ? (
+          <>
+            <dt className="text-muted">Driver</dt>
+            <dd>
+              {booking.driver.firstName} · {booking.driver.vehicle}
+              {booking.driver.plate ? ` · ${booking.driver.plate}` : ''}
+            </dd>
+          </>
+        ) : null}
       </dl>
       {booking.custodyState ? (
         <p
@@ -175,6 +184,11 @@ export function BookingDetails({
         <section className="border-border space-y-2 rounded-lg border p-3 text-sm">
           <h3 className="font-bold">Pickup / meeting point · {booking.trip.pickupArea}</h3>
           <p className="text-muted whitespace-pre-wrap">{booking.trip.pickupAddress}</p>
+          {booking.trip.flightNumber ? (
+            <p>
+              Flight <span className="font-mono font-bold">{booking.trip.flightNumber}</span>
+            </p>
+          ) : null}
           {booking.trip.dropoffArea ? (
             <>
               <h3 className="pt-2 font-bold">Drop-off · {booking.trip.dropoffArea}</h3>

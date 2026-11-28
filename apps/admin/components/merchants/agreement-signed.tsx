@@ -14,6 +14,7 @@ const day = (iso: string) =>
 
 const BASIS: Record<string, string> = {
   negotiated: 'negotiated rate',
+  category: 'category rate',
   own_riders: 'standard rate, own riders',
   nexg_delivery: 'NexG rider delivers',
 };

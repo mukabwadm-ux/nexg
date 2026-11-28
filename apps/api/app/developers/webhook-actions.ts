@@ -89,6 +89,32 @@ export async function sendWebhookTest(endpointId: string): Promise<WebhookResult
   return refreshed('A test event is on its way. It usually arrives within a minute.');
 }
 
+/** The reservation events a test endpoint can be sent a sample of. */
+const SampleType = z.enum([
+  'reservation.created',
+  'reservation.status_changed',
+  'reservation.updated',
+]);
+
+/**
+ * A sample reservation event for a TEST endpoint: rpc_api_webhook_sample
+ * (20270344000200) makes a test reservation and sends the event about it to
+ * that endpoint only. A live endpoint is refused there: it gets pings only.
+ */
+export async function sendWebhookSample(endpointId: string, type: string): Promise<WebhookResult> {
+  if (!Id.safeParse(endpointId).success) return { ok: false, message: 'No such endpoint.' };
+  const sample = SampleType.safeParse(type);
+  if (!sample.success) return { ok: false, message: 'Choose which reservation event to send.' };
+  const { error } = await rpcCaller(createClient()).rpc('rpc_api_webhook_sample', {
+    p_id: endpointId,
+    p_type: sample.data,
+  });
+  if (error) return { ok: false, message: error.message };
+  return refreshed(
+    'A sample reservation event is on its way, about a new test reservation your test key can read.',
+  );
+}
+
 export async function setWebhookEndpointEnabled(
   endpointId: string,
   enabled: boolean,

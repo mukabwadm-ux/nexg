@@ -11,6 +11,7 @@ vi.mock('next/headers', () => ({ cookies: () => ({ getAll: () => [], set: () => 
 import {
   createWebhookEndpoint,
   readWebhookDeliveries,
+  sendWebhookSample,
   sendWebhookTest,
   setWebhookEndpointEnabled,
 } from '../app/developers/webhook-actions';
@@ -114,6 +115,17 @@ describe('webhook endpoints in the developer console', () => {
     const sent = await sendWebhookTest(ENDPOINT);
     expect(sent).toMatchObject({ ok: true, endpoints: [{ id: ENDPOINT }] });
     expect(rpc).toHaveBeenCalledWith('rpc_api_webhook_ping', { p_id: ENDPOINT });
+
+    expect(await sendWebhookSample(ENDPOINT, 'booking.created')).toEqual({
+      ok: false,
+      message: 'Choose which reservation event to send.',
+    });
+    const sample = await sendWebhookSample(ENDPOINT, 'reservation.updated');
+    expect(sample).toMatchObject({ ok: true, endpoints: [{ id: ENDPOINT }] });
+    expect(rpc).toHaveBeenCalledWith('rpc_api_webhook_sample', {
+      p_id: ENDPOINT,
+      p_type: 'reservation.updated',
+    });
 
     const off = await setWebhookEndpointEnabled(ENDPOINT, false);
     expect(off).toMatchObject({ ok: true, message: 'Switched off. Waiting events were dropped.' });

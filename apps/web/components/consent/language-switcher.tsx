@@ -1,8 +1,9 @@
 'use client';
 
-import { ChevronDown, Globe, Loader2 } from 'lucide-react';
+import { ChevronDown, Loader2 } from 'lucide-react';
 import * as React from 'react';
 
+import { CurrencyFlag, LanguageFlag } from '@/components/preferences/flags';
 import {
   baseLocale,
   CurrencyOptions,
@@ -56,9 +57,9 @@ export function LanguageSwitcher({
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="relative inline-flex items-center">
-        <Globe
-          className="text-gold pointer-events-none absolute start-3 h-4 w-4"
-          aria-hidden="true"
+        <LanguageFlag
+          locale={value}
+          className="pointer-events-none absolute start-3 !h-3 !w-[1.125rem]"
         />
         <select
           aria-label={languageLabel}
@@ -87,11 +88,15 @@ export function LanguageSwitcher({
       </span>
 
       <span className="relative inline-flex items-center">
+        <CurrencyFlag
+          code={currency}
+          className="pointer-events-none absolute start-3 !h-3 !w-[1.125rem]"
+        />
         <select
           aria-label={currencyLabel}
           value={currency}
           onChange={(event) => setDisplayCurrency(event.target.value)}
-          className={`${select} pe-9 ps-4`}
+          className={`${select} pe-9 ps-9`}
         >
           <CurrencyOptions />
         </select>

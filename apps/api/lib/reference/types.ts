@@ -9,7 +9,7 @@
  * API they describe.
  */
 
-export type HttpMethod = 'GET' | 'POST' | 'PATCH';
+export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
 /**
  * - `live`: the route is served on api.nexgapp.com (or nexgapp.com).
@@ -38,6 +38,7 @@ export type EndpointGroup =
   | 'Services'
   | 'Orders'
   | 'Reservations'
+  | 'Booking setup'
   | 'Callbacks to NexG';
 
 export type AuthDoc =
@@ -84,6 +85,11 @@ export interface ResourceDoc {
     | 'ApiReservation'
     | 'ApiReservationOffering'
     | 'ApiReservationTrip'
+    | 'ApiReservationDriver'
+    | 'ApiOffering'
+    | 'ApiDeparture'
+    | 'ApiResource'
+    | 'ApiClosure'
     | 'PublicBranch'
     | 'ServiceBooking'
     | 'BookingReceipt'
