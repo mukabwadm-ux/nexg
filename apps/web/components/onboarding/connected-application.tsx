@@ -174,7 +174,9 @@ export function ConnectedApplication({
         })
         .catch(() => {});
     };
-    if (!home && !anonymousSession) {
+    // Anonymous applicants too: once the draft exists their sign-in is a
+    // merchant one, and the 7-minute idle limit applies to it.
+    if (!home) {
       window.addEventListener('pointerdown', activity, { passive: true });
       window.addEventListener('keydown', activity);
     }

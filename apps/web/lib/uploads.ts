@@ -40,6 +40,17 @@ export async function ensureApplicantSession(): Promise<string | null> {
 
 export type OwnerType = 'rider' | 'merchant';
 
+/** What the partner-documents bucket accepts (20260101001400). */
+const DOCUMENT_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+  'image/heif',
+  'application/pdf',
+];
+const DOCUMENT_MAX_BYTES = 10 * 1024 * 1024;
+
 /** Where an upload has got to, for a progress bar: checking, sending (0-1), recording. */
 export type UploadProgress =
   | { stage: 'checking' }
@@ -80,6 +91,19 @@ export async function uploadDocument({
   /** Called as the upload moves along, so the screen can show it. */
   onProgress?: (progress: UploadProgress) => void;
 }): Promise<UploadOutcome> {
+  /*
+   * The bucket takes 10 MB of JPG, PNG, WebP or PDF (20260101001400). Say so
+   * before sending: on a phone the storage refusal only came after the
+   * whole file had gone up, and in the storage service's own words.
+   */
+  if (!DOCUMENT_TYPES.includes(file.type))
+    return { ok: false, message: 'Upload a photo or PDF: JPG, PNG, WebP or PDF.' };
+  if (file.size > DOCUMENT_MAX_BYTES)
+    return {
+      ok: false,
+      message: `This file is ${(file.size / 1_048_576).toFixed(1)} MB. Upload one of 10 MB or less, for example a photo instead of a scan.`,
+    };
+  if (file.size === 0) return { ok: false, message: 'This file is empty. Choose another.' };
   const supabase = createClient();
   onProgress?.({ stage: 'checking' });
 

@@ -506,13 +506,37 @@ async function ReviewPane({
             : 'The merchant changed the application after submitting it. Waiting for them to submit again.';
     }
   }
-  const ready = standing.allVerified && detail.branches > 0;
   const left = standing.required - standing.verified;
-  const blocker = !standing.allVerified
-    ? `Verify every required document first (${left} of ${standing.required} still to verify).`
-    : detail.branches === 0
-      ? 'Add a primary branch before going live.'
-      : null;
+  /*
+   * Going live needs everything rpc_merchant_go_live checks
+   * (fn_merchant_go_live_missing): onboarding details, agreement and DPA,
+   * hours and a map pin as well as the documents. Use the same list as the
+   * merchant page, so the button is not offered when the database will refuse.
+   * Older merchants without the list keep the documents-and-branch rule.
+   */
+  let open: { label: string; who: string; count?: number }[] | null = null;
+  if (mode === 'activate') {
+    const { data: todo } = await supabase.rpc('rpc_merchant_setup_todo', {
+      p_merchant_id: merchantId,
+    });
+    open =
+      (todo as { items?: { label: string; who: string; count?: number }[] } | null)?.items ?? null;
+  }
+  const ready = open ? open.length === 0 : standing.allVerified && detail.branches > 0;
+  const blocker = open
+    ? open.length
+      ? `Still open: ${open
+          .map(
+            (item) =>
+              `${item.label}${item.count ? ` (${item.count})` : ''}${item.who === 'merchant' ? ' (merchant)' : ''}`,
+          )
+          .join('; ')}.`
+      : null
+    : !standing.allVerified
+      ? `Verify every required document first (${left} of ${standing.required} still to verify).`
+      : detail.branches === 0
+        ? 'Add a primary branch before going live.'
+        : null;
   let actorId: string | null = null;
   if (mode === 'review') {
     const { data } = await supabase.auth.getUser();

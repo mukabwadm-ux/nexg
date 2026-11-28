@@ -195,7 +195,9 @@ export function applicationHandler(ports: ApplicationPorts) {
             'Check the supplied fields, selection and draft limits.',
           );
         const input = command.data;
-        if (anonymous && (input.command === 'payout' || input.command === 'activity'))
+        // Activity is allowed: it keeps an anonymous applicant's draft session
+        // current while they type (20270346000100).
+        if (anonymous && input.command === 'payout')
           return problem(
             403,
             'access_denied',

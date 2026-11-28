@@ -162,7 +162,8 @@ export function AgreementDetailsFields({
         onChange={set('registration_number')}
         disabled={disabled}
         placeholder="PVT-AB12CD3"
-        hint="As on your certificate of registration or incorporation (CR12 or equivalent)."
+        required={false}
+        hint="As on your certificate of registration or incorporation (CR12 or equivalent). You can save without it while registration is under way, but it is needed before you go live."
       />
       <Text
         id={id('kra-pin')}

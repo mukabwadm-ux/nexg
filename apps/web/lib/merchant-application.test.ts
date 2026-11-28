@@ -144,7 +144,7 @@ describe('merchant application transport', () => {
       expect.any(AbortSignal),
     );
   });
-  it('lets an anonymous form session submit while keeping payout and session activity account-only', async () => {
+  it('lets an anonymous form session start and report activity while keeping payout account-only', async () => {
     const p = ports({ authenticate: async () => ({ authenticated: true, anonymous: true }) });
     const submit = await applicationHandler(p)(
       request({ command: 'start', operationId, capture: capture() }),
@@ -156,12 +156,18 @@ describe('merchant application transport', () => {
       ),
     );
     expect(payout.status).toBe(403);
+    // Typing in the form keeps the anonymous applicant's draft session current.
     const activity = await applicationHandler(p)(request({ command: 'activity', merchantId }));
-    expect(activity.status).toBe(403);
-    expect(p.rpc).toHaveBeenCalledTimes(1);
+    expect(activity.status).toBe(200);
+    expect(p.rpc).toHaveBeenCalledTimes(2);
     expect(p.rpc).toHaveBeenCalledWith(
       'rpc_merchant_application_start',
       { p_operation_id: operationId, p_payload: capture(), p_merchant_id: null },
+      expect.any(AbortSignal),
+    );
+    expect(p.rpc).toHaveBeenCalledWith(
+      'rpc_merchant_session_activity',
+      { p_merchant_id: merchantId },
       expect.any(AbortSignal),
     );
   });

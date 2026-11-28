@@ -123,9 +123,13 @@ test('a separate business phone is required only when not reusing the mobile con
   form.business.sameBusinessPhone = false;
   assert.equal(
     validateCapture(form, category, 0)['business.businessPhone'],
-    'Enter the business contact number.',
+    'Enter a Kenyan mobile number for the business, for example 0712 345678. Landlines are not accepted.',
   );
+  // The saved application only takes mobile numbers (contracts), so a landline
+  // is refused here rather than failing later on save.
   form.business.businessPhone = '+254 20 123 4567';
+  assert.ok(validateCapture(form, category, 0)['business.businessPhone']);
+  form.business.businessPhone = '0712 345 678';
   assert.deepEqual(validateCapture(form, category, 0), {});
 });
 test('marketing preference is optional while entry acknowledgements remain explicit', () => {

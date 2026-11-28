@@ -15,7 +15,7 @@ const HREF: Record<string, string> = {
   agreement: '/merchant/documents#agreement',
   dpa: '/merchant/documents#dpa',
   documents: '/merchant/documents#documents-list',
-  branch: '/merchant/business',
+  branch: '/merchant/business?tab=locations',
   branch_pin: '/merchant/stores',
   hours: '/merchant/hours',
 };

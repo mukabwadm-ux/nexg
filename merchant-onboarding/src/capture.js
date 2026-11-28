@@ -53,8 +53,16 @@ export function validateCapture(form, category, stepIndex, { includeConsent = fa
       add('business.branchCount', 'Enter a whole number of at least one.');
     if (business.registered !== true && business.registered !== false)
       add('business.registered', 'Choose Yes or No. Either answer can continue.');
-    if (!business.sameBusinessPhone && !/^\+?[\d\s()-]{7,20}$/.test(business.businessPhone || ''))
-      add('business.businessPhone', 'Enter the business contact number.');
+    // Same rule as the saved application (contracts: +2547… or +2541…), so a
+    // landline is caught here instead of failing on save with no field marked.
+    if (
+      !business.sameBusinessPhone &&
+      !phonePattern.test(String(business.businessPhone || '').replace(/[\s()-]/g, ''))
+    )
+      add(
+        'business.businessPhone',
+        'Enter a Kenyan mobile number for the business, for example 0712 345678. Landlines are not accepted.',
+      );
   }
   if (stepIndex === 1) {
     if (!category) add('categoryId', 'Choose a business category.');

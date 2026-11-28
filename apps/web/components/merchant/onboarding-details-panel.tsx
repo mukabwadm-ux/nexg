@@ -32,7 +32,12 @@ export function OnboardingDetailsPanel({
 
   async function save() {
     if (!details) return;
-    const problems = onboardingProblems(details.fields, answers);
+    // Save what is filled in: a merchant hunting for a licence number should
+    // not lose the rest. Gaps stay under "Still needed" (and on the go-live
+    // list); only a value in the wrong shape stops the save.
+    const problems = onboardingProblems(details.fields, answers).filter(
+      (problem) => !problem.message.endsWith(': is missing'),
+    );
     if (problems.length) {
       setError(problems[0]!.message);
       return;
